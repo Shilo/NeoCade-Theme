@@ -40,7 +40,11 @@ Read these files when the topic is relevant. Do not duplicate or summarize their
 
 ## GSD Workflow
 
-Per phase, commands MUST run in order: `/gsd-discuss-phase N` → **`/gsd-plan-review-convergence N --opencode`** → `/gsd-execute-phase N` → `/gsd-verify-work` → `/clear`. No `/clear` within a phase. Auto-advance suggests the next command; user types it.
+Per phase, commands MUST run in order: `/gsd-discuss-phase N` → **`/gsd-plan-review-convergence N --opencode`** → `/gsd-execute-phase N` → `/gsd-verify-work`. Auto-advance suggests the next command; user types it.
+
+**`/clear` is safe between any two GSD commands** — including within a single phase (discuss → plan, plan → execute, etc.). Each GSD command commits its artifact (`DISCUSS.md`, `PLAN.md`, code, `VERIFICATION.md`) and the next command reads from disk, not from conversation context. The only thing `/clear` loses is uncommitted side comments made AFTER the last GSD command's commit. If auto-advance suggests `/clear`, take it — it's fired immediately after a commit, so nothing's at risk.
+
+**Never invoke plain `/gsd-plan-phase` or plain `/gsd-review` directly** — both are wrapped inside `/gsd-plan-review-convergence`. Running them separately duplicates work and risks state desync.
 
 **Why `/gsd-plan-review-convergence --opencode` instead of `/gsd-plan-phase`:** Cross-AI peer review is mandatory on every phase. The user has configured (verified 2026-05-04):
 - `workflow.plan_review_convergence=true` (config.json)
