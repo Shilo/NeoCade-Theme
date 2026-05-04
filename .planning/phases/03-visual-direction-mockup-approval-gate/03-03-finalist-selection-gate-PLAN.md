@@ -18,6 +18,7 @@ must_haves:
     - "User sees the five direction boards and concept image outputs before any finalist mockups are built"
     - "User selects two or three finalists in writing, or explicitly requests a targeted revision to direction boards"
     - "Finalist selection records whether Boardwalk Sunset remains the recommended baseline or whether another direction becomes preferred"
+    - "Typography confirmation is logged: Inter Variable upright/Roman only, multiple `wght` values, no italic file, synthetic italic labelled, system fallback labelled, consumer mono override labelled"
     - "Typography remains Inter-only unless user explicitly reopens the font decision"
     - "Selection artifact names exactly which directions proceed to full-fidelity desktop/mobile mockups and what targeted changes each finalist should carry"
     - "No `DESIGN_TOKENS.md` is written yet; token values are finalized only after full-fidelity approval"
@@ -61,11 +62,19 @@ Pause for the first required visual gate: the user reviews the five concept/dire
     - Any risks or revisions to consider.
 
     Ask the user to choose exactly two or three finalists, or to request specific direction-board revisions.
+
+    Also ask the user to confirm the typography baseline as part of the same checkpoint:
+    - Inter Variable upright/Roman only.
+    - Multiple upright `wght` values are available; no true italic file ships in v1.
+    - Synthetic italic is labelled as synthetic v1 behavior.
+    - Non-Latin text uses functional system fallback unless consumers add script-specific fonts.
+    - Mono/code is a consumer override sample, not a bundled second font.
   </action>
   <how_to_verify>
     User responds in writing with:
     - selected finalists, or
     - targeted revision instructions.
+    - typography confirmation, or explicit typography override request.
   </how_to_verify>
   <done>
     User selection is available before writing `03-FINALIST-SELECTION.md`.
@@ -84,8 +93,9 @@ Pause for the first required visual gate: the user reviews the five concept/dire
     - Date and phase.
     - Exact user selection.
     - Direction names and slugs proceeding to finalist mockups.
+    - A machine-readable line `finalist_slugs: slug-one, slug-two[, slug-three]` for Plan 04 verification.
     - Required targeted adjustments per finalist.
-    - Explicit statement that Inter-only remains locked unless the user reopened it.
+    - Explicit statement that Inter Variable upright/Roman remains locked, or the user's written typography override request if reopened.
     - Explicit statement that `DESIGN_TOKENS.md` is still pending final approval.
     - Link to concept/direction-board artifacts.
 
@@ -96,6 +106,8 @@ Pause for the first required visual gate: the user reviews the five concept/dire
     Test-Path .planning\mockups\03-FINALIST-SELECTION.md
     Select-String -Path .planning\mockups\03-FINALIST-SELECTION.md -Pattern 'Finalists'
     Select-String -Path .planning\mockups\03-FINALIST-SELECTION.md -Pattern 'DESIGN_TOKENS.md.*pending'
+    Select-String -Path .planning\mockups\03-FINALIST-SELECTION.md -Pattern 'Inter Variable'
+    Select-String -Path .planning\mockups\03-FINALIST-SELECTION.md -Pattern '^finalist_slugs:'
     ```
   </verify>
   <done>

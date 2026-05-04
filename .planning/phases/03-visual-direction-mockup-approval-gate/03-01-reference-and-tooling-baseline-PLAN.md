@@ -31,6 +31,8 @@ must_haves:
     - "D-27: Phase 3 performs only a screenshot smoke test proving a Godot screenshot path; input injection is deferred to Phase 10 QA"
     - "D-28: Coding-Solo `godot-mcp` remains useful for launch/run/debug-output workflows, but the currently visible tool surface is recorded as lacking screenshot capture"
     - "GoPeak/Coding-Solo tooling comparison is hands-on and honest: current `mcp__godot__` tool surface is recorded, GoPeak screenshot smoke test is attempted or the environment blocker is documented, and a fallback screenshot path is specified"
+    - "Image generation availability is recorded before Plan 02: preferred path is Codex app `image_gen` through the `imagegen` skill; if unavailable, Plan 02 pauses for a user-visible blocker rather than substituting non-image mockups"
+    - "Committed mood-board reference images are license-safe: all-rights-reserved venue photos stay URL-only; local reference image files require explicit CC/PD license and attribution"
     - "Phase 3 screenshot baseline captures or explicitly attempts a Godot editor/project screenshot without requiring `.tres` styling changes"
     - "SOURCES.md Section 5 real/virtual arcade aesthetics gains a Phase 3 update cross-linking the mood-board"
     - "No files under `addons/neocade_theme/` and no `.tres` files are modified"
@@ -107,7 +109,9 @@ GoPeak candidate: `npx -y gopeak`.
     - `anti_cyberpunk_note`
     - `candidate_direction_influence`
 
-    Add a note that images with unclear licensing are reference-only and should not be embedded as distributable assets.
+    Specify that `references.json` is a JSON object with one top-level key: `{ "references": [...] }`.
+
+    Add a note that images with unclear licensing or all-rights-reserved promotional status are reference-only URL entries and must not be committed locally or embedded as distributable assets. Local reference images are allowed only when license is explicit CC/PD or equivalent and attribution is captured in the entry.
   </action>
   <verify>
     ```powershell
@@ -115,6 +119,7 @@ GoPeak candidate: `npx -y gopeak`.
     Test-Path .planning\research\mood-board\references.json
     Select-String -Path .planning\research\mood-board\INDEX.md -Pattern 'theme-safe'
     Select-String -Path .planning\research\mood-board\INDEX.md -Pattern 'anti-cyberpunk'
+    Select-String -Path .planning\research\mood-board\INDEX.md -Pattern 'URL-only'
     ```
   </verify>
   <done>
@@ -151,6 +156,7 @@ GoPeak candidate: `npx -y gopeak`.
     if ($json.references.Count -lt 20 -or $json.references.Count -gt 30) { throw "Mood-board count out of range" }
     foreach ($r in $json.references) {
       if (-not $r.tags -or -not $r.extract -or -not $r.anti_cyberpunk_note) { throw "Incomplete mood-board entry: $($r.id)" }
+      if ($r.image_url_or_local_path -and $r.image_url_or_local_path -notmatch '^https?://' -and $r.license_or_usage -notmatch 'CC|Creative Commons|Public Domain|PD|Own generated') { throw "Local reference image without clear reusable license: $($r.id)" }
     }
     ```
   </verify>
@@ -160,7 +166,7 @@ GoPeak candidate: `npx -y gopeak`.
 </task>
 
 <task type="auto">
-  <name>Task 3: Smoke-test Godot / GoPeak screenshot tooling</name>
+  <name>Task 3: Smoke-test Godot / GoPeak screenshot and image-generation tooling</name>
   <read_first>
     - project.godot
     - main.tscn
@@ -175,7 +181,8 @@ GoPeak candidate: `npx -y gopeak`.
     - Record currently exposed `mcp__godot__` tools and state whether screenshot capture is present.
     - Attempt to launch the editor or run the project through current MCP tooling.
     - Attempt GoPeak screenshot smoke test with `npx -y gopeak` if available in this environment, or document the exact blocker.
-    - If direct screenshot capture fails, specify a fallback screenshot harness using either a Godot script that saves `get_viewport().get_texture().get_image()` output or an external screenshot capture command.
+    - If direct screenshot capture fails, specify a fallback screenshot harness using either a Godot script that saves `get_viewport().get_texture().get_image()` output or an external screenshot capture command. The fallback must be programmatic, repeatable, and able to produce named output files so it can scale into Phase 10 screenshot QA rather than only manual PrintScreen capture.
+    - Record Codex image-generation availability for Plan 02. Preferred path is the Codex app `image_gen` tool invoked through the `imagegen` skill. If the current executor cannot access an image generator, mark Plan 02 as blocked until the user enables/provides an image-generation path; do not downgrade to HTML-only or text-only concept boards without explicit user approval.
 
     Phase 3 only needs screenshot capture evidence. Input injection is documented as deferred to Phase 10.
   </action>
@@ -184,6 +191,8 @@ GoPeak candidate: `npx -y gopeak`.
     Test-Path .planning\research\PHASE-3-TOOLING.md
     Select-String -Path .planning\research\PHASE-3-TOOLING.md -Pattern 'GoPeak'
     Select-String -Path .planning\research\PHASE-3-TOOLING.md -Pattern 'screenshot'
+    Select-String -Path .planning\research\PHASE-3-TOOLING.md -Pattern 'image_gen'
+    Select-String -Path .planning\research\PHASE-3-TOOLING.md -Pattern 'programmatic'
     Select-String -Path .planning\research\PHASE-3-TOOLING.md -Pattern 'Phase 10'
     ```
   </verify>
@@ -203,6 +212,7 @@ GoPeak candidate: `npx -y gopeak`.
   <action>
     Update `.planning/research/SOURCES.md` narrowly:
     - Section 5 real/virtual arcade aesthetics receives a Phase 3 update with mood-board link, what was read, adopted, rejected, still open, and confidence.
+    - Sections covering the user-supplied research report and prototype get cross-links only if Phase 3 critique adds new claim-by-claim findings.
     - The tooling/GoPeak mention is updated only where SOURCES.md already discusses MCP or tooling.
     - Do not mark visual direction confidence HIGH until user approval; mood-board raises source coverage, not final design certainty.
   </action>

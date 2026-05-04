@@ -34,6 +34,9 @@ must_haves:
     - "Mockups include image/visual material plus concise annotations; they are representative full-fidelity, not mere palette swatches"
     - "Inter-only typography is visible in every finalist; synthetic italic, system fallback sample, and consumer mono/code override sample are included"
     - "Contrast math is computed for candidate surface/text/accent pairs and any failing pair is corrected before approval"
+    - "Any contrast pair passing WCAG AA by 0.3 ratio or less is flagged for Phase 10 Web-export verification because font rasterization may reduce perceived contrast"
+    - "Finalist HTML pages visibly state that HTML rendering is an approval preview, while Godot 4.6 GL Compatibility may differ in font rasterization, anti-aliasing, and corner rendering"
+    - "Desktop/mobile mockup file counts are verified against the exact `finalist_slugs` recorded in Plan 03"
     - "Browser/render checks cover desktop and mobile widths and record any issue"
     - "No `DESIGN_TOKENS.md` is finalized yet unless Plan 05 approval passes"
     - "No files under `addons/neocade_theme/` and no `.tres` files are modified"
@@ -78,14 +81,16 @@ Build representative, full-fidelity desktop and mobile mockups for the selected 
   <action>
     Write a finalist mockup specification with:
     - List of selected finalists.
+    - `finalist_slugs` copied from `03-FINALIST-SELECTION.md`.
     - Representative Control set to show: buttons, check/radio/toggle, option/menu, line/text/code inputs, labels/rich text, sliders/progress/scrollbars, item list/tree/tabs/foldable, panel/dialog/popup/tooltip/window, ColorPicker sample, Graph sample, token gallery.
     - Required states: normal, hover, pressed, focus, disabled, selected, checked where applicable.
     - Desktop viewport target.
     - Mobile viewport targets: 360x800 and 768x1024.
     - Candidate token values per finalist, including surface/text/accent colors.
+    - One-line comparison to the user-supplied prototype for each finalist: what it improves in arcade warmth, what it preserves, and what it rejects.
   </action>
   <verify>
-    `03-finalist-comparison.md` lists every required Control family and both mobile viewport sizes.
+    `03-finalist-comparison.md` lists every required Control family, finalist slug, prototype comparison, and both mobile viewport sizes.
   </verify>
   <done>
     Mockup implementation has a clear scope before HTML is written.
@@ -107,12 +112,15 @@ Build representative, full-fidelity desktop and mobile mockups for the selected 
     - Danger/warning/success/info non-text contrast against panel and raised surfaces.
 
     Correct any failing candidate pair before building the HTML. Keep this as candidate-token math; final `DESIGN_TOKENS.md` waits for approval.
+
+    Flag any text-on-surface or accent-label pair that passes WCAG AA by 0.3 ratio or less as `verify-on-Web-export` for Phase 10, because Web export font rasterization can reduce perceived contrast even when hex math passes.
   </action>
   <verify>
     ```powershell
     Test-Path .planning\mockups\03-finalist-contrast.md
     Select-String -Path .planning\mockups\03-finalist-contrast.md -Pattern 'PASS'
     Select-String -Path .planning\mockups\03-finalist-contrast.md -Pattern 'focus'
+    Select-String -Path .planning\mockups\03-finalist-contrast.md -Pattern 'verify-on-Web-export'
     ```
   </verify>
   <done>
@@ -142,6 +150,7 @@ Build representative, full-fidelity desktop and mobile mockups for the selected 
     The comparison page should link to every finalist desktop/mobile mockup and embed thumbnails or screenshots if available.
 
     Design requirements:
+    - Add this visible disclaimer to every finalist page: "HTML rendering preview - Godot 4.6 GL Compatibility final output may differ slightly in font rasterization, anti-aliasing, and corner rendering; tonal/color/scale/sizing fidelity is the acceptance target."
     - Use Inter-only CSS font stack.
     - Use clear UI controls, not marketing hero layouts.
     - Include visual/image material from concept outputs and/or mood-board references where licensing allows; otherwise use generated/abstracted visual motifs.
@@ -152,11 +161,19 @@ Build representative, full-fidelity desktop and mobile mockups for the selected 
   </action>
   <verify>
     ```powershell
-    Get-ChildItem .planning\mockups\finalists -Filter '*-desktop.html' | Measure-Object
-    Get-ChildItem .planning\mockups\finalists -Filter '*-mobile.html' | Measure-Object
+    $selection = Get-Content -Raw .planning\mockups\03-FINALIST-SELECTION.md
+    $line = ($selection -split "`n" | Where-Object { $_ -match '^finalist_slugs:' } | Select-Object -First 1)
+    if (-not $line) { throw "Missing finalist_slugs" }
+    $slugs = ($line -replace '^finalist_slugs:\s*','').Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+    if ($slugs.Count -lt 2 -or $slugs.Count -gt 3) { throw "Expected two or three finalist slugs" }
+    foreach ($slug in $slugs) {
+      if (-not (Test-Path ".planning\mockups\finalists\$slug-desktop.html")) { throw "Missing desktop mockup for $slug" }
+      if (-not (Test-Path ".planning\mockups\finalists\$slug-mobile.html")) { throw "Missing mobile mockup for $slug" }
+    }
     Test-Path .planning\mockups\03-finalist-comparison.html
     Select-String -Path .planning\mockups\03-finalist-comparison.html -Pattern 'Inter'
     Select-String -Path .planning\mockups\03-finalist-comparison.html -Pattern '48px'
+    Select-String -Path .planning\mockups\03-finalist-comparison.html -Pattern 'HTML rendering preview'
     ```
   </verify>
   <done>
@@ -212,6 +229,7 @@ Build representative, full-fidelity desktop and mobile mockups for the selected 
     Write a summary with:
     - Finalist mockup file paths.
     - Contrast outcome.
+    - Any `verify-on-Web-export` low-margin contrast flags.
     - Render-check outcome.
     - Recommended finalist and why.
     - Known tradeoffs for each finalist.

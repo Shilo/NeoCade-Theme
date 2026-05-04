@@ -30,14 +30,18 @@ must_haves:
     - "D-13: Image-generator concept designs are created before implementation-style UI samples and explore concept, energy, imagery, shape language, lighting, material cues, layout direction, and emotional target"
     - "D-14: Directions vary layout, shapes, density, accent rhythm, surface treatment, control geometry, and color behavior; they are not recolors of one layout"
     - "D-17: Heading distinction comes from Inter `opsz`, weight, size, spacing/layout, and composition, not from a second display font"
-    - "D-18: Inter Variable Roman provides multiple upright weights in one file without true italic; do not re-open the font stack during execution unless the user asks"
+    - "D-18: Inter Variable upright/Roman provides multiple upright `wght` values in one file without true italic; do not re-open the font stack during execution unless the user asks"
     - "D-19: Every direction board shows a small synthetic italic/emphasis sample labelled as synthetic v1 behavior"
     - "D-20: Every direction board shows a functional Latin plus non-Latin system-fallback text panel, labelled as functional fallback with script-specific Noto fonts left to consumers"
+    - "Concept image generation uses the Codex app `image_gen` path recorded in `PHASE-3-TOOLING.md`; if unavailable, execution pauses and reports a blocker instead of substituting non-image artifacts"
+    - "Every concept image is UI-adjacent: it includes at least one abstract/sketched control surface such as a button bar, panel stack, dialog, tabs, or menu chrome, while remaining labelled as mood/atmosphere rather than final UI"
+    - "Every direction board includes basic contrast sanity checks before finalist selection and flags any direction that needs accessibility tuning"
+    - "The gallery opens with a compact comparison matrix so the user can compare the five directions before reading detailed boards"
     - "Exactly five named art directions are presented: Midnight Marquee, Boardwalk Sunset, Cabinet Chrome, plus two research-derived directions named from Plan 01 evidence"
     - "Each direction includes image-generator concept design output first, then a direction board; boards are not merely recolored copies"
     - "Every direction varies at least four of these axes: layout rhythm, shapes, density, accent rhythm, surface treatment, control geometry, imagery, signage, and color behavior"
     - "Boardwalk Sunset is clearly marked as the recommended baseline, with rationale, while other directions are serious alternatives with strengths and risks"
-    - "All five directions use Inter Variable Roman only; headings differ by opsz, weight, size, and composition"
+    - "All five directions use Inter Variable upright/Roman only; headings differ by `opsz`, `wght`, size, and composition"
     - "Each board includes synthetic italic, non-Latin system fallback sample, and consumer-supplied mono/code override sample"
     - "Each board includes mini token sketch: 5-stop surface ramp, 8 accent swatches, text colors, focus ring, spacing/radius/stroke suggestions, no-shadow policy"
     - "Each board includes a source trace back to mood-board IDs and phase research, including how risky/game-world references were constrained"
@@ -89,6 +93,7 @@ Explore NeoCade's visual identity as five full art directions, beginning with im
     - Direction 4 and 5 must be materially distinct from Midnight Marquee, Boardwalk Sunset, and Cabinet Chrome.
     - They must stay reusable as a Godot theme and pass NeoCade constraints: HD-only, professional, colorful, accessible, modern/neo arcade, not cyberpunk by default.
     - One may draw from sci-fi/spaceship/game-world inspiration only if it is explicitly constrained to extracted design moves.
+    - Any future/spaceship-derived direction must still read as a friendly modern arcade lobby or public entertainment venue, not a Tron set, synthwave poster, or cyberpunk menu.
     - Do not lock final token hex values yet; use token sketches and relative direction.
 
     Add a `## Direction Derivation` section to `03-direction-boards.md` with:
@@ -113,13 +118,16 @@ Explore NeoCade's visual identity as five full art directions, beginning with im
   </read_first>
   <files>.planning/mockups/concepts/</files>
   <action>
-    Use the image generation workflow/tool available in the runtime to create concept-design images for all five directions.
+    Use the Codex app `image_gen` workflow recorded in `.planning/research/PHASE-3-TOOLING.md` to create raster concept-design images for all five directions.
+
+    If `image_gen` or an equivalent raster image generator is not available in the execution environment, stop Plan 02 and report a blocker. Do not replace this with HTML-only, SVG-only, text-only, or mood-board-only concept boards unless the user explicitly approves a fallback.
 
     Each prompt must describe:
     - NeoCade as a polished Godot UI theme concept, not a game screenshot.
     - Arcade interior inspiration and emotional target.
     - Shape language and material cues.
     - Lighting and accent rhythm.
+    - At least one UI-adjacent motif: button bar, panel stack, dialog frame, tabs, slider surface, menu chrome, or control cluster.
     - Inter-only UI signage/text feel, without requiring legible generated typography.
     - Strict exclusions: cyberpunk, synthwave, vaporwave, scanlines, glitch, neon-noir, dystopian grime, pixel art UI, glow halos.
 
@@ -131,6 +139,8 @@ Explore NeoCade's visual identity as five full art directions, beginning with im
     - `{direction-5-slug}-concept.png`
 
     Also save prompt text beside each image as `{slug}-prompt.md`.
+
+    Add a short note beside each generated image: "Concept image: mood/atmosphere and shape-language reference, not a final UI preview."
   </action>
   <verify>
     ```powershell
@@ -159,6 +169,8 @@ Explore NeoCade's visual identity as five full art directions, beginning with im
   <action>
     Create an HTML gallery and markdown companion for the five direction boards.
 
+    The HTML gallery must open with a compact comparison matrix before the detailed boards. Rows should include palette warmth, density, shape language, surface material, accent rhythm, UI geometry, risk level, accessibility status, and recommended use case; columns are the five directions.
+
     Each board must include:
     - Concept image.
     - Direction promise: what it feels like and when it wins.
@@ -167,6 +179,7 @@ Explore NeoCade's visual identity as five full art directions, beginning with im
     - Shape language and control geometry.
     - Surface/material treatment.
     - 5-stop surface ramp sketch and 8 accent sketch.
+    - Basic contrast sanity results for body text against surface stops, primary/secondary accent labels against panel/raised surfaces, focus ring against base/panel, and danger/warning/success/info non-text accents against panel/raised surfaces. Failing or low-confidence pairs are marked `needs accessibility tuning` before finalist selection.
     - Button/input/panel/tabs/popup/list mini UI sample.
     - Focus/hover/pressed/disabled state sketches.
     - Inter-only type sample with opsz/weight notes.
@@ -180,12 +193,14 @@ Explore NeoCade's visual identity as five full art directions, beginning with im
   </action>
   <verify>
     ```powershell
+    Select-String -Path .planning\mockups\03-direction-boards.html -Pattern 'comparison matrix'
     Select-String -Path .planning\mockups\03-direction-boards.html -Pattern 'Midnight Marquee'
     Select-String -Path .planning\mockups\03-direction-boards.html -Pattern 'Boardwalk Sunset'
     Select-String -Path .planning\mockups\03-direction-boards.html -Pattern 'Cabinet Chrome'
     Select-String -Path .planning\mockups\03-direction-boards.html -Pattern 'synthetic italic'
     Select-String -Path .planning\mockups\03-direction-boards.html -Pattern 'system fallback'
     Select-String -Path .planning\mockups\03-direction-boards.html -Pattern '48px'
+    Select-String -Path .planning\mockups\03-direction-boards.html -Pattern 'contrast'
     ```
   </verify>
   <done>
@@ -200,7 +215,7 @@ Explore NeoCade's visual identity as five full art directions, beginning with im
   </read_first>
   <files>.planning/mockups/03-direction-boards-check.md</files>
   <action>
-    Open or render `03-direction-boards.html` using the available browser/Playwright path and document:
+    Probe the available browser/Playwright path, record the chosen tool or blocker, then open or render `03-direction-boards.html` and document:
     - Desktop viewport check at 1440px width.
     - Narrow/mobile viewport check at 390px width.
     - Text does not overlap.
