@@ -1008,4 +1008,676 @@ These three are enumerated below as `### MenuBar`, `### Panel`, `### Window` sec
 
 ## Engine-Default Cross-Reference and Pitfall Confirmations
 
-> This section is appended by **Plan 03 (default_theme.cpp omission cross-reference + Pitfall 1.1 / 1.7 confirmation/refutation)**. Heading reserved here for ordering only.
+> Appended by **Plan 03**. Distinguishes deliberate upstream omissions (slots `default_theme.cpp` declares but `minimal_theme.tres` leaves unset) from upstream-populated coverage, and confirms/refutes Pitfalls 1.1 (focus stylebox overlay) and 1.7 (popup separate-Window theming) directly from engine + theme evidence.
+
+### Engine-Default Cross-Reference
+
+> **Purpose:** For every user-facing Control enumerated in `## Per-Control Enumeration`, this subsection identifies slots that `scene/theme/default_theme.cpp` declares but upstream chose NOT to populate. These are deliberate upstream omissions (per CONTEXT.md D-12). NeoCade may either follow upstream's omission or populate the slot — but the choice is documented here, not silently propagated.
+
+**Engine-source anchor:**
+- Path: `/c/Programming_Files/Godot/godot-master/scene/theme/default_theme.cpp`
+- Anchor: NOT-A-GIT-REPO; using directory mtime: `2026-05-01 18:12:23 -0700` (ZIP-extracted snapshot, no git metadata)
+- Detected version: `major=4 minor=7 patch=0` (status="beta") from `version.py` — **newer than the Godot 4.6 release tag NeoCade targets per `.planning/PROJECT.md`**.
+- Caveat: This snapshot is Godot 4.7-beta (a development branch ahead of NeoCade's 4.6 minimum). Most theme-slot declarations in `default_theme.cpp` are stable across 4.6 → 4.7, but a small number of newer slots may exist in 4.7-beta that are NOT present in 4.6-stable. When this matters for a specific class, it is flagged inline below as `4.7-only?`. Phase 4 (token generator) SHOULD re-verify any `4.7-only?` entries against the official `godotengine/godot@4.6-stable` release tag before incorporating them into NeoCade's TokenSet structure. The reverse risk (slots upstream populates that no longer exist in 4.6/4.7) is captured in the per-class `upstream-orphaned slots` tables when found.
+
+**Methodology:** For each user-facing Control class, ran:
+```bash
+grep -nE 'theme->set_(stylebox|color|font|icon|constant|font_size)\([^,]+, ["\x27]<Class>["\x27]' \
+  /c/Programming_Files/Godot/godot-master/scene/theme/default_theme.cpp
+```
+Compared the returned slot set to Plan 02's `### <Class>` enumeration in `## Per-Control Enumeration` above. Slots in `default_theme.cpp` NOT in Plan 02's table = upstream omission (flagged below). Slots in upstream NOT in `default_theme.cpp` = upstream-orphaned (rare, flagged in a separate table when found). The "Implication for NeoCade" column distinguishes "follow upstream — engine fallback suffices" from "populate — affects accessibility / RTL / mobile / focus".
+
+> **Reading note on `_mirrored` variants:** `default_theme.cpp` does NOT call `theme->set_*` for `*_mirrored` stylebox slots on most classes (engine RTL stylebox lookup falls back to the base slot when no `_mirrored` is set). Upstream's `minimal_theme.tres` populates `_mirrored` variants explicitly for Button-family classes (Button, OptionButton, MenuButton, etc.) — these are listed below as **upstream-orphaned** slots, but they are NOT bugs: Godot's RTL renderer reads `_mirrored` slots when present and falls back to the base slot when absent. They appear "orphaned" only because the engine does not pre-declare them in defaults; setting them is correct upstream behavior, and NeoCade should follow.
+
+#### Button — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| font | font | (n/a) | 152 | Not set by upstream — engine fallback used (themed font ref ignored at this slot, defers to root theme `default_font` or engine's built-in font) | Populate — Phase 4 typography (Inter / Outfit per ARCHITECTURE.md) requires class-level font binding to guarantee consistent rendering across export targets. |
+| font_size | font_size | (n/a) | 153 | Not set by upstream — engine fallback `-1` (uses root theme `default_font_size`) | Populate — Phase 4 type scale needs explicit per-class size. |
+| color | font_outline_color | (n/a) | 162 | Not set by upstream — engine fallback `Color(0,0,0)` | Follow upstream — outline disabled (`outline_size=0` is set by upstream); NeoCade design uses focus rings, not text outlines. |
+| constant | h_separation | (n/a) | 171 | Not set by upstream — engine fallback `Math::round(4 * scale)` (EDSCALE-coupled) | Populate — NeoCade drops EDSCALE per D-05; design tokens supply icon-text gap. |
+| constant | icon_max_width | (n/a) | 172 | Not set by upstream — engine fallback `0` (no max) | Follow upstream — unlimited icon width; NeoCade typography sets icon size via design tokens. |
+| constant | align_to_largest_stylebox | (n/a) | 174 | Not set by upstream — engine fallback `0` (disabled) | Follow upstream — disabled. |
+
+#### Button — upstream-orphaned slots
+
+| Slot kind | Slot name | State | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|-------------------|-------------------------|
+| stylebox | normal_mirrored | normal (RTL) | Set by upstream; engine does not pre-declare on Button | Follow upstream — RTL renderer reads this when present; NeoCade should set for RTL parity. |
+| stylebox | hover_mirrored | hover (RTL) | Same as above | Follow upstream. |
+| stylebox | pressed_mirrored | pressed (RTL) | Same as above | Follow upstream. |
+| stylebox | hover_pressed_mirrored | hover_pressed (RTL) | Same as above | Follow upstream. |
+| stylebox | disabled_mirrored | disabled (RTL) | Same as above | Follow upstream. |
+
+#### CheckBox — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| stylebox | pressed | pressed | 282 | Not set by upstream — engine fallback `cbx_empty` (transparent) | Follow upstream — CheckBox state is communicated by icon, not stylebox. |
+| stylebox | disabled | disabled | 283 | Not set by upstream — engine fallback `cbx_empty` | Follow upstream. |
+| stylebox | hover | hover | 284 | Not set by upstream — engine fallback `cbx_empty` | Follow upstream — hover communicated via font color. |
+| stylebox | hover_pressed | hover_pressed | 285 | Not set by upstream — engine fallback `cbx_empty` | Follow upstream. |
+| stylebox | focus | focus | 286 | Not set by upstream — engine fallback `cbx_focus` (engine's built-in focus stylebox) | Populate — NeoCade focus ring (Phase 5) is design-token-driven; engine's `cbx_focus` is editor-bound EDSCALE styling. |
+| icon | checked | checked | 288 | Not set by upstream — engine fallback `icons["checked"]` (engine SVG) | Populate — Phase 4 ICON-* design supplies bespoke check icon. |
+| icon | checked_disabled | checked+disabled | 289 | Not set by upstream — engine fallback engine SVG | Populate — Phase 4 ICON-*. |
+| icon | unchecked | unchecked | 290 | Not set by upstream — engine fallback engine SVG | Populate — Phase 4 ICON-*. |
+| icon | unchecked_disabled | unchecked+disabled | 291 | Not set by upstream — engine fallback engine SVG | Populate — Phase 4 ICON-*. |
+| icon | radio_checked | (radio variant, checked) | 292 | Not set by upstream — engine fallback engine SVG | Populate — Phase 4 ICON-*; CheckBox is also used for radio selection in Godot. |
+| icon | radio_checked_disabled | (radio + disabled) | 293 | Not set by upstream — engine fallback engine SVG | Populate — Phase 4 ICON-*. |
+| icon | radio_unchecked | (radio, unchecked) | 294 | Not set by upstream — engine fallback engine SVG | Populate — Phase 4 ICON-*. |
+| icon | radio_unchecked_disabled | (radio + disabled) | 295 | Not set by upstream — engine fallback engine SVG | Populate — Phase 4 ICON-*. |
+| font | font | (n/a) | 297 | Not set by upstream — engine fallback root font | Populate — Phase 4 typography. |
+| font_size | font_size | (n/a) | 298 | Not set by upstream — engine fallback `-1` | Populate — Phase 4 type scale. |
+| color | font_color | normal | 300 | Not set by upstream — engine fallback `control_font_color` | Populate — NeoCade design tokens supply this. |
+| color | font_hover_color | hover | 302 | Not set by upstream — engine fallback `control_font_hover_color` | Populate — NeoCade hover token. |
+| color | font_focus_color | focus | 304 | Not set by upstream — engine fallback `control_font_focus_color` | Populate — NeoCade focus token. |
+| color | font_disabled_color | disabled | 305 | Not set by upstream — engine fallback `control_font_disabled_color` | Populate — NeoCade disabled token. |
+| color | font_outline_color | (n/a) | 306 | Not set by upstream — engine fallback `Color(0,0,0)` | Follow upstream — outlines disabled. |
+| constant | h_separation | (n/a) | 308 | Not set by upstream — EDSCALE-coupled | Populate — NeoCade design tokens (drop EDSCALE per D-05). |
+| constant | check_v_offset | (n/a) | 309 | Not set by upstream — engine fallback `0` | Follow upstream. |
+| constant | outline_size | (n/a) | 310 | Not set by upstream — engine fallback `0` | Follow upstream — outlines disabled. |
+| color | checkbox_checked_color | checked (icon tint) | 312 | Not set by upstream — engine fallback `Color(1,1,1)` | Populate — NeoCade accent color tints checkbox fill (4.7-only? — verify in 4.6). |
+| color | checkbox_unchecked_color | unchecked (icon tint) | 313 | Not set by upstream — engine fallback `Color(1,1,1)` | Populate — NeoCade outline color tints checkbox border (4.7-only? — verify in 4.6). |
+
+#### CheckButton — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| stylebox | normal | normal | 320 | Not set — engine fallback `cb_empty` (transparent) | Follow upstream — toggle state communicated by icon. |
+| stylebox | pressed | pressed | 321 | Not set — engine fallback `cb_empty` | Follow upstream. |
+| stylebox | disabled | disabled | 322 | Not set — engine fallback `cb_empty` | Follow upstream. |
+| stylebox | hover | hover | 323 | Not set — engine fallback `cb_empty` | Follow upstream. |
+| stylebox | hover_pressed | hover_pressed | 324 | Not set — engine fallback `cb_empty` | Follow upstream. |
+| stylebox | focus | focus | 325 | Not set — engine fallback engine `focus` stylebox | Populate — NeoCade focus ring is design-token-driven. |
+| icon | checked | checked | 327 | Not set — engine fallback `toggle_on` SVG | Populate — Phase 4 ICON-*. |
+| icon | checked_disabled | checked+disabled | 328 | Not set — engine fallback `toggle_on_disabled` SVG | Populate — Phase 4 ICON-*. |
+| icon | unchecked | unchecked | 329 | Not set — engine fallback `toggle_off` SVG | Populate — Phase 4 ICON-*. |
+| icon | unchecked_disabled | unchecked+disabled | 330 | Not set — engine fallback `toggle_off_disabled` SVG | Populate — Phase 4 ICON-*. |
+| icon | checked_mirrored | (RTL toggle on) | 332 | Not set — engine fallback mirrored SVG | Populate — Phase 4 ICON-* + RTL. |
+| icon | checked_disabled_mirrored | (RTL toggle on + disabled) | 333 | Not set — engine fallback mirrored SVG | Populate — Phase 4 ICON-*. |
+| icon | unchecked_mirrored | (RTL toggle off) | 334 | Not set — engine fallback mirrored SVG | Populate — Phase 4 ICON-*. |
+| icon | unchecked_disabled_mirrored | (RTL toggle off + disabled) | 335 | Not set — engine fallback mirrored SVG | Populate — Phase 4 ICON-*. |
+| font | font | (n/a) | 337 | Not set — engine fallback | Populate — Phase 4 typography. |
+| font_size | font_size | (n/a) | 338 | Not set — engine fallback `-1` | Populate. |
+| color | font_color | normal | 340 | Not set — engine fallback | Populate. |
+| color | font_hover_color | hover | 342 | Not set — engine fallback | Populate. |
+| color | font_disabled_color | disabled | 345 | Not set — engine fallback | Populate. |
+| color | font_outline_color | (n/a) | 346 | Not set — engine fallback `Color(0,0,0)` | Follow upstream — outlines disabled. |
+| constant | h_separation | (n/a) | 348 | Not set — EDSCALE-coupled | Populate — NeoCade design tokens. |
+| constant | check_v_offset | (n/a) | 349 | Not set — engine fallback `0` | Follow upstream. |
+| constant | outline_size | (n/a) | 350 | Not set — engine fallback `0` | Follow upstream. |
+| color | button_checked_color | checked (icon tint) | 352 | Not set — engine fallback `Color(1,1,1)` | Populate — NeoCade accent tint (4.7-only? — verify in 4.6). |
+| color | button_unchecked_color | unchecked (icon tint) | 353 | Not set — engine fallback `Color(1,1,1)` | Populate — NeoCade outline tint (4.7-only? — verify in 4.6). |
+
+#### FlatButton — omitted slots
+
+> FlatButton is **NOT a class declared in `default_theme.cpp`** — it is a Button TYPEVAR (type variation) used by the editor for borderless toolbar buttons. Engine grep returned **0 lines**. Upstream populates 22 slots on FlatButton because Godot's theme resolution chain reads type-variation entries when the variation name is set on the Button instance via `set_theme_type_variation("FlatButton")`. There are no engine-declared slots to omit; all upstream-set FlatButton slots are conventionally inherited from the Button slot list.
+
+> All engine-declared slots populated by upstream. *(No engine declarations exist for FlatButton; upstream-set entries are TYPEVAR-driven and inherit Button's slot schema. NeoCade's TYPEVAR-01 / DF-Button-1 reuses this convention per FEATURES.md.)*
+
+#### MenuButton — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| font | font | (n/a) | 261 | Not set — engine fallback | Populate — Phase 4 typography. |
+| font_size | font_size | (n/a) | 262 | Not set — engine fallback `-1` | Populate. |
+| color | font_outline_color | (n/a) | 269 | Not set — engine fallback `Color(0,0,0)` | Follow upstream — outlines disabled. |
+| constant | h_separation | (n/a) | 271 | Not set — EDSCALE-coupled | Populate — NeoCade design tokens. |
+
+#### MenuButton — upstream-orphaned slots
+
+| Slot kind | Slot name | State | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|-------------------|-------------------------|
+| stylebox | normal_mirrored | normal (RTL) | Set by upstream; not pre-declared | Follow upstream — RTL parity. |
+| stylebox | hover_mirrored | hover (RTL) | Same | Follow upstream. |
+| stylebox | pressed_mirrored | pressed (RTL) | Same | Follow upstream. |
+| stylebox | hover_pressed | hover_pressed | Set by upstream; engine declares `hover`/`pressed` but not `hover_pressed` for MenuButton (only Button declares `hover_pressed_color` analogue) | Follow upstream — populate to handle open-menu-while-hovering state. |
+| stylebox | hover_pressed_mirrored | hover_pressed (RTL) | Same | Follow upstream. |
+| stylebox | disabled_mirrored | disabled (RTL) | Same | Follow upstream. |
+| color | font_hover_pressed_color | hover_pressed | Set by upstream; engine declares the slot for Button but does not declare it for MenuButton in default_theme.cpp (`font_hover_pressed_color` IS in the engine's MenuButton color set in 4.7-only? — verify in 4.6) | Follow upstream — populate; if 4.6 lacks the engine declaration, populating still works because Godot's per-Control color resolution reads any slot the Theme resource sets. |
+
+#### OptionButton — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| icon | arrow | (n/a) | 235 | Not set — engine fallback `option_button_arrow` SVG | Populate — Phase 4 ICON-* design. |
+| font | font | (n/a) | 237 | Not set — engine fallback | Populate. |
+| font_size | font_size | (n/a) | 238 | Not set — engine fallback `-1` | Populate. |
+| color | font_outline_color | (n/a) | 246 | Not set — engine fallback `Color(0,0,0)` | Follow upstream. |
+| constant | h_separation | (n/a) | 248 | Not set — EDSCALE-coupled | Populate. |
+| constant | outline_size | (n/a) | 250 | Not set — engine fallback `0` | Follow upstream. |
+| constant | modulate_arrow | (n/a) | 251 | Not set — engine fallback `false` | Follow upstream — accent does not tint arrow icon. |
+
+#### Label — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| stylebox | focus | focus | 380 | Not set — engine fallback engine focus stylebox | Follow upstream — Label is non-interactive; focus rarely indicated. |
+| font | font | (n/a) | 381 | Not set — engine fallback | Populate — Phase 4 typography. |
+| font_size | font_size | (n/a) | 382 | Not set — engine fallback `-1` | Populate. |
+| color | font_shadow_color | (n/a) | 385 | Not set — engine fallback `Color(0,0,0,0)` (transparent) | Follow upstream — no shadow. |
+| color | font_outline_color | (n/a) | 386 | Not set — engine fallback `Color(0,0,0)` | Follow upstream. |
+| constant | shadow_offset_x | (n/a) | 388 | Not set — EDSCALE-coupled | Follow upstream — no shadow. |
+| constant | shadow_offset_y | (n/a) | 389 | Not set — EDSCALE-coupled | Follow upstream — no shadow. |
+| constant | outline_size | (n/a) | 390 | Not set — engine fallback `0` | Follow upstream — no outline. |
+| constant | shadow_outline_size | (n/a) | 391 | Not set — EDSCALE-coupled | Follow upstream — no shadow. |
+| constant | line_spacing | (n/a) | 392 | Not set — EDSCALE-coupled | Populate — Phase 4 type scale supplies line height. |
+
+#### LineEdit — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| font | font | (n/a) | 419 | Not set — engine fallback | Populate — Phase 4 typography. |
+| font_size | font_size | (n/a) | 420 | Not set — engine fallback `-1` | Populate. |
+| color | font_color | normal | 422 | Not set — engine fallback `control_font_color` | Populate — NeoCade design tokens. |
+| color | font_selected_color | selected | 423 | Not set — engine fallback `control_font_pressed_color` | Populate — selection text color. |
+| color | font_uneditable_color | read_only | 424 | Not set — engine fallback `control_font_disabled_color` | Populate — read-only text. |
+| color | font_outline_color | (n/a) | 426 | Not set — engine fallback `Color(0,0,0)` | Follow upstream. |
+| color | caret_color | (n/a) | 427 | Not set — engine fallback `control_font_hover_color` | Populate — accessible caret color. |
+| color | selection_color | (n/a) | 428 | Not set — engine fallback `control_selection_color` | Populate — NeoCade selection token (TEXT-* requirement). |
+| color | clear_button_color | (n/a) | 429 | Not set — engine fallback `control_font_color` | Populate. |
+| color | clear_button_color_pressed | (pressed) | 430 | Not set — engine fallback `control_font_pressed_color` | Populate. |
+| constant | minimum_character_width | (n/a) | 432 | Not set — engine fallback `4` | Follow upstream. |
+| constant | outline_size | (n/a) | 433 | Not set — engine fallback `0` | Follow upstream. |
+| constant | caret_width | (n/a) | 434 | Not set — engine fallback `1` | Follow upstream — single-pixel caret; consider mobile variant Phase 8-9. |
+| icon | clear | (n/a) | 436 | Not set — engine fallback `line_edit_clear` SVG | Populate — Phase 4 ICON-*. |
+
+#### RichTextLabel — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| stylebox | focus | focus | 1201 | Not set — engine fallback engine focus stylebox | Populate — RichTextLabel is selectable; focus indication needed. |
+| icon | horizontal_rule | (n/a) | 1208 | Not set — engine fallback `solid_icon` | Populate — Phase 4 ICON-*. |
+| font | normal_font / bold_font / italics_font / bold_italics_font / mono_font | (text style) | 1210-1214 | Not set — engine fallback | Populate — Phase 4 typography requires explicit BBCode font binding. |
+| font_size | normal_font_size / bold_font_size / italics_font_size / bold_italics_font_size / mono_font_size | (text style) | 1215-1219 | Not set — engine fallback `-1` | Populate. |
+| color | default_color | (n/a) | 1221 | Not set — engine fallback `Color(1,1,1)` | Populate — NeoCade text token. |
+| color | font_selected_color | (selected) | 1222 | Not set — engine fallback `Color(0,0,0,0)` (transparent — keeps original color) | Follow upstream — preserves BBCode color tags. |
+| color | selection_color | (n/a) | 1223 | Not set — engine fallback `Color(0.1,0.1,1,0.8)` (blue tint) | Populate — NeoCade selection token. |
+| color | font_shadow_color | (n/a) | 1225 | Not set — engine fallback `Color(0,0,0,0)` | Follow upstream — no shadow. |
+| color | font_outline_color | (n/a) | 1227 | Not set — engine fallback `Color(0,0,0)` | Follow upstream. |
+| constant | shadow_offset_x / shadow_offset_y / shadow_outline_size | (n/a) | 1229-1231 | Not set — EDSCALE-coupled | Follow upstream — no shadow. |
+| constant | line_separation / paragraph_separation | (n/a) | 1233-1234 | Not set — engine fallback `0` | Populate — Phase 4 type scale supplies line height. |
+| constant | table_h_separation / table_v_separation | (n/a) | 1235-1236 | Not set — EDSCALE-coupled | Populate — NeoCade design tokens. |
+| constant | outline_size | (n/a) | 1238 | Not set — engine fallback `0` | Follow upstream. |
+| color | table_odd_row_bg / table_even_row_bg / table_border | (n/a) | 1240-1242 | Not set — engine fallback transparent | Populate if NeoCade games render BBCode tables; otherwise follow upstream. |
+| constant | text_highlight_h_padding / text_highlight_v_padding | (n/a) | 1244-1245 | Not set — EDSCALE-coupled | Follow upstream. |
+| constant | underline_alpha / strikethrough_alpha | (n/a) | 1247-1248 | Not set — engine fallback `50` | Follow upstream. |
+
+#### TextEdit — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| icon | tab | (n/a) | 457 | Not set — engine fallback `text_edit_tab` SVG | Populate if NeoCade exposes whitespace; otherwise follow upstream. |
+| icon | space | (n/a) | 458 | Not set — engine fallback `text_edit_space` SVG | Populate if NeoCade exposes whitespace; otherwise follow upstream. |
+| font | font | (n/a) | 460 | Not set — engine fallback | Populate — Phase 4 typography (Inter for prose, JetBrainsMono for CodeEdit). |
+| font_size | font_size | (n/a) | 461 | Not set — engine fallback `-1` | Populate. |
+| color | background_color | (n/a) | 464 | Not set — engine fallback `Color(0,0,0,0)` (transparent — `normal` stylebox shows through) | Follow upstream — bg comes from stylebox. |
+| color | font_color | normal | 466 | Not set — engine fallback | Populate. |
+| color | font_selected_color | selected | 467 | Not set — engine fallback `Color(0,0,0,0)` | Follow upstream — preserves syntax color. |
+| color | font_readonly_color | read_only | 468 | Not set — engine fallback | Populate. |
+| color | font_placeholder_color | (placeholder) | 469 | Not set — engine fallback | Populate. |
+| color | font_outline_color | (n/a) | 470 | Not set — engine fallback | Follow upstream. |
+| color | selection_color | (n/a) | 471 | Not set — engine fallback | Populate — NeoCade selection token. |
+| color | current_line_color | (n/a) | 472 | Not set — engine fallback `Color(0.25,0.25,0.26,0.8)` | Populate — accessibility (line tracking). |
+| color | caret_color | (n/a) | 473 | Not set — engine fallback | Populate. |
+| color | caret_background_color | (n/a) | 474 | Not set — engine fallback `Color(0,0,0)` | Follow upstream. |
+| color | word_highlighted_color | (n/a) | 475 | Not set — engine fallback `Color(0.5,0.5,0.5,0.25)` | Populate — code editor feature; defer to CodeEdit additive (Phase 4 / D-09). |
+| color | search_result_color / search_result_border_color | (n/a) | 476-477 | Not set — engine fallback | Populate. |
+| constant | line_spacing | (n/a) | 479 | Not set — EDSCALE-coupled | Populate. |
+| constant | outline_size / caret_width / wrap_offset | (n/a) | 480-482 | Not set — engine fallback | Follow upstream. |
+
+#### ItemList — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| constant | h_separation | (n/a) | 961 | Not set — EDSCALE-coupled | Populate. |
+| constant | icon_margin | (n/a) | 963 | Not set — EDSCALE-coupled | Populate. |
+| constant | line_separation | (n/a) | 964 | Not set — EDSCALE-coupled | Populate. |
+| font | font | (n/a) | 966 | Not set — engine fallback | Populate. |
+| font_size | font_size | (n/a) | 967 | Not set — engine fallback `-1` | Populate. |
+| color | font_color | normal | 969 | Not set — engine fallback `control_font_lower_color` | Populate. |
+| color | font_hovered_color | hover | 970 | Not set — engine fallback | Populate. |
+| color | font_hovered_selected_color | hovered+selected | 971 | Not set — engine fallback | Populate. |
+| color | font_selected_color | selected | 972 | Not set — engine fallback | Populate. |
+| color | font_outline_color | (n/a) | 973 | Not set — engine fallback | Follow upstream. |
+| color | scroll_hint_color | (n/a) | 975 | Not set — engine fallback `Color(0,0,0)` | Follow upstream. |
+| icon | scroll_hint | (n/a) | 983 | Not set — engine fallback `scroll_hint_vertical` SVG | Populate — Phase 4 ICON-*. |
+| constant | outline_size | (n/a) | 985 | Not set — engine fallback `0` | Follow upstream. |
+
+#### TabBar — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| stylebox | button_pressed | (close-button pressed) | 1046 | Not set — engine fallback `button_pressed` (engine's button stylebox) | Populate if NeoCade games use closable tabs. |
+| stylebox | button_highlight | (close-button highlight) | 1047 | Not set — engine fallback `button_normal` | Populate same as above. |
+| icon | increment / increment_highlight / decrement / decrement_highlight / drop_mark / close | (scroll/close buttons) | 1049-1054 | Not set — engine fallback engine SVGs | Populate — Phase 4 ICON-*. |
+| font | font | (n/a) | 1056 | Not set — engine fallback | Populate. |
+| font_size | font_size | (n/a) | 1057 | Not set — engine fallback `-1` | Populate. |
+| color | font_outline_color | (n/a) | 1063 | Not set — engine fallback | Follow upstream. |
+| color | drop_mark_color | (n/a) | 1064 | Not set — engine fallback `Color(1,1,1)` | Populate — NeoCade accent. |
+| constant | h_separation | (n/a) | 1071 | Not set — EDSCALE-coupled | Populate. |
+| constant | icon_max_width | (n/a) | 1072 | Not set — engine fallback `0` | Follow upstream. |
+| constant | outline_size | (n/a) | 1073 | Not set — engine fallback `0` | Follow upstream. |
+| constant | hover_switch_wait_msec | (n/a) | 1074 | Not set — engine fallback `500` | Follow upstream. |
+
+#### TabContainer — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| icon | increment / increment_highlight / decrement / decrement_highlight / drop_mark / menu / menu_highlight | (n/a) | 1011-1017 | Not set — engine fallback engine SVGs | Populate — Phase 4 ICON-*. |
+| font | font | (n/a) | 1019 | Not set — engine fallback | Populate. |
+| font_size | font_size | (n/a) | 1020 | Not set — engine fallback `-1` | Populate. |
+| color | font_outline_color | (n/a) | 1026 | Not set — engine fallback | Follow upstream. |
+| color | drop_mark_color | (n/a) | 1027 | Not set — engine fallback `Color(1,1,1)` | Populate — NeoCade accent. |
+| constant | side_margin / icon_separation / icon_max_width / outline_size | (n/a) | 1034-1037 | Not set — EDSCALE-coupled or engine fallback | Populate `side_margin` and `icon_separation`; follow upstream on `icon_max_width` and `outline_size`. |
+
+#### Tree — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| stylebox | hovered | hover (engine slot) | 876 | Engine declares; upstream populates a *different* `hovered` via lines 940-942 (collapsed alongside `button_hover` etc.). The engine-declared semantic — a lighter alpha over the row — IS effectively used. | Follow upstream — NeoCade should populate explicitly. |
+| stylebox | hovered_dimmed | (dimmed-row hover) | 877 | Upstream collapses to same `sb` as `button_hover` group | Follow upstream. |
+| stylebox | title_button_normal / title_button_pressed / title_button_hover | (header) | 887-889 | Upstream populates these; not omitted | (already populated) |
+| stylebox | custom_button | normal | 890 | Not set by upstream — engine fallback `button_normal` | Follow upstream — NeoCade may want explicit token-driven custom_button stylebox. |
+| icon | checked / checked_disabled / unchecked / unchecked_disabled / indeterminate / indeterminate_disabled | (cell-checkbox icons) | 894-899 | Not set — engine fallback engine SVGs | Populate — Phase 4 ICON-*. |
+| icon | updown | (numeric-cell up/down) | 900 | Not set — engine fallback engine SVG | Populate — Phase 4 ICON-*. |
+| icon | select_arrow | (cell-dropdown arrow) | 901 | Not set — engine fallback `option_button_arrow` SVG | Populate — Phase 4 ICON-*. |
+| icon | arrow / arrow_collapsed / arrow_collapsed_mirrored | (expand/collapse) | 902-904 | Not set — engine fallback engine SVGs | Populate — Phase 4 ICON-*. |
+| icon | scroll_hint | (n/a) | 905 | Not set — engine fallback engine SVG | Populate. |
+| font | title_button_font | (header) | 907 | Not set — engine fallback | Populate — Phase 4 typography. |
+| font | font | (n/a) | 908 | Not set — engine fallback | Populate. |
+| font_size | font_size | (n/a) | 909 | Not set — engine fallback `-1` | Populate. |
+| font_size | title_button_font_size | (header) | 910 | Not set — engine fallback `-1` | Populate. |
+| color | title_button_color | (header) | 912 | Not set — engine fallback `control_font_color` | Populate. |
+| color | font_hovered_color / font_hovered_dimmed_color / font_hovered_selected_color / font_selected_color / font_disabled_color | (multiple states) | 914-918 | Not set — engine fallback | Populate — accessibility-critical for hierarchical data. |
+| color | font_outline_color | (n/a) | 919 | Not set — engine fallback | Follow upstream. |
+| color | drop_on_item_color | (drag-drop cue) | 921 | Not set — engine fallback `Color(1,1,1)` | Populate — NeoCade accent. |
+| color | relationship_line_color / children_hl_line_color | (line drawing) | 923, 925 | Not set — engine fallback `Color(0.27,0.27,0.27)` | Populate. |
+| color | custom_button_font_highlight | (custom-button hover) | 926 | Not set — engine fallback | Populate. |
+| color | scroll_hint_color | (n/a) | 927 | Not set — engine fallback `Color(0,0,0)` | Follow upstream. |
+| constant | h_separation / item_margin / button_margin | (n/a) | 929, 931, 938 | Not set — EDSCALE-coupled | Populate. |
+| constant | inner_item_margin_bottom / inner_item_margin_top | (n/a) | 932, 935 | Not set — engine fallback `0` | Follow upstream. |
+| constant | check_h_separation / icon_h_separation | (n/a) | 936-937 | Not set — EDSCALE-coupled | Populate. |
+| constant | parent_hl_line_margin | (n/a) | 943 | Not set — engine fallback `0` | Follow upstream. |
+| constant | dragging_unfold_wait_msec | (n/a) | 945 | Not set — engine fallback `500` | Follow upstream. |
+| constant | scroll_border / scroll_speed | (n/a) | 946-947 | Not set — EDSCALE-coupled or engine fallback | Follow upstream. |
+| constant | outline_size / icon_max_width | (n/a) | 948-949 | Not set — engine fallback `0` | Follow upstream. |
+| constant | scrollbar_margin_left / scrollbar_margin_top / scrollbar_margin_right / scrollbar_margin_bottom | (n/a) | 950-953 | Not set — engine fallback `-1` | Follow upstream. |
+| constant | scrollbar_h_separation / scrollbar_v_separation | (n/a) | 954-955 | Not set — EDSCALE-coupled | Populate. |
+
+#### ProgressBar — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| font | font | (n/a) | 443 | Not set — engine fallback | Populate. |
+| font_size | font_size | (n/a) | 444 | Not set — engine fallback `-1` | Populate. |
+| color | font_color | (n/a) | 446 | Not set — engine fallback `control_font_hover_color` | Populate. |
+| color | font_outline_color | (n/a) | 447 | Not set — engine fallback `Color(0,0,0)` | Follow upstream. |
+| constant | outline_size | (n/a) | 449 | Not set — engine fallback `0` | Follow upstream. |
+
+#### HSlider — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| stylebox | grabber_area | (grabber fill) | 586 | Not set — engine fallback `style_slider_grabber` | Populate — NeoCade accent for filled track. |
+| stylebox | grabber_area_highlight | (grabber fill, focused) | 587 | Not set — engine fallback `style_slider_grabber_highlight` | Populate. |
+| icon | grabber / grabber_highlight / grabber_disabled | (grabber states) | 589-591 | Not set — engine fallback engine SVGs | Populate — Phase 4 ICON-* (accessibility-critical for touch). |
+| icon | tick | (n/a) | 592 | Not set — engine fallback engine SVG | Populate — Phase 4 ICON-*. |
+| constant | center_grabber / grabber_offset / tick_offset | (n/a) | 594-596 | Not set — engine fallback `0` | Follow upstream. |
+
+#### VSlider — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| stylebox | grabber_area | (grabber fill) | 601 | Not set — engine fallback | Populate — NeoCade accent. |
+| stylebox | grabber_area_highlight | (grabber fill, focused) | 602 | Not set — engine fallback | Populate. |
+| icon | grabber / grabber_highlight / grabber_disabled | (grabber states) | 604-606 | Not set — engine fallback engine SVGs | Populate — Phase 4 ICON-*. |
+| icon | tick | (n/a) | 607 | Not set — engine fallback engine SVG | Populate. |
+| constant | center_grabber / grabber_offset / tick_offset | (n/a) | 609-611 | Not set — engine fallback `0` | Follow upstream. |
+
+#### HScrollBar — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| icon | increment / increment_highlight / increment_pressed / decrement / decrement_highlight / decrement_pressed | (scroll buttons) | 557-562 | Not set by upstream — engine fallback `empty_icon` (zero-size icon) | Follow upstream — empty arrows mean scrollbar shows track+grabber only, no end-arrows. Modern UX preference. |
+
+#### VScrollBar — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| icon | increment / increment_highlight / increment_pressed / decrement / decrement_highlight / decrement_pressed | (scroll buttons) | 572-577 | Not set by upstream — engine fallback `empty_icon` | Follow upstream — no end-arrows. |
+
+#### AcceptDialog — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| constant | buttons_separation | (n/a) | 706 | Not set — EDSCALE-coupled | Populate. |
+
+> **Note:** AcceptDialog has minimal engine declarations (2 slots: `panel`, `buttons_separation`). Title chrome / close icon / etc. live on the `Window` parent class — see Window section.
+
+#### Panel — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| stylebox | panel | (panel) | 134 | Not set by upstream (fully unthemed Control) — engine fallback `make_flat_stylebox(style_normal_color, 0, 0, 0, 0)` (transparent panel) | Populate — NeoCade-additive per D-08; ARCHITECTURE.md state-layer model supplies `surface_high` raised-card stylebox. |
+
+#### PopupMenu — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| icon | checked / checked_disabled / unchecked / unchecked_disabled / radio_checked / radio_checked_disabled / radio_unchecked / radio_unchecked_disabled | (item-state icons) | 765-772 | Not set — engine fallback engine SVGs | Populate — Phase 4 ICON-* (consistent with CheckBox icons). |
+| icon | submenu / submenu_mirrored | (submenu indicator) | 773-774 | Not set — engine fallback `popup_menu_arrow_*` SVGs | Populate — Phase 4 ICON-*. |
+| icon | search | (search-input glyph) | 775 | Not set — engine fallback `search` SVG | Populate — Phase 4 ICON-*. |
+| font | font | (n/a) | 777 | Not set — engine fallback | Populate. |
+| font | font_separator | (n/a) | 778 | Not set — engine fallback | Populate. |
+| font_size | font_size | (n/a) | 779 | Not set — engine fallback `-1` | Populate. |
+| font_size | font_separator_size | (n/a) | 780 | Not set — engine fallback `-1` | Populate. |
+| color | font_color | normal | 782 | Not set — engine fallback | Populate. |
+| color | font_accelerator_color | (accelerator hint) | 783 | Not set — engine fallback `Color(0.7,0.7,0.7,0.8)` | Populate. |
+| color | font_disabled_color | disabled | 784 | Not set — engine fallback | Populate. |
+| color | font_hover_color | hover | 785 | Not set — engine fallback | Populate. |
+| color | font_separator_color / font_separator_outline_color | (separator label) | 786, 788 | Not set — engine fallback | Populate. |
+| color | font_outline_color | (n/a) | 787 | Not set — engine fallback | Follow upstream. |
+| constant | indent / search_bar_separation / item_start_padding / item_end_padding | (n/a) | 790, 793, 796-797 | Not set or partial — `item_start_padding` IS set; others EDSCALE-coupled | Populate per Phase 4 design tokens. |
+| constant | outline_size / separator_outline_size / icon_max_width | (n/a) | 794-795, 798 | Not set — engine fallback `0` | Follow upstream. |
+| constant | gutter_compact | (n/a) | 799 | Not set — engine fallback `1` (4.7-only? — verify in 4.6) | Follow upstream — compact gutter is the modern default. |
+
+#### PopupPanel — omitted slots
+
+> All engine-declared slots populated by upstream. *(PopupPanel declares only `panel`; upstream sets it.)*
+
+#### TooltipPanel — omitted slots
+
+> All engine-declared slots populated by upstream. *(TooltipPanel declares only `panel`; upstream sets it.)*
+
+#### Window — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| stylebox | embedded_border | (embedded window chrome) | 686 | Not set — engine fallback `make_flat_stylebox(style_popup_color, 10, 28, 10, 8)` expanded | Populate — NeoCade-additive per D-08 / Window section. NeoCade dark-theme tokens supply chrome. |
+| stylebox | embedded_unfocused_border | (unfocused chrome) | 687 | Not set — engine fallback `style_popup_hover_color` chrome | Populate — NeoCade-additive. |
+| font | title_font | (n/a) | 689 | Not set — engine fallback | Populate. |
+| font_size | title_font_size | (n/a) | 690 | Not set — engine fallback `-1` | Populate. |
+| color | title_color | (n/a) | 691 | Not set — engine fallback `control_font_color` | Populate. |
+| color | title_outline_modulate | (n/a) | 692 | Not set — engine fallback `Color(0,0,0)` | Follow upstream. |
+| constant | title_outline_size | (n/a) | 693 | Not set — engine fallback `0` | Follow upstream. |
+| constant | title_height | (n/a) | 694 | Not set — EDSCALE-coupled (`36 * scale`) | Populate. |
+| constant | resize_margin | (n/a) | 695 | Not set — EDSCALE-coupled | Populate. |
+| icon | close / close_pressed | (close button) | 697-698 | Not set — engine fallback engine SVGs | Populate — Phase 4 ICON-*. |
+| constant | close_h_offset / close_v_offset | (close button position) | 699-700 | Not set — EDSCALE-coupled | Populate. |
+
+#### ColorPicker — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| constant | margin / sv_width / sv_height / h_width / label_width | (layout) | 1091-1095 | Not set — EDSCALE-coupled | Populate. |
+| constant | center_slider_grabbers | (n/a) | 1096 | Not set — engine fallback `1` | Follow upstream. |
+| color | focused_not_editing_cursor_color | (cursor color) | 1101 | Not set — engine fallback `Color(1,1,1,0.275)` | Follow upstream — subtle focus indicator. |
+| icon | menu_option / folded_arrow / expanded_arrow / screen_picker / shape_circle / shape_rect / shape_rect_wheel / add_preset / sample_bg / sample_revert / overbright_indicator / bar_arrow / picker_cursor / picker_cursor_bg / color_script / color_copy / color_hue | (compound widget icons) | 1103-1118, 1144 | Not set — engine fallback engine SVGs (extensive icon set) | Populate — Phase 4 ICON-* design substantial coverage delta. |
+
+#### GraphEdit — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| icon | zoom_out / zoom_in / zoom_reset / grid_toggle / minimap_toggle / snapping_toggle / layout | (toolbar icons) | 1295-1301 | Not set — engine fallback engine SVGs | Populate — Phase 4 ICON-*. |
+| stylebox | panel | (canvas background) | 1303 | Not set — engine fallback `make_flat_stylebox(style_normal_color, 4, 4, 4, 5)` | Populate — NeoCade dark-canvas surface token. |
+| stylebox | menu_panel | (toolbar panel) | 1307 | Not set — engine fallback `graph_toolbar_style` | Populate. |
+| color | grid_minor / grid_major | (grid lines) | 1309-1310 | Not set — engine fallback `Color(1,1,1,0.05)` / `Color(1,1,1,0.2)` | Populate — NeoCade design supplies grid color. |
+| color | selection_fill / selection_stroke | (rubber-band selection) | 1311-1312 | Not set — engine fallback white-tints | Populate — NeoCade accent. |
+| color | activity | (active connection) | 1313 | Not set — engine fallback `Color(1,1,1)` | Populate. |
+| color | connection_hover_tint_color / connection_valid_target_tint_color / connection_rim_color | (connection-line states) | 1314, 1316-1317 | Not set — engine fallback | Populate. |
+| constant | connection_hover_thickness / port_hotzone_inner_extent / port_hotzone_outer_extent | (n/a) | 1315, 1355-1356 | Not set — EDSCALE-coupled | Populate (touch targets matter on mobile variant). |
+
+#### MenuBar — omitted slots
+
+| Slot kind | Slot name | State | default_theme.cpp line | Upstream behavior | Implication for NeoCade |
+|-----------|-----------|-------|------------------------|-------------------|-------------------------|
+| stylebox | normal | normal | 177 | Not set by upstream (bare class unthemed; upstream targets MainMenuBar TYPEVAR) — engine fallback `button_normal` | Populate — NeoCade-additive per D-08. |
+| stylebox | hover | hover | 178 | Not set — engine fallback | Populate. |
+| stylebox | pressed | pressed | 179 | Not set — engine fallback | Populate. |
+| stylebox | disabled | disabled | 180 | Not set — engine fallback | Populate. |
+| font | font | (n/a) | 182 | Not set — engine fallback | Populate. |
+| font_size | font_size | (n/a) | 183 | Not set — engine fallback `-1` | Populate. |
+| constant | outline_size | (n/a) | 184 | Not set — engine fallback `0` | Follow upstream. |
+| color | font_color | normal | 186 | Not set — engine fallback | Populate. |
+| color | font_pressed_color / font_hover_color / font_focus_color / font_hover_pressed_color / font_disabled_color | (state colors) | 187-191 | Not set — engine fallback | Populate. |
+| color | font_outline_color | (n/a) | 192 | Not set — engine fallback | Follow upstream. |
+| constant | h_separation | (n/a) | 194 | Not set — EDSCALE-coupled | Populate. |
+
+### Pitfall 1.1 — Focus Stylebox Overlay Behavior (Confirmation)
+
+**Pitfall claim (PITFALLS.md §1.1):** "Focus stylebox is OVERLAY, not state — loses to pressed/checked. NeoCade must use composite-state slots (pressed_focus, checked_focus) and/or rely on font_focus_color to render focus when also pressed/checked."
+
+**Engine-source evidence (the *behavior*):**
+
+> **Note on file selection:** `scene/gui/base_button.cpp` is the abstract base class for all clickable controls — it handles pressed/hover state-machine transitions, focus event handling (lines 214, 258, 292, 319 manage `status.pressed_down_with_focus`), and `set_focus_mode(FOCUS_ALL)` registration (line 652). However, `BaseButton` does NOT draw — drawing is the responsibility of the concrete descendants. Button (and through it, CheckBox / CheckButton / MenuButton / OptionButton) draws in `scene/gui/button.cpp`'s `NOTIFICATION_DRAW` handler. Both files are part of the Pitfall 1.1 evidence chain: `base_button.cpp` defines that focus is a runtime *event/state* tracked separately from press/check, and `button.cpp` defines that focus is drawn as an *overlay* on top of the state stylebox.
+
+`scene/gui/button.cpp` `NOTIFICATION_DRAW` handler (lines 211-303 capture the relevant block; key citations below):
+
+- **Lines 222-226 — state stylebox is drawn FIRST:**
+  ```cpp
+  Ref<StyleBox> style = _get_current_stylebox();
+  // Draws the stylebox in the current state.
+  if (!flat) {
+      style->draw(ci, Rect2(Point2(), size));
+  }
+  ```
+  `_get_current_stylebox()` returns `normal`, `hover`, `pressed`, `disabled`, or composite `hover_pressed` based on the Button's runtime state — NOT `focus`.
+
+- **Lines 228-230 — focus stylebox is drawn AFTER, as an OVERLAY ON TOP:**
+  ```cpp
+  if (has_focus(true)) {
+      theme_cache.focus->draw(ci, Rect2(Point2(), size));
+  }
+  ```
+  The `focus` stylebox is drawn after the state stylebox, on top of it, when the Button has focus. Focus is NOT a state in its own right — it is an overlay layered on whatever state stylebox was just drawn.
+
+- **Lines 290-303 — font_focus_color takes precedence ONLY in DRAW_NORMAL state:**
+  ```cpp
+  case DRAW_NORMAL: {
+      // Focus colors only take precedence over normal state.
+      if (has_focus(true)) {
+          font_color = theme_cache.font_focus_color;
+          if (has_theme_color(SNAME("icon_focus_color"))) {
+              icon_modulate_color = theme_cache.icon_focus_color;
+          }
+      } else {
+          font_color = theme_cache.font_color;
+          ...
+      }
+  } break;
+  ```
+  The inline comment ("Focus colors only take precedence over normal state.") confirms the engine's design: when the Button is in DRAW_HOVER, DRAW_PRESSED, DRAW_HOVER_PRESSED, or DRAW_DISABLED, the state's font color wins over `font_focus_color`. Focus's font-color contribution is **suppressed** by all non-normal states.
+
+- **`scene/theme/default_theme.cpp` composite-state slot declarations (lines 285, 324):**
+  ```cpp
+  theme->set_stylebox("hover_pressed", "CheckBox", cbx_empty);   // line 285
+  theme->set_stylebox("hover_pressed", "CheckButton", cb_empty); // line 324
+  ```
+  And per-class composite font-color slots: `font_hover_pressed_color` is declared on Button (line 160), CheckBox (line 303), CheckButton (line 343), MenuButton (4.7-only? — see omission table), OptionButton (line 243), MenuBar (line 190), and similar. The engine's theme schema explicitly recognizes composite-state slots (`hover_pressed`, `font_hover_pressed_color`, etc.) precisely because focus-as-overlay would otherwise be invisible during pressed/checked states.
+
+**Theme-resource evidence (upstream's *response*):**
+
+`/c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres`:
+
+- **Line 271 — Button focus is a transparent no-op:**
+  ```gdscript
+  set_stylebox('focus', 'Button', base_empty_sb)
+  ```
+  `base_empty_sb` (constructed at lines 161-163) is `base_sb.duplicate()` with `draw_center = false` and `set_content_margin_all(0)` — fully transparent, zero margin. Drawing this on top of the state stylebox is a visual no-op.
+
+- **Line 690 — OptionButton focus is the same transparent no-op:**
+  ```gdscript
+  set_stylebox('focus', 'OptionButton', base_empty_sb)
+  ```
+
+- **Line 581 — ItemList focus is transparent:**
+  ```gdscript
+  set_stylebox('focus', 'ItemList', base_empty_sb)
+  ```
+
+- **Line 787 — ScrollContainer focus is transparent:**
+  ```gdscript
+  set_stylebox('focus', 'ScrollContainer', base_empty_sb)
+  ```
+
+- **Line 926 — Tree focus is transparent (with explicit comment at lines 924-925: "Leaving focus empty for trees and scroll containers because there's no way to make focus indication look not janky when only a part of a dock is highlighted"):**
+  ```gdscript
+  set_stylebox('focus', 'Tree', base_empty_sb)
+  ```
+
+- **Lines 859-861 — TabBar/TabContainer tab_focus is transparent:**
+  ```gdscript
+  set_stylebox('tab_focus', 'TabBar', base_empty_sb)
+  set_stylebox('tab_focus', 'TabContainer', base_empty_sb)
+  ```
+
+- **Composite-state coverage — upstream populates `hover_pressed` styleboxes AND `font_hover_pressed_color` colors for Button-family classes:**
+  ```gdscript
+  set_color('font_hover_pressed_color', 'Button', color_font_highlighted)        # line 260
+  set_stylebox('hover_pressed', 'Button', button_pressed_sb)                     # line 274
+  set_color('font_hover_pressed_color', 'CheckBox', color_font_highlighted)      # line 283
+  set_color('font_hover_pressed_color', 'CheckButton', color_font_highlighted)   # line 295
+  set_color('font_hover_pressed_color', 'FlatButton', color_font_highlighted)    # line 471
+  set_stylebox('hover_pressed', 'FlatButton', flat_button_pressed_sb)            # line 486
+  set_color('font_hover_pressed_color', 'MenuButton', color_font_highlighted)    # line 649
+  set_stylebox('hover_pressed', 'MenuButton', flat_button_hover_sb)              # line 668
+  set_color('font_hover_pressed_color', 'OptionButton', color_font_highlighted)  # line 679
+  set_stylebox('hover_pressed', 'OptionButton', button_pressed_sb)               # line 697
+  ```
+  Plus per-Control enumeration above (`### Button`, `### CheckBox`, `### CheckButton`, `### FlatButton`, `### MenuButton`, `### OptionButton`) tables show the populated `hover_pressed` rows.
+
+- **Note on `pressed_focus` / `checked_focus` slot families:** A grep against `minimal_theme.tres` for `pressed_focus`, `checked_focus`, or `radio_checked_focus` returned **zero matches**. Upstream does NOT populate these specific composite-focus slots for any class. Upstream's focus strategy is: (a) render focus stylebox as a transparent no-op (`base_empty_sb`), and (b) communicate focus visually via `font_focus_color` / `icon_focus_color` — which only takes precedence in `DRAW_NORMAL` per `button.cpp` lines 290-303, meaning **upstream's focus indication is INVISIBLE when the Button is also pressed/checked.** This is the unfortunate edge case Pitfall 1.1 calls out: even upstream's mitigation has a gap when state combinations stack.
+
+**Conclusion: Pitfall 1.1 is CONFIRMED.**
+
+- The *pitfall claim* (focus is overlay; loses to pressed/checked) is engine behavior verified by `button.cpp` lines 222-230 (focus drawn AS OVERLAY ON TOP of state stylebox) and lines 290-303 (font_focus_color suppressed in non-normal states). Engine source confirms the pitfall is correct.
+
+- Upstream's *response* is partial: (a) make focus stylebox a transparent no-op (`base_empty_sb`) so it never visually conflicts with state styleboxes, AND (b) populate composite-state `hover_pressed` styleboxes + `font_hover_pressed_color` colors so the most common focus-stacked state has explicit theming. But upstream does NOT populate `pressed_focus` / `checked_focus` slots — meaning upstream's solution still has the edge-case gap when a Button is focused AND pressed (or focused AND checked, for CheckBox / CheckButton).
+
+- **Implication for NeoCade:** Phase 5 (focus-ring design) must:
+  1. Decide whether `focus` stylebox should be a NeoCade-styled focus ring (currently REQUIREMENTS.md FOC-01 / FOC-02 implies YES — accent-colored 2-3 px outer ring) — which means NeoCade DIVERGES from upstream's transparent-focus approach. This is intentional: NeoCade's design system ranks accessibility (visible focus on EVERY state combination) above upstream's editor-aesthetic preference. Use `expand_margin` rather than `border_width` so the focus ring sits ON the outer perimeter, not inside the state stylebox's drawn area; this minimizes overlap with state styling but still lays focus on TOP per engine behavior.
+  2. Populate `pressed_focus` / `checked_focus` / `radio_checked_focus` slots on Button-family classes so focus is visually present even when the Control is also pressed/checked. Upstream's omission of these slots is the gap NeoCade closes.
+  3. Populate `font_focus_color` AND state-specific composite focus-font-color slots (`font_pressed_focus_color` is a 4.7+ candidate — verify in 4.6 release tag) for accessible text contrast in all state combinations.
+  4. NeoCade's mobile variant (Phase 8-9) needs INCREASED focus-ring expand_margin — touch targets emphasize visual focus indication even more strongly than desktop, since keyboard focus is less common but accessibility tools still navigate via focus.
+
+### Pitfall 1.7 — Popup Separate-Window Theming (Confirmation)
+
+**Pitfall claim (PITFALLS.md §1.7):** "Popups are separate Windows that don't inherit theme overrides. NeoCade must populate type-level theme entries (PopupMenu, PopupPanel, AcceptDialog, FileDialog, ConfirmationDialog, TooltipPanel, Window) — relying on a parent's `add_theme_*_override` won't reach the popup."
+
+**Two layers of theming (the pitfall is about the second; the prescription is to use the first):**
+
+#### Layer A — Resource-level type entries (DO apply to popups)
+
+Theme resources have type-level entries (`set_stylebox('panel', 'PopupMenu', sb)`). When a popup with no per-Control override is opened, the runtime walks the popup's class hierarchy and finds the type-level entry in the active Theme resource.
+
+- **Engine evidence:** `scene/theme/theme_db.cpp` lines 365-374 (class-hierarchy walk for runtime theme item resolution):
+  ```cpp
+  StringName class_name = p_instance->get_class();
+  while (class_name != StringName()) {
+      HashMap<StringName, HashMap<StringName, ThemeItemBind>>::Iterator E = theme_item_binds.find(class_name);
+      ...
+      class_name = ClassDB::get_parent_class_nocheck(class_name);
+  }
+  ```
+  And `theme_db.cpp` lines 380-383 (parent-class enumeration for `get_class_items`):
+  ```cpp
+  StringName class_name = p_class_name;
+  while (class_name != StringName()) {
+      class_hierarchy.push_front(class_name); // Put parent classes in front.
+      class_name = ClassDB::get_parent_class_nocheck(class_name);
+  }
+  ```
+  These walks are unconditional on Window-vs-Control: any node that calls `get_theme_stylebox(name, p_theme_type)` at runtime resolves through this chain. `scene/gui/control.cpp` lines 3585-3604 invoke this lookup for stylebox resolution (`get_theme_stylebox`), reading the type-level entry from `data.theme_owner->get_theme_item_in_types(...)`.
+
+- **Upstream evidence:** Plan 02's `### PopupMenu`, `### PopupPanel`, `### AcceptDialog`, `### TooltipPanel`, `### Window` sections (and per-Control omission tables in `### Engine-Default Cross-Reference` above) document upstream's type-level entries:
+  ```gdscript
+  # /c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres
+  set_stylebox('panel', 'PopupMenu', sb)        # line 714
+  set_stylebox('panel', 'PopupPanel', sb)       # line 735
+  set_stylebox('panel', 'TooltipPanel', sb)     # line 743
+  set_stylebox('panel', 'PopupDialog', sb)      # line 748
+  set_stylebox('panel', 'AcceptDialog', sb)     # line 749
+  ```
+  Plus six editor-only popup-dialog subclasses (lines 753-758) — which NeoCade does NOT mirror per D-05 / D-10 (no editor APIs).
+
+  Per-Control enumeration confirms:
+  - `### PopupMenu`: 8 set_* calls (3 constants, 5 styleboxes — `panel`, `hover`, `separator`, `labeled_separator_left`, `labeled_separator_right`)
+  - `### PopupPanel`: 1 set_* call (`panel`)
+  - `### AcceptDialog`: 1 set_* call (`panel` — shared `sb` from PopupDialog)
+  - `### TooltipPanel`: 1 set_* call (`panel`)
+  - `### Window`: 0 set_* calls (NeoCade-additive per D-08 reconciliation; upstream relies on Window's engine-default chrome and on each popup subclass populating its own `panel`)
+
+  All five upstream-themed popup classes have their `panel` stylebox populated at the type level, exactly as the pitfall prescribes.
+
+#### Layer B — Per-Control runtime override-bag overrides (DO NOT inherit through popups)
+
+When a parent Control calls `parent.add_theme_stylebox_override('panel', sb)`, that override is stored on the parent's per-Control override map (`theme_style_override`, etc.). A popup spawned by that parent is a separate Window — it has its own per-Window override map and its own `ThemeContext`, and it does NOT inherit the parent's override map.
+
+- **Engine evidence — Window has its own override maps:** `scene/main/window.cpp` lines 67-95:
+  ```cpp
+  if (!name.begins_with("theme_override")) { ... }
+  // ...
+  } else if (name.begins_with("theme_override_styles/")) {
+      ...
+      if (theme_style_override.has(dname)) {
+          theme_style_override[dname]->disconnect_changed(callable_mp(this, &Window::_notify_theme_override_changed));
+      }
+      theme_style_override.erase(dname);
+      _notify_theme_override_changed();
+  } else if (name.begins_with("theme_override_fonts/")) {
+      ...
+  ```
+  Each Window owns `theme_style_override`, `theme_icon_override`, `theme_font_override`, `theme_font_size_override`, `theme_color_override`, `theme_constant_override` maps — NOT shared with the parent Control / parent Window.
+
+- **Engine evidence — popups ARE Windows:** `scene/gui/popup.cpp` (the entire Popup class extends Window). Lines 54, 70, 171, 321 reference `is_embedded()` which is declared on `scene/main/window.cpp` line 682 (`bool Window::is_embedded() const { ... }`). Popup is a Window subclass; this is unambiguous in the engine source.
+
+- **Engine evidence — each Window establishes its own ThemeContext:** `scene/theme/theme_db.cpp` lines 217-263 implement `ThemeDB::create_theme_context` and `_propagate_theme_context`:
+  ```cpp
+  ThemeContext *ThemeDB::create_theme_context(Node *p_node, Vector<Ref<Theme>> &p_themes) {
+      ERR_FAIL_COND_V(theme_contexts.has(p_node), nullptr);
+      ThemeContext *context = memnew(ThemeContext);
+      context->parent = get_nearest_theme_context(p_node);
+      ...
+      theme_contexts[p_node] = context;
+      _propagate_theme_context(p_node, context);
+  }
+  void ThemeDB::_propagate_theme_context(Node *p_from_node, ThemeContext *p_context) {
+      ...
+      from_control->set_theme_context(p_context);
+      ...
+      from_window->set_theme_context(p_context);  // line 255 — Windows get separate contexts
+      ...
+      if (theme_contexts.has(child_node)) {
+          theme_contexts[child_node]->parent = p_context;
+          continue;  // line 264-265 — child Windows have their OWN ThemeContext entry
+      }
+  }
+  ```
+  When a child node is itself a registered theme context (i.e., a Window), `_propagate_theme_context` records the parent linkage but DOES NOT recurse into the child's interior — the child Window manages its own ThemeContext propagation independently. This is the structural reason runtime override-bag overrides do not cross Window boundaries: the override bag lives on a specific Window's ThemeContext, and resolution stops at that Window's boundary unless explicitly chained.
+
+#### Conclusion: Pitfall 1.7 is CONFIRMED
+
+- The *pitfall claim* (popups are separate Windows; runtime per-Control override bags don't propagate from a parent Control into a child popup) is engine behavior verified by:
+  - `theme_db.cpp` lines 217-263 (`ThemeContext` per-Window structure; child Windows get their own ThemeContext entries that don't inherit override maps)
+  - `window.cpp` lines 67-95 (each Window owns its own `theme_*_override` maps)
+  - `popup.cpp` (Popup extends Window; embedded vs. native windowing is per-instance, not theme-inherited)
+
+- Upstream's *response* (populating type-level `panel` entries on every popup class — Layer A) is the prescription the pitfall recommends. Plan 02's enumeration confirms upstream populates PopupMenu, PopupPanel, AcceptDialog, TooltipPanel, PopupDialog at the type level. This is the workaround that lets popups receive consistent theming via the Theme resource itself, bypassing the broken inheritance for runtime override bags.
+
+- **Critical distinction:** This is NOT a refutation of the pitfall. Resource-level type entries (Layer A — what upstream sets and what NeoCade also sets) are NOT the same as runtime override-bag overrides (Layer B — what fails to inherit). Anyone reading this must understand both layers; conflating them produces broken popup theming. The pitfall is about Layer B; the prescription is to use Layer A. Both can be true.
+
+- **Implication for NeoCade:** NeoCade's `neocade_theme.tres` MUST populate type-level entries for:
+  - PopupMenu (panel + hover + separator + labeled_separator_*  styleboxes; font / font_color / font_size / hover & disabled font colors / submenu / radio / checked icons; constants per Phase 4 design)
+  - PopupPanel (panel — drop NeoCade's shadow per Conflict 3 / SUMMARY.md GL-Compat-shadow constraint, even though upstream sets shadow_color on PopupPanel only)
+  - AcceptDialog (panel + buttons_separation + Window-class chrome — see Window row)
+  - **FileDialog (NeoCade-additive per D-09)** — engine declares 24 set_* calls' worth of slots in `default_theme.cpp`; upstream populates 0 (FileDialog inherits AcceptDialog via class chain); NeoCade owns first-class FileDialog theming
+  - **ConfirmationDialog (NeoCade-additive per D-09)** — engine declares 0 explicit slots in `default_theme.cpp` (inherits AcceptDialog); NeoCade adds dedicated theming if Phase 5 design diverges from AcceptDialog
+  - TooltipPanel (panel)
+  - **TooltipLabel (NeoCade-additive per D-09)** — engine declares 8 set_* calls' worth (font / font_color / font_size / outline / shadow); upstream populates 0; NeoCade owns first-class TooltipLabel theming
+  - Window (NeoCade-additive per D-08 — embedded_border / title_color / title_font / close icon / close_h_offset / etc.; substantial coverage delta)
+
+  Phase 6 / Phase 7 implementations CANNOT rely on `add_theme_*_override` calls on parent Controls — those don't reach popups. The token generator at Phase 4 must emit type-level Theme entries for every popup class, full stop.
+
+  Mobile variant (Phase 8-9) must duplicate this discipline into `neocade_mobile_theme.tres` per CROSS-PLATFORM.md token-sharing strategy — popup theming does not "inherit" between Theme resources any more than between Controls; the mobile theme's popup classes get their own type-level entries from the same TokenSet.
