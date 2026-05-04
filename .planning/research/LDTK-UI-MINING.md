@@ -559,11 +559,44 @@ The user-supplied report is useful as a hypothesis list, not a source of truth. 
 
 ## Anti-Cyberpunk Filter Audit
 
-Reserved for Plan 02-05.
+Standalone filter result: PASS. No adopted Haxe or SCSS pattern requires synthwave, neon-noir, dystopian, scanline, glitch, fake-circuit, or cyberpunk visual language. Several patterns include colors, shadows, filters, or attention effects in LDtk; those are treated as state-clarity evidence only, not copied visual language.
+
+| Pattern | Source section | Result | Filter reason |
+|---|---|---|---|
+| HAXE-01 semantic main-panel launchers | Haxe | Pass | Compact icon/action hierarchy is usability structure, not aesthetic identity. |
+| HAXE-02 linked panel button state | Haxe | Pass | Active/faded state taxonomy transfers; singleton panel behavior remains app logic. |
+| HAXE-03 persistent banners | Haxe | Pass | Blocking status communication can use calm tonal contrast rather than warning glow. |
+| HAXE-04 command palette | Haxe | Pass | Search/focus/context rows are workflow structure; no terminal/cyber motif is required. |
+| HAXE-05 context menus | Haxe | Pass | Invocation alternatives and selected rows are platform ergonomics. |
+| HAXE-06 select replacement | Haxe | Pass | Search, grid/list, and keyboard focus improve density without visual genre drift. |
+| HAXE-07 tool palette lifecycle | Haxe | Pass | Palette focus and popout states are control-state inspiration only. |
+| HAXE-08 active/unsupported classes | Haxe | Pass | Explicit unsupported/active states improve accessibility and reduce ambiguity. |
+| HAXE-09 layer-list rows | Haxe | Pass | Icons, context actions, and documentation tips help scan dense lists without full-row neon tinting. |
+| HAXE-10 reset/default affordances | Haxe | Pass | Default/reset state visibility belongs to form clarity. |
+| HAXE-11 dialog button taxonomy | Haxe | Pass | Dialog button roles map to Godot popup/window controls without LDtk-specific chrome. |
+| HAXE-12 notification severities | Haxe | Pass | Severity taxonomy transfers; blink/glow theatrics remain rejected unless reduced to one accessible cue. |
+| HAXE-13 cursor feedback | Haxe | Pass | Semantic feedback taxonomy transfers, while LDtk viewport cursor art is rejected. |
+| HAXE-14 invalid/preview tool states | Haxe | Pass | Invalid/preview/in-progress states support accessibility and are not style motifs. |
+| SCSS-01 button state model | SCSS | Pass | Disabled, hover, focus, and active can be tonal/border states with no shadow dependence. |
+| SCSS-02 active tabs | SCSS | Pass | Selection via fill/border/position avoids hue-only or glow-only indication. |
+| SCSS-03 select picker states | SCSS | Pass | Dense list/grid state coverage is interaction design, not visual copying. |
+| SCSS-04 notification layouts | SCSS | Pass | Full vs quick message taxonomy is portable; animated drama is not required. |
+| SCSS-05 modal/panel shells | SCSS | Pass | Shared shell grammar maps to Godot popup/window theme entries. |
+| SCSS-06 context-menu row states | SCSS | Pass | Checked/hover/focus row clarity is accessibility-preserving. |
+| SCSS-07 command palette rows | SCSS | Pass | Category/context/active rows are useful; the one LDtk overflow gradient is not a NeoCade identity motif. |
+| SCSS-08 form default/error states | SCSS | Pass | Required, defaulted, resettable, and error states are control obligations. |
+| SCSS-09 palette/list row markers | SCSS | Pass | Thin markers and swatches avoid LDtk-style content-domain full-row tinting. |
+| SCSS-10 scrollbars | SCSS | Pass | Thumb/track/hover/grab states are cross-platform usability polish. |
 
 ## Open Questions
 
-Reserved for Plan 02-05.
+- Phase 3: decide which LDtk-inspired interaction-density sketches appear in the approved mockup, especially compact tool launchers, icon-bearing lists, command-palette-like search, and notification samples.
+- Phase 3: confirm how much category color appears as small swatches/markers without becoming LDtk content-domain color semantics.
+- Phase 3: decide whether toast/notification attention gets a single non-animated cue or only static severity styling.
+- Phase 4: translate the accepted state taxonomy into TokenSet roles without binding to LDtk SCSS hex values, shadows, filters, or gradients.
+- Phase 5+: implement and inspect selected/focus/hover/pressed/disabled combinations for `Button`, `OptionButton`, `PopupMenu`, `Tree`, `ItemList`, `Tabs`, `ScrollBar`, dialogs, and form controls.
+- Phase 8+: ensure showcase rows include icons, swatches, disabled rows, required/error form rows, reset/default affordances, scrollbars, and popup/dialog states.
+- v1.x: consider editor-only CodeMirror-like/code-editor surfaces separately; Phase 2 rejected them for v1 Control-theme scope.
 
 ## Phase 2 Verification Log
 
@@ -603,3 +636,33 @@ High-value hits already covered: button state model, select/list picker states, 
 Rejected visual moves: LDtk uses extensive `box-shadow`, some `text-shadow`, a small number of filters, and one functional gradient. These are evidence of state emphasis only; they are not binding NeoCade token/style decisions. Direct glow/shadow copying would conflict with NeoCade v1's no-drop-shadow and anti-cyberpunk constraints.
 
 Line-count correction: this audit went far beyond `app.scss` lines 1-24. `rg -n "^"` reports 10819 physical lines, while the initial PowerShell fallback line count reported 9322; future citations use `rg` line numbers.
+
+### Final Phase 2 Threshold Verification
+
+Roadmap thresholds pass.
+
+| Verification item | Count / result |
+|---|---:|
+| File-by-file Haxe index rows | 80 |
+| Adopted Haxe patterns | 14 |
+| Adopted SCSS patterns | 10 |
+| Total adopted patterns | 24 |
+| Haxe rejected patterns | 6 |
+| SCSS rejection rows | 4 |
+| Asset rejection classes | 2 |
+| Prior-report claim rows checked | 7 |
+| CHANGELOG lessons | 16 |
+| SVG icons inventoried | 98 |
+| Aseprite atlas files inventoried | 2 |
+| Font-related files inventoried | 13 |
+| Active verification categories | 23 |
+| Forbidden cyberpunk term hits in `app.scss` audit | 0 |
+
+Quality confirmations:
+
+- Every adopted Haxe and SCSS pattern includes file:line evidence.
+- Every adopted Haxe and SCSS pattern includes anti-cyberpunk audit language.
+- Every translation note uses the mandatory prefix: `Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call.`
+- Anti-cyberpunk standalone audit result is PASS; no adopted pattern failed the filter.
+- No `.tres`, addon, theme, font, or icon asset files were edited in Phase 2.
+- Phase 2 remains research/docs only.

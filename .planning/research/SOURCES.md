@@ -66,6 +66,11 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 - LDtk editor-components page (component patterns, layout strategies)
 - LDtk's UI conventions referenced in user's prior research report
 
+**What was read/refined (Phase 2 source-dive, 2026-05-04):**
+- LDtk web-doc patterns were cross-checked against source evidence in `.planning/research/LDTK-UI-MINING.md`.
+- The source pass refined the docs-level panel, dropdown, context-menu, icon, palette/list, form, notification, and collapse observations into file:line-cited patterns.
+- Web-doc "polish benchmark" language remains valid, but implementation transfer is now explicitly inspiration-grade only.
+
 **What we adopted:**
 - **Polish/quality discipline as benchmark** — per PROJECT.md decision, LDtk is the polish bar, not visual copy. Reflected throughout ARCHITECTURE.md as "LDtk-grade clarity."
 - **Tinted-sidebar concept** — adapted into NeoCade's accent-palette approach (8 hues with role aliases per FEATURES.md DF-4) without copying LDtk's specific tints.
@@ -73,18 +78,19 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 - **Status-strip pattern** — bottom status bar with project info, layer, save status — informed FEATURES.md Section 5.4 showcase scope (resolution test selector, coverage counter).
 - **Toggleable panel pattern** — informed FoldableContainer requirement in FEATURES.md TS coverage.
 - **Keyboard-hint inline labels** — informed accessibility consideration (label every focus path).
+- **Source-refined interaction density** — from `.planning/research/LDTK-UI-MINING.md`: icon-bearing compact launchers, searchable popups, grid/list palette variants, reset/default affordances, row markers, and explicit unsupported/active states.
 
 **What we rejected:**
 - **Color-by-function-tinted sidebars** — LDtk does this for editor mode (blue=entities, brown=walls). NeoCade is a general theme, not a single-app editor — this pattern would over-constrain consuming projects.
 - **Bitmap atlas font discipline** — LDtk bakes Noto Sans into PNG atlases due to Heaps engine constraints. Godot 4.6 has mature TTF/VF support — STACK.md uses dynamic FontFile/FontVariation, not BMFont (Pitfall 5.4).
 - **`pixel_berry.png` pixel font for tiny labels** — pixel fonts categorically rejected by PROJECT.md (HD-only constraint).
 - **Fixed Endesga32 palette for content** — LDtk's content palette is for tile-art use, not UI; not relevant to NeoCade theme.
+- **Binding LDtk component behavior into the theme** — Phase 2 confirms singleton panels, popout palettes, viewport cursors, and CodeMirror-style editors are app/editor logic, not v1 Godot Theme deliverables.
 
 **What's still open:**
-- **Specific component API patterns** beyond the surface read (panel collapse behaviors, modal flow, dropdown reveal, multi-select interactions).
-- **Color application rules from LDtk's `app.scss`** beyond the lines 1-24 already extracted by ARCHITECTURE.md.
+- None for v1 LDtk UI-doc usage. Phase 3 decides which non-binding inspiration sketches appear in the mockup.
 
-**Confidence in coverage:** **MEDIUM**. The web docs were read at surface level. Deeper UI pattern mining lives in the source-code dossier below.
+**Confidence in coverage:** **HIGH for v1 inspiration use** after Phase 2. Web docs are no longer standing alone; their relevant UI claims are cross-checked against `.planning/research/LDTK-UI-MINING.md`.
 
 ---
 
@@ -100,24 +106,40 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 - LDtk CHANGELOG (surface read for major UI lessons-learned)
 - **NOT read in initial pass:** `src/electron.renderer/` UI implementation files (the user's "must read all of it" mandate); per-component code patterns; tinted-sidebar/icon/font/atlas implementation patterns under `res/`; full CHANGELOG audit for UI lessons; specific component implementation files
 
+**What was read (Phase 2 source-dive, 2026-05-04):**
+- `.planning/research/LDTK-UI-MINING.md` was created as the durable LDtk source-dive artifact.
+- Provenance pinned LDtk `1.5.3`, source root `C:\Programming_Files\ldtk-master\`, no `.git` metadata in the local snapshot, 143 renderer Haxe files, 69 UI Haxe files, `Editor.hx`, 9 tool files, 10,819 physical `app.scss` lines by `rg`, 98 SVG icons, 2 Aseprite atlases, and 13 font-related files.
+- File-by-file Haxe index covered 80 UI-relevant Haxe surfaces: 69 `src/electron.renderer/ui/**/*.hx`, `page/Editor.hx`, `Tool.hx`, and 9 tool files. One `DebugMenu.hx` surface was explicitly marked not-ui.
+- 14 Haxe patterns, 10 SCSS patterns, 16 changelog lessons, 98-icon metadata inventory, atlas/font inventory, active verification audit, and prior-report claim verification were appended with line citations.
+- `app.scss` source ranges were mined beyond the initial palette lines, including buttons, tabs, forms, select picker, notifications, modal/dialog/panel shells, context menus, command palette, palette/list rows, and scrollbars.
+- CHANGELOG UI lessons were audited across versioned entries, including hotfix UI feedback, panel organization, compact/zen views, icon/color list scanning, dropdown search, warning/tooltip changes, Noto typography, and large-dialog scrollbars.
+- LDtk-related prior-report claims were checked against local source evidence.
+
 **What we adopted:**
 - **Palette extraction informed Cabinet Chrome palette** — ARCHITECTURE.md Palette C uses `$bgDark` exactly (`#1E2229`) and tunes `$orange` to `#FFB020` for AA contrast; informed by real LDtk source values.
 - **"Single warm signature accent against neutral ramp" discipline** — extracted from LDtk's palette structure (one orange, multi-stop neutral). Reflected in NeoCade's role-primary-dominance pattern.
 - **"No glow effects, all elevation through tonal value" discipline** — extracted from observing LDtk's UI is precise because there's no ambiguity about which surface a thing sits on. Adopted as NeoCade's elevation-via-color philosophy (FEATURES.md DF-10, Conflict 3 resolution).
 - **Confirmation that pixel-art tools ship sans-serif chrome fonts** — STACK.md cites this as evidence supporting Inter+Noto Sans over arcade flair fonts.
+- **Explicit state coverage taxonomy** — disabled, hover, focus, active, selected, checked, unsupported, defaulted, required/error, resettable, and collapsed/folded states should be deliberately demonstrated in NeoCade.
+- **Dense tool-surface grammar** — compact icon launchers, grid/list palette modes, searchable dropdowns/popups, icon-bearing rows, row markers, and context-menu alternatives are adopted as inspiration sketches only.
+- **Popup/dialog coverage pressure** — LDtk's modal, panel, command-palette, select, context-menu, and notification evidence reinforces the need to theme Godot popup/window/dialog surfaces explicitly.
+- **Readable sans-serif chrome** — LDtk's Noto usage reinforces the Inter/Noto-family direction without adopting bitmap atlases.
 
 **What we rejected:**
 - **Bitmap atlas font approach** — Godot 4.6 has mature dynamic TTF/VF rendering; Pitfall 5.4 forbids BMFont in v1.
 - **`pixel_berry.png`** — pixel fonts categorically rejected.
 - **Heaps-specific UI primitives** — NeoCade is a Godot Theme; LDtk's UI architecture is not directly portable.
+- **jQuery/class-mutation implementation model** — state names are useful, but DOM mutation patterns are not portable to `.tres`.
+- **Singleton panel/popout/cursor behavior as a theme requirement** — these are consuming-app/editor logic, not Godot Theme resource behavior.
+- **LDtk content-domain colors as NeoCade semantic UI roles** — Endesga32 and layer/entity/IntGrid colors are content data, not reusable theme roles.
+- **LDtk shadows, filters, gradients, and blinking/glow attention language as visual defaults** — Phase 2 treats them as state evidence only.
+- **Copying LDtk SVGs, Aseprite atlases, bitmap fonts, or icon attributions** — asset inventory is for non-binding design inspiration and license caution only.
 
 **What's still open:**
-- **`src/electron.renderer/` UI patterns end-to-end** — sidebar tinting implementation, layer panel chrome, tool-button conventions, modal flow, drag-and-drop UI, panel collapse behaviors, context menu patterns, status indicator rendering. The user's "must read all of it" mandate is **explicitly unsatisfied** by the initial pass.
-- **`res/atlas/` UI atlas conventions** — what UI elements are atlased, how state transitions are encoded.
-- **CHANGELOG end-to-end UI lessons** — what UI changes shipped in each version, what was reverted, what design decisions surfaced post-release.
-- **Verification of user's prior research report's LDtk claims** (e.g. "uses Material Design SVG icons", "uses Endesga32 for level tiles") against actual source.
+- **Closed by Phase 2 for v1 UI-theme research:** UI pattern mining, atlas/font/icon inventory, CHANGELOG UI lessons, and LDtk-related prior-report claim verification.
+- **Still open by design:** non-UI LDtk internals, exact visual asset rendering, and any behavior that belongs to a consuming app rather than a Godot Theme. These are not blockers for NeoCade v1.
 
-**Confidence in coverage:** **LOW**. Palette extraction is HIGH-confidence (real file, real values), but the "must read all of it" UI mining mandate is largely deferred. **What would raise it:** Phase 2 source-dive spike (per SUMMARY.md roadmap) — Haxe code reading of `src/electron.renderer/`, file-by-file UI pattern catalogue, CHANGELOG audit.
+**Confidence in coverage:** **HIGH for v1 LDtk UI-source research**. Phase 2 closes the four prior source-dive gaps for NeoCade's theme-planning purposes: UI patterns, atlas/font/icon conventions, CHANGELOG UI lessons, and LDtk claim verification. Remaining gaps are non-UI or implementation-behavior questions outside `.tres` scope.
 
 ---
 
@@ -295,8 +317,8 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 | # | Prior-report claim | NeoCade verdict | Evidence / replacement |
 |---|---|---|---|
 | 1 | "VirtuCade Godot Theme" naming throughout | **REJECT** | PROJECT.md hard constraint: theme is **NeoCade**; VirtuCade is consuming game. STACK.md, ARCHITECTURE.md, SUMMARY.md all enforce. |
-| 2 | LDtk's UI uses "Material Design SVG icons" | **PARTIALLY VERIFY** | Initial pass did not open `src/electron.renderer/` to confirm; LDtk's `app.scss` palette extracted but icon source not directly verified. **Open** — Phase 2 source-dive spike addresses. |
-| 3 | LDtk uses Endesga32 palette for level tiles | **TANGENTIAL — IRRELEVANT TO THEME** | Endesga32 is for tile-art content, not UI. NeoCade is a UI theme. Not adopted. |
+| 2 | LDtk's UI uses "Material Design SVG icons" | **REJECT exact source claim after Phase 2** | `.planning/research/LDTK-UI-MINING.md` found 98 local SVGs but no Google/Material source metadata; evidence instead includes internal/FinalBossBlues attribution and one Font Awesome-marked SVG. Use clear icon metaphors, not LDtk's assets or unverified attribution. |
+| 3 | LDtk uses Endesga32 palette for level tiles | **CONFIRM content-only; REJECT as UI palette** | Phase 2 verified Endesga32 in `docs/CHANGELOG.md`, `README.md`, and `Const.hx` as generated content colors for entities/IntGrid/enums, not LDtk UI chrome. NeoCade must not use Endesga32 as its UI palette. |
 | 4 | LDtk UI is "dark mode base" with "color accents" tinted per panel/mode | **PARTIALLY ADOPT** | Real LDtk `app.scss` confirms dark base (`#1e2229`) and orange accent (`#ffcc00`). Per-panel-tinted-by-function rejected (over-constrains consuming projects). |
 | 5 | LDtk uses "flat iconography, monochrome white/light on colored backgrounds" | **ADOPT (without claim verification)** | Discipline aligns with NeoCade's bespoke SVG approach; claim's specific Material-icon source not verified in initial pass. |
 | 6 | Godot Minimal Theme: `#272727` base, `#569eff` accent, Inter font, 4-5px corner, high icon saturation | **ADOPT (Inter, 4-5px, saturation); REJECT (`#272727`, `#569eff`)** | Verified accurate (godot-minimal-theme README confirms). Numerics rejected for NeoCade per Pitfall 6.1 (editor-scale-tuned) and identity discipline. |
@@ -321,6 +343,17 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 - The **list of motifs to investigate** (neon/dark contrast, pixel/vector art, bold buttons, sound/animation suggestions) — even where the specific motifs are rejected, they identify the design space researchers had to enter and counter.
 
 **What we rejected:** Most specific recommendations (see audit table). The prior report consistently leans synthwave/cyberpunk-adjacent and uses "VirtuCade Theme" naming. Both are PROJECT.md hard-constraint violations.
+
+### Phase 2 LDtk Claim Verification
+
+Phase 2 checked LDtk-specific report claims in `.planning/research/LDTK-UI-MINING.md`.
+
+- Material/Google icon claim: not evidenced locally and rejected as an exact source claim. LDtk has 98 SVGs under `app/assets/icons`, but local metadata did not prove Google Material usage; source evidence points to internal/FinalBossBlues attribution and one Font Awesome-marked SVG.
+- Endesga32 claim: confirmed for generated content colors only, not UI chrome. It can inform content swatch contrast thinking, but it is rejected as a NeoCade UI palette.
+- Dark base with bright accents: broadly confirmed as LDtk-like, but non-binding for NeoCade token values.
+- Tinted sidebar/per-panel colors: partially true as app/content semantics, rejected as global NeoCade theme roles.
+- "UI colors come from themes/custom overrides": overstated; LDtk source uses app SCSS plus content/user color features.
+- Neon/synthwave/pixel-font and VirtuCade naming claims: already rejected by project hard constraints; Phase 2 reinforces those rejections with LDtk source boundaries.
 
 **What's still open:**
 - **Verification of cited sources** (e.g. "【3†L72-L80】", "【5†L384-L389】", "【44†L1360-L1368】") — the report uses internal citation tokens that don't link to verifiable sources. Initial pass did not back-trace these.
@@ -486,7 +519,7 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 
 ---
 
-**Net change to SOURCES.md after CROSS-PLATFORM:** Source 10 fully catalogued. No regressions to Sources 1-9. Pending source-dive spike phases (Phase 1 godot-minimal-theme dissection, Phase 2 LDtk source-code mining, Phase 3 real-arcade reference photos) remain the highest-priority gaps.
+**Net change to SOURCES.md after Phase 2 LDtk source-dive:** Sources 2, 3, and 8 now link to `.planning/research/LDTK-UI-MINING.md`; LDtk source coverage is HIGH for v1 UI-theme research. Remaining highest-priority gap is Phase 3 real-arcade reference photos.
 
 ---
 
@@ -497,8 +530,8 @@ Of the nine sources catalogued above, four have HIGH or HIGH-MEDIUM coverage fro
 | # | Source | Initial coverage | Spike phase recommended |
 |---|---|---|---|
 | 1 | godot-minimal-theme | MEDIUM (README only) | **Phase 1: `.tres` line-by-line dissection** |
-| 2 | LDtk UI docs | MEDIUM | (Folded into Phase 2) |
-| 3 | LDtk source code | LOW (palette only; "must read all" mandate unsatisfied) | **Phase 2: `src/electron.renderer/` UI mining** |
+| 2 | LDtk UI docs | HIGH for v1 inspiration use after Phase 2 | Complete for v1; Phase 3 mockup decides which sketches to use |
+| 3 | LDtk source code | HIGH for v1 UI-theme research after Phase 2 | Complete for v1; non-UI internals remain out of scope |
 | 4 | Material Design 3 | HIGH | None needed |
 | 5 | Real & virtual arcade aesthetics | MEDIUM (text) / LOW (visual) | **Phase 3 sub-spike: real-arcade reference photo collection** |
 | 6 | Godot Theme docs | HIGH | None needed (re-verify via Context7 at each phase per user's global rule) |
