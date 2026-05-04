@@ -183,7 +183,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Source-Dive: godot-minimal-theme | 1/5 | In Progress|  |
+| 1. Source-Dive: godot-minimal-theme | 4/5 | In Progress|  |
 | 2. Source-Dive: LDtk source | 0/TBD | Not started | - |
 | 3. Visual Direction Mockup + Approval Gate | 0/TBD | Not started | - |
 | 4. Foundation + `@tool` Generator | 0/TBD | Not started | - |
