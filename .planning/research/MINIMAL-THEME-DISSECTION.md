@@ -587,6 +587,145 @@ These three are enumerated below as `### MenuBar`, `### Panel`, `### Window` sec
 - Upstream font (`font`), font_size are NOT set on TextEdit — engine-default font / size, which means TextEdit text rendering relies on the engine's built-in font scaled by EDSCALE. Pitfall: NeoCade must explicitly set `font` + `font_size` on TextEdit (and CodeEdit additive) for stable runtime rendering across export targets.
 - **Editor-font usage:** Upstream's GDScript at lines 432-462 (extracted via grep) sets `Editor`-class `font` / `bold_font` / `italic_font` slots — these are editor-only `Editor` aggregator slots, NOT user-facing `TextEdit` slots. NeoCade's `TextEdit` font path goes through Phase 4's typography decision (Inter for monoscale text, Outfit for display).
 
+### ItemList
+
+**Gloss:** Godot's `ItemList` Control — selectable list of items with optional icons. Used for asset library, scene tree's recent-files panel, palette pickers.
+
+**Upstream entry count:** 11 total set_* calls (1 color, 1 constant, 9 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| color | guide_color | (n/a) | `Color.TRANSPARENT` | `Color(0,0,0,0)` | 574 |
+| constant | v_separation | (n/a) | `int(base_margin * 1.5 * scale)` | `6` (base_margin=4, scale=1) — EDSCALE-derived | 575 |
+| stylebox | cursor | cursor | local `sb` (line 577-578: `base_sb.duplicate()`, `bg_color = color_mono * Color(1,1,1,0.04)`) | bg ≈ `Color(1,1,1,0.04)` (subtle white tint over base) | 579, 577-578 |
+| stylebox | cursor_unfocused | cursor (unfocused) | same `sb` as cursor | (same) | 580, 577-578 |
+| stylebox | focus | focus | `base_empty_sb` | (transparent — Pitfall 1.1 evidence; focus relies on font color) | 581, 161-163 |
+| stylebox | hovered | hover | `flat_button_hover_sb` | (per dict; bg=`color_button_normal`, narrow vertical margin) | 583, 148-153 |
+| stylebox | selected | selected | `flat_button_hover_sb` | (same — selected and hovered visually identical) | 584, 148-153 |
+| stylebox | selected_focus | selected+focus | `flat_button_hover_sb` | (same) | 585, 148-153 |
+| stylebox | hovered_selected | hovered+selected | `flat_button_hover_sb` | (same) | 586, 148-153 |
+| stylebox | hovered_selected_focus | hovered+selected+focus | `flat_button_hover_sb` | (same) | 587, 148-153 |
+| stylebox | panel | (panel) | local `sb` (line 589-590: `base_sb.duplicate()`, `set_content_margin_all(base_margin * 2 * scale)`) | bg = base_color, content_margin = 8 (EDSCALE) | 591, 589-590 |
+
+**Per-class notes:**
+- Upstream collapses 5 distinct combined-states (`hovered`, `selected`, `selected_focus`, `hovered_selected`, `hovered_selected_focus`) onto the **same `flat_button_hover_sb` stylebox**. Visually, hover and selected look identical; focus indication is overlay-only (Pitfall 1.1 evidence). NeoCade should consider whether selected should look distinct from hover (e.g., accent-tinted fill) — Phase 5 design decision.
+- `cursor` and `cursor_unfocused` styleboxes are minimal (4% white tint) — almost invisible. Upstream's design choice favors selection indication over cursor indication.
+- `font_color`, `font_selected_color`, `font_hovered_color`, `font_outline_color`, `outline_size` NOT set — engine defaults. Plan 03 D-12 omissions list will include these.
+- **Type variation: ItemListSecondary** — line 1000 sets `panel` stylebox using the sidebar `sb` (color_surface_low bg). NeoCade FEATURES.md does not currently include an ItemListSecondary TYPEVAR; documented for completeness (potential v1.x).
+
+### TabBar
+
+**Gloss:** Godot's `TabBar` Control — horizontal row of tabs (used standalone or as part of TabContainer). Each tab is selectable; one is currently-selected.
+
+**Upstream entry count:** 13 total set_* calls (8 color, 5 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| color | font_selected_color | selected | `color_font_normal` | `Color(1,1,1,0.7)` | 828, 81 |
+| color | font_hovered_color | hover | `color_font_highlighted` | `Color(1,1,1,1)` | 830, 83 |
+| color | font_unselected_color | unselected | `color_font_secondary` = `color_mono_font * Color(1,1,1,0.45)` | `Color(1,1,1,0.45)` | 832, 82 |
+| color | font_disabled_color | disabled | `color_font_dimmed * Color(1,1,1,0.55)` | `Color(1,1,1, ~0.193)` (0.35 × 0.55) | 834, 84 |
+| color | icon_selected_color | selected | `color_font_normal` | `Color(1,1,1,0.7)` | 837, 81 |
+| color | icon_hovered_color | hover | `color_font_highlighted` | `Color(1,1,1,1)` | 839, 83 |
+| color | icon_unselected_color | unselected | `color_font_secondary` | `Color(1,1,1,0.45)` | 841, 82 |
+| color | icon_disabled_color | disabled | `color_font_dimmed * Color(1,1,1,0.55)` | `Color(1,1,1, ~0.193)` | 843, 84 |
+| stylebox | tab_selected | selected | local `sb` (line 846-850: `base_sb.duplicate()`, `_set_margin(sb, 16, ~8.4, 16, ~8.4)`, `set_corner_radius_all(0)` then `corner_radius_top_left = corner_radius_top_right = int(corner_radius * scale)`) | bg = base_color, top corners only rounded (4 EDSCALE), bottom corners square — visually "pinned" to panel below | 851, 846-850 |
+| stylebox | tab_focus | focus | `base_empty_sb` | (transparent — Pitfall 1.1 evidence) | 859, 161-163 |
+| stylebox | tab_unselected | unselected | local `sb = sb.duplicate()` from tab_selected, then `bg_color = color_surface_lowest`, `set_border_width_all(0)` (line 863-865) | bg ≈ `Color(0.10,0.10,0.10,1)` (surface_lowest), no border, top corners rounded | 866, 863-865 |
+| stylebox | tab_disabled | disabled | same `sb` as tab_unselected (line 870 reuses) | (same as tab_unselected — disabled visually = unselected) | 870, 863-865 |
+| stylebox | tab_hovered | hover | local `sb = sb.duplicate()` from tab_unselected, then `bg_color = color_surface_base * Color(1,1,1,0.8)` (line 874-875) | bg ≈ `Color(0.21,0.21,0.21,0.8)` (surface_base × 0.8 alpha) | 876, 874-875 |
+
+**Per-class notes:**
+- 8 colors paired (4 font / 4 icon — same role per state). The font and icon color tracks move together.
+- Tab styleboxes share the `_set_margin(sb, 16, 8.4, 16, 8.4)` pattern — wide horizontal padding, moderate vertical (`base_margin * 4` horizontal, `base_margin * 2.1` vertical). Tabs are visually substantial.
+- **Top-only corner rounding** is the visual signature: tabs round at top (next to panel above) but square at bottom (flush to panel below). NeoCade Phase 5 should preserve this — squaring the bottom is what makes a tab "feel docked."
+- `font` (typeface), `font_size`, `font_outline_color`, `outline_size`, `font_outline_size`, `h_separation`, `icon_separation` NOT set — engine defaults. Plan 03 D-12 omissions.
+- **Tab buttons** (`increment`, `decrement`, `increment_highlight`, `decrement_highlight`, `drop_mark`, `close`, `close_pressed`) — these icons are NOT set. Engine defaults used. NeoCade's icon set design (Phase 4 ICON-*) needs to cover these.
+- `button_pressed` / `button_highlight` slots NOT set.
+
+### TabContainer
+
+**Gloss:** Godot's `TabContainer` Control — TabBar + content panel + tab-switching. Top-level "tabbed pages" layout.
+
+**Upstream entry count:** 15 total set_* calls (8 color, 7 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| color | font_selected_color | selected | `color_font_normal` | `Color(1,1,1,0.7)` | 829, 81 |
+| color | font_hovered_color | hover | `color_font_highlighted` | `Color(1,1,1,1)` | 831, 83 |
+| color | font_unselected_color | unselected | `color_font_secondary` | `Color(1,1,1,0.45)` | 833, 82 |
+| color | font_disabled_color | disabled | `color_font_dimmed * Color(1,1,1,0.55)` | `Color(1,1,1, ~0.193)` | 835, 84 |
+| color | icon_selected_color | selected | `color_font_normal` | `Color(1,1,1,0.7)` | 838, 81 |
+| color | icon_hovered_color | hover | `color_font_highlighted` | `Color(1,1,1,1)` | 840, 83 |
+| color | icon_unselected_color | unselected | `color_font_secondary` | `Color(1,1,1,0.45)` | 842, 82 |
+| color | icon_disabled_color | disabled | `color_font_dimmed * Color(1,1,1,0.55)` | `Color(1,1,1, ~0.193)` | 844, 84 |
+| stylebox | tab_selected | selected | shared `sb` from TabBar (lines 846-850; same construction) | (same as TabBar.tab_selected) | 852, 846-850 |
+| stylebox | tab_focus | focus | `base_empty_sb` | (transparent) | 860, 161-163 |
+| stylebox | tab_unselected | unselected | shared `sb` from TabBar | (same as TabBar.tab_unselected) | 867, 863-865 |
+| stylebox | tab_disabled | disabled | shared `sb` from TabBar | (same as TabBar.tab_unselected — visual collapse) | 871, 863-865 |
+| stylebox | tab_hovered | hover | shared `sb` from TabBar | (same as TabBar.tab_hovered) | 877, 874-875 |
+| stylebox | panel | (panel) | local `sb` (line 880-884: `base_sb.duplicate()`, `set_content_margin_all(increased_margin * 1.5 * scale)`, `set_corner_radius_all(0)` then `corner_radius_bottom_right = corner_radius_bottom_left = int(corner_radius * scale)`) | bg = base_color, BOTTOM corners only rounded — mirrors tab top-rounding to form a "tabbed card" visual | 885, 880-884 |
+| stylebox | tabbar_background | (tabbar) | local `sb` (line 891-895: `base_sb.duplicate()`, `bg_color = color_surface_lowest`, `corner_radius_bottom_left = corner_radius_bottom_right = 0`, `_set_margin(sb, 0, 1, 4, 0)`) | bg ≈ `Color(0.10,0.10,0.10,1)` (surface_lowest), only top corners rounded | 896, 891-895 |
+
+**Per-class notes:**
+- TabContainer **shares all 5 tab_* styleboxes with TabBar** (same `sb` constructions at lines 846-850 / 863-865 / 874-875). Plus 2 TabContainer-only styleboxes: `panel` (the content area below tabs) and `tabbar_background` (the tab strip behind the tabs).
+- `panel` rounds BOTTOM corners; `tab_selected` rounds TOP corners. Together they form a continuous "tabbed card" — the selected tab's bottom edge bleeds into the panel's top edge.
+- 8 colors paired (4 font / 4 icon) — identical to TabBar's color matrix.
+- `tabbar_background` uses `surface_lowest` bg — visually the tab strip is the *darkest* surface, with selected tab popping forward to `base_color`.
+- `side_margin`, `icon_max_width`, `font_size`, `font_outline_size`, `outline_size`, `h_separation`, `icon_separation` NOT set — engine defaults. Plan 03 D-12 omissions.
+- **Type variation: TabContainerOdd** — lines 857, 861, 868, 872, 878, 889, 897 (7 set_*). Specializes 5 tab_* styleboxes + panel + tabbar_background by re-coloring with `color_surface_base` (panel) or `color_surface_lower` (tab_unselected/disabled). Used by upstream editor for the secondary inspector tabs to differentiate odd-row TabContainers from even ones. NeoCade FEATURES.md does NOT include TabContainerOdd; documented for completeness.
+- **Type variation: TreeSecondary, ItemListSecondary** — also reference via line 999/1000 for shared sidebar visual; documented under Tree / ItemList sections.
+
+### Tree
+
+**Gloss:** Godot's `Tree` Control — hierarchical row-based data view with collapsible parents. The most theme-complex Control in Godot's set; powers Inspector, Scene Tree, Filesystem dock.
+
+**Upstream entry count:** 30 total set_* calls (4 color, 8 constant, 18 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| color | drop_position_color | (n/a) | `color_font_dimmed` | `Color(1,1,1,0.35)` | 901, 84 |
+| color | font_color | normal | `color_font_normal` | `Color(1,1,1,0.7)` | 902, 81 |
+| color | guide_color | (n/a) | `Color.TRANSPARENT` | `Color(0,0,0,0)` | 903 |
+| color | parent_hl_line_color | (n/a) | `color_mono * Color(1,1,1, relationship_line_opacity)` | `Color(1,1,1, 0.5)` (relationship_line_opacity default 0.5) | 904, 34 |
+| constant | children_hl_line_width | (n/a) | literal `0` | `0` | 905 |
+| constant | draw_guides | (n/a) | literal `0` (false) | `0` | 906 |
+| constant | draw_relationship_lines | (n/a) | literal `1` (true) | `1` | 907 |
+| constant | inner_item_margin_left | (n/a) | `int(base_margin * scale)` | `4` (EDSCALE-derived) | 908 |
+| constant | inner_item_margin_right | (n/a) | `int(base_margin * scale)` | `4` (EDSCALE-derived) | 909 |
+| constant | parent_hl_line_width | (n/a) | `int(ceilf(scale))` | `1` (EDSCALE-derived) | 910 |
+| constant | relationship_line_width | (n/a) | literal `0` | `0` | 911 |
+| constant | v_separation | (n/a) | `tree_v_separation = int(pow(base_margin * 0.2 * scale, 3))` | `0` (4 × 0.2 = 0.8, 0.8^3 ≈ 0.512, int = 0) — effectively zero v_separation | 914, 913 |
+| stylebox | panel | (panel) | local `empty_sb` (line 920-921: `base_empty_sb.duplicate()`, `_set_margin(empty_sb, 6, 10, 6, 10)`) | (transparent panel; asymmetric margins favoring vertical for tall lists) | 922, 920-921 |
+| stylebox | focus | focus | `base_empty_sb` | (transparent — Pitfall 1.1) | 926, 161-163 |
+| stylebox | title_button_hover | (header hover) | local `sb` (line 928-934: `base_sb.duplicate()`, `bg_color = color_surface_lowest`, `border_width_left = border_width_right = int(ceilf(scale))`, `border_color = sb.bg_color * Color(1,1,1,0)` — transparent border for column-title separation) | bg ≈ `Color(0.10,0.10,0.10,1)`; left/right borders 1 EDSCALE wide, fully transparent | 936, 928-934 |
+| stylebox | title_button_normal | (header) | same `sb` as title_button_hover | (same) | 937, 928-934 |
+| stylebox | title_button_pressed | (header pressed) | same `sb` | (same) | 938, 928-934 |
+| stylebox | button_hover | hover | local `sb` (line 940-942: `flat_button_hover_sb.duplicate()`, `set_content_margin_all(0)`, `bg_color = color_button_disabled`) | bg ≈ `Color(0.31,0.31,0.31,1)` (button_disabled), zero margin | 943, 940-942 |
+| stylebox | hover | hover | same `sb` | (same) | 944, 940-942 |
+| stylebox | hovered_dimmed | (n/a) | same `sb` | (same) | 945, 940-942 |
+| stylebox | custom_button_hover | hover | same `sb` | (same) | 946, 940-942 |
+| stylebox | hovered | hover | same `sb` | (same) | 947, 940-942 |
+| stylebox | selected | selected | same `sb` | (same — selected = hovered visually) | 948, 940-942 |
+| stylebox | selected_focus | selected+focus | same `sb` | (same) | 949, 940-942 |
+| stylebox | hovered_selected | hovered+selected | local `sb = sb.duplicate()` then `bg_color = color_button_normal` (line 951-952) | bg ≈ `Color(0.34,0.34,0.34,1)` (button_normal — slightly brighter than disabled) | 953, 951-952 |
+| stylebox | hovered_selected_focus | hovered+selected+focus | same `sb` | (same) | 954, 951-952 |
+| stylebox | button_pressed | pressed | local `sb` (line 956-957: `flat_button_pressed_sb.duplicate()`, `_set_margin(sb, 4, 0, 4, 0)`) | bg = `color_button_hover`, narrow zero-vertical margin | 958, 956-957 |
+| stylebox | custom_button_pressed | pressed | same `sb` | (same) | 959, 956-957 |
+| stylebox | cursor | cursor | local `sb` (line 962-963: `base_sb.duplicate()`, `bg_color = color_mono * Color(1,1,1,0.04)` — transparent cursor overlay drawn on top of item) | bg ≈ `Color(1,1,1,0.04)` | 964, 962-963 |
+| stylebox | cursor_unfocused | cursor (unfocused) | same `sb` | (same) | 965, 962-963 |
+
+**Per-class notes:**
+- **Three stylebox tiers** — title_button (header), button/hover/selected/hovered (list rows; multiple slots collapse to ONE stylebox), hovered_selected (the brighter "still in selection" row state), button_pressed / custom_button_pressed (pressing an inline button on a tree item), cursor / cursor_unfocused (transparent overlay).
+- **State-collapse pattern reaches its peak here** — `button_hover`, `hover`, `hovered_dimmed`, `custom_button_hover`, `hovered`, `selected`, `selected_focus` all map to the SAME stylebox. Upstream's design philosophy: minimize visual noise on tree rows. NeoCade Phase 5 should consider whether tree-row state should differentiate more — accessibility may require it.
+- `tree_v_separation = int(pow(base_margin * 0.2 * scale, 3))` (line 913): with base_margin=4, scale=1, this evaluates to `pow(0.8, 3) = 0.512`, `int(0.512) = 0`. So `v_separation = 0`. **Trees have ZERO vertical separation between rows.** This is intentional for dense data display; NeoCade may want to revisit for accessibility (target row tappability on touch).
+- Comment at lines 916-919: "Using empty stylebox for trees to avoid drawing unnecessary borders in docks. Note that using opaque color that is the same as dock background doesn't work because EditorPropertyResource is using Tree panel stylebox to draw its background as well." — explicit acknowledgment of editor-coupling that NeoCade does NOT inherit (D-05); NeoCade's Tree panel can be opaque if Phase 5 design wants.
+- Comment at lines 924-925: "Leaving focus empty for trees and scroll containers because there's no way to make focus indication look not janky when only a part of a dock is highlighted" — Pitfall 1.1 evidence for Plan 03.
+- Comment at line 961: "Cursor is drawn on top of the item so it needs to be transparent" — Tree cursor stylebox must be a transparent overlay because Godot draws it ABOVE the row's stylebox; opaque cursor would hide row contents.
+- Slots NOT set: `arrow`, `arrow_collapsed`, `select_arrow`, `checked`, `unchecked`, `indeterminate`, `updown` icons; `font`, `font_size`, `title_button_font`, `font_outline_color`, `outline_size`, `font_outline_size`, `font_selected_color`, `relationship_line_color`, `children_hl_line_color`, `custom_button_font_*`, `item_margin`, `button_margin`, `scroll_border`, `scroll_speed` constants. Plan 03 D-12 omissions.
+- **Type variation: TreeSecondary** — line 999 sets `panel` stylebox using sidebar `sb` (color_surface_low bg). Used by editor's docks. NeoCade FEATURES.md does not include TreeSecondary; documented for completeness.
+
+
 
 
 
