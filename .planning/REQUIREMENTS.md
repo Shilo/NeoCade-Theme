@@ -197,7 +197,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [ ] **DOCS-02**: `MOBILE-DESIGN-SPEC.md` documents every mobile delta vs desktop with concrete numbers + rationale (MOBILE-07 deliverable).
 - [ ] **DOCS-03**: `EDITOR-COVERAGE.md` (already exists; per MAJ-7 review finding) maps which Editor surfaces are themed in v1 vs which fall back to default.
 - [ ] **DOCS-04**: README.md is comprehensive: project description; **install path = "Download `neocade_theme-v<VERSION>.zip` from GitHub Releases, extract `addons/neocade_theme/` into your project's `addons/` folder"** (no Asset Library reference); usage examples (project theme + per-scene theme + optional editor theme); cross-platform notes; accessibility notes; **font override patterns** (Noto Sans for non-Latin harmony, mono for CodeEdit, Inter Italic) per FONT-09; **link to web showcase** (`neocade_theme-showcase-web-v<VERSION>.zip` from the same release — extract and serve, or "play in browser" GitHub Pages link if v1.x adds it); editor-coverage map link (EDITOR-COVERAGE.md); license; attributions; link to GitHub repo.
-- [ ] **DOCS-05**: SOURCES.md is updated by Phase 1, 2, 3 source-dive spike outputs (RES-01..03) with new findings.
+- [x] **DOCS-05**: SOURCES.md is updated by Phase 1, 2, 3 source-dive spike outputs (RES-01..03) with new findings.
 
 ## v2 Requirements
 
