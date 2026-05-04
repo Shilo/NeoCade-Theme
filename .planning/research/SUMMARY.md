@@ -118,25 +118,27 @@ Other high-severity flagged: StyleBoxFlat shadow alpha bug (over-renders ~2× on
 
 ## Conflicts Resolved
 
-### Conflict 1 — Display/heading font: Outfit vs Inter Display via `opsz` — **REVISED 2026-05-04 after CROSS-PLATFORM**
+### Conflict 1 — Display/heading font + bundle minimization — **FINAL 2026-05-04 (Option D)**
 
-**ARCHITECTURE.md** recommended **Outfit** as a tertiary display font. **STACK.md** explicitly rejected adding any third font, citing Inter v4's unified Display via `opsz=32`. The initial synthesis sided with STACK (no Outfit in v1).
+History: Outfit added (Conflict 1 revision) → reversed to Option B (Inter+NotoSans+JBMono per FONT-REVIEW.md applying consistency principle) → user pushed further on size minimization, noting `Font.allow_system_fallback=true` makes Noto Sans optional and CodeEdit usage is rare in shipped games. **Final decision: Option D — Inter Variable ONLY.**
 
-**Revised decision (2026-05-04 after CROSS-PLATFORM landed): Ship Outfit Variable in v1 as the heading/marquee display font; defer Inter Italic to v1.x. Total bundle ~1.85 MB.**
+**Final v1 bundle: Inter Variable Roman ONLY. ~810 KB. Matches godot-minimal-theme exactly.**
 
-**Reasoning for the revision:**
-- ARCHITECTURE.md's type-scale table (display-small / headline-small) bakes Outfit into the type system as the marquee voice — Inter Display via `opsz=32` is a viable substitute but is structurally a body face stretched up, not a marquee face. The arcade brief specifically asks for "marquee feel" on headings.
-- CROSS-PLATFORM.md verified Outfit is OFL 1.1 — App Store + Play Store + Web embedding all legal. License-stack cost (single combined `OFL.txt` block) is trivial.
-- Trade: Inter Italic Variable (~0.85 MB) is dropped from v1; italic emphasis falls back to synthetic transform on the upright Inter Variable until v1.x bundles Inter Italic. This is a small visual compromise (synthetic italic isn't as nicely shaped as real italic) on a feature that body text uses sparingly.
-- Net bundle difference: `~2.3 MB (with Inter Italic, no Outfit) → ~1.85 MB (with Outfit, no Inter Italic)`. Smaller AND more on-brand.
-- Mockup gate at Phase 3 still presents the user with both directions for comparison: Variant A (Inter-only, no Outfit) vs Variant B (Inter body + Outfit headings). User can override this revised decision at mockup approval if they prefer Variant A.
+**Why minimal works:**
+- **`Font.allow_system_fallback = true` (Godot 4.x default)** handles missing-glyph rendering automatically. Non-Latin text (Arabic, Hebrew, Hindi, Thai, CJK, etc.) renders via the user's OS system fonts — no tofu boxes, no bundle overhead. Every supported export target (Win/Mac/Linux/iOS/Android/Web) has system fonts covering these scripts.
+- **CodeEdit / `[code]` BBCode is genuinely rare in shipped games.** Consumers who use it can override `theme.default_font` for that Control via documented README pattern.
+- **Headings differentiate via `opsz=32` + heavier `wght`** — Apple HIG / Material 3 native pattern.
+
+**Trade-off accepted:**
+- Non-Latin scripts will render with system fonts — functional, but visually less harmonized with Inter. For consumers who care, README documents how to extend `default_font.fallbacks` with their preferred coordinated font (e.g., Noto Sans for Arabic/Hebrew/Indic, Noto Sans CJK for East Asian).
+- CodeEdit users get unstyled-looking code unless they override.
 
 **Implications propagated:**
-- Phase 4 deliverables (below): bundle Inter Variable + Outfit Variable + Noto Sans Variable + `OFL.txt` (Inter Italic deferred to v1.x).
-- ARCHITECTURE.md type-scale table is now canonical (no edits required).
-- CROSS-PLATFORM.md font compliance section is correct (no edits required).
-- SOURCES.md font listings updated to match.
-- STACK.md "Supporting Libraries" must add Outfit Variable as v1 bundled font.
+- Phase 4 deliverables: bundle Inter Variable Roman + `OFL.txt`. NO Noto Sans, NO JetBrains Mono, NO Outfit, NO Inter Italic in v1.
+- Theme wiring: `theme.default_font = Inter Variable; default_font.fallbacks = []; default_font.allow_system_fallback = true (default).` Heading type variations use Inter at higher opsz/wght.
+- CodeEdit and RichTextLabel `[code]` get NO theme-bundled mono — README documents the override pattern for consumers who need it.
+- Phase 3 mockup gate's typography step: 1 typography mockup confirming Inter is sufficient + a sample showing CJK/Arabic system-fallback rendering for visual review.
+- v1.x roadmap items: bundle Noto Sans (designed-together cross-script harmony) + bundle Inter Italic (true italic) + optional JetBrains Mono.
 
 ### Conflict 2 — Surface token taxonomy: M3 5-stop ramp vs prototype's Base/Secondary/Panel/Raised/Elevated
 
@@ -177,8 +179,8 @@ Default v1 ships without CJK (~30 MB+ doubles addon size); README documents over
 ### UD-3: Stylebox authoring tooling — UPDATED post-CROSS-PLATFORM
 PROJECT.md mandates Godot's Theme Editor as the authoring path. CROSS-PLATFORM introduced a `@tool` script generator (`addons/neocade_theme/_dev/generate_themes.gd`) producing both desktop and mobile `.tres` from a single TokenSet block. **Reconciled recommendation: the `@tool` generator is the PRIMARY authoring path for tokenized properties (colors, font sizes, paddings, radii) — TokenSet is the single source of truth. Godot's Theme Editor is the VERIFICATION surface (open the generated `.tres` to visually confirm) and the targeted-edit path for non-tokenized one-off properties.** Both paths are committed to v1; Phase 4 establishes the workflow.
 
-### UD-4 (NEW): Inter Italic — v1 vs v1.x — RESOLVED in Conflict 1 revision
-**Resolution: defer Inter Italic to v1.x; ship Outfit Variable in v1 instead.** Net bundle smaller (~1.85 MB vs ~2.3 MB) and more on-brand. Synthetic italic transform used until v1.x. User can override at Phase 3 typography mockup gate.
+### UD-4: Inter Italic — v1 vs v1.x — RE-RESOLVED post-FONT-REVIEW
+**Resolution: defer Inter Italic to v1.x.** Original Conflict-1-revision rationale (swap Italic out, Outfit in) no longer applies — Outfit is dropped per consistency principle. Inter Italic deferral now driven purely by bundle-size economy (~+0.85 MB for a feature body text uses sparingly). Synthetic italic transform carries v1. User can override at Phase 3 typography mockup gate.
 
 ### UD-5 (NEW): Real-device cross-platform testing matrix
 CROSS-PLATFORM requires per-target export validation. Real-device coverage needs: 3 Android devices (low/mid/high-end); iOS testing requires Mac + paid Apple Developer Program. **User hardware/account status is unknown.** Phase 10 acceptance criteria must be marked with `(if-real-device-available)` qualifier where applicable. **Decision needed before Phase 10 plan is authored:** confirm available test surfaces, identify gaps, decide whether v1 ships with "verified on Windows/macOS/Linux/Web; mobile-targets pending real-device QA in v1.0.1" or with full mobile coverage.
@@ -198,7 +200,7 @@ Godot 4.6 has partial screen-reader integration via AccessKit. CROSS-PLATFORM fl
 
 All three pass WCAG 2.1 AA on body text and SC 1.4.11 (3:1 non-text) on accents. Full contrast tables in `ARCHITECTURE.md` Section 1.
 
-**Typography (default, post-Conflict-1-revision):** Inter Variable (upright body) + Outfit Variable (display/marquee headings) + Noto Sans Variable (multi-script fallback). JetBrains Mono for code. Inter Italic deferred to v1.x; synthetic italic transform used until then. M3 type scale (display-small 36 in Outfit, headline-small 24 in Outfit, title-large 20 in Outfit, body-medium 14 in Inter, code 13 in JetBrains Mono).
+**Typography (FINAL — Option D):** **Inter Variable Roman ONLY.** Single bundled font (~810 KB). Headings use `opsz=32` + heavier `wght`. Non-Latin scripts via Godot's `Font.allow_system_fallback=true`. Italic via synthetic transform (Inter Italic deferred to v1.x). CodeEdit/code surfaces via consumer-side override (no bundled mono in v1). M3 type scale: display-small 36 (Inter opsz=32 wght=800) / headline-small 24 (Inter opsz=32 wght=700) / title-large 20 (Inter opsz=24 wght=600) / body-medium 14 (Inter wght=400) / code 13 (consumer-supplied mono).
 
 **Geometry:** corner radius default 4px (godot-minimal-theme parity), 8px on PopupPanel/Window, 12px on dialogs. 1px hairline borders default; 2px focus rings; 3px reserved for danger emphasis. **No drop shadows; tonal surface ramp is the elevation system.**
 

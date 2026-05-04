@@ -4,6 +4,8 @@
 **Researched:** 2026-05-04
 **Overall confidence:** HIGH on Godot/Theme/font specifics; MEDIUM on Asset Library policy nuances; LOW on long-tail icon licensing edge cases.
 
+> **Font decision superseded 2026-05-04 — see `.planning/research/FONT-REVIEW.md` and SUMMARY.md Conflict 1 final.** This document originally recommended Inter + Inter Italic + Noto Sans (and CROSS-PLATFORM later added Outfit). The user's locked decision is **Option D: Inter Variable Roman ONLY** (~810 KB, matches godot-minimal-theme). Non-Latin via Godot's `Font.allow_system_fallback=true`. Inter Italic, Noto Sans, JetBrains Mono, Outfit — all deferred to v1.x or consumer-side override. Treat the font sections below as historical research context; SUMMARY.md is canonical for the v1 bundle.
+
 ---
 
 ## TL;DR — The 5 Decisions That Must Be Locked Before Implementation
@@ -12,7 +14,7 @@ These supersede every other recommendation below. Lock them at the end of design
 
 | # | Decision | Recommendation | Confidence | Why It Must Be Locked First |
 |---|---------|----------------|------------|---------------------------|
-| 1 | **Font distribution model** | Bundle Inter v4.x **upright variable + italic variable** as two `.ttf` files (NOT the static OTF set) + Noto Sans Variable for fallback. Use `FontVariation` with `wght` axis for weights, separate file for italic. | HIGH | Determines theme item structure, .tres complexity, addon size (~2-3 MB vs ~25 MB for static set), and italic correctness. |
+| 1 | **Font distribution model** | ~~Bundle Inter v4.x upright + italic + Noto Sans~~ **SUPERSEDED 2026-05-04 (Option D):** bundle Inter Variable Roman ONLY (~810 KB). Non-Latin via Godot's `Font.allow_system_fallback=true`. Italic via synthetic transform. CodeEdit mono via consumer override. | HIGH | Smallest viable bundle; matches godot-minimal-theme exactly; functional coverage of all scripts via system fallback. |
 | 2 | **Icon strategy** | Author **a small bespoke SVG icon set (~25-40 icons)** for the theme's intrinsic Godot icon slots (checkbox tick, dropdown arrow, tree expand, etc). Do NOT bundle Material Symbols / Lucide / Phosphor as a general icon font. | HIGH | Theme intrinsic icons have hard-coded names per Control class — generic libraries don't map 1:1. Asset Library size limits and license-stacking favor minimal bespoke set. |
 | 3 | **Display/heading font policy** | NO arcade display font in v1. Use Inter Display optical sizing (`wght 700-900`, larger size) for marquee/headline feel. Arcade aesthetic comes from **color, glow-via-border-color, and stylebox geometry** — not font novelty. | HIGH | User explicitly rejected pixel fonts for HD constraint and rejected synthwave/retro affectations. Adding a display arcade font reopens the rejected aesthetic. |
 | 4 | **StyleBox geometry baseline** | All interactive surfaces use `StyleBoxFlat` with `corner_radius >= 2` (forces AA on), `anti_aliasing = true`, `anti_aliasing_size = 1.0`. Avoid `corner_radius = 0` on focus/hover boxes. Avoid `StyleBoxTexture` for chrome. No drop-shadow on small controls (banding in GL Compatibility). | HIGH | StyleBoxFlat AA only renders with non-zero corner radius (Godot issue #87226). GL Compatibility renderer has known shadow/AA quirks — designing around the limit is faster than fighting it. |

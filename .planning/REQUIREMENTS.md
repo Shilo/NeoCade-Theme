@@ -20,7 +20,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 ### Design Mockups & Approval Gate (DESIGN)
 
 - [ ] **DESIGN-01**: Phase 3 produces 3 HTML/SVG palette mockups in `.planning/mockups/` showing surface ramp + accent palette + sample Controls for each of the 3 candidate palettes (A: Midnight Marquee, B: Boardwalk Sunset recommended, C: Cabinet Chrome). User selects one at Step 1 approval.
-- [ ] **DESIGN-02**: Phase 3 produces 2 typography mockups exploring Inter-only (no Outfit) vs Inter+Outfit display (recommended per Conflict 1 revision). User selects one at Step 2 approval.
+- [ ] **DESIGN-02**: Phase 3 produces 2 typography mockups exploring Variant A (Inter-only — recommended per FONT-REVIEW.md applying consistency principle) vs Variant B (Inter + Outfit headings — override option if user prefers two-stylistic-face design at the gate). User selects one at Step 2 approval.
 - [ ] **DESIGN-03**: Phase 3 produces 1 full-fidelity desktop Control gallery HTML mockup showing every Godot Control class with realistic content, all states visible, ~1500 lines HTML+CSS. Approved by user at Step 3.
 - [ ] **DESIGN-04**: Phase 3 produces 1 mobile-variant mockup (per ARCHITECTURE Section 6 Step 5b) showing the same Controls at mobile sizes (360×800 + 768×1024 viewports) with tap-target overlays visible (≥48px); approved together with DESIGN-03.
 - [ ] **DESIGN-05**: `DESIGN_TOKENS.md` finalized with both desktop and mobile token blocks (color tokens, typography scale, spacing scale, corner radius scale, stroke widths, elevation/surface ramp, interaction state opacities). Committed before any `.tres` styling work begins.
@@ -34,15 +34,15 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Fonts (FONT)
 
-- [ ] **FONT-01**: Inter Variable upright (`Inter-Variable.ttf` from Inter v4.x, OFL 1.1) bundled at `addons/neocade_theme/fonts/Inter-Variable.ttf`. Reserved Font Name preserved (file NOT renamed); imported as `FontFile.tres` referenced by `uid://`.
-- [ ] **FONT-02**: Outfit Variable (OFL 1.1) bundled as the v1 display/marquee font (per SUMMARY Conflict 1 revision; replaces Inter Italic for v1). Reserved Font Name preserved; imported as `FontFile.tres`.
-- [ ] **FONT-03**: Noto Sans Variable (Latin-extended, OFL 1.1) bundled as the multi-script fallback. Reserved Font Name preserved.
-- [ ] **FONT-04**: JetBrains Mono Variable (OFL 1.1) bundled as the code/monospace font (used by CodeEdit and code-related label variations).
-- [ ] **FONT-05**: Combined `OFL.txt` lists Reserved Font Name notice + copyright block per font (Inter + Outfit + Noto Sans + JetBrains Mono). Surfaced in README install instructions for downstream projects to embed in their About/Credits.
-- [ ] **FONT-06**: Theme `default_font` is Inter Variable upright; `default_font.fallbacks` order: Inter → Noto Sans Variable. Outfit assigned to type variations (HeaderLarge / HeaderMedium / HeaderSmall) only.
+- [ ] **FONT-01**: Inter Variable Roman (`Inter-Variable.ttf` from Inter v4.x, OFL 1.1) bundled at `addons/neocade_theme/fonts/Inter-Variable.ttf` — **the ONLY font bundled in v1 (Option D, locked 2026-05-04).** Reserved Font Name preserved (file NOT renamed); imported as `FontFile.tres` referenced by `uid://`. `allow_system_fallback` left at default `true` so non-Latin scripts (Arabic, Hebrew, Indic, Thai, CJK, etc.) render via the user's OS system fonts.
+- ~~[ ] **FONT-02**: Outfit Variable~~ — **STRICKEN 2026-05-04 per FONT-REVIEW.md.** Outfit dropped from v1 per user's consistency principle. Headings handled by Inter Variable at `opsz=32` + heavier `wght`. Outfit may be reconsidered at Phase 3 typography mockup gate (Variant B); if user picks Variant B there, this requirement is reinstated.
+- ~~[ ] **FONT-03**: Noto Sans Variable~~ — **STRICKEN 2026-05-04 (Option D).** Not bundled in v1. Non-Latin scripts handled by Godot's `Font.allow_system_fallback=true` using the user's OS system fonts. README documents how to add Noto Sans (or any preferred coordinated cross-script font) for consumers who want designed-together cross-script harmony.
+- ~~[ ] **FONT-04**: JetBrains Mono Variable~~ — **STRICKEN 2026-05-04 (Option D).** Not bundled in v1. CodeEdit / `[code]` BBCode is rare in shipped games. README documents the override pattern: `code_edit.add_theme_font_override("font", preload("res://your_mono.ttf"))`. Consumers who use code surfaces ship their preferred mono.
+- [ ] **FONT-05**: `OFL.txt` ships Inter's Reserved Font Name notice + copyright block (single-font OFL, since Inter is the only bundled font). Surfaced in README install instructions for downstream projects to embed in their About/Credits.
+- [ ] **FONT-06**: Theme `default_font` is Inter Variable Roman; `default_font.fallbacks = []` (empty); `default_font.allow_system_fallback = true` (Godot 4.x default — explicit set for clarity in `.tres`). Heading type variations (HeaderLarge / HeaderMedium / HeaderSmall) use Inter at `opsz=32` + heavier `wght` (700-800) via `FontVariation`, NOT a separate display font. Per Pitfall 1.2 (type variations don't inherit fonts from base type), recommend setting font ONLY on `default_font` and using `FontVariation` for heading variations — structurally avoids the inheritance bug.
 - [ ] **FONT-07**: Italic emphasis falls back to synthetic transform on Inter upright (Inter Italic deferred to v1.x per Conflict 1 revision). Body text rendering is acceptable; documented limitation in CHANGELOG.
 - [ ] **FONT-08**: Font import settings: Grayscale antialiasing, Light hinting, Auto subpixel positioning (per STACK + PITFALLS 5.5; verified for GL Compatibility renderer).
-- [ ] **FONT-09**: CJK is NOT bundled in v1 (per UD-2 default); README documents the override pattern for consumers who need it: duplicate theme + append CJK font to `default_font.fallbacks`.
+- [ ] **FONT-09**: README documents three consumer-side font override patterns: (a) **CJK / multi-script harmony**: `default_font.fallbacks.append(preload("res://your_noto_sans_cjk.ttf"))` for designed-together cross-script rendering (Inter alone relies on system fallback for non-Latin); (b) **Code/monospace**: per-Control override on CodeEdit / RichTextLabel `[code]` with consumer's preferred mono; (c) **Italic**: synthetic transform is used in v1; consumer can preload Inter Italic Variable to upgrade. (Per UD-2, Option D, and Conflict 1 final.)
 
 ### Icons (ICON)
 
@@ -62,7 +62,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [ ] **TOKEN-07**: Stroke width set: 1px hairline default; 2px focus rings; 3px reserved for danger emphasis. Integer pixels only (no fractional widths under GL Compatibility).
 - [ ] **TOKEN-08**: Elevation model: color-only (tonal surface ramp). NO drop shadows in v1 (per SUMMARY Conflict 3 + FEATURES AF-13 + GL Compatibility issue #23640). Optional 1px lighter top-bevel border allowed on raised buttons.
 - [ ] **TOKEN-09**: Interaction state system uses M3 deterministic state-layer model: hover 8% overlay, focus 12% overlay + 2px outer ring in `role.primary`, pressed 12% overlay, dragged 16% overlay, disabled 38% text / 12% container. Reproducible from any base color.
-- [ ] **TOKEN-10**: Type scale spine (M3-derived): display-small 36 (Outfit) / headline-small 24 (Outfit) / title-large 20 (Outfit) / title-medium 16 (Inter) / body-large 16 (Inter) / body-medium 14 (Inter) / body-small 12 (Inter) / label-large 14 (Inter) / label-small 11 (Inter) / code 13 (JetBrains Mono).
+- [ ] **TOKEN-10**: Type scale spine (M3-derived; all UI surfaces use Inter — heading discrimination via `opsz` axis + `wght`, not via family switch): display-small 36 (Inter opsz=32 wght=800) / headline-small 24 (Inter opsz=32 wght=700) / title-large 20 (Inter opsz=24 wght=600) / title-medium 16 (Inter wght=600) / body-large 16 (Inter wght=400) / body-medium 14 (Inter wght=400) / body-small 12 (Inter wght=400) / label-large 14 (Inter wght=500) / label-small 11 (Inter wght=500) / code 13 (consumer-supplied mono via override pattern; theme provides no mono in v1 per Option D).
 
 ### Control Coverage (COV)
 
@@ -80,7 +80,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 ### Type Variations (TYPEVAR)
 
 - [ ] **TYPEVAR-01**: 6 Button type variations: PrimaryButton, SecondaryButton, GhostButton, DangerButton, IconButton, FlatButton (role-semantic naming, not fill-semantic).
-- [ ] **TYPEVAR-02**: 5 Label type variations: HeaderLarge (Outfit display-small), HeaderMedium (Outfit headline-small), HeaderSmall (Outfit title-large), Caption (Inter body-small), CodeLabel (JetBrains Mono code).
+- [ ] **TYPEVAR-02**: 5 Label type variations: HeaderLarge (Inter opsz=32 wght=800, display-small), HeaderMedium (Inter opsz=32 wght=700, headline-small), HeaderSmall (Inter opsz=24 wght=600, title-large), Caption (Inter wght=400, body-small), CodeLabel (consumer-supplied mono via override; theme defines the variation but ships no mono in v1).
 - [ ] **TYPEVAR-03**: 1 RichTextLabel type variation: InfoText.
 - [ ] **TYPEVAR-04**: 2 Panel type variations: CardPanel, HeroPanel.
 - [ ] **TYPEVAR-05**: Fonts set explicitly on every type variation (per PITFALLS 1.2 — type variations DO NOT inherit fonts from base type, even when stylebox inheritance works). Verify under runtime QA, not editor preview.
@@ -90,7 +90,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 - [ ] **MOBILE-01**: `addons/neocade_theme/neocade_mobile_theme.tres` ships in v1 alongside the desktop primary, generated from `_dev/generate_themes.gd` `TokenSet.mobile` overrides.
 - [ ] **MOBILE-02**: Tap targets ≥48px (Godot pixels at base scale 1.0) on every interactive Control in the mobile theme. Satisfies iOS HIG 44pt minimum + Material 3 48dp minimum simultaneously.
-- [ ] **MOBILE-03**: Body text 16px on mobile vs 14px desktop. Headings retain Outfit display sizes (no scale change for headings).
+- [ ] **MOBILE-03**: Body text 16px on mobile vs 14px desktop. Headings retain their desktop sizes (Inter at opsz=32 + wght=700-800; no scale change for headings).
 - [ ] **MOBILE-04**: Spacing scale +50% on `space.4` and above on mobile. Corner radii STAY IDENTICAL across desktop/mobile (brand identity, not platform-specific).
 - [ ] **MOBILE-05**: One mobile theme covers all Android density buckets (per CROSS-PLATFORM 3.5; Godot uses `content_scale_factor` + stretch modes, NOT density qualifiers). Authored values are dp-equivalent at base scale 1.0.
 - [ ] **MOBILE-06**: Tap-target audit script confirms every interactive Control in mobile theme is ≥48px; runs as part of Phase 8 acceptance.
@@ -117,7 +117,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [ ] **EXPORT-05**: CI workflow exports + smoke-tests on Windows + Linux + macOS + Web targets (desktop runners + headless Web export).
 - [ ] **EXPORT-06**: Manual Android validation on at least 1 device (low / mid / high end if 3 devices available; or "deferred to v1.0.1" with explicit changelog note per UD-5).
 - [ ] **EXPORT-07**: Manual iOS validation on at least 1 device (requires Mac + paid Apple Developer Program; or "deferred to v1.0.1" with explicit changelog note per UD-5).
-- [ ] **EXPORT-08**: License compliance verified: all 4 bundled fonts (Inter / Outfit / Noto Sans / JetBrains Mono) are OFL 1.1 — App Store + Play Store + Web embedding all legal. Reserved Font Name clauses preserved (no binary renames).
+- [ ] **EXPORT-08**: License compliance verified: the single bundled font (Inter Variable Roman) is OFL 1.1 — App Store + Play Store + Web embedding all legal. Reserved Font Name clause preserved (Inter binary NOT renamed). Web export specifically: `Font.allow_system_fallback` behavior validated against Chrome / Firefox / Safari — non-Latin scripts render via browser-exposed system fonts.
 
 ### Accessibility (A11Y)
 
@@ -140,7 +140,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 ### Distribution (DIST)
 
 - [ ] **DIST-01**: Asset Library submission package complete: square 128×128 PNG icon URL; README with both install paths (project theme + per-scene theme + optional editor theme); license attributions surfaced; "not an editor plugin" note; editor-leak caveat (per PITFALLS 2.2 + EDITOR-COVERAGE.md).
-- [ ] **DIST-02**: Combined `OFL.txt` covers all bundled fonts (Inter + Outfit + Noto Sans + JetBrains Mono) with each font's Reserved Font Name notice block + copyright lines.
+- [ ] **DIST-02**: `OFL.txt` covers Inter (the single bundled font in v1, Option D) — Reserved Font Name notice block + copyright lines.
 - [ ] **DIST-03**: `LICENSE.md` for theme code (recommend MIT or CC-BY) + initial `CHANGELOG.md` entry for v1.0.0.
 - [ ] **DIST-04**: README documents: install paths (project theme / per-scene theme / editor theme); CJK override pattern (UD-2); editor-coverage map link (EDITOR-COVERAGE.md); cross-platform support summary; mobile variant usage.
 - [ ] **DIST-05**: Asset Library current submission policy verified via Context7 MCP at submission time (NOT training data); RES-05 closes this.

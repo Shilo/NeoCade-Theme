@@ -208,6 +208,8 @@ gui/theme/default_font_subpixel_positioning=1     # Auto
 
 ### Display Font: ADD a third "marquee" font for headings only
 
+> **SUPERSEDED 2026-05-04 (Option D, FINAL):** No third display font. No Outfit. Headings use Inter Variable Roman at `opsz=32` + heavier `wght` (700-800). v1 ships **only Inter Variable Roman**. See `.planning/research/FONT-REVIEW.md` and SUMMARY.md Conflict 1 final. Section below is historical research context.
+
 After evaluating five candidates, the recommendation is **Outfit** with a fallback to Inter. Outfit's geometric construction with rounded terminals and 45° cuts hits the "modern arcade signage" feel without leaning retro/synthwave. Smaller, secondary recommendation is **Space Grotesk** if Outfit feels too rounded.
 
 | Font | Designer | License | Weights | Variable axes | Lang coverage | Small-size | Arcade fit | Verdict |
