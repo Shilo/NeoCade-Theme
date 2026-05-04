@@ -23,12 +23,21 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 - License terms (MIT — compatible with NeoCade redistribution)
 - **NOT read in initial pass:** the `.tres` file itself line-by-line; per-Control × per-state entry enumeration; interaction state transforms; accent strategy; how it handles popups; whether it themes `TooltipPanel`/`TooltipLabel`/`Window` etc.
 
+**What was read (Phase 1 source-dive, 2026-05-04):**
+- `minimal_theme.tres` enumerated line-by-line — provenance recorded (SHA-256 `102fd6b3cab3b30b3c05878badff83e321df06a98adf4bb17e6a94d1b0a73f2e`, 1118 lines, 48,442 bytes). 27 user-facing Controls × per-state × per-entry tabulated; 80-class active-verification audit; FlatButton dissected as Button TYPEVAR-01 research per CONTEXT.md D-10. See `.planning/research/MINIMAL-THEME-DISSECTION.md`.
+- `default_theme.cpp` cross-referenced for engine-declared slots; per-Control omission tables for slots upstream chose NOT to populate.
+- `theme_db.cpp` + `base_button.cpp` consulted for Pitfall 1.1 (focus stylebox overlay) and Pitfall 1.7 (popup separate-Window theming) confirmation/refutation; both pitfalls **CONFIRMED** with engine-source + theme-resource evidence cited.
+- Coverage delta vs FEATURES.md 35-class matrix computed: 27 themed-in-upstream + 8 NeoCade-additives + FlatButton (research-only) + container-chrome reconciliation. See `.planning/research/MINIMAL-THEME-COVERAGE-DELTA.md`.
+
 **What we adopted:**
 - **Function-as-completeness-benchmark posture** — see PROJECT.md decision: "godot-minimal-theme is the feature-completeness benchmark, NOT visual reference." Reflected in FEATURES.md's 35-class coverage matrix.
 - **Inter as primary UI font** — same choice as minimal theme; harmonizes NeoCade with Godot 4.6's new default editor theme. STACK.md adopts Inter Variable v4.x.
 - **Corner radius default 4px** — STACK.md and ARCHITECTURE.md both anchor to this (godot-minimal-theme uses 4-5; we pick 4 with 8/12 escalations for popups/dialogs).
 - **High icon saturation discipline** — bespoke SVG icon set per STACK.md authored at full saturation against dark surface.
 - **Single-accent dominance pattern** — even though NeoCade has 8 accent hues, only ONE is the primary `role.primary` (cyan in Midnight Marquee, amber in Boardwalk Sunset, orange in Cabinet Chrome). Same discipline as minimal theme's `#569eff`.
+- **Composite-state slot strategy (from Pitfall 1.1 confirmation, Phase 1)** — populating `pressed_focus`, `hover_pressed`, `checked_focus`, `radio_checked_focus` slots is mandatory for visible focus on focusable Controls; relying on bare `focus` slot leaves focus invisible when also pressed/checked (engine behavior, not theme behavior). Phase 5 focus-ring design depends on this.
+- **Popup type-level theming as required pattern (from Pitfall 1.7 confirmation, Phase 1)** — every popup class (PopupMenu, PopupPanel, AcceptDialog, FileDialog, ConfirmationDialog, TooltipPanel, TooltipLabel, Window) must have type-level theme-resource entries; runtime `add_theme_*_override` on parents does NOT inherit through popups (separate Windows). NeoCade's coverage strategy aligns with this prescription.
+- **7-stop tonal surface ramp pattern documented as reference (Phase 1)** — upstream's 7-stop ramp (`color_surface_lowest..._highest` via `_get_base_color(brightness, sat_mult)`) is the design pattern; NeoCade's M3 5-stop ramp (per ARCHITECTURE.md) is the chosen architecture. Divergence is intentional (M3 is the canonical model adopted in Conflict 2 resolution); the upstream pattern is now research material, not direction.
 
 **What we rejected:**
 - **Verbatim numeric values** — Pitfall 6.1: minimal-theme numerics are tuned for editor scale (with `EDSCALE` factors); lifting them produces a theme that looks "minimal-ish" without distinct identity. NeoCade derives numerics from the design system in ARCHITECTURE.md, not from minimal-theme.
@@ -37,14 +46,14 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 - **`#272727` base color** — too cool/neutral for arcade direction. Boardwalk Sunset uses `#1A1410` (warm near-black, brown undertone); Cabinet Chrome uses `#1E2229` (matches LDtk's `$bgDark` exactly, slightly warmer than minimal theme).
 - **`#569eff` accent** — too generic-cool-blue per ARCHITECTURE.md Section 7. Replaced with arcade-amber/orange for distinctive identity.
 - **Editor-only theme types** — minimal theme styles `FlatButton`/`MainScreenButton`/`BottomPanelButton`/`EditorInspector*` etc. NeoCade v1 scopes to user-facing public Control hierarchy only (FEATURES.md AF-6); editor parity is v1.x.
+- **`@tool extends Theme` + `EditorInterface.get_editor_settings()` + `EDSCALE` runtime pattern** — D-05 rejection re-confirmed by Phase 1 enumeration. Upstream's GDScript reads 9 `interface/theme/*` editor settings + uses `EditorInterface.get_editor_scale()`. NeoCade's `@tool` token-generator (Phase 4) reads from a hand-authored TokenSet resource, not from EditorSettings — runtime-first; works in shipped games on all 6 export targets. The 13 specific Editor-API touchpoints with line citations are documented in `MINIMAL-THEME-DISSECTION.md` `## Editor-API Touchpoints (Forbidden in NeoCade per D-05)`.
 
 **What's still open:**
-- **Full `.tres` enumeration** — what entries are defined per Control × per state; what are the actual numeric values of styleboxes; how does interaction state transform per class. **Recommended phase:** Phase 1 source-dive spike (per SUMMARY.md roadmap).
-- **Accent application strategy** — how does minimal-theme apply its single accent across Tree selection, ItemList cursor, Tab selected, focus rings? Pattern catalogue not extracted.
+- **Accent application strategy** — partially resolved by Phase 1 enumeration (per-Control accent-using rows are now visible in DISSECTION.md). Synthesizing the cross-class accent pattern into a NeoCade design rule remains Phase 3 mockup-design work. Reduced from "open in initial pass" to "design synthesis pending Phase 3."
 - **Editor-theme-only types' theme entries** — even though we don't theme them in v1, we may want the entry list for v1.x editor-only coverage.
 - **Comparison against Godot 4.6's "Modern" editor theme** — minimal-theme was ported but may have been tuned. Need diff.
 
-**Confidence in coverage:** **MEDIUM** for v1 (README-level claims verified; coverage delta vs FEATURES.md not yet computed). **What would raise it:** Phase 1 source-dive spike that opens the `.tres` and enumerates entries.
+**Confidence in coverage:** **HIGH** for v1. Phase 1 source-dive (2026-05-04) opened the `.tres` and enumerated every entry per-Control × per-state with line citations; coverage delta vs FEATURES.md 35-class matrix computed; Pitfall 1.1 and Pitfall 1.7 confirmed from data with engine-source + theme-resource evidence. **Remaining uncertainty (LOW-impact):** edge-case Godot version drift between user's local engine clone and Godot 4.6 release tag; recommend re-pinning the omission cross-reference once Godot 4.6 is finalized in user's clone (caveat noted in DISSECTION.md `### Engine-Default Cross-Reference`).
 
 ---
 
