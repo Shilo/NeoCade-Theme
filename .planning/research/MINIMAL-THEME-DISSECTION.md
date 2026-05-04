@@ -1561,3 +1561,123 @@ Compared the returned slot set to Plan 02's `### <Class>` enumeration in `## Per
   2. Populate `pressed_focus` / `checked_focus` / `radio_checked_focus` slots on Button-family classes so focus is visually present even when the Control is also pressed/checked. Upstream's omission of these slots is the gap NeoCade closes.
   3. Populate `font_focus_color` AND state-specific composite focus-font-color slots (`font_pressed_focus_color` is a 4.7+ candidate — verify in 4.6 release tag) for accessible text contrast in all state combinations.
   4. NeoCade's mobile variant (Phase 8-9) needs INCREASED focus-ring expand_margin — touch targets emphasize visual focus indication even more strongly than desktop, since keyboard focus is less common but accessibility tools still navigate via focus.
+
+### Pitfall 1.7 — Popup Separate-Window Theming (Confirmation)
+
+**Pitfall claim (PITFALLS.md §1.7):** "Popups are separate Windows that don't inherit theme overrides. NeoCade must populate type-level theme entries (PopupMenu, PopupPanel, AcceptDialog, FileDialog, ConfirmationDialog, TooltipPanel, Window) — relying on a parent's `add_theme_*_override` won't reach the popup."
+
+**Two layers of theming (the pitfall is about the second; the prescription is to use the first):**
+
+#### Layer A — Resource-level type entries (DO apply to popups)
+
+Theme resources have type-level entries (`set_stylebox('panel', 'PopupMenu', sb)`). When a popup with no per-Control override is opened, the runtime walks the popup's class hierarchy and finds the type-level entry in the active Theme resource.
+
+- **Engine evidence:** `scene/theme/theme_db.cpp` lines 365-374 (class-hierarchy walk for runtime theme item resolution):
+  ```cpp
+  StringName class_name = p_instance->get_class();
+  while (class_name != StringName()) {
+      HashMap<StringName, HashMap<StringName, ThemeItemBind>>::Iterator E = theme_item_binds.find(class_name);
+      ...
+      class_name = ClassDB::get_parent_class_nocheck(class_name);
+  }
+  ```
+  And `theme_db.cpp` lines 380-383 (parent-class enumeration for `get_class_items`):
+  ```cpp
+  StringName class_name = p_class_name;
+  while (class_name != StringName()) {
+      class_hierarchy.push_front(class_name); // Put parent classes in front.
+      class_name = ClassDB::get_parent_class_nocheck(class_name);
+  }
+  ```
+  These walks are unconditional on Window-vs-Control: any node that calls `get_theme_stylebox(name, p_theme_type)` at runtime resolves through this chain. `scene/gui/control.cpp` lines 3585-3604 invoke this lookup for stylebox resolution (`get_theme_stylebox`), reading the type-level entry from `data.theme_owner->get_theme_item_in_types(...)`.
+
+- **Upstream evidence:** Plan 02's `### PopupMenu`, `### PopupPanel`, `### AcceptDialog`, `### TooltipPanel`, `### Window` sections (and per-Control omission tables in `### Engine-Default Cross-Reference` above) document upstream's type-level entries:
+  ```gdscript
+  # /c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres
+  set_stylebox('panel', 'PopupMenu', sb)        # line 714
+  set_stylebox('panel', 'PopupPanel', sb)       # line 735
+  set_stylebox('panel', 'TooltipPanel', sb)     # line 743
+  set_stylebox('panel', 'PopupDialog', sb)      # line 748
+  set_stylebox('panel', 'AcceptDialog', sb)     # line 749
+  ```
+  Plus six editor-only popup-dialog subclasses (lines 753-758) — which NeoCade does NOT mirror per D-05 / D-10 (no editor APIs).
+
+  Per-Control enumeration confirms:
+  - `### PopupMenu`: 8 set_* calls (3 constants, 5 styleboxes — `panel`, `hover`, `separator`, `labeled_separator_left`, `labeled_separator_right`)
+  - `### PopupPanel`: 1 set_* call (`panel`)
+  - `### AcceptDialog`: 1 set_* call (`panel` — shared `sb` from PopupDialog)
+  - `### TooltipPanel`: 1 set_* call (`panel`)
+  - `### Window`: 0 set_* calls (NeoCade-additive per D-08 reconciliation; upstream relies on Window's engine-default chrome and on each popup subclass populating its own `panel`)
+
+  All five upstream-themed popup classes have their `panel` stylebox populated at the type level, exactly as the pitfall prescribes.
+
+#### Layer B — Per-Control runtime override-bag overrides (DO NOT inherit through popups)
+
+When a parent Control calls `parent.add_theme_stylebox_override('panel', sb)`, that override is stored on the parent's per-Control override map (`theme_style_override`, etc.). A popup spawned by that parent is a separate Window — it has its own per-Window override map and its own `ThemeContext`, and it does NOT inherit the parent's override map.
+
+- **Engine evidence — Window has its own override maps:** `scene/main/window.cpp` lines 67-95:
+  ```cpp
+  if (!name.begins_with("theme_override")) { ... }
+  // ...
+  } else if (name.begins_with("theme_override_styles/")) {
+      ...
+      if (theme_style_override.has(dname)) {
+          theme_style_override[dname]->disconnect_changed(callable_mp(this, &Window::_notify_theme_override_changed));
+      }
+      theme_style_override.erase(dname);
+      _notify_theme_override_changed();
+  } else if (name.begins_with("theme_override_fonts/")) {
+      ...
+  ```
+  Each Window owns `theme_style_override`, `theme_icon_override`, `theme_font_override`, `theme_font_size_override`, `theme_color_override`, `theme_constant_override` maps — NOT shared with the parent Control / parent Window.
+
+- **Engine evidence — popups ARE Windows:** `scene/gui/popup.cpp` (the entire Popup class extends Window). Lines 54, 70, 171, 321 reference `is_embedded()` which is declared on `scene/main/window.cpp` line 682 (`bool Window::is_embedded() const { ... }`). Popup is a Window subclass; this is unambiguous in the engine source.
+
+- **Engine evidence — each Window establishes its own ThemeContext:** `scene/theme/theme_db.cpp` lines 217-263 implement `ThemeDB::create_theme_context` and `_propagate_theme_context`:
+  ```cpp
+  ThemeContext *ThemeDB::create_theme_context(Node *p_node, Vector<Ref<Theme>> &p_themes) {
+      ERR_FAIL_COND_V(theme_contexts.has(p_node), nullptr);
+      ThemeContext *context = memnew(ThemeContext);
+      context->parent = get_nearest_theme_context(p_node);
+      ...
+      theme_contexts[p_node] = context;
+      _propagate_theme_context(p_node, context);
+  }
+  void ThemeDB::_propagate_theme_context(Node *p_from_node, ThemeContext *p_context) {
+      ...
+      from_control->set_theme_context(p_context);
+      ...
+      from_window->set_theme_context(p_context);  // line 255 — Windows get separate contexts
+      ...
+      if (theme_contexts.has(child_node)) {
+          theme_contexts[child_node]->parent = p_context;
+          continue;  // line 264-265 — child Windows have their OWN ThemeContext entry
+      }
+  }
+  ```
+  When a child node is itself a registered theme context (i.e., a Window), `_propagate_theme_context` records the parent linkage but DOES NOT recurse into the child's interior — the child Window manages its own ThemeContext propagation independently. This is the structural reason runtime override-bag overrides do not cross Window boundaries: the override bag lives on a specific Window's ThemeContext, and resolution stops at that Window's boundary unless explicitly chained.
+
+#### Conclusion: Pitfall 1.7 is CONFIRMED
+
+- The *pitfall claim* (popups are separate Windows; runtime per-Control override bags don't propagate from a parent Control into a child popup) is engine behavior verified by:
+  - `theme_db.cpp` lines 217-263 (`ThemeContext` per-Window structure; child Windows get their own ThemeContext entries that don't inherit override maps)
+  - `window.cpp` lines 67-95 (each Window owns its own `theme_*_override` maps)
+  - `popup.cpp` (Popup extends Window; embedded vs. native windowing is per-instance, not theme-inherited)
+
+- Upstream's *response* (populating type-level `panel` entries on every popup class — Layer A) is the prescription the pitfall recommends. Plan 02's enumeration confirms upstream populates PopupMenu, PopupPanel, AcceptDialog, TooltipPanel, PopupDialog at the type level. This is the workaround that lets popups receive consistent theming via the Theme resource itself, bypassing the broken inheritance for runtime override bags.
+
+- **Critical distinction:** This is NOT a refutation of the pitfall. Resource-level type entries (Layer A — what upstream sets and what NeoCade also sets) are NOT the same as runtime override-bag overrides (Layer B — what fails to inherit). Anyone reading this must understand both layers; conflating them produces broken popup theming. The pitfall is about Layer B; the prescription is to use Layer A. Both can be true.
+
+- **Implication for NeoCade:** NeoCade's `neocade_theme.tres` MUST populate type-level entries for:
+  - PopupMenu (panel + hover + separator + labeled_separator_*  styleboxes; font / font_color / font_size / hover & disabled font colors / submenu / radio / checked icons; constants per Phase 4 design)
+  - PopupPanel (panel — drop NeoCade's shadow per Conflict 3 / SUMMARY.md GL-Compat-shadow constraint, even though upstream sets shadow_color on PopupPanel only)
+  - AcceptDialog (panel + buttons_separation + Window-class chrome — see Window row)
+  - **FileDialog (NeoCade-additive per D-09)** — engine declares 24 set_* calls' worth of slots in `default_theme.cpp`; upstream populates 0 (FileDialog inherits AcceptDialog via class chain); NeoCade owns first-class FileDialog theming
+  - **ConfirmationDialog (NeoCade-additive per D-09)** — engine declares 0 explicit slots in `default_theme.cpp` (inherits AcceptDialog); NeoCade adds dedicated theming if Phase 5 design diverges from AcceptDialog
+  - TooltipPanel (panel)
+  - **TooltipLabel (NeoCade-additive per D-09)** — engine declares 8 set_* calls' worth (font / font_color / font_size / outline / shadow); upstream populates 0; NeoCade owns first-class TooltipLabel theming
+  - Window (NeoCade-additive per D-08 — embedded_border / title_color / title_font / close icon / close_h_offset / etc.; substantial coverage delta)
+
+  Phase 6 / Phase 7 implementations CANNOT rely on `add_theme_*_override` calls on parent Controls — those don't reach popups. The token generator at Phase 4 must emit type-level Theme entries for every popup class, full stop.
+
+  Mobile variant (Phase 8-9) must duplicate this discipline into `neocade_mobile_theme.tres` per CROSS-PLATFORM.md token-sharing strategy — popup theming does not "inherit" between Theme resources any more than between Controls; the mobile theme's popup classes get their own type-level entries from the same TokenSet.
