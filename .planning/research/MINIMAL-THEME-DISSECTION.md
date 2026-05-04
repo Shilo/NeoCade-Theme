@@ -188,7 +188,113 @@ func _set_border(sb: StyleBoxFlat, color: Color, width: float = 1, blend: bool =
 
 ## Per-Control Enumeration
 
-> This section is appended by **Plan 02 (per-class enumeration)**. Heading reserved here for ordering only.
+> **Active Verification Audit (per CONTEXT.md D-08).** This subsection records every unique uppercase-token target the upstream `set_*` calls reference (80 tokens total — the keyword grep `set_(stylebox|color|font|icon|constant|font_size)\(...,\s*'[A-Z][a-zA-Z]+'` plus `[^,]+` first-arg surface them all). Each is classified into one of five buckets. The "user-facing — enumerated below" bucket is the dissection scope; the others are documented for completeness so coverage delta (Plan 04) starts from a verified baseline, not a keyword guess.
+
+### Active Verification Audit
+
+> **Methodology.** The audit grep `grep -oE "set_(stylebox|color|font|icon|constant|font_size)\([^,]+, '[A-Z][a-zA-Z]+'" minimal_theme.tres | grep -oE "'[A-Z][a-zA-Z]+'" | sort -u` extracts the SECOND positional argument of every `set_*` call. A separate broader sweep also surfaces FIRST-positional-argument uppercase tokens that are slot-names rather than classes (Background, ContextualToolbar, FocusViewport, LaunchPadMovieMode, LaunchPadNormal, MovieWriterButtonPressed, ThemeEditorPreviewBG, ThemeEditorPreviewFG — these are slot-names of `EditorStyles` class and surface in the audit-grep output as a side effect). The combined set is 80 tokens; the table below classifies all 80.
+
+| Class | Bucket | Why |
+|-------|--------|-----|
+| AcceptDialog | user-facing — enumerated below | D-08 user-facing dialog Control. Upstream set_* count: 1 (line 749). |
+| AnimationBezierTrackEdit | editor-only — skipped per D-10 | Editor animation pane internal class. 4 set_* (173-176). |
+| AnimationTimelineEdit | editor-only — skipped per D-10 | Editor animation pane internal class. 13 set_* (178-199). |
+| AnimationTrackEdit | editor-only — skipped per D-10 | Editor animation pane internal class. 5 set_* (201-216). |
+| AnimationTrackEditGroup | editor-only — skipped per D-10 | Editor animation pane internal class. 5 set_* (218-226). |
+| AssetLib | editor-only — skipped per D-10 | Editor Asset Library dialog. 1 set_* (line discoverable via `grep -n "'AssetLib'"`). |
+| Background | slot-name (not a class) — themed under EditorStyles class | First-arg slot-name of `set_stylebox('Background', 'EditorStyles', sb)` at line 397. Surfaces in keyword audit; not a Godot Control class. |
+| BottomPanelButton | editor-only — skipped per D-10 | Editor bottom-panel toggle button type. 4 set_* (233, 237, 238, 242). |
+| Button | user-facing — enumerated below | D-08 user-facing base Button. 24 set_* (lines 256-279). |
+| CheckBox | user-facing — enumerated below | D-08 user-facing toggle Control. 4 set_* (lines 283, 284, 289, 290). |
+| CheckButton | user-facing — enumerated below | D-08 user-facing switch Control. 3 set_* (lines 294, 295, 296). |
+| ColorPicker | user-facing — enumerated below | D-08 user-facing color picker. 3 set_* (lines 525, 526, 532). |
+| ContextualToolbar | slot-name (not a class) — themed under EditorStyles class | First-arg slot-name `set_stylebox('ContextualToolbar', 'EditorStyles', sb)` line 417. |
+| Editor | editor-only — skipped per D-10 | Editor-singleton aggregate-color/icon class. 16 set_* (lines 300-322 region). |
+| EditorAbout | editor-only — skipped per D-10 | About dialog. 1 set_* (line 757). |
+| EditorAudioBus | editor-only — skipped per D-10 | Audio bus editor. 3 set_* (lines 248, 249, 252). |
+| EditorDebuggerInspector | editor-only — skipped per D-10 | Debugger inspector pane. 1 set_* (line 1004). |
+| EditorHelpBitContent | editor-only — skipped per D-10 | Editor help-bit content area. 1 set_*. |
+| EditorHelpBitTitle | editor-only — skipped per D-10 | Editor help-bit title bar. 1 set_*. |
+| EditorInspector | editor-only — skipped per D-10 | Editor inspector pane. 2 set_*. |
+| EditorInspectorCategory | editor-only — skipped per D-10 | Inspector category header. 1 set_*. |
+| EditorInspectorSection | editor-only — skipped per D-10 | Inspector section folder. 1 set_*. |
+| EditorLogFilterButton | editor-only — skipped per D-10 | Log filter toggle. 3 set_*. |
+| EditorProperty | editor-only — skipped per D-10 | Inspector property row. 5 set_*. |
+| EditorSettingsDialog | editor-only — skipped per D-10 | Editor settings dialog. 1 set_* (line 753). |
+| EditorSpinSlider | editor-only — skipped per D-10 | Inspector spin-slider widget. 1 set_*. |
+| EditorStyles | editor-only — skipped per D-10 | Aggregate editor-styles namespace (carries Background/FocusViewport/LaunchPadNormal/etc. slot styleboxes). 13 set_* (lines 397, 405, 410-412, 417, 424, 429, 434, 853, 869, 985 region). |
+| EditorValidationPanel | editor-only — skipped per D-10 | Validation panel. 1 set_*. |
+| FlatButton | research-only (D-10 exception) | Editor-only in upstream (line 467-489) but enumerated below per CONTEXT.md D-10 because NeoCade reuses the name as Button TYPEVAR-01 (FEATURES.md DF-Button-1). 22 set_*. |
+| FlatMenuButton | type variation noted on its base — enumerated below alongside MenuButton | Editor-only specialization of MenuButton with a flat (border-less) base stylebox. 23 set_* (lines 493-517). Documented under MenuButton notes for reference; NeoCade does not currently define a FlatMenuButton type variation (FEATURES.md TYPEVAR-* table has none). |
+| FocusViewport | slot-name (not a class) — themed under EditorStyles class | First-arg slot-name `set_stylebox('FocusViewport', 'EditorStyles', sb)` line 405. |
+| GraphEdit | user-facing — enumerated below | D-08 user-facing node graph editor. 1 set_* (line 539). |
+| GraphStateMachine | editor-only — skipped per D-10 | AnimationStateMachine editor. 1 set_* (line 543). |
+| HBoxContainer | container chrome — enumerated below in "User-facing container chrome" section | Layout container; only constants. 1 set_* (line 547). |
+| HScrollBar | user-facing — enumerated below | D-08 user-facing horizontal scrollbar. 5 set_* (lines 795, 802, 804, 812, 813). |
+| HSeparator | container chrome — enumerated below in "User-facing container chrome" section | Layout separator; constant + stylebox. 2 set_* (lines 975, 978). |
+| HSlider | user-facing — enumerated below | D-08 user-facing horizontal slider. 1 set_* (line 988). |
+| HSplitContainer | container chrome — enumerated below in "User-facing container chrome" section | Layout container; constants only. 3 set_* (lines 552-554). |
+| InspectorActionButton | editor-only — skipped per D-10 | Inspector action button row. 9 set_* (lines 559-570). |
+| ItemList | user-facing — enumerated below | D-08 user-facing item list. 11 set_* (lines 574-591). |
+| ItemListSecondary | type variation noted on its base — enumerated below alongside ItemList | Editor secondary-pane ItemList specialization. 1 set_* (line 1000). |
+| Label | user-facing — enumerated below | D-08 user-facing label. 2 set_* (lines 595, 600). |
+| LaunchPadMovieMode | slot-name (not a class) — themed under EditorStyles class | First-arg slot-name `set_stylebox('LaunchPadMovieMode', 'EditorStyles', sb)` line 424. |
+| LaunchPadNormal | slot-name (not a class) — themed under EditorStyles class | First-arg slot-name `set_stylebox('LaunchPadNormal', 'EditorStyles', sb)` line 429. |
+| LineEdit | user-facing — enumerated below | D-08 user-facing single-line text input. 4 set_* (lines 604, 611, 616, 622). |
+| MainMenuBar | editor-only — skipped per D-10 | Editor's main-menu-bar type variation. 4 set_* (line 627 region). NOT the bare `MenuBar` class (see MenuBar reconciliation below). |
+| MainScreenButton | editor-only — skipped per D-10 | Editor main-screen button. 8 set_*. |
+| MenuButton | user-facing — enumerated below | D-08 user-facing menu trigger button. 23 set_* (lines 645-669). |
+| MovieWriterButtonPressed | slot-name (not a class) — themed under EditorStyles class | First-arg slot-name `set_stylebox('MovieWriterButtonPressed', 'EditorStyles', sb)` line 434. |
+| OptionButton | user-facing — enumerated below | D-08 user-facing dropdown trigger. 24 set_* (lines 673-698). |
+| PanelContainer | container chrome — enumerated below in "User-facing container chrome" section | Layout container with single panel stylebox. 1 set_* (line 725). |
+| PopupDialog | editor-only — skipped per D-10 | Legacy popup dialog (Godot 3.x leftover); upstream still themes it. 1 set_* (line 748). |
+| PopupMenu | user-facing — enumerated below | D-08 user-facing popup menu. 8 set_* (lines 702-723). |
+| PopupPanel | user-facing — enumerated below | D-08 user-facing popup panel. 1 set_* (line 735). |
+| ProgressBar | user-facing — enumerated below | D-08 user-facing progress indicator. 2 set_* (lines 769, 775). |
+| ProjectExportDialog | editor-only — skipped per D-10 | Editor project-export dialog. 1 set_* (line 755). |
+| ProjectManager | editor-only — skipped per D-10 | Project Manager window. 1 set_*. |
+| ProjectSettingsEditor | editor-only — skipped per D-10 | Editor project-settings dialog. 1 set_* (line 754). |
+| RichTextLabel | user-facing — enumerated below | D-08 user-facing rich-text label. 1 set_* (line 782). |
+| RunBarButton | editor-only — skipped per D-10 | Editor toolbar run-button. 1 set_*. |
+| RunBarButtonMovieMakerDisabled | editor-only — skipped per D-10 | Editor toolbar run-button (movie-maker disabled). 4 set_*. |
+| RunBarButtonMovieMakerEnabled | editor-only — skipped per D-10 | Editor toolbar run-button (movie-maker enabled). 4 set_*. |
+| SceneImportSettingsDialog | editor-only — skipped per D-10 | Editor import-settings dialog. 1 set_* (line 756). |
+| ScrollContainer | container chrome — enumerated below in "User-facing container chrome" section | Layout container; styleboxes. 2 set_* (lines 786, 787). |
+| SplitContainer | container chrome — enumerated below in "User-facing container chrome" section | Base SplitContainer constants. 2 set_* (lines 823, 824). |
+| TabBar | user-facing — enumerated below | D-08 user-facing tab bar. 13 set_* (lines 828-876, every other). |
+| TabContainer | user-facing — enumerated below | D-08 user-facing tab container. 15 set_* (lines 829-896, every other). |
+| TabContainerOdd | type variation noted on its base — enumerated below alongside TabContainer | Editor TabContainer odd-row specialization. 7 set_* (lines 857-897, scattered). |
+| TextEdit | user-facing — enumerated below | D-08 user-facing multi-line text input. 3 set_* (lines 612, 617, 623). |
+| ThemeEditorPreviewBG | slot-name (not a class) — themed under EditorStyles class | First-arg slot-name `set_stylebox('ThemeEditorPreviewBG', 'EditorStyles', sb)` line 869. |
+| ThemeEditorPreviewFG | slot-name (not a class) — themed under EditorStyles class | First-arg slot-name `set_stylebox('ThemeEditorPreviewFG', 'EditorStyles', sb)` line 853. |
+| ThemeItemEditorDialog | editor-only — skipped per D-10 | Editor theme-item-editor dialog. 1 set_* (line 758). |
+| TooltipPanel | user-facing — enumerated below | D-08 user-facing tooltip panel. 1 set_* (line 743). |
+| Tree | user-facing — enumerated below | D-08 user-facing tree control. 30 set_* (lines 901-965). |
+| TreeSecondary | type variation noted on its base — enumerated below alongside Tree | Editor secondary-pane Tree specialization. 1 set_* (line 999). |
+| VBoxContainer | container chrome — enumerated below in "User-facing container chrome" section | Layout container; only constants. 1 set_* (line 548). |
+| VScrollBar | user-facing — enumerated below | D-08 user-facing vertical scrollbar. 5 set_* (lines 796, 803, 805, 818, 819). |
+| VSeparator | container chrome — enumerated below in "User-facing container chrome" section | Layout separator. 2 set_* (lines 976, 981). |
+| VSlider | user-facing — enumerated below | D-08 user-facing vertical slider. 1 set_* (line 991). |
+| VSplitContainer | container chrome — enumerated below in "User-facing container chrome" section | Layout container; constants only. 3 set_* (lines 556-558). |
+
+**Bucket counts:**
+- user-facing — enumerated below: 24 (AcceptDialog, Button, CheckBox, CheckButton, ColorPicker, GraphEdit, HScrollBar, HSlider, ItemList, Label, LineEdit, MenuButton, OptionButton, PopupMenu, PopupPanel, ProgressBar, RichTextLabel, TabBar, TabContainer, TextEdit, TooltipPanel, Tree, VScrollBar, VSlider)
+- research-only (FlatButton, D-10 exception): 1 (FlatButton)
+- type variation noted on its base: 4 (FlatMenuButton → MenuButton notes; ItemListSecondary → ItemList notes; TabContainerOdd → TabContainer notes; TreeSecondary → Tree notes)
+- container chrome — enumerated below as a single section "User-facing container chrome": 9 (HBoxContainer, VBoxContainer, PanelContainer, ScrollContainer, SplitContainer, HSplitContainer, VSplitContainer, HSeparator, VSeparator)
+- editor-only — skipped per D-10: 34 (AnimationBezierTrackEdit, AnimationTimelineEdit, AnimationTrackEdit, AnimationTrackEditGroup, AssetLib, BottomPanelButton, Editor, EditorAbout, EditorAudioBus, EditorDebuggerInspector, EditorHelpBitContent, EditorHelpBitTitle, EditorInspector, EditorInspectorCategory, EditorInspectorSection, EditorLogFilterButton, EditorProperty, EditorSettingsDialog, EditorSpinSlider, EditorStyles, EditorValidationPanel, GraphStateMachine, InspectorActionButton, MainMenuBar, MainScreenButton, PopupDialog, ProjectExportDialog, ProjectManager, ProjectSettingsEditor, RunBarButton, RunBarButtonMovieMakerDisabled, RunBarButtonMovieMakerEnabled, SceneImportSettingsDialog, ThemeItemEditorDialog)
+- slot-name (not a class) — themed under EditorStyles class: 8 (Background, ContextualToolbar, FocusViewport, LaunchPadMovieMode, LaunchPadNormal, MovieWriterButtonPressed, ThemeEditorPreviewBG, ThemeEditorPreviewFG)
+
+**Total:** 24 + 1 + 4 + 9 + 34 + 8 = 80 tokens. Matches the audit-grep output exactly.
+
+**D-08 reconciliation:** D-08 lists 27 user-facing Controls; the audit surfaces only 24 with direct `set_*` entries. The three D-08 classes WITHOUT upstream entries are:
+1. **`MenuBar`** — D-08 lists it but upstream targets only `MainMenuBar` (editor type variation). The bare `MenuBar` class has zero `set_*` calls in `minimal_theme.tres`. **Classification:** unthemed by upstream — NeoCade owns first-class theming; coverage delta (Plan 04) flags this as NeoCade-additive.
+2. **`Panel`** — D-08 lists it but upstream targets `PanelContainer` (container Control) and `PopupPanel` (popup) and never the bare `Panel` Control. The bare `Panel` class has zero `set_*` calls. **Classification:** unthemed by upstream — NeoCade-additive.
+3. **`Window`** — D-08 lists it but upstream theme has zero `set_*` calls targeting bare `Window`. Window styling in upstream is implicit via the popup classes (`PopupDialog`, `AcceptDialog`, etc.) which are subclasses. **Classification:** unthemed by upstream — NeoCade-additive.
+
+These three are enumerated below as `### MenuBar`, `### Panel`, `### Window` sections each carrying an explicit "no upstream entries" / "NeoCade-additive" note (no enumeration table since there's nothing to enumerate). Coverage delta (Plan 04) consumes these as additives requiring NeoCade-original theming.
+
+
 
 ## Engine-Default Cross-Reference and Pitfall Confirmations
 
