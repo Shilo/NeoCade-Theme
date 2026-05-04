@@ -77,3 +77,27 @@ OpenCode / DeepSeek V4 Pro:
 - Plan 04 now enforces mockup files against `finalist_slugs`, flags low-margin contrast for Web export, adds HTML-to-Godot rendering disclaimers, and compares finalists back to the prototype.
 - Plan 05 now defines direction-level reset routing, explicit typography confirmation, and `03-ESCALATION.md` after three failed targeted mockup revision rounds.
 - `ROADMAP.md` Phase 3 success criteria now match the five-direction, concept-first, representative finalist-mockup flow captured during discussion.
+
+## Cycle 2 Reviews
+
+Cycle 2 verdict: PASS. Both reviewers confirmed the high blockers were resolved and found no new HIGH issues.
+
+Claude:
+
+`CYCLE_SUMMARY: high=0; medium=4; low=5; verdict=PASS`
+
+Key notes:
+- H-01 image generation path is resolved by Plan 01 tooling baseline plus Plan 02 named `image_gen` workflow and blocker behavior.
+- H-02 escalation is resolved by Plan 05 `03-ESCALATION.md`, direction-level reset routing, and no-token-before-approval rule.
+- Remaining MEDIUM notes concern extra guardrails: Plan 02 should mechanically read `PHASE-3-TOOLING.md`, Plan 05 could softly cap repeated direction-level resets, hard-blocker verification could inspect Phase 3 commit history, and missing `finalist_slugs` could point back to Plan 03.
+
+OpenCode / DeepSeek V4 Pro:
+
+`CYCLE_SUMMARY: high=0; medium=4; low=3; verdict=PASS`
+
+Key notes:
+- H-01 image generation is resolved because `image_gen` / `imagegen` is named, availability is recorded, and non-image fallback is forbidden without user approval.
+- H-02 approval escalation is resolved because `03-ESCALATION.md` now captures disagreement, evidence, options, and a binding override path.
+- Remaining MEDIUM notes concern optional unblocking alternatives if Codex `image_gen` is absent, browser tooling baseline, Plan 02 precondition wording, and autonomy clarity outside Codex.
+
+Convergence status: no HIGH concerns remain after cycle 2.
