@@ -1,4 +1,4 @@
-# godot-minimal-theme — Coverage Delta vs FEATURES.md 35-Class Matrix
+# godot-minimal-theme — Coverage Delta vs FEATURES.md User-Facing Class Matrix
 
 **Authored:** 2026-05-04
 **Status:** Living research artifact — feeds Phase 4 generator (TokenSet structure decisions) and Phase 10 COV-10 verification.
@@ -7,13 +7,13 @@
 
 **Cross-references:**
 - `.planning/research/MINIMAL-THEME-DISSECTION.md` — descriptive enumeration of every entry upstream populates per Control × per state × per slot.
-- `.planning/research/FEATURES.md` — the 35-class FEATURES.md matrix authoritative for NeoCade's v1 user-facing-Control coverage scope.
+- `.planning/research/FEATURES.md` — FEATURES.md user-facing Control matrix (informally cited as "35 classes" in the executive summary header — see "Scope reconciliation note" below; the 37-row scorecard is this doc's authoritative count).
 - `.planning/research/ARCHITECTURE.md` §1 (palette proposals A/B/C with WCAG-verified hex), §2-3 (typography + M3 type scale), §5 (M3 state-layer model), §6 (mockup approval workflow) — **NeoCade's visual design source of truth** (not this doc).
 - `.planning/research/SOURCES.md` Section 1 (godot-minimal-theme) — synthesis pattern (`What was read / adopted / rejected / still open`); this delta doc is one of the artifacts SOURCES.md links to (cross-linked by Plan 05).
 
 ## Methodology
 
-Each of the 35 user-facing Controls in FEATURES.md is classified into one of:
+Each user-facing Control identified in Plan 01-02's `set_*` audit (37 state-rich classes after reconciliation against FEATURES.md's user-facing scope) is classified into one of:
 - **Themed in upstream** — at least one `set_*` call targets the class in `minimal_theme.tres`. NeoCade has an upstream benchmark; coverage delta says "feature-complete to upstream's bar" for this class.
 - **Bare-class unthemed (themed via specialization)** — upstream themes a more specialized class name (e.g., `MainMenuBar` instead of bare `MenuBar`). NeoCade-additive for the bare class — first-class theming required because the engine doesn't auto-cascade from the specialized name to the bare class.
 - **NeoCade-additive** — no upstream entries; NeoCade owns the design (no benchmark exists).
@@ -22,7 +22,9 @@ Every "themed in upstream" row links into `MINIMAL-THEME-DISSECTION.md`'s `### C
 
 ## Coverage Scorecard
 
-> **Scorecard scope: 35 FEATURES.md v1 user-facing classes (per cross-AI review 2026-05-04 fix).** HSplitContainer (#14) and VSplitContainer (#36) ARE part of the 35 (verified at plan-authoring time by reading FEATURES.md — both rows marked YES with "Constants + grabber icon" entries). FlatButton is documented separately under "## FlatButton — Type Variation Note (D-10)" because it's a Button TYPEVAR-01 variation, not a Control class — counted as research-only OUTSIDE the 35-class scope per D-10. **The 38-row + double-count framing of the prior plan version was wrong; this scorecard has exactly 35 rows.**
+> **Scorecard scope: 37 numbered rows covering the state-rich Controls that need per-class theming attention** (24 directly themed in upstream + 1 Window-via-subclass + 2 bare-class unthemed + 2 container-chrome constants-only + 8 NeoCade-additive). Per-row classification details and bucket reconciliation in the [Numeric Summary](#numeric-summary) below. FlatButton is documented separately under "## FlatButton — Type Variation Note (D-10)" because it's a Button TYPEVAR-01 variation, not a Control class — counted as research-only OUTSIDE the scorecard per D-10.
+>
+> **Scope reconciliation note (added 2026-05-04 post-verification):** Earlier versions of this doc claimed "35 firm" rows matching FEATURES.md's "35 classes" header. That claim was inherited from FEATURES.md's executive summary, but FEATURES.md's own YES-marked rows total ~52 — the "35" was never a clean enumeration. This scorecard has 37 rows reflecting the actual Phase 1 audit findings. The 9 FEATURES.md YES-marked classes that don't appear here (HBoxContainer, VBoxContainer, FlowContainer + specializations, GridContainer, MarginContainer, PanelContainer, ScrollContainer, HSeparator, VSeparator) are constants-only or aggregate-by-base classes folded into Phase 7 container-chrome work (see "Surfaced Beyond FEATURES.md" footer + DISSECTION.md `### User-facing container chrome` section). Phase 10 COV-10 should diff against this 37-row scorecard, not against the FEATURES.md "35" header.
 
 | # | Class | FEATURES.md class type | Upstream coverage | Cross-reference |
 |---|-------|------------------------|-------------------|-----------------|
@@ -64,7 +66,7 @@ Every "themed in upstream" row links into `MINIMAL-THEME-DISSECTION.md`'s `### C
 | 36 | VSplitContainer    | container               | themed in upstream (container chrome — constants only: `autohide`, `minimum_grab_thickness`, `separation`; 3 set_* at lines 556-558) | DISSECTION.md `### User-facing container chrome` |
 | 37 | Window             | popup/window            | themed in upstream (via subclass coverage — bare `Window` has zero `set_*` per Plan 02 audit, but `AcceptDialog`/`PopupPanel`/`PopupMenu`/`TooltipPanel` Window subclasses all themed; Godot's Theme system effectively styles Window through its subclass surface) | DISSECTION.md `### Window` |
 
-> **Row-count reconciliation (Task 2 outcome):** The scorecard table contains 37 numbered rows for ergonomic readability (every Class gets its own row). The **35-class FEATURES.md v1 user-facing universe** is the authoritative scope; the Numeric Summary below sums to exactly 35 by treating HSplitContainer + VSplitContainer as a single `Container chrome` bucket (2 classes) distinct from the per-class `Themed in upstream` bucket, and by counting Window's effective theming via its subclass surface (AcceptDialog / PopupPanel / PopupMenu / TooltipPanel are all directly themed) rather than as a bare-class unthemed entry. **Sum invariant verified at Task 2 completion:** themed-in-upstream + NeoCade-additive + bare-class-unthemed + container-chrome = 23 + 8 + 2 + 2 = 35.
+> **Row-count reconciliation:** The scorecard table contains 37 numbered rows — one per state-rich Control identified by the Plan 02 `set_*` audit. The Numeric Summary below sums to exactly 37 row entries: 24 directly-themed + 1 themed-via-subclass-only (Window) + 2 bare-class-unthemed (MenuBar, Panel) + 2 container-chrome-constants-only (HSplit, VSplit) + 8 NeoCade-additive = 37. **Sum invariant (corrected):** `24 + 1 + 2 + 2 + 8 = 37`. Earlier "23 + 8 + 2 + 2 = 35" framing was off-by-one (Window double-handled — both excluded from the "23" count and listed as a scorecard row in the same bucket); see Numeric Summary's reconciliation note for the full correction history.
 
 ## NeoCade-Additives (8) — Detail
 
@@ -115,4 +117,4 @@ Plan 02's Active Verification Audit (`MINIMAL-THEME-DISSECTION.md ### Active Ver
 - **8 EditorStyles slot-names (not classes)** (Background, ContextualToolbar, FocusViewport, LaunchPadMovieMode, LaunchPadNormal, MovieWriterButtonPressed, ThemeEditorPreviewBG, ThemeEditorPreviewFG) — slot-names within EditorStyles, not Control classes. Out of NeoCade v1 scope.
 - **9 container-chrome classes** beyond HSplit/VSplit themselves (HBoxContainer, VBoxContainer, PanelContainer, ScrollContainer, SplitContainer, HSeparator, VSeparator) — these ARE user-facing in FEATURES.md (rows 24-35 of FEATURES.md table), but were not enumerated as scorecard rows here because they share the consolidated `### User-facing container chrome` DISSECTION.md section and don't have per-class state matrices. Phase 7 styles them as part of container chrome.
 
-The `### User-facing container chrome` consolidation in DISSECTION.md is a documentation pattern (one section, multiple classes) — NOT a coverage gap. NeoCade Phase 7's container styling closes all 9 chrome classes via shared constants/styleboxes, so v1 ships with all 35 + 9 = 44 user-facing classes themed (35 explicit scorecard + 9 container chrome already covered by Phase 7's consolidated work). The "35 firm" v1 universe is the **state-rich Controls**; the +9 chrome classes are constants-only and don't require independent coverage analysis here.
+The `### User-facing container chrome` consolidation in DISSECTION.md is a documentation pattern (one section, multiple classes) — NOT a coverage gap. NeoCade Phase 7's container styling closes all 9 chrome classes via shared constants/styleboxes, so v1 ships with the 37 scorecard rows + 9 additional container/separator chrome classes = 46 user-facing classes themed in total (37 explicit scorecard rows + 9 chrome classes covered by Phase 7's consolidated work). The scorecard's 37 rows are the **state-rich Controls** that need per-class theming attention; the +9 chrome classes are constants-only / aggregate-by-base and don't require independent coverage analysis here. The earlier "35 + 9 = 44" framing in prior versions of this doc was based on FEATURES.md's informal "35 classes" header which doesn't match its own row count — see Numeric Summary's reconciliation note above.
