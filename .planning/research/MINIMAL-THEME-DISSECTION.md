@@ -1444,3 +1444,120 @@ Compared the returned slot set to Plan 02's `### <Class>` enumeration in `## Per
 | color | font_pressed_color / font_hover_color / font_focus_color / font_hover_pressed_color / font_disabled_color | (state colors) | 187-191 | Not set — engine fallback | Populate. |
 | color | font_outline_color | (n/a) | 192 | Not set — engine fallback | Follow upstream. |
 | constant | h_separation | (n/a) | 194 | Not set — EDSCALE-coupled | Populate. |
+
+### Pitfall 1.1 — Focus Stylebox Overlay Behavior (Confirmation)
+
+**Pitfall claim (PITFALLS.md §1.1):** "Focus stylebox is OVERLAY, not state — loses to pressed/checked. NeoCade must use composite-state slots (pressed_focus, checked_focus) and/or rely on font_focus_color to render focus when also pressed/checked."
+
+**Engine-source evidence (the *behavior*):**
+
+> **Note on file selection:** `scene/gui/base_button.cpp` is the abstract base class for all clickable controls — it handles pressed/hover state-machine transitions, focus event handling (lines 214, 258, 292, 319 manage `status.pressed_down_with_focus`), and `set_focus_mode(FOCUS_ALL)` registration (line 652). However, `BaseButton` does NOT draw — drawing is the responsibility of the concrete descendants. Button (and through it, CheckBox / CheckButton / MenuButton / OptionButton) draws in `scene/gui/button.cpp`'s `NOTIFICATION_DRAW` handler. Both files are part of the Pitfall 1.1 evidence chain: `base_button.cpp` defines that focus is a runtime *event/state* tracked separately from press/check, and `button.cpp` defines that focus is drawn as an *overlay* on top of the state stylebox.
+
+`scene/gui/button.cpp` `NOTIFICATION_DRAW` handler (lines 211-303 capture the relevant block; key citations below):
+
+- **Lines 222-226 — state stylebox is drawn FIRST:**
+  ```cpp
+  Ref<StyleBox> style = _get_current_stylebox();
+  // Draws the stylebox in the current state.
+  if (!flat) {
+      style->draw(ci, Rect2(Point2(), size));
+  }
+  ```
+  `_get_current_stylebox()` returns `normal`, `hover`, `pressed`, `disabled`, or composite `hover_pressed` based on the Button's runtime state — NOT `focus`.
+
+- **Lines 228-230 — focus stylebox is drawn AFTER, as an OVERLAY ON TOP:**
+  ```cpp
+  if (has_focus(true)) {
+      theme_cache.focus->draw(ci, Rect2(Point2(), size));
+  }
+  ```
+  The `focus` stylebox is drawn after the state stylebox, on top of it, when the Button has focus. Focus is NOT a state in its own right — it is an overlay layered on whatever state stylebox was just drawn.
+
+- **Lines 290-303 — font_focus_color takes precedence ONLY in DRAW_NORMAL state:**
+  ```cpp
+  case DRAW_NORMAL: {
+      // Focus colors only take precedence over normal state.
+      if (has_focus(true)) {
+          font_color = theme_cache.font_focus_color;
+          if (has_theme_color(SNAME("icon_focus_color"))) {
+              icon_modulate_color = theme_cache.icon_focus_color;
+          }
+      } else {
+          font_color = theme_cache.font_color;
+          ...
+      }
+  } break;
+  ```
+  The inline comment ("Focus colors only take precedence over normal state.") confirms the engine's design: when the Button is in DRAW_HOVER, DRAW_PRESSED, DRAW_HOVER_PRESSED, or DRAW_DISABLED, the state's font color wins over `font_focus_color`. Focus's font-color contribution is **suppressed** by all non-normal states.
+
+- **`scene/theme/default_theme.cpp` composite-state slot declarations (lines 285, 324):**
+  ```cpp
+  theme->set_stylebox("hover_pressed", "CheckBox", cbx_empty);   // line 285
+  theme->set_stylebox("hover_pressed", "CheckButton", cb_empty); // line 324
+  ```
+  And per-class composite font-color slots: `font_hover_pressed_color` is declared on Button (line 160), CheckBox (line 303), CheckButton (line 343), MenuButton (4.7-only? — see omission table), OptionButton (line 243), MenuBar (line 190), and similar. The engine's theme schema explicitly recognizes composite-state slots (`hover_pressed`, `font_hover_pressed_color`, etc.) precisely because focus-as-overlay would otherwise be invisible during pressed/checked states.
+
+**Theme-resource evidence (upstream's *response*):**
+
+`/c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres`:
+
+- **Line 271 — Button focus is a transparent no-op:**
+  ```gdscript
+  set_stylebox('focus', 'Button', base_empty_sb)
+  ```
+  `base_empty_sb` (constructed at lines 161-163) is `base_sb.duplicate()` with `draw_center = false` and `set_content_margin_all(0)` — fully transparent, zero margin. Drawing this on top of the state stylebox is a visual no-op.
+
+- **Line 690 — OptionButton focus is the same transparent no-op:**
+  ```gdscript
+  set_stylebox('focus', 'OptionButton', base_empty_sb)
+  ```
+
+- **Line 581 — ItemList focus is transparent:**
+  ```gdscript
+  set_stylebox('focus', 'ItemList', base_empty_sb)
+  ```
+
+- **Line 787 — ScrollContainer focus is transparent:**
+  ```gdscript
+  set_stylebox('focus', 'ScrollContainer', base_empty_sb)
+  ```
+
+- **Line 926 — Tree focus is transparent (with explicit comment at lines 924-925: "Leaving focus empty for trees and scroll containers because there's no way to make focus indication look not janky when only a part of a dock is highlighted"):**
+  ```gdscript
+  set_stylebox('focus', 'Tree', base_empty_sb)
+  ```
+
+- **Lines 859-861 — TabBar/TabContainer tab_focus is transparent:**
+  ```gdscript
+  set_stylebox('tab_focus', 'TabBar', base_empty_sb)
+  set_stylebox('tab_focus', 'TabContainer', base_empty_sb)
+  ```
+
+- **Composite-state coverage — upstream populates `hover_pressed` styleboxes AND `font_hover_pressed_color` colors for Button-family classes:**
+  ```gdscript
+  set_color('font_hover_pressed_color', 'Button', color_font_highlighted)        # line 260
+  set_stylebox('hover_pressed', 'Button', button_pressed_sb)                     # line 274
+  set_color('font_hover_pressed_color', 'CheckBox', color_font_highlighted)      # line 283
+  set_color('font_hover_pressed_color', 'CheckButton', color_font_highlighted)   # line 295
+  set_color('font_hover_pressed_color', 'FlatButton', color_font_highlighted)    # line 471
+  set_stylebox('hover_pressed', 'FlatButton', flat_button_pressed_sb)            # line 486
+  set_color('font_hover_pressed_color', 'MenuButton', color_font_highlighted)    # line 649
+  set_stylebox('hover_pressed', 'MenuButton', flat_button_hover_sb)              # line 668
+  set_color('font_hover_pressed_color', 'OptionButton', color_font_highlighted)  # line 679
+  set_stylebox('hover_pressed', 'OptionButton', button_pressed_sb)               # line 697
+  ```
+  Plus per-Control enumeration above (`### Button`, `### CheckBox`, `### CheckButton`, `### FlatButton`, `### MenuButton`, `### OptionButton`) tables show the populated `hover_pressed` rows.
+
+- **Note on `pressed_focus` / `checked_focus` slot families:** A grep against `minimal_theme.tres` for `pressed_focus`, `checked_focus`, or `radio_checked_focus` returned **zero matches**. Upstream does NOT populate these specific composite-focus slots for any class. Upstream's focus strategy is: (a) render focus stylebox as a transparent no-op (`base_empty_sb`), and (b) communicate focus visually via `font_focus_color` / `icon_focus_color` — which only takes precedence in `DRAW_NORMAL` per `button.cpp` lines 290-303, meaning **upstream's focus indication is INVISIBLE when the Button is also pressed/checked.** This is the unfortunate edge case Pitfall 1.1 calls out: even upstream's mitigation has a gap when state combinations stack.
+
+**Conclusion: Pitfall 1.1 is CONFIRMED.**
+
+- The *pitfall claim* (focus is overlay; loses to pressed/checked) is engine behavior verified by `button.cpp` lines 222-230 (focus drawn AS OVERLAY ON TOP of state stylebox) and lines 290-303 (font_focus_color suppressed in non-normal states). Engine source confirms the pitfall is correct.
+
+- Upstream's *response* is partial: (a) make focus stylebox a transparent no-op (`base_empty_sb`) so it never visually conflicts with state styleboxes, AND (b) populate composite-state `hover_pressed` styleboxes + `font_hover_pressed_color` colors so the most common focus-stacked state has explicit theming. But upstream does NOT populate `pressed_focus` / `checked_focus` slots — meaning upstream's solution still has the edge-case gap when a Button is focused AND pressed (or focused AND checked, for CheckBox / CheckButton).
+
+- **Implication for NeoCade:** Phase 5 (focus-ring design) must:
+  1. Decide whether `focus` stylebox should be a NeoCade-styled focus ring (currently REQUIREMENTS.md FOC-01 / FOC-02 implies YES — accent-colored 2-3 px outer ring) — which means NeoCade DIVERGES from upstream's transparent-focus approach. This is intentional: NeoCade's design system ranks accessibility (visible focus on EVERY state combination) above upstream's editor-aesthetic preference. Use `expand_margin` rather than `border_width` so the focus ring sits ON the outer perimeter, not inside the state stylebox's drawn area; this minimizes overlap with state styling but still lays focus on TOP per engine behavior.
+  2. Populate `pressed_focus` / `checked_focus` / `radio_checked_focus` slots on Button-family classes so focus is visually present even when the Control is also pressed/checked. Upstream's omission of these slots is the gap NeoCade closes.
+  3. Populate `font_focus_color` AND state-specific composite focus-font-color slots (`font_pressed_focus_color` is a 4.7+ candidate — verify in 4.6 release tag) for accessible text contrast in all state combinations.
+  4. NeoCade's mobile variant (Phase 8-9) needs INCREASED focus-ring expand_margin — touch targets emphasize visual focus indication even more strongly than desktop, since keyboard focus is less common but accessibility tools still navigate via focus.
