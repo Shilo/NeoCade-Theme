@@ -725,6 +725,94 @@ These three are enumerated below as `### MenuBar`, `### Panel`, `### Window` sec
 - Slots NOT set: `arrow`, `arrow_collapsed`, `select_arrow`, `checked`, `unchecked`, `indeterminate`, `updown` icons; `font`, `font_size`, `title_button_font`, `font_outline_color`, `outline_size`, `font_outline_size`, `font_selected_color`, `relationship_line_color`, `children_hl_line_color`, `custom_button_font_*`, `item_margin`, `button_margin`, `scroll_border`, `scroll_speed` constants. Plan 03 D-12 omissions.
 - **Type variation: TreeSecondary** — line 999 sets `panel` stylebox using sidebar `sb` (color_surface_low bg). Used by editor's docks. NeoCade FEATURES.md does not include TreeSecondary; documented for completeness.
 
+### ProgressBar
+
+**Gloss:** Godot's `ProgressBar` Control — horizontal indeterminate-or-determinate progress indicator. Used by editor for asset import, build progress, etc.
+
+**Upstream entry count:** 2 total set_* calls (2 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| stylebox | background | (background) | local `sb` (line 762-768: `base_sb.duplicate()`, `bg_color = color_surface_lowest`, `expand_margin_top = expand_margin_bottom = base_margin * 0.5 * scale`, `set_content_margin_all(base_margin * scale)`, conditional `_set_border(sb, color_extra_border_dimmed, 1)` if `draw_extra_borders`) | bg ≈ `Color(0.10,0.10,0.10,1)` (surface_lowest); top/bottom expand_margin = 2 (EDSCALE), content_margin = 4 | 769, 762-768 |
+| stylebox | fill | (fill) | local `sb = sb.duplicate()` from background, `bg_color = color_button_normal`, conditional `_set_border(sb, color_extra_border, 1)` if `draw_extra_borders` | bg ≈ `Color(0.34,0.34,0.34,1)` (button_normal — same fill color as a normal Button) | 775, 771-774 |
+
+**Per-class notes:**
+- 2 styleboxes only — `background` (the track) and `fill` (the filled portion). Upstream uses **the same color as a normal Button** for the fill, treating progress as "an animated button growing across the track." Subtle but cohesive.
+- `expand_margin_top` / `expand_margin_bottom` of `0.5 * base_margin = 2` EDSCALE units make the background slightly "fatter" than its content area — gives the rounded rectangle a slight vertical breathing room.
+- `font`, `font_color`, `font_size`, `font_outline_color`, `outline_size`, `font_outline_size` NOT set — engine defaults. ProgressBar typically doesn't render text overlay in the editor; if a NeoCade game shows percentage labels, font theming becomes additive coverage.
+
+### HSlider
+
+**Gloss:** Godot's `HSlider` Control — horizontal slider with grabber. Used for editor sliders (camera FOV, audio levels) and game runtime controls.
+
+**Upstream entry count:** 1 total set_* call (1 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| stylebox | slider | (track) | local `sb` (line 985-987: `base_sb.duplicate()`, `bg_color = color_mono_inv * Color(1,1,1,0.35)`, `_set_margin(sb, 0, 2, 0, 2)`) | bg ≈ `Color(0,0,0,0.35)` (color_mono_inv = BLACK in dark_theme; 35% alpha) — semi-transparent dark track | 988, 985-987 |
+
+**Per-class notes:**
+- ONLY the `slider` (track) stylebox is set. `grabber_area`, `grabber_area_highlight`, `grabber_disabled` styleboxes NOT set — engine defaults.
+- `grabber`, `grabber_highlight`, `grabber_disabled` ICONS NOT set — engine-default circular grabber.
+- `tick` icon NOT set — engine default.
+- `center_grabber`, `grabber_offset` constants NOT set — engine defaults.
+- **Heavy reliance on engine defaults** — upstream invests almost nothing in slider theming. NeoCade's REQUIREMENTS.md may require more extensive slider theming (accessible touch targets, accent-colored grabber per ARCHITECTURE.md focus model).
+
+### VSlider
+
+**Gloss:** Godot's `VSlider` Control — vertical slider with grabber. Used in audio bus volume meters and similar vertical controls.
+
+**Upstream entry count:** 1 total set_* call (1 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| stylebox | slider | (track) | local `sb = sb.duplicate()` from HSlider, `_set_margin(sb, 2, 0, 2, 0)` (rotated margin from HSlider) | bg ≈ `Color(0,0,0,0.35)` (same as HSlider, rotated margins) | 991, 989-990 |
+
+**Per-class notes:**
+- Constructed by **rotating HSlider's margins**: HSlider has `_set_margin(sb, 0, 2, 0, 2)` (vertical breathing room around horizontal track); VSlider has `_set_margin(sb, 2, 0, 2, 0)` (horizontal breathing room around vertical track). Identical bg_color, identical bordering, just transposed margins.
+- Same engine-default slots as HSlider — `grabber*` styleboxes/icons, `tick`, `center_grabber`, `grabber_offset` all NOT set.
+- NeoCade should mirror this rotation pattern when designing slider styleboxes — share construction, transpose orientation.
+
+### HScrollBar
+
+**Gloss:** Godot's `HScrollBar` Control — horizontal scrollbar with grabber. Used by ScrollContainer for horizontal overflow.
+
+**Upstream entry count:** 5 total set_* calls (5 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| stylebox | grabber | normal | local `sb` (line 791-793: `base_sb.duplicate()`, `bg_color = _get_base_color(0.5, 0.6)`, `_set_border(sb, base_color * Color(1,1,1,0), 3)` — 3-EDSCALE transparent border) | bg ≈ `Color(0.43, 0.43, 0.43, 1)` (V≈ +0.163 from base, sat × 0.6); transparent 3px border (acts as inset margin) | 795, 791-793 |
+| stylebox | grabber_highlight | hover | local `sb = base_sb.duplicate()` (line 798-800: `bg_color = _get_base_color(1.4, 0.5)`, `_set_border(sb, base_color * Color(1,1,1,0), 2.5)`) | bg ≈ `Color(0.61, 0.61, 0.61, 1)` (V≈ +0.455 from base, sat × 0.5 — much brighter on hover); transparent 2.5px border | 802, 798-800 |
+| stylebox | grabber_pressed | pressed | same `sb` as grabber_highlight | (same — pressed = hover visually) | 804, 798-800 |
+| stylebox | scroll | (track) | local `empty_sb` (line 807-810: `base_empty_sb.duplicate()`, `_set_margin(empty_sb, 0, margin, 0, margin)` where `margin = 12 if increase_scrollbar_touch_area else 6`) | (transparent track; vertical content_margin = 6 normally, 12 on touchscreens) — see `enable_touch_optimizations` notes | 812, 807-810 |
+| stylebox | scroll_focus | focus | same `empty_sb` as scroll | (same — focus = scroll visually; Pitfall 1.1) | 813, 807-810 |
+
+**Per-class notes:**
+- **Touch-optimization conditional:** Lines 38-44 (Globals section) read `increase_scrollbar_touch_area` based on engine-version-conditional `enable_touch_optimizations`. With touch enabled, scrollbar `scroll` stylebox margins double from 6 to 12 EDSCALE units, making the touch target larger. NeoCade has a separate mobile theme variant (`neocade_mobile_theme.tres`, Phase 8-9), so this runtime conditional is dropped in favor of fixed mobile-vs-desktop margins.
+- Track (`scroll` / `scroll_focus`) is transparent; visual exists only via the grabber. Compare to NeoCade's likely design: explicit visible track for accessibility.
+- Grabber-pressed uses SAME stylebox as grabber-highlight (line 802 = line 804 source `sb`). Pressing doesn't visually distinguish from hovering — acceptable for scrollbar (most users grab + drag without noticing the press transition).
+- `decrement`, `increment`, `decrement_highlight`, `increment_highlight`, `decrement_pressed`, `increment_pressed` ICONS NOT set — engine-default arrows. Plan 03 D-12 omissions.
+
+### VScrollBar
+
+**Gloss:** Godot's `VScrollBar` Control — vertical scrollbar with grabber. Used by ScrollContainer for vertical overflow (the typical use case).
+
+**Upstream entry count:** 5 total set_* calls (5 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| stylebox | grabber | normal | shared `sb` from HScrollBar (line 791-793: `_get_base_color(0.5, 0.6)`, transparent 3-EDSCALE border) | (same as HScrollBar.grabber) | 796, 791-793 |
+| stylebox | grabber_highlight | hover | shared `sb` from HScrollBar (line 798-800: `_get_base_color(1.4, 0.5)`, transparent 2.5-EDSCALE border) | (same as HScrollBar.grabber_highlight) | 803, 798-800 |
+| stylebox | grabber_pressed | pressed | same `sb` as grabber_highlight | (same) | 805, 798-800 |
+| stylebox | scroll | (track) | local `empty_sb = empty_sb.duplicate()` from HScrollBar (line 815-816: rotates margin → `_set_margin(empty_sb, margin, 0, margin, 0)`) | (transparent track; horizontal content_margin = 6/12, see HScrollBar notes) | 818, 815-816 |
+| stylebox | scroll_focus | focus | same `empty_sb` as scroll | (same) | 819, 815-816 |
+
+**Per-class notes:**
+- VScrollBar **shares all 3 grabber styleboxes verbatim with HScrollBar** (single `sb` construction at lines 791-793 / 798-800 used for both classes). Track is rotated like HSlider/VSlider (horizontal margin vs vertical margin).
+- `enable_touch_optimizations` conditional (lines 38-44 Globals) — same touch-area dynamic as HScrollBar; NeoCade uses fixed mobile theme variant instead.
+- Same engine-default omissions as HScrollBar (decrement/increment icons, etc.).
+
+
 
 
 
