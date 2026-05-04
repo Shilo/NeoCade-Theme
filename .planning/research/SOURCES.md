@@ -189,7 +189,7 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 - **Curated mood-board of real reference photos** — interior shots of Round1, Dave & Buster's, Two Bit Circus, classic 80s halls (Pac-Man arcade cabinets, Galaga cabinets, Skee-Ball alleys, ticket booths, prize counters). Initial pass relied on **textual interpretation** of color brands and aesthetic-wiki entries, not photo-grade visual reference. PITFALLS.md 7.x detection rituals require side-by-side comparison against real photos at the mockup gate, but the photos haven't been collected yet.
 - **Specific design-move inventory** — what does a "ticket-stub texture cue" actually look like in StyleBoxFlat terms? What is "booth chrome" in geometric terms? What is "marquee bulb" feel without a glow primitive? These need translation from photo to StyleBox spec.
 - **Prize counter palette** — distinct from cabinet palette; teal/green-coded historically, not yet sampled.
-- **Marquee typography** — real arcade marquees use bold-condensed sans (Metro Bold, Microgramma, Eurostile derivatives) — Outfit was proposed in Conflict 1 but the visual reference for "what marquee actually looks like" wasn't curated.
+- **Marquee typography** — real arcade marquees use bold-condensed sans (Metro Bold, Microgramma, Eurostile derivatives) — Outfit was confirmed for v1 in Conflict 1 (revised 2026-05-04) but the visual reference for "what marquee actually looks like" wasn't curated. Phase 3 mood-board sub-spike addresses; user can compare Outfit vs Inter-only at typography mockup gate.
 
 **Confidence in coverage:** **MEDIUM** for written articulation of arcade-vs-cyberpunk distinction; **LOW** for visual-reference grounding. **What would raise it:** Phase 3 mood-board sub-phase — collect ~20-30 high-res reference photos before mockup production; explicitly review them against the proposed palettes A/B/C.
 
@@ -470,7 +470,7 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 
 - Real-device Android testing matrix: 3 devices needed (low/mid/high-end). User hardware unknown.
 - iOS testing requires Mac + paid Apple Developer Program. User status unknown.
-- Whether to ship Inter Italic in v1 (~+0.85 MB) or defer to v1.x.
+- ~~Whether to ship Inter Italic in v1 (~+0.85 MB) or defer to v1.x.~~ **RESOLVED 2026-05-04 in SUMMARY Conflict 1 revision: defer Inter Italic to v1.x; ship Outfit Variable in v1 instead. Synthetic italic transform used until v1.x.**
 - AccessKit / VoiceOver / TalkBack screen-reader integration is partial in Godot 4.6 — full integration deferred to v1.x or v2; v1 sets `accessibility_name` on showcase Controls only.
 
 These are surfaced for the roadmap planning phase to convert into open user decisions or scope decisions.

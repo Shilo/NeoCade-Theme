@@ -10,10 +10,10 @@
 
 The "features" of a Godot Theme project are not behavioral features — they are **coverage**. v1 ships when (a) every Godot 4.6 built-in Control class has a complete styling entry, (b) a coherent semantic token system underpins those entries, (c) a small set of justified type variations exists, and (d) a showcase scene proves it on screen.
 
-**Coverage target.** 39 distinct theme classes need entries to match godot-minimal-theme's bar (32 user-facing Controls + 4 editor-only classes + Window + 2 Editor* variations the minimal theme adds). NeoCade matches the user-facing 32 in v1; editor-only theming is **deferred** (out of scope for v1).
+**Coverage target.** **35 user-facing Control classes** require theme entries in v1 (per Section 1's authoritative enumeration; superseding the earlier "32 user-facing" count which was stale). NeoCade matches all 35 in v1; editor-only types (FlatButton, MainScreenButton, EditorInspector*, BottomPanelButton, etc.) are **deferred** to v1.x.
 
-**Token system critique.** The prototype's token panel is a strong start but has three gaps the implementation must fix:
-1. **Surface tokens are correct in spirit but missing one rung** — Base/Secondary/Panel/Raised/Elevated covers backgrounds but lacks an "overlay" token for popups and a "sunken" token for inputs. Add `surface.sunken` and `surface.overlay`.
+**Token system critique.** The prototype's token panel is a strong start but has gaps the implementation must fix (reconciled with `SUMMARY.md` Conflict 2):
+1. **Surface tokens are correct in spirit but missing one rung** — Base/Secondary/Panel/Raised/Elevated covers backgrounds but lacks an "overlay" token for popups. Add `surface.overlay` (mapped to M3 `surface-container-highest`). **`surface.sunken` REJECTED for v1** per SUMMARY.md Conflict 2 — depth-via-color-only philosophy doesn't have a natural sunken story; inputs are visually distinguished via focus/normal stylebox + corner radius.
 2. **No semantic role aliases** — the prototype names accents by hue (Cyan/Pink/etc.) but never by role (primary/success/warning/danger/info). Implementation must define both: physical (`accent.cyan`) AND semantic (`role.primary -> accent.cyan`). Themes that only have hue names lock you into a palette; semantic aliases let v2 swap palettes.
 3. **Typography tokens conflate role and weight** — the prototype shows Stroke/Strong/Text/Muted/Dim, which is text-COLOR variants only. There is no typography SCALE (sizes/weights for h1/h2/body/caption). Add a separate `type.*` scale for sizes and a `text.*` scale for colors.
 
@@ -487,8 +487,8 @@ A 5-axis token system. Names use dot-notation (Godot theme entries don't enforce
 | surface.panel | #1A1E28 | Default Panel/PanelContainer |
 | surface.raised | #222735 | Buttons in normal state, popup panels |
 | surface.elevated | #2C3242 | Hover states, elevated cards |
-| surface.overlay | #353B4D | **NEW vs prototype** — modal backdrops, dropdowns over content |
-| surface.sunken | #0A0C11 | **NEW vs prototype** — text inputs, tree backgrounds (look "carved into" base) |
+| surface.overlay | #353B4D | **NEW vs prototype** — modal backdrops, dropdowns over content (M3 `surface-container-highest`) |
+| ~~surface.sunken~~ | ~~#0A0C11~~ | **REJECTED for v1** per SUMMARY.md Conflict 2 — inputs distinguished via focus/normal stylebox + corner radius instead. Reconsider for v2 if depth-via-color-only proves insufficient. |
 
 **B. Text colors (matches prototype's typography panel)**
 | Token | Hex | Role |
@@ -823,13 +823,16 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 
 ### Launch With (v1) — exhaustive
 
-**Phase 1: Foundation**
-- [ ] All 6.1 token resources defined (colors, types, spacings, radii, strokes, elevations)
-- [ ] Inter + Noto Sans bundled, font resources created
-- [ ] `neocade_theme.tres` scaffold with empty entries for every type
-- [ ] Mockup approval gate passed for representative Controls
+> **Note 2026-05-04:** The 5-phase plan below was authored before CROSS-PLATFORM landed. The current authoritative phase decomposition is the **11-phase plan in `SUMMARY.md` "Implications for Roadmap"**. The 5 categories below remain valid as DELIVERABLES groupings (what gets shipped); SUMMARY.md provides the actual phase sequence (research/design spikes → foundation → core/lists/dialogs → mobile authoring → showcase → QA + cross-platform validation → distribution). Roadmapper should use SUMMARY.md for phasing and FEATURES.md (this file) for per-deliverable specifics.
 
-**Phase 2: Core Controls**
+**Foundation deliverables**
+- [ ] All 6.1 token resources defined (colors, types, spacings, radii, strokes, elevations)
+- [ ] Inter Variable + Outfit Variable + Noto Sans Variable bundled, font resources created (per Conflict 1 revision; Inter Italic deferred to v1.x)
+- [ ] `addons/neocade_theme/_dev/generate_themes.gd` `@tool` script with TokenSet (desktop) + TokenSet.mobile blocks
+- [ ] Generated `neocade_theme.tres` + `neocade_mobile_theme.tres` scaffolds with empty entries for every type
+- [ ] Mockup approval gate passed for representative Controls (desktop + mobile mockups both required, per ARCHITECTURE Section 6 Step 5b)
+
+**Core Controls deliverables (desktop authoring; mobile overrides accrue alongside)**
 - [ ] Button + 6 button variations themed (5 states each)
 - [ ] LineEdit + TextEdit + CodeEdit + SpinBox themed
 - [ ] Label + RichTextLabel + 5 label variations themed
@@ -837,7 +840,7 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 - [ ] CheckBox + CheckButton + OptionButton + MenuButton + ColorPickerButton + LinkButton themed
 - [ ] Custom icons authored: check, radio, toggle, arrow_down, clear, close
 
-**Phase 3: Lists & Layout**
+**Lists & Layout deliverables (desktop authoring)**
 - [ ] Tree themed (16 styleboxes, 12 icons)
 - [ ] ItemList themed
 - [ ] TabBar + TabContainer themed
@@ -846,30 +849,57 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 - [ ] Splits + Separators + ScrollContainer themed
 - [ ] HSlider + VSlider + ProgressBar + HScrollBar + VScrollBar themed
 
-**Phase 4: Dialogs & Advanced**
+**Dialogs & Advanced deliverables (desktop authoring)**
 - [ ] Window + AcceptDialog + ConfirmationDialog + FileDialog themed
 - [ ] PopupMenu + PopupPanel + TooltipPanel + TooltipLabel themed
 - [ ] MenuBar themed
 - [ ] ColorPicker themed
 - [ ] GraphEdit + GraphNode + GraphFrame themed (basic)
 
-**Phase 5: Showcase & QA**
+**Mobile Variant Authoring deliverables (NEW; CROSS-PLATFORM Section 3)**
+- [ ] TokenSet.mobile overrides filled (button height 48px, body 16px, spacing +50% on space.4+)
+- [ ] Generator outputs `neocade_mobile_theme.tres`
+- [ ] Tap-target audit script confirms every interactive Control ≥48px in mobile theme
+- [ ] `MOBILE-DESIGN-SPEC.md` documents deltas vs desktop
+- [ ] Showcase scene supports three-way theme toggle (NeoCade desktop ↔ NeoCade mobile ↔ Godot default)
+
+**Showcase deliverables**
 - [ ] `main.tscn` with all 9 sections rendered
-- [ ] Theme toggle button functional
+- [ ] Three-way theme toggle button functional (desktop ↔ mobile ↔ default)
 - [ ] Token gallery section
-- [ ] Visual QA via Godot MCP screenshots at 1080p, 1440p, 4K
-- [ ] WCAG contrast verified for all text + interactive states
 - [ ] Coverage counter shows "35/35"
+
+**QA + Cross-Platform Export Validation deliverables (EXPANDED; CROSS-PLATFORM Section 6.5)**
+- [ ] Visual QA via Godot MCP screenshots at 1080p, 1440p, 4K (Forward+ + GL Compat)
+- [ ] WCAG 2.1 AA contrast verified for all text + interactive states
+- [ ] Tab-walk every Control + screenshot focused state
+- [ ] CVD simulation pass (deuteranopia/protanopia/tritanopia)
+- [ ] Multi-script label test (Latin, Cyrillic, Arabic, Hebrew, Devanagari)
+- [ ] Per-target export builds + screenshot decks: Windows, macOS, Linux, iOS, Android, Web/Browser
+- [ ] CI workflow for desktop + Web targets
+- [ ] Manual Android + iOS validation on real devices (or noted deferred per UD-5)
+
+**Distribution deliverables**
+- [ ] Asset Library submission package (icon, README, license attributions, install paths)
+- [ ] `OFL.txt` covering all bundled fonts (Inter + Outfit + Noto Sans + JetBrains Mono)
+- [ ] `LICENSE.md` + initial `CHANGELOG.md`
+- [ ] Fresh-install dry-run on a clean Godot project
+- [ ] Asset Library current policy verified at submission time (not training data)
 
 ### Add After Validation (v1.x)
 
+- [ ] Inter Italic Variable bundled (was deferred from v1 in Conflict 1 revision; replaces synthetic italic transform)
 - [ ] Light theme variant (PROJECT.md note: deferred to v1.x or v2)
 - [ ] Editor-side application (using as Godot editor theme)
 - [ ] Editor-only theme types (FlatButton, MainScreenButton, etc.) for full editor parity
+- [ ] Deeper screen-reader QA (VoiceOver/TalkBack/AccessKit) — see UD-6
+- [ ] CJK Noto Sans bundling (or formalized opt-in) — see UD-2
 
 ### Future Consideration (v2+)
 
-- [ ] Mobile-tuned variant (`neocade_mobile_theme.tres`)
+- [ ] ~~Mobile-tuned variant (`neocade_mobile_theme.tres`)~~ **MOVED TO v1 — see Mobile Variant Authoring deliverables above**
+- [ ] Alternate palette variants (e.g., `neocade_neon_magenta.tres`, `neocade_amber.tres`)
+- [ ] Light mode for both desktop AND mobile variants
 - [ ] Alternate palette variants (magenta-led, amber-led, etc.)
 - [ ] CodeEdit syntax color presets (separate resource, not theme entries)
 - [ ] Animation/transition recommendations as accompanying GDScript snippets
@@ -908,7 +938,7 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 
 ### Prototype Gaps (adjust)
 
-1. **No surface.sunken or surface.overlay** — inputs need a "carved-in" visual (sunken), and dropdowns/popups over content need a layer above elevated (overlay). ADD both.
+1. **No surface.overlay** — dropdowns/popups over content need a layer above elevated (overlay). ADD `surface.overlay`. ~~`surface.sunken` for inputs~~ **REJECTED for v1** per SUMMARY.md Conflict 2 — inputs distinguished via focus/normal stylebox + corner radius. Reconsider for v2.
 2. **No semantic role aliases** — palette is named only by hue. Consuming projects that want to swap palettes (v2) must rename every reference. ADD `role.primary/success/warning/danger/info/link` as named pointers.
 3. **Conflated "typography" axis** — prototype's Typography panel only shows COLOR variants, not SIZES. There is no h1/h2/h3/body scale visible. ADD `type.display/h1/h2/h3/body/body.sm/label/code` size scale separately from text colors.
 4. **"Stroke" token is ambiguous** — the prototype panel labels its brightest text color "Stroke" but in design-system parlance "stroke" means border thickness. RENAME to `text.strong` or `text.heading`; reserve "stroke" for border-related tokens (already done in our token system).

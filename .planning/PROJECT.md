@@ -4,7 +4,7 @@
 
 NeoCade is a Godot 4.6 native UI Theme resource, distributed as a drop-in addon, that styles every built-in Control with a polished neo/neon arcade aesthetic — modern, colorful, professional, accessibility-first. It works universally across the Godot Editor and game runtime, and is designed to scale from desktop to mobile. v1 ships a single dark theme; future variants (mobile-tuned, alternate palettes, light mode) are planned.
 
-The theme is built primarily to power the author's upcoming game **VirtuCade** — a 2D tile-based pixel-art online multiplayer game set inside a large interior arcade environment with interactive booths and mini-games — but is designed as a standalone, reusable addon for the Godot community.
+The theme is built primarily to power the author's upcoming game (codename: **VirtuCade**) — a 2D tile-based pixel-art online multiplayer game set inside a large interior arcade environment with interactive booths and mini-games — but is designed as a standalone, reusable addon for the Godot community. The theme name is **NeoCade**; VirtuCade is the consuming game, not the theme.
 
 ## Core Value
 
@@ -41,10 +41,11 @@ If everything else fails, this single deliverable must work: a polished, feature
 ### Out of Scope (v1)
 
 - **Light color mode** — deferred to v1.x or v2; arcades are dark-ambient, dark-first matches the brand and Godot editor default
-- ~~**Mobile-optimized variant** (`neocade_mobile_theme.tres`)~~ — **MOVED INTO v1 ACTIVE** per user constraint update. v1 ships both desktop primary + mobile variant.
 - **Alternate palette variants** (e.g., `neocade_neon_magenta.tres`, `neocade_amber.tres`) — explicitly future work
 - **Light color mode for mobile variant** — mobile theme follows the same dark-only constraint as desktop in v1; iOS/Android system theme integration deferred to v2
 - **Native iOS/Android system look** — the mobile variant follows iOS HIG + Material 3 mobile guidance loosely (touch targets, type scale, accessibility) but retains the NeoCade arcade visual identity. We are NOT trying to make a Godot UI look like native iOS or Android.
+
+> Note on mobile variant: previously listed as Out of Scope; **moved into v1 Active on 2026-05-04** per user constraint update. See Active requirements above and `.planning/research/CROSS-PLATFORM.md` for specs.
 - **Cyberpunk aesthetic** — explicitly rejected; theme leans arcade/neo/modern, not dystopian/grimy/glitchy
 - **Pixelated/retro-pixel theming** — VirtuCade's game content is pixel art, but the UI theme is HD and crisp
 - **Editor plugin behaviors** (`plugin.cfg`, EditorPlugin scripts) — addon ships only the Theme resource and bundled fonts, no editor extensions
@@ -96,6 +97,10 @@ If everything else fails, this single deliverable must work: a polished, feature
 | Godot control_gallery demo | Reference scope for showcase scene contents | https://github.com/godotengine/godot-demo-projects/tree/master/gui/control_gallery |
 | `.planning/inputs/NeoCade-Research-Report.md` | User's prior research synthesis, NOT source of truth — researchers MUST challenge it. Known critiques to validate: (a) uses "VirtuCade Theme" name throughout — wrong, the theme is **NeoCade**; (b) leans into synthwave/vaporwave/scanlines/glow — adjacent to cyberpunk which is explicitly rejected; (c) suggests a pixel font for logos — conflicts with HD-only constraint; (d) name suggestions include "CyberCade" (rejected) and others — name is already locked as NeoCade. | `.planning/inputs/` |
 | `.planning/inputs/NeoCade-Theme-Prototype.png` | Early design mockup. Strong palette, surface token system (Base/Secondary/Panel/Raised/Elevated), comprehensive Control showcase. User feels it leans too futuristic / not arcade-y enough. Researchers must produce variations that explore more arcade warmth (e.g., booth-style chrome, marquee glow, ticket-stub texture cues) while preserving the prototype's strengths. Also misnames the theme as "VirtuCade Godot Theme" — must be **NeoCade**. | `.planning/inputs/` |
+| `.planning/research/SUMMARY.md` | **Project canon** — synthesized research findings, conflict resolutions (display font, surface tokens, shadows), 11-phase roadmap recommendation, open user decisions UD-1 through UD-6. Authoritative for downstream phase planning. | `.planning/research/` |
+| `.planning/research/SOURCES.md` | **Project canon** — per-source dossier (10 sources). What was read, adopted, rejected, open. Mandated by Source Coverage commitment below. | `.planning/research/` |
+| `.planning/research/EDITOR-COVERAGE.md` | **Project canon** — explicit map of which Editor surfaces are themed in v1 vs which fall back to default. Resolves ambiguity about "Universal Editor + Runtime usage." | `.planning/research/` |
+| `.planning/research/CROSS-PLATFORM.md` + STACK.md + FEATURES.md + ARCHITECTURE.md + PITFALLS.md | **Project canon** — dimension reports backing the synthesis. Roadmapper and phase planners read these as authoritative for technical specifics. | `.planning/research/` |
 
 **Tooling available:**
 - Godot MCP (`mcp__godot__*`) — editor launch, scene CRUD, run/stop, debug output, screenshots
@@ -146,7 +151,9 @@ These cannot be overturned by research without explicit user reconsideration:
 - Theme must be **feature-complete to godot-minimal-theme's bar** — coverage is non-negotiable
 - Theme distributes as `res://addons/neocade_theme/neocade_theme.tres`
 - Mockup approval gate is mandatory before implementation
-- Inter + Noto Sans is the **primary** font stack (research may add a tertiary display font but cannot replace the primaries)
+- Inter + Noto Sans is the **primary** font stack (research may add a tertiary display font but cannot replace the primaries — and as of 2026-05-04 has done so: Outfit Variable added as v1 display font per SUMMARY Conflict 1 revision; Inter Italic deferred to v1.x)
+- Cross-platform: all 6 Godot export targets (Windows/macOS/Linux/iOS/Android/Web)
+- Mobile variant `neocade_mobile_theme.tres` is v1 must-have alongside desktop primary (added 2026-05-04; specs in CROSS-PLATFORM.md)
 
 ### Research workflow expectations
 

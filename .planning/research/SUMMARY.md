@@ -118,16 +118,25 @@ Other high-severity flagged: StyleBoxFlat shadow alpha bug (over-renders ~2× on
 
 ## Conflicts Resolved
 
-### Conflict 1 — Display/heading font: Outfit vs Inter Display via `opsz`
+### Conflict 1 — Display/heading font: Outfit vs Inter Display via `opsz` — **REVISED 2026-05-04 after CROSS-PLATFORM**
 
-**ARCHITECTURE.md** recommended **Outfit** as a tertiary display font. **STACK.md** explicitly rejected adding any third font, citing Inter v4's unified Display via `opsz=32`.
+**ARCHITECTURE.md** recommended **Outfit** as a tertiary display font. **STACK.md** explicitly rejected adding any third font, citing Inter v4's unified Display via `opsz=32`. The initial synthesis sided with STACK (no Outfit in v1).
 
-**Decision: STACK.md wins for v1 — no third font in v1.**
+**Revised decision (2026-05-04 after CROSS-PLATFORM landed): Ship Outfit Variable in v1 as the heading/marquee display font; defer Inter Italic to v1.x. Total bundle ~1.85 MB.**
 
-**Reasoning:**
-- Inter Display via `opsz=32` is a **factually free move** — same `.ttf` we're already bundling, zero bytes, zero license complexity, zero font-stack maintenance.
-- Outfit adds ~210 KB, third OFL `LICENSE` block, third `FontFile`/`FontVariation` chain, AND a third typography variable to defend in mockup review. Cost-benefit only justifies inclusion if Inter Display at 32 visibly fails the "marquee" feel — not yet demonstrated.
-- However, Outfit is a credible v1.x experiment. **Surface as a mockup-gate question, not a research-time question.** The typography mockup phase produces 2 variants (A: Inter-only with `opsz` engagement; B: Inter body + Outfit headings); user picks at typography approval gate.
+**Reasoning for the revision:**
+- ARCHITECTURE.md's type-scale table (display-small / headline-small) bakes Outfit into the type system as the marquee voice — Inter Display via `opsz=32` is a viable substitute but is structurally a body face stretched up, not a marquee face. The arcade brief specifically asks for "marquee feel" on headings.
+- CROSS-PLATFORM.md verified Outfit is OFL 1.1 — App Store + Play Store + Web embedding all legal. License-stack cost (single combined `OFL.txt` block) is trivial.
+- Trade: Inter Italic Variable (~0.85 MB) is dropped from v1; italic emphasis falls back to synthetic transform on the upright Inter Variable until v1.x bundles Inter Italic. This is a small visual compromise (synthetic italic isn't as nicely shaped as real italic) on a feature that body text uses sparingly.
+- Net bundle difference: `~2.3 MB (with Inter Italic, no Outfit) → ~1.85 MB (with Outfit, no Inter Italic)`. Smaller AND more on-brand.
+- Mockup gate at Phase 3 still presents the user with both directions for comparison: Variant A (Inter-only, no Outfit) vs Variant B (Inter body + Outfit headings). User can override this revised decision at mockup approval if they prefer Variant A.
+
+**Implications propagated:**
+- Phase 4 deliverables (below): bundle Inter Variable + Outfit Variable + Noto Sans Variable + `OFL.txt` (Inter Italic deferred to v1.x).
+- ARCHITECTURE.md type-scale table is now canonical (no edits required).
+- CROSS-PLATFORM.md font compliance section is correct (no edits required).
+- SOURCES.md font listings updated to match.
+- STACK.md "Supporting Libraries" must add Outfit Variable as v1 bundled font.
 
 ### Conflict 2 — Surface token taxonomy: M3 5-stop ramp vs prototype's Base/Secondary/Panel/Raised/Elevated
 
@@ -159,14 +168,23 @@ Other high-severity flagged: StyleBoxFlat shadow alpha bug (over-renders ~2× on
 
 ## Open User Decisions
 
-### UD-1: MCP server swap (decision before QA tooling baseline phase)
+### UD-1: MCP server swap (decision before Phase 10 QA tooling baseline sub-spike)
 Currently wired Coding-Solo `godot-mcp` lacks screenshot capture; PROJECT.md mandates screenshot-driven QA. **Recommend: swap to GoPeak Godot MCP** (`npx gopeak`) before QA phases begin. Alternates: GDAI MCP, Godot MCP Pro.
 
 ### UD-2: CJK font bundling
-Default v1 ships without CJK (~30 MB+ doubles addon size); README documents override path. **Recommend: confirm default — defer CJK to v2 or optional bundle.**
+Default v1 ships without CJK (~30 MB+ doubles addon size); README documents override path. **Recommend: confirm default — defer CJK to v2 or optional bundle.** Decision must land before Phase 4 commits the font folder structure.
 
-### UD-3: Stylebox authoring tooling
-PROJECT.md mandates Godot's Theme Editor as the authoring path. For 35 Controls × all states + 13 variations, hand-authoring risks token-drift and is slow. **Recommend: Theme Editor as primary per project mandate; allow targeted post-hoc edits to `.tres` text format for token-aliasing only (e.g. global hex updates). No full-file generators.**
+### UD-3: Stylebox authoring tooling — UPDATED post-CROSS-PLATFORM
+PROJECT.md mandates Godot's Theme Editor as the authoring path. CROSS-PLATFORM introduced a `@tool` script generator (`addons/neocade_theme/_dev/generate_themes.gd`) producing both desktop and mobile `.tres` from a single TokenSet block. **Reconciled recommendation: the `@tool` generator is the PRIMARY authoring path for tokenized properties (colors, font sizes, paddings, radii) — TokenSet is the single source of truth. Godot's Theme Editor is the VERIFICATION surface (open the generated `.tres` to visually confirm) and the targeted-edit path for non-tokenized one-off properties.** Both paths are committed to v1; Phase 4 establishes the workflow.
+
+### UD-4 (NEW): Inter Italic — v1 vs v1.x — RESOLVED in Conflict 1 revision
+**Resolution: defer Inter Italic to v1.x; ship Outfit Variable in v1 instead.** Net bundle smaller (~1.85 MB vs ~2.3 MB) and more on-brand. Synthetic italic transform used until v1.x. User can override at Phase 3 typography mockup gate.
+
+### UD-5 (NEW): Real-device cross-platform testing matrix
+CROSS-PLATFORM requires per-target export validation. Real-device coverage needs: 3 Android devices (low/mid/high-end); iOS testing requires Mac + paid Apple Developer Program. **User hardware/account status is unknown.** Phase 10 acceptance criteria must be marked with `(if-real-device-available)` qualifier where applicable. **Decision needed before Phase 10 plan is authored:** confirm available test surfaces, identify gaps, decide whether v1 ships with "verified on Windows/macOS/Linux/Web; mobile-targets pending real-device QA in v1.0.1" or with full mobile coverage.
+
+### UD-6 (NEW): AccessKit / VoiceOver / TalkBack screen-reader integration
+Godot 4.6 has partial screen-reader integration via AccessKit. CROSS-PLATFORM flags full integration as v1.x or v2 work. **Recommend confirm:** v1 sets `accessibility_name` on every showcase Control (cheap win) but defers deeper screen-reader QA to v1.x. If user wants screen-reader QA in v1, Phase 10 needs additional acceptance criteria + estimated +4-8 hours.
 
 ---
 
@@ -180,7 +198,7 @@ PROJECT.md mandates Godot's Theme Editor as the authoring path. For 35 Controls 
 
 All three pass WCAG 2.1 AA on body text and SC 1.4.11 (3:1 non-text) on accents. Full contrast tables in `ARCHITECTURE.md` Section 1.
 
-**Typography (default):** Inter Variable upright + Inter Italic Variable + Noto Sans Variable. M3 type scale (display-small 36, headline-small 24, title-large 20, body-medium 14, code 13 JetBrains Mono).
+**Typography (default, post-Conflict-1-revision):** Inter Variable (upright body) + Outfit Variable (display/marquee headings) + Noto Sans Variable (multi-script fallback). JetBrains Mono for code. Inter Italic deferred to v1.x; synthetic italic transform used until then. M3 type scale (display-small 36 in Outfit, headline-small 24 in Outfit, title-large 20 in Outfit, body-medium 14 in Inter, code 13 in JetBrains Mono).
 
 **Geometry:** corner radius default 4px (godot-minimal-theme parity), 8px on PopupPanel/Window, 12px on dialogs. 1px hairline borders default; 2px focus rings; 3px reserved for danger emphasis. **No drop shadows; tonal surface ramp is the elevation system.**
 
@@ -228,46 +246,68 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 
 **[GATE: User mockup approval. No `.tres` edits before this passes.]**
 
-### Phase 4: Foundation — Tokens, Fonts, Icons, Scaffold
-**Rationale:** Token system blocks every stylebox; fonts block per-Control text styling; icons block buttons/Tree/TabBar/ColorPicker/FileDialog/PopupMenu/ScrollBar.
-**Delivers:** `addons/neocade_theme/fonts/` (Inter VF + Inter Italic VF + Noto Sans VF + `OFL.txt`); `addons/neocade_theme/icons/` (~30 SVGs at 32×32, Scale=2.0 + Linear With Mipmaps); `neocade_theme.tres` scaffold with empty entries; `DESIGN_TOKENS.md` finalized.
-**Implements:** Architecture layers 1-3.
+### Phase 4: Foundation — Tokens, Fonts, Icons, Scaffold + `@tool` Generator
+**Rationale:** Token system blocks every stylebox; fonts block per-Control text styling; icons block buttons/Tree/TabBar/ColorPicker/FileDialog/PopupMenu/ScrollBar. Per CROSS-PLATFORM, both desktop and mobile `.tres` are generated from a single `TokenSet` block via a `@tool` script — Foundation phase establishes that mechanism so subsequent phases populate one source of truth.
+**Delivers:** `addons/neocade_theme/fonts/` (Inter Variable + Outfit Variable + Noto Sans Variable + `OFL.txt`; per Conflict 1 revision, no Inter Italic in v1); `addons/neocade_theme/icons/` (~30 SVGs at 32×32, Scale=2.0 + Linear With Mipmaps); `addons/neocade_theme/_dev/generate_themes.gd` `@tool` script with `TokenSet` constants block; first-run output of empty-but-valid `neocade_theme.tres` and `neocade_mobile_theme.tres` scaffolds; `DESIGN_TOKENS.md` finalized.
+**Implements:** Architecture layers 1-3 + token-sharing strategy.
 
-### Phase 5: Core Controls — Buttons, Inputs, Labels, Panels
-**Rationale:** Button is keystone; Labels carry typography system; Panels carry elevation system.
+### Phase 5: Core Controls — Buttons, Inputs, Labels, Panels (desktop authoring)
+**Rationale:** Button is keystone; Labels carry typography system; Panels carry elevation system. Desktop entries authored first; mobile overrides accrue in TokenSet.mobile alongside.
 **Delivers:** Button + 6 button variations × 5 states; LineEdit + TextEdit + CodeEdit + SpinBox; Label + RichTextLabel + 5 label variations; Panel + PanelContainer + 2 panel variations; Checkbox/CheckButton/OptionButton/MenuButton/ColorPickerButton/LinkButton; bespoke button-state icons.
 **Avoids:** Pitfalls 1.1 (focus overlay), 1.2 (font inheritance fail), 1.4 (shadow alpha bug — disabled).
 
-### Phase 6: Lists, Layout, Range — Tree, ItemList, Tabs, Containers, Sliders
+### Phase 6: Lists, Layout, Range — Tree, ItemList, Tabs, Containers, Sliders (desktop authoring)
 **Rationale:** Tree alone is half-day (16 styleboxes, 12 icons); TabBar/TabContainer share state model.
 **Delivers:** Tree + ItemList + TabBar + TabContainer + FoldableContainer; all container constants; Splits + Separators + ScrollContainer; HSlider + VSlider + ProgressBar + HScrollBar + VScrollBar.
 
-### Phase 7: Dialogs, Popups, Advanced — Window, Popups, MenuBar, ColorPicker, Graph
+### Phase 7: Dialogs, Popups, Advanced — Window, Popups, MenuBar, ColorPicker, Graph (desktop authoring)
 **Rationale:** Popup-class controls are separate Windows (Pitfall 1.7) — must be themed as first-class types.
 **Delivers:** Window + AcceptDialog + ConfirmationDialog + FileDialog; PopupMenu + PopupPanel + TooltipPanel + TooltipLabel; MenuBar; ColorPicker + 16 bespoke icons; GraphEdit + GraphNode + GraphFrame (basic).
 **Avoids:** Pitfall 1.7 (popup theming); 4.3 (tooltip readability).
 
-### Phase 8: Showcase + Token Gallery + Theme Toggle
-**Rationale:** PROJECT.md mandates showcase + prominent toggle. Showcase doubles as QA forcing function.
-**Delivers:** `res://main.tscn` with 9 sections (Buttons, Text Inputs, Numbers/Range, Selection/Lists, Containers/Layout, Dialogs/Popups, Advanced/Graph, Token Gallery, Coverage 35/35); toggle with inline overrides (Pitfall 10.3); BBCode demo; `accessibility_name` on every Control (Pitfall 2.5).
+### Phase 8 (NEW post-CROSS-PLATFORM): Mobile Variant Authoring
+**Rationale:** PROJECT.md elevates mobile variant to v1 must-have. CROSS-PLATFORM specifies concrete mobile token deltas (button height 48px / body 16px / spacing +50% on space.4+; corner radii identical for brand identity). The `@tool` generator authored in Phase 4 produces the mobile `.tres` from a TokenSet.mobile override block — this phase fills that block, validates against tap-target audit, and confirms parity.
+**Delivers:** `addons/neocade_theme/_dev/generate_themes.gd` filled with TokenSet.mobile overrides; generated `neocade_mobile_theme.tres` committed; `MOBILE-DESIGN-SPEC.md` documenting deltas vs desktop; tap-target audit script (every interactive Control ≥48px in mobile theme); showcase variant toggle (NeoCade desktop ↔ NeoCade mobile ↔ Godot default) — three-way toggle.
+**Interleaving note:** In practice, mobile token overrides accrue in parallel with Phases 5-7 desktop authoring (each desktop entry surfaces its mobile delta). Phase 8 is the dedicated mobile-completeness checkpoint and audit.
+**Avoids:** Token drift between desktop and mobile (structurally impossible with `@tool` generator); manual sync errors.
+**Estimated:** 12-18 hours.
 
-### Phase 9: QA + Distribution — Dual-renderer screenshots, Accessibility QA, Fresh-install dry-run, Asset Library prep
-**Rationale:** PITFALLS.md flags multiple QA gates pre-ship.
-**Delivers:** Full screenshot matrix (5 sections × 2 renderers × 3 resolutions × 3 scale factors); WCAG audit signed off; deuteranopia/protanopia/tritanopia simulation pass; multi-script label test; fresh-project install dry-run; Asset Library submission package (square 128×128 PNG icon URL, README with both install paths + editor-leak caveat + "not an editor plugin" note + license attributions).
-**Sub-spike:** MCP/QA tooling baseline (UD-1 resolution + GoPeak smoke test) at start of phase.
-**Avoids:** All distribution pitfalls (9.1-9.5); all QA pitfalls (8.1-8.4).
+### Phase 9: Showcase + Token Gallery + Theme Toggle
+**Rationale:** PROJECT.md mandates showcase + prominent toggle. Showcase doubles as QA forcing function. With mobile variant in v1, the showcase scene also demonstrates the desktop ↔ mobile theme switch.
+**Delivers:** `res://main.tscn` with 9 sections (Buttons, Text Inputs, Numbers/Range, Selection/Lists, Containers/Layout, Dialogs/Popups, Advanced/Graph, Token Gallery, Coverage 35/35); three-way theme toggle button (NeoCade desktop ↔ NeoCade mobile ↔ Godot default) with inline overrides (Pitfall 10.3); BBCode demo; `accessibility_name` on every Control (Pitfall 2.5); realistic sample content per Control (Pitfall 10.1).
 
-### Phase Ordering Rationale
-- Research/spike (1-3) precedes implementation (4-7) per mandatory mockup gate.
-- Foundation (4) precedes Core (5) — token/font/icon are stylebox dependencies.
-- Core (5) → Lists/Layout (6) → Dialogs/Popups (7) — Button is keystone; Tree depends on Button-state language; Popups depend on Window themeing language Phase 5 establishes.
-- Showcase (8) follows full coverage — requires all controls themed before sample-content discipline (Pitfall 10.1) can render meaningfully.
-- QA + Distribution (9) is last — full matrix requires complete `.tres` and showcase.
+### Phase 10 (EXPANDED post-CROSS-PLATFORM): QA + Cross-Platform Export Validation
+**Rationale:** PITFALLS flags multiple QA gates pre-ship. CROSS-PLATFORM elevates per-target export validation to v1 must-have. This phase combines visual QA, accessibility QA, dual-renderer screenshot pass, and per-target export validation.
+**Delivers:**
+- **Visual QA matrix:** screenshot pass (9 showcase sections × Forward+ + GL Compat × 1080p/1440p/4K × 100%/150%/200% scale) — produces `.planning/qa/screenshots/` reference set.
+- **Accessibility QA:** WCAG 2.1 AA audit signed off; focus stylebox audit (Tab-walk every Control, screenshot the focused state); deuteranopia/protanopia/tritanopia CVD simulation pass; multi-script label test (Latin/Cyrillic/Arabic/Hebrew/Devanagari).
+- **Cross-platform export validation:** per-target export builds (Windows, macOS, Linux, iOS, Android, Web/Browser); per-target screenshot decks; CI workflow for desktop+Web (Linux runner via headless export); manual Android+iOS validation on real devices (or noted as deferred if hardware unavailable — see UD-5).
+- **Sub-spike at start of phase:** MCP/QA tooling baseline (UD-1 resolution + GoPeak smoke test) — required before screenshot capture begins.
+**Estimated:** 8-12 hours plus device time.
+**Avoids:** All distribution pitfalls (9.x); all QA pitfalls (8.x); cross-platform regressions (CROSS-PLATFORM Section 1).
+
+### Phase 11: Distribution — Asset Library Submission, README, License Attribution
+**Rationale:** Final pre-ship gate. Asset Library policies may have changed since initial research; final verification at submission time.
+**Delivers:** Asset Library submission package (square 128×128 PNG icon URL, README with both install paths + editor-leak caveat + "not an editor plugin" note + license attributions surfaced); fresh-install dry-run on a clean Godot project; combined `OFL.txt` covering Inter + Outfit + Noto Sans + JetBrains Mono; `LICENSE.md` (theme code, e.g. MIT or CC-BY) + `CHANGELOG.md` initial entry.
+**Sub-research at start of phase:** Asset Library current policy verification via Context7 (do NOT rely on initial-pass docs which may be stale).
+**Avoids:** Submission rejection (font license oversights, missing README sections, malformed icon).
+
+### Optional Buffer: Cross-Platform Hardening Spike
+**When:** Inserted before Phase 11 only if Phase 10 surfaces real-device regressions.
+**Delivers:** targeted fixes per regression, re-run of relevant Phase 10 acceptance criteria.
+**Estimated:** 4-8 hours.
+
+### Phase Ordering Rationale (post-CROSS-PLATFORM)
+- Research/spike (1-3) precedes implementation (4-9) per mandatory mockup gate.
+- Foundation (4) establishes the `@tool` generator and TokenSet structure — every later phase populates the one source of truth.
+- Desktop core authoring (5-7) → Mobile variant authoring/audit (8) → Showcase (9): mobile overrides depend on desktop entries existing.
+- QA + Cross-Platform Validation (10) requires both themes complete and the showcase scene ready.
+- Distribution (11) is last — packaging and Asset Library policy verification.
 
 ### Research Flags
-**Phases needing per-phase RESEARCH.md:** Phase 1 (godot-minimal-theme dissection — line-by-line), Phase 2 (LDtk UI mining — Haxe code), Phase 3 (mockup phase — real-arcade reference collection + MCP tooling baseline), Phase 9 (Asset Library policy verification at submission time).
+**Phases needing per-phase RESEARCH.md:** Phase 1 (godot-minimal-theme `.tres` dissection), Phase 2 (LDtk Haxe-source UI mining), Phase 3 (mockup phase — real-arcade reference photo collection + MCP tooling baseline), Phase 11 (Asset Library current policy verification at submission time).
 
-**Phases with standard patterns (skip research-phase):** Phase 4 (Foundation), Phase 5/6/7 (per-Control authoring — entry tables authoritative; only Tree and ColorPicker may want a sub-research per their complexity), Phase 8 (Showcase — well-covered by FEATURES.md Section 5).
+**Phases with standard patterns (skip research-phase):** Phase 4 (Foundation — patterns established by FEATURES.md and CROSS-PLATFORM), Phase 5/6/7 (per-Control authoring — entry tables authoritative; only Tree and ColorPicker may want sub-research per complexity), Phase 8 (Mobile Variant Authoring — overrides driven by CROSS-PLATFORM Section 3 numerics), Phase 9 (Showcase — well-covered by FEATURES.md Section 5), Phase 10 (QA — checklist-driven from PITFALLS).
 
 **Additional dedicated spikes recommended (some folded into Phases 1-3 above):**
 - MCP/QA tooling baseline spike (UD-1 + GoPeak smoke test).
@@ -287,7 +327,7 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 | Features | HIGH | Coverage matrix and per-Control theme entry enumeration cross-checked against official Godot 4.6 docs; godot-minimal-theme as completeness benchmark. MEDIUM on token taxonomy (synthesized from M3 + prototype critique). |
 | Architecture | HIGH | M3 type scale and state-layer opacities pulled from upstream `material-web` SCSS; LDtk palette from real `app.scss` with file path; godot-minimal-theme from upstream README; WCAG via W3C luminance formula. MEDIUM on real-arcade visual interpretation (D&B brand color is single-source). |
 | Pitfalls | HIGH | Most items backed by Godot issue numbers/PRs. MEDIUM on visual identity drift sections (7.x — synthesized from multiple aesthetic-wiki sources). |
-| Cross-Platform | PENDING | 5th researcher in flight as of this synthesis. SUMMARY.md will be amended before REQUIREMENTS.md is authored. |
+| Cross-Platform | HIGH (Godot/iOS HIG/Material 3 numerics, font licensing); MEDIUM (Web export real-world reliability, real-device coverage) | All findings folded in 2026-05-04. Per-target table verified, mobile spec concrete, token-sharing strategy verified against Godot Theme API limits. Real-device testing matrix is open (UD-5). |
 
 **Overall confidence:** HIGH on technical surface; MEDIUM on visual-identity direction (resolved via mockup gate); LOW on two source-dive areas explicitly flagged for follow-up phases.
 

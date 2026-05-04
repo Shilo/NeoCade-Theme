@@ -443,12 +443,24 @@ This produces **deterministic, reproducible** state colors so designers don't ha
 - Variant 3 (optional): Inter body + Space Grotesk headings
 - Each shows the same H1/H2/H3/body/code/button-label sample text
 
-**Step 5 (full-fidelity mockup, 1 file):**
+**Step 5 (full-fidelity desktop mockup, 1 file):**
 - One large HTML file simulating every Godot Control class from `control_gallery` ([github.com/godotengine/godot-demo-projects/tree/master/gui/control_gallery](https://github.com/godotengine/godot-demo-projects/tree/master/gui/control_gallery))
 - Buttons: normal/hover/focused/pressed/disabled — all 5 states visible per button type
 - LineEdit / TextEdit / SpinBox / Slider / ProgressBar / CheckBox / OptionButton / Tabs / PopupMenu / Tree / ItemList / GraphEdit (sketched)
 - Window/AcceptDialog/ConfirmationDialog
 - Approximately 1500 lines of HTML+CSS, organized by control group with subheadings
+
+**Step 5b (mobile-variant mockup, 1 file) — ADDED 2026-05-04 per CROSS-PLATFORM and MAJ-6:**
+Mobile variant is a v1 must-have, so the mockup gate must include a mobile mockup before `.tres` work begins.
+- One HTML file showing the same Controls at mobile sizes (e.g. 360×800 and 768×1024 viewports)
+- Tap-target overlays visible (44pt iOS / 48dp Android minimums highlighted; every interactive Control ≥48px in the mockup)
+- Body type at 16px (vs desktop 14px), spacing scale +50% on space.4 and above; corner radii identical to desktop
+- Same accent palette / surface ramp / typography stack as Step 5 — only scale and density differ
+- User APPROVES desktop and mobile together (not separately) — one approval gate covers both variants
+
+**Step 6 (combined approval):**
+- User approves Step 5 + Step 5b together as a single design package, OR sends back specific feedback for revision (max 3 rounds total across both variants).
+- Output on approval: `DESIGN_TOKENS.md` finalized with both desktop and mobile token blocks; `.planning/mockups/*.html` archived; `.tres` work UNLOCKED.
 
 ### After Approval
 

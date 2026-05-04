@@ -198,18 +198,21 @@ res://
 **If shipping for desktop only (current v1 scope):**
 - Use full Inter + Noto Sans bundle (~2.3 MB).
 - Enable StyleBoxFlat `anti_aliasing` on all rounded controls.
-- Use `shadow_size = 4-6` on dialogs/popups for elevation.
+- ~~Use `shadow_size = 4-6` on dialogs/popups for elevation.~~ **REVOKED 2026-05-04:** drop shadows are forbidden in v1 per `SUMMARY.md` Conflict 3 + `FEATURES.md` AF-13. Convey elevation through the tonal surface ramp (color stops). Optional 1px lighter top-bevel border allowed on raised buttons.
 
-**If extending to mobile in v2:**
-- Keep Inter (still readable at small sizes thanks to `opsz` axis).
-- Increase tap target sizes via `content_margin_*` (44pt minimum per WCAG).
-- Drop drop-shadows on mobile (perf cost on GL Compatibility on Android low-end).
-- Consider exposing a `theme_type_variation` like `MobileButton` with larger paddings.
+**Mobile variant — v1 must-have (UPDATED 2026-05-04, was "v2 extension"):**
+Mobile is no longer deferred. Per CROSS-PLATFORM.md Section 3, `neocade_mobile_theme.tres` ships in v1 alongside the desktop primary, generated from the same `TokenSet` block via `@tool` script.
+- Keep Inter (still readable at small sizes thanks to `opsz` axis); body text 16px on mobile vs 14px desktop.
+- Tap targets ≥48px (Godot pixels) on mobile — covers iOS HIG 44pt + Material 3 48dp simultaneously.
+- Spacing scale +50% on `space.4` and above; corner radii STAY IDENTICAL across desktop/mobile (brand identity).
+- Drop shadows are forbidden on both desktop AND mobile (was previously framed as "drop on mobile only" — reconciled).
+- Mobile-specific Control overrides documented in `MOBILE-DESIGN-SPEC.md` (Phase 8 deliverable).
 
 **If extending to light mode in v2:**
 - Keep same StyleBox geometry; swap color tokens.
 - Re-verify all WCAG contrast pairs in light context (pure inversion fails ~30% of token pairs typically).
 - Maintain identical type variation names so consuming projects don't refactor.
+- **Note:** with mobile variant in v1, light mode in v2 multiplies across both desktop AND mobile (up to 4 `.tres` files: desktop dark, desktop light, mobile dark, mobile light) — unless mobile-light is explicitly out per PROJECT.md Out of Scope.
 
 **If consuming project needs CJK:**
 - Document override pattern in README:

@@ -755,7 +755,7 @@ Each glow is locally justified ("needed for visibility"); the cumulative effect 
 - [ ] Hard rule: **No more than 1 glowing element on screen at a time.** If a control has a glow, others must not.
 - [ ] Reserve "glow" for a single semantic role (e.g. focus only) and use solid edges everywhere else.
 - [ ] Audit each mockup with a "count the glows" check.
-- [ ] Use **drop shadow**, not outer glow, for elevation. Shadows are arcade-native (cabinets cast shadows); glows are synthwave-native.
+- [ ] **DO NOT use drop shadows for elevation in v1.** Per `SUMMARY.md` Conflict 3, `FEATURES.md` AF-13, and `ARCHITECTURE.md` elevation-via-color: drop shadows are categorically forbidden in v1 because GL Compatibility over-renders shadow alpha (~2×, Godot issue #23640) and the StyleBoxFlat shadow path renders behind content as a "ghosted clone." Glows are synthwave-native and forbidden too. **Convey elevation through the tonal surface ramp (color stops) only.** Optional: 1px lighter top-bevel border on raised buttons (`border_width_top=1` + lighter color) — implements arcade button cap highlight without engaging the broken shadow path.
 
 **Detection ritual:**
 - [ ] If a screenshot of the showcase scene at 50% opacity still looks bright everywhere, glow is everywhere.
