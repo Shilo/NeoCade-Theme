@@ -14,13 +14,16 @@ must_haves:
     - "MINIMAL-THEME-DISSECTION.md exists at .planning/research/ with provenance, globals, helpers, color-system, and Editor-API touchpoints sections all present at top of file"
     - "Provenance block names the snapshot file path, file size in bytes, line count, ISO date downloaded, and SHA-256 hash 102fd6b3cab3b30b3c05878badff83e321df06a98adf4bb17e6a94d1b0a73f2e"
     - "Editor-API Touchpoints callout is explicit and lists every EditorInterface/EditorSettings/EDSCALE reference with line citations into minimal_theme.tres so downstream phases never accidentally port editor-bound code (D-05)"
+    - "Editor-API Touchpoints line numbers are runtime-validated against the live file (Task 3) — not just structurally grep-checked. Verification stamp appended to DISSECTION.md."
+    - "Globals 'scale' row carries an explicit FORBIDDEN-in-NeoCade callout per D-05 so no downstream reader mistakes EDSCALE-derived values for NeoCade-usable constants (per cross-AI review 2026-05-04)"
     - "Globals/helpers/color-system documentation is comprehensive enough that per-class enumeration plans (02, 03) can reference by name (e.g. color_surface_base, color_font_normal, _set_margin) without re-defining"
   artifacts:
-    - .planning/research/MINIMAL-THEME-DISSECTION.md (created — file exists with skeleton sections)
+    - .planning/research/MINIMAL-THEME-DISSECTION.md (created — file exists with skeleton sections + line-citation verification stamp)
   key_links:
     - "Provenance hash matches `sha256sum /c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres` output"
-    - "Globals section line citations resolve to actual lines in minimal_theme.tres (verifiable via grep)"
+    - "Globals section line citations resolve to actual lines in minimal_theme.tres (verifiable via grep AND `sed -n 'Np'` runtime spot-check per Task 3)"
     - "Editor-API Touchpoints section is greppable as 'Editor-API Touchpoints' (used by VALIDATION.md task 01-01-03)"
+    - "Line-citation runtime validation stamp is greppable as 'Line-citation runtime validation' (Task 3 deliverable)"
 ---
 
 <objective>
@@ -269,8 +272,8 @@ Provenance values (already computed; copy verbatim into doc):
     | `base_margin` | `float(base_spacing)` | 50 | 4.0 |
     | `extra_spacing` | `settings.get_setting('interface/theme/additional_spacing')` | 28 | 0 (Godot default) |
     | `increased_margin` | `base_spacing + extra_spacing * 0.75` | 51 | 4.0 |
-    | `popup_margin` | `maxf(base_margin * 2.4, 4.0 * scale)` | 52 | 9.6 (or 4.0×scale, whichever bigger) |
-    | `scale` | `EditorInterface.get_editor_scale()` (D-05 forbidden) | 21 | 1.0 (default 100% editor scale) |
+    | `popup_margin` | `maxf(base_margin * 2.4, 4.0 * scale)` | 52 | 9.6 (or 4.0×scale, whichever bigger) — **NeoCade note:** the `4.0 * scale` term is EDSCALE-derived and forbidden in NeoCade per D-05; NeoCade's `popup_margin` uses `base_margin * 2.4` only (Phase 4 token rule). |
+    | `scale` | `EditorInterface.get_editor_scale()` ⚠ **EDSCALE-derived; FORBIDDEN in NeoCade per D-05.** Any formula in this Globals table or a per-class table that multiplies by `scale` MUST be flagged in Plan 02 / 03 / 04 outputs and stripped before NeoCade-token use (Phase 4). | 21 | 1.0 (default 100% editor scale) |
 
     ### Theme-mode flags
 
@@ -395,6 +398,93 @@ Provenance values (already computed; copy verbatim into doc):
     - File contains the names `_get_base_color`, `_set_margin`, `_set_border`, `color_surface_base`, `color_font_normal` (greppable as identifiers)
     - File contains the placeholder headings `## Per-Control Enumeration` and `## Engine-Default Cross-Reference and Pitfall Confirmations` so plans 02-03 can append
     - Helper-function code blocks contain actual GDScript bodies (no placeholder text like "executor extracts at runtime")
+    - Globals "Margins / spacing" table contains the literal string `FORBIDDEN in NeoCade per D-05` on the `scale` row (D-05 callout, per cross-AI review)
+  </acceptance_criteria>
+</task>
+
+<task type="auto">
+  <name>Task 3: Runtime line-citation grep validation — verify the Editor-API Touchpoints table's hardcoded line numbers match the live file (per cross-AI review HIGH #2)</name>
+  <read_first>
+    - .planning/research/MINIMAL-THEME-DISSECTION.md (just-written file from Task 2 — contains the table to be validated)
+    - C:\Programming_Files\Godot\godot-minimal-theme-main\minimal_theme.tres (live file — lines being cited)
+  </read_first>
+  <files>(no files written — verification step; if mismatches found, may rewrite the table cells in MINIMAL-THEME-DISSECTION.md)</files>
+  <action>
+    The Editor-API Touchpoints table in Task 2's document body hardcodes absolute line numbers (e.g., line 15 = `EditorInterface.get_editor_settings()`, line 21 = `EditorInterface.get_editor_scale()`, line 18 = `base_color`, etc.). Task 1's SHA-256 verification proves file integrity but does NOT prove that these specific line numbers are correct — the string `EditorInterface.get_editor_scale` could appear anywhere in the file and still pass Task 2's structural greps.
+
+    This task runtime-validates each cited line number against `sed -n 'Np'` output, catching any drift before downstream plans build on incorrect citations.
+
+    For EACH of the following 12 cited lines (covering all rows of the Editor-API Touchpoints table where a specific line number is given), run `sed -n 'Np' /c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres` and verify the expected substring appears on that line:
+
+    | Cited line | Expected substring on that line |
+    |------------|---------------------------------|
+    | 15 | `EditorInterface.get_editor_settings()` |
+    | 18 | `interface/theme/base_color` |
+    | 20 | `interface/theme/contrast` |
+    | 21 | `EditorInterface.get_editor_scale()` |
+    | 24 | `interface/theme/accent_color` |
+    | 26 | `interface/theme/base_spacing` |
+    | 28 | `interface/theme/additional_spacing` |
+    | 30 | `interface/theme/corner_radius` |
+    | 32 | `interface/theme/icon_and_font_color` |
+    | 34 | `interface/theme/relationship_line_opacity` |
+    | 36 | `interface/theme/draw_extra_borders` |
+    | 56 | `dark_theme` AND `get_luminance` (both must appear) |
+
+    Run as a single shell block:
+    ```bash
+    src=/c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres
+    fail=0
+    check() { local n=$1 needle=$2; sed -n "${n}p" "$src" | grep -qF -- "$needle" || { echo "MISMATCH line $n: expected '$needle'"; fail=$((fail+1)); }; }
+    check 15 "EditorInterface.get_editor_settings()"
+    check 18 "interface/theme/base_color"
+    check 20 "interface/theme/contrast"
+    check 21 "EditorInterface.get_editor_scale()"
+    check 24 "interface/theme/accent_color"
+    check 26 "interface/theme/base_spacing"
+    check 28 "interface/theme/additional_spacing"
+    check 30 "interface/theme/corner_radius"
+    check 32 "interface/theme/icon_and_font_color"
+    check 34 "interface/theme/relationship_line_opacity"
+    check 36 "interface/theme/draw_extra_borders"
+    sed -n "56p" "$src" | grep -q "dark_theme" && sed -n "56p" "$src" | grep -q "get_luminance" || { echo "MISMATCH line 56: expected 'dark_theme' AND 'get_luminance'"; fail=$((fail+1)); }
+    test "$fail" -eq 0 || { echo "Line citation validation FAILED ($fail mismatches)"; exit 1; }
+    echo "All 12 line citations verified."
+    ```
+
+    **If ALL 12 checks pass:** Append a verification stamp to MINIMAL-THEME-DISSECTION.md immediately under the Editor-API Touchpoints table (use Edit tool):
+    ```markdown
+    > **Line-citation runtime validation (per cross-AI review 2026-05-04):** All 12 cited lines (15, 18, 20, 21, 24, 26, 28, 30, 32, 34, 36, 56) verified by `sed -n 'Np'` against the live snapshot. Stamp date: 2026-05-04.
+    ```
+
+    **If ANY check fails:** Halt the plan and report. The executor MUST then either:
+    - (A) Re-grep each forbidden-API string to find its actual current line number and rewrite the table cells in MINIMAL-THEME-DISSECTION.md before continuing, or
+    - (B) If the file SHA also no longer matches Task 1's expected hash, regenerate provenance (re-run Task 1) and re-author the table from the live file's line numbers.
+
+    Do NOT proceed to plans 02/03/04/05 with mismatched citations — downstream plans cite into this table and a wrong line number propagates.
+  </action>
+  <verify>
+    ```bash
+    # Line-citation validation block (re-run for verify)
+    src=/c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres
+    sed -n "15p" "$src" | grep -qF "EditorInterface.get_editor_settings()"
+    sed -n "21p" "$src" | grep -qF "EditorInterface.get_editor_scale()"
+    sed -n "18p" "$src" | grep -qF "interface/theme/base_color"
+    sed -n "30p" "$src" | grep -qF "interface/theme/corner_radius"
+    sed -n "56p" "$src" | grep -qF "dark_theme"
+    sed -n "56p" "$src" | grep -qF "get_luminance"
+    # Verification stamp recorded in DISSECTION.md
+    grep -q "Line-citation runtime validation" .planning/research/MINIMAL-THEME-DISSECTION.md
+    grep -q "All 12 cited lines" .planning/research/MINIMAL-THEME-DISSECTION.md
+    ```
+  </verify>
+  <done>
+    All 12 line-number citations verified against live snapshot. Verification stamp appended to MINIMAL-THEME-DISSECTION.md. (No table cells rewritten — they were already correct against this snapshot.) If any mismatches were found and corrected, the corrected table now matches the live file.
+  </done>
+  <acceptance_criteria>
+    - All 6 spot-check `sed`+`grep` commands in the verify block exit 0
+    - File contains the literal string `Line-citation runtime validation`
+    - File contains the literal string `All 12 cited lines`
   </acceptance_criteria>
 </task>
 
@@ -423,12 +513,15 @@ Provenance values (already computed; copy verbatim into doc):
 - [ ] Editor-API Touchpoints section is the most prominent visible callout (above per-class enumeration heading) so downstream phase implementers see it first
 - [ ] Helper-function bodies are pasted verbatim (not paraphrased)
 - [ ] Provenance hash is byte-identical to live `sha256sum` output
+- [ ] Editor-API Touchpoints line numbers runtime-validated against live file (Task 3); verification stamp present in DISSECTION.md
+- [ ] Globals "scale" row contains FORBIDDEN-in-NeoCade callout per D-05
 </verification>
 
 <success_criteria>
 - File `.planning/research/MINIMAL-THEME-DISSECTION.md` exists
 - All 12 grep acceptance checks in task 2 pass
 - Provenance values match the live snapshot (task 1 verification passed)
+- All 12 Editor-API line citations runtime-verified by Task 3 (sed-based spot-check); verification stamp recorded
 - File reads top-to-bottom in this order: header → provenance → methodology → glossary → Editor-API Touchpoints → Globals → Helper Functions → (placeholder) Per-Control Enumeration → (placeholder) Engine-Default Cross-Reference and Pitfall Confirmations
 </success_criteria>
 

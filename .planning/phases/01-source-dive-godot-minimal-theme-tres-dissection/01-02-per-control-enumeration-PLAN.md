@@ -226,21 +226,33 @@ The "Snapshot @ defaults" column uses upstream README defaults (`base_color=#272
   </action>
   <verify>
     ```bash
+    src=/c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres
+    out=.planning/research/MINIMAL-THEME-DISSECTION.md
     for c in Button CheckBox CheckButton OptionButton MenuButton FlatButton; do
-      grep -q "^### $c\$" .planning/research/MINIMAL-THEME-DISSECTION.md || { echo "MISSING SECTION: $c"; exit 1; }
-      # Each section has at least 5 enumeration rows (very loose lower bound; actual counts much higher)
-      awk "/^### $c\$/,/^### [A-Z]/" .planning/research/MINIMAL-THEME-DISSECTION.md | grep -cE "^\| (stylebox|color|font|font_size|icon|constant) " | (read n; test "$n" -ge 5 || { echo "$c has only $n rows; expected ≥5"; exit 1; })
+      grep -q "^### $c\$" "$out" || { echo "MISSING SECTION: $c"; exit 1; }
+      # DYNAMIC count check (per cross-AI review): row count ≥ discovery-grep count, never a hardcoded floor.
+      # FlatButton is editor-only in upstream — it MAY have zero set_* lines per CONTEXT.md D-10. If discovery=0, the section must contain an explicit "no upstream entries — research-only TYPEVAR-01 placeholder" note (matched separately below).
+      discovery=$(grep -cE "set_(stylebox|color|font|icon|constant|font_size)\([^,]+, '$c'" "$src" || true)
+      enumerated=$(awk "/^### $c\$/,/^### [A-Z]/" "$out" | grep -cE "^\| (stylebox|color|font|font_size|icon|constant) ")
+      if [ "$discovery" -eq 0 ]; then
+        # Class has no upstream entries — section must carry an explicit "no upstream entries" note
+        awk "/^### $c\$/,/^### [A-Z]/" "$out" | grep -qE "no upstream entries|research-only|NeoCade-additive" || { echo "$c has 0 set_* in upstream; section must carry an explicit 'no upstream entries' / 'research-only' / 'NeoCade-additive' note"; exit 1; }
+      else
+        # Class has N upstream entries — enumeration must equal discovery count exactly (D-07: exhaustive, no shortcuts and no surplus)
+        test "$enumerated" -eq "$discovery" || { echo "$c: discovery=$discovery upstream entries, enumeration=$enumerated rows. Must equal exactly (per D-07 + cross-AI review: no static floors, no missing rows, no duplicate rows)."; exit 1; }
+      fi
     done
-    grep -q "TYPEVAR-01" .planning/research/MINIMAL-THEME-DISSECTION.md   # FlatButton notes reference
+    grep -q "TYPEVAR-01" "$out"   # FlatButton notes reference
     ```
     Plus: spot-check 3 random rows in the Button section against `set_*` lines in minimal_theme.tres — formula matches the cited line.
   </verify>
   <done>
-    All 6 sections present, each ≥5 entry rows, FlatButton notes reference TYPEVAR-01, spot-check passes.
+    All 6 sections present. For every class with N≥1 upstream `set_*` lines, the enumeration row count equals N exactly (not a static floor). For any class with 0 upstream entries (FlatButton may qualify per D-10), the section carries an explicit "no upstream entries" / "research-only" / "NeoCade-additive" note. FlatButton notes reference TYPEVAR-01. Spot-check passes.
   </done>
   <acceptance_criteria>
     - File contains exactly the headings `### Button`, `### CheckBox`, `### CheckButton`, `### OptionButton`, `### MenuButton`, `### FlatButton`
-    - Each of those sections contains ≥5 rows of `| stylebox|color|font|font_size|icon|constant |` shape
+    - For each section, the row count of `| stylebox|color|font|font_size|icon|constant |` shape rows EQUALS the count of upstream `set_*` lines targeting that class (dynamic equality — discovery grep run live in verify block above)
+    - For any class where the discovery grep returns zero, the section contains one of the literal strings: `no upstream entries`, `research-only`, or `NeoCade-additive`
     - The `### FlatButton` section contains the literal string `TYPEVAR-01`
     - At least one row in `### Button` cites a line number ≤ 300 (the Button block in upstream starts ~line 256)
   </acceptance_criteria>
@@ -263,18 +275,27 @@ The "Snapshot @ defaults" column uses upstream README defaults (`base_color=#272
   </action>
   <verify>
     ```bash
+    src=/c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres
+    out=.planning/research/MINIMAL-THEME-DISSECTION.md
     for c in Label RichTextLabel LineEdit TextEdit; do
-      grep -q "^### $c\$" .planning/research/MINIMAL-THEME-DISSECTION.md || { echo "MISSING: $c"; exit 1; }
-      awk "/^### $c\$/,/^### [A-Z]/" .planning/research/MINIMAL-THEME-DISSECTION.md | grep -cE "^\| (stylebox|color|font|font_size|icon|constant) " | (read n; test "$n" -ge 3 || { echo "$c has $n rows; expected ≥3"; exit 1; })
+      grep -q "^### $c\$" "$out" || { echo "MISSING: $c"; exit 1; }
+      discovery=$(grep -cE "set_(stylebox|color|font|icon|constant|font_size)\([^,]+, '$c'" "$src" || true)
+      enumerated=$(awk "/^### $c\$/,/^### [A-Z]/" "$out" | grep -cE "^\| (stylebox|color|font|font_size|icon|constant) ")
+      if [ "$discovery" -eq 0 ]; then
+        awk "/^### $c\$/,/^### [A-Z]/" "$out" | grep -qE "no upstream entries|research-only|NeoCade-additive" || { echo "$c has 0 upstream entries; section must carry explicit note"; exit 1; }
+      else
+        test "$enumerated" -eq "$discovery" || { echo "$c: discovery=$discovery, enumeration=$enumerated. Must equal exactly (D-07 + cross-AI review)"; exit 1; }
+      fi
     done
     ```
   </verify>
   <done>
-    All 4 sections present, each ≥3 rows.
+    All 4 sections present. For each class with N≥1 upstream entries, enumeration count equals N exactly. For any class with 0 upstream entries, section carries explicit "no upstream entries" note.
   </done>
   <acceptance_criteria>
     - File contains exactly the headings `### Label`, `### RichTextLabel`, `### LineEdit`, `### TextEdit`
-    - Each section has ≥3 enumeration rows
+    - For each section, the row count of `| stylebox|color|font|font_size|icon|constant |` shape rows EQUALS the count of upstream `set_*` lines targeting that class (dynamic equality, no static floor)
+    - For any class where discovery grep returns zero, section contains one of: `no upstream entries`, `research-only`, `NeoCade-additive`
   </acceptance_criteria>
 </task>
 
@@ -297,19 +318,28 @@ The "Snapshot @ defaults" column uses upstream README defaults (`base_color=#272
   </action>
   <verify>
     ```bash
+    src=/c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres
+    out=.planning/research/MINIMAL-THEME-DISSECTION.md
     for c in Tree ItemList TabBar TabContainer; do
-      grep -q "^### $c\$" .planning/research/MINIMAL-THEME-DISSECTION.md || { echo "MISSING: $c"; exit 1; }
-      awk "/^### $c\$/,/^### [A-Z]/" .planning/research/MINIMAL-THEME-DISSECTION.md | grep -cE "^\| (stylebox|color|font|font_size|icon|constant) " | (read n; test "$n" -ge 8 || { echo "$c has $n rows; expected ≥8"; exit 1; })
+      grep -q "^### $c\$" "$out" || { echo "MISSING: $c"; exit 1; }
+      discovery=$(grep -cE "set_(stylebox|color|font|icon|constant|font_size)\([^,]+, '$c'" "$src" || true)
+      enumerated=$(awk "/^### $c\$/,/^### [A-Z]/" "$out" | grep -cE "^\| (stylebox|color|font|font_size|icon|constant) ")
+      if [ "$discovery" -eq 0 ]; then
+        awk "/^### $c\$/,/^### [A-Z]/" "$out" | grep -qE "no upstream entries|research-only|NeoCade-additive" || { echo "$c has 0 upstream entries; section must carry explicit note"; exit 1; }
+      else
+        test "$enumerated" -eq "$discovery" || { echo "$c: discovery=$discovery, enumeration=$enumerated. Must equal exactly (D-07 + cross-AI review)"; exit 1; }
+      fi
     done
-    grep -q "TreeSecondary\|ItemListSecondary\|TabContainerOdd" .planning/research/MINIMAL-THEME-DISSECTION.md   # type-variation noted somewhere
+    grep -q "TreeSecondary\|ItemListSecondary\|TabContainerOdd" "$out"   # type-variation noted somewhere
     ```
   </verify>
   <done>
-    All 4 sections present, each ≥8 rows, type variations noted.
+    All 4 sections present. For each class with N≥1 upstream entries, enumeration count equals N exactly. Type variations noted.
   </done>
   <acceptance_criteria>
     - File contains exactly the headings `### Tree`, `### ItemList`, `### TabBar`, `### TabContainer`
-    - Each section has ≥8 enumeration rows
+    - For each section, enumeration row count EQUALS upstream `set_*` discovery count (dynamic equality, no static floor)
+    - For any class with 0 upstream entries, section contains one of: `no upstream entries`, `research-only`, `NeoCade-additive`
     - At least one of TreeSecondary, ItemListSecondary, TabContainerOdd appears as a per-class note
   </acceptance_criteria>
 </task>
@@ -331,19 +361,28 @@ The "Snapshot @ defaults" column uses upstream README defaults (`base_color=#272
   </action>
   <verify>
     ```bash
+    src=/c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres
+    out=.planning/research/MINIMAL-THEME-DISSECTION.md
     for c in ProgressBar HSlider VSlider HScrollBar VScrollBar; do
-      grep -q "^### $c\$" .planning/research/MINIMAL-THEME-DISSECTION.md || { echo "MISSING: $c"; exit 1; }
-      awk "/^### $c\$/,/^### [A-Z]/" .planning/research/MINIMAL-THEME-DISSECTION.md | grep -cE "^\| (stylebox|color|font|font_size|icon|constant) " | (read n; test "$n" -ge 4 || { echo "$c has $n rows; expected ≥4"; exit 1; })
+      grep -q "^### $c\$" "$out" || { echo "MISSING: $c"; exit 1; }
+      discovery=$(grep -cE "set_(stylebox|color|font|icon|constant|font_size)\([^,]+, '$c'" "$src" || true)
+      enumerated=$(awk "/^### $c\$/,/^### [A-Z]/" "$out" | grep -cE "^\| (stylebox|color|font|font_size|icon|constant) ")
+      if [ "$discovery" -eq 0 ]; then
+        awk "/^### $c\$/,/^### [A-Z]/" "$out" | grep -qE "no upstream entries|research-only|NeoCade-additive" || { echo "$c has 0 upstream entries; section must carry explicit note"; exit 1; }
+      else
+        test "$enumerated" -eq "$discovery" || { echo "$c: discovery=$discovery, enumeration=$enumerated. Must equal exactly (D-07 + cross-AI review)"; exit 1; }
+      fi
     done
-    grep -q "increase_scrollbar_touch_area\|enable_touch_optimizations" .planning/research/MINIMAL-THEME-DISSECTION.md
+    grep -q "increase_scrollbar_touch_area\|enable_touch_optimizations" "$out"
     ```
   </verify>
   <done>
-    All 5 sections present, each ≥4 rows, touch-area note included.
+    All 5 sections present. For each class with N≥1 upstream entries, enumeration count equals N exactly. Touch-area note included.
   </done>
   <acceptance_criteria>
     - File contains exactly the headings `### ProgressBar`, `### HSlider`, `### VSlider`, `### HScrollBar`, `### VScrollBar`
-    - Each section has ≥4 enumeration rows
+    - For each section, enumeration row count EQUALS upstream `set_*` discovery count (dynamic equality, no static floor)
+    - For any class with 0 upstream entries, section contains one of: `no upstream entries`, `research-only`, `NeoCade-additive`
     - File mentions either `increase_scrollbar_touch_area` or `enable_touch_optimizations`
   </acceptance_criteria>
 </task>
@@ -402,21 +441,27 @@ The "Snapshot @ defaults" column uses upstream README defaults (`base_color=#272
   </action>
   <verify>
     ```bash
-    grep -q "^### ColorPicker\$" .planning/research/MINIMAL-THEME-DISSECTION.md
-    grep -q "^### GraphEdit\$" .planning/research/MINIMAL-THEME-DISSECTION.md
-    grep -qE "^### MenuBar\$|MenuBar.*NeoCade-additive" .planning/research/MINIMAL-THEME-DISSECTION.md
-    grep -q "^### User-facing container chrome\$" .planning/research/MINIMAL-THEME-DISSECTION.md
-    awk '/^### ColorPicker\$/,/^### [A-Z]/' .planning/research/MINIMAL-THEME-DISSECTION.md | grep -cE "^\| (stylebox|color|font|font_size|icon|constant) " | (read n; test "$n" -ge 3 || { echo "ColorPicker $n rows; expected ≥3"; exit 1; })
-    awk '/^### GraphEdit\$/,/^### [A-Z]/' .planning/research/MINIMAL-THEME-DISSECTION.md | grep -cE "^\| (stylebox|color|font|font_size|icon|constant) " | (read n; test "$n" -ge 5 || { echo "GraphEdit $n rows; expected ≥5"; exit 1; })
+    src=/c/Programming_Files/Godot/godot-minimal-theme-main/minimal_theme.tres
+    out=.planning/research/MINIMAL-THEME-DISSECTION.md
+    grep -q "^### ColorPicker\$" "$out"
+    grep -q "^### GraphEdit\$" "$out"
+    grep -qE "^### MenuBar\$|MenuBar.*NeoCade-additive" "$out"
+    grep -q "^### User-facing container chrome\$" "$out"
+    # Dynamic discovery-grep equality (per cross-AI review): no static floors
+    for c in ColorPicker GraphEdit; do
+      discovery=$(grep -cE "set_(stylebox|color|font|icon|constant|font_size)\([^,]+, '$c'" "$src" || true)
+      enumerated=$(awk "/^### $c\$/,/^### [A-Z]/" "$out" | grep -cE "^\| (stylebox|color|font|font_size|icon|constant) ")
+      test "$enumerated" -eq "$discovery" || { echo "$c: discovery=$discovery, enumeration=$enumerated. Must equal exactly (D-07 + cross-AI review)"; exit 1; }
+    done
     ```
   </verify>
   <done>
-    All 4 sections present (or MenuBar reconciliation), counts pass.
+    All 4 sections present (or MenuBar reconciliation). For ColorPicker and GraphEdit, enumeration row count equals upstream discovery count exactly (no static floor).
   </done>
   <acceptance_criteria>
     - File contains `### ColorPicker`, `### GraphEdit`, and `### User-facing container chrome` headings exactly
     - Either `### MenuBar` heading exists OR file contains the literal string `MenuBar` near the literal string `NeoCade-additive`
-    - ColorPicker section has ≥3 enumeration rows; GraphEdit section has ≥5
+    - ColorPicker and GraphEdit enumeration row counts EQUAL upstream `set_*` discovery counts (dynamic equality, no static floor)
   </acceptance_criteria>
 </task>
 
@@ -480,7 +525,8 @@ The "Snapshot @ defaults" column uses upstream README defaults (`base_color=#272
 
 <verification>
 - [ ] All 28 `### ClassName` sections (27 user-facing + FlatButton) present, with reconciliation notes for any D-08 class upstream doesn't theme
-- [ ] Each section's row count matches the count of `set_*` lines for that class in upstream (`grep -c` cross-check)
+- [ ] Each section's row count EXACTLY EQUALS the count of `set_*` lines for that class in upstream (`grep -c` dynamic equality — no static floors per cross-AI review 2026-05-04)
+- [ ] For any class with 0 upstream entries, section carries an explicit "no upstream entries" / "research-only" / "NeoCade-additive" note (instead of a row count)
 - [ ] No row references a Globals/helper name not defined in Plan 01's sections
 - [ ] Active-verification audit covers all 80 unique class targets
 - [ ] Pitfall 1.7 evidence-anchor note present for Plan 03 to consume

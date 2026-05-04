@@ -2,9 +2,10 @@
 phase: 01-source-dive-godot-minimal-theme-tres-dissection
 plan: 03
 type: execute
-wave: 1
+wave: 2
 depends_on:
   - 01
+  - 02
 files_modified:
   - .planning/research/MINIMAL-THEME-DISSECTION.md
 autonomous: true
@@ -101,7 +102,19 @@ Pitfall 1.7 reads: "popups need first-class type theming because they are separa
       (git log -1 --format='%H %ad' --date=iso-strict 2>/dev/null || echo "NOT-A-GIT-REPO; using directory mtime: $(stat -c %y /c/Programming_Files/Godot/godot-master 2>/dev/null)")
     ```
 
-    If a SHA is returned: cite it. If "NOT-A-GIT-REPO": flag that the cross-reference is anchored to the local snapshot's directory mtime, not a git commit, and recommend a future re-verification against an actual `godotengine/godot` 4.6 release tag.
+    Also try to detect the Godot version this clone represents (per cross-AI review MEDIUM #5 — mtime alone does not pin engine version):
+    ```bash
+    # Try to extract VERSION from Godot's version file (works on both git and ZIP-extracted clones)
+    GODOT_VERSION_LINE=$(grep -hE '^(major|minor|patch)\s*=\s*[0-9]+' /c/Programming_Files/Godot/godot-master/version.py 2>/dev/null || echo "version.py not found")
+    echo "$GODOT_VERSION_LINE"
+    ```
+
+    **Decision matrix (per cross-AI review):**
+    - If `git log` returns a SHA → cite it. Done.
+    - If NOT-A-GIT-REPO **AND** `version.py` extraction yields `major=4 minor=6` (or higher) → record mtime + version.py-derived "4.6+" anchor. Acceptable but flag the caveat.
+    - If NOT-A-GIT-REPO **AND** `version.py` is missing OR yields `major < 4` or `minor < 6` → **mtime alone does NOT pin the engine version**. Mandatory caveat: write the cross-reference but ALSO emit an explicit ⚠ marker that downstream Phase 4 (theme generator) MUST re-verify omission flags against an actual Godot 4.6 release tag before relying on this section. Do NOT abort the plan — continue with the caveat in place — but the marker MUST be greppable as `ENGINE-VERSION-CAVEAT` (Phase 4 plan check will look for this).
+
+    If a SHA is returned: cite it. If "NOT-A-GIT-REPO": flag that the cross-reference is anchored to the local snapshot (mtime + version.py if available), not a git commit, and recommend a future re-verification against an actual `godotengine/godot` 4.6 release tag.
 
     Append (immediately under `## Engine-Default Cross-Reference and Pitfall Confirmations`):
 
@@ -112,8 +125,11 @@ Pitfall 1.7 reads: "popups need first-class type theming because they are separa
 
     **Engine-source anchor:**
     - Path: `/c/Programming_Files/Godot/godot-master/scene/theme/default_theme.cpp`
-    - Anchor: [SHA + iso date if git, OR directory mtime + caveat]
+    - Anchor: [SHA + iso date if git, OR directory mtime + version.py-derived "4.6+" if available, OR mtime-only with ENGINE-VERSION-CAVEAT marker if version cannot be confirmed]
+    - Detected version: [from `version.py` extraction — e.g., `major=4 minor=6 patch=0` OR `version.py not found`]
     - Caveat: If the user's clone is older than Godot 4.6 release, some entries upstream sets may not yet exist in this `default_theme.cpp` snapshot. Re-verify against `godotengine/godot` tag `4.6-stable` before relying on this section for downstream Phase 4 generator decisions.
+
+    > ⚠ **ENGINE-VERSION-CAVEAT (per cross-AI review 2026-05-04):** [Include this entire block ONLY if the engine source clone is not a git repo AND its version.py either does not exist or does not confirm Godot ≥ 4.6.] The omission cross-reference below was generated against a `default_theme.cpp` snapshot whose engine version COULD NOT BE CONFIRMED to be ≥ 4.6 from local-clone metadata alone. Phase 4 (token generator) MUST re-verify omission flags against an actual Godot 4.6 release tag (e.g. `godotengine/godot@4.6-stable`) before incorporating omission decisions into NeoCade's TokenSet structure. Specifically, any class whose enumerated upstream-themed slots are missing from this `default_theme.cpp` snapshot may indicate engine-version drift, NOT an upstream omission worth following.
 
     **Methodology:** For each Control class, ran:
     ```bash
@@ -125,18 +141,27 @@ Pitfall 1.7 reads: "popups need first-class type theming because they are separa
   </action>
   <verify>
     ```bash
-    grep -q "^### Engine-Default Cross-Reference" .planning/research/MINIMAL-THEME-DISSECTION.md
-    grep -q "Engine-source anchor:" .planning/research/MINIMAL-THEME-DISSECTION.md
-    grep -qE "(SHA|NOT-A-GIT-REPO|directory mtime)" .planning/research/MINIMAL-THEME-DISSECTION.md
+    out=.planning/research/MINIMAL-THEME-DISSECTION.md
+    grep -q "^### Engine-Default Cross-Reference" "$out"
+    grep -q "Engine-source anchor:" "$out"
+    grep -qE "(SHA|NOT-A-GIT-REPO|directory mtime)" "$out"
+    grep -q "Detected version:" "$out"
+
+    # Conditional: if NOT-A-GIT-REPO AND no version.py confirmation, ENGINE-VERSION-CAVEAT must be present
+    if grep -q "NOT-A-GIT-REPO" "$out" && ! grep -q "major=4" "$out"; then
+      grep -q "ENGINE-VERSION-CAVEAT" "$out" || { echo "Engine version cannot be confirmed from clone metadata — ENGINE-VERSION-CAVEAT marker required"; exit 1; }
+    fi
     ```
   </verify>
   <done>
-    Subsection header present, engine-source anchor recorded (git SHA OR mtime+caveat), methodology paragraph greppable.
+    Subsection header present, engine-source anchor recorded (git SHA OR mtime+version.py OR mtime+caveat), methodology paragraph greppable. If engine version cannot be confirmed from clone metadata, ENGINE-VERSION-CAVEAT marker is present so Phase 4 plan-check catches the unverified state.
   </done>
   <acceptance_criteria>
     - File contains `### Engine-Default Cross-Reference` heading
     - File contains the literal string `Engine-source anchor:`
+    - File contains the literal string `Detected version:` (records version.py extraction or "version.py not found")
     - File contains either a 40-character hex SHA OR the literal string `NOT-A-GIT-REPO` OR the literal string `directory mtime` (one of the three forms produced by the anchor command)
+    - If `NOT-A-GIT-REPO` is present AND `major=4` is NOT present, file MUST contain the literal string `ENGINE-VERSION-CAVEAT` (so Phase 4 plan-check can detect unverified engine source)
   </acceptance_criteria>
 </task>
 

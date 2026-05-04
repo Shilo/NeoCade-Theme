@@ -2,7 +2,7 @@
 phase: 01-source-dive-godot-minimal-theme-tres-dissection
 plan: 05
 type: execute
-wave: 2
+wave: 3
 depends_on:
   - 01
   - 02

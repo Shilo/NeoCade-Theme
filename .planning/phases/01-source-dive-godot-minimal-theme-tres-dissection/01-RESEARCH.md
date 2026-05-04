@@ -58,7 +58,15 @@ The dissection target is fully accessible and well-bounded: `minimal_theme.tres`
 
 Of the 80 unique class targets, ~27 are user-facing Controls per CONTEXT.md D-08, ~50+ are editor-only types (skipped per D-10), and FlatButton is a research-only research target per D-10 because NeoCade reuses the name as a Button variation. The plan must (1) capture provenance up front (already computed: SHA-256 `102fd6b3cab3b30b3c05878badff83e321df06a98adf4bb17e6a94d1b0a73f2e`, 48,442 bytes, 1118 lines), (2) extract globals/helpers/color-system once (shared across all per-class enumerations), (3) enumerate each user-facing Control × each populated state × each entry slot exhaustively with line-number citations into `minimal_theme.tres`, (4) cross-reference each Control's populated slots against `scene/theme/default_theme.cpp` to flag deliberate omissions, (5) confirm/refute Pitfall 1.1 and Pitfall 1.7 from the populated data, and (6) compute the 27-vs-35 coverage delta + NeoCade-additives.
 
-**Primary recommendation:** Structure the work as **5 plans** — one per file deliverable (DISSECTION provenance+globals+helpers, DISSECTION per-class enumerations, DISSECTION omission cross-reference + pitfall confirmations, COVERAGE-DELTA, SOURCES.md update). Plans 1-3 produce one composite file (`MINIMAL-THEME-DISSECTION.md`) in three appended sections — split is purely for parallelism and verification granularity. Wave 0: Plan 1 (provenance + globals — short, blocks downstream). Wave 1: Plans 2 + 3 + 4 in parallel (per-class enumeration is independent of omission analysis is independent of coverage delta). Wave 2: Plan 5 (SOURCES.md update — depends on all three doc deliverables existing so it can link them).
+**Primary recommendation:** Structure the work as **5 plans** — one per file deliverable (DISSECTION provenance+globals+helpers, DISSECTION per-class enumerations, DISSECTION omission cross-reference + pitfall confirmations, COVERAGE-DELTA, SOURCES.md update). Plans 1-3 produce one composite file (`MINIMAL-THEME-DISSECTION.md`) in three appended sections — split is purely for verification granularity (Plan 02 also produces the active-verification audit table that Plans 03 and 04 consume).
+
+**Wave schedule (corrected per cross-AI review 2026-05-04):**
+- **Wave 0:** Plan 01 (provenance + globals — short, blocks downstream).
+- **Wave 1:** Plan 02 (per-class enumeration AND active-verification audit). This plan ALONE — Plans 03 and 04 hard-read its DISSECTION.md output (per-Control tables for slot-diff in Plan 03; active-verification audit table for HSplit/VSplit/MenuBar/Panel reconciliation in Plan 04). Running 03/04 in parallel with 02 produces empty output or read-after-write race failures.
+- **Wave 2:** Plans 03 + 04 in parallel. They write to different files (Plan 03 → `MINIMAL-THEME-DISSECTION.md` Engine-Default + Pitfall sections; Plan 04 → new `MINIMAL-THEME-COVERAGE-DELTA.md`) and have no read-dependency on each other; both depend only on Plan 02's outputs.
+- **Wave 3:** Plan 05 (SOURCES.md update — depends on all three doc deliverables existing so it can link them).
+
+The earlier wave schedule (Plans 02+03+04 parallel in Wave 1) was a planning bug — see "Dependency Graph" below for evidence. The corrected dependency graph is `01 → 02 → [03, 04] → 05`.
 
 ## Architectural Responsibility Map
 
@@ -106,29 +114,45 @@ None. Phase 1 produces no code, no resource files, no test fixtures. Discussion 
                               |
                               v
             ┌─────────────────────────────────────┐
-            |  Plan 2: Dissection (provenance,    |
-            |  globals, helpers, color system)    |
+            |  Wave 0 — Plan 01: Skeleton         |
+            |  (provenance, globals, helpers,     |
+            |   color system, Editor-API flags)   |
             └─────────────────────────────────────┘
                               |
-        ┌─────────────────────┼─────────────────────┐
-        v                     v                     v
-┌────────────────┐  ┌─────────────────┐  ┌──────────────────┐
-| Plan 3:        |  | Plan 4:         |  | Plan 5:          |
-| Per-Control x  |  | default_theme.  |  | Coverage delta   |
-| per-state      |  | cpp omission    |  | (27 user-facing  |
-| enumeration    |  | cross-reference |  | + 8 additives    |
-| (~27 classes + |  | + Pitfall 1.1/  |  | + FlatButton)    |
-| FlatButton)    |  | 1.7 confirm     |  | vs FEATURES.md   |
-└────────────────┘  └─────────────────┘  └──────────────────┘
-        |                     |                     |
-        └─────────────────────┼─────────────────────┘
                               v
-                ┌────────────────────────────┐
-                | Plan 6: SOURCES.md Section |
-                | 1 update (links to docs    |
-                | above; adopt/reject/open)  |
-                └────────────────────────────┘
+            ┌─────────────────────────────────────┐
+            |  Wave 1 — Plan 02: Per-Control      |
+            |  enumeration + active-verification  |
+            |  audit (80-class classification)    |
+            |  Output: DISSECTION.md per-class    |
+            |  tables + Active Verification Audit |
+            └─────────────────────────────────────┘
+                              |
+                ┌─────────────┴─────────────┐
+                v                           v
+    ┌──────────────────────┐   ┌──────────────────────┐
+    |  Wave 2 — Plan 03:   |   |  Wave 2 — Plan 04:   |
+    |  default_theme.cpp   |   |  Coverage delta vs   |
+    |  omission cross-ref  |   |  FEATURES.md         |
+    |  + Pitfall 1.1/1.7   |   |  35-class matrix     |
+    |  confirm. READS:     |   |  + 8 additives.      |
+    |  Plan 02's per-class |   |  READS: Plan 02's    |
+    |  tables (slot diff). |   |  audit (HSplit/VSplit|
+    |                      |   |  + MenuBar/Panel     |
+    |                      |   |  reconciliation).    |
+    └──────────────────────┘   └──────────────────────┘
+                |                           |
+                └─────────────┬─────────────┘
+                              v
+            ┌─────────────────────────────────────┐
+            |  Wave 3 — Plan 05: SOURCES.md       |
+            |  Section 1 update — links DISSECTION|
+            |  + COVERAGE-DELTA; adopt/reject/    |
+            |  open synthesis.                    |
+            └─────────────────────────────────────┘
 ```
+
+**Why Plans 03 + 04 are NOT parallel-eligible with Plan 02 (per cross-AI review 2026-05-04):** Plan 03 Task 2 reads the per-Control slot tables Plan 02 writes into DISSECTION.md (slot diff vs default_theme.cpp); Plan 04 Task 2 reads Plan 02's `### Active Verification Audit` table to reconcile HSplitContainer / VSplitContainer / MenuBar / Panel placeholders. Both are hard read-after-write dependencies. Plans 03 and 04 ARE parallel with each other (different output files; no shared writes; both depend only on Plan 02's outputs).
 
 ### Recommended Project Structure
 
@@ -239,7 +263,7 @@ set_color('font_color', 'Button', color_font_normal)
 
 **What goes wrong:** Going straight into per-class tables without first documenting the 9 editor-settings reads + 7-stop surface ramp + named font/icon/state colors. Per-class tables then have to expand every formula inline, ballooning the doc and making cross-class patterns invisible.
 **Why it happens:** Eagerness to start enumerating; per-class is the visible deliverable.
-**How to avoid:** Plan 2 (globals/helpers) is Wave 0 explicitly to force the shared vocabulary first. Per-class plans (Wave 1) cite into the Globals section by name.
+**How to avoid:** Plan 01 (globals/helpers) is Wave 0 explicitly to force the shared vocabulary first. Plan 02 per-class enumeration (Wave 1) cites into the Globals section by name.
 **Warning signs:** First per-class entry table has 200-character formula cells; cross-class duplication is high.
 
 ### Pitfall 6: Missed line-number citations
@@ -373,7 +397,7 @@ VBoxContainer, VScrollBar, VSeparator, VSlider, VSplitContainer
 | RES-01 | Coverage delta written | grep | `test -f .planning/research/MINIMAL-THEME-COVERAGE-DELTA.md && grep -q "27" .planning/research/MINIMAL-THEME-COVERAGE-DELTA.md && grep -q "FlatButton" .planning/research/MINIMAL-THEME-COVERAGE-DELTA.md` | ❌ Wave 0 |
 | RES-01 | Pitfall 1.1 + 1.7 confirmation sections present | grep | `grep -q "Pitfall 1.1" .planning/research/MINIMAL-THEME-DISSECTION.md && grep -q "Pitfall 1.7" .planning/research/MINIMAL-THEME-DISSECTION.md` | ❌ Wave 0 |
 | RES-01 | Editor-API touchpoints flagged (D-05) | grep | `grep -qE "Editor[ -]API" .planning/research/MINIMAL-THEME-DISSECTION.md` | ❌ Wave 0 |
-| DOCS-05 | SOURCES.md Section 1 updated; confidence raised; links to new docs | grep | `grep -q "MINIMAL-THEME-DISSECTION" .planning/research/SOURCES.md && grep -q "MINIMAL-THEME-COVERAGE-DELTA" .planning/research/SOURCES.md` and `grep -A30 "^## 1\\. godot-minimal-theme" .planning/research/SOURCES.md \| grep -q "Confidence in coverage:.*HIGH"` | ❌ Wave 2 |
+| DOCS-05 | SOURCES.md Section 1 updated; confidence raised; links to new docs | grep | `grep -q "MINIMAL-THEME-DISSECTION" .planning/research/SOURCES.md && grep -q "MINIMAL-THEME-COVERAGE-DELTA" .planning/research/SOURCES.md` and `grep -A30 "^## 1\\. godot-minimal-theme" .planning/research/SOURCES.md \| grep -q "Confidence in coverage:.*HIGH"` | ❌ Wave 3 |
 
 ### Sampling Rate
 - **Per task commit:** Run that task's acceptance-criteria greps locally
@@ -474,7 +498,7 @@ VBoxContainer, VScrollBar, VSeparator, VSlider, VSplitContainer
 - Pitfalls: HIGH — six pitfalls drawn directly from CONTEXT.md decisions, PITFALLS.md citations, and existing SOURCES.md structure.
 - Symbolic methodology (Pattern 1): HIGH — exemplified live against line 256 of `minimal_theme.tres`.
 - 80-target enumeration (Code Examples §4): HIGH — verified via grep in this session.
-- Plan structure (5-plan Wave 0/1/2 split): HIGH — driven by file-deliverable boundaries from D-14.
+- Plan structure (5-plan, Waves 0 → 1 → [2,2] → 3): HIGH — driven by file-deliverable boundaries from D-14 and read-after-write dependencies (Plans 03/04 read Plan 02's DISSECTION.md outputs; corrected per cross-AI review 2026-05-04).
 
 **Research date:** 2026-05-04
 **Valid until:** No expiry — `minimal_theme.tres` snapshot is frozen by D-02; engine source cross-reference is checked once and pinned in the dissection doc.
