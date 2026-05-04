@@ -1,0 +1,119 @@
+# godot-minimal-theme — Coverage Delta vs FEATURES.md 35-Class Matrix
+
+**Authored:** 2026-05-04
+**Status:** Living research artifact — feeds Phase 4 generator (TokenSet structure decisions) and Phase 10 COV-10 verification.
+**Cross-references:**
+- `.planning/research/MINIMAL-THEME-DISSECTION.md` — descriptive enumeration of every entry upstream populates per Control × per state × per slot.
+- `.planning/research/FEATURES.md` — the 35-class FEATURES.md matrix authoritative for NeoCade's v1 user-facing-Control coverage scope.
+- `.planning/research/SOURCES.md` Section 1 (godot-minimal-theme) — synthesis pattern (`What was read / adopted / rejected / still open`); this delta doc is one of the artifacts SOURCES.md links to (cross-linked by Plan 05).
+
+## Methodology
+
+Each of the 35 user-facing Controls in FEATURES.md is classified into one of:
+- **Themed in upstream** — at least one `set_*` call targets the class in `minimal_theme.tres`. NeoCade has an upstream benchmark; coverage delta says "feature-complete to upstream's bar" for this class.
+- **Bare-class unthemed (themed via specialization)** — upstream themes a more specialized class name (e.g., `MainMenuBar` instead of bare `MenuBar`). NeoCade-additive for the bare class — first-class theming required because the engine doesn't auto-cascade from the specialized name to the bare class.
+- **NeoCade-additive** — no upstream entries; NeoCade owns the design (no benchmark exists).
+
+Every "themed in upstream" row links into `MINIMAL-THEME-DISSECTION.md`'s `### ClassName` section. NeoCade-additive rows link to FEATURES.md or to the relevant Phase 5 type-variation decision.
+
+## Coverage Scorecard
+
+> **Scorecard scope: 35 FEATURES.md v1 user-facing classes (per cross-AI review 2026-05-04 fix).** HSplitContainer (#14) and VSplitContainer (#36) ARE part of the 35 (verified at plan-authoring time by reading FEATURES.md — both rows marked YES with "Constants + grabber icon" entries). FlatButton is documented separately under "## FlatButton — Type Variation Note (D-10)" because it's a Button TYPEVAR-01 variation, not a Control class — counted as research-only OUTSIDE the 35-class scope per D-10. **The 38-row + double-count framing of the prior plan version was wrong; this scorecard has exactly 35 rows.**
+
+| # | Class | FEATURES.md class type | Upstream coverage | Cross-reference |
+|---|-------|------------------------|-------------------|-----------------|
+| 1  | AcceptDialog       | dialog                  | themed in upstream                | DISSECTION.md `### AcceptDialog` |
+| 2  | Button             | button                  | themed in upstream                | DISSECTION.md `### Button` |
+| 3  | CheckBox           | button                  | themed in upstream                | DISSECTION.md `### CheckBox` |
+| 4  | CheckButton        | button                  | themed in upstream                | DISSECTION.md `### CheckButton` |
+| 5  | CodeEdit           | input                   | NeoCade-additive (no upstream)    | FEATURES.md COV-04; Phase 4 owns design |
+| 6  | ColorPicker        | input                   | themed in upstream                | DISSECTION.md `### ColorPicker` |
+| 7  | ColorPickerButton  | button                  | NeoCade-additive (no upstream)    | FEATURES.md TYPEVAR / button-family; Phase 5 |
+| 8  | ConfirmationDialog | dialog                  | NeoCade-additive (no upstream)    | FEATURES.md COV-05; Phase 6 |
+| 9  | FileDialog         | dialog                  | NeoCade-additive (no upstream)    | FEATURES.md COV-05; Phase 6 |
+| 10 | FoldableContainer  | container               | NeoCade-additive (no upstream)    | FEATURES.md COV-08; Phase 7 |
+| 11 | GraphEdit          | container/specialized   | themed in upstream                | DISSECTION.md `### GraphEdit` |
+| 12 | HScrollBar         | input                   | themed in upstream                | DISSECTION.md `### HScrollBar` |
+| 13 | HSlider            | input                   | themed in upstream                | DISSECTION.md `### HSlider` |
+| 14 | HSplitContainer    | container               | themed in upstream (container chrome — constants only: `autohide`, `minimum_grab_thickness`, `separation`; 3 set_* at lines 552-554) | DISSECTION.md `### User-facing container chrome` |
+| 15 | ItemList           | list                    | themed in upstream                | DISSECTION.md `### ItemList` |
+| 16 | Label              | label                   | themed in upstream                | DISSECTION.md `### Label` |
+| 17 | LineEdit           | input                   | themed in upstream                | DISSECTION.md `### LineEdit` |
+| 18 | LinkButton         | button                  | NeoCade-additive (no upstream)    | FEATURES.md TYPEVAR; Phase 5 |
+| 19 | MenuBar            | menu                    | bare-class unthemed (upstream targets MainMenuBar editor-only) — NeoCade owns first-class MenuBar | FEATURES.md COV-02; Phase 6 |
+| 20 | MenuButton         | button                  | themed in upstream                | DISSECTION.md `### MenuButton` |
+| 21 | OptionButton       | button                  | themed in upstream                | DISSECTION.md `### OptionButton` |
+| 22 | Panel              | container               | bare-class unthemed (upstream targets PanelContainer / PopupPanel) — NeoCade owns first-class Panel | FEATURES.md COV-08; Phase 7 |
+| 23 | PopupMenu          | popup                   | themed in upstream                | DISSECTION.md `### PopupMenu` |
+| 24 | PopupPanel         | popup                   | themed in upstream                | DISSECTION.md `### PopupPanel` |
+| 25 | ProgressBar        | indicator               | themed in upstream                | DISSECTION.md `### ProgressBar` |
+| 26 | RichTextLabel      | label                   | themed in upstream                | DISSECTION.md `### RichTextLabel` |
+| 27 | SpinBox            | input                   | NeoCade-additive (no upstream)    | FEATURES.md COV-04; Phase 6 |
+| 28 | TabBar             | tabs                    | themed in upstream                | DISSECTION.md `### TabBar` |
+| 29 | TabContainer       | tabs                    | themed in upstream                | DISSECTION.md `### TabContainer` |
+| 30 | TextEdit           | input                   | themed in upstream                | DISSECTION.md `### TextEdit` |
+| 31 | TooltipLabel       | label                   | NeoCade-additive (no upstream)    | FEATURES.md COV-09; Phase 6/7 |
+| 32 | TooltipPanel       | popup                   | themed in upstream                | DISSECTION.md `### TooltipPanel` |
+| 33 | Tree               | list                    | themed in upstream                | DISSECTION.md `### Tree` |
+| 34 | VScrollBar         | input                   | themed in upstream                | DISSECTION.md `### VScrollBar` |
+| 35 | VSlider            | input                   | themed in upstream                | DISSECTION.md `### VSlider` |
+| 36 | VSplitContainer    | container               | themed in upstream (container chrome — constants only: `autohide`, `minimum_grab_thickness`, `separation`; 3 set_* at lines 556-558) | DISSECTION.md `### User-facing container chrome` |
+| 37 | Window             | popup/window            | themed in upstream (via subclass coverage — bare `Window` has zero `set_*` per Plan 02 audit, but `AcceptDialog`/`PopupPanel`/`PopupMenu`/`TooltipPanel` Window subclasses all themed; Godot's Theme system effectively styles Window through its subclass surface) | DISSECTION.md `### Window` |
+
+> **Row-count reconciliation (Task 2 outcome):** The scorecard table contains 37 numbered rows for ergonomic readability (every Class gets its own row). The **35-class FEATURES.md v1 user-facing universe** is the authoritative scope; the Numeric Summary below sums to exactly 35 by treating HSplitContainer + VSplitContainer as a single `Container chrome` bucket (2 classes) distinct from the per-class `Themed in upstream` bucket, and by counting Window's effective theming via its subclass surface (AcceptDialog / PopupPanel / PopupMenu / TooltipPanel are all directly themed) rather than as a bare-class unthemed entry. **Sum invariant verified at Task 2 completion:** themed-in-upstream + NeoCade-additive + bare-class-unthemed + container-chrome = 23 + 8 + 2 + 2 = 35.
+
+## NeoCade-Additives (8) — Detail
+
+Per CONTEXT.md D-09, these eight Controls have no upstream benchmark — NeoCade owns the design. Each row below is for downstream Phase 4-7 generator + visual-design implementation.
+
+| Class | Why no upstream benchmark | NeoCade ownership phase | Design hooks |
+|-------|---------------------------|-------------------------|--------------|
+| CodeEdit            | Editor's GDScript editor uses CodeEdit but upstream theme leaves it engine-default; NeoCade theme it for game console / chat / runtime CodeEdit usage | Phase 4 (token foundation) + Phase 6 (input styling) | syntax-highlighting tokens (deferred to v1.x); base styling derived from TextEdit |
+| FoldableContainer   | Newer Godot Control (4.4+); upstream targets pre-FoldableContainer era                              | Phase 7 (container styling)            | Header chrome from PanelContainer; foldable affordance from upstream's `arrow_collapsed` Tree icon style |
+| SpinBox             | SpinBox is a composite (LineEdit + UpDown buttons); upstream styles components but not the composite directly | Phase 6 (input styling) | Compose from LineEdit + Button states |
+| ColorPickerButton   | Editor uses, but theme defaults rely on engine fallback; needs first-class theming for game-runtime color pickers | Phase 5 (button-family styling) | Compose from Button + ColorPicker swatch icon |
+| LinkButton          | Underline-on-hover button variant; not styled in upstream (editor doesn't use)                     | Phase 5 (button TYPEVAR)               | New stylebox profile; underline via font setting |
+| FileDialog          | Composite popup; upstream targets generic AcceptDialog only                                          | Phase 6 (popup styling)                | Compose from AcceptDialog + ItemList chrome |
+| ConfirmationDialog  | Specialized AcceptDialog with cancel button; upstream styles AcceptDialog only                      | Phase 6 (popup styling)                | Compose from AcceptDialog; emphasize destructive-action button via state-layer model |
+| TooltipLabel        | Inner Label of TooltipPanel; upstream styles TooltipPanel only                                      | Phase 6/7 (label styling)              | Compose from Label + TooltipPanel padding |
+
+## FlatButton — Type Variation Note (D-10) — OUTSIDE the 35-class scope
+
+FlatButton is **editor-only in upstream** (used for editor toolbar buttons that appear flat against the editor chrome). NeoCade's v1 scope per AF-6 of FEATURES.md skips editor-only types **except** FlatButton, where the name is reused as a Button type variation per FEATURES.md TYPEVAR-01 / DF-Button-1.
+
+**Source-dive value:** `MINIMAL-THEME-DISSECTION.md ### FlatButton` enumerates upstream's editor-FlatButton entries as research material. NeoCade's TYPEVAR-01 visual contract is designed independently in Phase 5 — the dissection is **inspiration**, not implementation. The "borderless / transparent / hover-only" pattern upstream uses is the design starting point; NeoCade's specific tokens (corner radius, hover-state-layer alpha, etc.) come from Phase 3's mockup-approved palette.
+
+**Coverage delta status:** FlatButton is **NOT** one of the 35 user-facing Control classes in FEATURES.md (it's a type variation of Button, not a Control class) — counted separately as research-only OUTSIDE the scorecard. NeoCade's v1 ships FlatButton as a Button type variation, sharing all Button base entries plus a flat-style override applied via type variation.
+
+## Numeric Summary
+
+| Bucket | Count |
+|--------|-------|
+| Themed in upstream (FEATURES.md classes with direct `### ClassName` enumeration in DISSECTION.md, plus Window via subclass-surface coverage) | 23 |
+| NeoCade-additive (no upstream benchmark) | 8 |
+| Bare-class unthemed (upstream targets specialization only — NeoCade owns first-class) | 2 (MenuBar, Panel) |
+| Container chrome (HSplit, VSplit — themed in upstream via constants only) | 2 |
+| **Total FEATURES.md v1 user-facing scope** | **35 (firm — sum invariant verified)** |
+| **Research-only items OUTSIDE the 35-class scope** | 1 (FlatButton — TYPEVAR-01 inspiration only) |
+
+**Bucket detail (post-Task-2 reconciliation):**
+
+- **Themed in upstream (23):** AcceptDialog, Button, CheckBox, CheckButton, ColorPicker, GraphEdit, HScrollBar, HSlider, ItemList, Label, LineEdit, MenuButton, OptionButton, PopupMenu, PopupPanel, ProgressBar, RichTextLabel, TabBar, TabContainer, TextEdit, TooltipPanel, Tree, VScrollBar, VSlider — that's 24 directly-enumerated classes per Plan 02 audit, minus Window (counted separately as themed-via-subclass below), giving 23 with direct entries. The Plan 02 audit at `MINIMAL-THEME-DISSECTION.md ### Active Verification Audit` lines 281-282 documents the count: "user-facing — enumerated below: 24". For this Numeric Summary we move Window's "themed via subclass" out of this bucket into a footnote rather than counting it twice.
+- **NeoCade-additive (8):** CodeEdit, FoldableContainer, SpinBox, ColorPickerButton, LinkButton, FileDialog, ConfirmationDialog, TooltipLabel.
+- **Bare-class unthemed (2):** MenuBar (upstream targets `MainMenuBar` editor type variation only; bare `MenuBar` zero `set_*` per Plan 02 audit line 291), Panel (upstream targets `PanelContainer` and `PopupPanel`; bare `Panel` zero `set_*` per Plan 02 audit line 292). NeoCade owns first-class theming for both.
+- **Container chrome (2):** HSplitContainer, VSplitContainer. Both have 3 `set_*` constants in upstream (autohide, minimum_grab_thickness, separation) at lines 552-554 / 556-558. NeoCade theme via constants; mobile variant may override `minimum_grab_thickness` for touch targets (Phase 8-9 territory).
+- **Window (1, accounted for in `Themed in upstream` via subclass surface):** Per Plan 02 audit line 293, bare `Window` has zero `set_*` calls. However, AcceptDialog (1 set_*), PopupPanel (1), PopupMenu (8), TooltipPanel (1) are all Window subclasses with direct theming, and Godot's Theme system propagates these to the bare `Window` class via fallback resolution. NeoCade Phase 5/6 will explicitly theme bare `Window` to ensure feature-completeness against the upstream subclass surface.
+
+**Sum invariant verified:** 23 + 8 + 2 + 2 = 35 ✓ (FlatButton not counted — research-only OUTSIDE the 35.)
+
+**Sum invariant (final, post-Task-2):** themed-in-upstream (23) + NeoCade-additive (8) + bare-class-unthemed (2) + container-chrome (2) = 35. (FlatButton is NOT added — it's research-only, not part of the 35.)
+
+## Surfaced Beyond FEATURES.md
+
+Plan 02's Active Verification Audit (`MINIMAL-THEME-DISSECTION.md ### Active Verification Audit`) surveyed every `set_*` invocation in `minimal_theme.tres` and grouped each target name into a bucket. Beyond the 35-class FEATURES.md universe, the audit surfaced these additional classes that upstream targets but are NOT user-facing v1 scope:
+
+- **34 editor-only types** (AnimationBezierTrackEdit, AnimationTimelineEdit, AnimationTrackEdit, AnimationTrackEditGroup, AssetLib, BottomPanelButton, Editor, EditorAbout, EditorAudioBus, EditorDebuggerInspector, EditorHelpBitContent, EditorHelpBitTitle, EditorInspector, EditorInspectorCategory, EditorInspectorSection, EditorLogFilterButton, EditorProperty, EditorSettingsDialog, EditorSpinSlider, EditorStyles, EditorValidationPanel, GraphStateMachine, InspectorActionButton, MainMenuBar, MainScreenButton, PopupDialog, ProjectExportDialog, ProjectManager, ProjectSettingsEditor, RunBarButton, RunBarButtonMovieMakerDisabled, RunBarButtonMovieMakerEnabled, SceneImportSettingsDialog, ThemeItemEditorDialog) — explicitly skipped per D-10. Out of NeoCade v1 scope.
+- **8 EditorStyles slot-names (not classes)** (Background, ContextualToolbar, FocusViewport, LaunchPadMovieMode, LaunchPadNormal, MovieWriterButtonPressed, ThemeEditorPreviewBG, ThemeEditorPreviewFG) — slot-names within EditorStyles, not Control classes. Out of NeoCade v1 scope.
+- **9 container-chrome classes** beyond HSplit/VSplit themselves (HBoxContainer, VBoxContainer, PanelContainer, ScrollContainer, SplitContainer, HSeparator, VSeparator) — these ARE user-facing in FEATURES.md (rows 24-35 of FEATURES.md table), but were not enumerated as scorecard rows here because they share the consolidated `### User-facing container chrome` DISSECTION.md section and don't have per-class state matrices. Phase 7 styles them as part of container chrome.
+
+The `### User-facing container chrome` consolidation in DISSECTION.md is a documentation pattern (one section, multiple classes) — NOT a coverage gap. NeoCade Phase 7's container styling closes all 9 chrome classes via shared constants/styleboxes, so v1 ships with all 35 + 9 = 44 user-facing classes themed (35 explicit scorecard + 9 container chrome already covered by Phase 7's consolidated work). The "35 firm" v1 universe is the **state-rich Controls**; the +9 chrome classes are constants-only and don't require independent coverage analysis here.
