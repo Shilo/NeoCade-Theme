@@ -2,9 +2,13 @@
 
 **Authored:** 2026-05-04
 **Status:** Living research artifact — feeds Phase 4 generator (TokenSet structure decisions) and Phase 10 COV-10 verification.
+
+> **For NeoCade's actual visual design (palette / typography / state-layer model / focus-ring strategy), this doc is NOT the source of truth.** Visual design lives in `.planning/research/ARCHITECTURE.md` (3 candidate palettes, M3 type scale, M3 state-layer model, mockup approval workflow) and crystallizes in `.planning/DESIGN_TOKENS.md` (created by Phase 3 mockup-approval gate, consumed by Phase 4 `@tool` generator). Phase 1 enumerates upstream's *coverage axis* — what classes/slots/states must be themed; not what NeoCade should look like.
+
 **Cross-references:**
 - `.planning/research/MINIMAL-THEME-DISSECTION.md` — descriptive enumeration of every entry upstream populates per Control × per state × per slot.
 - `.planning/research/FEATURES.md` — the 35-class FEATURES.md matrix authoritative for NeoCade's v1 user-facing-Control coverage scope.
+- `.planning/research/ARCHITECTURE.md` §1 (palette proposals A/B/C with WCAG-verified hex), §2-3 (typography + M3 type scale), §5 (M3 state-layer model), §6 (mockup approval workflow) — **NeoCade's visual design source of truth** (not this doc).
 - `.planning/research/SOURCES.md` Section 1 (godot-minimal-theme) — synthesis pattern (`What was read / adopted / rejected / still open`); this delta doc is one of the artifacts SOURCES.md links to (cross-linked by Plan 05).
 
 ## Methodology
@@ -87,26 +91,21 @@ FlatButton is **editor-only in upstream** (used for editor toolbar buttons that 
 
 ## Numeric Summary
 
-| Bucket | Count |
-|--------|-------|
-| Themed in upstream (FEATURES.md classes with direct `### ClassName` enumeration in DISSECTION.md, plus Window via subclass-surface coverage) | 23 |
-| NeoCade-additive (no upstream benchmark) | 8 |
-| Bare-class unthemed (upstream targets specialization only — NeoCade owns first-class) | 2 (MenuBar, Panel) |
-| Container chrome (HSplit, VSplit — themed in upstream via constants only) | 2 |
-| **Total FEATURES.md v1 user-facing scope** | **35 (firm — sum invariant verified)** |
-| **Research-only items OUTSIDE the 35-class scope** | 1 (FlatButton — TYPEVAR-01 inspiration only) |
+| Bucket | Count | Members |
+|--------|------:|---------|
+| **Themed in upstream — direct entries** | 24 | AcceptDialog, Button, CheckBox, CheckButton, ColorPicker, GraphEdit, HScrollBar, HSlider, ItemList, Label, LineEdit, MenuButton, OptionButton, PopupMenu, PopupPanel, ProgressBar, RichTextLabel, TabBar, TabContainer, TextEdit, TooltipPanel, Tree, VScrollBar, VSlider |
+| **Themed in upstream — via subclass surface only** | 1 | Window (bare class has zero `set_*`; AcceptDialog/PopupPanel/PopupMenu/TooltipPanel subclasses themed) |
+| **Bare-class unthemed (NeoCade owns first-class)** | 2 | MenuBar (upstream targets MainMenuBar editor variation only), Panel (upstream targets PanelContainer / PopupPanel only) |
+| **Container chrome (constants only in upstream)** | 2 | HSplitContainer, VSplitContainer |
+| **NeoCade-additive (no upstream benchmark)** | 8 | CodeEdit, ColorPickerButton, ConfirmationDialog, FileDialog, FoldableContainer, LinkButton, SpinBox, TooltipLabel |
+| **Total scorecard rows** | **37** | |
+| | | |
+| **Research-only items OUTSIDE the scorecard** | 1 | FlatButton — Button TYPEVAR-01 inspiration; type variation, not a Control class |
 
-**Bucket detail (post-Task-2 reconciliation):**
+**Sum invariant (corrected):** `direct (24) + subclass-only (1: Window) + bare-class-unthemed (2: MenuBar, Panel) + container-chrome (2) + NeoCade-additive (8) = 37 row entries`.
 
-- **Themed in upstream (23):** AcceptDialog, Button, CheckBox, CheckButton, ColorPicker, GraphEdit, HScrollBar, HSlider, ItemList, Label, LineEdit, MenuButton, OptionButton, PopupMenu, PopupPanel, ProgressBar, RichTextLabel, TabBar, TabContainer, TextEdit, TooltipPanel, Tree, VScrollBar, VSlider — that's 24 directly-enumerated classes per Plan 02 audit, minus Window (counted separately as themed-via-subclass below), giving 23 with direct entries. The Plan 02 audit at `MINIMAL-THEME-DISSECTION.md ### Active Verification Audit` lines 281-282 documents the count: "user-facing — enumerated below: 24". For this Numeric Summary we move Window's "themed via subclass" out of this bucket into a footnote rather than counting it twice.
-- **NeoCade-additive (8):** CodeEdit, FoldableContainer, SpinBox, ColorPickerButton, LinkButton, FileDialog, ConfirmationDialog, TooltipLabel.
-- **Bare-class unthemed (2):** MenuBar (upstream targets `MainMenuBar` editor type variation only; bare `MenuBar` zero `set_*` per Plan 02 audit line 291), Panel (upstream targets `PanelContainer` and `PopupPanel`; bare `Panel` zero `set_*` per Plan 02 audit line 292). NeoCade owns first-class theming for both.
-- **Container chrome (2):** HSplitContainer, VSplitContainer. Both have 3 `set_*` constants in upstream (autohide, minimum_grab_thickness, separation) at lines 552-554 / 556-558. NeoCade theme via constants; mobile variant may override `minimum_grab_thickness` for touch targets (Phase 8-9 territory).
-- **Window (1, accounted for in `Themed in upstream` via subclass surface):** Per Plan 02 audit line 293, bare `Window` has zero `set_*` calls. However, AcceptDialog (1 set_*), PopupPanel (1), PopupMenu (8), TooltipPanel (1) are all Window subclasses with direct theming, and Godot's Theme system propagates these to the bare `Window` class via fallback resolution. NeoCade Phase 5/6 will explicitly theme bare `Window` to ensure feature-completeness against the upstream subclass surface.
-
-**Sum invariant verified:** 23 + 8 + 2 + 2 = 35 ✓ (FlatButton not counted — research-only OUTSIDE the 35.)
-
-**Sum invariant (final, post-Task-2):** themed-in-upstream (23) + NeoCade-additive (8) + bare-class-unthemed (2) + container-chrome (2) = 35. (FlatButton is NOT added — it's research-only, not part of the 35.)
+> **Note on the "35" claim** (correction to prior versions of this doc):
+> The "35-class v1 user-facing scope" phrase comes from FEATURES.md's executive summary line *"NeoCade v1 styles all that have theme entries (35 classes — content-only Controls like NinePatchRect have none)"* — but FEATURES.md's own Category-A-through-H YES-marked rows total ~52 classes, so 35 was never a clean enumeration. This scorecard's 37 rows are the actual classes Phase 1 identified as needing per-class theming attention; the 9 additional FEATURES.md YES-marked classes (HBoxContainer, VBoxContainer, FlowContainer + flow specializations, GridContainer, MarginContainer, PanelContainer, ScrollContainer, HSeparator, VSeparator — see "Surfaced Beyond FEATURES.md" below) are constants-only or aggregate-by-base classes folded into Phase 7 container-chrome work via the consolidated DISSECTION.md `### User-facing container chrome` section. The "35" figure should be treated as informal until FEATURES.md is reconciled. **Phase 10 COV-10 verification should diff against this 37-row scorecard, not against FEATURES.md's "35" header claim.**
 
 ## Surfaced Beyond FEATURES.md
 

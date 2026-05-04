@@ -4,6 +4,10 @@
 **Status:** Living research artifact — appended to by Phase 1 plans 01-03.
 **Author:** NeoCade Theme research / Phase 1 source-dive.
 
+> **For NeoCade's actual visual design (palette / typography / state-layer model / focus-ring strategy), this doc is NOT the source of truth.** Visual design lives in `.planning/research/ARCHITECTURE.md` (3 candidate palettes A/B/C with WCAG-verified hex, M3 type scale, M3 state-layer model, mockup approval workflow) and crystallizes in `.planning/DESIGN_TOKENS.md` (created by Phase 3 mockup-approval gate, consumed by Phase 4 `@tool` generator). This doc enumerates **what upstream themes** as the *coverage axis*; values inside are upstream's editor-bound formulas (FORBIDDEN per D-05, see `## Editor-API Touchpoints`) — research material, never lifted into NeoCade source.
+
+**See also:** `.planning/research/ARCHITECTURE.md` for NeoCade visual design · `.planning/research/MINIMAL-THEME-COVERAGE-DELTA.md` for the analytical 35-class scorecard · `.planning/research/SOURCES.md` §1 for adopt/reject synthesis.
+
 ## Provenance
 
 | Field | Value |
