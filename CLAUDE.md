@@ -40,7 +40,17 @@ Read these files when the topic is relevant. Do not duplicate or summarize their
 
 ## GSD Workflow
 
-Per phase, commands MUST run in order: `/gsd-discuss-phase N` → `/gsd-plan-phase N` → `/gsd-execute-phase N` → `/gsd-verify-work` → `/clear`. No `/clear` within a phase. Auto-advance suggests the next command; user types it.
+Per phase, commands MUST run in order: `/gsd-discuss-phase N` → **`/gsd-plan-review-convergence N --opencode`** → `/gsd-execute-phase N` → `/gsd-verify-work` → `/clear`. No `/clear` within a phase. Auto-advance suggests the next command; user types it.
+
+**Why `/gsd-plan-review-convergence --opencode` instead of `/gsd-plan-phase`:** Cross-AI peer review is mandatory on every phase. The user has configured (verified 2026-05-04):
+- `workflow.plan_review_convergence=true` (config.json)
+- `review.models.opencode="deepseek/deepseek-v4-pro"` (config.json)
+- `DEEPSEEK_API_KEY` env var (set; OpenCode auto-detects)
+- OpenCode CLI shim at `/c/Users/shilo/.local/bin/opencode` → forwards to `C:\Users\shilo\AppData\Local\opencode\opencade-cli.exe` v1.14.33
+
+The convergence command auto-loops: `gsd-plan-phase` → `gsd-review --opencode` (DeepSeek V4 Pro) → if HIGH concerns → `gsd-plan-phase --reviews` → re-review → ... → converge or escalate at max-cycles=3. Never invoke plain `/gsd-plan-phase` directly — always use the convergence wrapper.
+
+**If convergence fails:** check OpenCode shim works (`opencode --version` should print `1.14.33`), `DEEPSEEK_API_KEY` is set, and `gsd-sdk query config-get workflow.plan_review_convergence` returns `true`.
 
 **Before any GSD command, read [.planning/STATE.md](.planning/STATE.md). If a step is skipped, REFUSE and name the missing step.** Common skips and refusal messages:
 
