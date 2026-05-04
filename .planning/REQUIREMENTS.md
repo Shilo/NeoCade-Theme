@@ -13,8 +13,8 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 - [x] **RES-01**: Phase 1 source-dive spike produces line-by-line dissection of `passivestar/godot-minimal-theme` `.tres` (per-Control × per-state entry enumeration; interaction state transforms; popup/window theming patterns). Findings appended to SOURCES.md.
 - [x] **RES-02**: Phase 2 source-dive spike mines LDtk source code under `C:\Programming_Files\ldtk-master\src\electron.renderer\` for UI implementation patterns (sidebar tinting, layer panel chrome, tool-button conventions, modal flow, panel collapse, context menus, status indicators); appended to SOURCES.md.
-- [ ] **RES-03**: Phase 3 sub-spike produces a curated mood-board of 20-30 high-resolution real-arcade interior reference photos (Round1 / Dave & Buster's / Two Bit Circus / classic 80s halls / cabinet imagery / ticket booth / prize counter / marquee). Saved to `.planning/research/mood-board/`.
-- [ ] **RES-04**: Phase 3 sub-spike resolves UD-1 (MCP server swap to GoPeak) with a hands-on smoke test capturing a Godot editor screenshot via `npx gopeak` and verifying input-injection works. Outcome documented; if approved, project's MCP config switches.
+- [x] **RES-03**: Phase 3 sub-spike produces a curated mood-board of 20-30 high-resolution real-arcade interior reference photos (Round1 / Dave & Buster's / Two Bit Circus / classic 80s halls / cabinet imagery / ticket booth / prize counter / marquee). Saved to `.planning/research/mood-board/`.
+- [x] **RES-04**: Phase 3 sub-spike resolves UD-1 (MCP server swap to GoPeak) with a hands-on smoke test capturing a Godot editor screenshot via `npx gopeak` and verifying input-injection works. Outcome documented; if approved, project's MCP config switches.
 - ~~[ ] **RES-05**: Asset Library policy re-verification~~ — **STRICKEN 2026-05-04 per Phase 11 revision.** No Asset Library submission in v1; distribution is GitHub Releases via GitHub Actions workflow only.
 
 ### Design Mockups & Approval Gate (DESIGN)
@@ -24,7 +24,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [ ] **DESIGN-03**: Phase 3 produces 1 full-fidelity desktop Control gallery HTML mockup showing every Godot Control class with realistic content, all states visible, ~1500 lines HTML+CSS. Approved by user at Step 3.
 - [ ] **DESIGN-04**: Phase 3 produces 1 mobile-variant mockup (per ARCHITECTURE Section 6 Step 5b) showing the same Controls at mobile sizes (360×800 + 768×1024 viewports) with tap-target overlays visible (≥48px); approved together with DESIGN-03.
 - [ ] **DESIGN-05**: `DESIGN_TOKENS.md` finalized with both desktop and mobile token blocks (color tokens, typography scale, spacing scale, corner radius scale, stroke widths, elevation/surface ramp, interaction state opacities). Committed before any `.tres` styling work begins.
-- [ ] **DESIGN-06**: Mockup approval gate is an explicit blocker — no `.tres` styling commits until approved. Maximum 3 revision rounds; if not approved by round 3, escalation discussion before proceeding.
+- [x] **DESIGN-06**: Mockup approval gate is an explicit blocker — no `.tres` styling commits until approved. Maximum 3 revision rounds; if not approved by round 3, escalation discussion before proceeding.
 
 ### Theme Foundation (FOUND)
 
