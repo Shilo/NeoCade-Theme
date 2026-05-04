@@ -25,6 +25,8 @@ If everything else fails, this single deliverable must work: a polished, feature
 - [ ] **Dark theme v1**: single polished dark color mode (light mode deferred to v2)
 - [ ] **Universal usage**: theme works correctly in both Godot Editor and game runtime
 - [ ] **HD resolution**: theme is high-resolution and non-pixelated (sharp at HD/4K), regardless of VirtuCade's pixel-art game content
+- [ ] **Cross-platform export support — all 6 Godot export targets**: Windows, macOS, Linux, iOS, Android, Web/Browser. Theme + every bundled asset (fonts, icons, .tres) must load and render correctly on each target. Web export is the highest-risk target (font loading, .tres path resolution, GL Compatibility quirks); iOS App Store requires font license compliance (OFL/Apache-only); Android density buckets must be tested. v1 verification includes a screenshot pass on every target before release.
+- [ ] **Mobile-optimized theme variant — `neocade_mobile_theme.tres` (v1 must-have)**: ships ALONGSIDE the desktop primary. Same visual identity (shared tokens), but tuned for touch and small screens — minimum 44pt (iOS HIG) / 48dp (Android Material) tap targets, larger default text sizes, denser-content guards relaxed, simplified typography scale, mobile-appropriate spacing. References iOS Human Interface Guidelines + Material 3 mobile guidance loosely. Both themes share the underlying color/typography token system so visual identity stays unified.
 - [ ] **Bundled fonts**: Inter (UI) + Noto Sans (multi-script fallback) bundled in the addon under OFL license; bold/italic/weights/variable axes covered. Research must also evaluate arcade-styled display fonts as candidates, but readability and accessibility take priority over arcade flair
 - [ ] **Strict design system documentation**: written specs for color tokens, typography scale, spacing scale, corner radii, stroke widths, elevation/shadow, motion (if any) — committed before implementation
 - [ ] **Mockup approval gate**: design variation mockups produced and explicitly approved by user before any styling is committed to the .tres
@@ -39,8 +41,10 @@ If everything else fails, this single deliverable must work: a polished, feature
 ### Out of Scope (v1)
 
 - **Light color mode** — deferred to v1.x or v2; arcades are dark-ambient, dark-first matches the brand and Godot editor default
-- **Mobile-optimized variant** (`neocade_mobile_theme.tres`) — design tokens will be mobile-aware, but a dedicated mobile theme file is v2
+- ~~**Mobile-optimized variant** (`neocade_mobile_theme.tres`)~~ — **MOVED INTO v1 ACTIVE** per user constraint update. v1 ships both desktop primary + mobile variant.
 - **Alternate palette variants** (e.g., `neocade_neon_magenta.tres`, `neocade_amber.tres`) — explicitly future work
+- **Light color mode for mobile variant** — mobile theme follows the same dark-only constraint as desktop in v1; iOS/Android system theme integration deferred to v2
+- **Native iOS/Android system look** — the mobile variant follows iOS HIG + Material 3 mobile guidance loosely (touch targets, type scale, accessibility) but retains the NeoCade arcade visual identity. We are NOT trying to make a Godot UI look like native iOS or Android.
 - **Cyberpunk aesthetic** — explicitly rejected; theme leans arcade/neo/modern, not dystopian/grimy/glitchy
 - **Pixelated/retro-pixel theming** — VirtuCade's game content is pixel art, but the UI theme is HD and crisp
 - **Editor plugin behaviors** (`plugin.cfg`, EditorPlugin scripts) — addon ships only the Theme resource and bundled fonts, no editor extensions
@@ -63,9 +67,21 @@ If everything else fails, this single deliverable must work: a polished, feature
 - .NET / C# enabled (`project/assembly_name="NeoCade Theme"`)
 
 **Addon layout (decided):**
-- `res://addons/neocade_theme/neocade_theme.tres` — primary theme resource (currently empty scaffold)
+- `res://addons/neocade_theme/neocade_theme.tres` — desktop primary theme resource (currently empty scaffold)
+- `res://addons/neocade_theme/neocade_mobile_theme.tres` — mobile-optimized variant (v1, to be authored)
+- `res://addons/neocade_theme/fonts/` — bundled Inter Variable + Inter Italic + Noto Sans Variable (path TBC by font/icon spike phase)
+- `res://addons/neocade_theme/icons/` — bespoke SVG icon set (~30 icons, per STACK research)
+- `res://addons/neocade_theme/OFL.txt` — combined OFL license file for bundled fonts
 - `res://main.tscn` — showcase scene, applies theme to a fullscreen Control root
 - `res://icon.svg` — Godot project icon (default, may be rebranded later)
+
+**Export targets (all required for v1):**
+- Windows (desktop + mobile theme both work)
+- macOS (desktop + mobile theme both work)
+- Linux (desktop + mobile theme both work)
+- iOS (mobile theme primary; OFL/Apache font licensing required for App Store)
+- Android (mobile theme primary; density-bucket testing required)
+- Web / Browser (highest-risk: font loading from `res://addons/`, GL Compatibility quirks, .tres path resolution under HTML5)
 
 **Inspirations & references:**
 
@@ -99,6 +115,8 @@ If everything else fails, this single deliverable must work: a polished, feature
 - **Distribution**: single-folder addon at `addons/neocade_theme/`. User installs by copying the folder. No `plugin.cfg` (not an editor plugin — just a theme resource + assets).
 - **Resolution**: HD-first. Theme must look sharp at 1080p, 1440p, 4K, and DPI-scaled displays. No pixel-art textures in the theme itself.
 - **Universal**: theme must work in both Editor (when applied as editor theme via add-on usage patterns) and Runtime (game UI). Both contexts are v1 must-haves.
+- **Cross-platform exports**: theme + assets must work across all six Godot export targets — Windows, macOS, Linux, iOS, Android, Web/Browser. Asset paths must resolve from `res://addons/neocade_theme/` on every target. Fonts must load over Web export (no system-font fallback assumption). License compliance verified for iOS App Store (OFL/Apache only — Inter and Noto Sans pass; verify Outfit/Inter Display decision against this). v1 requires screenshot QA on every target before release.
+- **Mobile guidelines reference (loose, not strict)**: iOS Human Interface Guidelines + Android Material 3 mobile guidance inform the mobile variant's tap target sizes, type scale, and accessibility minima. We adopt their *minimums* (44pt iOS / 48dp Android tap targets, scaled type), not their visual language. NeoCade arcade identity persists across all platforms.
 - **Aesthetic**: arcade-leaning, neo, neon, modern, colorful, professional, friendly. Explicitly NOT cyberpunk, NOT grimy, NOT dystopian. Closer to "vibrant arcade hall" than "Blade Runner street".
 - **Accessibility**: WCAG 2.1 AA minimum for text contrast and interactive elements. Visible focus indicators. No color-only information.
 - **Fonts**: must be popular, professional, OFL/Apache-licensed, bundled, with full language coverage (CJK, Cyrillic, Arabic, Hebrew, Devanagari, etc.) via fallback. Bold, italic, full weight range required. Inter + Noto Sans is the primary candidate stack.
@@ -184,7 +202,9 @@ Concretely, "exhaustive" for this project includes (non-exhaustive list):
 | Showcase scene mirrors godot-demo-projects/gui/control_gallery scope | Established reference for "every Control"; ensures coverage | — Pending |
 | Theme toggle in showcase: NeoCade ↔ Godot default (NOT light/dark) | Communicates "this is what NeoCade adds" to users | — Pending |
 | Mockup approval gate before implementation | User explicitly required this — must approve design variations before any .tres styling is committed | — Pending |
-| Mobile variant + alternate palettes are v2 | User clarified focus is "very polished initial theme first" | — Pending |
+| Mobile variant elevated to v1 must-have (alongside desktop primary) | User constraint update: ship `neocade_mobile_theme.tres` in v1 with shared tokens, mobile-tuned scale, iOS HIG + Material 3 mobile guidance. Alternate palettes remain v2. | ✓ Good |
+| Cross-platform export support — all 6 Godot targets in v1 | User constraint: Windows, macOS, Linux, iOS, Android, Web/Browser. Web is highest-risk (font loading, path resolution); iOS requires OFL/Apache-only licensing. Screenshot QA on every target before v1 ships. | ✓ Good |
+| Two `.tres` files share one underlying token system | Desktop and mobile themes derive from the same color/typography tokens; mobile overrides scales/touch-targets/density. Avoids visual identity drift between the two. | — Pending |
 | Subagent research/review at every major step | User explicitly required exhaustive subagent-driven research and review | — Pending |
 | MCP-driven QA (Godot MCP screenshots, Context7 docs) | User explicitly required heavy MCP usage | — Pending |
 | Cyberpunk aesthetic explicitly rejected | User specified "Neo/Neon/Modern, not Cyberpunk"; arcade-friendly, not dystopian | ✓ Good |
