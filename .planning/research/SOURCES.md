@@ -379,14 +379,105 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 
 ---
 
-## Pending — Source 10: CROSS-PLATFORM dimension
+## 10. CROSS-PLATFORM dimension sources (added 2026-05-04 after 5th researcher landed)
 
-**Status:** Researcher in flight as of 2026-05-04. SOURCES.md will be amended with sources catalogued by the cross-platform research dimension before REQUIREMENTS.md is authored. Anticipated sources to be catalogued:
-- Godot 4.6 export docs (Web, iOS, Android, desktop)
-- iOS Human Interface Guidelines (Layout, Typography, Touch targets, Accessibility)
-- Android Material 3 mobile guidance (Window size classes, Touch targets, Adaptive contrast)
-- Godot GitHub issues filtered by export-target topics
-- Real-device testing requirements per target
+**Source name + location:**
+- See `.planning/research/CROSS-PLATFORM.md` for full dimension document.
+
+### 10a. Godot 4.6 export docs (per target)
+
+**What was read:** Godot 4.6 export tutorials for Web, iOS, Android, Windows, macOS, Linux; Multiple resolutions / `content_scale_factor`; Godot 4.6 release notes for export-relevant changes.
+
+**What we adopted:**
+- **GL Compatibility renderer is the cross-platform-safe choice** — already locked in `project.godot`. Avoids two new Godot 4.6 regressions (#116090 iOS Mobile-renderer Metal validation failure on iPhone SE 2nd gen; #111729 Android Mobile-renderer reduces Play Store device coverage). Stay on GL Compat.
+- **`content_scale_factor` + Godot stretch modes (`canvas_items` + `expand`) for density** — ONE mobile theme covers all Android density buckets; no per-bucket .tres needed.
+- **`uid://` references mandatory** for all theme/font/icon resources — survives PCK remap on all targets including Web.
+- **Web export: SystemFont fails silently** — must use FontFile + bundled `.ttf`. `.ttf` files added to "Filters to export non-resources" OR wrapped in saved `FontFile.tres`.
+
+**What we rejected:**
+- **Switching to Mobile renderer** for iOS/Android — explicit anti-pattern given current 4.6 regressions.
+- **Per-density-bucket theme files** (`mdpi.tres`, `hdpi.tres`, etc.) — Godot doesn't use Android density qualifiers for theme resources.
+- **Pixel-parity expectation across targets** — iOS Safari WebGL2 has documented quirks; v1 acceptance is "render correctly," not "pixel-identical to desktop."
+
+**What's still open:**
+- Whether 4.6.x has fixed the iOS Safari/Chrome HTML5 audio crash (#107390, was 4.5 dev5) — informational only since theme has no audio.
+- Whether iOS Mobile-renderer regression (#116090) gets backported to 4.6.x point release — informational only since we use GL Compat.
+
+**Confidence:** HIGH on Godot 4.6 export docs and named regression issues; MEDIUM on Web export real-world reliability.
+
+### 10b. iOS Human Interface Guidelines (HIG)
+
+**What was read:** developer.apple.com/design/human-interface-guidelines pages — Layout, Typography, Touch targets, Accessibility.
+
+**What we adopted:**
+- **44×44 pt minimum tap target** — mobile theme Button minimum height = 48px (Godot pixels at base scale 1.0) covers iOS HIG 44pt and Android Material 48dp simultaneously.
+- **Type-scale uplift on mobile** — body text 16px on mobile vs 14px desktop; line-height retained as M3 spec.
+- **Visible focus indicator on all focusable controls** — 2px outer ring (already mandated by ARCHITECTURE.md Section 5).
+
+**What we rejected:**
+- **Native iOS visual look** — NeoCade retains arcade visual identity across platforms; we adopt iOS HIG *minimums*, not its visual language.
+- **iOS-specific dark/light auto-switching** — v1 is dark-only; auto-switching is v2.
+
+**Confidence:** HIGH (current HIG verified; numerics cited from spec).
+
+### 10c. Android Material 3 mobile guidance
+
+**What was read:** m3.material.io pages — Layout (window size classes), Touch targets (48dp), Accessibility (contrast and adaptive sizing).
+
+**What we adopted:**
+- **48dp minimum tap target** — same value as iOS HIG 44pt × 1.09 — covered by 48px theme constant.
+- **Spacing scale +50% on space.4 and above on mobile** — preserves usability without breaking desktop visual rhythm.
+- **Window size classes are application-level concern, not theme-level** — NeoCade ships two themes (desktop + mobile); consuming app picks per platform/window size.
+
+**What we rejected:**
+- **Material You dynamic palettes on Android** — NeoCade ships fixed palettes; v2 alt-palette generation is explicit fork, not generated.
+- **Adaptive theming via Android theme XML** — orthogonal to Godot theme system.
+
+**Confidence:** HIGH.
+
+### 10d. Token-sharing strategy: ThemeGen reference + Godot Theme class verification
+
+**What was read:** Godot Theme class API docs (verified `merge_with()` and `copy_from()` are runtime-only; no .tres-to-.tres inheritance exists); ThemeGen MIT (github.com/Inspiaaa/ThemeGen) — proven `@tool` script generator pattern.
+
+**What we adopted:**
+- **`@tool` script generator pattern** — `addons/neocade_theme/_dev/generate_themes.gd` builds BOTH `neocade_theme.tres` and `neocade_mobile_theme.tres` from a single `TokenSet` constants block. Both .tres files are committed final artifacts. Drift is structurally impossible.
+- **ThemeGen as prior-art reference** — verifies the pattern works and is shippable; we author our own minimal generator (no runtime dependency on ThemeGen for consumers).
+
+**What we rejected:**
+- **`.tres`-to-`.tres` inheritance** — does not exist in Godot's Theme system (verified, not assumed).
+- **Runtime token computation** — both .tres files are committed pre-rendered; no consumer-side runtime work required.
+- **External tool dependency for consumers** — generator is `_dev/`-prefixed; consumers receive only the rendered .tres files + fonts + icons.
+
+**Confidence:** HIGH on Godot Theme limits; MEDIUM on generator implementation (well-precedented but custom code path).
+
+### 10e. Font license compliance — SIL OFL FAQ + Inter/Noto Sans/Outfit/JetBrains Mono LICENSE.txt
+
+**What was read:** openfontlicense.org/ofl-faq, Inter LICENSE.txt, Noto Sans Reserved Font Name notice, Outfit OFL terms, JetBrains Mono OFL terms.
+
+**What we adopted:**
+- **All 4 candidate fonts pass App Store + Play Store + Web embedding** under OFL 1.1.
+- **Single combined `OFL.txt`** covers all bundled fonts (each with its Reserved Font Name notice block).
+- **Reserved-name clause: do NOT rename `Inter-VariableFont*.ttf`** — keeps OFL compliance intact.
+- **Consuming apps surface `OFL.txt` content in About/Credits** — README documents this requirement for downstream developers.
+
+**What we rejected:**
+- Renaming bundled font binaries (would violate OFL Reserved Font Name).
+- Modifying font binary metadata (same).
+
+**Confidence:** HIGH (cited authoritative sources).
+
+### 10f. Open testing-matrix questions (NOT sources, but raised by CROSS-PLATFORM research)
+
+- Real-device Android testing matrix: 3 devices needed (low/mid/high-end). User hardware unknown.
+- iOS testing requires Mac + paid Apple Developer Program. User status unknown.
+- Whether to ship Inter Italic in v1 (~+0.85 MB) or defer to v1.x.
+- AccessKit / VoiceOver / TalkBack screen-reader integration is partial in Godot 4.6 — full integration deferred to v1.x or v2; v1 sets `accessibility_name` on showcase Controls only.
+
+These are surfaced for the roadmap planning phase to convert into open user decisions or scope decisions.
+
+---
+
+**Net change to SOURCES.md after CROSS-PLATFORM:** Source 10 fully catalogued. No regressions to Sources 1-9. Pending source-dive spike phases (Phase 1 godot-minimal-theme dissection, Phase 2 LDtk source-code mining, Phase 3 real-arcade reference photos) remain the highest-priority gaps.
 
 ---
 

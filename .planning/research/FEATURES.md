@@ -75,7 +75,7 @@ These look attractive but create problems for a v1 Godot theme. PROJECT.md alrea
 | AF-2 | Scanline overlays on panels | "Arcade CRT" reference | Same scaling problem; conflicts with PROJECT.md "no synthwave/scanlines" decision. | Solid surface tokens; arcade feel comes from accent palette and corner radii |
 | AF-3 | Animated/transitioning hover states beyond Godot's built-in | Modern web feel | Godot Theme has no animation primitives; would require GDScript on every Control. PROJECT.md forbids. | Distinct hover stylebox with brighter color — instant change reads as "responsive" |
 | AF-4 | Light mode | "Themes should support both" | Doubles design + QA surface; PROJECT.md defers to v2. | Single dark theme; v2 adds light mode |
-| AF-5 | Mobile-specific theme variant (`neocade_mobile_theme.tres`) | "Should work on mobile" | Would require duplicate theme file with larger touch targets; PROJECT.md defers. | One theme tuned with mobile-aware spacing (8px minimum touch separation), single file |
+| ~~AF-5~~ | ~~Mobile-specific theme variant (`neocade_mobile_theme.tres`)~~ — **STRICKEN 2026-05-04** | _was: "Should work on mobile"_ | **No longer an anti-feature.** Per user constraint update, mobile variant is v1 must-have alongside desktop primary. See `.planning/research/CROSS-PLATFORM.md` for tap-target/type-scale/spacing specifics, token-sharing via `@tool` script generator, and dedicated Mobile Variant Authoring + Cross-Platform Export Validation roadmap phases. | _superseded — see CROSS-PLATFORM.md_ |
 | AF-6 | Editor-only types (FlatButton, FlatMenuButton, MainScreenButton, BottomPanelButton, EditorInspector*, etc.) | godot-minimal-theme styles them | These are not in the public Control class hierarchy; they affect Godot's editor chrome only. PROJECT.md scopes to "every built-in Control class". | Skip in v1; if applied as editor theme, the user's editor will fall back to default for these — acceptable for v1 |
 | AF-7 | Custom syntax-highlight color scheme for CodeEdit | "Code looks good" | Syntax highlighting is per-language and not a theme entry — it's set by individual nodes/scripts. CodeEdit theme entries (bookmark/breakpoint icons) are in scope; syntax colors are not. | Style CodeEdit's StyleBox + gutter colors only. Document that syntax colors are app-level |
 | AF-8 | TextureButton / NinePatchRect / VideoStreamPlayer styling | These are Controls | They have NO theme entries — they render textures provided by the consuming scene. Theme can't style them. | Document in README that these are content-driven, not theme-driven |
@@ -777,7 +777,7 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 | Scanlines / CRT overlays | PROJECT.md no-synthwave decision (AF-2) |
 | Animations beyond Godot built-in | Not theme-able (AF-3) |
 | Light mode | Deferred to v2 (AF-4) |
-| Mobile-specific theme file | Deferred to v2 (AF-5) |
+| ~~Mobile-specific theme file~~ | ~~Deferred to v2 (AF-5)~~ — **STRICKEN 2026-05-04**; mobile variant is now v1 must-have. See CROSS-PLATFORM.md. |
 | Editor-only types (FlatButton, MainScreenButton, EditorInspector*, etc. as per godot-minimal-theme) | Out of "every Control class" scope (AF-6) |
 | CodeEdit syntax highlighting colors | Not a theme entry; app-level (AF-7) |
 | Texture-driven Controls (TextureButton, TextureRect, NinePatchRect, VideoStreamPlayer) | No theme entries — content driven (AF-8) |

@@ -5,7 +5,16 @@
 **Researched:** 2026-05-04 (initial parallel pass complete)
 **Overall confidence:** HIGH on Godot Theme/Font API, table-stakes Control coverage, and table-stakes pitfalls. MEDIUM on real-arcade visual reference depth, Asset Library policy nuance, MCP screenshot tooling baseline. LOW on `godot-minimal-theme` `.tres` line-by-line entry enumeration and LDtk `src/electron.renderer/` UI mining — both flagged for dedicated source-dive spike phases.
 
-> **Note (2026-05-04):** This synthesis was authored before the user added the cross-platform export constraint (all 6 Godot targets — Windows/macOS/Linux/iOS/Android/Web — plus mobile variant `neocade_mobile_theme.tres` as v1 must-have). A 5th research dimension (CROSS-PLATFORM) is in flight; SUMMARY.md will be updated with its findings before REQUIREMENTS.md is authored.
+> **Update (2026-05-04, post-CROSS-PLATFORM):** The 5th research dimension landed after the initial synthesis. Key cross-platform findings have been folded in below:
+> - **No `.tres`-to-`.tres` inheritance in Godot Theme** — verified against Theme class API. Token-sharing strategy: `@tool` script (`addons/neocade_theme/_dev/generate_themes.gd`) generates BOTH desktop and mobile `.tres` from a single `TokenSet` constants block. Both `.tres` files are committed final artifacts, generated from one source of truth — drift is structurally impossible. ThemeGen (MIT) is a proven prior-art reference.
+> - **GL Compatibility renderer is the safest cross-platform choice** — already locked in project.godot. Avoids two new Godot 4.6 regressions: iOS Mobile-renderer Metal validation failure on iPhone SE 2nd gen (#116090, 4.7 release blocker) and Android Mobile-renderer reducing Play Store device coverage (#111729). **Stay on GL Compatibility — do NOT switch.**
+> - **Web export is highest-risk** — three failure modes: SystemFont resource silently fails (must use FontFile + bundled `.ttf`); `.ttf` files must be in "Filters to export non-resources" OR wrapped in saved FontFile.tres; iOS Safari has documented WebGL2 quirks (no pixel-parity required for v1). All `.tres` references must use `uid://` to survive PCK remap.
+> - **Mobile spec is concrete:** Button height 48px mobile vs 32px desktop (satisfies iOS HIG 44pt + Material 3 48dp); body 16px mobile vs 14px desktop; spacing scale +50% on space.4 and above; **corner radii STAY IDENTICAL** across desktop/mobile (brand identity, not platform-specific).
+> - **Density buckets — answered:** Ship ONE `neocade_mobile_theme.tres`, not four. Godot does not use Android density qualifiers for theme resources; density variation is handled at runtime via `content_scale_factor` + Godot stretch modes (`canvas_items` + `expand`). Authored values are dp-equivalent at base scale 1.0.
+> - **License compliance:** Inter, Noto Sans, Outfit, JetBrains Mono are all OFL 1.1 — App Store + Play Store + Web embedding legal per SIL OFL FAQ. Reserved-name clause: do NOT rename `Inter-VariableFont*.ttf`. Single combined `OFL.txt` covers all bundled fonts.
+> - **Two new phases required** in the roadmap: **Mobile Variant Authoring** (interleaved with desktop authoring after Foundation) and **Cross-Platform Export Validation** (post-desktop-QA, pre-v1-release). Optional Cross-Platform Hardening Spike buffer phase recommended.
+> - **FEATURES.md AF-5 must be stricken** — mobile-as-anti-feature is no longer correct; mobile variant is now v1 must-have.
+> - **Open questions surfaced (not blocking):** Whether 4.6.x has fixed iOS Safari/Chrome HTML5 audio crash (#107390) — informational only since theme has no audio; whether iOS Mobile-renderer regression (#116090) gets backported — informational only since we use GL Compat; real-device Android testing matrix (3 devices: low/mid/high-end) — user hardware unknown; iOS testing requires Mac + paid Apple Developer Program — user status unknown; whether to ship Inter Italic in v1 (~+0.85 MB) or defer; AccessKit/VoiceOver/TalkBack screen-reader integration is partial in 4.6 — full integration deferred to v1.x or v2; v1 sets `accessibility_name` on showcase Controls only.
 
 ---
 
@@ -181,9 +190,22 @@ All three pass WCAG 2.1 AA on body text and SC 1.4.11 (3:1 non-text) on accents.
 
 ## Implications for Roadmap
 
-Suggested 9-phase structure. Phases 1-3 are research/design spikes (no `.tres` edits). Phases 4-7 are implementation. Phases 8-9 are QA + distribution. **Mockup approval gate falls between Phase 3 and Phase 4.**
+Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/design spikes (no `.tres` edits). Phases 4-8 are implementation (with mobile variant interleaved). Phase 9-10 are QA/cross-platform validation. Phase 11 is distribution. **Mockup approval gate falls between Phase 3 and Phase 4.**
 
-> **Pending update:** the CROSS-PLATFORM dimension (in flight) will likely add at least two more phases (mobile variant authoring + cross-platform export validation) and reshape Phase 9. The roadmapper will receive both this synthesis and the CROSS-PLATFORM findings.
+**Phase order (post-CROSS-PLATFORM):**
+- Phase 1: Source-Dive Spike — godot-minimal-theme `.tres` dissection
+- Phase 2: Source-Dive Spike — LDtk source code UI mining
+- Phase 3: Visual Direction Mockup Phase (3-step approval gate, mockups must include desktop+mobile representations) **+ MCP/QA tooling baseline sub-spike (UD-1 GoPeak swap) + real-arcade reference photo collection**
+- **[GATE: User mockup approval. No `.tres` edits before this passes.]**
+- Phase 4: Foundation — Tokens, Fonts, Icons, Scaffold + **`@tool` theme generator script** (`addons/neocade_theme/_dev/generate_themes.gd`) producing BOTH desktop and mobile `.tres` from shared TokenSet
+- Phase 5: Core Controls — Buttons, Inputs, Labels, Panels (desktop authoring)
+- Phase 6: Lists, Layout, Range — Tree, ItemList, Tabs, Containers, Sliders (desktop authoring)
+- Phase 7: Dialogs, Popups, Advanced — Window, Popups, MenuBar, ColorPicker, Graph (desktop authoring)
+- **Phase 8 (NEW): Mobile Variant Authoring** — Mobile token overrides (tap targets 48px / body 16px / spacing +50%); generator outputs `neocade_mobile_theme.tres`; tap-target audit script; mobile showcase variant or toggle. Estimated 12-18 hours. Interleaved with phases 5-7 in practice (token overrides accrue as desktop entries land).
+- Phase 9: Showcase + Token Gallery + Theme Toggle — `res://main.tscn`; desktop+mobile theme toggle in addition to NeoCade↔Godot toggle.
+- **Phase 10 (NEW/EXPANDED): QA + Cross-Platform Export Validation** — Dual-renderer screenshot pass (Forward+ vs GL Compat); per-target export builds (Windows/macOS/Linux/iOS/Android/Web) with screenshot decks; CI workflow for desktop + Web targets; manual Android+iOS validation; accessibility QA (WCAG, focus stylebox audit, CVD simulation); fresh-install dry-run. Estimated 8-12 hours plus device time.
+- Phase 11: Distribution — Asset Library submission package; README with both install paths; OFL.txt attribution; Asset Library policy verification at submission time.
+- **Optional buffer:** Cross-Platform Hardening Spike (4-8 hours) inserted before Phase 11 if real-device regressions surface.
 
 ### Phase 1: Source-Dive Spike — godot-minimal-theme `.tres` dissection
 **Rationale:** PROJECT.md names this top-value source requiring dedicated spike. Initial pass extracted README values (Inter, `#272727`, `#569eff`, 4-5px radius) but did NOT enumerate the `.tres`'s actual entries per Control × state. Godot 4.6 ships its productized port as the new default — line-by-line list needed for "feature-complete to godot-minimal-theme's bar" claims.
