@@ -12,7 +12,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 ### Research & Spike (RES)
 
 - [x] **RES-01**: Phase 1 source-dive spike produces line-by-line dissection of `passivestar/godot-minimal-theme` `.tres` (per-Control × per-state entry enumeration; interaction state transforms; popup/window theming patterns). Findings appended to SOURCES.md.
-- [ ] **RES-02**: Phase 2 source-dive spike mines LDtk source code under `C:\Programming_Files\ldtk-master\src\electron.renderer\` for UI implementation patterns (sidebar tinting, layer panel chrome, tool-button conventions, modal flow, panel collapse, context menus, status indicators); appended to SOURCES.md.
+- [x] **RES-02**: Phase 2 source-dive spike mines LDtk source code under `C:\Programming_Files\ldtk-master\src\electron.renderer\` for UI implementation patterns (sidebar tinting, layer panel chrome, tool-button conventions, modal flow, panel collapse, context menus, status indicators); appended to SOURCES.md.
 - [ ] **RES-03**: Phase 3 sub-spike produces a curated mood-board of 20-30 high-resolution real-arcade interior reference photos (Round1 / Dave & Buster's / Two Bit Circus / classic 80s halls / cabinet imagery / ticket booth / prize counter / marquee). Saved to `.planning/research/mood-board/`.
 - [ ] **RES-04**: Phase 3 sub-spike resolves UD-1 (MCP server swap to GoPeak) with a hands-on smoke test capturing a Godot editor screenshot via `npx gopeak` and verifying input-injection works. Outcome documented; if approved, project's MCP config switches.
 - ~~[ ] **RES-05**: Asset Library policy re-verification~~ — **STRICKEN 2026-05-04 per Phase 11 revision.** No Asset Library submission in v1; distribution is GitHub Releases via GitHub Actions workflow only.
@@ -271,7 +271,7 @@ Phase mapping per ROADMAP.md (which adopts SUMMARY.md's 11-phase plan verbatim).
 | Requirement | Primary Phase | Cumulative Contributors | Status |
 |-------------|---------------|------------------------|--------|
 | RES-01 | Phase 1 (Source-Dive: godot-minimal-theme `.tres` dissection) | — | Pending |
-| RES-02 | Phase 2 (Source-Dive: LDtk source UI mining) | — | Pending |
+| RES-02 | Phase 2 (Source-Dive: LDtk source UI mining) | — | Complete |
 | RES-03 | Phase 3 (mood-board sub-spike) | — | Pending |
 | RES-04 | Phase 3 (MCP tooling baseline sub-spike — UD-1) | — | Pending |
 | ~~RES-05~~ | _STRICKEN 2026-05-04 — no AssetLib in v1_ | — | _N/A_ |
