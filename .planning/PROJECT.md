@@ -139,6 +139,26 @@ These cannot be overturned by research without explicit user reconsideration:
 5. **Subagent peer review at every artifact boundary**: research → review; design → review; implementation → review. Multiple sets of eyes are mandatory, not optional.
 6. **Findings are committed and dated**. Verbal/in-context conclusions are not durable and don't count as research output.
 
+### Source coverage commitment
+
+Every source the user named must end up catalogued — not just generally referenced. Each source gets a documented entry stating what was read, what was adopted, what was rejected (with reasoning), and what remains open. This catalogue is produced as `.planning/research/SOURCES.md` by the synthesizer, and updated as roadmap-level source-dive spike phases produce deeper findings.
+
+**Sources requiring explicit catalogue entries:**
+
+| Source | Type | Catalogue entry must capture |
+|--------|------|------------------------------|
+| godot-minimal-theme (passivestar) | Repo + theme.tres | Full enumeration of theme entries it defines (per Control × per state); interaction state transforms; accent strategy; what NeoCade adopts vs differs |
+| LDtk UI docs (ldtk.io/docs/general/editor-components/) | Web docs | Component patterns, layout strategies, interaction conventions worth borrowing |
+| LDtk source code (C:\Programming_Files\ldtk-master) | Source — "must read all of it for UI" per user | UI implementation patterns under `src/electron.renderer/`; tinted-sidebar/icon/font/atlas patterns under `res/`; lessons learned from CHANGELOG; what to adopt vs leave |
+| Material Design 3 (m3.material.io) | Styleguide | Spacing/contrast/accessibility/state-system principles adopted; visual language explicitly NOT adopted |
+| Real & virtual arcade aesthetics | Visual research | Concrete reference imagery and what makes it distinct from cyberpunk; specific design moves to adopt (marquee, ticket-stub, booth chrome, prize counter palette) |
+| Godot Theme docs (4 specific URLs listed in Inspirations) | Authoritative docs | Authoritative Godot 4.6 Theme API behavior, type variations, theme editor workflow; verified via Context7 not training data |
+| Godot controls gallery (godot-demo-projects/gui/control_gallery) | Demo project | Showcase scope reference: every Control to include, layout patterns |
+| `.planning/inputs/NeoCade-Research-Report.md` | User's prior research | Claim-by-claim audit: which claims hold, which to reject, which to verify further. Known rejections: "VirtuCade Theme" name, synthwave direction, pixel fonts |
+| `.planning/inputs/NeoCade-Theme-Prototype.png` | User's prior mockup | Element-by-element critique: tokens to keep (palette, surface ramp, control panel scope), elements to rework (chrome restraint, arcade warmth, naming) |
+
+Each catalogue entry must be evidence-grade — citations, file paths, specific values — not vibes. The roadmap will include dedicated source-dive spike phases for the top-value sources (godot-minimal-theme `.tres` dissection, LDtk source code UI mining, real arcade visual reference collection) where the initial research pass alone won't be deep enough.
+
 ### What "exhaustive" means here
 
 Concretely, "exhaustive" for this project includes (non-exhaustive list):
