@@ -15,13 +15,13 @@ Authored: 2026-05-04
 | `src/electron.renderer/ui/**/*.hx` | 69 Haxe files |
 | `src/electron.renderer/page/Editor.hx` | 1 file, 2456 lines |
 | `src/electron.renderer/tool/**/*.hx` | 9 Haxe files |
-| `app/assets/css/app.scss` | 9322 lines |
+| `app/assets/css/app.scss` | 10819 physical lines via `rg -n "^"`; PowerShell `Measure-Object -Line` reported 9322 and is treated as stale/unsafe for this file |
 | `docs/CHANGELOG.md` | 1023 lines |
 | `app/assets/icons/*.svg` | 98 SVG files |
 | `res/atlas/` | 2 files: `appElements.aseprite`, `icons.aseprite` |
 | `res/fonts/` | 13 files: Noto Sans Display Semicondensed bitmap atlases, `pixel_berry`, and notes |
 
-Inventory commands were run from Windows PowerShell. Preferred `rg` commands were paired with `Get-ChildItem` or `Get-Content | Measure-Object` fallbacks; when both were available for SVG icons, they agreed at 98 files. The local LDtk root has no root `version.txt`; `docs/version.txt` and `app/package.json` both report `1.5.3`.
+Inventory commands were run from Windows PowerShell. Preferred `rg` commands were paired with `Get-ChildItem` or `Get-Content | Measure-Object` fallbacks; when both were available for SVG icons, they agreed at 98 files. During Plan 02-03, `app.scss` line-count verification was corrected from the initial PowerShell fallback value (9322) to `rg`'s physical-line count (10819), because live citations extend beyond the fallback count. The local LDtk root has no root `version.txt`; `docs/version.txt` and `app/package.json` both report `1.5.3`.
 
 ## Scope and Method
 
@@ -279,7 +279,170 @@ Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call. Tool buttons an
 
 ## SCSS Chrome and Interaction Conventions
 
-Reserved for Plan 02-03.
+### Section Map
+
+| Area | Evidence range | Notes |
+|---|---|---|
+| Global palette, sizing, cursors | `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:1-30` | Non-binding source values plus app cursor URLs |
+| Base button state model | `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:155-209` | Default, disabled, hover, focus, active, icon opacity |
+| Tabs and active surface transition | `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:1100-1144` | Active tab uses stronger color/position than hover |
+| Form default/error affordances | `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:1745-1845`; `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:7358-7535` | Default stripes, required/error, image picker empty/error |
+| Select/list picker | `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:2169-2318` | Search header, grid columns, selected/focus/default/disabled rows |
+| Notifications and quick status | `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:2724-2824` | Full notification stack vs quick transient overlay |
+| Modal, dialog, and side panel shells | `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:2981-3115` | Mask, centered window, wrapper, header, panel close button |
+| Context menus | `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:3695-3867` | Open target outline, menu rows, selected, disabled, warning, submenu |
+| Command palette | `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:5557-5638` | Full-screen search overlay, result row categories, active result, fade |
+| Palette/list row state | `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:6700-6735` | Left color strip, hover outline, active outline |
+| Scrollbar affordance | `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:10441-10455` | Track/thumb/hover contrast |
+
+### SCSS-01: Buttons Separate Disabled, Hover, Focus, And Active
+
+Classification: interaction-state.
+
+Evidence: `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:155-209`.
+
+LDtk gives buttons a default raised cap, a distinct disabled treatment, hover color, focus inheritance, and active treatment. Numeric values are evidence only and are not NeoCade token decisions.
+
+NeoCade adoption: Adopt the state taxonomy, not the exact bevel/shadow values. Godot Button slots must make disabled, hover, pressed/active, focus, and composite focus states visibly different.
+
+Anti-cyberpunk note: Crisp state differentiation is accessibility-driven and can be expressed without glow or console styling.
+
+Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call. Button tokens should reserve stronger contrast for active/pressed and keep disabled readable without relying on low-opacity text alone.
+
+### SCSS-02: Active Tabs Change Position, Weight, And Fill
+
+Classification: chrome/layout plus interaction-state.
+
+Evidence: `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:1100-1144`.
+
+LDtk's tabs use a base rail, hover lift, and active row that changes fill, text weight, and vertical position. The lesson is that active tabs need more than a color-only change.
+
+NeoCade adoption: Translate into Godot `TabBar`/`TabContainer` styles with clear selected-vs-hover distinction, while avoiding LDtk's exact color values.
+
+Anti-cyberpunk note: A tab rail is ordinary app chrome; no forbidden aesthetic terms or effects are required.
+
+Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call. Active tabs should appear physically selected through fill/border/offset, not only through hue.
+
+### SCSS-03: Select Picker Supports Dense List And Grid States
+
+Classification: chrome/layout plus interaction-state.
+
+Evidence: `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:2169-2318`.
+
+LDtk's select picker has a search header, scrollable value area, grid column classes, image rows, default rows, null rows, disabled rows, selected outline, and focus outline. This confirms the Haxe finding that option-heavy controls need many visible states.
+
+NeoCade adoption: Use this as checklist pressure for `OptionButton`, `PopupMenu`, `ItemList`, `Tree`, and mobile picker samples.
+
+Anti-cyberpunk note: Dense list/grid clarity is practical and genre-neutral.
+
+Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call. Popup/list demos should include selected, focus, disabled, default, null/empty, icon/image, and grid-density variants.
+
+### SCSS-04: Notifications Reserve Separate Layouts For Full And Quick Messages
+
+Classification: chrome/layout.
+
+Evidence: `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:2724-2824`.
+
+LDtk uses a stacked notification list for durable messages and a separate quick-notification overlay for transient feedback. It also softens non-latest notifications with width and opacity changes.
+
+NeoCade adoption: Adopt the separation as a showcase/status-surface lesson, not as a required runtime notification system.
+
+Anti-cyberpunk note: Notification hierarchy can stay bright and friendly without alarm-console styling.
+
+Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call. Include info/success/warning/error toasts plus a compact quick-status sample in the showcase.
+
+### SCSS-05: Modal, Dialog, And Panel Shells Share A Mask/Wrapper/Header Grammar
+
+Classification: chrome/layout.
+
+Evidence: `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:2981-3115`.
+
+LDtk uses a full-window modal wrapper, separate mask, centered option, scrollable wrapper, header strip, and side-panel variant. Panels also have a dedicated close button hover state.
+
+NeoCade adoption: Adopt the structural grammar for Godot `Window`, `PopupPanel`, and dialog resources; reject exact shadows and one-off pixel values as binding.
+
+Anti-cyberpunk note: Modal hierarchy is application clarity; avoid noir overlays/glow-heavy shadows in NeoCade v1.
+
+Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call. Dialog/window styles should share surface, header, body, close-button, mask-adjacent, and focus treatment.
+
+### SCSS-06: Context Menus Highlight Invocation Target And Row State
+
+Classification: chrome/layout plus interaction-state.
+
+Evidence: `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:3695-3867`.
+
+LDtk outlines the element that opened a context menu, styles menu buttons with icon/subtext slots, differentiates hover, selected, disabled, warning, strong, and submenu-open states, and dims sibling submenu rows.
+
+NeoCade adoption: Use this as a `PopupMenu`/`MenuButton` checklist: invocation state, hover, checked/selected, disabled, warning/destructive, separator, submenu, icon, and subtext treatment.
+
+Anti-cyberpunk note: Context-menu state is conventional desktop polish.
+
+Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call. Menus should show a visible checked mark/selected state distinct from hover and focus.
+
+### SCSS-07: Command Palette Rows Use Category, Context, Active, And Overflow Fade
+
+Classification: chrome/layout plus interaction-state.
+
+Evidence: `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:5557-5638`.
+
+LDtk positions the command palette as a full-screen search overlay, makes result rows three-column grids, uses softer context text, category coloring, active row fills, and one bottom fade gradient for overflow. The gradient is evidence only; it is not a NeoCade style decision.
+
+NeoCade adoption: Adopt row structure, active selection, and secondary-context treatment; evaluate any fade/gradient carefully during Phase 3 and avoid making it a default Theme motif.
+
+Anti-cyberpunk note: One utilitarian overflow fade is not cyberpunk by itself, but gradients should remain rare and functional.
+
+Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call. Search/list rows should support icon, label, muted context, category tint, active row, and overflow indication.
+
+### SCSS-08: Form Defaults And Required/Error States Are Distinct
+
+Classification: interaction-state.
+
+Evidence: `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:1745-1845`; `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:7358-7535`.
+
+LDtk differentiates default content, empty picker, error picker, file-not-found input, required default replacement, color wrapper hover, and reset/default button states. The theme lesson is that forms need a matrix of non-happy-path visual states.
+
+NeoCade adoption: Adopt the matrix for `LineEdit`, `TextEdit`, `OptionButton`, `CheckBox`, `ColorPickerButton`, `SpinBox`, and form-row samples.
+
+Anti-cyberpunk note: Error/required states should be readable and friendly, not red-glow dramatic.
+
+Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call. Build form samples that show defaulted, resettable, required, file-missing/error, empty, hover, focus, and disabled states.
+
+### SCSS-09: Palette/List Rows Benefit From Thin Structural Markers
+
+Classification: chrome/layout plus interaction-state.
+
+Evidence: `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:6700-6735`.
+
+LDtk list rows can use a thin left marker set in code, hover outline, and active outline. The portable lesson is that a small marker can carry role/category information without repainting the whole row.
+
+NeoCade adoption: Consider restrained left-border or swatch treatment for theme samples, especially `Tree`, `ItemList`, and color/category lists.
+
+Anti-cyberpunk note: Thin structural markers are work-focused and avoid neon slabs.
+
+Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call. Prefer small swatches/edge markers for category roles rather than full-row per-function tinting.
+
+### SCSS-10: Scrollbar Track/Thumb/Hover Is Deliberately Themed
+
+Classification: chrome/layout plus interaction-state.
+
+Evidence: `C:\Programming_Files\ldtk-master\app\assets\css\app.scss:10441-10455`.
+
+LDtk explicitly themes scrollbar width, track, thumb, and thumb hover. Godot scrollbar theming is part of the control coverage bar, and this confirms scrollbars should be treated as visible chrome, not browser/runtime leftovers.
+
+NeoCade adoption: Adopt the coverage expectation for `VScrollBar`, `HScrollBar`, and scroll-container embedded bars; exact LDtk dimensions/colors are non-binding.
+
+Anti-cyberpunk note: Scrollbar contrast is accessibility polish, not aesthetic drift.
+
+Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call. Scrollbars should have readable thumb, track, hover, grab, and disabled states on both desktop and mobile variants.
+
+### SCSS Rejections From Active Verification
+
+| Rejected move | Evidence | Reason |
+|---|---|---|
+| Binding LDtk button bevel/shadow values | `app.scss:155-209` | NeoCade v1 rejects drop-shadow dependence under GL Compatibility; use tonal/border states instead. |
+| Red glow/error drama as default form language | `app.scss:1829-1837`; `app.scss:7530-7535` | Useful as "do not miss error state" evidence, but direct glow/shadow styling risks alarm/noir drift. |
+| Command palette gradient as general visual motif | `app.scss:5630-5638` | A single overflow fade may be functional, but gradients must not become NeoCade's identity language. |
+| Content/domain color categories as theme roles | `app.scss:5607-5625`; `app.scss:6700-6705` | Category colors are LDtk content/app semantics; NeoCade token roles must remain reusable. |
 
 ## Rejected Patterns
 
@@ -355,4 +518,39 @@ Reserved for Plan 02-05.
 
 ## Phase 2 Verification Log
 
-Reserved for Plan 02-05.
+### Active Verification Audit
+
+Plan 02-03 searched `app.scss` for: gradients, box shadows, text shadows, filters, transitions, animations, focus, hover, active, selected, disabled, collapsed, modal, context, palette, panel, button, scroll, warning, error, success, plus forbidden cyberpunk terms (`scanline`, `aberration`, `glitch`, `hex-grid`, `circuit`, `cyber`, `noir`, `TRANSMISSION`, `SYSTEM`).
+
+Hit density by category:
+
+| Category | Hits |
+|---|---:|
+| `hover` | 130 |
+| `button` | 128 |
+| `box-shadow` | 105 |
+| `active` | 46 |
+| `text-shadow` | 35 |
+| `filter` | 30 |
+| `disabled` | 18 |
+| `panel` | 17 |
+| `context` | 14 |
+| `error` | 14 |
+| `animation` | 11 |
+| `collapsed` | 11 |
+| `focus` | 10 |
+| `warning` | 9 |
+| `selected` | 7 |
+| `scroll` | 6 |
+| `transition` | 6 |
+| `palette` | 2 |
+| `gradient` | 1 |
+| `modal` literal | 0 |
+| `success` literal | 0 |
+| Forbidden cyberpunk terms | 0 |
+
+High-value hits already covered: button state model, select/list picker states, notifications, modal/panel shells, context menus, command palette, default/error form states, palette/list row markers, and scrollbars. Additional `collapsed` hits are carried forward to Plan 02-04/02-05 as a CHANGELOG/open-question theme because Haxe+SCSS evidence shows collapse behavior is app-level while the theme responsibility is selected/folded/disabled state styling.
+
+Rejected visual moves: LDtk uses extensive `box-shadow`, some `text-shadow`, a small number of filters, and one functional gradient. These are evidence of state emphasis only; they are not binding NeoCade token/style decisions. Direct glow/shadow copying would conflict with NeoCade v1's no-drop-shadow and anti-cyberpunk constraints.
+
+Line-count correction: this audit went far beyond `app.scss` lines 1-24. `rg -n "^"` reports 10819 physical lines, while the initial PowerShell fallback line count reported 9322; future citations use `rg` line numbers.
