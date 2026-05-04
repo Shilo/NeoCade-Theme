@@ -812,6 +812,110 @@ These three are enumerated below as `### MenuBar`, `### Panel`, `### Window` sec
 - `enable_touch_optimizations` conditional (lines 38-44 Globals) — same touch-area dynamic as HScrollBar; NeoCade uses fixed mobile theme variant instead.
 - Same engine-default omissions as HScrollBar (decrement/increment icons, etc.).
 
+### AcceptDialog
+
+**Gloss:** Godot's `AcceptDialog` Control — modal popup with title bar, content area, and OK button (and optional cancel/custom buttons). Base class for ConfirmationDialog, FileDialog.
+
+**Upstream entry count:** 1 total set_* call (1 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| stylebox | panel | (panel) | shared `sb` from PopupDialog (line 745-747: `base_sb.duplicate()`, `set_content_margin_all(int(popup_margin * scale))`, `set_corner_radius_all(0)` — square corners) | bg = base_color, content_margin ≈ 9.6 EDSCALE units, square corners | 749, 745-747 |
+
+**Per-class notes:**
+- AcceptDialog shares its `panel` stylebox with `PopupDialog` (line 748 sets PopupDialog's panel from the SAME `sb`; line 749 sets AcceptDialog's panel from the SAME `sb`). Both use the same construction.
+- `set_corner_radius_all(0)` — **dialog corners are square**, NOT rounded. Visual signature: dialogs feel solid/anchored compared to popup menus (which also use square corners) and tooltips.
+- The OK button row, "OK" label, custom buttons all inherit Button-class theming via type chain (no AcceptDialog-specific button theming in upstream).
+- Slots NOT set: `title_color`, `title_outline_size`, `title_height`, `embedded_border`, `embedded_unfocused_border` — all engine-default. (NOTE: these slots actually live on the `Window` parent class, not AcceptDialog itself; the engine-default fallback handles them via Window's own slots, which upstream also leaves unthemed — see Window section.)
+- ConfirmationDialog (subclass of AcceptDialog) NOT explicitly themed — inherits via type chain. NeoCade-additive coverage at REQUIREMENTS.md DIA-* level.
+
+### Panel
+
+**Gloss:** Godot's bare `Panel` Control — a simple box-with-stylebox Control. Distinct from `PanelContainer` (which is a layout container).
+
+**Upstream entry count:** 0 set_* calls. **Unthemed by upstream.**
+
+> **NeoCade-additive (D-08 reconciliation):** Upstream `minimal_theme.tres` does not theme the bare `Panel` class. NeoCade owns first-class `Panel` theming; coverage delta (Plan 04) flags this as NeoCade-additive. The audit-grep evidence: zero `set_*('panel'..., 'Panel'...)` and zero `set_*(..., 'Panel')` in `minimal_theme.tres` (verified via `grep -nE "['\"]Panel['\"]"` returning empty). The bare `Panel` Control falls back to engine defaults in upstream usage. NeoCade Phase 4 generator will populate `Panel.panel` stylebox from NeoCade's design tokens (likely `surface_high` or `surface_higher` for raised content cards, per ARCHITECTURE.md state-layer model).
+
+### PopupMenu
+
+**Gloss:** Godot's `PopupMenu` Control — vertical list of selectable items, supports separators / submenus / checked items. Used by MenuButton, OptionButton, right-click context menus.
+
+**Upstream entry count:** 8 total set_* calls (3 constant, 5 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| constant | item_start_padding | (n/a) | `int(popup_margin * scale)` | `9` (popup_margin ≈ 9.6, EDSCALE-derived) | 702 |
+| constant | v_separation | (n/a) | `int(base_margin * 1.75 * scale)` | `7` (EDSCALE-derived) | 703 |
+| constant | h_separation | (n/a) | `int(base_margin * 1.75 * scale)` | `7` (EDSCALE-derived) | 704 |
+| stylebox | hover | hover | `flat_button_hover_sb` | (per dict; bg = `color_button_normal`) | 706, 148-153 |
+| stylebox | panel | (panel) | local `sb` (line 708-713: `base_sb.duplicate()`, `bg_color = color_surface_lower`, `set_content_margin_all(int(popup_margin * scale))`, `set_corner_radius_all(0)`, conditional `_set_border(sb, color_extra_border_dimmed, 1)` if `draw_extra_borders`) | bg ≈ `Color(0.13,0.13,0.13,1)` (surface_lower), square corners, content_margin ≈ 9.6 | 714, 708-713 |
+| stylebox | labeled_separator_left | (n/a) | local `line_sb` (line 716-720: `StyleBoxLine.new()`, `color = color_mono * Color(1,1,1, 0.075 if dark_theme else 0.125)`, `grow_begin = grow_end = base_margin * -2.0 * scale`, `thickness = int(ceilf(scale * 2))`) | semi-transparent white line; in dark_theme, color ≈ `Color(1,1,1,0.075)`; thickness 2 EDSCALE | 721, 716-720 |
+| stylebox | labeled_separator_right | (n/a) | same `line_sb` as labeled_separator_left | (same) | 722, 716-720 |
+| stylebox | separator | (n/a) | same `line_sb` | (same) | 723, 716-720 |
+
+**Per-class notes:**
+- PopupMenu **square corners** — `set_corner_radius_all(0)` at line 711. Same visual treatment as AcceptDialog/PopupDialog/TooltipPanel/PopupPanel: popups uniformly have square corners. NeoCade Phase 5 design decision: STACK.md mentions per-stylebox-role corner radius (8 popups, 12 dialogs); upstream collapses both to 0. NeoCade DIVERGES.
+- `hover` is the ONLY interactive-state stylebox — there's no `pressed`, `disabled`, or `focus` stylebox for items. Engine handles those visually via font_color (which upstream doesn't set either — relies on engine-default font colors).
+- `font_color`, `font_hover_color`, `font_pressed_color`, `font_disabled_color`, `font_separator_color`, `font_accelerator_color`, `font_outline_color`, `font_outline_size`, `outline_size`, `font_size`, `font_separator_size` — ALL NOT set. Plan 03 D-12 omissions.
+- `submenu`, `submenu_mirrored`, `checked`, `unchecked`, `radio_checked`, `radio_unchecked`, `radio_checked_disabled`, `radio_unchecked_disabled`, `visibility_hidden`, `visibility_visible`, `visibility_xray` — ALL ICON SLOTS NOT set. Engine-default icons. Plan 03 D-12 omissions; NeoCade icon set design (Phase 4 ICON-*) needs to cover these.
+- Three separator stylebox variants (`labeled_separator_left`, `labeled_separator_right`, `separator`) ALL share the SAME `line_sb`. The "labeled separator" feature (a separator with a centered label like "──── Section ────") uses left/right line halves, but visually they're the same line as a regular separator.
+
+### PopupPanel
+
+**Gloss:** Godot's `PopupPanel` Control — generic popup window wrapper. Used by tooltips, context-floating UIs, popup-color-pickers.
+
+**Upstream entry count:** 1 total set_* call (1 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| stylebox | panel | (panel) | local `sb` (line 727-734: `base_sb.duplicate()`, `bg_color = color_surface_lower`, `shadow_color = Color(0,0,0,0.3)`, `shadow_size = int(base_margin * 0.75 * scale)`, `set_content_margin_all(int(popup_margin * scale))`, `set_corner_radius_all(0)`, conditional `_set_border(sb, color_extra_border_dimmed, 1)` if `draw_extra_borders`) | bg ≈ `Color(0.13,0.13,0.13,1)`, drop shadow with 30% black alpha, shadow_size = 3 EDSCALE, square corners | 735, 727-734 |
+
+**Per-class notes:**
+- **PopupPanel is the ONLY popup-class stylebox in upstream that sets a drop shadow** (`shadow_color = Color(0,0,0,0.3)`, `shadow_size = int(base_margin * 0.75 * scale)` = 3 EDSCALE). PopupMenu, AcceptDialog, PopupDialog, TooltipPanel all leave shadow at engine defaults (zero or whatever). This is **conflict territory for NeoCade**: ARCHITECTURE.md Conflict 3 / SUMMARY.md says "no drop shadows in v1 (GL Compat over-renders shadow alpha per Godot #23640)." NeoCade MUST drop this shadow (Phase 5 design rule).
+- Square corners (`set_corner_radius_all(0)`) — consistent with all upstream popups.
+- Content margin ≈ 9.6 EDSCALE units (popup_margin * scale).
+
+### TooltipPanel
+
+**Gloss:** Godot's `TooltipPanel` Control — the wrapper popup for tooltips (the contained TooltipLabel renders the actual text).
+
+**Upstream entry count:** 1 total set_* call (1 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| stylebox | panel | (panel) | local `sb` (line 737-742: `base_sb.duplicate()`, `bg_color = color_surface_lower`, `set_content_margin_all(0)` — zero content margin, `set_corner_radius_all(0)`, conditional `_set_border(sb, color_extra_border_dimmed, 1)` if `draw_extra_borders`) | bg ≈ `Color(0.13,0.13,0.13,1)` (surface_lower), zero content_margin, square corners | 743, 737-742 |
+
+**Per-class notes:**
+- TooltipPanel uses **zero content_margin** (line 739). The contained TooltipLabel handles its own padding. NeoCade should preserve this composition — set TooltipLabel's font margin separately, not TooltipPanel's panel content margin.
+- TooltipLabel slots (NeoCade-additive per FEATURES.md / D-09) NOT set in upstream — `font`, `font_color`, `font_size`, `font_outline_color`, `outline_size` are NOT themed at the TooltipLabel level either. Engine-default font/color used. NeoCade Phase 4 must cover both classes for proper tooltip rendering.
+
+### Window
+
+**Gloss:** Godot's `Window` Control — top-level OS window or embedded popup window. Base class for AcceptDialog / PopupMenu / PopupPanel via internal Godot inheritance.
+
+**Upstream entry count:** 0 set_* calls. **Unthemed by upstream.**
+
+> **NeoCade-additive (D-08 reconciliation):** Upstream `minimal_theme.tres` does not theme the bare `Window` class. NeoCade owns first-class `Window` theming; coverage delta (Plan 04) flags this as NeoCade-additive. The audit-grep evidence: zero `set_*(..., 'Window')` calls in `minimal_theme.tres` (verified via `grep -nE "['\"]Window['\"]"` returning empty). Window-specific slots — `embedded_border`, `embedded_unfocused_border`, `title_color`, `title_outline_modulate`, `close` icon, `close_pressed` icon, `close_h_offset`, `close_v_offset`, `resize_margin`, `title_height`, `title_outline_size`, `title_font_size` — ALL fall back to engine defaults. Upstream relies on the engine-default Window chrome for embedded windows. NeoCade Phase 4 generator should populate these slots from NeoCade's design tokens to ensure the editor + game runtime show NeoCade-styled window chrome consistently.
+
+> **Pitfall 1.7 (popup separate-Window theming) evidence:**
+>
+> The upstream theme populates `panel` stylebox on FIVE distinct popup classes:
+> - `PopupMenu` (line 714, 8 set_* total)
+> - `PopupPanel` (line 735, 1 set_*)
+> - `PopupDialog` (line 748, 1 set_*)
+> - `AcceptDialog` (line 749, 1 set_*)
+> - `TooltipPanel` (line 743, 1 set_*)
+>
+> Plus six editor-only popup-dialog subclasses at lines 753-758 (`EditorSettingsDialog`, `ProjectSettingsEditor`, `ProjectExportDialog`, `SceneImportSettingsDialog`, `EditorAbout`, `ThemeItemEditorDialog`).
+>
+> **What this confirms:** Upstream **explicitly themes each popup class at the Theme-resource type level** rather than relying on a shared `Window` base class theme. This is the *correct fix* for Pitfall 1.7 — popups DO inherit type-level theme entries (because the Theme resource maps `class_name → entries`), but they do NOT inherit *runtime per-instance theme overrides* (because each popup is a separate Window with its own theme override bag). By setting type-level entries on every popup class explicitly, upstream ensures consistent visual identity across all popup types regardless of where the popup is instantiated.
+>
+> **What this does NOT confirm:** Whether per-instance `Control.add_theme_*_override()` calls would propagate from a parent Control into a child popup. The pitfall claim is that they do NOT (per `scene/theme/theme_db.cpp` runtime resolution: popups are separate Windows; override bags don't inherit through Window boundaries). The dissection cannot prove or disprove this from upstream's data alone — it's an engine behavior; Plan 03's `theme_db.cpp` cross-reference confirms.
+>
+> **Conclusion (preliminary, refined in Plan 03):** Pitfall 1.7 is NOT refuted by upstream theming popups exhaustively at the type level — that's the *workaround*, not the disproof. The pitfall warning ("popups are separate Windows; theme overrides don't propagate") still holds for runtime per-instance overrides, which is what the warning was always about. NeoCade must follow upstream's lead: theme every popup class at the type level, NOT rely on parent Control theme overrides.
+
+
 
 
 
