@@ -202,6 +202,11 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 - Joel Chan "Outrun aesthetic deconstructed" (Medium) — surface read to articulate visual signatures
 - Steam Community Synthwave/Vaporwave/OutRun guide — surface read of forbidden visual moves
 
+**Phase 3 update (2026-05-04):**
+- `.planning/research/mood-board/INDEX.md` and `.planning/research/mood-board/references.json` — 25 URL-only or license-screened references collected across modern arcade venues, prize/ticket/counter/crane references, classic/barcade/pinball/cabinet rows, and a curated minority of future/neo/sci-fi immersive venues.
+- Representative source families now include Round1 official location/activity pages, Dave & Buster's play/events pages, Main Event games/bowling pages, Two Bit Circus, Andretti arcade, Neon Retro Arcade, Barcade, Pinball Hall of Fame, Wikimedia Commons arcade/claw categories, Internet Arcade, AREA15, Electric Playhouse, Level99, and Sandbox VR.
+- `.planning/research/PHASE-3-TOOLING.md` — Godot/Coding-Solo MCP and GoPeak availability recorded; screenshot baseline captured at `.planning/research/godot-screenshot-smoke.png`; Plan 02 image-generation path confirmed as Codex app `image_gen` via the `imagegen` skill.
+
 **What we adopted:**
 - **"Vibrant arcade hall by day, NOT neon noir alley by night" mental model** — PROJECT.md Key Decision; reinforced by ARCHITECTURE.md Section 7.
 - **Warm-neutral surface direction (Boardwalk Sunset)** — derived from the observation that real-arcade interior lighting is warm-coded (cabinet wood, painted booths, ticket-counter coral, marquee gold), not cool-coded (Tron-blue, computer-screen cyan). ARCHITECTURE.md Palette B.
@@ -210,19 +215,21 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 - **Dave & Buster's brand stack as reality check** — ARCHITECTURE.md Section 7: real arcade brands lean warm/orange-coded, not magenta/cyan synthwave-coded. Boardwalk Sunset's amber primary is anchored to this.
 - **Explicit anti-cyberpunk rules** — ARCHITECTURE.md Section 7 lists 12 forbidden moves (chromatic aberration, scanlines, grid overlays, glow halos, drop-shadow on text, monospace body, pure-black surfaces, ALL CAPS body, sci-fi terminology, "TRANSMISSION"/"SYSTEM" labels, hex-grid backgrounds, fake circuitry).
 - **Mockup-gate detection ritual** — "Could this be the menu screen of a Hotline Miami / Cyberpunk 2077 / Tron clone?" If yes → drift. (PITFALLS.md 7.1)
+- **Reference tags and constrained influence model** — Phase 3 mood-board entries use `theme-safe`, `game-world`, `palette`, `surface`, `shape`, and `risky` tags. `game-world` and `risky` references can inspire extracted moves only; they do not become the whole NeoCade mood.
+- **Two additional direction candidates grounded in references** — Prize Pop Plaza derives from prize/crane/counter/reward-loop evidence; Orbital Playdeck derives from a minority future-facing immersive-venue lane. Both remain candidates until mockup review.
 
 **What we rejected:**
 - **User's prior research report claim "Synthwave/Vaporwave Vibe — references to 1980s-90s sci-fi (Tron, synth music)"** — explicitly forbidden by PROJECT.md. Tracked in Source 8 below.
 - **Aesthetics-wiki Arcadecore palette suggestions** — wiki is broad; specific palette suggestions may include synthwave-adjacent hues. NeoCade scopes to Boardwalk Sunset / Cabinet Chrome / Midnight Marquee — three curated directions, not wiki-pick.
 - **"Arcadecore" as a brand alignment** — too internet-aesthetic-coded; NeoCade aligns with real-place-arcade (Round1/D&B), not aesthetics-fandom-arcade.
+- **Copying or embedding promotional venue imagery** — all-rights-reserved images remain URL-only research references; no venue photos are copied into distributable or committed visual assets.
 
 **What's still open (significant gap):**
-- **Curated mood-board of real reference photos** — interior shots of Round1, Dave & Buster's, Two Bit Circus, classic 80s halls (Pac-Man arcade cabinets, Galaga cabinets, Skee-Ball alleys, ticket booths, prize counters). Initial pass relied on **textual interpretation** of color brands and aesthetic-wiki entries, not photo-grade visual reference. PITFALLS.md 7.x detection rituals require side-by-side comparison against real photos at the mockup gate, but the photos haven't been collected yet.
-- **Specific design-move inventory** — what does a "ticket-stub texture cue" actually look like in StyleBoxFlat terms? What is "booth chrome" in geometric terms? What is "marquee bulb" feel without a glow primitive? These need translation from photo to StyleBox spec.
-- **Prize counter palette** — distinct from cabinet palette; teal/green-coded historically, not yet sampled.
-- **Marquee typography** — real arcade marquees use bold-condensed sans (Metro Bold, Microgramma, Eurostile derivatives) — Outfit was confirmed for v1 in Conflict 1 (revised 2026-05-04) but the visual reference for "what marquee actually looks like" wasn't curated. Phase 3 mood-board sub-spike addresses; user can compare Outfit vs Inter-only at typography mockup gate.
+- **Mockup approval** — mood-board coverage is now adequate, but final visual direction confidence cannot be HIGH until the Phase 3 concept images and boards are reviewed and approved by the user.
+- **Specific StyleBox translation** — the mood-board identifies design moves, but concrete token values for borders, fills, radii, disabled/focus states, and panel hierarchy are intentionally deferred until after finalist selection and the final mockup board.
+- **Generated concept quality** — Plan 02 must prove that the concept-design images and HTML boards can carry the reference evidence without drifting into cyberpunk, synthwave, or childish prize-room styling.
 
-**Confidence in coverage:** **MEDIUM** for written articulation of arcade-vs-cyberpunk distinction; **LOW** for visual-reference grounding. **What would raise it:** Phase 3 mood-board sub-phase — collect ~20-30 high-res reference photos before mockup production; explicitly review them against the proposed palettes A/B/C.
+**Confidence in coverage:** **MEDIUM-HIGH** for reference-source coverage after the Phase 3 mood-board; **MEDIUM** for final design certainty until user mockup approval. **What would raise it:** Complete Plan 02 concept boards, then pass the Phase 3 finalist and final approval checkpoints without anti-cyberpunk or accessibility concerns.
 
 ---
 
@@ -533,7 +540,7 @@ Of the nine sources catalogued above, four have HIGH or HIGH-MEDIUM coverage fro
 | 2 | LDtk UI docs | HIGH for v1 inspiration use after Phase 2 | Complete for v1; Phase 3 mockup decides which sketches to use |
 | 3 | LDtk source code | HIGH for v1 UI-theme research after Phase 2 | Complete for v1; non-UI internals remain out of scope |
 | 4 | Material Design 3 | HIGH | None needed |
-| 5 | Real & virtual arcade aesthetics | MEDIUM (text) / LOW (visual) | **Phase 3 sub-spike: real-arcade reference photo collection** |
+| 5 | Real & virtual arcade aesthetics | MEDIUM-HIGH source coverage / MEDIUM final design certainty | Phase 3 mood-board complete; mockup approval still pending |
 | 6 | Godot Theme docs | HIGH | None needed (re-verify via Context7 at each phase per user's global rule) |
 | 7 | Godot controls gallery | MEDIUM-HIGH | (Folded into Phase 8 showcase implementation) |
 | 8 | NeoCade-Research-Report.md | HIGH (audited) | None — correctly bounded as "challenged reference" |
@@ -541,7 +548,7 @@ Of the nine sources catalogued above, four have HIGH or HIGH-MEDIUM coverage fro
 | 10 | CROSS-PLATFORM (pending) | PENDING | Will produce its own spike-phase recommendations |
 
 Additional spike recommendations not tied to a specific source:
-- **MCP/QA tooling baseline spike** (UD-1 + GoPeak smoke test) — necessary infrastructure for Phase 9 QA harness.
+- **MCP/QA tooling baseline spike** (UD-1 + GoPeak smoke test) — Phase 3 baseline recorded in `.planning/research/PHASE-3-TOOLING.md`; direct GoPeak screenshot call remains pending until GoPeak is loaded as the active MCP server, but a programmatic screenshot fallback is proven.
 - **Accessibility QA phase** — focus stylebox audit + CVD simulation + screen-reader sanity test. Phase 9 sub-phase.
 - **Dual-renderer screenshot pass** (Forward+ vs GL Compatibility) — Phase 9 sub-phase.
 - **Fresh-install dry-run** — pre-Asset-Library submission. Phase 9 sub-phase.
