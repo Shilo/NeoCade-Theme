@@ -1,183 +1,101 @@
 ---
 phase: 1
+cycle: 2
 reviewers: [opencode]
 reviewer_models:
   opencode: deepseek/deepseek-v4-pro
-reviewed_at: 2026-05-04T17:33:12Z
+reviewed_at: 2026-05-04T18:05:00Z
 plans_reviewed:
   - 01-01-dissection-skeleton-PLAN.md
   - 01-02-per-control-enumeration-PLAN.md
   - 01-03-omission-and-pitfalls-PLAN.md
   - 01-04-coverage-delta-PLAN.md
   - 01-05-sources-md-update-PLAN.md
-high_concerns: 2
-medium_concerns: 4
+high_concerns: 0
+medium_concerns: 0
 low_concerns: 4
-overall_risk: MEDIUM
+overall_risk: LOW
+convergence_judgment: EXIT
+prior_cycle:
+  cycle: 1
+  high_concerns: 2
+  medium_concerns: 4
+  low_concerns: 4
+  overall_risk: MEDIUM
 ---
 
-# Cross-AI Plan Review — Phase 1
+# Cross-AI Plan Review — Phase 1 (Cycle 2)
 
 ## OpenCode Review (DeepSeek V4 Pro)
 
-# Cross-AI Plan Review — NeoCade Theme Phase 1
+# Cross-AI Plan Review — NeoCade Theme Phase 1 (CYCLE 2)
 
-## Summary
+## 1. Summary
 
-The 5-plan set is **thorough and largely well-designed**, with exhaustive coverage of RES-01 and DOCS-05 requirements, strong alignment with all 15 locked D-decisions, and clear acceptance criteria. However, the **Wave 1 scheduling claim is factually incorrect** — Plans 03 and 04 have hard read-dependencies on Plan 02's output despite being declared "parallel-eligible." This will cause execution failures if the three run in parallel. Two plans also embed massive verbatim document templates that assume precise line numbers in the upstream source; provenance verification (Plan 01-01 Task 1) mitigates this but doesn't fully close the gap. Overall risk: **MEDIUM** — the plans would work if executed sequentially (02 → 03 → 04) but will fail under the stated Wave-1 parallelism.
+All 6 cycle-1 concerns (2 HIGH + 4 MEDIUM) are **fully resolved** in the plan text. The re-waving is correct (01→02→[03,04]→05), line-citation validation is now a Task 3 with runtime `sed -n 'Np'` spot-checks, row counts use dynamic `grep -c` equality, the scorecard correctly pins FlatButton outside the 35-class universe, engine-source anchoring now extracts from `version.py` with a greppable `ENGINE-VERSION-CAVEAT` fallback, and the Globals `scale`/`popup_margin` rows carry explicit FORBIDDEN-in-NeoCade callouts. No new HIGH concerns. The coverage scorecard in Plan 01-04 lists 37 rows against a claimed 35-row universe (self-acknowledged, reconciled by Task 2) — polish-level, not blocking.
 
----
+## 2. Verification of Cycle-1 Fixes
 
-## Strengths
+### HIGH #1 — Wave-1 parallelism broken
+**RESOLVED.** Waves reordered: 01 (wave 0) → 02 (wave 1) → [03, 04] (wave 2) → 05 (wave 3). Plan 03 declares `depends_on: [01, 02]`; Plan 04 declares `depends_on: [01, 02]`; Plan 05 declares `depends_on: [01, 02, 03, 04]`. Task dependencies match the wave structure.
 
-- **Complete D-decision alignment**: Every locked decision D-01 through D-15 is explicitly addressed by at least one plan. D-05 (Editor-API touchpoints) gets a dedicated, highly-visible section with 13 touchpoint line citations. D-12 (omission flags) and D-13 (pitfall confirmation) are fully discharged.
-- **Three-file split (D-14/D-15) is cleanly executed**: DISSECTION.md (descriptive), COVERAGE-DELTA.md (analysis), SOURCES.md (synthesis) — each plan targets exactly one deliverable.
-- **Acceptance criteria are grep-verifiable**: Every plan specifies bash greps that can objectively verify completion. Plan 01-01's 12 structural checks, Plan 01-02's per-class row counts, Plan 01-03's pitfall-confirmation string checks — all mechanically testable without human judgment.
-- **Pitfall handling is nuanced**: Pitfall 1.1 and 1.7 sections correctly distinguish engine *behavior* from theme *response*, avoiding the RESEARCH.md Pitfalls 3/4 conflation errors. Layer A/B distinction for popup theming is precise.
-- **Active-verification audit (Plan 01-02 Task 1) re-surveys the entire 80-class surface**: This discharges the "keyword grep might miss classes" risk. The audit produces a classification table that feeds both the coverage delta and the omission cross-reference.
-- **Provenance double-check (Plan 01-01 Task 1)**: Re-hashes the live snapshot before any writes, catching stale references immediately.
-- **Threat models included per plan**: Even for research-only artifacts, STRIDE registers are present with specific threat → disposition → mitigation triples.
+### HIGH #2 — Hardcoded line citations without runtime validation
+**RESOLVED.** Plan 01-01 Task 3 validates all 12 cited line numbers against the live snapshot via `sed -n 'Np'` spot-checks, appends a `Line-citation runtime validation` stamp on success, and provides a correction path if any check fails. The verify block re-runs the same checks.
 
----
+### MED #3 — False-fail static minimum row counts
+**RESOLVED.** Plans 01-02 Tasks 2–7 all use dynamic equality: `discovery=$(grep -cE ...); enumerated=$(awk ...); test "$enumerated" -eq "$discovery"`. Zero-discovery classes require an explicit "no upstream entries" note instead of a row count.
 
-## Concerns
+### MED #4 — 38-vs-35 double-count for HSplit/VSplit
+**RESOLVED.** Plan 01-04's `<interfaces>` block states: "HSplitContainer and VSplitContainer ARE in the v1 user-facing class matrix (both rows marked YES)." The Coverage Scorecard is scoped to 35 rows; FlatButton is in a separate `## FlatButton — Type Variation Note (D-10) — OUTSIDE the 35-class scope` section. The sum invariant `themed-in-upstream + NeoCade-additive + bare-class-unthemed + container-chrome = 35` is explicitly verified in Task 2.
 
-### HIGH
+### MED #5 — Engine-source anchor weak when not a git repo
+**RESOLVED.** Plan 01-03 Task 1 extracts `major`/`minor`/`patch` from `version.py`; emits `ENGINE-VERSION-CAVEAT` only if version.py cannot confirm Godot ≥ 4.6 AND the dir is not a git repo. The acceptance criteria includes: "If NOT-A-GIT-REPO is present AND major=4 is NOT present, file MUST contain `ENGINE-VERSION-CAVEAT`."
 
-1. **Wave-1 parallelism is broken — Plan 03 and Plan 04 cannot run in parallel with Plan 02** (`01-03-omission-and-pitfalls-PLAN.md`, `01-04-coverage-delta-PLAN.md`, RESEARCH.md).
+### MED #6 — Globals `scale`/`popup_margin` missing FORBIDDEN callouts
+**RESOLVED.** Plan 01-01 Task 2's Globals table has:
+- `scale` row: `⚠ **EDSCALE-derived; FORBIDDEN in NeoCade per D-05.**`
+- `popup_margin` row: `**NeoCade note:** the 4.0 * scale term is EDSCALE-derived and forbidden in NeoCade per D-05`
+Acceptance criterion requires greppable `FORBIDDEN in NeoCade per D-05` on the `scale` row.
 
-   RESEARCH.md §"Architectural Responsibility Map" and the opening block claim:
-   > "Wave 1: Plans 2 + 3 + 4 in parallel (per-class enumeration is independent of omission analysis is independent of coverage delta)"
+## 3. New HIGH Concerns
 
-   This is false. Plan 03 Task 2 explicitly states: *"Extract the slot+state names from Plan 02's `### <ClassName>` table (column 'Slot Name' combined with 'State')"* — a hard read-dependency on Plan 02's enumeration data in DISSECTION.md. Plan 04 Task 2 says: *"Read DISSECTION.md's Active Verification Audit"* — same problem. If the executor launches Plans 02, 03, 04 in parallel as directed, Plans 03 and 04 will either fail (DISSECTION.md's per-class sections / audit table don't exist yet) or produce empty/incorrect output.
+**None.** No new HIGH concerns introduced by the cycle-1 fixes.
 
-   **Fix**: Re-wave. Options: (A) Plan 02 → Wave 1, Plans 03+04 → Wave 2, Plan 05 → Wave 3. Or (B) Keep Wave 1 but make Plans 03/04 explicitly aware: run their write-phase tasks in Wave 1, then reconciliation-phase tasks (03-Task 2, 04-Task 2) in a deferred Wave 1.1 after Plan 02 completes.
+## 4. Remaining MEDIUM Concerns
 
-2. **Plan 01-01 embeds absolute line-number assumptions into a verbatim document template** (`01-01-dissection-skeleton-PLAN.md` Task 2 action body).
+**None.** All 4 cycle-1 MEDIUMs are fully resolved; no new MEDIUMs found.
 
-   The Editor-API Touchpoints table hardcodes line numbers (e.g., *"Line 15: EditorInterface.get_editor_settings()"*, *"Line 21: EditorInterface.get_editor_scale()"*). If the user's snapshot differs from the expected 1118-line file (re-download, different ZIP extraction), these line citations will be wrong. Task 1 verifies the SHA match, but the verify checks for this document are structural (`grep -q "EditorInterface.get_editor_scale"`), not line-number-correctness checks. The string "EditorInterface.get_editor_scale" could appear anywhere in the doc and pass verification even if the cited line number is wrong.
+## 5. LOW Concerns
 
-   **Fix**: Either (A) don't pre-populate line numbers — have the executor grep for them at runtime and substitute, or (B) add a verification step after Task 2 that grep-checks at least 3 random line citations against the live file (e.g., `sed -n '21p' minimal_theme.tres | grep -q "EditorInterface.get_editor_scale"`).
+- **LOW (carry-over #7):** Plan 01-03 Task 4 uses `grep -rn` on `popup.cpp` and `window.cpp` with `2>/dev/null` — if either file doesn't exist in the user's Godot clone, Pitfall 1.7 engine evidence relies on `theme_db.cpp` alone. Non-blocking; grep won't crash.
+- **LOW (carry-over #8):** Plan 01-03 Tasks 3/4 still use `head -20` / `head -30` in engine-source greps. If focus/popup draw logic falls outside the first 20-30 matches, evidence is missed. Acceptable for initial discovery; the pitfall sections already cite specific line numbers from prior research, so the heads are confirmatory, not foundational.
+- **LOW (carry-over #9):** Plan 01-05's in-place edits on SOURCES.md require exact `old_string` matches. The plan mitigates this with `read_first` verification of current Section 1 state before any edits.
+- **LOW:** Plan 01-04's Coverage Scorecard template has 37 numbered rows (1–37) but claims a 35-class universe. The plan self-acknowledges this ("Row count is 37 — wait, that's an off-by-one") and defers exact reconciliation to Task 2. The sum-invariant verify in Task 2 will catch any genuine miscount. Not a HIGH because: (a) the plan is aware of the discrepancy, (b) Task 2's verify block enforces `themed+additive+bare+chrome=35` exactly, (c) the acceptance criteria allow 35-37 rows pre-Task-2.
+- **LOW (cycle-1 #10 — no longer a concern):** The cycle-1 concern about the awk pattern `/^### [A-Z]/` not matching `### User-facing container chrome` was based on a misunderstanding of regex — `[A-Z]` matches the single character `U`, so the pattern correctly matches. The awk script in Task 8 is sound for this document.
 
-### MEDIUM
+## 6. Risk Assessment
 
-3. **Plan 01-02 verify commands use per-class minimum row counts that could false-fail on minimally-themed classes** (`01-02-per-control-enumeration-PLAN.md`, Tasks 2-7).
+**Overall risk: LOW.** All 6 cycle-1 concerns (2 HIGH + 4 MEDIUM) are fully resolved in the plan text. No new HIGH or MEDIUM concerns found. The remaining LOWs are polish-level: grep-head truncation risk in engine-source searches, exact-string match fragility in SOURCES.md edits, and a self-acknowledged 37-vs-35 row count in the scorecard that Task 2 reconciles.
 
-   Each task's verify block uses a different `≥N` minimum (5 for buttons, 3 for labels, 4 for ranges). If upstream genuinely themes a class with fewer entries than the minimum (e.g., a container class with only 2 constant entries), the verify fails even though the enumeration is correct. The plan acknowledges *"very loose lower bound"* but doesn't handle the case where a class legitimately has 1-2 entries.
+## 7. Convergence Judgment
 
-   **Fix**: Base minimums on actual `grep -c` output from the discovery command (run the grep first, assert the row count matches that number ±0), or accept 1 as the absolute floor and only warn for count mismatches with discovery grep.
-
-4. **Plan 01-04 Scorecard has 38 rows for a supposed 35-class matrix — double-count risk** (`01-04-coverage-delta-PLAN.md` Task 1 action body).
-
-   The Coverage Scorecard preface says: *"Row count is 38 — 35 FEATURES.md classes + FlatButton (research-only D-10) + HSplitContainer + VSplitContainer (container chrome called out in D-09). FEATURES.md may already include HSplit/VSplit in its 35; verify in Task 2 and reconcile if double-counted."* This means the scorecard may overcount by 2 if HSplit/VSplit are already in FEATURES.md's 35. Task 2 addresses this, but Task 2 is gated on Plan 02's audit, which is the Wave-1 parallelism problem from Concern 1.
-
-   **Fix**: Read FEATURES.md at plan-prep time (not just at runtime) and pre-classify HSplit/VSplit into one bucket. The ambiguity is resolvable by reading the existing file — no need to defer it to Task 2.
-
-5. **Plan 01-03 engine-source anchor may be uncertain** (`01-03-omission-and-pitfalls-PLAN.md` Task 1).
-
-   The `git log -1` command may fail if the godot-master directory isn't a git repo. The plan handles this with a fallback to `stat -c %y` or `ls -la`, but a non-git directory mtime doesn't pin the engine version at all — it could be an arbitrary date. If the clone is pre-4.6, omission flags from `default_theme.cpp` will be wrong for NeoCade's actual target (Godot 4.6). The caveat note is present, but the downstream impact is that Phase 4 might build its generator from incomplete slot lists.
-
-   **Fix**: Make the engine-source anchor check mandatory — if not a git repo, require the user to run `git clone --depth 1 --branch 4.6-stable` before proceeding. OR accept the mtime but add a task to the caveat: "Before Phase 4, re-verify omission flags against tagged 4.6-stable release."
-
-6. **Globals section in DISSECTION.md references `scale` but NeoCade forgoes EDSCALE** (Plan 01-01 Task 2 document body, Globals table).
-
-   The Margins/Spacing table lists `scale` as `EditorInterface.get_editor_scale()` (line 21, D-05 forbidden). The Editor-API Touchpoints callout warns against this, but the Globals table itself doesn't mark `scale` as forbidden/upstream-only. A reader scrolling from Globals → per-class tables might see `popup_margin = maxf(base_margin * 2.4, 4.0 * scale)` and think "scale" is a NeoCade-usable convention.
-
-   **Fix**: Add a `> NeoCade note` callout on the `scale` row in the Globals table: "EDSCALE-derived; forbidden in NeoCade per D-05."
-
-### LOW
-
-7. **Plan 01-02 Task 7 references `scene/gui/popup.cpp` and `scene/main/window.cpp` for Pitfall 1.7 engine evidence** — these filenames may differ in Godot 4.x (e.g., Popup logic merged into `popup_menu.cpp`, Window at `scene/main/window.cpp`). The grep has `2>/dev/null` so it won't crash, but if files aren't found the pitfall evidence will be weaker (relying on `theme_db.cpp` only).
-
-8. **The `<interfaces>` blocks in multiple plans embed `head -20` or `head -30` in grep commands** — if relevant lines fall outside the first 20/30 matches, evidence is missed. Acceptable for initial discovery, but the pitfall sections should eventually read the full function bodies, not just early lines.
-
-9. **Plan 01-05 EDIT 1 inserts a large block between two existing bullets in SOURCES.md** — the `old_string` matched is the entire "- **NOT read in initial pass:**" bullet text. If SOURCES.md has been edited since the plan was authored (e.g., format change, additional bullets), the exact match will fail and the edit will cascade-fail. The plan's Task 1 `read_first` includes reading Section 1 to verify current state, which mitigates this.
-
-10. **Plan 01-02 Task 8's empty-section check awk script has a subtle bug**: the pattern `/^### [A-Z]/` won't match `### User-facing container chrome` (which has the word "User-facing" starting with uppercase). The `[A-Z]` character class only matches the first character, so `### User-facing...` would match `U` and trigger a false "empty section" check on the previous section. However, since container chrome is a single section and its heading starts with `### U`, it should still match the pattern correctly.
+**EXIT.** No HIGH concerns remain. The plans are ready for execution.
 
 ---
 
-## Dependency Graph (corrected)
+## Consensus Summary (single reviewer)
 
-The stated graph (from RESEARCH.md):
+Only one reviewer was invoked this cycle (OpenCode + DeepSeek V4 Pro per project config `review.models.opencode`). No cross-reviewer consensus to synthesize.
 
-```
-01 (Wave 0) → [02, 03, 04] (Wave 1, parallel) → 05 (Wave 2)
-```
+### Cycle 2 Outcome
 
-Actual dependencies (what the task bodies reveal):
+- **Cycle 1 → Cycle 2 deltas:**
+  - HIGH concerns: 2 → 0 (-2, both RESOLVED)
+  - MEDIUM concerns: 4 → 0 (-4, all RESOLVED)
+  - LOW concerns: 4 → 4 (3 carry-overs + 1 new self-acknowledged scorecard row count)
+  - Overall risk: MEDIUM → LOW
+- **Convergence verdict:** EXIT — no HIGH concerns remain; plans ready for `/gsd-execute-phase 1`.
 
-```
-01 (Wave 0)
-  ↓
-02 (Wave 1 — enumeration data created in DISSECTION.md)
-  ↓
-03 (Wave 2 — reads 02's per-class tables for slot diff; also reads 02's audit for classification)
-04 (Wave 2 — reads 02's audit table for HSplit/VSplit reconciliation)
-  ↓
-05 (Wave 3 — reads all DISSECTION.md + COVERAGE-DELTA.md)
-```
+### Carry-over LOWs (planner discretion — non-blocking)
 
-The minimum fix: keep the file-level deliverables as described but reorder execution to **02 → 03 → 04 → 05** sequentially (or 02 → [03, 04] in parallel within Wave 2, then 05 in Wave 3). Plan 02's tasks internally can be parallelized (tasks 2-7 enumerate different Control groups), but Plan 03 and 04 must not start before Plan 02 finishes.
-
----
-
-## Recommendations
-
-1. **Re-wave immediately**: Change the wave ordering to `01 (Wave 0) → 02 (Wave 1) → 03, 04 (Wave 2) → 05 (Wave 3)`. Update RESEARCH.md and each plan's `depends_on` field. Plan 03 should add `depends_on: [01, 02]`. Plan 04 should add `depends_on: [01, 02]`.
-
-2. **Make line-number citations runtime-verified**: Add a step to Plan 01-01 Task 2's verify block that grep-confirms at least 5 random Editor-API line claims against the live snapshot. Example:
-   ```bash
-   sed -n '21p' minimal_theme.tres | grep -q "EditorInterface.get_editor_scale"
-   ```
-
-3. **Read FEATURES.md at plan-authoring time for Plan 01-04**: Pre-resolve the HSplitContainer/VSplitContainer membership question by checking whether they're in the 35-class matrix now, rather than deferring to Task 2.
-
-4. **Drop minimum-row-count verify checks in Plan 01-02**: Replace `test "$n" -ge N` with a dynamic check: run the per-class discovery grep FIRST, count the lines, then assert the enumeration row count equals that number. This eliminates the false-fail risk.
-
-5. **Add runbook for missing engine source**: If `C:\Programming_Files\Godot\godot-master\scene\theme\default_theme.cpp` doesn't exist when Plan 03 executes, the plan should specify a fallback (flag the omission cross-reference as "pending engine source availability" rather than aborting the entire phase).
-
----
-
-## Risk Assessment: MEDIUM
-
-**Justification**: The plans are individually well-specified and would produce correct outputs if executed in the correct order. The Wave-1 parallelism bug (Concern #1) is the primary risk — it would cause execution crashes if the executor naively follows the RESEARCH.md wave schedule. The line-number-hardcoding risk (Concern #2) is real but partially mitigated by provenance verification. The re-waving fix is trivial (update `depends_on` arrays and reconsider the wave table). No plan contradicts any D-decision. All five ROADMAP success criteria are covered by at least one plan. Once re-waved, the plans are ready for execution.
-
----
-
-## Consensus Summary
-
-Single reviewer (OpenCode + DeepSeek V4 Pro). No cross-reviewer consensus to synthesize.
-
-### Top Concerns (priority order)
-
-1. **HIGH — Wave-1 parallelism bug**: RESEARCH.md declares Plans 02/03/04 parallel-eligible, but Plans 03 and 04 have hard read-dependencies on Plan 02's DISSECTION.md output. Re-wave to `01 → 02 → [03, 04] → 05`.
-2. **HIGH — Hardcoded line citations in Plan 01-01**: Editor-API Touchpoints table has baked-in line numbers (e.g., line 21 = `get_editor_scale()`); SHA check verifies file integrity but not line-number correctness. Add runtime line-citation grep validation.
-3. **MEDIUM — Plan 01-02 minimum row counts can false-fail** legitimately-low-entry classes; replace static minimums with dynamic discovery-grep equality assertions.
-4. **MEDIUM — Plan 01-04 Scorecard 38-row vs 35-class double-count risk** for HSplit/VSplit; resolve at plan-prep time by reading FEATURES.md, not at Task 2 runtime.
-5. **MEDIUM — Plan 01-03 engine-source provenance** when godot-master directory isn't a git repo; mtime doesn't pin engine version. Mandate `git clone --branch 4.6-stable` or flag downstream Phase 4 dependency.
-6. **MEDIUM — DISSECTION.md Globals table** lists `scale` (EDSCALE-derived) without forbidden-in-NeoCade callout; risks confusing readers per D-05.
-
-### Agreed Strengths (single reviewer)
-
-- Complete D-01..D-15 decision coverage
-- Clean three-file split per D-14/D-15
-- Grep-verifiable acceptance criteria across all five plans
-- Active-verification audit re-surveys 80-class surface (Plan 01-02 Task 1)
-- Per-plan STRIDE threat models even for research-only artifacts
-
-### Divergent Views
-
-N/A — single reviewer.
-
----
-
-## How to Incorporate
-
-To feed this review back into planning:
-
-```
-/gsd-plan-phase 1 --reviews
-```
-
-This re-runs plan generation with the REVIEWS.md feedback loaded as context. The convergence wrapper `/gsd-plan-review-convergence 1 --opencode` will auto-iterate until HIGH concerns are resolved or `max-cycles=3` is hit.
+The 3 carry-over LOWs from cycle 1 (#7 popup.cpp/window.cpp existence, #8 head -20/-30 truncation, #9 SOURCES.md exact-match fragility) and the 1 new LOW (37-vs-35 scorecard row count, self-reconciled by Task 2) are flagged for planner awareness but do NOT block convergence per the cycle-2 severity bar.
