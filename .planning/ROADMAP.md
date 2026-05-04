@@ -12,7 +12,7 @@ NeoCade is a feature-complete coverage project, not a velocity project. The jour
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Source-Dive — godot-minimal-theme `.tres` Dissection** - Line-by-line enumeration of passivestar's `.tres` to set the feature-completeness bar
+- [x] **Phase 1: Source-Dive — godot-minimal-theme `.tres` Dissection** - Line-by-line enumeration of passivestar's `.tres` to set the feature-completeness bar (completed 2026-05-04)
 - [ ] **Phase 2: Source-Dive — LDtk Source UI Mining** - Mine `C:\Programming_Files\ldtk-master\src\electron.renderer\` for polished-UI implementation patterns
 - [ ] **Phase 3: Visual Direction Mockup + Approval Gate** - 3-step approval (palette → typography → full-fidelity desktop+mobile gallery), MCP/QA tooling baseline, real-arcade reference photo collection
 - [ ] **Phase 4: Foundation — Tokens, Fonts, Icons, Scaffold + `@tool` Generator** - TokenSet single-source-of-truth, bundled fonts, bespoke icons, generator producing both `.tres` files
@@ -183,7 +183,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Source-Dive: godot-minimal-theme | 4/5 | In Progress|  |
+| 1. Source-Dive: godot-minimal-theme | 5/5 | Complete   | 2026-05-04 |
 | 2. Source-Dive: LDtk source | 0/TBD | Not started | - |
 | 3. Visual Direction Mockup + Approval Gate | 0/TBD | Not started | - |
 | 4. Foundation + `@tool` Generator | 0/TBD | Not started | - |
