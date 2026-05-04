@@ -40,9 +40,9 @@ Read these files when the topic is relevant. Do not duplicate or summarize their
 
 ## GSD Workflow
 
-Per phase, commands MUST run in order: `/gsd-discuss-phase N` → **`/gsd-plan-review-convergence N --opencode`** → `/gsd-execute-phase N` → `/gsd-verify-work`. Auto-advance suggests the next command; user types it.
+Per phase, commands MUST run in order: `/gsd-discuss-phase N` → **`/gsd-plan-review-convergence N --opencode`** → `/gsd-execute-phase N` → `/gsd-verify-work` → `/clear`. **No `/clear` within a phase.** Auto-advance suggests the next command; user types it.
 
-**`/clear` is safe between any two GSD commands** — including within a single phase (discuss → plan, plan → execute, etc.). Each GSD command commits its artifact (`DISCUSS.md`, `PLAN.md`, code, `VERIFICATION.md`) and the next command reads from disk, not from conversation context. The only thing `/clear` loses is uncommitted side comments made AFTER the last GSD command's commit. If auto-advance suggests `/clear`, take it — it's fired immediately after a commit, so nothing's at risk.
+**`/clear` rule (project-specific override of GSD default):** clear ONLY at phase boundaries — after `/gsd-verify-work` of phase N, before `/gsd-discuss-phase N+1`. NOT between discuss → plan, plan → execute, or execute → verify within the same phase. Reason: DISCUSS.md captures structured outcomes but not every conversational nuance (subtle clarifications, "yeah but really X" moments, edge cases noticed mid-discuss). Those nuances inform the next command's subagent quality. Context bloat is the lesser cost. **If auto-advance suggests `/clear` between within-phase commands, IGNORE it for this project.**
 
 **Never invoke plain `/gsd-plan-phase` or plain `/gsd-review` directly** — both are wrapped inside `/gsd-plan-review-convergence`. Running them separately duplicates work and risks state desync.
 
