@@ -2,6 +2,10 @@
 
 Authored: 2026-05-04
 
+> **For NeoCade's actual visual design (palette / typography / state-layer model / focus-ring strategy), this doc is NOT the source of truth.** Visual design lives in `.planning/research/ARCHITECTURE.md` (3 candidate palettes A/B/C with WCAG-verified hex, M3 type scale, M3 state-layer model, mockup approval workflow) and crystallizes in `.planning/DESIGN_TOKENS.md` (created by Phase 3 mockup-approval gate, consumed by Phase 4 `@tool` generator). This doc enumerates **LDtk UI patterns and rejections** — what to *consider* and what to *avoid* in Phase 3+. NeoCade adopts no LDtk values, only patterns vetted by the anti-cyberpunk filter.
+
+**See also:** `.planning/research/ARCHITECTURE.md` for NeoCade visual design · `.planning/research/MINIMAL-THEME-DISSECTION.md` for the godot-minimal-theme coverage axis · `.planning/research/SOURCES.md` §2-3 for adopt/reject synthesis · **Appendix A** at end of this doc for the Pattern → Godot Control reverse index.
+
 ## Provenance
 
 | Field | Live value |
@@ -666,3 +670,60 @@ Quality confirmations:
 - Anti-cyberpunk standalone audit result is PASS; no adopted pattern failed the filter.
 - No `.tres`, addon, theme, font, or icon asset files were edited in Phase 2.
 - Phase 2 remains research/docs only.
+
+## Appendix A: Pattern → Godot Control Reverse Index
+
+> **Purpose.** Phase 3 mockup work + Phase 5+ per-Control authoring needs to ask "which LDtk patterns inform `Button`?" or "which SCSS findings shape `Tree`?" and get a direct answer. This appendix maps every adopted pattern (HAXE-01..14, SCSS-01..10) to the user-facing Godot Controls in `MINIMAL-THEME-COVERAGE-DELTA.md`'s 37-row scorecard. CHANGELOG lessons (CHG-*) are included only where Control-specific.
+>
+> **How to use.** Find your Control in the table. The pattern IDs link back to this doc's `## UI Pattern Catalogue` (HAXE-*) and `## SCSS Chrome and Interaction Conventions` (SCSS-*) sections.
+
+| Godot Control | Pattern IDs that inform mockup + theme work |
+|---|---|
+| **Button** | HAXE-01 (semantic launchers), HAXE-08 (active/unsupported state), HAXE-10 (reset affordance), HAXE-11 (dialog button taxonomy), HAXE-14 (invalid/preview), SCSS-01 (disabled/hover/focus/active matrix), CHG-02 (pressed/loading) |
+| **CheckBox** | HAXE-08 (active/unsupported), SCSS-01 (state matrix), SCSS-08 (form required/error) |
+| **CheckButton** | HAXE-08, SCSS-01, SCSS-08 |
+| **OptionButton** | HAXE-04 (focus-trapped search), HAXE-05 (context menus), HAXE-06 (select replacement grid/list), HAXE-10 (reset/default), SCSS-03 (dense list/grid states), SCSS-08 (form state), CHG-08 (search/list-grid/icons/colors) |
+| **MenuButton** | HAXE-01 (semantic launchers), HAXE-05 (context menus), SCSS-06 (invocation target highlight) |
+| **LinkButton** | SCSS-01 (state matrix generalizes across button-family) |
+| **ColorPickerButton** | SCSS-01, SCSS-08 (form-row variants), HAXE-10 (reset) |
+| **Label / RichTextLabel** | HAXE-03 (persistent banner content), HAXE-12 (notification severity copy), CHG-13 (toast/notification distinct states) |
+| **LineEdit** | HAXE-10 (default-collapse, reset), SCSS-08 (form default/required/error/empty), CHG-15 (click traps/focus recovery) |
+| **TextEdit** | SCSS-08 (form state matrix) — code-editor surfaces explicitly rejected per HAXE-R06 |
+| **CodeEdit** | NeoCade-additive; LDtk's CodeMirror styling rejected (HAXE-R06). v1 chrome only — no syntax highlighting. |
+| **SpinBox** | HAXE-10 (reset/default), SCSS-08 (form state), CHG-15 (numeric stepper shortcuts) |
+| **Tree** | HAXE-04 (search/result rows), HAXE-06 (dense list/grid), HAXE-09 (multi-affordance dense rows), SCSS-03 (state matrix), SCSS-07 (category/context/active/overflow), SCSS-09 (thin structural markers) |
+| **ItemList** | HAXE-04, HAXE-06, HAXE-07 (palette focus + popout — surface theming only), HAXE-09, SCSS-03, SCSS-07, SCSS-09 |
+| **TabBar / TabContainer** | SCSS-02 (active tab position/weight/fill — NOT hue-only) |
+| **ProgressBar** | (No LDtk pattern directly applicable; CHG-02 informs pressed/loading-state work) |
+| **HSlider / VSlider** | (No LDtk pattern directly applicable; SCSS-01's state matrix is the closest analog) |
+| **HScrollBar / VScrollBar** | SCSS-10 (scrollbar track/thumb/hover deliberately themed) |
+| **Panel** | HAXE-03 (persistent banner variant), HAXE-12 (notification severity Panel variants), SCSS-05 (modal/dialog/panel shell grammar) — note HAXE-02 informs Panel button-link state pattern, but the singleton-open behavior is rejected (HAXE-R02) |
+| **PanelContainer** | (Chrome-only; no LDtk pattern directly applicable) |
+| **PopupMenu** | HAXE-04, HAXE-05, HAXE-06, SCSS-03, SCSS-06 (invocation target outline), SCSS-07, CHG-08 |
+| **PopupPanel** | SCSS-05 (modal/dialog/panel shell grammar) — popout *behavior* rejected (HAXE-R04); only surface styling adopted |
+| **AcceptDialog / ConfirmationDialog** | HAXE-11 (dialog button taxonomy: confirm/cancel/destructive/close), SCSS-05 (shell grammar) |
+| **FileDialog** | HAXE-11, SCSS-05 |
+| **TooltipPanel** | CHG-15 (larger tooltips), CHG-10 (tooltip readability without noise), SCSS-04 (notification quick variant — analogous treatment) |
+| **TooltipLabel** | CHG-10 |
+| **Window** | HAXE-11, SCSS-05 |
+| **MenuBar** | HAXE-01 (semantic main-panel launchers), HAXE-05, SCSS-06 |
+| **ColorPicker** | (Composite; informed by Button + LineEdit + Slider patterns above) |
+| **GraphEdit / GraphNode** | (No LDtk pattern directly applicable — LDtk has no graph-editor surface) |
+| **HSplitContainer / VSplitContainer** | (Constants-only; no LDtk pattern directly applicable) |
+| **FoldableContainer** | CHG-11 (collapsible entity properties), CHG-16 (collapsible rules panels — density via organization, not extra dividers) |
+
+**Cross-cutting patterns** (apply to every focusable Control, not Control-specific):
+- **HAXE-13** — semantic cursor / drag/drop / selected outline / focus-ring legibility (theme handles focus-ring + selected-outline; LDtk's viewport cursor *rendering* is rejected per HAXE-R03)
+- **HAXE-14** — invalid/active/in-progress states (applies to interactive Controls broadly)
+- **SCSS-01** — state taxonomy (generalizes across button-family)
+
+**Rejected patterns reference** (NOT indexed above — these are *what NOT to copy*):
+- **HAXE-R01** jQuery class-mutation implementation model — Godot Theme limitation
+- **HAXE-R02** singleton panel open/close behavior — app logic, not theme
+- **HAXE-R03** Heaps viewport cursor rendering as theme chrome — runtime concern
+- **HAXE-R04** tool-palette popout behavior — app layout logic
+- **HAXE-R05** LDtk content-domain colors as theme semantic roles — must remain reusable
+- **HAXE-R06** CodeMirror/text-editor modal styling — out of v1 Control coverage
+- **SCSS rejections** (4 rows in `### SCSS Rejections From Active Verification`) — bevel/shadow values, red-glow drama, gradient identity motifs, content-domain category colors
+
+**Patterns absent from this index** are CHG-* lessons that are control-agnostic (e.g., CHG-04 zen mode, CHG-12 Endesga32 confirmation, CHG-14 type scale principles). Read the `## CHANGELOG Lessons Learned` section directly for those.
