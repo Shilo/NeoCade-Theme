@@ -20,6 +20,7 @@ If everything else fails, this single deliverable must work: a polished, feature
 
 ### Active
 
+- [ ] **Exhaustive research & spiking is a first-class deliverable**: produce committed, dated, written research artifacts that exhaustively investigate every domain area (Godot Theme API, Control coverage, font/icon strategy, palette/typography options, accessibility math, LDtk patterns, godot-minimal-theme dissection, Material 3, real arcade visual language, identity-drift risks, distribution). Research is **mandated to challenge** the user's existing NeoCade-Research-Report.md, the NeoCade-Theme-Prototype.png, AND any pending Key Decisions in this document — and may propose overturning them with evidence. Multiple dedicated research/spike phases in the roadmap (not just one upfront pass). Findings MUST be written down before they influence design or implementation; verbal-only conclusions don't count.
 - [ ] **Feature-complete Control coverage**: every built-in Godot Control has theme styling — match godot-minimal-theme's coverage bar
 - [ ] **Dark theme v1**: single polished dark color mode (light mode deferred to v2)
 - [ ] **Universal usage**: theme works correctly in both Godot Editor and game runtime
@@ -86,10 +87,11 @@ If everything else fails, this single deliverable must work: a polished, feature
 - Web fetch / search — for LDtk patterns, arcade aesthetic research
 
 **Process discipline:**
-- Subagent-driven research at every major step (multiple parallel researchers per dimension)
+- Subagent-driven research at every major step (multiple parallel researchers per dimension) — see Research Charter section below for full mandate
 - Subagent-driven design and implementation review (separate eyes on each artifact)
 - Mockup approval gate is non-negotiable before implementation begins
 - Heavy MCP-based screenshot QA — every Control class verified visually
+- Research findings can override Pending Key Decisions; user's hard constraints cannot be overridden without explicit reconsideration (see Research Charter)
 
 ## Constraints
 
@@ -103,6 +105,51 @@ If everything else fails, this single deliverable must work: a polished, feature
 - **License**: theme intended to be open and shareable; all bundled assets must permit redistribution.
 - **Coverage bar**: every Control class in the Godot 4.6 stable docs must have appropriate theme styling — measured against godot-minimal-theme's coverage list.
 - **No runtime dependencies**: addon must work standalone (no required external libraries beyond Godot stdlib).
+
+## Research Charter
+
+**Research and spiking are first-class deliverables for this project — not background activities.** The user has explicitly mandated exhaustive subagent-driven investigation that **must challenge every prior input**, including the user's own attached research report, the prototype image, AND any decision currently sitting in this document marked as `Pending`. Research can — and should, where evidence warrants — propose a different direction.
+
+### Sources to challenge (NOT to follow)
+
+| Source | Status | What "challenge" means |
+|--------|--------|------------------------|
+| `.planning/inputs/NeoCade-Research-Report.md` | Reference, NOT source of truth | Verify every claim against current Godot 4.6 docs, real arcade reference imagery, accessibility math, and font license texts. Disagree freely. Already-flagged issues to validate: misnames theme as "VirtuCade"; recommends synthwave/scanline/glow direction; suggests pixel font for logos. |
+| `.planning/inputs/NeoCade-Theme-Prototype.png` | Reference, NOT source of truth | Visually critique. Identify what works and what reads as cyberpunk/futuristic instead of arcade. Produce alternative directions for user comparison. |
+| Any `Pending` Key Decision in this document | Defeasible | Research that surfaces strong counter-evidence may propose a reversal. The reversal must be a written recommendation with reasoning, not a silent override. |
+
+### Sources NOT subject to override (user's hard constraints)
+
+These cannot be overturned by research without explicit user reconsideration:
+
+- The theme name is **NeoCade** (not VirtuCade, not CyberCade, not anything else)
+- Aesthetic is **arcade-friendly, NOT cyberpunk** — no synthwave, no neon-noir, no dystopian
+- Theme is **HD-only** — no pixel art in the theme itself
+- Theme must be **feature-complete to godot-minimal-theme's bar** — coverage is non-negotiable
+- Theme distributes as `res://addons/neocade_theme/neocade_theme.tres`
+- Mockup approval gate is mandatory before implementation
+- Inter + Noto Sans is the **primary** font stack (research may add a tertiary display font but cannot replace the primaries)
+
+### Research workflow expectations
+
+1. **Initial parallel research pass** (in flight as of project init): 4 parallel `gsd-project-researcher` subagents covering STACK, FEATURES, ARCHITECTURE, PITFALLS — outputs in `.planning/research/`. A `gsd-research-synthesizer` produces `.planning/research/SUMMARY.md`.
+2. **Roadmap-level research/spike phases** (to be authored by `gsd-roadmapper`): the roadmap MUST include dedicated research and/or spike phases beyond the initial pass. Examples likely to appear: a deep visual-direction spike (multiple mockup variations for user comparison), a Control coverage audit spike, a font/typography validation spike, an accessibility math spike, an MCP-driven QA tooling spike. Implementation phases must be downstream of these.
+3. **Per-phase pre-planning research** (workflow-level): `gsd-phase-researcher` runs before each phase plan is written, producing a `RESEARCH.md` consumed by `gsd-planner`.
+4. **Mid-execution spikes are allowed and encouraged**: if implementation hits an unknown, the team pauses and spikes before proceeding — never guesses.
+5. **Subagent peer review at every artifact boundary**: research → review; design → review; implementation → review. Multiple sets of eyes are mandatory, not optional.
+6. **Findings are committed and dated**. Verbal/in-context conclusions are not durable and don't count as research output.
+
+### What "exhaustive" means here
+
+Concretely, "exhaustive" for this project includes (non-exhaustive list):
+
+- Reading the actual `.tres` of `passivestar/godot-minimal-theme` to enumerate its theme entries — not just describing it
+- Mining `C:\Programming_Files\ldtk-master/src/electron.renderer/` for actual UI patterns, not just looking at LDtk's website
+- Computing real WCAG contrast ratios for every proposed text-on-surface and stateful combination
+- Verifying current Godot 4.6 Theme API behavior via Context7 — not relying on training data
+- Sourcing real arcade visual references (Round1, Dave & Buster's, Two Bit Circus, classic 80s halls) and articulating what makes them visually distinct from cyberpunk
+- Producing 2+ palette options and 2+ mockup directions for user comparison, not a single "best guess"
+- Auditing the user's prior research report claim-by-claim with citation-grade verification
 
 ## Key Decisions
 
@@ -121,8 +168,10 @@ If everything else fails, this single deliverable must work: a polished, feature
 | Subagent research/review at every major step | User explicitly required exhaustive subagent-driven research and review | — Pending |
 | MCP-driven QA (Godot MCP screenshots, Context7 docs) | User explicitly required heavy MCP usage | — Pending |
 | Cyberpunk aesthetic explicitly rejected | User specified "Neo/Neon/Modern, not Cyberpunk"; arcade-friendly, not dystopian | ✓ Good |
-| Research report and prototype are inspirational refs only — NOT source of truth | User explicitly required research to challenge them. Specific critiques to enforce: theme is **NeoCade** (not VirtuCade); no synthwave/vaporwave/scanlines/glow; no pixel fonts; arcade warmth must come through stronger than the prototype shows. | — Pending |
+| Research report and prototype are inspirational refs only — NOT source of truth | User explicitly required research to challenge them. Specific critiques to enforce: theme is **NeoCade** (not VirtuCade); no synthwave/vaporwave/scanlines/glow; no pixel fonts; arcade warmth must come through stronger than the prototype shows. | ✓ Good |
 | Theme aesthetic anchor: "vibrant arcade hall by day", not "neon noir alley by night" | Concrete mental image to keep researchers/designers oriented. Bright, inviting, energetic — like walking into Round1 or Dave & Buster's, not Blade Runner. | — Pending |
+| Exhaustive research/spiking is a first-class deliverable | Research is mandated to challenge ALL prior inputs (the report, the prototype, and any Pending decision in this doc). The roadmap will include dedicated research/spike phases beyond the initial parallel pass. See Research Charter section. | ✓ Good |
+| Research can override `Pending` Key Decisions; cannot override user's hard constraints | Hard constraints (theme name, anti-cyberpunk, HD-only, full Control coverage, addon distribution path, mockup gate, Inter+Noto Sans primary) require explicit user reconsideration to change. Pending decisions are defeasible by evidence. | ✓ Good |
 
 ## Evolution
 
