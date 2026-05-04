@@ -7,7 +7,7 @@
 
 ## v1 Requirements
 
-Requirements for initial release. Each REQ-ID maps to exactly one phase in ROADMAP.md.
+Requirements for initial release. Each REQ-ID maps to exactly one primary phase in ROADMAP.md (some are cumulative across multiple phases — see Traceability section).
 
 ### Research & Spike (RES)
 
@@ -220,49 +220,134 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Phase mapping per SUMMARY.md's 11-phase plan. Updated when ROADMAP.md is created.
+Phase mapping per ROADMAP.md (which adopts SUMMARY.md's 11-phase plan verbatim). Every v1 REQ-ID maps to exactly ONE primary phase. Cumulative requirements (those whose work accrues across multiple phases) are assigned a primary phase with explicit cumulative reasoning.
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| RES-01 | Phase 1 (Source-Dive: godot-minimal-theme) | Pending |
-| RES-02 | Phase 2 (Source-Dive: LDtk source) | Pending |
-| RES-03 | Phase 3 (Mockup phase sub-spike) | Pending |
-| RES-04 | Phase 3 (MCP tooling baseline sub-spike) | Pending |
-| RES-05 | Phase 11 (Distribution sub-research) | Pending |
-| DESIGN-01..06 | Phase 3 (Visual Direction Mockup) | Pending |
-| FOUND-01..03 | Phase 4 (Foundation) | Pending |
-| FONT-01..09 | Phase 4 (Foundation) | Pending |
-| ICON-01..04 | Phase 4 (Foundation) | Pending |
-| TOKEN-01..10 | Phase 3 (DESIGN-05) + Phase 4 (FOUND-02 generator) | Pending |
-| COV-01 | Phase 5 + 6 + 7 (cumulative) | Pending |
-| COV-02 | Phase 5 (Core Controls) | Pending |
-| COV-03 | Phase 5 (Core Controls) | Pending |
-| COV-04 | Phase 6 (Lists/Layout/Range) | Pending |
-| COV-05 | Phase 6 (Lists/Layout/Range) | Pending |
-| COV-06 | Phase 7 (Dialogs/Popups/Advanced) | Pending |
-| COV-07 | Phase 5/6/7 cumulative | Pending |
-| COV-08 | Phase 7 (Dialogs/Popups/Advanced) | Pending |
-| COV-09 | Phase 5..7 cumulative; verified Phase 10 | Pending |
-| COV-10 | Phase 10 verification (RES-01 dependency) | Pending |
-| TYPEVAR-01..06 | Phase 5 + 6 | Pending |
-| MOBILE-01..08 | Phase 8 (Mobile Variant Authoring) | Pending |
-| SHOW-01..08 | Phase 9 (Showcase) | Pending |
-| EXPORT-01..08 | Phase 10 (QA + Cross-Platform Export Validation) | Pending |
-| A11Y-01..06 | Phase 10 (Accessibility QA sub-phase) | Pending |
-| QA-01..06 | Phase 10 | Pending |
-| DIST-01..05 | Phase 11 (Distribution) | Pending |
-| DOCS-01 | Phase 3 (DESIGN-05 dependency) | Pending |
-| DOCS-02 | Phase 8 (MOBILE-07 dependency) | Pending |
-| DOCS-03 | Already created (EDITOR-COVERAGE.md exists) | Complete |
-| DOCS-04 | Phase 11 (DIST-04 dependency) | Pending |
-| DOCS-05 | Phase 1 + 2 + 3 (continuous update) | Pending |
+| Requirement | Primary Phase | Cumulative Contributors | Status |
+|-------------|---------------|------------------------|--------|
+| RES-01 | Phase 1 (Source-Dive: godot-minimal-theme `.tres` dissection) | — | Pending |
+| RES-02 | Phase 2 (Source-Dive: LDtk source UI mining) | — | Pending |
+| RES-03 | Phase 3 (mood-board sub-spike) | — | Pending |
+| RES-04 | Phase 3 (MCP tooling baseline sub-spike — UD-1) | — | Pending |
+| RES-05 | Phase 11 (Asset Library policy re-verification) | — | Pending |
+| DESIGN-01 | Phase 3 (Step 1 palette mockups) | — | Pending |
+| DESIGN-02 | Phase 3 (Step 2 typography mockups) | — | Pending |
+| DESIGN-03 | Phase 3 (Step 3 desktop full-fidelity gallery) | — | Pending |
+| DESIGN-04 | Phase 3 (Step 3 mobile mockup) | — | Pending |
+| DESIGN-05 | Phase 3 (`DESIGN_TOKENS.md` finalized pre-Phase-4) | — | Pending |
+| DESIGN-06 | Phase 3 (gate enforcement) | — | Pending |
+| FOUND-01 | Phase 4 (addon directory layout) | — | Pending |
+| FOUND-02 | Phase 4 (`@tool` generator script) | — | Pending |
+| FOUND-03 | Phase 4 (empty-but-valid `.tres` scaffolds) | — | Pending |
+| FONT-01 | Phase 4 | — | Pending |
+| FONT-02 | Phase 4 | — | Pending |
+| FONT-03 | Phase 4 | — | Pending |
+| FONT-04 | Phase 4 | — | Pending |
+| FONT-05 | Phase 4 (combined `OFL.txt`) | — | Pending |
+| FONT-06 | Phase 4 (default_font + fallbacks wiring) | — | Pending |
+| FONT-07 | Phase 4 (synthetic italic policy + CHANGELOG note) | — | Pending |
+| FONT-08 | Phase 4 (font import settings) | — | Pending |
+| FONT-09 | Phase 4 (CJK exclusion + README override pattern) | — | Pending |
+| ICON-01 | Phase 4 | — | Pending |
+| ICON-02 | Phase 4 (1:1 icon-slot mapping) | — | Pending |
+| ICON-03 | Phase 4 (monochrome SVG policy) | — | Pending |
+| ICON-04 | Phase 4 (no external icon library) | — | Pending |
+| TOKEN-01 | Phase 3 (token values defined) | Phase 4 (generator implements) | Pending |
+| TOKEN-02 | Phase 3 | Phase 4 | Pending |
+| TOKEN-03 | Phase 3 (WCAG AA verification) | Phase 4 | Pending |
+| TOKEN-04 | Phase 3 (`surface.sunken` rejection) | Phase 4 | Pending |
+| TOKEN-05 | Phase 3 (radius scale) | Phase 4 | Pending |
+| TOKEN-06 | Phase 3 (spacing scale + mobile +50%) | Phase 4 | Pending |
+| TOKEN-07 | Phase 3 (stroke widths) | Phase 4 | Pending |
+| TOKEN-08 | Phase 3 (no-shadows policy) | Phase 4 (`shadow_size = -1` everywhere) | Pending |
+| TOKEN-09 | Phase 3 (M3 state-layer model) | Phase 4 | Pending |
+| TOKEN-10 | Phase 3 (M3 type scale spine) | Phase 4 | Pending |
+| COV-01 | Phase 7 (35/35 desktop coverage closes here) | Phase 5 + Phase 6 (cumulative authoring) | Pending |
+| COV-02 | Phase 5 (Core Controls — BaseButton family) | — | Pending |
+| COV-03 | Phase 5 (Core Controls — text classes) | — | Pending |
+| COV-04 | Phase 6 (range controls) | — | Pending |
+| COV-05 | Phase 6 (lists/tree/tabs) | — | Pending |
+| COV-06 | Phase 7 (popup-class as first-class types) | — | Pending |
+| COV-07 | Phase 7 (container chrome closes here) | Phase 5 (Panel) + Phase 6 (Scroll/Split/Margin) | Pending |
+| COV-08 | Phase 7 (MenuBar/ColorPicker/Graph) | — | Pending |
+| COV-09 | Phase 5 (focus-as-outer-ring pattern established) | Phase 6 + 7 (applied to every focusable Control); Phase 10 (verification) | Pending |
+| COV-10 | Phase 10 (verification against RES-01 enumeration) | Depends on Phase 1 RES-01 | Pending |
+| TYPEVAR-01 | Phase 5 (6 Button variations) | — | Pending |
+| TYPEVAR-02 | Phase 5 (5 Label variations) | — | Pending |
+| TYPEVAR-03 | Phase 5 (RichTextLabel InfoText) | — | Pending |
+| TYPEVAR-04 | Phase 5 (2 Panel variations) | — | Pending |
+| TYPEVAR-05 | Phase 5 (fonts set explicitly per variation) | Phase 6 + 7 (any variations declared in later phases follow same pattern) | Pending |
+| TYPEVAR-06 | Phase 8 (`MOBILE-DESIGN-SPEC.md` + `DESIGN_TOKENS.md` finalized with all 13 variations) | Phase 5 + 6 (variation declarations) | Pending |
+| MOBILE-01 | Phase 8 | — | Pending |
+| MOBILE-02 | Phase 8 (≥48px tap targets) | — | Pending |
+| MOBILE-03 | Phase 8 (16px body / heading parity) | — | Pending |
+| MOBILE-04 | Phase 8 (spacing +50% / radii unchanged) | — | Pending |
+| MOBILE-05 | Phase 8 (single mobile theme covers all density buckets) | — | Pending |
+| MOBILE-06 | Phase 8 (tap-target audit script) | — | Pending |
+| MOBILE-07 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Pending |
+| MOBILE-08 | Phase 8 (NeoCade identity preservation) | — | Pending |
+| SHOW-01 | Phase 9 (`res://main.tscn` as project main scene) | — | Pending |
+| SHOW-02 | Phase 9 (9 sections / 35 classes covered) | — | Pending |
+| SHOW-03 | Phase 9 (realistic sample content) | — | Pending |
+| SHOW-04 | Phase 9 (three-way theme toggle) | — | Pending |
+| SHOW-05 | Phase 9 (BBCode demo) | — | Pending |
+| SHOW-06 | Phase 9 (`accessibility_name` on every interactive Control) | — | Pending |
+| SHOW-07 | Phase 9 (Token Gallery section) | — | Pending |
+| SHOW-08 | Phase 9 (Coverage Verification strip) | — | Pending |
+| EXPORT-01 | Phase 10 (all 6 targets export) | — | Pending |
+| EXPORT-02 | Phase 10 (per-target screenshot decks) | — | Pending |
+| EXPORT-03 | Phase 10 (Web export specifics) | — | Pending |
+| EXPORT-04 | Phase 10 (GL Compatibility lock) | — | Pending |
+| EXPORT-05 | Phase 10 (CI workflow) | — | Pending |
+| EXPORT-06 | Phase 10 (Android validation; UD-5 conditional) | — | Pending |
+| EXPORT-07 | Phase 10 (iOS validation; UD-5 conditional) | — | Pending |
+| EXPORT-08 | Phase 10 (font license verification) | — | Pending |
+| A11Y-01 | Phase 10 (WCAG 2.1 AA contrast audit) | — | Pending |
+| A11Y-02 | Phase 10 (focus indicator audit) | Phase 5 (pattern), Phase 6 + 7 (applied) | Pending |
+| A11Y-03 | Phase 10 (no color-only information) | — | Pending |
+| A11Y-04 | Phase 10 (CVD simulation pass) | — | Pending |
+| A11Y-05 | Phase 10 (multi-script label test) | — | Pending |
+| A11Y-06 | Phase 10 (`accessibility_name` verification) | Phase 9 (set) | Pending |
+| QA-01 | Phase 10 (MCP/QA tooling baseline reconfirmation; also Phase 3 sub-spike for initial baseline) | Phase 3 (initial GoPeak smoke test via RES-04) | Pending |
+| QA-02 | Phase 10 (visual QA matrix) | — | Pending |
+| QA-03 | Phase 10 (Tab-walk focus audit) | — | Pending |
+| QA-04 | Phase 10 (dual-renderer screenshot pass) | — | Pending |
+| QA-05 | Phase 10 (fresh-install dry-run) | — | Pending |
+| QA-06 | Phase 10 (theme inspector workaround documented in CONTRIBUTING.md) | — | Pending |
+| DIST-01 | Phase 11 (Asset Library submission package) | — | Pending |
+| DIST-02 | Phase 11 (combined `OFL.txt`) | — | Pending |
+| DIST-03 | Phase 11 (`LICENSE.md` + `CHANGELOG.md`) | — | Pending |
+| DIST-04 | Phase 11 (README) | — | Pending |
+| DIST-05 | Phase 11 (Asset Library policy verification — closes RES-05) | — | Pending |
+| DOCS-01 | Phase 3 (`DESIGN_TOKENS.md` pre-Phase-4) | — | Pending |
+| DOCS-02 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Pending |
+| DOCS-03 | Already complete (EDITOR-COVERAGE.md exists) | — | Complete |
+| DOCS-04 | Phase 11 (README — closes DIST-04) | — | Pending |
+| DOCS-05 | Phase 1 (initial SOURCES.md update) | Phase 2 + Phase 3 (continuous update through source-dive spikes) | Pending |
 
 **Coverage:**
-- v1 requirements: 88 total
-- Mapped to phases: 88
+- v1 requirements: 99 total (RES-5, DESIGN-6, FOUND-3, FONT-9, ICON-4, TOKEN-10, COV-10, TYPEVAR-6, MOBILE-8, SHOW-8, EXPORT-8, A11Y-6, QA-6, DIST-5, DOCS-5)
+- Mapped to a primary phase: 99 (DOCS-03 already Complete pre-roadmap; remaining 98 mapped Pending)
 - Unmapped: 0 ✓
+- Cumulative requirements (assigned primary phase + documented contributors): TOKEN-01..10, COV-01, COV-07, COV-09, COV-10, TYPEVAR-05, TYPEVAR-06, A11Y-02, A11Y-06, QA-01, DOCS-05
+
+**Phase distribution (primary-phase counts):**
+- Phase 1: 2 (RES-01, plus Phase 1 contribution to DOCS-05)
+- Phase 2: 1 (RES-02)
+- Phase 3: 16 (RES-03, RES-04, DESIGN-01..06, DOCS-01, TOKEN-01..10 design definitions)
+- Phase 4: 16 (FOUND-01..03, FONT-01..09, ICON-01..04 — TOKEN-01..10 contribute as generator implementation)
+- Phase 5: 9 (COV-02, COV-03, TYPEVAR-01..05, plus Phase 5 contributions to COV-01, COV-07, COV-09)
+- Phase 6: 2 (COV-04, COV-05)
+- Phase 7: 4 (COV-06, COV-08, plus closing of COV-01, COV-07)
+- Phase 8: 10 (MOBILE-01..08, DOCS-02, TYPEVAR-06)
+- Phase 9: 8 (SHOW-01..08)
+- Phase 10: 21 (COV-10, EXPORT-01..08, A11Y-01..06, QA-01..06)
+- Phase 11: 7 (RES-05, DIST-01..05, DOCS-04)
+
+**Mockup approval gate:** Hard blocker between Phase 3 and Phase 4. No `.tres` styling commits permitted before Step 3 user approval is logged in writing.
+
+**Open user decisions (UD-1..UD-6):** Tracked in-phase per ROADMAP.md "Coverage Summary" section. None block roadmap creation.
 
 ---
 *Requirements defined: 2026-05-04*
-*Last updated: 2026-05-04 after research synthesis + independent review reconciliation*
-*Next update trigger: ROADMAP.md authoring; phase plans may surface additional requirements or move some to v1.x*
+*Last updated: 2026-05-04 after ROADMAP.md authoring — Traceability finalized to primary-phase + cumulative-contributors model*
+*Next update trigger: Phase plan authoring may surface additional requirements or move some to v1.x*
