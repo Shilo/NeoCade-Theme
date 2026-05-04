@@ -498,15 +498,64 @@ Rejection basis: phase scope.
 
 ## CHANGELOG Lessons Learned
 
-Reserved for Plan 02-04.
+LDtk's changelog contains no release dates in the local `docs/CHANGELOG.md`; citations below use version headings plus physical file lines.
+
+| ID | Version evidence | UI lesson | NeoCade implication |
+|---|---|---|---|
+| CHG-01 | `docs/CHANGELOG.md:7` | macOS `CTRL+Left click` was mapped to right-click/context menus for editing tools. | Context-menu affordances should be keyboard/mouse-accessible and not assume one desktop input convention. |
+| CHG-02 | `docs/CHANGELOG.md:18-27` | Visual feedback during async painting, app icons, neighbor-level rendering, and general UI fixes shipped as hotfix-level work. | Pressed/loading/feedback states must be explicit tokens, not decorative afterthoughts. |
+| CHG-03 | `docs/CHANGELOG.md:100-117` | Large rule panels, render toggles, expand/collapse sections, toolbar order, preview sizing, keyboard Select bounds, and right-aligned labels all received targeted fixes. | Dense tool surfaces need stable sizing, predictable toolbar hierarchy, collapsers, and form alignment. |
+| CHG-04 | `docs/CHANGELOG.md:148-153` | Zen mode hides the side interface; tool palettes gained compact grid view. | NeoCade should support compact, scan-friendly controls without binding layout behavior into the theme. |
+| CHG-05 | `docs/CHANGELOG.md:160-170` | Rule groups gained icons/colors, entity previews were refined, and integrated icon coverage expanded. | Icons and color chips can improve dense list scanning; content colors remain app data, not theme roles. |
+| CHG-06 | `docs/CHANGELOG.md:185-209` | Middle-click reset, better Select modals, custom IntGrid icons, palette search, and visibility icon fixes were user-facing improvements. | Theme coverage should include reset buttons, searchable popups, icon cells, and visible hidden/visible states. |
+| CHG-07 | `docs/CHANGELOG.md:222-234` | Layer UI colors, tile sidebar button reorganization, unfocused-window dim opt-out, context menu duplication, and popped-out palette timing were refined. | Color customization and focus/dim states are valuable, but popout behavior is app logic outside `.tres`. |
+| CHG-08 | `docs/CHANGELOG.md:264-290` | DropDown supports quick search, list/grid view, icons, and colors; tags became collapsible. | `OptionButton`, `PopupMenu`, `Tree`, and list-like controls need variants for icons, colors, search density, and expand/collapse. |
+| CHG-09 | `docs/CHANGELOG.md:315-324` | Quick search, colored entity lists, context menus, flag icons, collapsible world-panel sections, and reset button sizing were iterated. | Control states must hold up in repeated list rows, grouped panels, and small icon-button contexts. |
+| CHG-10 | `docs/CHANGELOG.md:338-343` | Tooltips and persistent help blocks were removed or reduced to reclaim working space. | NeoCade should make tooltips readable but avoid turning help/chrome into visual noise. |
+| CHG-11 | `docs/CHANGELOG.md:359-374` | Entity properties became collapsible; warnings were strengthened; opaque table visuals and rules-assistant color chips were added. | Collapsible containers, warning states, table/grid surfaces, and color swatches need clear, non-alarmist styling. |
+| CHG-12 | `docs/CHANGELOG.md:463-474` | Endesga32 was added for generated content colors and a color-blind option affected generated entity/IntGrid/enum colors; UI fixes removed borders and aligned things. | Confirmed: Endesga32 is content-data inspiration only, not NeoCade's UI palette. Accessibility options and alignment polish are the transferable lesson. |
+| CHG-13 | `docs/CHANGELOG.md:578-620` | Notifications were refreshed, errors/warnings blink once, integrated icons arrived, and Noto improved readability at 2K/4K. | Toast/notification states should be distinct; blinking/glow drama is rejected unless reduced to a single accessible attention cue. |
+| CHG-14 | `docs/CHANGELOG.md:672-706` | Toolbar hierarchy, shortcuts, Noto font, visibility of errors, and contextual help tips were reworked together. | Type scale, help affordances, toolbar colors, and error language must be designed as one system. |
+| CHG-15 | `docs/CHANGELOG.md:764-816` | Numeric stepper shortcuts, defaults, App Settings access, click traps, larger tooltips, locked backup panels, help color, and oversized-dialog scrollbars all landed in v1 UI work. | `SpinBox`, disabled/locked states, tooltip scale, scroll containers, and focus recovery are first-class theme coverage risks. |
+| CHG-16 | `docs/CHANGELOG.md:884-904`; `docs/CHANGELOG.md:942-964` | Rules panels lost clutter through context menus and fewer buttons; UI rework reduced lines/gutters, improved fields, added scaling for 4K/8K, moved buttons, and removed destructive buttons. | Density should come from organization and state clarity, not extra dividers, gutters, or always-visible destructive actions. |
 
 ## Asset Inventory
 
-Reserved for Plan 02-04.
+All assets below are inventory evidence only. NeoCade must not copy LDtk assets, bitmap fonts, Aseprite atlases, or icon shapes; Phase 3+ may use them only as interaction-density inspiration.
+
+### SVG Icons
+
+Inventory command counted `98` SVGs under `C:\Programming_Files\ldtk-master\app\assets\icons`. Metadata extraction found `93` icons with `viewBox="0 0 24 24"`, `2` with no `viewBox`, and one each with `0 0 245 240`, `0 0 384 512`, and `0 0 5 5`. Fill usage was `50 #FFFFFF`, `43 white`, `2 none`, `1 #5eab6b`, `1 #fff`, and one blank fill; only `2` SVGs declared `stroke="#fff"`.
+
+Named SVGs: `add.svg`, `alpha.svg`, `appUpdate.svg`, `arrow_down.svg`, `arrow_left.svg`, `arrow_right.svg`, `arrow_up.svg`, `autoLayer.svg`, `bug.svg`, `checkboxOff.svg`, `checkboxOn.svg`, `checker.svg`, `clear.svg`, `collapsed.svg`, `color.svg`, `community.svg`, `contextMenu.svg`, `contextMenuOpen.svg`, `copy.svg`, `cut.svg`, `delete.svg`, `deleteIcon.svg`, `discord.svg`, `doc.svg`, `down.svg`, `download.svg`, `drag.svg`, `dragAlpha.svg`, `edit.svg`, `email.svg`, `embed.svg`, `exit.svg`, `expanded.svg`, `fit.svg`, `flatten.svg`, `folder.svg`, `folderClose.svg`, `folderOpen.svg`, `fullscreen_exit.svg`, `fullscreen.svg`, `ghost.svg`, `gridOff.svg`, `gridOn.svg`, `gridView.svg`, `help.svg`, `helpBg.svg`, `history.svg`, `json.svg`, `left.svg`, `level.svg`, `link.svg`, `list.svg`, `listView.svg`, `locate.svg`, `lock.svg`, `love.svg`, `manual.svg`, `new.svg`, `offset.svg`, `open.svg`, `optional.svg`, `outOfBounds.svg`, `paste.svg`, `percent.svg`, `pick.svg`, `pickIcon.svg`, `prohibited.svg`, `random.svg`, `recall.svg`, `refresh.svg`, `rename.svg`, `reset.svg`, `right.svg`, `rule.svg`, `save.svg`, `saveAs.svg`, `search.svg`, `settings.svg`, `showDetailsOff.svg`, `showDetailsOn.svg`, `singleLayer.svg`, `slide.svg`, `stack.svg`, `stop.svg`, `toggleOff.svg`, `toggleOn.svg`, `tutorial.svg`, `unlink.svg`, `unlock.svg`, `up.svg`, `update.svg`, `warn.svg`, `web.svg`, `wizard.svg`, `world.svg`, `worldLayer_below.svg`, `worldLayer_top.svg`, `zen.svg`.
+
+Role observations: the set emphasizes direct action metaphors, directional arrows, file/folder/project operations, visibility/detail toggles, grid/list view modes, world/layer concepts, warning/help states, and social/documentation exits. Transferable principle: Godot theme states should prefer clear icon slots and compact state toggles over text-heavy chrome.
+
+Claim caution: local source search did not verify the user report's "Google Material icon library" claim. Evidence instead names internal icon attribution in `src/electron.renderer/Lang.hx:90-95`, and `app/assets/icons/ghost.svg:4` carries Font Awesome license metadata for that one icon. The changelog also attributes integrated icon tileset art to FinalBossBlues in `docs/CHANGELOG.md:610-620`.
+
+### Atlases
+
+Atlas inventory found `appElements.aseprite` and `icons.aseprite` under LDtk's atlas assets, with source usage in `src/electron.renderer/Assets.hx:23` and dictionary usage in `src/electron.renderer/AssetsDictionaries.hx:3`. These are rejected for direct adoption: Aseprite source atlases and embedded editor icon tilesets are not Godot Theme resources and carry copying/licensing risk.
+
+### Fonts
+
+Font inventory found bitmap atlas pairs for `noto_sans_display_semicondensed_extralight_90`, `noto_sans_display_semicondensed_light_30`, `noto_sans_display_semicondensed_medium_12`, `noto_sans_display_semicondensed_medium_19`, `noto_sans_display_semicondensed_semibold_15`, plus `pixel_berry` and `notes.txt`. Source usage maps Noto atlases to LDtk font roles in `src/electron.renderer/Assets.hx:16-19`.
+
+Adoptable lesson: modern arcade tooling can use a readable sans family for chrome without losing personality. Rejected: bitmap font atlases, `pixel_berry`, and any HD theme treatment that mimics pixel-art typography.
 
 ## Prior Research Report Claim Verification
 
-Reserved for Plan 02-04.
+The user-supplied report is useful as a hypothesis list, not a source of truth. Verdicts below challenge it against local LDtk evidence and current NeoCade project constraints.
+
+| Report claim | Verdict | Evidence | NeoCade decision |
+|---|---|---|---|
+| "LDtk uses Material Design SVG icons" / "Google Material icon library as LDtk does" | Not evidenced locally; exact source claim rejected. | Report lines `3`, `12`, and `98`; local icon search found plain SVG files, internal/FinalBossBlues attribution at `src/electron.renderer/Lang.hx:90-95`, Font Awesome metadata in `ghost.svg:4`, and no Google/Material source metadata for the SVG set. | Use clear icon metaphors, not LDtk's icon assets or unverified attribution. |
+| "Endesga32 palette for level tiles / project content" | Confirmed for generated content colors only. | Report line `11`; `docs/CHANGELOG.md:463-466`; `src/electron.renderer/Const.hx:104` and `:139`; `README.md:89`. | Do not use Endesga32 as NeoCade UI palette. It can inform content swatch contrast checks only. |
+| "Dark mode base with bright accents" | Broadly confirmed as LDtk-like, but non-binding. | Report lines `3` and `8`; SCSS variables and token-like colors audited in Plan 02-03. | NeoCade v1 is dark, vibrant, and arcade-hall-forward; avoid noir/synthwave drift. |
+| "Tinted sidebar/per-panel colors" | Partially true, mostly content/app semantics. | Report lines `3` and `10`; changelog layer UI color at `docs/CHANGELOG.md:222`; SCSS content-category evidence in Plan 02-03. | Use semantic state/accent tokens, not LDtk content-domain colors as global theme roles. |
+| "UI colors come from themes/custom overrides" | Overstated for LDtk. | Report line `11`; LDtk SCSS is hardcoded app chrome plus user/content color features. | NeoCade must use its own TokenSet and generated `.tres` resources. |
+| Neon glows, synthwave/cyber terms, neon-grid naming, pixel-font vibe | Rejected for v1. | Report lines `39-59`, `63-76`, `81-88`; project charter forbids cyberpunk/synthwave/neon-noir/dystopian and HD theme pixel art. | Preserve "vibrant arcade hall by day"; no scanline/glitch/cyber/noir identity language. |
+| Theme naming around VirtuCade | Refuted for the theme. | Report title line `1` and name suggestions around `81-88`; project charter says the theme name is NeoCade and VirtuCade is the consuming game. | Keep docs and deliverables named NeoCade. |
 
 ## Anti-Cyberpunk Filter Audit
 
