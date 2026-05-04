@@ -42,7 +42,39 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [ ] **FONT-06**: Theme `default_font` is Inter Variable Roman; `default_font.fallbacks = []` (empty); `default_font.allow_system_fallback = true` (Godot 4.x default — explicit set for clarity in `.tres`). Heading type variations (HeaderLarge / HeaderMedium / HeaderSmall) use Inter at `opsz=32` + heavier `wght` (700-800) via `FontVariation`, NOT a separate display font. Per Pitfall 1.2 (type variations don't inherit fonts from base type), recommend setting font ONLY on `default_font` and using `FontVariation` for heading variations — structurally avoids the inheritance bug.
 - [ ] **FONT-07**: Italic emphasis falls back to synthetic transform on Inter upright (Inter Italic deferred to v1.x per Conflict 1 revision). Body text rendering is acceptable; documented limitation in CHANGELOG.
 - [ ] **FONT-08**: Font import settings: Grayscale antialiasing, Light hinting, Auto subpixel positioning (per STACK + PITFALLS 5.5; verified for GL Compatibility renderer).
-- [ ] **FONT-09**: README documents three consumer-side font override patterns: (a) **CJK / multi-script harmony**: `default_font.fallbacks.append(preload("res://your_noto_sans_cjk.ttf"))` for designed-together cross-script rendering (Inter alone relies on system fallback for non-Latin); (b) **Code/monospace**: per-Control override on CodeEdit / RichTextLabel `[code]` with consumer's preferred mono; (c) **Italic**: synthetic transform is used in v1; consumer can preload Inter Italic Variable to upgrade. (Per UD-2, Option D, and Conflict 1 final.)
+- [ ] **FONT-09**: README documents three consumer-side font override patterns. **Opt-in fonts are NEVER bundled with NeoCade — Option D ships Inter only.** Consumers download and add what their audience needs:
+
+  **(a) Multi-script visual harmony.** Inter alone relies on Godot's `Font.allow_system_fallback=true` for non-Latin scripts. System fonts vary by OS and may clash with Inter's metrics. For consumers who care, recommend **script-specific Noto Sans variants** (NOT the generic "Noto Sans" — that mostly covers Latin/Cyrillic/Greek which Inter already handles). All OFL 1.1, designed to harmonize with Inter:
+  - Chinese Simplified — Noto Sans SC (~5 MB subset)
+  - Chinese Traditional — Noto Sans TC
+  - Japanese — Noto Sans JP
+  - Korean — Noto Sans KR
+  - Arabic — Noto Sans Arabic
+  - Hebrew — Noto Sans Hebrew
+  - Devanagari (Hindi/Marathi/Sanskrit) — Noto Sans Devanagari
+  - Bengali / Tamil / Telugu / Kannada / Malayalam / Gujarati / Punjabi — Noto Sans Bengali/Tamil/Telugu/etc.
+  - Thai / Khmer / Lao / Myanmar — Noto Sans Thai/Khmer/Lao/Myanmar
+  - Source: https://fonts.google.com/noto
+
+  Override pattern (per consuming project):
+  ```gdscript
+  var theme = preload("res://addons/neocade_theme/neocade_theme.tres").duplicate()
+  theme.default_font.fallbacks.append(preload("res://your_noto_sans_sc.ttf"))
+  # apply theme to scene root
+  ```
+
+  **(b) Code/monospace.** Per-Control override on CodeEdit / RichTextLabel `[code]`:
+  ```gdscript
+  $CodeEdit.add_theme_font_override("font", preload("res://your_jetbrains_mono.ttf"))
+  ```
+  Recommended monospace fonts (all OFL): JetBrains Mono, Fira Code, Cascadia Code, IBM Plex Mono. Consumer's choice.
+
+  **(c) Italic upgrade.** v1 uses synthetic italic transform on Inter Variable. To upgrade to true italic, preload Inter Italic Variable:
+  ```gdscript
+  theme.default_font_italic = preload("res://Inter-Italic-VariableFont.ttf")
+  ```
+
+  Per UD-2, Option D, and Conflict 1 final — none of these fonts are bundled in v1.
 
 ### Icons (ICON)
 
