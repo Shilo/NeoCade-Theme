@@ -1008,4 +1008,21 @@ These three are enumerated below as `### MenuBar`, `### Panel`, `### Window` sec
 
 ## Engine-Default Cross-Reference and Pitfall Confirmations
 
-> This section is appended by **Plan 03 (default_theme.cpp omission cross-reference + Pitfall 1.1 / 1.7 confirmation/refutation)**. Heading reserved here for ordering only.
+> Appended by **Plan 03**. Distinguishes deliberate upstream omissions (slots `default_theme.cpp` declares but `minimal_theme.tres` leaves unset) from upstream-populated coverage, and confirms/refutes Pitfalls 1.1 (focus stylebox overlay) and 1.7 (popup separate-Window theming) directly from engine + theme evidence.
+
+### Engine-Default Cross-Reference
+
+> **Purpose:** For every user-facing Control enumerated in `## Per-Control Enumeration`, this subsection identifies slots that `scene/theme/default_theme.cpp` declares but upstream chose NOT to populate. These are deliberate upstream omissions (per CONTEXT.md D-12). NeoCade may either follow upstream's omission or populate the slot — but the choice is documented here, not silently propagated.
+
+**Engine-source anchor:**
+- Path: `/c/Programming_Files/Godot/godot-master/scene/theme/default_theme.cpp`
+- Anchor: NOT-A-GIT-REPO; using directory mtime: `2026-05-01 18:12:23 -0700` (ZIP-extracted snapshot, no git metadata)
+- Detected version: `major=4 minor=7 patch=0` (status="beta") from `version.py` — **newer than the Godot 4.6 release tag NeoCade targets per `.planning/PROJECT.md`**.
+- Caveat: This snapshot is Godot 4.7-beta (a development branch ahead of NeoCade's 4.6 minimum). Most theme-slot declarations in `default_theme.cpp` are stable across 4.6 → 4.7, but a small number of newer slots may exist in 4.7-beta that are NOT present in 4.6-stable. When this matters for a specific class, it is flagged inline below as `4.7-only?`. Phase 4 (token generator) SHOULD re-verify any `4.7-only?` entries against the official `godotengine/godot@4.6-stable` release tag before incorporating them into NeoCade's TokenSet structure. The reverse risk (slots upstream populates that no longer exist in 4.6/4.7) is captured in the per-class `upstream-orphaned slots` tables when found.
+
+**Methodology:** For each user-facing Control class, ran:
+```bash
+grep -nE 'theme->set_(stylebox|color|font|icon|constant|font_size)\([^,]+, ["\x27]<Class>["\x27]' \
+  /c/Programming_Files/Godot/godot-master/scene/theme/default_theme.cpp
+```
+Compared the returned slot set to Plan 02's `### <Class>` enumeration in `## Per-Control Enumeration` above. Slots in `default_theme.cpp` NOT in Plan 02's table = upstream omission (flagged below). Slots in upstream NOT in `default_theme.cpp` = upstream-orphaned (rare, flagged in a separate table when found). The "Implication for NeoCade" column distinguishes "follow upstream — engine fallback suffices" from "populate — affects accessibility / RTL / mobile / focus".
