@@ -15,7 +15,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [ ] **RES-02**: Phase 2 source-dive spike mines LDtk source code under `C:\Programming_Files\ldtk-master\src\electron.renderer\` for UI implementation patterns (sidebar tinting, layer panel chrome, tool-button conventions, modal flow, panel collapse, context menus, status indicators); appended to SOURCES.md.
 - [ ] **RES-03**: Phase 3 sub-spike produces a curated mood-board of 20-30 high-resolution real-arcade interior reference photos (Round1 / Dave & Buster's / Two Bit Circus / classic 80s halls / cabinet imagery / ticket booth / prize counter / marquee). Saved to `.planning/research/mood-board/`.
 - [ ] **RES-04**: Phase 3 sub-spike resolves UD-1 (MCP server swap to GoPeak) with a hands-on smoke test capturing a Godot editor screenshot via `npx gopeak` and verifying input-injection works. Outcome documented; if approved, project's MCP config switches.
-- [ ] **RES-05**: Phase 11 distribution sub-research re-verifies current Godot Asset Library submission policy via Context7 MCP at submission time (do NOT rely on training-data docs). Findings noted in distribution package.
+- ~~[ ] **RES-05**: Asset Library policy re-verification~~ — **STRICKEN 2026-05-04 per Phase 11 revision.** No Asset Library submission in v1; distribution is GitHub Releases via GitHub Actions workflow only.
 
 ### Design Mockups & Approval Gate (DESIGN)
 
@@ -139,18 +139,28 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Distribution (DIST)
 
-- [ ] **DIST-01**: Asset Library submission package complete: square 128×128 PNG icon URL; README with both install paths (project theme + per-scene theme + optional editor theme); license attributions surfaced; "not an editor plugin" note; editor-leak caveat (per PITFALLS 2.2 + EDITOR-COVERAGE.md).
+- [ ] **DIST-01** (REVISED 2026-05-04): `.github/workflows/release.yml` exists. Single `workflow_dispatch` trigger with NO inputs (per PentaTile reference D-05-15). Manually triggered from Actions tab. Runs on `ubuntu-latest`. Uses `actions/checkout@v6` with `fetch-depth: 0` and `persist-credentials: true`. Job-level `permissions: contents: write`. Uses `github-actions[bot]` git identity.
 - [ ] **DIST-02**: `OFL.txt` covers Inter (the single bundled font in v1, Option D) — Reserved Font Name notice block + copyright lines.
 - [ ] **DIST-03**: `LICENSE.md` for theme code (recommend MIT or CC-BY) + initial `CHANGELOG.md` entry for v1.0.0.
-- [ ] **DIST-04**: README documents: install paths (project theme / per-scene theme / editor theme); CJK override pattern (UD-2); editor-coverage map link (EDITOR-COVERAGE.md); cross-platform support summary; mobile variant usage.
-- [ ] **DIST-05**: Asset Library current submission policy verified via Context7 MCP at submission time (NOT training data); RES-05 closes this.
+- [ ] **DIST-04** (REVISED 2026-05-04): Version commit + tag + push: workflow rewrites `addons/neocade_theme/VERSION` to new version, rewrites `CHANGELOG.md`'s `## [Unreleased]` heading to `## [<NEW_VERSION>] — <DATE>`, commits with `chore(release): v<NEW_VERSION>`, creates annotated tag `v<NEW_VERSION>`, runs `git push origin HEAD:main` + `git push origin "v<NEW_VERSION>"`.
+- [ ] **DIST-05** (REVISED 2026-05-04): Addon zip via `git archive --format=zip --prefix="neocade_theme-v<VERSION>/" -o "neocade_theme-v<VERSION>.zip" "v<VERSION>" -- addons/neocade_theme/` — only tracked files at the tagged commit, only the addon directory (PentaTile pitfall #11 — excludes `.godot/`, build artifacts, untracked).
+- [ ] **DIST-06** (NEW): Auto-version-increment from `addons/neocade_theme/VERSION` (single-line `MAJOR.MINOR.PATCH` file). Default bump: minor +1. If minor would exceed 9: major +1, minor=0. Patch always 0 (patches NOT supported by this scheme — same as PentaTile D-05-16). Sed-based rewrite preserves quote style if any.
+- [ ] **DIST-07** (NEW): CI gates run before version bump. Workflow downloads pinned `Godot_v4.6.x-stable_linux.x86_64`; runs headless project import (`godot --headless --path . --import --quit-after 2`) checking stderr for `^(ERROR|SCRIPT ERROR):` markers (PentaTile pitfall #1); opens `res://main.tscn` headless to verify showcase loads cleanly; runs any test suite present. Failure aborts release before any commits/pushes.
+- [ ] **DIST-08** (NEW): Godot Web export build. Workflow downloads matching Godot 4.6.x Web export templates (`Godot_v4.6.x-stable_export_templates.tpz`), installs them to `~/.local/share/godot/export_templates/4.6.x.stable/`, runs `godot --headless --export-release "Web" <output_dir>/index.html` against a committed `export_presets.cfg` "Web" preset (created as part of Phase 9 showcase work). Archives the resulting `index.html` + `index.wasm` + `index.pck` + `index.js` + `index.audio.worklet.js` + supporting files into `neocade_theme-showcase-web-v<VERSION>.zip`.
+- [ ] **DIST-09** (NEW): CHANGELOG slice extraction. awk-based extraction of the `[<NEW_VERSION>] — <DATE>` section from `CHANGELOG.md` into `release-notes-body.md`. Trim trailing blank lines. Fail fast (exit 1) if the slice is empty.
+- [ ] **DIST-10** (NEW): GitHub Release published via `softprops/action-gh-release@v3` (REQUIRES `ubuntu-latest` for Node 24 — PentaTile pitfall #5; do NOT pin to ubuntu-22.04). Attach BOTH `neocade_theme-v<VERSION>.zip` AND `neocade_theme-showcase-web-v<VERSION>.zip` as release assets. `body_path: release-notes-body.md`. `draft: false`, `prerelease: false`. Auth via implicit `GITHUB_TOKEN` from job-level `permissions: contents: write`.
+- [ ] **DIST-11** (NEW): `addons/neocade_theme/VERSION` exists as a single-line `MAJOR.MINOR.PATCH` file (initial value `0.1.0` or similar pre-release). This is the v1 source of truth for theme version (replaces `plugin.cfg` pattern from PentaTile — NeoCade has no `plugin.cfg` per Option D).
+- [ ] **DIST-12** (NEW): `addons/neocade_theme/OFL.txt` ships Inter's Reserved Font Name notice + copyright (single-font OFL per Option D).
+- [ ] **DIST-13** (NEW): `LICENSE.md` for theme code at addon root (recommend MIT or CC-BY).
+- [ ] **DIST-14** (NEW): `CHANGELOG.md` at repo root with a `## [Unreleased]` section pre-populated by each phase's deliverables. v1.0.0 entry will be auto-generated by the release workflow on first dispatch.
+- [ ] **DIST-15** (NEW): `export_presets.cfg` committed at repo root with a "Web" export preset configured for `main.tscn` (showcase scene). Created as part of Phase 9 showcase deliverables. Required for DIST-08 web build.
 
 ### Documentation (DOCS)
 
 - [ ] **DOCS-01**: `DESIGN_TOKENS.md` is committed before Phase 4 begins (FOUND-02 dependency); contains finalized desktop + mobile token blocks, sourced from approved Phase 3 mockups.
 - [ ] **DOCS-02**: `MOBILE-DESIGN-SPEC.md` documents every mobile delta vs desktop with concrete numbers + rationale (MOBILE-07 deliverable).
 - [ ] **DOCS-03**: `EDITOR-COVERAGE.md` (already exists; per MAJ-7 review finding) maps which Editor surfaces are themed in v1 vs which fall back to default.
-- [ ] **DOCS-04**: README.md is comprehensive: project description, install paths, usage examples, cross-platform notes, accessibility notes, license, attributions, link to GitHub repo.
+- [ ] **DOCS-04**: README.md is comprehensive: project description; **install path = "Download `neocade_theme-v<VERSION>.zip` from GitHub Releases, extract `addons/neocade_theme/` into your project's `addons/` folder"** (no Asset Library reference); usage examples (project theme + per-scene theme + optional editor theme); cross-platform notes; accessibility notes; **font override patterns** (Noto Sans for non-Latin harmony, mono for CodeEdit, Inter Italic) per FONT-09; **link to web showcase** (`neocade_theme-showcase-web-v<VERSION>.zip` from the same release — extract and serve, or "play in browser" GitHub Pages link if v1.x adds it); editor-coverage map link (EDITOR-COVERAGE.md); license; attributions; link to GitHub repo.
 - [ ] **DOCS-05**: SOURCES.md is updated by Phase 1, 2, 3 source-dive spike outputs (RES-01..03) with new findings.
 
 ## v2 Requirements
@@ -228,7 +238,7 @@ Phase mapping per ROADMAP.md (which adopts SUMMARY.md's 11-phase plan verbatim).
 | RES-02 | Phase 2 (Source-Dive: LDtk source UI mining) | — | Pending |
 | RES-03 | Phase 3 (mood-board sub-spike) | — | Pending |
 | RES-04 | Phase 3 (MCP tooling baseline sub-spike — UD-1) | — | Pending |
-| RES-05 | Phase 11 (Asset Library policy re-verification) | — | Pending |
+| ~~RES-05~~ | _STRICKEN 2026-05-04 — no AssetLib in v1_ | — | _N/A_ |
 | DESIGN-01 | Phase 3 (Step 1 palette mockups) | — | Pending |
 | DESIGN-02 | Phase 3 (Step 2 typography mockups) | — | Pending |
 | DESIGN-03 | Phase 3 (Step 3 desktop full-fidelity gallery) | — | Pending |
@@ -313,11 +323,21 @@ Phase mapping per ROADMAP.md (which adopts SUMMARY.md's 11-phase plan verbatim).
 | QA-04 | Phase 10 (dual-renderer screenshot pass) | — | Pending |
 | QA-05 | Phase 10 (fresh-install dry-run) | — | Pending |
 | QA-06 | Phase 10 (theme inspector workaround documented in CONTRIBUTING.md) | — | Pending |
-| DIST-01 | Phase 11 (Asset Library submission package) | — | Pending |
-| DIST-02 | Phase 11 (combined `OFL.txt`) | — | Pending |
-| DIST-03 | Phase 11 (`LICENSE.md` + `CHANGELOG.md`) | — | Pending |
-| DIST-04 | Phase 11 (README) | — | Pending |
-| DIST-05 | Phase 11 (Asset Library policy verification — closes RES-05) | — | Pending |
+| DIST-01 | Phase 11 (release.yml workflow scaffold) | — | Pending |
+| DIST-02 | Phase 11 (auto-version-increment from VERSION file) | — | Pending |
+| DIST-03 | Phase 11 (CI gates — headless import + showcase open) | — | Pending |
+| DIST-04 | Phase 11 (version commit + tag + push) | — | Pending |
+| DIST-05 | Phase 11 (addon zip via git archive) | — | Pending |
+| DIST-06 | Phase 11 (auto-version-increment policy) | — | Pending |
+| DIST-07 | Phase 11 (CI gates) | — | Pending |
+| DIST-08 | Phase 11 (Godot Web export build + zip) | — | Pending |
+| DIST-09 | Phase 11 (CHANGELOG slice extraction) | — | Pending |
+| DIST-10 | Phase 11 (GitHub Release publish via softprops/action-gh-release@v3) | — | Pending |
+| DIST-11 | Phase 4 (`addons/neocade_theme/VERSION` file scaffold) — set up alongside addon root files; Phase 11 reads it | — | Pending |
+| DIST-12 | Phase 4 (`OFL.txt` scaffold; Phase 11 ships it) | — | Pending |
+| DIST-13 | Phase 4 (`LICENSE.md`; Phase 11 ships it) | — | Pending |
+| DIST-14 | Phase 4 (CHANGELOG.md scaffold; populated continuously through phases; Phase 11 reads it) | — | Pending |
+| DIST-15 | Phase 9 (`export_presets.cfg` Web preset; Phase 11 uses it) | — | Pending |
 | DOCS-01 | Phase 3 (`DESIGN_TOKENS.md` pre-Phase-4) | — | Pending |
 | DOCS-02 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Pending |
 | DOCS-03 | Already complete (EDITOR-COVERAGE.md exists) | — | Complete |

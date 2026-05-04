@@ -100,7 +100,7 @@ The architecture **is** the visual design system encoded in the `.tres`. Six lay
 2. `addons/neocade_theme/fonts/` — Inter VF + Inter Italic VF + Noto Sans VF + `OFL.txt`.
 3. `addons/neocade_theme/icons/` — bespoke SVGs + `.import` sidecars.
 4. `res://main.tscn` — 9-section showcase + top bar with theme toggle.
-5. `README.md` + `LICENSE.md` + `CHANGELOG.md` — Asset Library compliance.
+5. `README.md` + `LICENSE.md` + `CHANGELOG.md` + `addons/neocade_theme/VERSION` + `.github/workflows/release.yml` — GitHub Releases distribution (no Asset Library in v1).
 
 ### Critical Pitfalls
 
@@ -224,7 +224,7 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 - **Phase 8 (NEW): Mobile Variant Authoring** — Mobile token overrides (tap targets 48px / body 16px / spacing +50%); generator outputs `neocade_mobile_theme.tres`; tap-target audit script; mobile showcase variant or toggle. Estimated 12-18 hours. Interleaved with phases 5-7 in practice (token overrides accrue as desktop entries land).
 - Phase 9: Showcase + Token Gallery + Theme Toggle — `res://main.tscn`; desktop+mobile theme toggle in addition to NeoCade↔Godot toggle.
 - **Phase 10 (NEW/EXPANDED): QA + Cross-Platform Export Validation** — Dual-renderer screenshot pass (Forward+ vs GL Compat); per-target export builds (Windows/macOS/Linux/iOS/Android/Web) with screenshot decks; CI workflow for desktop + Web targets; manual Android+iOS validation; accessibility QA (WCAG, focus stylebox audit, CVD simulation); fresh-install dry-run. Estimated 8-12 hours plus device time.
-- Phase 11: Distribution — Asset Library submission package; README with both install paths; OFL.txt attribution; Asset Library policy verification at submission time.
+- Phase 11: Distribution — GitHub Actions release workflow (modeled on Shilo/PentaTile release.yml); auto-version-bump from `addons/neocade_theme/VERSION`; CI gates (headless import + showcase open); commit/tag/push; addon zip via `git archive`; Godot Web export of showcase scene; GitHub Release publishes both zips as assets. NO Asset Library in v1.
 - **Optional buffer:** Cross-Platform Hardening Spike (4-8 hours) inserted before Phase 11 if real-device regressions surface.
 
 ### Phase 1: Source-Dive Spike — godot-minimal-theme `.tres` dissection
@@ -288,10 +288,9 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 **Estimated:** 8-12 hours plus device time.
 **Avoids:** All distribution pitfalls (9.x); all QA pitfalls (8.x); cross-platform regressions (CROSS-PLATFORM Section 1).
 
-### Phase 11: Distribution — Asset Library Submission, README, License Attribution
-**Rationale:** Final pre-ship gate. Asset Library policies may have changed since initial research; final verification at submission time.
-**Delivers:** Asset Library submission package (square 128×128 PNG icon URL, README with both install paths + editor-leak caveat + "not an editor plugin" note + license attributions surfaced); fresh-install dry-run on a clean Godot project; combined `OFL.txt` covering Inter + Outfit + Noto Sans + JetBrains Mono; `LICENSE.md` (theme code, e.g. MIT or CC-BY) + `CHANGELOG.md` initial entry.
-**Sub-research at start of phase:** Asset Library current policy verification via Context7 (do NOT rely on initial-pass docs which may be stale).
+### Phase 11: Distribution — GitHub Actions Release Workflow
+**Rationale (REVISED 2026-05-04):** Final pre-ship gate. Distribution is GitHub Releases via a single manually-triggered GitHub Actions workflow modeled on [Shilo/PentaTile release.yml](https://github.com/Shilo/PentaTile/blob/main/.github/workflows/release.yml). **No Asset Library submission in v1.**
+**Delivers:** `.github/workflows/release.yml` (workflow_dispatch, no inputs); `addons/neocade_theme/VERSION` single-line version source; auto-version-increment policy; CI gates (headless import + showcase scene open); version commit + tag + push; addon zip via `git archive`; Godot Web export of `main.tscn` packaged as `neocade_theme-showcase-web-v<VERSION>.zip`; CHANGELOG slice extraction for release body; GitHub Release published via `softprops/action-gh-release@v3` attaching both zips. Plus `OFL.txt` (Inter only per Option D), `LICENSE.md`, `CHANGELOG.md` with `[Unreleased]` section pre-populated.
 **Avoids:** Submission rejection (font license oversights, missing README sections, malformed icon).
 
 ### Optional Buffer: Cross-Platform Hardening Spike
@@ -304,10 +303,10 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 - Foundation (4) establishes the `@tool` generator and TokenSet structure — every later phase populates the one source of truth.
 - Desktop core authoring (5-7) → Mobile variant authoring/audit (8) → Showcase (9): mobile overrides depend on desktop entries existing.
 - QA + Cross-Platform Validation (10) requires both themes complete and the showcase scene ready.
-- Distribution (11) is last — packaging and Asset Library policy verification.
+- Distribution (11) is last — GitHub Actions release pipeline (CI checks → version bump → addon zip + web export → GitHub Release publish). No Asset Library in v1.
 
 ### Research Flags
-**Phases needing per-phase RESEARCH.md:** Phase 1 (godot-minimal-theme `.tres` dissection), Phase 2 (LDtk Haxe-source UI mining), Phase 3 (mockup phase — real-arcade reference photo collection + MCP tooling baseline), Phase 11 (Asset Library current policy verification at submission time).
+**Phases needing per-phase RESEARCH.md:** Phase 1 (godot-minimal-theme `.tres` dissection), Phase 2 (LDtk Haxe-source UI mining), Phase 3 (mockup phase — real-arcade reference photo collection + MCP tooling baseline). Phase 11 needs no research (GitHub Actions workflow modeled directly on PentaTile reference).
 
 **Phases with standard patterns (skip research-phase):** Phase 4 (Foundation — patterns established by FEATURES.md and CROSS-PLATFORM), Phase 5/6/7 (per-Control authoring — entry tables authoritative; only Tree and ColorPicker may want sub-research per complexity), Phase 8 (Mobile Variant Authoring — overrides driven by CROSS-PLATFORM Section 3 numerics), Phase 9 (Showcase — well-covered by FEATURES.md Section 5), Phase 10 (QA — checklist-driven from PITFALLS).
 
@@ -339,7 +338,7 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 - Real-arcade reference photos (MEDIUM-confidence visual interp) → Phase 3 mood-board sub-phase.
 - MCP screenshot tooling validated end-to-end → UD-1 + Phase 3 sub-phase.
 - Per-state-combination accessibility math (focus+hover, focus+pressed, etc.) → Phase 9 accessibility QA.
-- Asset Library policy current at submission → Phase 9 distribution sub-phase re-verifies via Context7.
+- ~~Asset Library policy current at submission~~ — **N/A 2026-05-04: no Asset Library in v1; distribution is GitHub Releases only.**
 - 4.6.x crash workarounds for inspector edits (#115500) — verify against latest 4.6 stable at start of Phase 5.
 - Cross-platform export support (all 6 targets) and mobile variant — pending CROSS-PLATFORM researcher completion.
 
