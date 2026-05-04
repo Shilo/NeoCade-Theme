@@ -14,8 +14,10 @@ must_haves:
   truths:
     - "Every .hx file under src/electron.renderer/ui/, ui/modal/, ui/palette/, and ui/vp/ receives at least a one-line entry in the File-by-File UI Index"
     - "page/Editor.hx and src/electron.renderer/tool/ are mined for chrome wiring and tool-button conventions"
-    - "At least 12 Haxe-derived adoptable UI patterns are documented with file:line citations, behavior notes, anti-cyberpunk audit notes, and non-binding NeoCade inspiration sketches where obvious"
-    - "At least 5 Haxe-derived rejected patterns are documented with file:line citations and Godot Theme portability reasoning"
+    - "Haxe mining uses a two-pass strategy: full one-line index for every target UI file, then batched deep reads only for files with concrete chrome/interaction evidence"
+    - "Index row count is verified against the target file list count; any skipped files are explicitly marked `not-ui` or `background`, never silently omitted"
+    - "Haxe-derived adoptable UI patterns are documented with file:line citations, behavior notes, anti-cyberpunk audit notes, and non-binding NeoCade inspiration sketches where obvious"
+    - "Haxe-derived rejected patterns are documented with file:line citations and Godot Theme portability reasoning"
     - "D-04: ROADMAP minimum thresholds are treated as blocking floors, not targets; Haxe mining should materially exceed 8-12 adopted patterns and 3-5 rejections where evidence supports it"
     - "D-06: Comprehensive source coverage does not promote LDtk to spec depth; the executor reads everything, adopts selectively, and writes evidence so later phases can re-check it"
     - "Every translation note uses the exact prefix `Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call.`"
@@ -67,10 +69,24 @@ Core Haxe targets:
     - Primary UI pattern, if any
     - Mining disposition: `adopt-candidate`, `rejected`, `background`, or `not-ui`
 
-    Use `rg --files` for the file list, then read files in batches. Do not skip small files; D-01 requires a comprehensive pass.
+    Use `rg --files` for the file list, with `Get-ChildItem -Recurse -Filter *.hx` as fallback. Do not skip target files; D-01 requires a comprehensive index.
+
+    Two-pass rule:
+    1. Metadata/index pass: every file in the target UI directories gets a one-line summary and disposition.
+    2. Deep-read pass: only files with concrete chrome, modal, palette, list, form, command, tool, context-menu, or interaction-state evidence are read in detail. Batch deep reads by subdirectory and stop after extracting enough line-cited evidence from a file; do not reread background/not-ui files.
+
+    Verify index completeness by comparing target file count to index row count. If they differ, add explicit rows for the missing files or explain why each is excluded from target scope.
   </action>
   <verify>
-    The index contains rows for `ui\CommandPalette.hx`, `ui\modal\ContextMenu.hx`, `ui\modal\Panel.hx`, `ui\palette\`, `ui\vp\`, `page\Editor.hx`, and at least one `tool\*.hx` file.
+    ```powershell
+    Select-String -Path .planning\research\LDTK-UI-MINING.md -SimpleMatch 'ui\CommandPalette.hx'
+    Select-String -Path .planning\research\LDTK-UI-MINING.md -SimpleMatch 'ui\modal\ContextMenu.hx'
+    Select-String -Path .planning\research\LDTK-UI-MINING.md -SimpleMatch 'ui\modal\Panel.hx'
+    Select-String -Path .planning\research\LDTK-UI-MINING.md -SimpleMatch 'ui\palette\'
+    Select-String -Path .planning\research\LDTK-UI-MINING.md -SimpleMatch 'ui\vp\'
+    Select-String -Path .planning\research\LDTK-UI-MINING.md -SimpleMatch 'page\Editor.hx'
+    Select-String -Path .planning\research\LDTK-UI-MINING.md -SimpleMatch 'tool\'
+    ```
   </verify>
   <done>
     Comprehensive file index is appended.
@@ -84,7 +100,9 @@ Core Haxe targets:
   </read_first>
   <files>.planning/research/LDTK-UI-MINING.md</files>
   <action>
-    Append at least 12 entries to `## UI Pattern Catalogue`. Each entry must include:
+    Append at least 12 Haxe-derived entries to `## UI Pattern Catalogue` if the Haxe evidence supports that many. If Haxe yields fewer, document the count and let Plan 05 decide against the combined Haxe+SCSS ROADMAP threshold; do not pad weak patterns.
+
+    Each entry must include:
     - Pattern name
     - Evidence: one or more `C:\Programming_Files\ldtk-master\...:N-M` citations
     - What LDtk does
@@ -130,7 +148,7 @@ Core Haxe targets:
     Strong candidates include behavior requiring scripting rather than Theme entries, Heaps/Electron-specific process/UI assumptions, hover-triggered popouts, bitmap/atlas-driven UI primitives, or LDtk content-domain affordances that should not become NeoCade theme spec.
   </action>
   <verify>
-    At least 5 rejected Haxe patterns are present and none are vague or uncited.
+    At least 5 rejected Haxe patterns are present unless fewer than 5 genuinely rejected Haxe patterns exist; if fewer, document the shortfall for Plan 05 combined-threshold verification.
   </verify>
   <done>
     Rejection list appended.
@@ -141,8 +159,8 @@ Core Haxe targets:
 
 <verification>
 - [ ] Haxe file-by-file index covers every required UI directory
-- [ ] At least 12 Haxe-derived adopted patterns exist
-- [ ] At least 5 Haxe-derived rejected patterns exist
+- [ ] Haxe file-by-file index row count is reconciled against target file count
+- [ ] Haxe adopted/rejected pattern counts are recorded for Plan 05 combined-threshold verification
 - [ ] Every adopted pattern includes a line citation and anti-cyberpunk note
 - [ ] Every translation note uses the mandatory prefix
 - [ ] No theme/addon files changed

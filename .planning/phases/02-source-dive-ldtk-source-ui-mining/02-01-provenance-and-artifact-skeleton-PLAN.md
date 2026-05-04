@@ -15,6 +15,8 @@ must_haves:
     - "Provenance records source root, snapshot date, LDtk version from docs/version.txt when available, no-git-metadata status, and live line/file counts"
     - "File inventory includes src/electron.renderer/**/*.hx, src/electron.renderer/ui/**/*.hx, page/Editor.hx, tool/, app.scss, docs/CHANGELOG.md, app/assets/icons/*.svg, res/atlas, and res/fonts"
     - "Method section states LDtk is loose inspiration only and every translation note must use the mandatory inspiration-sketch prefix"
+    - "PowerShell-native fallbacks are documented for every rg inventory command so execution is not blocked if ripgrep is unavailable"
+    - "Git metadata check is guarded by a .git existence check so the known no-.git snapshot is recorded cleanly"
     - "No addon, theme, .tres, font, or icon asset files are modified"
   artifacts:
     - .planning/research/LDTK-UI-MINING.md
@@ -65,18 +67,21 @@ Primary targets:
   </read_first>
   <files>(no files written)</files>
   <action>
-    Run live inventory commands and keep their outputs for Task 2:
+    Run live inventory commands and keep their outputs for Task 2. Prefer `rg` where available; if `rg` is missing, use the PowerShell fallback beside each command.
     ```powershell
     Test-Path 'C:\Programming_Files\ldtk-master'
     Get-Content -Raw 'C:\Programming_Files\ldtk-master\docs\version.txt' -ErrorAction SilentlyContinue
-    git -C 'C:\Programming_Files\ldtk-master' rev-parse --short HEAD
+    if (Test-Path 'C:\Programming_Files\ldtk-master\.git') { git -C 'C:\Programming_Files\ldtk-master' rev-parse --short HEAD } else { 'No .git directory in snapshot' }
     rg --files 'C:\Programming_Files\ldtk-master\src\electron.renderer' -g '*.hx' | Measure-Object
+    Get-ChildItem 'C:\Programming_Files\ldtk-master\src\electron.renderer' -Recurse -Filter *.hx | Measure-Object
     rg --files 'C:\Programming_Files\ldtk-master\src\electron.renderer\ui' -g '*.hx' | Measure-Object
+    Get-ChildItem 'C:\Programming_Files\ldtk-master\src\electron.renderer\ui' -Recurse -Filter *.hx | Measure-Object
     (Get-Content 'C:\Programming_Files\ldtk-master\app\assets\css\app.scss' | Measure-Object -Line).Lines
     (Get-Content 'C:\Programming_Files\ldtk-master\docs\CHANGELOG.md' | Measure-Object -Line).Lines
     rg --files 'C:\Programming_Files\ldtk-master\app\assets\icons' -g '*.svg' | Measure-Object
+    Get-ChildItem 'C:\Programming_Files\ldtk-master\app\assets\icons' -Filter *.svg | Measure-Object
     ```
-    If `git rev-parse` fails, record `No .git directory in snapshot` rather than blocking.
+    If `rg` and fallback counts disagree, record both and use the PowerShell fallback as the Windows-native verification anchor.
   </action>
   <verify>
     The LDtk root exists, `app.scss` exists, `docs/CHANGELOG.md` exists, and the Haxe/icon counts are nonzero.
@@ -94,7 +99,9 @@ Primary targets:
   </read_first>
   <files>.planning/research/LDTK-UI-MINING.md</files>
   <action>
-    Create `.planning/research/LDTK-UI-MINING.md` with:
+    Create `.planning/research/LDTK-UI-MINING.md` with the D-10 sections plus two execution-friendly additions (`File-by-File UI Index` and `SCSS Chrome and Interaction Conventions`). Add a short note in `## Scope and Method` that the order is optimized for mining flow while preserving every D-10 deliverable.
+
+    Required content:
     - Header: `# LDtk UI Mining`
     - Authored date: `2026-05-04`
     - Provenance table using Task 1 live values
@@ -117,7 +124,7 @@ Primary targets:
   <verify>
     ```powershell
     Select-String -Path .planning\research\LDTK-UI-MINING.md -Pattern '# LDtk UI Mining'
-    Select-String -Path .planning\research\LDTK-UI-MINING.md -Pattern 'Inspiration sketch - Phase 3 mockup or Phase 5\+ designer''s call\.'
+    Select-String -Path .planning\research\LDTK-UI-MINING.md -SimpleMatch "Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call."
     Select-String -Path .planning\research\LDTK-UI-MINING.md -Pattern '## UI Pattern Catalogue'
     Select-String -Path .planning\research\LDTK-UI-MINING.md -Pattern '## Phase 2 Verification Log'
     ```
@@ -145,4 +152,3 @@ Primary targets:
 <output>
 After completion, create `.planning/phases/02-source-dive-ldtk-source-ui-mining/02-01-SUMMARY.md` with provenance values recorded, any source files missing, and confirmation that no theme files were touched.
 </output>
-

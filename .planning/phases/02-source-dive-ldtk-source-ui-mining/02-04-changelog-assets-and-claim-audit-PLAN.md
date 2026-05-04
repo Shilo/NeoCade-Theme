@@ -2,9 +2,10 @@
 phase: 02-source-dive-ldtk-source-ui-mining
 plan: 04
 type: execute
-wave: 1
+wave: 3
 depends_on:
   - 01
+  - 03
 files_modified:
   - .planning/research/LDTK-UI-MINING.md
 autonomous: true
@@ -15,6 +16,7 @@ must_haves:
     - "docs/CHANGELOG.md is audited end-to-end for UI-relevant additions, reworks, removals, and fixes"
     - "CHANGELOG lessons are recorded with version/date context when available and categorized by chrome, modal, icon, interaction, focus/accessibility, typography, palette/list, or panel organization"
     - "app/assets/icons/*.svg inventory covers all SVG icons and summarizes silhouette/stroke/fill conventions without copying designs"
+    - "SVG icon inventory uses batch XML metadata extraction for viewBox/fill/stroke/stroke-width/stroke-linecap/stroke-linejoin, with visual judgments limited unless icons are actually rendered"
     - "res/atlas and res/fonts are catalogued, with bitmap fonts and Aseprite atlases rejected or marked non-adoptable as required"
     - "LDtk-specific claims in the user's prior research report are confirmed, refuted, or marked not-evidenced with citations"
     - "Material Design icon and Endesga32 claims are explicitly handled"
@@ -58,6 +60,11 @@ Targets:
   <action>
     Read CHANGELOG.md end-to-end. Extract only UI-relevant entries and append them under `## CHANGELOG Lessons Learned`.
 
+    Filter heuristic:
+    - Include entries about panels, modals, context menus, icons, forms, palettes, list/search behavior, focus, layout, editor chrome, sidebars, buttons, tooltip/help surfaces, or visual rendering of UI.
+    - Exclude parser/exporter/file-format/data-model entries unless they explicitly affect the visible editor UI.
+    - When uncertain, include with `[tentative UI relevance]` rather than silently skipping.
+
     For each lesson include:
     - Version/date if available from surrounding heading
     - Category: chrome, modal, icon, interaction, focus/accessibility, typography, palette/list, panel organization
@@ -84,16 +91,32 @@ Targets:
   </read_first>
   <files>.planning/research/LDTK-UI-MINING.md</files>
   <action>
+    First run a batch metadata pass for SVG files instead of reading every SVG manually:
+    ```powershell
+    Get-ChildItem 'C:\Programming_Files\ldtk-master\app\assets\icons' -Filter *.svg | ForEach-Object {
+      $raw = Get-Content -Raw $_.FullName
+      [pscustomobject]@{
+        Name = $_.Name
+        ViewBox = ([regex]::Match($raw, 'viewBox="([^"]+)"').Groups[1].Value)
+        Fill = ([regex]::Match($raw, 'fill="([^"]+)"').Groups[1].Value)
+        Stroke = ([regex]::Match($raw, 'stroke="([^"]+)"').Groups[1].Value)
+        StrokeWidth = ([regex]::Match($raw, 'stroke-width="([^"]+)"').Groups[1].Value)
+        StrokeLinecap = ([regex]::Match($raw, 'stroke-linecap="([^"]+)"').Groups[1].Value)
+        StrokeLinejoin = ([regex]::Match($raw, 'stroke-linejoin="([^"]+)"').Groups[1].Value)
+      }
+    }
+    ```
+
     Append `## Asset Inventory` content:
     - Count and list all SVG icons by filename, dimensions/viewBox if cheaply extractable, and likely role.
-    - Summarize visible SVG design conventions: stroke/fill discipline, simple silhouettes, corner/end-cap style, color usage, consistency risks.
+    - Summarize SVG design conventions from XML metadata: stroke/fill discipline, simple silhouettes where filename/path evidence supports it, corner/end-cap style, color usage, consistency risks. If icons are not rendered, explicitly write that visual silhouette judgment is limited to metadata/file-name inspection.
     - Record `res/atlas` files and mark them sprite-sheet source, not directly adoptable for NeoCade.
     - Record `res/fonts` files and re-confirm bitmap atlas font rejection under Pitfall 5.4 / HD-only / Inter-only v1 rules.
 
     Do not copy SVG path data into the doc. Cite filenames and short, human-readable observations only.
   </action>
   <verify>
-    Asset inventory mentions the observed SVG icon count, `appElements.aseprite`, `icons.aseprite`, `pixel_berry`, and Noto Sans bitmap atlas files.
+    Asset inventory mentions the observed SVG icon count, SVG metadata extraction, `appElements.aseprite`, `icons.aseprite`, `pixel_berry`, and Noto Sans bitmap atlas files.
   </verify>
   <done>
     Asset inventory appended.
@@ -146,4 +169,3 @@ Targets:
 <output>
 After completion, create `.planning/phases/02-source-dive-ldtk-source-ui-mining/02-04-SUMMARY.md` with CHANGELOG lesson count, asset counts, and claim-verification verdicts.
 </output>
-

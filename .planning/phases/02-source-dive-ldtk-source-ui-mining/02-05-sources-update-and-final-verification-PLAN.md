@@ -2,7 +2,7 @@
 phase: 02-source-dive-ldtk-source-ui-mining
 plan: 05
 type: execute
-wave: 2
+wave: 4
 depends_on:
   - 02
   - 03
@@ -19,6 +19,8 @@ must_haves:
     - "LDTK-UI-MINING.md final verification log proves roadmap thresholds: at least 8-12 adopted patterns and 3-5 rejected patterns, with counts from the live document"
     - "Every adopted pattern has file:line evidence and anti-cyberpunk audit language"
     - "Every translation note uses the mandatory inspiration-sketch prefix"
+    - "Standalone Anti-Cyberpunk Filter Audit section is populated by compiling per-pattern anti-cyberpunk notes, or it explicitly records that no adopted pattern failed the filter"
+    - "Open Questions section is populated with unresolved Phase 3+ design questions, or explicitly closed with `None`"
     - "D-11: SOURCES.md updates are mandatory Phase 2 output; Section 2 and Section 3 must be updated in place, and Section 8 must receive a narrow LDtk-claim verification note where applicable"
     - "D-13: Any translation sketches summarized into SOURCES.md stay explicitly inspiration-grade and do not become binding design-token or implementation specifications"
     - "SOURCES.md Section 2 (LDtk UI docs) and Section 3 (LDtk source) are updated in place with Phase 2 findings and cross-links to LDTK-UI-MINING.md"
@@ -66,18 +68,44 @@ Finalize the Phase 2 research artifact, run threshold/quality verification, and 
     - Confirmation that every translation note uses `Inspiration sketch - Phase 3 mockup or Phase 5+ designer's call.`
     - Confirmation that no `.tres`/addon files were touched
 
-    If any threshold is under ROADMAP minimum, stop and add a `BLOCKED` note instead of proceeding to SOURCES.md.
+    If any ROADMAP threshold is under minimum, write `BLOCKED` to the verification log, create the SUMMARY.md with the blocking reason, and skip Tasks 2-5. Do not update SOURCES.md with incomplete confidence claims.
   </action>
   <verify>
     Verification log includes counts and shows adopted patterns >= 8, rejected patterns >= 3, and no addon-touch confirmation.
   </verify>
   <done>
-    `LDTK-UI-MINING.md` finalized or explicitly blocked.
+    If thresholds pass, `LDTK-UI-MINING.md` verification log is finalized. If thresholds fail, the plan stops with a BLOCKED note and no SOURCES.md edits.
   </done>
 </task>
 
 <task type="auto">
-  <name>Task 2: Update SOURCES.md Section 2 and Section 3 with LDtk findings</name>
+  <name>Task 2: Compile standalone Anti-Cyberpunk Filter Audit and Open Questions sections</name>
+  <read_first>
+    - .planning/research/LDTK-UI-MINING.md
+  </read_first>
+  <files>.planning/research/LDTK-UI-MINING.md</files>
+  <action>
+    Populate `## Anti-Cyberpunk Filter Audit` by compiling a table from every adopted pattern:
+    - Pattern name
+    - Source section
+    - Filter result: pass / rejected
+    - Reason it does not pull NeoCade toward synthwave, neon-noir, dystopian, scanline, glitch, fake-circuit, or cyberpunk visual language
+
+    Then populate `## Open Questions`:
+    - Scan the artifact for `open`, `Phase 3`, `designer's call`, `defer`, `unknown`, and translation notes.
+    - Lift unresolved design questions into bullets with downstream owner (Phase 3, Phase 4, Phase 5+, or v1.x).
+    - If no unresolved questions remain, write exactly: `None - all LDtk patterns were either resolved, rejected, or marked as non-binding inspiration.`
+  </action>
+  <verify>
+    `LDTK-UI-MINING.md` contains non-empty content under `## Anti-Cyberpunk Filter Audit` and `## Open Questions`.
+  </verify>
+  <done>
+    Standalone audit and open-question sections are populated or explicitly closed.
+  </done>
+</task>
+
+<task type="auto">
+  <name>Task 3: Update SOURCES.md Section 2 and Section 3 with LDtk findings</name>
   <read_first>
     - .planning/research/SOURCES.md Sections 2 and 3
     - .planning/research/LDTK-UI-MINING.md final verification log
@@ -92,7 +120,8 @@ Finalize the Phase 2 research artifact, run threshold/quality verification, and 
       - atlas conventions
       - CHANGELOG end-to-end
       - prior-report claim verification
-    - Raise confidence to HIGH only if all four are closed; otherwise choose MEDIUM-HIGH or honest lower confidence with remaining items.
+    - Raise confidence to HIGH only if all four are closed.
+    - If any of the four remain open, treat that as a phase-blocking issue: add a BLOCKED note to `02-05-SUMMARY.md`, do not claim Phase 2 complete, and set Section 3 confidence no higher than MEDIUM-HIGH with the remaining open item named.
 
     Preserve existing SOURCES.md structure and avoid editing unrelated sections.
   </action>
@@ -100,19 +129,19 @@ Finalize the Phase 2 research artifact, run threshold/quality verification, and 
     Section 3 contains `LDTK-UI-MINING.md`, Phase 2 date, adopted/rejected summaries, and an updated confidence line.
   </verify>
   <done>
-    SOURCES.md Sections 2 and 3 updated.
+    SOURCES.md Sections 2 and 3 updated, or the phase is blocked with the unclosed item named.
   </done>
 </task>
 
 <task type="auto">
-  <name>Task 3: Update SOURCES.md Section 8 for LDtk-related prior-report claim results</name>
+  <name>Task 4: Update SOURCES.md Section 8 for LDtk-related prior-report claim results</name>
   <read_first>
     - .planning/research/SOURCES.md Section 8
     - LDTK-UI-MINING.md prior-report claim verification table
   </read_first>
   <files>.planning/research/SOURCES.md</files>
   <action>
-    Append a targeted Phase 2 note to Section 8 for LDtk-specific claims only. Include:
+    Add a `### Phase 2 LDtk Claim Verification` subsection under Section 8 for LDtk-specific claims only. Include:
     - Material Design SVG icons verdict
     - Endesga32 verdict
     - Any additional LDtk claim verdicts
@@ -129,7 +158,7 @@ Finalize the Phase 2 research artifact, run threshold/quality verification, and 
 </task>
 
 <task type="auto">
-  <name>Task 4: Run final no-theme-touch and documentation verification</name>
+  <name>Task 5: Run final no-theme-touch and documentation verification</name>
   <read_first>
     - git status
     - .planning/research/LDTK-UI-MINING.md

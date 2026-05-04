@@ -2,9 +2,10 @@
 phase: 02-source-dive-ldtk-source-ui-mining
 plan: 03
 type: execute
-wave: 1
+wave: 2
 depends_on:
   - 01
+  - 02
 files_modified:
   - .planning/research/LDTK-UI-MINING.md
 autonomous: true
@@ -16,7 +17,9 @@ must_haves:
     - "SCSS chrome conventions are documented with selector line ranges for panels, buttons/tool buttons, modal/dialog surfaces, context menus, palette/list surfaces, focus/hover/active states, and scroll/status affordances where present"
     - "Active verification grep audit covers gradients, shadow declarations, transition/animation, focus, hover, active, selected, disabled, collapsed, modal, context-menu, and panel selectors"
     - "SCSS-derived findings are framed as inspiration only and do not promote LDtk numeric values into NeoCade binding tokens"
-    - "At least 8 SCSS-derived patterns or confirmations are appended with line citations"
+    - "At least 8 SCSS-derived patterns or confirmations are appended with line citations, split across at least 4 chrome/layout findings and at least 4 interaction-state findings where evidence exists"
+    - "Active verification output is grouped by hit category rather than dumped as raw rg output"
+    - "Forbidden cyberpunk-term sniff includes ARCHITECTURE Section 7 terms such as scanline, aberration, glitch, hex-grid, circuitry, TRANSMISSION, and SYSTEM"
     - "Any cyberpunk-adjacent or non-portable visual move is rejected explicitly"
   artifacts:
     - .planning/research/LDTK-UI-MINING.md (appended)
@@ -79,6 +82,12 @@ Main stylesheet:
   <action>
     Append at least 8 SCSS-derived findings under `## SCSS Chrome and Interaction Conventions`.
 
+    Distribution target:
+    - At least 4 chrome/layout findings (panel, modal, context-menu, list/palette, form, toolbar, status/banner, scroll surfaces)
+    - At least 4 interaction-state findings (hover, focus, active/pressed, selected, disabled, collapsed/expanded, warning/error/success)
+
+    If the evidence cannot support that split, document the shortfall explicitly for Plan 05 verification.
+
     Each finding must include:
     - Selector or convention name
     - `app.scss:N-M` citation
@@ -107,16 +116,18 @@ Main stylesheet:
     Run an active grep audit with patterns including:
     ```powershell
     rg -n "gradient|box-shadow|text-shadow|filter|transition|animation|focus|hover|active|selected|disabled|collapsed|modal|context|palette|panel|button|scroll|warning|error|success" 'C:\Programming_Files\ldtk-master\app\assets\css\app.scss'
+    rg -n "scanline|aberration|glitch|hex-grid|circuit|cyber|noir|TRANSMISSION|SYSTEM" 'C:\Programming_Files\ldtk-master\app\assets\css\app.scss'
     ```
 
     Append an `Active Verification Audit` subsection under `## Phase 2 Verification Log` listing:
     - Patterns searched
-    - Any high-value hits not already covered
+    - Hit categories and approximate hit density
+    - Any high-value hits not already covered, grouped by category
     - Any rejected visual moves, especially shadows/glow/gradient usage that would conflict with NeoCade v1 constraints
     - Confirmation that the SCSS pass went beyond lines 1-24
   </action>
   <verify>
-    The verification log contains the phrase `Active Verification Audit` and mentions gradients, shadows, focus, hover, selected, disabled, collapsed, modal, context, panel, and button searches.
+    The verification log contains the phrase `Active Verification Audit` and mentions gradients, shadows, focus, hover, selected, disabled, collapsed, modal, context, panel, button, and forbidden cyberpunk-term searches.
   </verify>
   <done>
     Active verification audit appended.
@@ -141,4 +152,3 @@ Main stylesheet:
 <output>
 After completion, create `.planning/phases/02-source-dive-ldtk-source-ui-mining/02-03-SUMMARY.md` with SCSS line ranges read, findings count, rejection count, and active-verification notes.
 </output>
-
