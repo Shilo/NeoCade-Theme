@@ -156,6 +156,8 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [ ] **DIST-15** (NEW): `export_presets.cfg` committed at repo root with a "Web" export preset configured for `main.tscn` (showcase scene). Created as part of Phase 9 showcase deliverables. Required for DIST-08 web build.
 - [ ] **DIST-16** (NEW): GitHub Pages deployment of the Web build. Workflow uses `actions/upload-pages-artifact@v3` (upload the web export directory as a Pages artifact) followed by `actions/deploy-pages@v4` (deploy to the `github-pages` environment). Adds `pages: write` and `id-token: write` to the workflow's `permissions` block. **One-time repo-side setup required** (manual): GitHub repo settings → Pages → Source = "GitHub Actions". Once configured, every release auto-deploys to `https://<owner>.github.io/<repo>/`. The release zip (DIST-08) remains as the offline/archive artifact; Pages provides the "click and play" link surfaced in README and release notes.
 - [ ] **DIST-17** (NEW): README + release notes include the GitHub Pages "Try the showcase in your browser" link (`https://<owner>.github.io/<repo>/`). Link surfaced in README's intro section + auto-included in CHANGELOG `[Unreleased]` template so each release body shows it.
+- [ ] **DIST-18** (NEW): COOP/COEP service worker verification on the deployed Pages URL. Godot 4.x Web export uses `SharedArrayBuffer` which requires `Cross-Origin-Opener-Policy: same-origin` + `Cross-Origin-Embedder-Policy: require-corp` headers. GitHub Pages cannot set custom HTTP headers, so Godot's `coi-serviceworker.js` (shipped by the web export template) must be registered and active. **Acceptance test:** load the deployed Pages URL in Chrome DevTools console, evaluate `crossOriginIsolated`, must be `true`. Phase 9 export preset must have `head_include` set so the service worker is registered. Phase 10 cross-platform validation includes this check.
+- [ ] **DIST-19** (NEW): Repository visibility check before Phase 11 ships. GitHub Pages free tier requires PUBLIC repo. If repo is private, requires GitHub Pro / Team / Enterprise — surface as a UD if user's plan status is unknown when Phase 11 starts.
 
 ### Documentation (DOCS)
 
@@ -342,6 +344,8 @@ Phase mapping per ROADMAP.md (which adopts SUMMARY.md's 11-phase plan verbatim).
 | DIST-15 | Phase 9 (`export_presets.cfg` Web preset; Phase 11 uses it) | — | Pending |
 | DIST-16 | Phase 11 (GitHub Pages deployment of web build) | — | Pending |
 | DIST-17 | Phase 11 (README + release notes link to Pages URL) | — | Pending |
+| DIST-18 | Phase 9 (head_include export preset) + Phase 10 (deploy verification — `crossOriginIsolated===true`) | — | Pending |
+| DIST-19 | Phase 11 prerequisite (repo public OR user has Pro+ plan) | — | Pending — confirm repo visibility |
 | DOCS-01 | Phase 3 (`DESIGN_TOKENS.md` pre-Phase-4) | — | Pending |
 | DOCS-02 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Pending |
 | DOCS-03 | Already complete (EDITOR-COVERAGE.md exists) | — | Complete |
