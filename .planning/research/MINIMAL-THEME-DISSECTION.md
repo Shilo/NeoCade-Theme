@@ -915,6 +915,89 @@ These three are enumerated below as `### MenuBar`, `### Panel`, `### Window` sec
 >
 > **Conclusion (preliminary, refined in Plan 03):** Pitfall 1.7 is NOT refuted by upstream theming popups exhaustively at the type level — that's the *workaround*, not the disproof. The pitfall warning ("popups are separate Windows; theme overrides don't propagate") still holds for runtime per-instance overrides, which is what the warning was always about. NeoCade must follow upstream's lead: theme every popup class at the type level, NOT rely on parent Control theme overrides.
 
+### ColorPicker
+
+**Gloss:** Godot's `ColorPicker` Control — compound widget with hue/saturation pickers, RGB/HSV/RAW sliders, color samples, eyedropper. Editor uses extensively; games use less commonly.
+
+**Upstream entry count:** 3 total set_* calls (3 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| stylebox | sample_focus | focus (sample swatch) | local `sb` (line 521-523: `base_sb.duplicate()`, `draw_center = false`, `_set_border(sb, color_mono * Color(1,1,1,0.3), 1)`) | transparent fill, 1-EDSCALE white-30%-alpha border | 525, 521-523 |
+| stylebox | picker_focus_rectangle | focus (picker square) | same `sb` as sample_focus | (same) | 526, 521-523 |
+| stylebox | picker_focus_circle | focus (picker circle) | local `sb = sb.duplicate()` from sample_focus, `set_corner_radius_all(int(256 * scale))`, `set_corner_detail(int(32 * scale))` (lines 528-530) | (same border/fill, fully circular at 256 EDSCALE corner radius with 32-detail subdivision) | 532, 528-530 |
+
+**Per-class notes:**
+- ONLY 3 styleboxes set — all are FOCUS-state overlays (transparent fill, light border). Upstream relies on engine defaults for the actual color picker visuals (the saturation/hue/wheel rendering, the slider tracks, the swatch grid).
+- The `picker_focus_circle` uses **256 EDSCALE corner radius** to force fully circular rendering (any radius ≥ half-the-min-dimension produces a circle). 32-detail subdivision smooths the curve at standard zoom.
+- ColorPicker is **substantially under-themed by upstream** (only 3 of likely 30+ available slots). Most of ColorPicker's visual is engine-default + Godot's built-in shaders (the gradient renderers).
+- NeoCade's REQUIREMENTS.md COL-* category likely requires fuller ColorPicker coverage. NeoCade-additive coverage at REQUIREMENTS.md level (Plan 04 tracks).
+- Slots NOT set by upstream: `bar_arrow`, `picker_cursor`, `picker_cursor_bg`, `screen_picker`, `expanded_arrow`, `folded_arrow`, `add_preset`, `color_hue`, `color_okhsl_hue`, `color_sample`, `color_script`, plus all sliders / icons / constants. Plan 03 D-12 omissions.
+
+### GraphEdit
+
+**Gloss:** Godot's `GraphEdit` Control — node-based editor (visual scripting / shader graph / animation tree). Pannable/zoomable canvas hosting GraphNodes connected by lines.
+
+**Upstream entry count:** 1 total set_* call (1 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| stylebox | panel_focus | focus | local `sb` (line 536-538: `base_sb.duplicate()`, `draw_center = false`, `_set_border(sb, color_mono * Color(1,1,1,0.07), 2)`) | transparent fill, 2-EDSCALE white-7%-alpha border (very subtle focus indication) | 539, 536-538 |
+
+**Per-class notes:**
+- ONLY ONE set_* call — `panel_focus`. The main `panel` (background canvas), grid colors (`grid_major`, `grid_minor`), connection colors (`connection_*`), selection rectangle colors, activity highlights, port grab distances, button icons (`grid_toggle`, `minus`, `more`, `reset`, `snapping_toggle`, `zoom`, `layout`), zoom controls (`zoom_in`, `zoom_out`, `zoom_reset`) — **ALL NOT set**. Engine defaults handle the entire GraphEdit visual identity.
+- This is the **most-underthemed user-facing Control in upstream** (1/30+ slots). Upstream apparently considers GraphEdit's engine-default visual sufficient.
+- NeoCade-additive coverage: a NeoCade game using GraphEdit (visual scripting plugins) would benefit from explicit grid/connection theming. Plan 04 flags as substantial coverage delta.
+- `GraphStateMachine` (line 543) is a separate editor-only class with `focus_color = Color.TRANSPARENT` — editor-internal, skipped per D-10.
+
+### MenuBar
+
+**Gloss:** Godot's `MenuBar` Control — horizontal bar of menu trigger buttons (File / Edit / View / etc.). Distinct from `MainMenuBar` (an editor type variation for the Godot editor's own menu bar).
+
+**Upstream entry count:** 0 set_* calls. **Unthemed by upstream.**
+
+> **NeoCade-additive (D-08 reconciliation):** Upstream `minimal_theme.tres` does not theme the bare `MenuBar` class. Upstream targets `MainMenuBar` (editor type variation, 4 set_* at line 627 region — see editor-only audit row), but the bare user-facing `MenuBar` class has zero entries (verified via `grep -nE "['\"]MenuBar['\"]"` returning empty for the standalone class — `MainMenuBar` is a distinct token). NeoCade owns first-class `MenuBar` theming; coverage delta (Plan 04) flags this as NeoCade-additive. Upstream's `MainMenuBar.normal` stylebox uses `flat_button_normal_sb` (transparent panel with `draw_center = false`) — editor-only and not directly portable to NeoCade per D-05/D-10. NeoCade Phase 4 generator should populate `MenuBar` slots from NeoCade's design tokens (likely transparent panel similar to MenuButton + flat-button hover/pressed for menu trigger states).
+
+### User-facing container chrome
+
+**Gloss:** Layout containers in Godot's user-facing API — primarily constant-only theming (separations and minimum-grab-thicknesses) plus minimal stylebox theming. These containers don't have rich state matrices; one row per (class, slot) pair below.
+
+**Combined upstream entry count:** 17 total set_* calls (10 constant, 7 stylebox) across 9 classes.
+
+| Class | Slot Kind | Slot Name | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-------|-----------|-----------|--------------------|---------------------|----------------|
+| HBoxContainer | constant | separation | `int(2 * scale)` | `2` (EDSCALE-derived) | 547 |
+| VBoxContainer | constant | separation | `int(2 * scale)` | `2` (EDSCALE-derived) | 548 |
+| HSplitContainer | constant | autohide | literal `1` (true) | `1` | 552 |
+| HSplitContainer | constant | minimum_grab_thickness | `int(base_margin * 1.5 * scale)` | `6` (EDSCALE-derived) | 553 |
+| HSplitContainer | constant | separation | `int(ceilf(2 * scale))` | `2` (EDSCALE-derived) | 554 |
+| VSplitContainer | constant | autohide | literal `1` (true) | `1` | 556 |
+| VSplitContainer | constant | minimum_grab_thickness | `int(base_margin * 1.5 * scale)` | `6` (EDSCALE-derived) | 557 |
+| VSplitContainer | constant | separation | `int(ceilf(2 * scale))` | `2` (EDSCALE-derived) | 558 |
+| PanelContainer | stylebox | panel | `base_empty_wide_sb` | (per dict; transparent panel, wide horizontal margins) | 725, 165-169 |
+| ScrollContainer | stylebox | panel | `base_empty_sb` | (per dict; transparent, zero content_margin) | 786, 161-163 |
+| ScrollContainer | stylebox | focus | `base_empty_sb` | (transparent — Pitfall 1.1) | 787, 161-163 |
+| SplitContainer | constant | minimum_grab_thickness | `int(base_margin * 2.0 * scale)` | `8` (EDSCALE-derived) | 823 |
+| SplitContainer | constant | separation | `int(base_margin * 0.75 * scale)` | `3` (EDSCALE-derived) | 824 |
+| HSeparator | constant | separation | `int(base_margin * 2 * scale)` | `8` (EDSCALE-derived) | 975 |
+| VSeparator | constant | separation | `int(base_margin * 2 * scale)` | `8` (EDSCALE-derived) | 976 |
+| HSeparator | stylebox | separator | local `line_sb` (lines 969-973: `StyleBoxLine.new()`, `color = Color(0,0,0,0.4) if dark_theme else Color(0,0,0,0.2)`, `grow_begin = grow_end = base_margin * -1 * scale`, `thickness = int(ceilf(scale * 2))`) | line color ≈ `Color(0,0,0,0.4)` (dark_theme); grow_* = -4 EDSCALE; thickness = 2 EDSCALE | 978, 969-973 |
+| VSeparator | stylebox | separator | `line_sb = line_sb.duplicate()` then `line_sb.vertical = true` (line 979-980) | (same line, vertical orientation) | 981, 979-980 |
+
+**Per-class notes (per container):**
+- **HBoxContainer / VBoxContainer:** ONLY constant `separation = 2 EDSCALE`. No stylebox. Layout-only.
+- **HSplitContainer / VSplitContainer:** 3 constants each (autohide, minimum_grab_thickness, separation). No stylebox; the split divider visual is engine-default. NeoCade game runtime touch-targets may want larger `minimum_grab_thickness` — neocade_mobile_theme override territory (Phase 8-9).
+- **PanelContainer:** Single `panel` stylebox = `base_empty_wide_sb` (transparent panel with wide horizontal margins). Upstream PanelContainer is visually a NO-OP (transparent) — NeoCade Phase 5 design decision: should `PanelContainer.panel` be opaque (raised card visual) or remain transparent like upstream?
+- **ScrollContainer:** Two transparent styleboxes (`panel`, `focus`) — visually invisible. Same Pitfall 1.1 evidence as Tree (focus = empty stylebox).
+- **SplitContainer (base):** 2 constants (minimum_grab_thickness, separation). Different values from H/VSplitContainer (these are the parent-class defaults; H/VSplit override).
+- **HSeparator / VSeparator:** Each gets `separation` constant + `separator` stylebox (line drawing). HSeparator's `line_sb` has `vertical = false` (default); VSeparator duplicates and sets `vertical = true`. Color is `Color(0,0,0,0.4)` dark / `Color(0,0,0,0.2)` light — fixed alpha black, NOT the `color_mono` global pattern.
+
+**Combined notes:**
+- All `* scale` factors are EDSCALE-derived per D-05 — Phase 4 generator drops them; NeoCade uses fixed design-token unit values.
+- `font`, `font_color`, `font_size`, etc. NOT applicable for container chrome — these classes don't render text.
+- Most container constants (separation, minimum_grab_thickness) are 2-8 EDSCALE units — small. Mobile variant (Phase 8-9) likely needs 16-24 px touch targets, so MOBILE-DESIGN-SPEC overrides these substantially.
+
+
 
 
 
