@@ -28,6 +28,10 @@ Read these files when the topic is relevant. Do not duplicate or summarize their
 - 10 categories of pitfalls + prevention checklists + phase mapping: [.planning/research/PITFALLS.md](.planning/research/PITFALLS.md)
 - Cross-platform export specs + mobile variant deltas + token-sharing strategy: [.planning/research/CROSS-PLATFORM.md](.planning/research/CROSS-PLATFORM.md)
 - Editor surfaces themed in v1 vs default-fallback: [.planning/research/EDITOR-COVERAGE.md](.planning/research/EDITOR-COVERAGE.md)
+- Final design tokens (specific hex / px values; **created by Phase 3** after mockup approval; consumed by Phases 4-9): `.planning/DESIGN_TOKENS.md` (does not exist until Phase 3 closes)
+- Mobile design spec (concrete mobile-vs-desktop overrides; **created by Phase 8**; consumed by Phase 9-10): `MOBILE-DESIGN-SPEC.md` (does not exist until Phase 8 closes)
+- Per-phase plan (atomic task breakdown for Phase N; **created by `/gsd-plan-phase N`**): `.planning/phases/phase-N/PLAN.md`
+- Per-phase verification (goal-backward audit for Phase N; **created by `/gsd-verify-work`**): `.planning/phases/phase-N/VERIFICATION.md`
 - User-supplied research report (NOT source of truth — must be challenged): [.planning/inputs/NeoCade-Research-Report.md](.planning/inputs/NeoCade-Research-Report.md)
 - User-supplied prototype mockup (NOT source of truth — must be challenged): [.planning/inputs/NeoCade-Theme-Prototype.png](.planning/inputs/NeoCade-Theme-Prototype.png)
 - Godot project file (engine 4.6, GL Compatibility renderer, .NET enabled): [project.godot](project.godot)
