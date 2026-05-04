@@ -21,7 +21,7 @@ Mine LDtk's Haxe + SCSS + asset source under `C:\Programming_Files\ldtk-master\`
 **Out of scope (explicit):**
 - Any `.tres` styling commits in `addons/neocade_theme/` — Phase 2 is research-only; first styling commits gated on Phase 3 mockup approval.
 - Lifting LDtk's numeric SCSS values verbatim into NeoCade — values are tuned for Heaps/Electron, not Godot/StyleBoxFlat (Pitfall 6.1 cousin).
-- **Verbatim lifting** of LDtk's specific values — copying `$bgDark: #1e2229` into NeoCade's surface palette, redrawing LDtk's specific icons 1:1, copying `$orange: #ffcc00` as NeoCade's primary accent, etc. **Pattern-level inspiration mining IS in scope** (per D-01, D-05, D-12) — extract conventions like "single warm accent against neutral ramp", "icons use silhouette discipline + N px stroke weight", "tinted panel headers", "modal flow with darkened backdrop overlay" with file:line citations. Phase 3 mockup designer decides which patterns to translate into NeoCade's independent design language. The line is: **patterns ✓, specific values ✗.**
+- Lifting LDtk's specific visual language — colors, gradients, exact icon designs. LDtk is **polish/quality benchmark, NOT visual copy** (PROJECT.md hard constraint).
 - Heaps engine architecture + LDtk's Haxe-specific abstractions — read for behavior intent, not for porting.
 - Bitmap atlas font architecture (BMFont, `noto_sans_display_*.png/.xml`) — Pitfall 5.4 already rejects in v1.
 - `pixel_berry.png` and any pixel-font usage — HD-only constraint already rejects.
