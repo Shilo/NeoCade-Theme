@@ -294,6 +294,233 @@ func _set_border(sb: StyleBoxFlat, color: Color, width: float = 1, blend: bool =
 
 These three are enumerated below as `### MenuBar`, `### Panel`, `### Window` sections each carrying an explicit "no upstream entries" / "NeoCade-additive" note (no enumeration table since there's nothing to enumerate). Coverage delta (Plan 04) consumes these as additives requiring NeoCade-original theming.
 
+> **Stylebox-variable dictionary (used by per-class tables below).** Several `var X : StyleBoxFlat = ...` declarations sit between the Globals section (line ~95) and the per-class `set_*` calls (line 173+). Per-class tables cite these by name rather than expanding the construction recipe inline; this dictionary is the lookup. All `* scale` factors are EDSCALE-derived and FORBIDDEN in NeoCade per D-05 — Phase 4 token generator drops them.
+
+| Variable | Definition (symbolic) | Lines |
+|----------|-----------------------|-------|
+| `color_button_normal` | `_get_base_color(0.35, 0.85)` | 96 |
+| `color_button_hover` | `_get_base_color(0.55, 0.75)` | 97 |
+| `color_button_pressed` | `_get_base_color(0.75, 0.75)` | 98 |
+| `color_button_disabled` | `_get_base_color(0.2, 0.75)` | 99 |
+| `color_button_border` | `_get_base_color(0.45, 0.75)` | 100 |
+| `color_button_border_hover` | `_get_base_color(0.65, 0.75)` | 101 |
+| `color_button_border_pressed` | `_get_base_color(0.85, 0.75)` | 102 |
+| `color_extra_border` | `color_mono * Color(1, 1, 1, 0.4)` | 105 |
+| `color_extra_border_dimmed` | `color_mono * Color(1, 1, 1, 0.2)` | 106 |
+| `base_sb` | `StyleBoxFlat.new()` with `bg_color = base_color`, `content_margin_all = base_margin * scale`, `corner_radius_all = int(corner_radius * scale)` | 109-112 |
+| `button_sb` | `base_sb.duplicate()` with `bg_color = color_button_normal`, `shadow_color = color_mono_inv * Color(1,1,1,0.005)`, `shadow_size = int(ceilf(8 * scale))`, `shadow_offset = Vector2(0,4) * scale`, `_set_border(.., color_extra_border or color_button_border, 1)` (per `draw_extra_borders`), `_set_margin(.., base_margin*2, base_margin*1.5, base_margin*2, base_margin*1.5)` | 117-126 |
+| `button_hover_sb` | `button_sb.duplicate()` with `bg_color = color_button_hover`, `_set_border(.., color_extra_border or color_button_border_hover, 1)` (per `draw_extra_borders`) | 128-133 |
+| `button_pressed_sb` | `button_sb.duplicate()` with `bg_color = color_button_pressed`, `_set_border(.., color_extra_border or color_button_border_pressed, 1)` (per `draw_extra_borders`) | 135-140 |
+| `button_disabled_sb` | `button_sb.duplicate()` with `border_width_all = 0`, `bg_color = color_button_disabled`, conditional `_set_border(.., color_extra_border_dimmed * Color(1,1,1,0.5), 1)` if `draw_extra_borders` | 142-146 |
+| `flat_button_hover_sb` | `base_sb.duplicate()` with `_set_margin(.., base_margin*1.5, base_margin*0.9, base_margin*1.5, base_margin*0.9)`, `bg_color = color_button_normal`, conditional `_set_border(.., color_extra_border, 1)` if `draw_extra_borders` | 148-153 |
+| `flat_button_pressed_sb` | `flat_button_hover_sb.duplicate()` with `bg_color = color_button_hover` | 155-156 |
+| `flat_button_normal_sb` | `flat_button_hover_sb.duplicate()` with `draw_center = false` | 158-159 |
+| `base_empty_sb` | `base_sb.duplicate()` with `draw_center = false`, `set_content_margin_all(0)` | 161-163 |
+| `base_empty_wide_sb` | `base_sb.duplicate()` with `draw_center = false`, `_set_margin(.., base_empty_wide_margin*1.5, base_empty_wide_margin, base_empty_wide_margin*1.5, base_empty_wide_margin)` where `base_empty_wide_margin = maxf(base_margin, 3.0)` (line 168) | 165-169 |
+
+> **Snapshot at upstream defaults** (`base_color=#272727`, `accent_color=#569eff`, `contrast=0.325`, `corner_radius=4`, `dark_theme=true`, `dark_theme_icon_and_font=true`, `draw_extra_borders=false`, `scale=1.0`, `base_margin=4.0`):
+> - `color_button_normal` ≈ `Color(0.34, 0.34, 0.34, 1)` (base_color brightened by `0.35*0.325 ≈ 0.114` in HSV V; saturation × 0.85 ≈ 0)
+> - `color_button_hover` ≈ `Color(0.40, 0.40, 0.40, 1)` (V shift ≈ 0.179)
+> - `color_button_pressed` ≈ `Color(0.46, 0.46, 0.46, 1)` (V shift ≈ 0.244)
+> - `color_button_disabled` ≈ `Color(0.31, 0.31, 0.31, 1)` (V shift ≈ 0.065)
+> - `color_button_border` ≈ `Color(0.37, 0.37, 0.37, 1)` (V shift ≈ 0.146)
+> - `color_button_border_hover` ≈ `Color(0.43, 0.43, 0.43, 1)` (V shift ≈ 0.211)
+> - `color_button_border_pressed` ≈ `Color(0.49, 0.49, 0.49, 1)` (V shift ≈ 0.276)
+>
+> Per cross-AI review HIGH #4 anchor: the snapshot column in per-class tables uses these computed values, never `(unevaluated)` placeholders.
+
+### Button
+
+**Gloss:** Godot's base `Button` Control — text + optional icon, no toggle behavior. Source of all push-button-style theme entries; CheckBox / CheckButton / OptionButton / MenuButton inherit / share much of this.
+
+**Upstream entry count:** 24 total set_* calls (12 stylebox, 11 color, 1 constant, 0 font/icon).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| color | font_color | normal | `color_font_normal` = `color_mono_font * Color(1,1,1,0.7)` (mono_font = WHITE since dark_theme_icon_and_font) | `Color(1,1,1,0.7)` | 256 (set), 81 (def) |
+| color | font_disabled_color | disabled | `color_font_dimmed` = `color_mono_font * Color(1,1,1, 0.35 if dark_theme_icon_and_font else 0.5)` | `Color(1,1,1,0.35)` | 257, 84 |
+| color | font_focus_color | focus | `color_font_highlighted` = `color_mono_font` (full alpha) | `Color(1,1,1,1)` | 258, 83 |
+| color | font_hover_color | hover | `color_font_highlighted` | `Color(1,1,1,1)` | 259, 83 |
+| color | font_hover_pressed_color | hover_pressed | `color_font_highlighted` | `Color(1,1,1,1)` | 260, 83 |
+| color | font_pressed_color | pressed | `color_font_highlighted` | `Color(1,1,1,1)` | 261, 83 |
+| color | icon_disabled_color | disabled | `color_icon_disabled` = `Color(1,1,1, 0.35 if dark_theme_icon_and_font else 0.5)` | `Color(1,1,1,0.35)` | 262, 93 |
+| color | icon_focus_color | focus | `color_icon_focus` = `Color(1,1,1)` | `Color(1,1,1,1)` | 263, 89 |
+| color | icon_hover_color | hover | `color_icon_hover` = `Color(1,1,1)` | `Color(1,1,1,1)` | 264, 90 |
+| color | icon_hover_pressed_color | hover_pressed | `color_icon_hover` = `Color(1,1,1)` | `Color(1,1,1,1)` | 265, 90 |
+| color | icon_normal_color | normal | `color_icon_normal` = `Color(1,1,1, 0.7 if dark_theme_icon_and_font else 0.95)` | `Color(1,1,1,0.7)` | 266, 87 |
+| color | icon_pressed_color | pressed | `color_icon_pressed` = `accent_color * (1.15 if dark_theme_icon_and_font else 3.5)` then `.a = 1.0` | `Color(0.39, 0.71, 1.0, 1)` (≈ accent#569eff × 1.15) | 267, 91-92 |
+| constant | outline_size | (n/a) | literal `0` | `0` | 268 |
+| stylebox | disabled | disabled | `button_disabled_sb` | (per dict; `bg_color≈(0.31,0.31,0.31)`, `border_width_all=0`) | 269, 142-146 |
+| stylebox | disabled_mirrored | disabled (RTL) | `button_disabled_sb` | (same as `disabled`) | 270, 142-146 |
+| stylebox | focus | focus | `base_empty_sb` | (per dict; `draw_center=false`, `content_margin=0`) — pure focus is a no-op overlay; Pitfall 1.1 evidence | 271, 161-163 |
+| stylebox | hover | hover | `button_hover_sb` | (per dict; `bg_color≈(0.40,0.40,0.40)`, border_color=`color_button_border_hover`) | 272, 128-133 |
+| stylebox | hover_mirrored | hover (RTL) | `button_hover_sb` | (same as `hover`) | 273, 128-133 |
+| stylebox | hover_pressed | hover_pressed | `button_pressed_sb` | (per dict; `bg_color≈(0.46,0.46,0.46)`) | 274, 135-140 |
+| stylebox | hover_pressed_mirrored | hover_pressed (RTL) | `button_pressed_sb` | (same as `hover_pressed`) | 275, 135-140 |
+| stylebox | normal | normal | `button_sb` | (per dict; `bg_color≈(0.34,0.34,0.34)`, shadow_size=8 EDSCALE, content_margin per `_set_margin(sb, 8, 6, 8, 6)`) | 276, 117-126 |
+| stylebox | normal_mirrored | normal (RTL) | `button_sb` | (same as `normal`) | 277, 117-126 |
+| stylebox | pressed | pressed | `button_pressed_sb` | (per dict; `bg_color≈(0.46,0.46,0.46)`) | 278, 135-140 |
+| stylebox | pressed_mirrored | pressed (RTL) | `button_pressed_sb` | (same as `pressed`) | 279, 135-140 |
+
+**Per-class notes:**
+- Upstream sets BOTH `<state>` and `<state>_mirrored` styleboxes for every state (normal/hover/pressed/hover_pressed/disabled). RTL UI support is explicit, even though the values are identical. NeoCade should mirror this discipline — Godot's RTL renderer expects the `_mirrored` slots to be present.
+- `outline_size = 0` (line 268) explicitly disables font outlines on Buttons. Upstream does not set `font_outline_color`; engine default is whatever Godot picks. If NeoCade ever wants outlines, both `outline_size` and `font_outline_color` must be set.
+- `focus` slot is `base_empty_sb` (draw_center=false, no margins). This is **Pitfall 1.1 evidence in action** — focus-as-overlay loses to pressed/checked, so upstream makes the focus stylebox a transparent no-op and relies on `font_focus_color` / `icon_focus_color` for focus indication. Plan 03 confirms/refutes Pitfall 1.1 from this evidence.
+- `font_size`, `icon_max_width`, `h_separation` are NOT explicitly set on Button — engine defaults apply. Plan 03 will flag these as deliberate omissions per D-12.
+
+### CheckBox
+
+**Gloss:** Godot's `CheckBox` Control — Button subclass with a square tickbox icon to the left of label text. Inherits Button's full state matrix; only overrides what differs.
+
+**Upstream entry count:** 4 total set_* calls (2 stylebox, 2 color).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| color | font_hover_pressed_color | hover_pressed | `color_font_highlighted` = `color_mono_font` | `Color(1,1,1,1)` | 283, 83 |
+| color | font_pressed_color | pressed | `color_font_normal` = `color_mono_font * Color(1,1,1,0.7)` | `Color(1,1,1,0.7)` | 284, 81 |
+| stylebox | normal | normal | `sb` (locally constructed at 286-288: `base_sb.duplicate()`, `draw_center=false`, `_set_margin(sb, 6, 2, 6, 2)`) | (transparent panel, asymmetric margins favoring horizontal padding) | 289, 286-288 |
+| stylebox | normal_mirrored | normal (RTL) | same `sb` as above | (same) | 290, 286-288 |
+
+**Per-class notes:**
+- Upstream sets ONLY `font_pressed_color` (overriding Button's `color_font_highlighted` to `color_font_normal` — pressed CheckBox text dims, unlike Button) and `font_hover_pressed_color`. Other font/icon colors (font_color, font_focus_color, font_hover_color, etc.) inherit from Button via type chain.
+- The radio-related slots (`radio_checked`, `radio_unchecked`, `radio_checked_disabled`, `radio_unchecked_disabled`) are NOT set on CheckBox. These ARE Godot-API-level slots per `default_theme.cpp` — Plan 03 cross-reference will flag them as deliberate upstream omissions (engine-default ticked-box icon used).
+- `checked`, `unchecked`, `checked_disabled`, `unchecked_disabled` icon slots also not set — engine-default icons used.
+
+### CheckButton
+
+**Gloss:** Godot's `CheckButton` Control — Button subclass with a horizontal switch (toggle slider) icon. Visually distinct from CheckBox; semantics identical (binary toggle).
+
+**Upstream entry count:** 3 total set_* calls (3 color, 0 stylebox/font/icon/constant).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| color | font_focus_color | focus | `color_font_normal` = `color_mono_font * Color(1,1,1,0.7)` | `Color(1,1,1,0.7)` | 294, 81 |
+| color | font_hover_pressed_color | hover_pressed | `color_font_highlighted` = `color_mono_font` | `Color(1,1,1,1)` | 295, 83 |
+| color | font_pressed_color | pressed | `color_font_normal` | `Color(1,1,1,0.7)` | 296, 81 |
+
+**Per-class notes:**
+- Upstream sets ONLY 3 font colors. All styleboxes (normal/hover/pressed/disabled/focus) inherit from Button base class via the engine's type-resolution chain.
+- Note `font_focus_color` is overridden to `color_font_normal` (Color(1,1,1,0.7)), distinct from Button's `color_font_highlighted` (Color(1,1,1,1)). CheckButton text appears dimmer in focus than a regular Button would.
+- The toggle-icon slots (`on`, `off`, `on_disabled`, `off_disabled`, `on_mirrored`, `off_mirrored`, etc.) are NOT set — engine-default switch icons used.
+
+### FlatButton
+
+**Gloss:** Editor-only Button type variation in upstream — used for borderless toolbar buttons (Properties tab, Inspector tab). NeoCade reuses the name as a Button TYPEVAR-01 / DF-Button-1 per FEATURES.md (research-only enumeration here per CONTEXT.md D-10).
+
+**Upstream entry count:** 22 total set_* calls (10 stylebox, 12 color, 0 constant/font/icon).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| color | font_color | normal | `color_font_normal` | `Color(1,1,1,0.7)` | 467, 81 |
+| color | font_disabled_color | disabled | `color_font_dimmed` | `Color(1,1,1,0.35)` | 468, 84 |
+| color | font_focus_color | focus | `color_font_highlighted` | `Color(1,1,1,1)` | 469, 83 |
+| color | font_hover_color | hover | `color_font_highlighted` | `Color(1,1,1,1)` | 470, 83 |
+| color | font_hover_pressed_color | hover_pressed | `color_font_highlighted` | `Color(1,1,1,1)` | 471, 83 |
+| color | font_pressed_color | pressed | `color_font_highlighted` | `Color(1,1,1,1)` | 472, 83 |
+| color | icon_disabled_color | disabled | `color_icon_disabled` | `Color(1,1,1,0.35)` | 473, 93 |
+| color | icon_focus_color | focus | `color_icon_focus` | `Color(1,1,1,1)` | 474, 89 |
+| color | icon_hover_color | hover | `color_icon_hover` | `Color(1,1,1,1)` | 475, 90 |
+| color | icon_hover_pressed_color | hover_pressed | `color_icon_hover` | `Color(1,1,1,1)` | 476, 90 |
+| color | icon_normal_color | normal | `color_icon_normal` | `Color(1,1,1,0.7)` | 477, 87 |
+| color | icon_pressed_color | pressed | `color_icon_pressed` | `Color(0.39,0.71,1.0,1)` (≈ accent × 1.15) | 478, 91-92 |
+| stylebox | disabled | disabled | `base_empty_wide_sb` | (per dict; draw_center=false, wide horizontal margin) | 480, 165-169 |
+| stylebox | disabled_mirrored | disabled (RTL) | `base_empty_wide_sb` | (same) | 481, 165-169 |
+| stylebox | normal | normal | `base_empty_wide_sb` | (transparent — flat button has no normal-state background) | 482, 165-169 |
+| stylebox | normal_mirrored | normal (RTL) | `base_empty_wide_sb` | (same) | 483, 165-169 |
+| stylebox | hover | hover | `flat_button_hover_sb` | (per dict; bg=`color_button_normal`, narrow vertical margin) | 484, 148-153 |
+| stylebox | hover_mirrored | hover (RTL) | `flat_button_hover_sb` | (same) | 485, 148-153 |
+| stylebox | hover_pressed | hover_pressed | `flat_button_pressed_sb` | (per dict; bg=`color_button_hover`) | 486, 155-156 |
+| stylebox | hover_pressed_mirrored | hover_pressed (RTL) | `flat_button_pressed_sb` | (same) | 487, 155-156 |
+| stylebox | pressed | pressed | `flat_button_pressed_sb` | (same) | 488, 155-156 |
+| stylebox | pressed_mirrored | pressed (RTL) | `flat_button_pressed_sb` | (same) | 489, 155-156 |
+
+**Per-class notes:**
+- **TYPEVAR-01 design context.** Editor-only in upstream; enumerated here per CONTEXT.md D-10 because NeoCade reuses the name as a Button type variation per FEATURES.md TYPEVAR-01 (DF-Button-1). NeoCade's FlatButton variation does NOT inherit upstream's editor-bound implementation; this enumeration is research material for the TYPEVAR-01 visual contract decision in Phase 5.
+- Color matrix is **identical to Button's** — same 12 entries, same source globals. The only difference is the stylebox set: FlatButton uses the "flat" (border-less, transparent-normal) variants instead of the bordered/filled `button_*_sb` family.
+- No `focus` stylebox is set on FlatButton (unlike Button which sets `focus → base_empty_sb` at line 271). FlatButton's focus state has no theme entry → engine default applies, which on a flat button is effectively invisible. Pitfall 1.1 worth noting: focus indication on flat buttons relies entirely on `font_focus_color` and `icon_focus_color`.
+- TYPEVAR-01 NeoCade visual contract should NOT replicate the "no normal-state background" approach if NeoCade's design system requires visible idle affordance. Phase 5 decision.
+
+### MenuButton
+
+**Gloss:** Godot's `MenuButton` Control — Button subclass that opens a PopupMenu when pressed. Used for menu triggers in toolbars and dropdown menus.
+
+**Upstream entry count:** 23 total set_* calls (11 stylebox, 12 color, 0 constant/font/icon).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| color | font_color | normal | `color_font_normal` | `Color(1,1,1,0.7)` | 645, 81 |
+| color | font_disabled_color | disabled | `color_font_dimmed` | `Color(1,1,1,0.35)` | 646, 84 |
+| color | font_focus_color | focus | `color_font_highlighted` | `Color(1,1,1,1)` | 647, 83 |
+| color | font_hover_color | hover | `color_font_highlighted` | `Color(1,1,1,1)` | 648, 83 |
+| color | font_hover_pressed_color | hover_pressed | `color_font_highlighted` | `Color(1,1,1,1)` | 649, 83 |
+| color | font_pressed_color | pressed | `color_font_highlighted` | `Color(1,1,1,1)` | 650, 83 |
+| color | icon_disabled_color | disabled | `color_icon_disabled` | `Color(1,1,1,0.35)` | 652, 93 |
+| color | icon_focus_color | focus | `color_icon_focus` | `Color(1,1,1,1)` | 653, 89 |
+| color | icon_hover_color | hover | `color_icon_hover` | `Color(1,1,1,1)` | 654, 90 |
+| color | icon_hover_pressed_color | hover_pressed | `color_icon_hover` | `Color(1,1,1,1)` | 655, 90 |
+| color | icon_normal_color | normal | `color_icon_normal` | `Color(1,1,1,0.7)` | 656, 87 |
+| color | icon_pressed_color | pressed | `color_icon_pressed` | `Color(0.39,0.71,1.0,1)` | 657, 91-92 |
+| stylebox | disabled | disabled | `base_empty_wide_sb` | (per dict; transparent, wide margins) | 659, 165-169 |
+| stylebox | disabled_mirrored | disabled (RTL) | `base_empty_wide_sb` | (same) | 660, 165-169 |
+| stylebox | focus | focus | `base_empty_wide_sb` | (transparent — focus is a no-op; relies on `font_focus_color`) | 661, 165-169 |
+| stylebox | normal | normal | `base_empty_wide_sb` | (transparent — flat button styling) | 662, 165-169 |
+| stylebox | normal_mirrored | normal (RTL) | `base_empty_wide_sb` | (same) | 663, 165-169 |
+| stylebox | pressed | pressed | `flat_button_pressed_sb` | (per dict; bg=`color_button_hover`) | 664, 155-156 |
+| stylebox | pressed_mirrored | pressed (RTL) | `flat_button_pressed_sb` | (same) | 665, 155-156 |
+| stylebox | hover | hover | `flat_button_hover_sb` | (per dict; bg=`color_button_normal`) | 666, 148-153 |
+| stylebox | hover_mirrored | hover (RTL) | `flat_button_hover_sb` | (same) | 667, 148-153 |
+| stylebox | hover_pressed | hover_pressed | `flat_button_hover_sb` | (intentional — see notes) | 668, 148-153 |
+| stylebox | hover_pressed_mirrored | hover_pressed (RTL) | `flat_button_hover_sb` | (same) | 669, 148-153 |
+
+**Per-class notes:**
+- MenuButton uses **flat-style styleboxes throughout** (`base_empty_wide_sb` for normal/disabled/focus + `flat_button_*_sb` for hover/pressed). This is consistent with FlatButton — both treat MenuButton as a "button living in a toolbar" semantically.
+- **Asymmetry vs Button:** `hover_pressed` uses `flat_button_hover_sb` (not `flat_button_pressed_sb`). When a menu is open AND mouse is hovering the trigger, the visual is "hover" not "pressed" — the open menu IS the pressed-state indicator, not the trigger background. Subtle but intentional.
+- **Type variation: FlatMenuButton** — upstream defines an editor-only `FlatMenuButton` variation (lines 493-517, 23 set_*) that is structurally identical to MenuButton (same 23 slot/color entries) but exists as a distinct type for editor toolbar styling. NeoCade FEATURES.md does NOT currently define a FlatMenuButton TYPEVAR; this is documented for completeness only. If NeoCade adds menu-button-in-toolbar variations in v1.x, FlatMenuButton would be the precedent.
+- Color matrix identical to Button + FlatButton (same 12 colors, same globals). The "button family" share a common color axis; styleboxes differentiate.
+
+### OptionButton
+
+**Gloss:** Godot's `OptionButton` Control — Button subclass that opens a PopupMenu and displays the selected option's text/icon. Used for dropdown selection.
+
+**Upstream entry count:** 24 total set_* calls (12 stylebox, 12 color (include `arrow_margin` which is constant — actually 1 constant + 12 color = 13 non-stylebox; recheck below), and breakdown is: 1 constant + 12 color + 11 stylebox = 24).
+
+> Recount (per acceptance-criterion exact equality): 1 constant (line 673) + 12 color (lines 675-686) + 11 stylebox (lines 688-698) = 24. ✓
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| constant | arrow_margin | (n/a) | `int(base_margin * 2 * scale)` | `8` (base_margin=4, scale=1) — EDSCALE-derived; NeoCade drops `* scale` | 673 |
+| color | font_color | normal | `color_font_normal` | `Color(1,1,1,0.7)` | 675, 81 |
+| color | font_disabled_color | disabled | `color_font_dimmed` | `Color(1,1,1,0.35)` | 676, 84 |
+| color | font_focus_color | focus | `color_font_highlighted` | `Color(1,1,1,1)` | 677, 83 |
+| color | font_hover_color | hover | `color_font_highlighted` | `Color(1,1,1,1)` | 678, 83 |
+| color | font_hover_pressed_color | hover_pressed | `color_font_highlighted` | `Color(1,1,1,1)` | 679, 83 |
+| color | font_pressed_color | pressed | `color_font_highlighted` | `Color(1,1,1,1)` | 680, 83 |
+| color | icon_disabled_color | disabled | `color_icon_disabled` | `Color(1,1,1,0.35)` | 681, 93 |
+| color | icon_focus_color | focus | `color_icon_focus` | `Color(1,1,1,1)` | 682, 89 |
+| color | icon_hover_color | hover | `color_icon_hover` | `Color(1,1,1,1)` | 683, 90 |
+| color | icon_hover_pressed_color | hover_pressed | `color_icon_hover` | `Color(1,1,1,1)` | 684, 90 |
+| color | icon_normal_color | normal | `color_icon_normal` | `Color(1,1,1,0.7)` | 685, 87 |
+| color | icon_pressed_color | pressed | `color_icon_pressed` | `Color(0.39,0.71,1.0,1)` | 686, 91-92 |
+| stylebox | disabled | disabled | `button_disabled_sb` | (per dict) | 688, 142-146 |
+| stylebox | disabled_mirrored | disabled (RTL) | `button_disabled_sb` | (same) | 689, 142-146 |
+| stylebox | focus | focus | `base_empty_sb` | (transparent — Pitfall 1.1) | 690, 161-163 |
+| stylebox | normal | normal | `button_sb` | (per dict; bordered + filled) | 691, 117-126 |
+| stylebox | normal_mirrored | normal (RTL) | `button_sb` | (same) | 692, 117-126 |
+| stylebox | pressed | pressed | `button_pressed_sb` | (per dict) | 693, 135-140 |
+| stylebox | pressed_mirrored | pressed (RTL) | `button_pressed_sb` | (same) | 694, 135-140 |
+| stylebox | hover | hover | `button_hover_sb` | (per dict) | 695, 128-133 |
+| stylebox | hover_mirrored | hover (RTL) | `button_hover_sb` | (same) | 696, 128-133 |
+| stylebox | hover_pressed | hover_pressed | `button_pressed_sb` | (per dict) | 697, 135-140 |
+| stylebox | hover_pressed_mirrored | hover_pressed (RTL) | `button_pressed_sb` | (same) | 698, 135-140 |
+
+**Per-class notes:**
+- OptionButton uses the **same stylebox set as Button** (`button_sb` / `button_hover_sb` / `button_pressed_sb` / `button_disabled_sb` / `base_empty_sb`-for-focus) — it's a "real button" visually, in contrast to MenuButton which is a flat toolbar-button.
+- The `arrow_margin` constant (line 673) controls horizontal spacing between the option's icon/text and the dropdown arrow icon. It's the only OptionButton-specific constant; engine defaults handle `h_separation`, `icon_max_width`, etc.
+- `arrow` icon slot is NOT set — engine-default dropdown arrow used. Plan 03 will flag this as a deliberate omission per D-12.
+- Color matrix identical to Button (same 12 colors, same globals).
+
+
+
 
 
 ## Engine-Default Cross-Reference and Pitfall Confirmations
