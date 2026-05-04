@@ -519,6 +519,75 @@ These three are enumerated below as `### MenuBar`, `### Panel`, `### Window` sec
 - `arrow` icon slot is NOT set — engine-default dropdown arrow used. Plan 03 will flag this as a deliberate omission per D-12.
 - Color matrix identical to Button (same 12 colors, same globals).
 
+### Label
+
+**Gloss:** Godot's `Label` Control — static text display. No interactive states; the simplest theme-able Control.
+
+**Upstream entry count:** 2 total set_* calls (1 color, 1 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| color | font_color | normal | `color_font_normal` | `Color(1,1,1,0.7)` | 595, 81 |
+| stylebox | normal | normal | local `empty_sb` (line 597-599: `base_empty_sb.duplicate()`, then `_set_margin(empty_sb, 8, 4, 8, 4)` in EDSCALE units, base_margin=4) | (transparent panel, asymmetric margins favoring horizontal padding to prevent the editor's quick-open dialog from cramming text) | 600, 597-599 |
+
+**Per-class notes:**
+- Upstream sets ONLY `font_color` and `normal` stylebox. Outline (`font_outline_color`, `outline_size`), font itself (`font`), font_size, and shadow (`font_shadow_*`) are NOT set — engine defaults apply.
+- Comment at line 598: "Keeping vertical margin low otherwise quick open looks bad" — explicit acknowledgment that Label margins were tuned for the editor's quick-open dialog. NeoCade should select Label margins from its own design system, not lift this `_set_margin(8, 4, 8, 4)` (a Pitfall 6.1 / EDSCALE forbidden lift anyway since `_set_margin` multiplies by `scale`).
+- Label is a base class for ToolTip / FoldableContainer headers / many other Controls. Inheritance chain matters; per-class tests in downstream phases should verify that LabelSettings overrides don't conflict with the upstream `font_color` set on the type root.
+
+### LineEdit
+
+**Gloss:** Godot's `LineEdit` Control — single-line text input. Critical for editor inspector property fields.
+
+**Upstream entry count:** 4 total set_* calls (1 color, 3 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| color | font_placeholder_color | (placeholder) | `color_font_dimmed` = `color_mono_font * Color(1,1,1, 0.35 if dark_theme_icon_and_font else 0.5)` | `Color(1,1,1,0.35)` | 604, 84 |
+| stylebox | focus | focus | local `sb` (line 606-610: `base_sb.duplicate()`, `bg_color = color_surface_lowest`, conditional `_set_border(sb, color_extra_border, 1)` if `draw_extra_borders`, `_set_margin(sb, 8, 3, 8, 3)`) | bg ≈ `Color(0.10, 0.10, 0.10, 1)` (surface_lowest, V≈ -1.3 × 0.325 = -0.423 from base) | 611, 606-610 |
+| stylebox | normal | normal | local `sb = sb.duplicate()` from focus, then `bg_color = color_surface_lower` (line 614-615) | bg ≈ `Color(0.13, 0.13, 0.13, 1)` (surface_lower, V≈ -0.95 × 0.325 = -0.309 from base) | 616, 614-615 |
+| stylebox | read_only | read_only | local `sb = sb.duplicate()` from normal, then `bg_color = Color(0,0,0,0.2) if dark_theme else Color(1,1,1,0.5)` (line 620-621) | `Color(0,0,0,0.2)` (dark_theme branch) | 622, 620-621 |
+
+**Per-class notes:**
+- Upstream uses **shared stylebox construction** with TextEdit — lines 606-623 set both `LineEdit` and `TextEdit` from the same `sb` variable. The first stylebox built (focus, surface_lowest bg) is darker than the normal-state (surface_lower bg) — visually, focus is *darker* than normal, opposite of the typical "focus is highlighted" pattern. This communicates "this field accepts input."
+- Read-only stylebox uses bg_color `Color(0,0,0,0.2)` (transparent dark overlay) for dark_theme; comment at line 619: "Using transparent background for readonly otherwise it looks bad in the master audio bus."
+- **Selection / caret colors NOT set on LineEdit** (no `selection_color`, `caret_color`, `caret_background_color`, `font_selected_color`). Engine defaults handle these. This is a deliberate omission per D-12 — NeoCade's TEXT-* requirements (REQUIREMENTS.md) include caret/selection theming, so Plan 04 flags as additive coverage NeoCade owns.
+- `font` (typeface), `font_size`, `font_color`, `font_uneditable_color`, `clear_button_color`, `clear_button_color_pressed` are NOT set — engine-default editor font / sizes used.
+
+### RichTextLabel
+
+**Gloss:** Godot's `RichTextLabel` Control — BBCode-rendered text with inline formatting (bold/italic/colors). Used for editor help, console logs, multi-line tooltips.
+
+**Upstream entry count:** 1 total set_* call (1 stylebox).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| stylebox | normal | normal | local `sb` (line 779-781: `base_sb.duplicate()`, `bg_color = color_surface_low`, `set_content_margin_all(base_margin * 2 * scale)`) | bg ≈ `Color(0.16, 0.16, 0.16, 1)` (surface_low, V≈ -0.6 × 0.325 = -0.195 from base) | 782, 779-781 |
+
+**Per-class notes:**
+- Single set_* call. `default_color` (text base color), `font_selected_color`, `selection_color`, `outline_color`, `outline_size`, `bold_font` / `italic_font` / `bold_italic_font` / `mono_font` / `normal_font`, plus per-section font_size are ALL NOT set — engine defaults apply.
+- `surface_low` bg is the **uniform RichTextLabel background** — slightly raised from `surface_base` (anchor) but well below `surface_high`. Reads as a "content well" against the editor's `surface_base` panels.
+- NeoCade should treat this as a starting point only — REQUIREMENTS.md TYPO-* category likely requires explicit bold/italic font slots and selection color.
+
+### TextEdit
+
+**Gloss:** Godot's `TextEdit` Control — multi-line text input. Foundation for CodeEdit (NeoCade-additive per D-09). Used for inspector multi-line property fields.
+
+**Upstream entry count:** 3 total set_* calls (3 stylebox, 0 color).
+
+| Slot Kind | Slot Name | State | Formula (symbolic) | Snapshot @ defaults | Source line(s) |
+|-----------|-----------|-------|--------------------|---------------------|----------------|
+| stylebox | focus | focus | shared `sb` from LineEdit construction (line 606-610: `base_sb.duplicate()`, `bg_color = color_surface_lowest`, `_set_margin(sb, 8, 3, 8, 3)`) | bg ≈ `Color(0.10, 0.10, 0.10, 1)` | 612, 606-610 |
+| stylebox | normal | normal | shared `sb` from LineEdit (line 614-615: `bg_color = color_surface_lower`) | bg ≈ `Color(0.13, 0.13, 0.13, 1)` | 617, 614-615 |
+| stylebox | read_only | read_only | shared `sb` from LineEdit (line 620-621: `bg_color = Color(0,0,0,0.2) if dark_theme else Color(1,1,1,0.5)`) | `Color(0,0,0,0.2)` (dark) | 623, 620-621 |
+
+**Per-class notes:**
+- TextEdit shares its 3 styleboxes (`focus`, `normal`, `read_only`) verbatim with LineEdit (same `sb` variable, same construction) — upstream constructs the stylebox once and assigns to both classes simultaneously (lines 611-612 / 616-617 / 622-623 paired).
+- **Zero colors and zero constants** set on TextEdit. The full TextEdit theming surface (line/background colors, caret_color, selection_color, font_selected_color, font_readonly_color, font_placeholder_color, line_height, search_result_*, code_completion_*, indent_guide_color, etc.) — ALL NOT set. Engine defaults applied. This is a substantial deliberate omission per D-12; CodeEdit (NeoCade-additive) inherits from TextEdit and would inherit all of this gap.
+- Upstream font (`font`), font_size are NOT set on TextEdit — engine-default font / size, which means TextEdit text rendering relies on the engine's built-in font scaled by EDSCALE. Pitfall: NeoCade must explicitly set `font` + `font_size` on TextEdit (and CodeEdit additive) for stable runtime rendering across export targets.
+- **Editor-font usage:** Upstream's GDScript at lines 432-462 (extracted via grep) sets `Editor`-class `font` / `bold_font` / `italic_font` slots — these are editor-only `Editor` aggregator slots, NOT user-facing `TextEdit` slots. NeoCade's `TextEdit` font path goes through Phase 4's typography decision (Inter for monoscale text, Outfit for display).
+
+
 
 
 
