@@ -114,11 +114,65 @@ Catalogue conclusion: raised treatment is an affordance amplifier. It should be 
 
 ## Construction Recipes
 
-Reserved for Plan 03.1-05.
+These sketches are not implementation architecture. They define what visual outcomes future phases must support.
+
+### Recipe A: Direct `StyleBoxFlat` Shadow Offset
+
+| Field | Sketch | Feasibility |
+|---|---|---|
+| Top shape | `bg_color = action/surface role`, `corner_radius_* = token`, `border_width_*` optional. | Viable for flat top. |
+| Offset shape | Try `shadow_color = darker duplicate`, `shadow_offset = Vector2(0, 3)`, `shadow_size` as hard offset. | Non-viable for v1 under no-soft-shadow rule unless Phase 3.2 proves a hard-edged duplicate with no blur/glow/soft shadow and no `shadow_size = -1` conflict. |
+| Shadow disabled baseline | Flat mode and all non-raised families keep `shadow_size = -1`. | Required by project pitfall/no-soft-shadow resolution. |
+
+Decision: Recipe A is **non-viable for v1 under no-soft-shadow rule** as a default research recommendation. Current Godot docs prove `shadow_color`, `shadow_offset`, and `shadow_size` exist, but they do not prove a clean hard-edged offset duplicate that preserves `shadow_size = -1`. Empirical validation belongs to Phase 3.2, not this visual research phase.
+
+### Recipe B: Two-Layer / Wrapper Composition
+
+Default research recommendation for extruded-flat raised mode: use **two stacked** layers in a wrapper-style composition.
+
+```text
+[offset darker duplicate layer]  y + 2..4px, same radius, darker role color
+[foreground top layer]           y + 0px, solid role color, text/icon above
+```
+
+Sketch:
+
+| Layer | Visual role | Notes |
+|---|---|---|
+| Wrapper/background | darker duplicate, same silhouette, translated down/right or down only | Could be a parent/background Control, extra stylebox host, or generated composition; Phase 3.2 decides feasibility. |
+| Foreground/top | normal Button/Control stylebox | Contains content and focus ring. |
+| Focus | 2px solid ring around foreground top shape | No glow. Ring must not be hidden behind offset layer. |
+
+### State Recipe
+
+| State | Value / sketch | Notes |
+|---|---|---|
+| normal | top shape at base role color; optional offset layer darker. | raised=false omits offset layer. |
+| hover 8% | blend on-role/state-layer over the top shape at hover 8%. | Offset layer generally unchanged to avoid jitter. |
+| focus 12% | top shape may blend focus 12% where useful, plus 2px solid ring. | Focus ring is required; blend alone is insufficient. |
+| pressed 12% | top shape shifts/tones darker via pressed 12%; optional visual press can reduce offset from 3px to 1px if architecture allows. | Keep layout dimensions stable. |
+| dragged 16% | use dragged 16% for sliders, split handles, tabs, GraphEdit objects. | Useful for handles, not all buttons. |
+| disabled 38% / disabled container 12% | text/icon content uses disabled 38%; container/outline/offset uses disabled container 12% or a muted tonal step. | Do not leave a bright raised offset on disabled controls. |
 
 ## Godot StyleBoxFlat Translation Notes
 
-Reserved for Plan 03.1-05.
+Baseline flat recipe:
+
+| Concept | Godot-oriented sketch |
+|---|---|
+| Fill | `StyleBoxFlat.bg_color` from role/surface token. |
+| Border | `border_color` and `border_width_*` for outlined or focus-adjacent states. |
+| Radius | `corner_radius_*` from direction-specific shape scale. |
+| Padding | `content_margin_*` from desktop/mobile density tokens. |
+| Shadow | `shadow_size = -1` for flat baseline and any family that should not use hard extruded composition. |
+
+Extruded-flat translation:
+
+- Prefer wrapper/two-layer composition (Recipe B) over direct `StyleBoxFlat` shadow.
+- The offset duplicate must be a hard-edged solid shape, not a blurred shadow.
+- Offset should be small: 2-4px desktop, potentially 3-5px mobile if Phase 3.4 mockups approve.
+- Raised styling must preserve stable layout dimensions; hover, focus, pressed, text, and icons must not resize controls.
+- Direct `shadow_offset` remains a research note only until Phase 3.2 proves it produces an acceptable hard duplicate without violating the no-soft-shadow rule.
 
 ## Control-Family Matrix
 
