@@ -202,11 +202,77 @@ D-14 coverage note: `SpinBox`, `CodeEdit`, `GraphEdit`, `GraphNode`, `GraphFrame
 
 ## Godot Visual Recipe Notes
 
-Reserved for Plan 03.1-02.
+These recipes are implementation-neutral sketches. They describe what Phase 3.2 architecture and Phase 4+ token implementation must support, without deciding code structure.
+
+### Flat `StyleBoxFlat` Baseline
+
+| Slot | Recipe sketch | Godot field / source |
+|---|---|---|
+| Fill | One solid semantic surface or role color. | `bg_color`; https://docs.godotengine.org/en/stable/classes/class_styleboxflat.html |
+| Border | Optional 1px outline role for outlined controls and panels. | `border_color`, `border_width_*` |
+| Corners | MD3 shape role translated to integer corner radii. | `corner_radius_top_left`, `corner_radius_top_right`, `corner_radius_bottom_left`, `corner_radius_bottom_right` |
+| Padding | Tokenized content margins per Control family. | `content_margin_*` |
+| Shadows | Disabled in the flat baseline. | `shadow_size = -1` per project no-soft-shadow rule and StyleBoxFlat shadow pitfall. |
+| Anti-aliasing | Keep antialiased corners/edges enabled unless a future Godot screenshot pass proves a renderer issue. | StyleBoxFlat AA fields; verify in GL Compatibility later. |
+
+### State-Layer Approximation
+
+Create state styleboxes by blending the state-layer color over the container color:
+
+```text
+state_color = blend(container_color, state_layer_color, opacity)
+```
+
+State values cross-check:
+
+| State | Value | Application sketch |
+|---|---:|---|
+| hover 8% | 0.08 | Blend role/on-role color over base container for `hover` stylebox. |
+| focus 12% | 0.12 | Blend focus/on-role color where useful, plus visible 2px focus ring. |
+| pressed 12% | 0.12 | Blend toward on-role or darken filled accents for `pressed`. |
+| dragged 16% | 0.16 | Use for draggable sliders, split handles, tab reorder, graph elements. |
+| disabled 38% content | 0.38 | Derive disabled text/icon colors. |
+| disabled container 12% | 0.12 | Derive disabled filled/outline containers. |
+
+Numeric correctness note: hover/focus/pressed/dragged are sourced from Material Web system state tokens; disabled 38% content / disabled container 12% is sourced from Material Web filled/outlined button component tokens. The Phase 3.1 Verification Log must keep this source agreement visible.
+
+### Focus Recipe
+
+Focus must be a separate visible ring, not only a font color or background tint:
+
+- 2px solid focus ring.
+- No glow, blur, chromatic aberration, or soft shadow.
+- Ring color comes from the approved theme primary/focus role.
+- The ring must remain visible against normal, hover, pressed, checked, selected, and disabled-adjacent surfaces.
+
+### Disabled Recipe
+
+Use two channels:
+
+- Content: text, icon, checkmark, slider handle, and progress label use disabled 38% content treatment.
+- Container: filled background, outline, or track uses disabled container 12% treatment.
+
+Godot may require precomputed colors per state slot rather than runtime alpha stacking. That is implementation detail for Phase 4; this document only requires the derived colors to follow the documented values.
+
+### Surface Ramp Translation
+
+| MD3 role family | NeoCade research alias | Godot targets |
+|---|---|---|
+| `surface` | base/root | root Control background, Window base. |
+| `surface-container-low` | low/secondary | inactive tabs, scroll tracks, low-emphasis list rows. |
+| `surface-container` | panel | Panel, PanelContainer, GraphEdit workspace. |
+| `surface-container-high` | raised/action field | Button normal, LineEdit, OptionButton, MenuBar. |
+| `surface-container-highest` | overlay | PopupMenu, PopupPanel, TooltipPanel, AcceptDialog/FileDialog surface. |
+
+The final hex values are intentionally absent. Phase 3.4 approval and Phase 4 token implementation own them.
 
 ## Adoption, Rejection, and Open Questions
 
-Reserved for Plans 03.1-02 and 03.1-03.
+| Category | Adopt | Reject / defer | Open for downstream |
+|---|---|---|---|
+| Baseline MD3 | Tokenized roles, tonal surfaces, state-layer values, shape/type scales, component hierarchy. | Roboto dependency, dynamic wallpaper sourcing, soft shadow elevation, app/runtime motion. | Which final NeoCade directions should be denser, rounder, brighter, or more restrained. |
+| Godot mapping | Exact mappings where natural; composed mappings for SpinBox, CodeEdit, Tree, dialogs, and graph surfaces. | Fake Material component names for Godot-specific Controls. | Phase 3.2 must validate how dynamic theme subclasses generate all mapped slots. |
+| Accessibility | 2px focus ring, state layers, on-role contrast discipline. | Glow-only focus, hover-only focus, low-contrast disabled text. | Final contrast values after theme palettes are approved. |
 
 ## Anti-Cyberpunk and Anti-Texture Audit
 
