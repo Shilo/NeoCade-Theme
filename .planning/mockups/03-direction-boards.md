@@ -69,3 +69,15 @@ Boardwalk Sunset remains the recommended baseline because it best matches the lo
 | Orbital Playdeck | Can become Tron, cyberpunk, or a spaceship cockpit. | Keep it bright, social, and visitable; use clean immersive-venue surfaces, not military, terminal, glitch, or dystopian cues. |
 
 All directions use Inter Variable Roman only. Heading distinction comes from optical size, weight, scale, density, and composition, with synthetic italic and functional system-fallback samples shown in the detailed boards.
+
+## Concept Image Outputs
+
+Concept image: mood/atmosphere and shape-language reference, not a final UI preview.
+
+| Direction | Concept image | Prompt |
+| --- | --- | --- |
+| Midnight Marquee | `concepts/midnight-marquee-concept.png` | `concepts/midnight-marquee-prompt.md` |
+| Boardwalk Sunset | `concepts/boardwalk-sunset-concept.png` | `concepts/boardwalk-sunset-prompt.md` |
+| Cabinet Chrome | `concepts/cabinet-chrome-concept.png` | `concepts/cabinet-chrome-prompt.md` |
+| Prize Pop Plaza | `concepts/prize-pop-plaza-concept.png` | `concepts/prize-pop-plaza-prompt.md` |
+| Orbital Playdeck | `concepts/orbital-playdeck-concept.png` | `concepts/orbital-playdeck-prompt.md` |
