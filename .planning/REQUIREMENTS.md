@@ -19,8 +19,8 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Design Mockups & Approval Gate (DESIGN)
 
-- [ ] **DESIGN-01**: Phase 3 produces 3 HTML/SVG palette mockups in `.planning/mockups/` showing surface ramp + accent palette + sample Controls for each of the 3 candidate palettes (A: Midnight Marquee, B: Boardwalk Sunset recommended, C: Cabinet Chrome). User selects one at Step 1 approval.
-- [ ] **DESIGN-02**: Phase 3 produces 2 typography mockups exploring Variant A (Inter-only — recommended per FONT-REVIEW.md applying consistency principle) vs Variant B (Inter + Outfit headings — override option if user prefers two-stylistic-face design at the gate). User selects one at Step 2 approval.
+- [x] **DESIGN-01**: Phase 3 produces 3 HTML/SVG palette mockups in `.planning/mockups/` showing surface ramp + accent palette + sample Controls for each of the 3 candidate palettes (A: Midnight Marquee, B: Boardwalk Sunset recommended, C: Cabinet Chrome). User selects one at Step 1 approval.
+- [x] **DESIGN-02**: Phase 3 produces 2 typography mockups exploring Variant A (Inter-only — recommended per FONT-REVIEW.md applying consistency principle) vs Variant B (Inter + Outfit headings — override option if user prefers two-stylistic-face design at the gate). User selects one at Step 2 approval.
 - [ ] **DESIGN-03**: Phase 3 produces 1 full-fidelity desktop Control gallery HTML mockup showing every Godot Control class with realistic content, all states visible, ~1500 lines HTML+CSS. Approved by user at Step 3.
 - [ ] **DESIGN-04**: Phase 3 produces 1 mobile-variant mockup (per ARCHITECTURE Section 6 Step 5b) showing the same Controls at mobile sizes (360×800 + 768×1024 viewports) with tap-target overlays visible (≥48px); approved together with DESIGN-03.
 - [ ] **DESIGN-05**: `DESIGN_TOKENS.md` finalized with both desktop and mobile token blocks (color tokens, typography scale, spacing scale, corner radius scale, stroke widths, elevation/surface ramp, interaction state opacities). Committed before any `.tres` styling work begins.
@@ -85,16 +85,16 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Design System Tokens (TOKEN)
 
-- [ ] **TOKEN-01**: Color token system: 5-stop M3 tonal surface ramp (`surface` / `surface-container-low` / `surface-container` / `surface-container-high` / `surface-container-highest`) with friendlier aliases (base / secondary / panel / raised / overlay) per SUMMARY Conflict 2.
-- [ ] **TOKEN-02**: 8-hue accent palette + semantic role aliases (`role.primary` → chosen accent, `role.success`, `role.warning`, `role.danger`, `role.info`, plus decorative accents).
-- [ ] **TOKEN-03**: 3 text colors (`text.strong` / `text.default` / `text.muted`) verified WCAG 2.1 AA against every surface stop.
+- [x] **TOKEN-01**: Color token system: 5-stop M3 tonal surface ramp (`surface` / `surface-container-low` / `surface-container` / `surface-container-high` / `surface-container-highest`) with friendlier aliases (base / secondary / panel / raised / overlay) per SUMMARY Conflict 2.
+- [x] **TOKEN-02**: 8-hue accent palette + semantic role aliases (`role.primary` → chosen accent, `role.success`, `role.warning`, `role.danger`, `role.info`, plus decorative accents).
+- [x] **TOKEN-03**: 3 text colors (`text.strong` / `text.default` / `text.muted`) verified WCAG 2.1 AA against every surface stop.
 - [ ] **TOKEN-04**: `surface.sunken` token is REJECTED for v1 (per SUMMARY Conflict 2); inputs distinguished via focus/normal stylebox + corner radius.
-- [ ] **TOKEN-05**: 4-rung corner radius scale: `radius.none=0` / `radius.sm=4` / `radius.md=8` / `radius.lg=12`. Default 4px (godot-minimal-theme parity); 8px on PopupPanel/Window; 12px on dialogs.
-- [ ] **TOKEN-06**: 8-step spacing scale: `space.0` through `space.8` (4px base scale: 0/4/8/12/16/24/32/48 — desktop). Mobile overrides: +50% on `space.4` and above.
-- [ ] **TOKEN-07**: Stroke width set: 1px hairline default; 2px focus rings; 3px reserved for danger emphasis. Integer pixels only (no fractional widths under GL Compatibility).
-- [ ] **TOKEN-08**: Elevation model: color-only (tonal surface ramp). NO drop shadows in v1 (per SUMMARY Conflict 3 + FEATURES AF-13 + GL Compatibility issue #23640). Optional 1px lighter top-bevel border allowed on raised buttons.
-- [ ] **TOKEN-09**: Interaction state system uses M3 deterministic state-layer model: hover 8% overlay, focus 12% overlay + 2px outer ring in `role.primary`, pressed 12% overlay, dragged 16% overlay, disabled 38% text / 12% container. Reproducible from any base color.
-- [ ] **TOKEN-10**: Type scale spine (M3-derived; all UI surfaces use Inter — heading discrimination via `opsz` axis + `wght`, not via family switch): display-small 36 (Inter opsz=32 wght=800) / headline-small 24 (Inter opsz=32 wght=700) / title-large 20 (Inter opsz=24 wght=600) / title-medium 16 (Inter wght=600) / body-large 16 (Inter wght=400) / body-medium 14 (Inter wght=400) / body-small 12 (Inter wght=400) / label-large 14 (Inter wght=500) / label-small 11 (Inter wght=500) / code 13 (consumer-supplied mono via override pattern; theme provides no mono in v1 per Option D).
+- [x] **TOKEN-05**: 4-rung corner radius scale: `radius.none=0` / `radius.sm=4` / `radius.md=8` / `radius.lg=12`. Default 4px (godot-minimal-theme parity); 8px on PopupPanel/Window; 12px on dialogs.
+- [x] **TOKEN-06**: 8-step spacing scale: `space.0` through `space.8` (4px base scale: 0/4/8/12/16/24/32/48 — desktop). Mobile overrides: +50% on `space.4` and above.
+- [x] **TOKEN-07**: Stroke width set: 1px hairline default; 2px focus rings; 3px reserved for danger emphasis. Integer pixels only (no fractional widths under GL Compatibility).
+- [x] **TOKEN-08**: Elevation model: color-only (tonal surface ramp). NO drop shadows in v1 (per SUMMARY Conflict 3 + FEATURES AF-13 + GL Compatibility issue #23640). Optional 1px lighter top-bevel border allowed on raised buttons.
+- [x] **TOKEN-09**: Interaction state system uses M3 deterministic state-layer model: hover 8% overlay, focus 12% overlay + 2px outer ring in `role.primary`, pressed 12% overlay, dragged 16% overlay, disabled 38% text / 12% container. Reproducible from any base color.
+- [x] **TOKEN-10**: Type scale spine (M3-derived; all UI surfaces use Inter — heading discrimination via `opsz` axis + `wght`, not via family switch): display-small 36 (Inter opsz=32 wght=800) / headline-small 24 (Inter opsz=32 wght=700) / title-large 20 (Inter opsz=24 wght=600) / title-medium 16 (Inter wght=600) / body-large 16 (Inter wght=400) / body-medium 14 (Inter wght=400) / body-small 12 (Inter wght=400) / label-large 14 (Inter wght=500) / label-small 11 (Inter wght=500) / code 13 (consumer-supplied mono via override pattern; theme provides no mono in v1 per Option D).
 
 ### Control Coverage (COV)
 
