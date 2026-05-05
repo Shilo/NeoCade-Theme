@@ -5,7 +5,8 @@ redirect_date: 2026-05-04
 replaced_by:
   - 03.1-source-dive-md3-and-flat-3d-game-ui-research
   - 03.2-godot-dynamic-theme-architecture-research
-  - 03.3-visual-direction-flat-extruded-flat-mockup-approval-gate
+  - 03.3-theme-direction-research
+  - 03.4-visual-direction-flat-extruded-flat-mockup-approval-gate
 ---
 
 # Phase 3 — REDIRECTED 2026-05-04
@@ -37,15 +38,18 @@ The user explicitly requested historical retention: any v0 direction may be revi
 - Plans 03-04 and 03-05 will not be executed in their current form.
 - Phase 3 will not be re-executed; its functionality is split into Phase 3.1 (research) + Phase 3.2 (revised mockup phase).
 
-## What's next (post-architecture-revision 2026-05-04)
+## What's next (post-architecture-revision + theme-direction-insertion 2026-05-04)
 
-Three replacement phases (1 + 2 are parallel-eligible):
+**Four replacement phases** (3.1 + 3.2 parallel-eligible; 3.3 + 3.4 sequential):
 
 1. `/gsd-discuss-phase 3.1` — Phase 3.1: Source-Dive — MD3 + MD3 Expressive + Flat-3D Game UI Research (visual design language)
-2. `/gsd-discuss-phase 3.2` — Phase 3.2 (NEW): Source-Dive — Godot Dynamic Theme Architecture Research (`NeoCadeTheme` superclass + per-theme subclass feasibility validation; primary deliverable is a working code spike at `.planning/spikes/dynamic-theme/`)
-3. After Phase 3.1 + 3.2 verify: `/gsd-discuss-phase 3.3` — Phase 3.3 (was Phase 3.2): Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat). Mockups demonstrate the dynamic superclass through 4-grid format (flat × raised × desktop × mobile from one subclass).
+2. `/gsd-discuss-phase 3.2` — Phase 3.2: Source-Dive — Godot Dynamic Theme Architecture Research (`NeoCadeTheme` superclass + per-theme subclass feasibility validation; primary deliverable is a working code spike at `.planning/spikes/dynamic-theme/`). Parallel-eligible with Phase 3.1.
+3. `/gsd-discuss-phase 3.3` — Phase 3.3: Theme Direction Research — derive **5 NEW candidate theme directions** from user goals + restrictions + per-v0-direction reactions as DNA (NOT v0 name carryovers). Outputs `.planning/research/THEME-DIRECTIONS.md` with text-level user-approval checkpoint.
+4. `/gsd-discuss-phase 3.4` — Phase 3.4 (was Phase 3.3 → 3.2 originally): Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat). Mockups demonstrate the dynamic superclass — Step 1 shows BOTH flat AND raised per direction (10 concept boards = 5 directions × 2 variations); Step 2 shows 1-3 finalists in full 4-grid (flat × raised × desktop × mobile).
 
-Phase 3.3 mockup gate replaces the original Phase 3 gate. Phase 4 cannot start until Phase 3.3 user approval is logged in writing.
+**The user's per-v0-direction reactions feed directly into Phase 3.3 as DNA inputs (not name carryovers).** New directions MUST have NEW names — no Midnight Marquee/Boardwalk Sunset/Cabinet Chrome/Prize Pop Plaza/Orbital Playdeck reuse. Phase 3.3 is forced to derive directions FROM SCRATCH applying the user's goals + restrictions filter.
+
+Phase 3.4 mockup gate replaces the original Phase 3 gate. Phase 4 cannot start until Phase 3.4 user approval is logged in writing.
 
 ## User feedback log captured for Phase 3.2 input
 
