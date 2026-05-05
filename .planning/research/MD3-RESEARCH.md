@@ -351,10 +351,23 @@ Skeleton audit gate: every adoption must be checked against the hard filter abov
 
 ## Flat vs Raised: When to Use Which
 
-Reserved final matrix for Plan 03.1-06. Baseline principle: MD3 flat treatment is the default; raised treatment is optional extruded-flat affordance, not conventional shadow elevation.
+Baseline principle: MD3 flat treatment is the default; raised treatment is optional extruded-flat affordance, not conventional shadow elevation.
+
+| Situation | Prefer flat | Prefer raised | Evidence basis / downstream owner |
+|---|---|---|---|
+| Dense desktop/editor-like UI | Yes. Preserve scan speed, table/list density, and text stability. | Rare. Use only for one or two key actions. | MD3 hierarchy + FEATURES/MINIMAL-THEME coverage axis; Phase 3.4 visual approval. |
+| Primary action button | Flat is acceptable for quiet directions. | Yes when direction wants friendly mobile-game affordance. | Flat-3D user exemplars + MD3 button hierarchy. |
+| Secondary/text/toolbar action | Yes. | Usually no; maybe `RaisedButton` opt-in if future requirement accepts it. | Escape hatch note; Phase 3.3/3.4 decision. |
+| Text field / editor | Yes. Inputs stay flat/outlined. | No, except tiny SpinBox steppers may inherit button treatment. | MD3 text field mapping; FLAT-3D matrix. |
+| Popup/dialog shell | Yes: tonal high surface. | Only selected action row/buttons, not a soft-shadow shell. | Popup Window pitfall + no-soft-shadow rule. |
+| Passive labels/separators | Yes. | No visible raised delta. | Typography/divider principles. |
+| Theme direction mockups | Show flat baseline for every direction. | Show raised variation for every direction in Phase 3.4. | Phase 3.4 requirement: 5 directions x 2 variations. |
 
 ## Phase 3.1 Verification Log
 
 | Date | Plan | Check | Result |
 |---|---|---|---|
 | 2026-05-05 | 03.1-01 | Skeleton created with source roles, source-access status labels, citation contract, hard filter, Inter Variable Roman note, provenance table, and reserved headings. | Pending command verification. |
+| 2026-05-05 | 03.1-02 | MD3 foundations/mapping/recipes verified with URL count, numeric state-layer values, source-access labels, source agreement, mapping terms, and StyleBoxFlat recipe checks. | PASS |
+| 2026-05-05 | 03.1-03 | MD3 Expressive source facts, adopt/reject/open synthesis, post-launch check, and drift audit verified. | PASS |
+| 2026-05-05 | 03.1-06 | Final cross-document audit checked Flat vs Raised matrix, numeric state values, source agreement, source-access status, and populated anti-filter audit. | PASS |

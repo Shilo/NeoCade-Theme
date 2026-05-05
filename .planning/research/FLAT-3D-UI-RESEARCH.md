@@ -217,10 +217,26 @@ Skeleton audit gate: any adoption that depends on gradient shine, bevel highligh
 
 ## Flat vs Raised: When to Use Which
 
-Reserved final matrix for Plan 03.1-06. Baseline principle: flat is the default design language; raised is an optional extruded-flat affordance for controls that benefit from a more tactile invitation.
+Baseline principle: flat is the default design language; raised is an optional extruded-flat affordance for controls that benefit from a more tactile invitation.
+
+| Control / context | Use flat when... | Use raised when... | Recommendation |
+|---|---|---|---|
+| Buttons and button-like controls | The direction is dense, editor-like, or action hierarchy is already obvious through color/outline. | The direction needs friendly tactile/mobile-game energy or a clearer primary CTA. | Raised changes strongly; most visible raised family. |
+| Text inputs and editors | Always for input field shells, code gutters, and read-heavy areas. | Only tiny SpinBox steppers may inherit subtle button treatment. | Normally stays flat. |
+| Panels and containers | Almost always; panels are layout/readability surfaces. | Only headers/actions inside panels, not large content shells. | Normally stays flat. |
+| Popups/dialogs/windows/tooltips | The shell should read as highest tonal surface. | Action buttons or title/action bars may use raised treatment. | Changes subtly and selectively. |
+| Lists/trees/tabs/menus | Rows need dense scan speed and stable height. | Selected tabs/chips/menu items can get subtle hard offset if mockups prove it helps. | Changes subtly. |
+| Range/progress controls | Tracks and progress fills are status surfaces. | Handles/grabbers may lift during hover/dragged states. | Changes subtly. |
+| Advanced Godot controls | Evidence is absent or control is composite. | Only child actions/nodes with clear press/selection affordance. | NeoCade-owned decision. |
+| Labels/RichText/separators | Always. | Never. | No visible raised delta. |
+
+Final handoff: Phase 3.4 mockups must show both flat and raised versions for each candidate direction so the user can judge whether raised energy supports the direction or makes it feel toy-like.
 
 ## Phase 3.1 Verification Log
 
 | Date | Plan | Check | Result |
 |---|---|---|---|
 | 2026-05-05 | 03.1-01 | Skeleton created with source roles, source-access status labels, citation contract, hard filter, solid top shape plus offset darker duplicate rule, raised-toggle semantics, and reserved headings. | Pending command verification. |
+| 2026-05-05 | 03.1-04 | User exemplars, broad survey rows, visual-capture notes, rejection rows, and pattern catalogue verified. | PASS |
+| 2026-05-05 | 03.1-05 | Recipe A/B decision, wrapper/two-layer recommendation, Control-family matrix, and escape-hatch notes verified. | PASS |
+| 2026-05-05 | 03.1-06 | Final cross-document audit checked Flat vs Raised matrix, visual-capture fields, hard-filter audit, adopt/reject/open decisions, and forbidden implementation surface status. | PASS |
