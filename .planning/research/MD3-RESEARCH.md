@@ -57,7 +57,7 @@ v0 DNA note: Midnight Marquee and Cabinet Chrome dark saturated colors, Prize Po
 | Source | URL | Evidence role | source-access status | Retrieved | Facts captured | source agreement / gap |
 |---|---|---|---|---|---|---|
 | Material color system overview | https://m3.material.io/styles/color/system/overview | official/spec | browser/manual verified; fallback source used | 2026-05-05 | Official landing URL for color system, key colors, tonal palettes, dynamic color principle, and semantic roles. | Official page returned `This website requires JavaScript`; Android Developers and Material Web token files supply extractable corroboration. |
-| Android Developers Material Design 3 in Compose | https://developer.android.com/develop/ui/compose/designsystems/material3 | official/spec | directly extracted | 2026-05-05 | Material theme subsystems, five key colors, tonal palettes, dynamic color setup, color-role usage, 15-role typography values, shape examples, accessibility guidance, system UI ripple/overscroll notes, and MD3 Expressive current note. | Source agreement: corroborates Material official role model and Material Web token values. Last updated 2026-05-01 UTC on source page. |
+| Android Developers Material Design 3 in Compose | https://developer.android.com/develop/ui/compose/designsystems/material3 | official/spec | directly extracted | 2026-05-05 | Material theme subsystems, five key colors, tonal palettes, dynamic color setup, color-role usage, 15-role typography values, shape examples, accessibility guidance, system UI ripple/overscroll notes, and MD3 Expressive current note. | Source agreement: corroborates Material official role model and Material Web token values. Last updated 2026-03-30 UTC per source/search result. |
 | Material type scale tokens | https://m3.material.io/styles/typography/type-scale-tokens | official/spec | browser/manual verified; fallback source used | 2026-05-05 | Official URL retained for type scale token canon. | Official page returned `This website requires JavaScript`; Android Developers and Material Web raw `_md-sys-typescale.scss` supply accessible values. |
 | Material Web type scale source | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-sys-typescale.scss | upstream token source | upstream-token corroborated | 2026-05-05 | 15 typography roles with size, line-height, tracking, and weight tokens. | Source agreement: rem values match Android Developers px values at 16px root; Material Web additionally exposes tracking. |
 | Material shape scale tokens | https://m3.material.io/styles/shape/shape-scale-tokens | official/spec | browser/manual verified; fallback source used | 2026-05-05 | Official URL retained for shape token canon. | Official URL redirected to a JS-rendered shape page in this runtime; Material Web shape source and Android Developers shape examples supply accessible values. |
@@ -157,7 +157,47 @@ Motion is informational for Phase 3.1. Android Developers and the Google MD3 Exp
 
 ## MD3 Expressive Delta
 
-Reserved for Plan 03.1-03.
+### Source Status and Dates
+
+| Source | URL | Evidence role | source-access status | Retrieved / source date | Facts captured | source agreement / gap |
+|---|---|---|---|---|---|---|
+| Material official Expressive blog entry | https://m3.material.io/blog/building-with-m3-expressive | official/spec | browser/manual verified; fallback source used | Retrieved 2026-05-05 | Official Material URL for building with M3 Expressive. | Official page is JS-rendered in this runtime; Android Developers and Google blog sources provide extractable corroboration. |
+| Google launch post | https://blog.google/products/android/material-3-expressive-android-wearos-launch/ | official/spec | directly extracted | Published 2025-05-13; retrieved 2026-05-05 | Public launch framing for Android/Wear OS refresh and personalization. | Source agreement: aligns with Android Developers page that M3 Expressive expands MD3 and complements Android 16 visual style/system UI. |
+| Legacy/redirected Google URL from plan | https://blog.google/products-and-platforms/platforms/android/material-3-expressive-android-wearos-launch/ | official/spec | fallback source used | Retrieved 2026-05-05 | Planned URL path appears superseded by the `products/android` URL. | Non-blocking fallback: use canonical Google blog URL above. |
+| Android Developers Material Design 3 in Compose | https://developer.android.com/develop/ui/compose/designsystems/material3 | official/spec | directly extracted | Last updated 2026-03-30 UTC; retrieved 2026-05-05 | Current source check: Jetpack Compose implements Material You and Material 3 Expressive; Expressive expands MD3 across theming, components, motion, typography, and more. | Source agreement: current developer docs confirm Expressive is still the active MD3 evolution, not only a 2025 announcement. |
+| Compose Material 3 release notes | https://developer.android.com/jetpack/androidx/releases/compose-material3 | official/spec | directly extracted | Latest update 2026-04-22; retrieved 2026-05-05 | Current-source check after the 2025-05-13 announcement; lists stable 1.4.0 and alpha 1.5.0-alpha18, plus Wear OS Expressive guidance. | Source agreement: confirms active development and that Wear OS Expressive uses Wear Compose Material 3 rather than the phone/tablet library. |
+| Wear OS 6 features | https://developer.android.com/training/wearables/versions/6/features?hl=en | official/spec | directly extracted | Last updated 2026-03-05 UTC; retrieved 2026-05-05 | Wear OS 6 includes a design refresh based on Material 3 Expressive. | Source agreement: separates Wear OS round-display behavior from reusable visual-language principles. |
+| Android Developers Blog for Wear OS Expressive | https://android-developers.googleblog.com/2025/08/introducing-material-3-expressive-for-wear-os.html | official/spec | directly extracted | Published 2025-08-25; retrieved 2026-05-05 | Post-launch official/developer source describing Wear OS Expressive personality and round-screen quick-action confidence. | Source agreement: useful as platform-specific evidence; NeoCade rejects Wear OS round-display behavior as implementation scope. |
+| Official extraction gap row | https://m3.material.io/ | official/spec | unresolved extraction gap | Retrieved 2026-05-05 | Direct non-JS extraction from Material official pages remains limited. | Non-blocking: all Expressive facts used here are corroborated by current Google/Android Developers sources; no downstream owner unless Phase 3.3 wants official-page screenshots. |
+
+### Delta vs Baseline MD3
+
+| Expressive delta | Official/source basis | NeoCade interpretation |
+|---|---|---|
+| More personality | Google launch post and Android Developers docs present Expressive as a research-backed expansion intended to make products more engaging/desirable. | Adopt stronger direction-level personality in Phase 3.3: different themes may vary shape, hierarchy, accent confidence, and density more than baseline MD3 would. |
+| More expressive color | Google/Android sources connect Expressive to personalization and dynamic color. | Adopt controlled saturation and bolder color hierarchy, but not Android wallpaper dynamic color or magenta/cyan synthwave lock-in. |
+| Theming + component updates | Android Developers current page names theming and components as part of the Expressive expansion. | Adopt larger emphasis moments and clearer action hierarchy in static controls. |
+| Motion | Android Developers names motion as part of Expressive. | Reject/defer as Theme behavior. A Godot Theme resource cannot encode spring choreography or product-level animation. |
+| Typography | Android Developers names typography as part of Expressive. | Adopt scale, weight, and layout expressiveness inside Inter Variable Roman only; do not add a display font. |
+| Android 16 system UI | Android Developers says M3 Expressive complements Android 16 visual style/system UI. | Reject system UI behavior as out of scope. NeoCade is cross-platform Godot UI, not Android-native system chrome. |
+| Wear OS behavior | Wear OS sources apply Expressive to round displays and quick actions. | Reject round-display-specific layout as source authority for NeoCade; keep only the idea of glanceable quick-action hierarchy. |
+
+### Static Design-Language Value for NeoCade
+
+Adopt:
+
+- Stronger personality than baseline MD3, expressed through theme-direction-specific shapes, density, surface rhythm, and accent distribution.
+- Saturated but controlled color: colorful/playful/expressive without making every surface loud.
+- Larger emphasis moments where static Theme resources can show them: primary action buttons, selected tabs, active toggles, dialog actions, and major navigation surfaces.
+- Expressive shape/scale where it improves hierarchy: larger corners or bigger target surfaces in some directions, without bevels or texture.
+- Glanceable hierarchy: quick scan of primary/secondary/disabled/focused states through color, outline, scale, and typography.
+
+Reject/defer:
+
+- Android/Wear OS platform behavior, Live Updates, system notifications, system UI, round-display adaptation, dynamic wallpaper color, haptics, spring animation, blur/depth backgrounds, or any motion-only behavior.
+- Glow, synthwave pairings, textured/materialized chrome, painterly effects, or display-font substitutions.
+
+Post-launch check: A 2026-05-05 search found current official/developer sources after the 2025-05-13 announcement, specifically Android Developers Material 3 in Compose (last updated 2026-03-30 UTC), Compose Material 3 release notes (latest update 2026-04-22), and Wear OS 6 feature docs (last updated 2026-03-05 UTC). This means Phase 3.1 should treat Expressive as current active guidance, with Android/Wear OS platform features carefully filtered out for Godot Theme scope.
 
 ## Component to Godot Control Mapping
 
