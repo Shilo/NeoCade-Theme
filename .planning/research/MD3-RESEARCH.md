@@ -339,6 +339,16 @@ Expressive guardrail: every adopted Expressive idea must remain static, flat, In
 
 Skeleton audit gate: every adoption must be checked against the hard filter above. Any finding that relies on glow, blur, bevel gradient, texture, chrome shine, sci-fi HUD language, pixel art, or dark cyan/magenta synthwave pairing is rejected or rewritten before downstream use. MD3 Expressive can contribute stronger hierarchy, color confidence, playful shape, and glanceable emphasis, but only when translated into static, flat, Theme-compatible Godot styling.
 
+### MD3 Expressive Drift Audit
+
+| Risk | Why it can happen | Audit verdict | Safe NeoCade translation |
+|---|---|---|---|
+| Saturated color becomes synthwave | Expressive encourages stronger color, and old NeoCade prototype/v0 material over-indexed on cyan/magenta-darkness. | Reject any direction whose identity depends on cyan+magenta pairing, nightclub/noir darkness, glow, or sci-fi HUD vocabulary. | Use saturation in role hierarchy, accent families, selected states, and playful theme direction differences. Keep palettes broader and warmer or more arcade-social than synthwave. |
+| Expressive shape becomes bevel/emboss | Bigger shape and touch surfaces can be mistaken for 3D chrome. | Reject bevel gradients, embossing, carved outlines, inner shadows, metallic material, and texture. | Use simple `StyleBoxFlat` corner radii, flat borders, solid fills, and state-layer color changes. |
+| Glanceable emphasis becomes glow or blur | "Attention" is often drawn with bloom, outer shadow, blur, or halo effects. | Reject glow, blurred drop shadow, chromatic aberration, bloom, and soft depth backgrounds. | Use 2px solid focus rings, role color, bolder filled buttons, selected tab underline/fill, and larger static spacing/scale. |
+| Motion/haptics become Theme requirements | Expressive official sources include motion, haptics-adjacent platform feel, and Android/Wear OS behavior. | Reject/defer. Godot Theme resources cannot encode these and NeoCade must work across all 6 export targets. | Record them as inspiration for immediate state readability only. Any app-level animation belongs outside the theme. |
+| Wear OS roundness becomes universal pill UI | Wear OS Expressive sources emphasize round displays and quick actions. | Reject as implementation guidance. | Keep only the idea of quick-action clarity; desktop density and Godot editor/runtime controls still need restrained, scannable layouts. |
+
 ## Flat vs Raised: When to Use Which
 
 Reserved final matrix for Plan 03.1-06. Baseline principle: MD3 flat treatment is the default; raised treatment is optional extruded-flat affordance, not conventional shadow elevation.
