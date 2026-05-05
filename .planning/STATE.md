@@ -7,11 +7,11 @@ stopped_at: Phase 3 REDIRECTED 2026-05-04 at Plan 03-03 finalist-selection gate;
 last_updated: "2026-05-04T19:00:00.000Z"
 last_activity: 2026-05-04
 progress:
-  total_phases: 13
+  total_phases: 14
   completed_phases: 2
   total_plans: 15
   completed_plans: 12
-  percent: 15
+  percent: 14
 ---
 
 # Project State
@@ -20,17 +20,17 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-04)
 
-**Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships **N approved themes × 4 variations** (flat-desktop, flat-mobile, raised-desktop with extruded-flat depth, raised-mobile) produced from a single `@tool` TokenSet matrix — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect).
-**Current focus:** Phase 3 REDIRECTED 2026-05-04 → next is Phase 3.1 (MD3 + Flat-3D Game UI Research Spike), then Phase 3.2 (revised mockup phase)
+**Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships **N approved theme subclass `.tres` files** (one per theme) extending a dynamic `NeoCadeTheme` superclass. Consumer toggles `raised` / `platform` / `base_color` / `accent_color` exports for flat/raised × desktop/mobile/AUTO variations — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect). **Dynamic-theme architecture** locked 2026-05-04 architecture revision: `NeoCadeTheme` superclass (`@tool extends Theme`) regenerates entries from `@export` props; per-theme subclasses contribute personality.
+**Current focus:** Phase 3 REDIRECTED 2026-05-04 → next is Phase 3.1 (MD3 visual research) **parallel-eligible with** Phase 3.2 (Godot dynamic theme architecture research with feasibility validation), then Phase 3.3 (revised mockup phase)
 
 ## Current Position
 
-Phase: 3 REDIRECTED (visual-direction-mockup-approval-gate) — outputs preserved as v0 historical reference; functionality replaced by Phase 3.1 + 3.2
-Next: Phase 3.1 (Source-Dive — MD3 + MD3 Expressive + Flat-3D Game UI Research)
-Status: Awaiting `/gsd-discuss-phase 3.1`
-Last activity: 2026-05-04 (Phase 3 redirect captured)
+Phase: 3 REDIRECTED (visual-direction-mockup-approval-gate) — outputs preserved as v0 historical reference; functionality replaced by Phase 3.1 + 3.2 + 3.3
+Next: Phase 3.1 (MD3 visual research) and/or Phase 3.2 (Godot dynamic theme architecture research with feasibility spike) — parallel-eligible
+Status: Awaiting `/gsd-discuss-phase 3.1` and/or `/gsd-discuss-phase 3.2`
+Last activity: 2026-05-04 (architecture revision captured: NeoCadeTheme superclass + per-theme subclasses; AUTO platform detection; one .tres per theme)
 
-Progress: [██░░░░░░░░░░░] 15% (2 of 13 phases complete; Phase 3 REDIRECTED — does not count toward percent)
+Progress: [██░░░░░░░░░░░░] 14% (2 of 14 phases complete; Phase 3 REDIRECTED — does not count toward percent)
 
 ## Performance Metrics
 
@@ -74,7 +74,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 1 Plan 01 (2026-05-04): Dissection skeleton MINIMAL-THEME-DISSECTION.md committed with SHA-256-pinned provenance, verbatim helper bodies, and runtime-validated line citations — Plans 02/03 unblocked.
 - [Phase ?]: Phase 1 Plan 02 (2026-05-04): Per-Control enumeration appended to MINIMAL-THEME-DISSECTION.md — 80-token Active Verification Audit + 25 user-facing class sections + 3 NeoCade-additive sections (MenuBar/Panel/Window) + 1 combined container-chrome section + Pitfall 1.7 evidence anchor; 225 enumeration rows total; D-08 reconciliation surfaces 3 user-facing classes upstream does not theme.
 - Phase 2 verification (2026-05-04): LDtk source mining passed UAT with 5/5 checks, 0 issues; LDtk coverage is HIGH for v1 UI-theme research, with source outputs explicitly non-binding inspiration for Phase 3 mockups.
-- **Phase 3 REDIRECTED (2026-05-04):** User rejected the painterly arcade-venue direction at Plan 03-03 finalist-selection checkpoint. **Boardwalk Sunset (the original recommended baseline) is rejected.** New direction: **flat MD3 / MD3 Expressive visual identity, no textures / no patterns / no embossing / no gradients on chrome.** Optional "extruded flat 3D" raised variation per the Flat-3D Game UI pattern (per user's itch.io references). Each theme delivers 4 `.tres` variations: flat-desktop, flat-mobile, raised-desktop, raised-mobile. Architecture supports undefined number of themes. Phase 3 outputs (mood-board, 5 concept images, direction boards) preserved as v0 historical reference. Replaced by Phase 3.1 (research spike) + Phase 3.2 (revised mockup phase).
+- **Phase 3 REDIRECTED (2026-05-04):** User rejected the painterly arcade-venue direction at Plan 03-03 finalist-selection checkpoint. **Boardwalk Sunset (the original recommended baseline) is rejected.** New direction: **flat MD3 / MD3 Expressive visual identity, no textures / no patterns / no embossing / no gradients on chrome.** Optional "extruded flat 3D" raised variation per the Flat-3D Game UI pattern (per user's itch.io references). Phase 3 outputs (mood-board, 5 concept images, direction boards) preserved as v0 historical reference. Replaced by Phase 3.1 (MD3 visual research) + Phase 3.3 (revised mockup phase).
+- **Architecture revision (2026-05-04):** Replaced "4 static `.tres` per theme generated from TokenSet matrix" with **dynamic `NeoCadeTheme` superclass + per-theme subclasses**. Superclass is `@tool extends Theme` with `@export` props (`base_color`, `accent_color`, `raised: bool`, `platform: {DESKTOP, MOBILE, AUTO}`). Setters dynamically regenerate theme entries via `_get_base_color`-style formulas ported from passivestar's editor theme (driven by exports, not `EditorSettings`). Per-theme subclasses contribute personality (corner radii, outlines, color tint formula parameters). **One `.tres` per theme** (consumer toggles exports for variations). `platform=AUTO` auto-detects via `OS.has_feature("mobile")` at runtime; `DESKTOP` and `MOBILE` are forced sizes. **NEW Phase 3.2 inserted** between Phase 3.1 (visual research) and what is now Phase 3.3 (mockup phase, was 3.2): Godot Dynamic Theme Architecture Research with feasibility validation as primary deliverable. Architecture must prove feasible (working spike) before Phase 3.3 mockups assume it works.
 
 ### Pending Todos
 
@@ -125,8 +126,14 @@ Resume file: .planning/ROADMAP.md (see Phase 3.1 + 3.2 entries)
 - The finalist-selection checkpoint from Plan 03-03 is **NOT** to be answered; it's been routed around by this redirect.
 
 **What's next:**
-1. `/gsd-discuss-phase 3.1` — gather context for the MD3 / MD3 Expressive / Flat-3D Game UI research spike
-2. `/gsd-plan-review-convergence 3.1 --opencode` — plan + cross-AI review
-3. `/gsd-execute-phase 3.1` — execute research
-4. `/gsd-verify-work 3.1` → `/clear` → `/gsd-discuss-phase 3.2`
-5. Phase 3.2 mockup phase replaces the redirected Phase 3
+Phase 3.1 (MD3 visual research) and Phase 3.2 (Godot dynamic theme architecture research with feasibility spike) are **parallel-eligible** — different research domains, no shared deliverables.
+
+Recommended sequence (sequential, simpler):
+1. `/gsd-discuss-phase 3.1` → `/gsd-plan-review-convergence 3.1 --opencode` → `/gsd-execute-phase 3.1` → `/gsd-verify-work 3.1`
+2. `/clear` → `/gsd-discuss-phase 3.2` → `/gsd-plan-review-convergence 3.2 --opencode` → `/gsd-execute-phase 3.2` → `/gsd-verify-work 3.2`
+3. `/clear` → `/gsd-discuss-phase 3.3` → `/gsd-plan-review-convergence 3.3 --opencode` → `/gsd-execute-phase 3.3` → `/gsd-verify-work 3.3`
+4. Phase 3.3 mockup gate replaces the redirected Phase 3 gate; Phase 4 starts after approval
+
+Alternative parallel sequence (faster but more state to juggle):
+1. Run Phase 3.1 and Phase 3.2 in parallel sessions (each on its own branch ideally)
+2. Both complete → merge → Phase 3.3 begins with both research outputs available

@@ -4,7 +4,8 @@ status: REDIRECTED
 redirect_date: 2026-05-04
 replaced_by:
   - 03.1-source-dive-md3-and-flat-3d-game-ui-research
-  - 03.2-visual-direction-flat-extruded-flat-mockup-approval-gate
+  - 03.2-godot-dynamic-theme-architecture-research
+  - 03.3-visual-direction-flat-extruded-flat-mockup-approval-gate
 ---
 
 # Phase 3 — REDIRECTED 2026-05-04
@@ -36,13 +37,15 @@ The user explicitly requested historical retention: any v0 direction may be revi
 - Plans 03-04 and 03-05 will not be executed in their current form.
 - Phase 3 will not be re-executed; its functionality is split into Phase 3.1 (research) + Phase 3.2 (revised mockup phase).
 
-## What's next
+## What's next (post-architecture-revision 2026-05-04)
 
-1. `/gsd-discuss-phase 3.1` — gather context for Phase 3.1 (MD3 + MD3 Expressive + Flat-3D Game UI research spike)
-2. `/gsd-plan-review-convergence 3.1 --opencode` — plan + cross-AI review
-3. `/gsd-execute-phase 3.1` — execute research
-4. `/gsd-verify-work 3.1` → `/clear` → `/gsd-discuss-phase 3.2`
-5. Phase 3.2 mockup phase produces 5 new themes × 4 variations and replaces the original Phase 3 gate
+Three replacement phases (1 + 2 are parallel-eligible):
+
+1. `/gsd-discuss-phase 3.1` — Phase 3.1: Source-Dive — MD3 + MD3 Expressive + Flat-3D Game UI Research (visual design language)
+2. `/gsd-discuss-phase 3.2` — Phase 3.2 (NEW): Source-Dive — Godot Dynamic Theme Architecture Research (`NeoCadeTheme` superclass + per-theme subclass feasibility validation; primary deliverable is a working code spike at `.planning/spikes/dynamic-theme/`)
+3. After Phase 3.1 + 3.2 verify: `/gsd-discuss-phase 3.3` — Phase 3.3 (was Phase 3.2): Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat). Mockups demonstrate the dynamic superclass through 4-grid format (flat × raised × desktop × mobile from one subclass).
+
+Phase 3.3 mockup gate replaces the original Phase 3 gate. Phase 4 cannot start until Phase 3.3 user approval is logged in writing.
 
 ## User feedback log captured for Phase 3.2 input
 
@@ -60,15 +63,38 @@ The user explicitly requested historical retention: any v0 direction may be revi
 - The "Flat 3D Game UI" / "Extruded Flat UI" pattern (per user's itch.io references) is the optional **raised** variation: solid color + offset darker shape underneath = depth, no soft shadows/textures.
 - 5 themes, each in 4 variations (flat × raised × desktop × mobile) — undefined number of themes supported by architecture.
 
-## Theme variation matrix (NEW v1 spec)
+## Architecture revision (2026-05-04 — supersedes the original 4-`.tres`-per-theme plan)
 
-Per theme, 4 `.tres` files:
+The user revised the architecture to be **dynamic, not pre-baked**. Per theme, **one `.tres` file**:
 
-| Variation | Filename pattern |
-|-----------|------------------|
-| Flat × Desktop | `{theme}_flat_desktop.tres` |
-| Flat × Mobile | `{theme}_flat_mobile.tres` |
-| Raised × Desktop | `{theme}_raised_desktop.tres` |
-| Raised × Mobile | `{theme}_raised_mobile.tres` |
+```
+addons/neocade_theme/themes/prize_pop_plaza_neocade_theme.tres   # extends PrizePopPlazaNeoCadeTheme
+addons/neocade_theme/themes/cabinet_chrome_neocade_theme.tres    # extends CabinetChromeNeoCadeTheme
+... (one per approved theme)
+```
 
-5 themes × 4 variations = 20 `.tres` files for v1. Architecture supports undefined N. Phase 4 generator updated to produce N × 4 from a single TokenSet matrix.
+Each subclass extends a `NeoCadeTheme` superclass:
+
+```gdscript
+@tool
+class_name NeoCadeTheme extends Theme
+
+enum Platform { DESKTOP, MOBILE, AUTO }
+
+@export var base_color: Color
+@export var accent_color: Color
+@export var raised: bool = false
+@export var platform: Platform = Platform.DESKTOP
+# Setters trigger _regenerate_theme() that recomputes all entries
+```
+
+**Variation semantics:**
+- `raised = false` → flat surfaces, `shadow_size = -1` everywhere
+- `raised = true` → extruded-flat (offset darker shape underneath, no blur)
+- `platform = DESKTOP` → forced desktop sizes (32px button, 14px body)
+- `platform = MOBILE` → forced mobile sizes (48px button, 16px body, +50% spacing on space.4+)
+- `platform = AUTO` → auto-detect via `OS.has_feature("mobile")` at runtime
+
+**v1 file count:** N approved themes × 1 = N `.tres` files (was 4N). Each consumer toggles exports for the variation they want. Architecture supports undefined N.
+
+**Phase 3.2 (NEW) must validate this is feasible** with a working code spike before Phase 3.3 mockups assume it works. If feasibility fails, fallback to static-`.tres`-per-variation generator per the original plan.
