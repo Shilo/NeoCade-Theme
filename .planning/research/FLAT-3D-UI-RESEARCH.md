@@ -193,7 +193,19 @@ Matrix rule: every `NeoCade-owned decision` row still chooses a category and rat
 
 ## Escape Hatch Type-Variation Notes
 
-Reserved for Plan 03.1-05.
+Escape hatches are research recommendations only. Phase 3.1 must not edit `REQUIREMENTS.md`.
+
+| Type variation concept | Behavior | Why it exists | Requirement impact |
+|---|---|---|---|
+| `RaisedButton` | Opt-in raised styling while `raised=false`. | Lets a flat theme still mark one high-emphasis action as tactile. Useful for dialogs, launch actions, or game-like primary CTAs. | Not currently in the known TYPEVAR list. Future planning must decide whether adding it is worth the extra type-variation surface. |
+| `FlatButton` | Opt-out flat styling while `raised=true`. | Lets a raised theme keep toolbar/menu/secondary actions quiet and dense. | Already exists in TYPEVAR-01 as a Button type variation concept, so this escape hatch aligns with existing requirement language. |
+
+Guidance for Phase 3.3/3.4:
+
+- Show flat and raised variants side by side before deciding whether `RaisedButton` is worth adding.
+- Keep `FlatButton` available for dense toolbars, menus, and secondary actions.
+- Do not let escape hatches become a huge combinatorial set. The goal is one opt-in and one opt-out pressure valve, not per-color/per-control variants.
+- If `RaisedButton` is accepted later, update requirements in the proper planning phase rather than silently expanding Phase 3.1 scope.
 
 ## Adoption, Rejection, and Open Questions
 
