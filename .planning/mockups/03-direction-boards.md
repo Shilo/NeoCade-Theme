@@ -81,3 +81,80 @@ Concept image: mood/atmosphere and shape-language reference, not a final UI prev
 | Cabinet Chrome | `concepts/cabinet-chrome-concept.png` | `concepts/cabinet-chrome-prompt.md` |
 | Prize Pop Plaza | `concepts/prize-pop-plaza-concept.png` | `concepts/prize-pop-plaza-prompt.md` |
 | Orbital Playdeck | `concepts/orbital-playdeck-concept.png` | `concepts/orbital-playdeck-prompt.md` |
+
+## Compact Comparison Matrix
+
+| Axis | Midnight Marquee | Boardwalk Sunset | Cabinet Chrome | Prize Pop Plaza | Orbital Playdeck |
+| --- | --- | --- | --- | --- | --- |
+| Palette warmth | Cool navy with amber correction | Warm pine, amber, coral, mint | Neutral charcoal with orange focus | Dark neutral plus bright prize colors | Clean dark future with teal, amber, citrus, violet |
+| Density | Dense cabinet rows | Moderate public venue flow | Compact professional panels | Organized prize-wall density | Airier modular play zones |
+| Shape language | Bezel strips, marquee headers | Small-radius panels, ticket tabs | Hardware rails, bevels, control decks | Transparent bays, chunky controls | Rounded decks, capsules, modular portals |
+| Risk | Synthwave if cyan/pink dominate | Brown/orange overload if accents collapse | Generic editor chrome | Childish/toy-store drift | Tron/cockpit drift |
+| Accessibility status | Pass with warm accent discipline | Pass and recommended | Pass; muted text needs care | Pass in sketch; black labels on bright fills | Pass in sketch; violet text needs tuning |
+
+## Detailed Direction Boards
+
+### Midnight Marquee
+
+- **Promise:** Cool cabinet hall, warm marquee correction, and highest continuity with the original prototype.
+- **Sources:** ARCHITECTURE Palette A; MB-001, MB-017, MB-020, MB-021.
+- **Layout rhythm and density:** Dense rows, horizontal marquee strips, compact dialogs, stacked cabinet-panel rhythm.
+- **Shape and control geometry:** Small-radius cabinet bezels, narrow tab caps, tactile button clusters, slider rails with illuminated thumbs.
+- **Surface/material treatment:** Deep navy lacquered cabinet paint, amber panel caps, warm pink action rails, cyan support only.
+- **Token sketch:** Surface ramp `#0F1626`, `#141C2F`, `#1A2440`, `#243154`, `#2E3D68`; accents `#4FB8FF`, `#FF7BAC`, `#FFC857`, `#5BD99B`, `#FFB454`, `#FF6B6B`, `#7D8CFF`, `#E8EFFC`.
+- **Contrast sanity:** Body text 15.63:1 vs base; muted text 5.19:1 vs raised; focus 11.74:1 vs base. PASS, with `needs accessibility tuning` if cyan/pink compete as primary label colors.
+- **State sketch:** Hover raises tonal panel one stop, pressed darkens and shifts 1px, focus uses 2px amber ring, disabled opacity stays above readable contrast for labels.
+- **Typography:** Inter Variable Roman only; headings at larger `opsz` and `wght` 800. Synthetic italic sample is v1 oblique behavior. Latin plus non-Latin system fallback sample: `NeoCade / 日本語 / عربى`. Mono/code override sample: `Control.theme_type_variation = "CodeSmall"`.
+- **Desktop/mobile notes:** Desktop can carry dense cabinet rhythm. Mobile expands interactive rows to 48px and reduces simultaneous marquee rails.
+
+### Boardwalk Sunset
+
+- **Promise:** Recommended baseline; warm real-venue arcade hall with amber focus, coral reward accents, mint counter color, and professional editor-safe composition.
+- **Sources:** ARCHITECTURE Palette B; MB-002, MB-005, MB-006, MB-008, MB-018.
+- **Layout rhythm and density:** Open public venue flow, moderate density, panels that feel like counters and booths.
+- **Shape and control geometry:** Small-radius panels, ticket-stub tab accents, balanced lists, warm focus rails.
+- **Surface/material treatment:** Warm dark pine, amber/coral/mint accents, cream text color, no-shadow tonal elevation.
+- **Token sketch:** Surface ramp `#1A1410`, `#221A14`, `#2C2218`, `#3A2C20`, `#4A3828`; accents `#FFB347`, `#FF6B8A`, `#5DD3C3`, `#9CD168`, `#FFD166`, `#E84855`, `#D9C7B0`, `#FBF1E4`.
+- **Contrast sanity:** Body text 16.33:1 vs base; secondary text 9.45:1 vs panel; amber focus 10.24:1 vs base; danger non-text 3.52:1 vs raised. PASS and recommended.
+- **State sketch:** Hover warms panel by one surface stop, pressed uses deeper warm surface, focus is amber 2px ring, disabled keeps cream-to-warm contrast with reduced opacity.
+- **Typography:** Inter Variable Roman only; headings at `opsz` 32 and `wght` 780. Synthetic italic sample is v1 oblique behavior. Latin plus non-Latin system fallback sample: `NeoCade / 한국어 / हिन्दी`. Mono/code override sample remains consumer-supplied.
+- **Desktop/mobile notes:** Desktop is balanced and editor-friendly. Mobile uses 48px rows, fewer list columns, and the same warm focus signature.
+
+### Cabinet Chrome
+
+- **Promise:** Polished machine surfaces, LDtk/minimal-theme discipline, and safest editor-facing option.
+- **Sources:** ARCHITECTURE Palette C; MB-003, MB-007, MB-011, MB-019, MB-020.
+- **Layout rhythm and density:** Inspector grids, control-deck rows, precise separators, compact density.
+- **Shape and control geometry:** Hardware rails, bevel-like tonal edges, tabbed deck modules, dark molded controls.
+- **Surface/material treatment:** Graphite, brushed chrome cues, dark plastic, crisp orange focus.
+- **Token sketch:** Surface ramp `#1E2229`, `#252A33`, `#2E333F`, `#3A404D`, `#475065`; accents `#FFB020`, `#5C9CFF`, `#FF7849`, `#7FD984`, `#FFCC00`, `#C1CFEB`, `#8E99B8`, `#F2F5FA`.
+- **Contrast sanity:** Body text 14.6:1 vs base; secondary text 8.06:1 vs panel; muted text 4.34:1 vs panel. PASS, but muted small text needs accessibility tuning.
+- **State sketch:** Hover brightens panel edge, pressed uses inset darker deck, focus is orange 2px ring, disabled reduces control chrome without hiding labels.
+- **Typography:** Inter Variable Roman only; headings use tighter `opsz` 28 and `wght` 760. Synthetic italic sample is v1 oblique behavior. Latin plus non-Latin system fallback sample: `NeoCade / 中文 / עברית`. Mono/code override sample: inspector token preview.
+- **Desktop/mobile notes:** Desktop is strongest for dense editor panels. Mobile requires de-densifying grids into 48px stacked rows.
+
+### Prize Pop Plaza
+
+- **Promise:** Bright prize/counter/crane energy, reward-state clarity, and accessible big-button playfulness.
+- **Sources:** MB-012, MB-013, MB-014, MB-015, MB-016.
+- **Layout rhythm and density:** Prize-wall modules, progress cards, card-station rows, chunky 48px-friendly actions.
+- **Shape and control geometry:** Transparent bay frames, rounded control pads, card/ticket chips, joystick/button references.
+- **Surface/material treatment:** Mature dark neutral base, glassy prize cases, coral/lemon/mint/aqua reward color.
+- **Token sketch:** Surface ramp `#16191E`, `#1E242A`, `#2A3036`, `#343B42`, `#45515B`; accents `#FF6B61`, `#FFD34E`, `#9FE6B8`, `#5BDDE0`, `#FF8AB3`, `#FFB347`, `#B8E86B`, `#A78BFA`.
+- **Contrast sanity:** Body text 16.73:1 vs base; secondary text 9.87:1 vs panel; muted text 6.10:1 vs panel; coral/lemon/aqua non-text accents all pass 3:1. Bright fills use black labels.
+- **State sketch:** Hover raises prize tile, pressed darkens bay fill, focus uses aqua or lemon ring, disabled dims reward saturation while retaining label contrast.
+- **Typography:** Inter Variable Roman only; headings use larger playful scale and `wght` 800. Synthetic italic sample is v1 oblique behavior. Latin plus non-Latin system fallback sample: `NeoCade / ไทย / العربية`. Mono/code override sample: `reward_id: PRIZE_A7`.
+- **Desktop/mobile notes:** Naturally supports 48px tap targets. Mobile should paginate dense prize tiles and avoid toy-store clutter.
+
+### Orbital Playdeck
+
+- **Promise:** Friendly future arcade deck, spaceship-adjacent but public, social, optimistic, and constrained.
+- **Sources:** MB-010, MB-022, MB-023, MB-024, MB-025.
+- **Layout rhythm and density:** Modular playdeck zones, broad segmented controls, airy team-session panels.
+- **Shape and control geometry:** Rounded decks, capsule controls, portal-like panel modules, broad focus rings.
+- **Surface/material treatment:** Clean consumer-tech panels, projected play fields, teal/amber/violet accents on neutral future surfaces.
+- **Token sketch:** Surface ramp `#11171C`, `#192128`, `#242D35`, `#303B45`, `#41505A`; accents `#58DAD3`, `#FFC24A`, `#B896FF`, `#9BE86E`, `#FF7A67`, `#62A8FF`, `#F3F07B`, `#E76F9A`.
+- **Contrast sanity:** Body text 17.06:1 vs base; secondary text 9.42:1 vs panel; muted text 5.37:1 vs panel; teal/amber/violet accents pass 3:1 non-text. Violet needs tuning if used for small text.
+- **State sketch:** Hover uses projected-panel lift, pressed darkens capsule, focus uses amber ring, disabled removes future glow and keeps structure legible.
+- **Typography:** Inter Variable Roman only; future feel comes from spacing and panels, not sci-fi typography. Synthetic italic sample is v1 oblique behavior. Latin plus non-Latin system fallback sample: `NeoCade / 日本語 / हिन्दी`. Mono/code override sample: `session_state = "ready"`.
+- **Desktop/mobile notes:** Desktop can use broad playdeck zones. Mobile uses 48px segmented controls and fewer simultaneous team panels.

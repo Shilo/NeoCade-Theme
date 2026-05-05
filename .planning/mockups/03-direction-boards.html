@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NeoCade Phase 3 Direction Boards</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #101317;
+      --ink: #f4f7fb;
+      --muted: #b5c0cc;
+      --line: #333b46;
+      --panel: #181d24;
+      --panel2: #202731;
+      --focus: #ffb347;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      line-height: 1.45;
+      letter-spacing: 0;
+    }
+
+    main {
+      width: min(1520px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 56px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 4rem);
+      line-height: 0.95;
+      margin-bottom: 12px;
+      font-weight: 820;
+    }
+
+    h2 {
+      font-size: clamp(1.4rem, 2.2vw, 2.4rem);
+      line-height: 1.05;
+      margin-bottom: 12px;
+      font-weight: 780;
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+      font-weight: 760;
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 560px);
+      gap: 20px;
+      align-items: end;
+      padding: 20px 0 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .intro p {
+      color: var(--muted);
+      max-width: 860px;
+      margin-bottom: 0;
+      font-size: 1.02rem;
+    }
+
+    .recommendation {
+      border: 1px solid #72552f;
+      background: #221a13;
+      padding: 14px;
+      border-radius: 8px;
+    }
+
+    .recommendation strong { color: #ffca72; }
+
+    .comparison {
+      margin: 28px 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #151a20;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1020px;
+    }
+
+    caption {
+      caption-side: top;
+      text-align: left;
+      padding: 14px 16px;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      color: #ffcf78;
+    }
+
+    th, td {
+      border-top: 1px solid #2e3641;
+      border-right: 1px solid #2e3641;
+      padding: 11px 12px;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: #1d242d;
+      color: #eef4ff;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    td:first-child, th:first-child {
+      color: #ffcf78;
+      font-weight: 780;
+      width: 160px;
+      position: sticky;
+      left: 0;
+      background: #1b2129;
+      z-index: 2;
+    }
+
+    .board {
+      margin: 34px 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--panel);
+    }
+
+    .board-header {
+      display: grid;
+      grid-template-columns: minmax(300px, 48%) minmax(0, 1fr);
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+
+    .concept {
+      margin: 0;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #0b0e12;
+    }
+
+    .concept img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+    }
+
+    .concept figcaption {
+      padding: 9px 10px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .promise {
+      display: grid;
+      align-content: start;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 780px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mini {
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 94px;
+      background: rgba(0,0,0,0.12);
+    }
+
+    .mini b {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--accent, #ffbd5c);
+      margin-bottom: 6px;
+    }
+
+    .mini span, .mini p {
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin: 0;
+    }
+
+    .samples {
+      display: grid;
+      grid-template-columns: minmax(260px, 1.1fr) minmax(260px, 0.9fr);
+      gap: 16px;
+    }
+
+    .ui-sample, .spec {
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 14px;
+      background: rgba(0,0,0,0.14);
+    }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .accents {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .swatch {
+      min-height: 42px;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 6px;
+    }
+
+    .accent-dot {
+      min-height: 32px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.16);
+    }
+
+    .sample-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .tabs, .button-row, .state-row, .list {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .tab, .button, .field, .popup, .list-item, .pill {
+      border-radius: 6px;
+      border: 1px solid var(--sample-line, #41506a);
+      background: var(--sample-panel, #202838);
+      color: var(--sample-ink, #eef5ff);
+      min-height: 36px;
+      padding: 8px 12px;
+      font-size: 0.86rem;
+    }
+
+    .button.primary {
+      background: var(--sample-accent, #ffb347);
+      color: #0a0a0a;
+      border-color: color-mix(in srgb, var(--sample-accent, #ffb347), #000 25%);
+      font-weight: 800;
+    }
+
+    .field {
+      flex: 1 1 160px;
+      color: var(--sample-muted, #aeb8c8);
+    }
+
+    .popup, .list {
+      width: 100%;
+    }
+
+    .list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .focus { outline: 2px solid var(--sample-focus, #ffb347); outline-offset: 2px; }
+    .pressed { transform: translateY(1px); filter: brightness(0.88); }
+    .disabled { opacity: 0.44; }
+
+    .type-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .type-card {
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px;
+      background: rgba(0,0,0,0.16);
+      min-height: 86px;
+    }
+
+    .type-card strong {
+      display: block;
+      font-size: 1.1rem;
+      line-height: 1.1;
+      margin-bottom: 5px;
+    }
+
+    .type-card small {
+      color: var(--muted);
+      display: block;
+    }
+
+    .synthetic {
+      font-style: oblique 10deg;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      color: #cde7ff;
+    }
+
+    .contrast-list {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .contrast-list li {
+      border-left: 3px solid var(--sample-accent, #ffb347);
+      padding: 6px 8px;
+      background: rgba(255,255,255,0.04);
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    .midnight {
+      --accent: #ffc857;
+      --sample-panel: #1a2440;
+      --sample-line: #3b4d7c;
+      --sample-ink: #e8effc;
+      --sample-muted: #b5c2dd;
+      --sample-accent: #ffc857;
+      --sample-focus: #ffc857;
+      background: #0f1626;
+    }
+
+    .boardwalk {
+      --accent: #ffb347;
+      --sample-panel: #2c2218;
+      --sample-line: #5c4632;
+      --sample-ink: #fbf1e4;
+      --sample-muted: #d9c7b0;
+      --sample-accent: #ffb347;
+      --sample-focus: #ffb347;
+      background: #1a1410;
+    }
+
+    .chrome {
+      --accent: #ffb020;
+      --sample-panel: #2e333f;
+      --sample-line: #545d73;
+      --sample-ink: #f2f5fa;
+      --sample-muted: #c1cfeb;
+      --sample-accent: #ffb020;
+      --sample-focus: #ffb020;
+      background: #1e2229;
+    }
+
+    .prize {
+      --accent: #ffd34e;
+      --sample-panel: #2a3036;
+      --sample-line: #5f7178;
+      --sample-ink: #f7faf4;
+      --sample-muted: #cfe2da;
+      --sample-accent: #ffd34e;
+      --sample-focus: #5bdde0;
+      background: #16191e;
+    }
+
+    .orbital {
+      --accent: #58dad3;
+      --sample-panel: #242d35;
+      --sample-line: #54626d;
+      --sample-ink: #f3faf8;
+      --sample-muted: #c5d8d4;
+      --sample-accent: #58dad3;
+      --sample-focus: #ffc24a;
+      background: #11171c;
+    }
+
+    .layout-marquee .samples { grid-template-columns: 1fr 0.85fr; }
+    .layout-boardwalk .samples { grid-template-columns: 0.92fr 1.08fr; }
+    .layout-chrome .ui-sample { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .layout-prize .button { min-height: 48px; min-width: 96px; }
+    .layout-orbital .ui-sample { border-radius: 8px; }
+
+    @media (max-width: 860px) {
+      main { width: min(100% - 20px, 720px); padding-top: 14px; }
+      .intro, .board-header, .samples, .meta-grid, .type-row {
+        grid-template-columns: 1fr;
+      }
+      .board { padding: 12px; }
+      h1 { font-size: 2.15rem; }
+      .swatches { grid-template-columns: repeat(5, minmax(38px, 1fr)); }
+      .accents { grid-template-columns: repeat(4, minmax(38px, 1fr)); }
+      .button, .tab, .field, .popup, .list-item, .pill {
+        min-height: 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <section class="intro">
+    <div>
+      <h1>NeoCade Direction Boards</h1>
+      <p>Five concept-first art directions for the Phase 3 approval gate. These boards compare the complete visual energy, layout rhythm, shape language, surface behavior, token sketches, typography handling, and accessibility risk before any theme resource work begins.</p>
+    </div>
+    <aside class="recommendation">
+      <strong>Recommended baseline: Boardwalk Sunset.</strong>
+      It best matches "vibrant arcade hall by day": warm, colorful, professional, reusable, and least likely to drift into cyberpunk. The strongest alternatives are Prize Pop Plaza for playful reward clarity and Cabinet Chrome for editor-safe discipline.
+    </aside>
+  </section>
+
+  <section class="comparison" aria-labelledby="matrix-title">
+    <table>
+      <caption id="matrix-title">Comparison Matrix</caption>
+      <thead>
+        <tr>
+          <th>Axis</th>
+          <th>Midnight Marquee</th>
+          <th>Boardwalk Sunset</th>
+          <th>Cabinet Chrome</th>
+          <th>Prize Pop Plaza</th>
+          <th>Orbital Playdeck</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Palette Warmth</td>
+          <td>Cool navy with amber correction.</td>
+          <td>Warm pine, amber, coral, mint.</td>
+          <td>Neutral charcoal with orange focus.</td>
+          <td>Dark neutral plus bright prize colors.</td>
+          <td>Clean dark future with teal, amber, citrus, soft violet.</td>
+        </tr>
+        <tr>
+          <td>Density</td>
+          <td>Dense cabinet-row rhythm.</td>
+          <td>Moderate, open public venue flow.</td>
+          <td>Compact professional panels.</td>
+          <td>Organized prize-wall density.</td>
+          <td>Airier modular play zones.</td>
+        </tr>
+        <tr>
+          <td>Shape Language</td>
+          <td>Cabinet bezels, marquee strips, tight controls.</td>
+          <td>Small-radius panels, ticket tabs, warm counters.</td>
+          <td>Hardware rails, bevel edges, control decks.</td>
+          <td>Transparent bays, chunky controls, reward cards.</td>
+          <td>Rounded decks, capsules, modular portals.</td>
+        </tr>
+        <tr>
+          <td>Surface Material</td>
+          <td>Navy lacquered cabinet paint.</td>
+          <td>Warm stained cabinet and hospitality surfaces.</td>
+          <td>Graphite, brushed chrome, dark molded plastic.</td>
+          <td>Glass/plastic prize cases over mature dark base.</td>
+          <td>Clean consumer-tech panels and projection surfaces.</td>
+        </tr>
+        <tr>
+          <td>Accent Rhythm</td>
+          <td>Cyan, warm pink, amber marquee.</td>
+          <td>Amber primary, coral reward, mint counter.</td>
+          <td>Orange signature, blue support, red danger.</td>
+          <td>Coral, lemon, mint, aqua reward sequence.</td>
+          <td>Teal primary, amber focus, violet/citrus secondary.</td>
+        </tr>
+        <tr>
+          <td>UI Geometry</td>
+          <td>Rows, strips, stacked popups.</td>
+          <td>Balanced panels, lists, warm focus rails.</td>
+          <td>Inspector grids, tabs, sliders, deck modules.</td>
+          <td>Large 48px-friendly buttons and card tiles.</td>
+          <td>Segmented controls, team panels, wide deck spacing.</td>
+        </tr>
+        <tr>
+          <td>Risk Level</td>
+          <td>Medium: synthwave drift if pink/cyan dominate.</td>
+          <td>Low: warmth can become too brown if accents collapse.</td>
+          <td>Low-medium: could become generic editor chrome.</td>
+          <td>Medium: can become childish if novelty cues enter.</td>
+          <td>High: can become sci-fi cockpit or Tron if overdone.</td>
+        </tr>
+        <tr>
+          <td>Accessibility Status</td>
+          <td>Pass with known Architecture ratios; warm pink labels use dark text.</td>
+          <td>Pass and recommended; body/focus ratios are strongest.</td>
+          <td>Pass; muted text needs care on raised surfaces.</td>
+          <td>Pass in sketch; bright fills use black labels.</td>
+          <td>Pass in sketch; violet accents need tuning if used as text.</td>
+        </tr>
+        <tr>
+          <td>Recommended Use</td>
+          <td>Prototype continuity and cabinet nostalgia.</td>
+          <td>Default v1 candidate.</td>
+          <td>Editor-first fallback.</td>
+          <td>Playful reward-forward variant.</td>
+          <td>Future/game-world variant candidate only if constrained.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="board midnight layout-marquee" id="midnight-marquee">
+    <div class="board-header">
+      <figure class="concept">
+        <img src="concepts/midnight-marquee-concept.png" alt="Midnight Marquee concept image">
+        <figcaption>Concept image: mood/atmosphere and shape-language reference, not a final UI preview.</figcaption>
+      </figure>
+      <div class="promise">
+        <h2>Midnight Marquee</h2>
+        <p class="tagline">A cleaned-up version of the original cool cabinet-hall direction: deep navy panels, amber marquee strips, warm pink correction, and dense cabinet-row rhythm.</p>
+        <div class="meta-grid">
+          <div class="mini"><b>Sources</b><span>ARCHITECTURE Palette A; MB-001, MB-017, MB-020, MB-021.</span></div>
+          <div class="mini"><b>Layout</b><span>Dense strips, stacked dialogs, marquee headers, compact control rows.</span></div>
+          <div class="mini"><b>Guardrail</b><span>Warm amber and pink, no cyan/magenta synthwave pairing.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="samples">
+      <div class="ui-sample">
+        <h3>Mini UI Sample</h3>
+        <div class="sample-grid">
+          <div class="tabs"><span class="tab focus">Marquee</span><span class="tab">Cabinets</span><span class="tab">Scores</span></div>
+          <div class="button-row"><span class="button primary">Start</span><span class="button">Options</span><span class="button pressed">Pressed</span><span class="button disabled">Disabled</span></div>
+          <div class="field">Input field with warm focus rail</div>
+          <div class="popup">Popup frame with amber tab cap and warm-pink action button</div>
+          <div class="list"><span class="list-item">List row <b>selected</b></span><span class="list-item">Hover row <b>cyan</b></span></div>
+        </div>
+        <div class="type-row">
+          <div class="type-card"><strong>Inter opsz 32 / wght 800</strong><small>Heading, no second display face.</small></div>
+          <div class="type-card"><strong class="synthetic">synthetic italic</strong><small>Labelled v1 emphasis behavior.</small></div>
+          <div class="type-card"><strong>Latin / 日本語 / عربى</strong><small>system fallback sample, consumers may add script-specific Noto.</small></div>
+        </div>
+      </div>
+      <div class="spec">
+        <h3>Token Sketch And Contrast</h3>
+        <div class="swatches"><i class="swatch" style="background:#0F1626"></i><i class="swatch" style="background:#141C2F"></i><i class="swatch" style="background:#1A2440"></i><i class="swatch" style="background:#243154"></i><i class="swatch" style="background:#2E3D68"></i></div>
+        <div class="accents"><i class="accent-dot" style="background:#4FB8FF"></i><i class="accent-dot" style="background:#FF7BAC"></i><i class="accent-dot" style="background:#FFC857"></i><i class="accent-dot" style="background:#5BD99B"></i><i class="accent-dot" style="background:#FFB454"></i><i class="accent-dot" style="background:#FF6B6B"></i><i class="accent-dot" style="background:#7D8CFF"></i><i class="accent-dot" style="background:#E8EFFC"></i></div>
+        <ul class="contrast-list">
+          <li>contrast: on-surface vs surface 15.63:1; body text PASS.</li>
+          <li>contrast: muted vs raised 5.19:1; body/metadata PASS.</li>
+          <li>contrast: primary/focus non-text vs base 8.28:1 / 11.74:1; PASS.</li>
+          <li>needs accessibility tuning: keep pink/cyan as accents, not large competing label systems.</li>
+        </ul>
+        <p><code>mono override sample: Control.theme_type_variation = "CodeSmall"</code></p>
+        <p>Desktop: compact cabinet density. Mobile: all touch rows expand to 48px minimum with fewer simultaneous accent rails.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="board boardwalk layout-boardwalk" id="boardwalk-sunset">
+    <div class="board-header">
+      <figure class="concept">
+        <img src="concepts/boardwalk-sunset-concept.png" alt="Boardwalk Sunset concept image">
+        <figcaption>Concept image: mood/atmosphere and shape-language reference, not a final UI preview.</figcaption>
+      </figure>
+      <div class="promise">
+        <h2>Boardwalk Sunset</h2>
+        <p class="tagline">The recommended baseline: warm public arcade hall, amber focus, coral reward accents, mint counter color, and professional editor-safe composition.</p>
+        <div class="meta-grid">
+          <div class="mini"><b>Sources</b><span>ARCHITECTURE Palette B; MB-002, MB-005, MB-006, MB-008, MB-018.</span></div>
+          <div class="mini"><b>Layout</b><span>Open venue flow, moderate density, panels that feel like counters and booths.</span></div>
+          <div class="mini"><b>Guardrail</b><span>Preserve mint/coral variety so warmth does not collapse into brown-orange.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="samples">
+      <div class="spec">
+        <h3>Token Sketch And Contrast</h3>
+        <div class="swatches"><i class="swatch" style="background:#1A1410"></i><i class="swatch" style="background:#221A14"></i><i class="swatch" style="background:#2C2218"></i><i class="swatch" style="background:#3A2C20"></i><i class="swatch" style="background:#4A3828"></i></div>
+        <div class="accents"><i class="accent-dot" style="background:#FFB347"></i><i class="accent-dot" style="background:#FF6B8A"></i><i class="accent-dot" style="background:#5DD3C3"></i><i class="accent-dot" style="background:#9CD168"></i><i class="accent-dot" style="background:#FFD166"></i><i class="accent-dot" style="background:#E84855"></i><i class="accent-dot" style="background:#D9C7B0"></i><i class="accent-dot" style="background:#FBF1E4"></i></div>
+        <ul class="contrast-list">
+          <li>contrast: on-surface vs base 16.33:1; body text PASS.</li>
+          <li>contrast: variant vs panel 9.45:1; secondary text PASS.</li>
+          <li>contrast: focus amber vs base 10.24:1; focus ring PASS.</li>
+          <li>contrast: danger vs raised 3.52:1; non-text PASS, body labels use black/on-surface.</li>
+        </ul>
+        <p><code>mono override sample: code spans use consumer mono or Inter fallback in v1 docs.</code></p>
+        <p>Desktop: balanced editor panels. Mobile: 48px rows, reduced list density, same warm focus signature.</p>
+      </div>
+      <div class="ui-sample">
+        <h3>Mini UI Sample</h3>
+        <div class="sample-grid">
+          <div class="tabs"><span class="tab focus">Venue</span><span class="tab">Rewards</span><span class="tab">Settings</span></div>
+          <div class="list"><span class="list-item">Warm selected row <b>amber</b></span><span class="list-item">Counter accent <b>mint</b></span><span class="list-item">Ticket action <b>coral</b></span></div>
+          <div class="button-row"><span class="button primary">Confirm</span><span class="button">Cancel</span><span class="button pressed">Pressed</span><span class="button disabled">Disabled</span></div>
+          <div class="field">Input with pine panel fill</div>
+          <div class="popup">Popup/menu chrome with coral action tab and no-shadow policy</div>
+        </div>
+        <div class="type-row">
+          <div class="type-card"><strong>Inter opsz 32 / wght 780</strong><small>Warm signage through layout, not font switching.</small></div>
+          <div class="type-card"><strong class="synthetic">synthetic italic</strong><small>Small v1 emphasis only.</small></div>
+          <div class="type-card"><strong>Latin / 한국어 / हिन्दी</strong><small>system fallback sample for non-Latin scripts.</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="board chrome layout-chrome" id="cabinet-chrome">
+    <div class="board-header">
+      <figure class="concept">
+        <img src="concepts/cabinet-chrome-concept.png" alt="Cabinet Chrome concept image">
+        <figcaption>Concept image: mood/atmosphere and shape-language reference, not a final UI preview.</figcaption>
+      </figure>
+      <div class="promise">
+        <h2>Cabinet Chrome</h2>
+        <p class="tagline">The machine-polished option: charcoal panels, orange focus rhythm, chrome rails, pinball hardware cues, and the strongest editor-first discipline.</p>
+        <div class="meta-grid">
+          <div class="mini"><b>Sources</b><span>ARCHITECTURE Palette C; MB-003, MB-007, MB-011, MB-019, MB-020.</span></div>
+          <div class="mini"><b>Layout</b><span>Inspector grid, control deck rows, precise separators, compact density.</span></div>
+          <div class="mini"><b>Guardrail</b><span>Keep orange arcade control rhythm visible so it does not become generic chrome.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="samples">
+      <div class="ui-sample">
+        <h3>Mini UI Sample</h3>
+        <div class="sample-grid">
+          <div class="tabs"><span class="tab focus">Deck</span><span class="tab">Inspector</span><span class="tab">Output</span></div>
+          <div class="button-row"><span class="button primary">Apply</span><span class="button">Reset</span><span class="button pressed">Pressed</span><span class="button disabled">Disabled</span></div>
+          <div class="field">Numeric input / dropdown cluster</div>
+          <div class="field">Slider rail with orange thumb</div>
+          <div class="popup">Hardware-framed popup with precise close affordance</div>
+          <div class="list"><span class="list-item">Layer row <b>active</b></span><span class="list-item">Muted metadata <b>careful</b></span></div>
+        </div>
+      </div>
+      <div class="spec">
+        <h3>Token Sketch And Contrast</h3>
+        <div class="swatches"><i class="swatch" style="background:#1E2229"></i><i class="swatch" style="background:#252A33"></i><i class="swatch" style="background:#2E333F"></i><i class="swatch" style="background:#3A404D"></i><i class="swatch" style="background:#475065"></i></div>
+        <div class="accents"><i class="accent-dot" style="background:#FFB020"></i><i class="accent-dot" style="background:#5C9CFF"></i><i class="accent-dot" style="background:#FF7849"></i><i class="accent-dot" style="background:#7FD984"></i><i class="accent-dot" style="background:#FFCC00"></i><i class="accent-dot" style="background:#C1CFEB"></i><i class="accent-dot" style="background:#8E99B8"></i><i class="accent-dot" style="background:#F2F5FA"></i></div>
+        <ul class="contrast-list">
+          <li>contrast: on-surface vs surface 14.6:1; body text PASS.</li>
+          <li>contrast: variant vs panel 8.06:1; secondary text PASS.</li>
+          <li>contrast: muted vs panel 4.34:1; needs accessibility tuning for small body text.</li>
+          <li>contrast: orange focus vs base 8.73:1; focus ring PASS.</li>
+        </ul>
+        <div class="type-row">
+          <div class="type-card"><strong>Inter opsz 28 / wght 760</strong><small>Sharper hierarchy through weight and spacing.</small></div>
+          <div class="type-card"><strong class="synthetic">synthetic italic</strong><small>Rare emphasis; not a separate font.</small></div>
+          <div class="type-card"><strong>Latin / 中文 / עברית</strong><small>system fallback sample.</small></div>
+        </div>
+        <p><code>mono override sample: inspector code token preview</code></p>
+        <p>Desktop: strongest for dense editor panels. Mobile: 48px controls require de-densifying the inspector grid.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="board prize layout-prize" id="prize-pop-plaza">
+    <div class="board-header">
+      <figure class="concept">
+        <img src="concepts/prize-pop-plaza-concept.png" alt="Prize Pop Plaza concept image">
+        <figcaption>Concept image: mood/atmosphere and shape-language reference, not a final UI preview.</figcaption>
+      </figure>
+      <div class="promise">
+        <h2>Prize Pop Plaza</h2>
+        <p class="tagline">A bright, reward-forward arcade-counter direction: transparent prize bays, mature candy accents, card/ticket states, and large approachable controls.</p>
+        <div class="meta-grid">
+          <div class="mini"><b>Sources</b><span>MB-012, MB-013, MB-014, MB-015, MB-016.</span></div>
+          <div class="mini"><b>Layout</b><span>Prize-wall modules, progress cards, chunky 48px-friendly action rows.</span></div>
+          <div class="mini"><b>Guardrail</b><span>Reward clarity without mascots, novelty fonts, or toy-store clutter.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="samples">
+      <div class="ui-sample">
+        <h3>Mini UI Sample</h3>
+        <div class="sample-grid">
+          <div class="tabs"><span class="tab focus">Prizes</span><span class="tab">Tickets</span><span class="tab">Wallet</span></div>
+          <div class="button-row"><span class="button primary">Redeem</span><span class="button">Save</span><span class="button pressed">Pressed</span><span class="button disabled">Disabled</span></div>
+          <div class="list"><span class="list-item">Reward progress <b>lemon</b></span><span class="list-item">Success state <b>mint</b></span><span class="list-item">Action state <b>coral</b></span></div>
+          <div class="field">Card-station input with glassy bay outline</div>
+          <div class="popup">Transparent-case popup frame over dark neutral base</div>
+        </div>
+        <div class="type-row">
+          <div class="type-card"><strong>Inter opsz 32 / wght 800</strong><small>Big playful scale, still Inter-only.</small></div>
+          <div class="type-card"><strong class="synthetic">synthetic italic</strong><small>Use sparingly; reward labels stay upright.</small></div>
+          <div class="type-card"><strong>Latin / ไทย / العربية</strong><small>system fallback sample.</small></div>
+        </div>
+      </div>
+      <div class="spec">
+        <h3>Token Sketch And Contrast</h3>
+        <div class="swatches"><i class="swatch" style="background:#16191E"></i><i class="swatch" style="background:#1E242A"></i><i class="swatch" style="background:#2A3036"></i><i class="swatch" style="background:#343B42"></i><i class="swatch" style="background:#45515B"></i></div>
+        <div class="accents"><i class="accent-dot" style="background:#FF6B61"></i><i class="accent-dot" style="background:#FFD34E"></i><i class="accent-dot" style="background:#9FE6B8"></i><i class="accent-dot" style="background:#5BDDE0"></i><i class="accent-dot" style="background:#FF8AB3"></i><i class="accent-dot" style="background:#FFB347"></i><i class="accent-dot" style="background:#B8E86B"></i><i class="accent-dot" style="background:#A78BFA"></i></div>
+        <ul class="contrast-list">
+          <li>contrast: on-surface vs base 16.73:1; body text PASS.</li>
+          <li>contrast: variant vs panel 9.87:1; secondary text PASS.</li>
+          <li>contrast: muted vs panel 6.10:1; metadata PASS.</li>
+          <li>contrast: coral/lemon/aqua non-text vs panel 4.78:1 / 9.32:1 / 8.17:1; PASS with black labels on fills.</li>
+        </ul>
+        <p><code>mono override sample: reward_id: PRIZE_A7</code></p>
+        <p>Desktop: playful but organized. Mobile: naturally fits 48px tap targets, but dense prize tiles need pagination.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="board orbital layout-orbital" id="orbital-playdeck">
+    <div class="board-header">
+      <figure class="concept">
+        <img src="concepts/orbital-playdeck-concept.png" alt="Orbital Playdeck concept image">
+        <figcaption>Concept image: mood/atmosphere and shape-language reference, not a final UI preview.</figcaption>
+      </figure>
+      <div class="promise">
+        <h2>Orbital Playdeck</h2>
+        <p class="tagline">A friendly future-venue direction for the user's open sci-fi/spaceship possibility: social, bright, modular, visitable, and not a terminal/cockpit fantasy.</p>
+        <div class="meta-grid">
+          <div class="mini"><b>Sources</b><span>MB-010, MB-022, MB-023, MB-024, MB-025.</span></div>
+          <div class="mini"><b>Layout</b><span>Modular playdeck zones, broad segmented controls, airy team-session panels.</span></div>
+          <div class="mini"><b>Guardrail</b><span>No Tron grid, command terminal, military cockpit, glitch, or noir darkness.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="samples">
+      <div class="spec">
+        <h3>Token Sketch And Contrast</h3>
+        <div class="swatches"><i class="swatch" style="background:#11171C"></i><i class="swatch" style="background:#192128"></i><i class="swatch" style="background:#242D35"></i><i class="swatch" style="background:#303B45"></i><i class="swatch" style="background:#41505A"></i></div>
+        <div class="accents"><i class="accent-dot" style="background:#58DAD3"></i><i class="accent-dot" style="background:#FFC24A"></i><i class="accent-dot" style="background:#B896FF"></i><i class="accent-dot" style="background:#9BE86E"></i><i class="accent-dot" style="background:#FF7A67"></i><i class="accent-dot" style="background:#62A8FF"></i><i class="accent-dot" style="background:#F3F07B"></i><i class="accent-dot" style="background:#E76F9A"></i></div>
+        <ul class="contrast-list">
+          <li>contrast: on-surface vs base 17.06:1; body text PASS.</li>
+          <li>contrast: variant vs panel 9.42:1; secondary text PASS.</li>
+          <li>contrast: muted vs panel 5.37:1; metadata PASS.</li>
+          <li>contrast: teal/amber/violet non-text vs panel 8.25:1 / 8.70:1 / 5.89:1; PASS, violet needs tuning for small text.</li>
+        </ul>
+        <p><code>mono override sample: session_state = "ready"</code></p>
+        <p>Desktop: broad modular zones. Mobile: 48px segmented controls with fewer simultaneous team panels.</p>
+      </div>
+      <div class="ui-sample">
+        <h3>Mini UI Sample</h3>
+        <div class="sample-grid">
+          <div class="tabs"><span class="tab focus">Deck</span><span class="tab">Team</span><span class="tab">Portal</span></div>
+          <div class="button-row"><span class="button primary">Ready</span><span class="button">Queue</span><span class="button pressed">Pressed</span><span class="button disabled">Disabled</span></div>
+          <div class="field">Capsule input with amber focus ring</div>
+          <div class="popup">Projected-panel dialog with restrained teal emphasis</div>
+          <div class="list"><span class="list-item">Team slot <b>teal</b></span><span class="list-item">Challenge marker <b>amber</b></span><span class="list-item">Secondary role <b>violet</b></span></div>
+        </div>
+        <div class="type-row">
+          <div class="type-card"><strong>Inter opsz 32 / wght 760</strong><small>Future polish through spacing and panels, not sci-fi type.</small></div>
+          <div class="type-card"><strong class="synthetic">synthetic italic</strong><small>Limited emphasis only.</small></div>
+          <div class="type-card"><strong>Latin / 日本語 / हिन्दी</strong><small>system fallback sample.</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
