@@ -161,7 +161,44 @@ Reserved for Plan 03.1-03.
 
 ## Component to Godot Control Mapping
 
-Reserved for Plan 03.1-02.
+Mapping rule: exact Material component matches are useful where they exist, but Godot has many editor/runtime Controls that do not have a direct Material equivalent. Those must be composed from MD3 principles or labeled as NeoCade-owned decisions. No fake Material equivalent should be invented.
+
+| Godot Control / family | MD3 reference pattern | Mapping type | Visual direction for NeoCade | Source basis / note |
+|---|---|---|---|---|
+| Button | Filled, filled tonal, outlined, text, elevated button families | Exact | Base Button maps to a flat filled or tonal action depending on type variation. PrimaryButton/DangerButton/GhostButton/FlatButton can mirror MD3 action hierarchy while using NeoCade role names. | https://developer.android.com/develop/ui/compose/designsystems/material3 and Material Web button tokens. |
+| CheckBox | Checkbox selection control | Exact | Use MD3 state layers and role color for checked/focused states; keep icon geometry crisp and flat. | Material component pattern; Godot owns exact theme icon slots. |
+| CheckButton | Switch / toggle control | Exact-adjacent | Map to MD3 switch semantics, but render using Godot CheckButton theme slots. | MD3 switch principle; no one-to-one name but behavior matches. |
+| OptionButton | Button plus menu | Composed | Button chrome for closed state; PopupMenu surface/menu item rules for open state. | Compose Button + PopupMenu. Do not rely on parent theme inheritance because popup is a Window. |
+| MenuButton | Button plus menu | Composed | Same as OptionButton but with command/menu semantics rather than selected-value semantics. | Compose Button + PopupMenu. |
+| PopupMenu | Menus | Exact-adjacent | High surface role, item state layers, check/radio/submenu icons; no glow or texture. | Material menus; Godot PopupMenu has extensive item icons and separators. |
+| LinkButton | Text button / link | Exact-adjacent | Use text-button state layers and link role color; keep underline/hover behavior Godot-native. | MD3 text button hierarchy; Godot LinkButton-specific theme entries. |
+| ColorPickerButton | Button plus ColorPicker dialog | Composed | Button state model plus swatch affordance; open picker uses dialog/panel tokens. | No fake Material equivalent; compose from Button + ColorPicker + popup/dialog principles. |
+| LineEdit | Text field | Exact | Flat/outlined input with visible focus ring, selection/caret colors, placeholder text, and disabled text/container opacity. | MD3 text field principles; Godot LineEdit theme slots. |
+| TextEdit | Multi-line text field | Exact-adjacent | Same visual language as LineEdit with scroll, selection, caret, and read-only states. | MD3 text field principles; Godot TextEdit state entries. |
+| CodeEdit | Text field plus code gutter | Composed | TextEdit chrome plus gutter/line-number/bookmark/breakpoint affordances. Syntax colors are app-level, not Theme scope. | No fake Material equivalent; compose from text field and NeoCade-owned code-surface rules. |
+| SpinBox | Text field plus stepper buttons | Composed | LineEdit-style field with small button-like steppers; raised mode should not lift the whole field. | No fake Material equivalent; compose from text field + compact buttons. |
+| Label | Typography roles | Exact | Map MD3 type roles to Label type variations using Inter Variable Roman only. | Type scale source rows above. |
+| RichTextLabel | Typography roles plus rich text surface | Exact-adjacent | Same color/type scale as Label; BBCode/code snippets remain content-level, not new fonts. | Type scale source rows above; Godot RichTextLabel docs via FEATURES.md. |
+| ProgressBar | Linear progress indicator | Exact | Track/fill colors from role and state tokens; avoid animated behavior beyond app logic. | MD3 progress indicator principle. |
+| HSlider / VSlider | Slider | Exact | Track, active fill, handle, ticks, hover/dragged/focus states from MD3 state layers. | State-layer source rows; Godot Slider theme slots. |
+| HScrollBar / VScrollBar | Scrollbar | NeoCade-owned decision | MD3 has platform scrolling principles but not a direct theme component. Use low-emphasis track, clear grabber, and dragged 16% state. | No fake Material equivalent; derive from MD3 state hierarchy and Godot-minimal coverage. |
+| TabBar / TabContainer | Tabs | Exact-adjacent | Selected tab uses role accent and state layer; unselected tabs stay quiet; focus ring remains visible. | Material tab principles plus Godot TabBar slots. |
+| ItemList | Lists | Exact-adjacent | List items use hover 8%, selected state, focus ring/cursor, and optional icon accents. | Material list principles; Godot ItemList has cursor/selected theme entries. |
+| Tree | Lists plus disclosure / hierarchy | Composed | Tree rows follow list state layers; disclosure icons and guide lines are NeoCade-owned. | Compose Material lists + Godot tree affordances. |
+| Panel / PanelContainer | Surface / card | Exact-adjacent | Flat surface role with border/radius; raised mode normally stays flat unless used as popup/dialog shell. | Material surfaces/cards as inspiration; NeoCade no soft shadow. |
+| PopupPanel / TooltipPanel / TooltipLabel | Surface / tooltip | Exact-adjacent | Highest surface role, compact padding, high contrast, no blurred shadow. | Material tooltip/menu surface principles; popup separate-Window pitfall. |
+| Window / AcceptDialog / ConfirmationDialog / FileDialog | Dialogs / sheets | Composed | Dialog surface, title typography, action buttons, and inner list/input controls. | Compose Material dialog principles with Godot Window/Dialog-specific slots. |
+| MenuBar | App bar/menu launcher | NeoCade-owned decision | Quiet toolbar/menu row with button-like hover/focus states and PopupMenu continuity. | No fake Material equivalent; derive from navigation/action hierarchy. |
+| ColorPicker | Picker / composite editor | NeoCade-owned decision | Treat as advanced composite: fields, sliders, swatches, preview surfaces, and action buttons share base recipes. | No fake Material equivalent; Godot owns picker-specific theme entries. |
+| GraphEdit | Canvas/workspace surface | NeoCade-owned decision | Low-contrast workspace surface, grid/connection colors, drag/selection/focus feedback from state layers. | No fake Material equivalent; derive from MD3 surfaces and Godot graph editor needs. |
+| GraphNode | Card/node surface | NeoCade-owned decision | Card-like node surface, title strip, port colors, selection/focus rings; no fake Material component name. | Derived from Material cards + NeoCade graph semantics. |
+| GraphFrame | Grouping / section surface | NeoCade-owned decision | Low-emphasis grouping surface with outline and label typography; no raised treatment by default. | Derived from surface hierarchy. |
+| FoldableContainer | Disclosure section | Composed | Header button/list row plus collapsible panel body; disclosure icon from Tree semantics. | Compose Tree disclosure + PanelContainer surface. |
+| HSplitContainer / VSplitContainer | Drag handle / divider | NeoCade-owned decision | Divider line plus grabber icon; dragged 16% state if interactive. | No fake Material equivalent; derive from state layers and Godot split handle behavior. |
+| HSeparator / VSeparator | Divider | Exact-adjacent | Outline/variant color only; no raised delta. | Material divider principle. |
+| Passive layout Containers | Layout only | NeoCade-owned decision | Constants only where supported; no visible chrome. | No fake Material equivalent; do not theme invisible layout as surfaces. |
+
+D-14 coverage note: `SpinBox`, `CodeEdit`, `GraphEdit`, `GraphNode`, `GraphFrame`, `FileDialog`, `FoldableContainer`, `MenuBar`, and splitter/separator chrome are composed or NeoCade-owned mappings. They should inherit MD3 discipline, not Material component names.
 
 ## Godot Visual Recipe Notes
 
