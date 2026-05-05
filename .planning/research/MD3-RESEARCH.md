@@ -314,6 +314,27 @@ The final hex values are intentionally absent. Phase 3.4 approval and Phase 4 to
 | Godot mapping | Exact mappings where natural; composed mappings for SpinBox, CodeEdit, Tree, dialogs, and graph surfaces. | Fake Material component names for Godot-specific Controls. | Phase 3.2 must validate how dynamic theme subclasses generate all mapped slots. |
 | Accessibility | 2px focus ring, state layers, on-role contrast discipline. | Glow-only focus, hover-only focus, low-contrast disabled text. | Final contrast values after theme palettes are approved. |
 
+### MD3 Expressive Adopt / Reject / Open
+
+| Decision type | Expressive principle or feature | NeoCade decision | Rationale |
+|---|---|---|---|
+| Adopt | Stronger personality | Adopt static personality per theme direction. | Phase 3.3 can let candidate directions vary shape, saturation, density, and emphasis more boldly while staying flat MD3. |
+| Adopt | Saturated but controlled color | Adopt color confidence, not color chaos. | NeoCade should feel playful and modern; hard filter still rejects magenta/cyan synthwave lock-in and glow. |
+| Adopt | Bigger emphasis moments | Adopt for key controls. | Primary buttons, selected tabs, active toggles, dialog actions, and menu selections can get stronger scale/color contrast. |
+| Adopt | Expressive shape/scale | Adopt where static and density-safe. | Rounded corners, larger touch surfaces, and hierarchy changes can be rendered by Theme values. |
+| Adopt | Glanceable hierarchy | Adopt. | Good fit for arcade UI: users should immediately read action, state, disabled, focus, and selected surfaces. |
+| Reject | Spring animation / motion systems | Reject as v1 Theme behavior. | Godot Theme resources do not encode motion choreography; app-level animation can exist outside the theme later. |
+| Reject | Haptics | Reject. | Not a Theme resource capability and not universal across all 6 export targets. |
+| Reject | Blur/depth backgrounds | Reject. | Conflicts with no-soft-shadow/no-blur hard filter and GL Compatibility caution. |
+| Reject | Android system UI / Live Updates / notification behavior | Reject. | NeoCade is cross-platform Godot UI, not Android system chrome. |
+| Reject | Wear OS round-display behavior | Reject as implementation guidance. | Useful source for glanceable hierarchy only; round-screen layouts do not map to the Godot Theme addon. |
+| Reject | New fonts for expressiveness | Reject. | Inter Variable Roman remains the only v1 font assumption; expressiveness comes from weight, optical size, scale, color, shape, and layout. |
+| Open | Per-direction expressiveness | Phase 3.3 decision. | Some directions may be quieter (modern arcade control panel) while others may be friendlier/mobile-like. |
+| Open | Which Controls can grow larger/rounder | Phase 3.3/3.4 decision. | Need mockups to decide which Controls tolerate bolder shape without harming desktop density. |
+| Open | Flat vs raised emphasis split | Phase 3.4 decision. | Concept boards should show both flat and raised versions before final theme direction approval. |
+
+Expressive guardrail: every adopted Expressive idea must remain static, flat, Inter-only, no-gradient, no-texture, and no-soft-shadow. The phrase "expressive" does not license painterly chrome, sci-fi UI, or decorative material effects.
+
 ## Anti-Cyberpunk and Anti-Texture Audit
 
 Skeleton audit gate: every adoption must be checked against the hard filter above. Any finding that relies on glow, blur, bevel gradient, texture, chrome shine, sci-fi HUD language, pixel art, or dark cyan/magenta synthwave pairing is rejected or rewritten before downstream use. MD3 Expressive can contribute stronger hierarchy, color confidence, playful shape, and glanceable emphasis, but only when translated into static, flat, Theme-compatible Godot styling.
