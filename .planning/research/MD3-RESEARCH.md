@@ -56,15 +56,104 @@ v0 DNA note: Midnight Marquee and Cabinet Chrome dark saturated colors, Prize Po
 
 | Source | URL | Evidence role | source-access status | Retrieved | Facts captured | source agreement / gap |
 |---|---|---|---|---|---|---|
-| Material color system overview | https://m3.material.io/styles/color/system/overview | official/spec | pending Plan 02 | 2026-05-05 | Reserved for MD3 color system. | Official URL retained; JS extraction fallback expected if needed. |
-| Material type scale tokens | https://m3.material.io/styles/typography/type-scale-tokens | official/spec | pending Plan 02 | 2026-05-05 | Reserved for MD3 typography. | Official URL retained; upstream token corroboration expected. |
-| Material shape scale tokens | https://m3.material.io/styles/shape/shape-scale-tokens | official/spec | pending Plan 02 | 2026-05-05 | Reserved for MD3 shape. | Official URL retained; upstream token corroboration expected. |
-| Material state layers | https://m3.material.io/foundations/interaction/states/state-layers | official/spec | pending Plan 02 | 2026-05-05 | Reserved for state-layer values. | Official URL retained; upstream token corroboration expected. |
-| Material Web tokens | https://github.com/material-components/material-web/tree/main/tokens/versions | upstream token source | pending Plan 02 | 2026-05-05 | Reserved for numeric token corroboration. | Source agreement to be checked against official/developer docs. |
+| Material color system overview | https://m3.material.io/styles/color/system/overview | official/spec | browser/manual verified; fallback source used | 2026-05-05 | Official landing URL for color system, key colors, tonal palettes, dynamic color principle, and semantic roles. | Official page returned `This website requires JavaScript`; Android Developers and Material Web token files supply extractable corroboration. |
+| Android Developers Material Design 3 in Compose | https://developer.android.com/develop/ui/compose/designsystems/material3 | official/spec | directly extracted | 2026-05-05 | Material theme subsystems, five key colors, tonal palettes, dynamic color setup, color-role usage, 15-role typography values, shape examples, accessibility guidance, system UI ripple/overscroll notes, and MD3 Expressive current note. | Source agreement: corroborates Material official role model and Material Web token values. Last updated 2026-05-01 UTC on source page. |
+| Material type scale tokens | https://m3.material.io/styles/typography/type-scale-tokens | official/spec | browser/manual verified; fallback source used | 2026-05-05 | Official URL retained for type scale token canon. | Official page returned `This website requires JavaScript`; Android Developers and Material Web raw `_md-sys-typescale.scss` supply accessible values. |
+| Material Web type scale source | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-sys-typescale.scss | upstream token source | upstream-token corroborated | 2026-05-05 | 15 typography roles with size, line-height, tracking, and weight tokens. | Source agreement: rem values match Android Developers px values at 16px root; Material Web additionally exposes tracking. |
+| Material shape scale tokens | https://m3.material.io/styles/shape/shape-scale-tokens | official/spec | browser/manual verified; fallback source used | 2026-05-05 | Official URL retained for shape token canon. | Official URL redirected to a JS-rendered shape page in this runtime; Material Web shape source and Android Developers shape examples supply accessible values. |
+| Material Web shape source | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-sys-shape.scss | upstream token source | upstream-token corroborated | 2026-05-05 | Shape tokens: none, extra-small, small, medium, large, extra-large, full plus directional variants. | Source agreement: same role family as Android Developers; note numeric delta for `extraLarge` sample (Android page uses 24dp sample, Material Web v0.192 token says 28px). NeoCade does not adopt final radii here. |
+| Material state layers | https://m3.material.io/foundations/interaction/states/state-layers | official/spec | browser/manual verified; fallback source used | 2026-05-05 | Official URL retained for state-layer model. | Official page returned `This website requires JavaScript`; Material Web raw state tokens supply hover/focus/pressed/dragged values. |
+| Material Web state source | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-sys-state.scss | upstream token source | upstream-token corroborated | 2026-05-05 | hover 8%, focus 12%, pressed 12%, dragged 16%. | Source agreement: matches ARCHITECTURE.md and ROADMAP.md expected values. |
+| Material Web filled-button source | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-comp-filled-button.scss | upstream token source | upstream-token corroborated | 2026-05-05 | Disabled container opacity 12%, disabled label/icon opacity 38%, button height 40px, full corner token, state-layer token wiring. | Source agreement: supplies component-level disabled values not present in the system state file. |
+| Material Web outlined-button source | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-comp-outlined-button.scss | upstream token source | upstream-token corroborated | 2026-05-05 | Disabled outline opacity 12%, disabled label/icon opacity 38%, outline width 1px, state-layer token wiring. | Source agreement: corroborates disabled 38% content / 12% container-outline pattern. |
+| Material Web theming docs | https://material-web.dev/theming/material-theming/ | official/spec | directly extracted | 2026-05-05 | System token role names for color and typography in Material Web. | Source agreement: describes `--md-sys-color-*` and `--md-sys-typescale-*` role mapping used by components. |
+| Material Web shape docs | https://material-web.dev/theming/shape/ | official/spec | directly extracted | 2026-05-05 | Public CSS custom-property naming for shape tokens. | Source agreement: lists shape token names and sample small/medium/large values. |
+| Material Web elevation source | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-sys-elevation.scss | upstream token source | upstream-token corroborated | 2026-05-05 | MD3 elevation level numerics 0, 1, 3, 6, 8, 12. | Source agreement: useful as MD3 reference only; NeoCade rejects soft shadows and adopts tonal depth only. |
+| Material Web color source | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-sys-color.scss | upstream token source | upstream-token corroborated | 2026-05-05 | Dark/light semantic roles including primary, secondary, tertiary, surface-container ladder, outline, scrim, shadow. | Source agreement: corroborates Android Developers color-role guidance and NeoCade's 5-stop tonal surface ramp. |
+| Godot `StyleBoxFlat` docs | https://docs.godotengine.org/en/stable/classes/class_styleboxflat.html | official/spec | directly extracted | 2026-05-05 | `bg_color`, `border_color`, corner radius, content margins, `shadow_color`, `shadow_offset`, `shadow_size`, and skew warning. | Source agreement: confirms direct StyleBoxFlat shadow properties exist, but no hard-edged duplicate without shadow semantics is proven. |
+| Godot `Theme` docs | https://docs.godotengine.org/en/stable/classes/class_theme.html | official/spec | directly extracted | 2026-05-05 | Theme items, type variation checks, and merge APIs. | Source agreement: sufficient for mapping research; architecture validation stays Phase 3.2. |
+| Godot Theme type variations tutorial | https://docs.godotengine.org/en/stable/tutorials/ui/gui_theme_type_variations.html | official/spec | directly extracted | 2026-05-05 | Theme variation concepts used for Button/Label/Panel variant recommendations. | Source agreement: used for mapping/escape hatch notes only. |
+| Official Material JS extraction gap note | https://m3.material.io/ | official/spec | unresolved extraction gap | 2026-05-05 | Direct text extraction from several `m3.material.io` pages was not available without JavaScript. | Non-blocking: all required numeric facts are corroborated through Android Developers and Material Web raw token sources. No downstream owner unless Phase 3.3 needs visual screenshots from Material pages. |
 
 ## MD3 Foundations
 
-Reserved for Plan 03.1-02.
+### Foundation Summary
+
+Material Design 3 contributes a system grammar rather than a final NeoCade look: key colors generate tonal palettes; semantic color roles map those palettes into components; typography is organized into 15 named roles; shape is a token scale; interaction states are encoded as state layers; elevation is a system concept but NeoCade adopts only tonal depth because the project has a no-soft-shadow constraint.
+
+### Color System
+
+| MD3 concept | Source URL | evidence role | source-access status | Retrieved | Source fact / source agreement | NeoCade adoption boundary |
+|---|---|---|---|---|---|---|
+| key colors | https://developer.android.com/develop/ui/compose/designsystems/material3 | official/spec | directly extracted | 2026-05-05 | Android Developers says a color scheme is founded on five key colors, each related to a tonal palette of 13 tones. | Adopt the idea of key colors and tonal palettes as structure. Do not adopt Android wallpaper-derived dynamic color for v1. |
+| dynamic color principle | https://developer.android.com/develop/ui/compose/designsystems/material3 | official/spec | directly extracted | 2026-05-05 | Dynamic color can generate light/dark schemes from wallpaper on Android 12+. | Reject dynamic wallpaper sourcing for NeoCade v1; theme subclasses use curated base/accent colors. |
+| semantic roles | https://developer.android.com/develop/ui/compose/designsystems/material3 | official/spec | directly extracted | 2026-05-05 | Primary is used for prominent buttons/active states/tint of elevated surfaces; secondary expands color expression for less prominent components; tertiary balances or draws enhanced attention. | Adopt semantic role aliases (`primary`, `secondary`, `tertiary`, `danger`, etc.) rather than hue-only naming. |
+| accessible role pairing | https://developer.android.com/develop/ui/compose/designsystems/material3 | official/spec | directly extracted | 2026-05-05 | Android Developers warns to pair `on-primary` with `primary`, `on-primary-container` with `primary-container`, and equivalent role pairs for contrast. | Adopt strict on-role pairing and WCAG checks before any final token is accepted. |
+| surface roles | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-sys-color.scss | upstream token source | upstream-token corroborated | 2026-05-05 | Material Web exposes `surface`, `surface-container-lowest`, `surface-container-low`, `surface-container`, `surface-container-high`, and `surface-container-highest`. | Adopt the surface-container ladder as NeoCade's tonal depth vocabulary; final hex values belong to Phase 3.4/4. |
+
+NeoCade result: color should stay flat, saturated, playful, and role-driven. The source agreement across Android Developers and Material Web supports using MD3 as a role system. It does not justify glow, blur, or dynamic wallpaper-driven palettes.
+
+### Typography: 15-Role Type Scale
+
+All values below use the Android Developers px/sp display names and are cross-checked against Material Web rem tokens at a 16px root. NeoCade keeps Inter Variable Roman only; `displayLarge` etc. are roles, not font-family changes.
+
+| MD3 role | Size / line-height | Weight | Tracking source note | Source URL | source-access status | source agreement / NeoCade note |
+|---|---:|---|---|---|---|---|
+| displayLarge | 57 / 64 | regular | -0.25px from Material Web `-0.015625rem` | https://developer.android.com/develop/ui/compose/designsystems/material3 and https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-sys-typescale.scss | directly extracted; upstream-token corroborated | Android values and Material Web rem values agree. NeoCade may use this only for rare showcase or direction-board scale, with Inter Variable Roman. |
+| displayMedium | 45 / 52 | regular | 0 | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| displaySmall | 36 / 44 | regular | 0 | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| headlineLarge | 32 / 40 | regular | 0 | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| headlineMedium | 28 / 36 | regular | 0 | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| headlineSmall | 24 / 32 | regular | 0 | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| titleLarge | 22 / 28 | regular | 0 | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| titleMedium | 16 / 24 | medium | 0.15px from Material Web `0.009375rem` | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| titleSmall | 14 / 20 | medium | 0.1px from Material Web `0.00625rem` | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| bodyLarge | 16 / 24 | regular | 0.5px from Material Web `0.03125rem` | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| bodyMedium | 14 / 20 | regular | 0.25px from Material Web `0.015625rem` | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| bodySmall | 12 / 16 | regular | 0.4px from Material Web `0.025rem` | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| labelLarge | 14 / 20 | medium | 0.1px from Material Web `0.00625rem` | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| labelMedium | 12 / 16 | medium | 0.5px from Material Web `0.03125rem` | same as above | directly extracted; upstream-token corroborated | Agreement. |
+| labelSmall | 11 / 16 | medium | 0.5px from Material Web `0.03125rem` | same as above | directly extracted; upstream-token corroborated | Agreement. |
+
+NeoCade result: use the role ladder as a sizing spine, but do not copy Roboto or introduce a separate display family. Inter Variable Roman can vary by weight/opsz/size/layout. Letter spacing should be rounded cautiously in Godot because theme constants are not fractional typography systems.
+
+### Shape Scale
+
+| Shape token | Material Web value | Android Developers sample | Source URL | source-access status | source agreement / NeoCade note |
+|---|---:|---:|---|---|---|
+| corner-none | 0px | not listed in sample | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-sys-shape.scss | upstream-token corroborated | Adopt as divider/tab-strip option only. |
+| corner-extra-small | 4px | 4dp | same | upstream-token corroborated | Strong match; maps well to compact Godot controls. |
+| corner-small | 8px | 8dp | same | upstream-token corroborated | Strong match; useful for panels and larger buttons if direction wants softness. |
+| corner-medium | 12px | 12dp | same | upstream-token corroborated | Strong match; likely popup/card candidate. |
+| corner-large | 16px | 16dp | same | upstream-token corroborated | Strong match; use sparingly for expressive controls. |
+| corner-extra-large | 28px | 24dp sample | same plus https://developer.android.com/develop/ui/compose/designsystems/material3 | upstream-token corroborated; directly extracted | Numeric difference between Material Web token and Compose sample. Non-blocking because NeoCade final radii are not selected in Phase 3.1. |
+| corner-full | 9999px | full/circular concept | same | upstream-token corroborated | Useful for pill/toggle mode only; not a global shape default. |
+
+NeoCade mapping to `StyleBoxFlat`: use `corner_radius_*` for per-corner values. Shape can express personality, but must avoid bevels, embossing, texture, and conventional 3D.
+
+### State Layers and Disabled Values
+
+| State / value | Numeric fact | Source URL | evidence role | source-access status | Retrieved | source agreement / NeoCade translation |
+|---|---:|---|---|---|---|---|
+| hover 8% | `hover-state-layer-opacity: 0.08` | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-sys-state.scss | upstream token source | upstream-token corroborated | 2026-05-05 | Matches ROADMAP.md required hover 8%. Translate to a hover stylebox by blending the content/on-role color over the container. |
+| focus 12% | `focus-state-layer-opacity: 0.12` | same | upstream token source | upstream-token corroborated | 2026-05-05 | Matches ROADMAP.md required focus 12%. NeoCade additionally requires a 2px focus ring from project accessibility requirements. |
+| pressed 12% | `pressed-state-layer-opacity: 0.12` | same | upstream token source | upstream-token corroborated | 2026-05-05 | Matches ROADMAP.md required pressed 12%. |
+| dragged 16% | `dragged-state-layer-opacity: 0.16` | same | upstream token source | upstream-token corroborated | 2026-05-05 | Matches ROADMAP.md required dragged 16%; mostly relevant to sliders, tabs, graph nodes, splitters, and drag/drop affordances. |
+| disabled 38% content | `disabled-label-text-opacity: 0.38`; disabled icon opacity also 0.38 | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-comp-filled-button.scss and https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-comp-outlined-button.scss | upstream token source | upstream-token corroborated | 2026-05-05 | Matches ROADMAP.md disabled 38% content requirement. Use for disabled text/icon color derivation. |
+| disabled container 12% | `disabled-container-opacity: 0.12`; outlined disabled outline opacity 0.12 | same filled/outlined button sources | upstream token source | upstream-token corroborated | 2026-05-05 | Matches ROADMAP.md disabled container 12% requirement. Use for disabled background or outline, never as hidden/unreadable content. |
+| focus ring | 2px solid ring | .planning/ROADMAP.md and .planning/phases/03.1-source-dive-md3-and-flat-3d-game-ui-research/03.1-CONTEXT.md | project requirement | directly extracted from local project docs | 2026-05-05 | MD3 state-layer value alone is insufficient for Godot accessibility; NeoCade must provide a visible 2px ring without glow. |
+
+### Elevation
+
+| Concept | Source URL | source-access status | Source fact / source agreement | NeoCade decision |
+|---|---|---|---|---|
+| elevation levels | https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-sys-elevation.scss | upstream-token corroborated | Material Web exposes levels 0, 1, 3, 6, 8, 12. | Informational only. NeoCade does not use soft shadows in v1. |
+| elevated surfaces and tint | https://developer.android.com/develop/ui/compose/designsystems/material3 | directly extracted | Android Developers describes primary tint and component elevation in Material contexts. | Adopt tonal surface depth only: surface/container roles carry hierarchy. |
+| Godot shadow feasibility | https://docs.godotengine.org/en/stable/classes/class_styleboxflat.html | directly extracted | `shadow_color`, `shadow_offset`, and `shadow_size` exist; `shadow_color` has no effect when `shadow_size` is lower than 1. | Do not use StyleBoxFlat soft shadows as MD3 elevation. Raised-mode hard offset is investigated in Flat-3D research, not here. |
+
+### Motion
+
+Motion is informational for Phase 3.1. Android Developers and the Google MD3 Expressive launch post both discuss motion/system behavior, but a Godot Theme resource cannot encode spring animation, haptics, ripple behavior, overscroll, or runtime choreography. NeoCade may adopt the static visual intent behind motion: clear hierarchy, immediate state feedback, and glanceable emphasis. It rejects motion as a v1 Theme requirement.
 
 ## MD3 Expressive Delta
 
