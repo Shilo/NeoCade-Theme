@@ -65,7 +65,14 @@ v0 DNA note: Midnight Marquee, Cabinet Chrome, Prize Pop Plaza, and Orbital Play
 
 ## User Exemplar Provenance
 
-Reserved for Plan 03.1-04.
+These two sources are user exemplars: they define the visual direction the user meant by Flat-3D / extruded flat, but they are asset packs, not artwork to copy. NeoCade adopts construction principles only.
+
+| Source | URL | Evidence role | source-access status | Retrieved | screenshot / visual-capture note | What was read | Adopted construction principles | Rejected / non-portable parts | hard-filter audit |
+|---|---|---|---|---|---|---|---|---|---|
+| Renderman / HCGames Flat GUI for mobile games | https://hcgamestudios.itch.io/flat-game-ui-for-mobile-games | user exemplar; asset-pack example | directly extracted; browser/manual verified | 2026-05-05 | Page exposes multiple image links at the bottom (`Image` links 44-50) plus product preview images; visual-capture note: mobile/casual GUI pack with colorful flat buttons, panels, menus, and icons. | Page says the pack is flat, customizable, mobile-ready, includes main/login/level/info/shop/settings/score/victory/fail screens, 5 button colors, 68 icons per color, 345 buttons, 70+ flat icons, Photoshop and PNG files, vector shapes, editable organization. | Broad mobile GUI coverage; colorful role-coded buttons; solid simple shapes; multiple button colors; menu/dialog/screen coverage; editable vector source as evidence of flat construction. | Asset artwork, PNG/PSD workflow, icon art, Junegull/free font choices, and sprite-pack composition are not portable into a Godot Theme resource. NeoCade does not import or imitate the artwork. | PASS for construction vocabulary if reduced to solid top shape, flat fills, crisp icons, and optional offset duplicate. REJECT any background art or decorative sprite content as Theme scope. |
+| Fajrulaslim UI Button Flat Design | https://fajrulaslim.itch.io/ui-button-flat-design/devlog/157464/ui-button-flat-design | user exemplar; asset-pack example | directly extracted; browser/manual verified | 2026-05-05 | Page exposes image links 26-37; visual-capture note: button/icon model sheet with many flat variants. | Page says the asset is vector Adobe Illustrator, includes original Illustrator/EPS files, 678 UI button/icon models, 678 PNG sprites, and game-UI/button/icon tags. | Button-specific breadth; repeated button/icon states; editable vector shapes; solid, simple button families as construction evidence. | Illustrator/EPS/PNG sprite workflow, specific button silhouettes, and icon art are not portable. NeoCade must express only themeable shape/border/fill/state principles. | PASS for flat-button family evidence. REJECT copying icon/button models; use as construction principles only. |
+
+User-exemplar conclusion: the common transferable pattern is not the asset art; it is a reusable construction grammar: simple solid foreground shape, clear rounded silhouette, crisp icon/text layer, high-saturation role colors, and optional tactile depth from a solid top shape plus offset darker duplicate.
 
 ## Broad Visual Survey
 
