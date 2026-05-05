@@ -9,9 +9,9 @@ last_activity: 2026-05-04
 progress:
   total_phases: 15
   completed_phases: 2
-  total_plans: 15
+  total_plans: TBD
   completed_plans: 12
-  percent: 13
+  percent: 14
 ---
 
 # Project State
@@ -30,7 +30,7 @@ Next: Phase 3.1 (MD3 visual research) and/or Phase 3.2 (Godot dynamic theme arch
 Status: Awaiting `/gsd-discuss-phase 3.1` and/or `/gsd-discuss-phase 3.2`
 Last activity: 2026-05-04 (theme-direction phase 3.3 inserted: derives 5 candidate directions FROM SCRATCH using user goals + restrictions + v0 DNA, NOT v0 carryovers)
 
-Progress: [██░░░░░░░░░░░░░] 13% (2 of 15 phases complete; Phase 3 REDIRECTED — does not count toward percent)
+Progress: [██░░░░░░░░░░░░] 14% (2 of 14 active phases complete; Phase 3 REDIRECTED — excluded from active count)
 
 ## Performance Metrics
 
@@ -67,10 +67,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
 - Project init (2026-05-04): Mobile variant elevated to v1 must-have alongside desktop primary; cross-platform support across all 6 Godot export targets locked as v1 must-have.
-- Research synthesis (2026-05-04): SUMMARY.md Conflict 1 revised — ship Outfit Variable in v1 as display/marquee font; defer Inter Italic to v1.x; net bundle smaller (~1.85 MB) and more on-brand.
+- ~~Research synthesis (2026-05-04): SUMMARY.md Conflict 1 revised — ship Outfit Variable in v1 as display/marquee font; defer Inter Italic to v1.x; net bundle smaller (~1.85 MB) and more on-brand.~~ **SUPERSEDED 2026-05-04 by UD-4 Option D:** Inter Variable Roman ONLY in v1; Outfit + Noto Sans + JetBrains Mono all deferred (~810 KB bundle). See FONT-REVIEW.md.
 - Research synthesis (2026-05-04): SUMMARY.md Conflict 2 — adopt M3 5-stop tonal surface ramp as canonical with friendlier aliases (base/secondary/panel/raised/overlay); reject `surface.sunken` for v1.
 - Research synthesis (2026-05-04): SUMMARY.md Conflict 3 — no drop shadows in v1 (GL Compat over-renders shadow alpha per Godot #23640); elevation conveyed via tonal surface ramp only; `shadow_size = -1` on every StyleBoxFlat.
-- Roadmap (2026-05-04): 11-phase structure adopted from SUMMARY.md verbatim; mockup approval gate is hard blocker between Phase 3 and Phase 4; token-sharing strategy is `@tool` script generator (not `.tres` inheritance).
+- ~~Roadmap (2026-05-04): 11-phase structure adopted from SUMMARY.md verbatim; mockup approval gate is hard blocker between Phase 3 and Phase 4; token-sharing strategy is `@tool` script generator (not `.tres` inheritance).~~ **SUPERSEDED 2026-05-04 by Phase 3 redirect + architecture revision:** 15-phase structure (Phase 3 REDIRECTED, 3.1/3.2/3.3/3.4 inserted); mockup approval gate is between Phase 3.4 and Phase 4; token-sharing strategy is `NeoCadeTheme` superclass + per-theme subclasses (effective `.tres` inheritance via GDScript `class_name extends NeoCadeTheme`), NOT a TokenSet generator script.
 - [Phase ?]: Phase 1 Plan 01 (2026-05-04): Dissection skeleton MINIMAL-THEME-DISSECTION.md committed with SHA-256-pinned provenance, verbatim helper bodies, and runtime-validated line citations — Plans 02/03 unblocked.
 - [Phase ?]: Phase 1 Plan 02 (2026-05-04): Per-Control enumeration appended to MINIMAL-THEME-DISSECTION.md — 80-token Active Verification Audit + 25 user-facing class sections + 3 NeoCade-additive sections (MenuBar/Panel/Window) + 1 combined container-chrome section + Pitfall 1.7 evidence anchor; 225 enumeration rows total; D-08 reconciliation surfaces 3 user-facing classes upstream does not theme.
 - Phase 2 verification (2026-05-04): LDtk source mining passed UAT with 5/5 checks, 0 issues; LDtk coverage is HIGH for v1 UI-theme research, with source outputs explicitly non-binding inspiration for Phase 3 mockups.
