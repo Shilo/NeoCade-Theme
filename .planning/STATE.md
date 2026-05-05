@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
-status: Awaiting `/gsd-discuss-phase 3.1` and/or `/gsd-discuss-phase 3.2`
-stopped_at: Phase 3.1 context gathered
+status: Phase 3.1 context gathered; awaiting `/gsd-plan-review-convergence 3.1 --opencode`
+stopped_at: Phase 3.1 context gathered (interactive discuss-phase complete; D-01..D-16 captured)
 last_updated: "2026-05-05T03:46:02.946Z"
-last_activity: "2026-05-04 (theme-direction phase 3.3 inserted: derives 5 candidate directions FROM SCRATCH using user goals + restrictions + v0 DNA, NOT v0 carryovers)"
+last_activity: "2026-05-04 (Phase 3.1 context gathered through interactive discuss-phase Q&A — broad visual survey, theme-wide raised toggle + control-family matrix + escape hatches, light v0 DNA, concrete Godot recipes)"
 progress:
   total_phases: 15
   completed_phases: 2
-  total_plans: 15
+  total_plans: TBD
   completed_plans: 12
-  percent: 80
+  percent: 14
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-04)
 
 **Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships **N approved theme subclass `.tres` files** (one per theme) extending a dynamic `NeoCadeTheme` superclass. Consumer toggles `raised` / `platform` / `base_color` / `accent_color` exports for flat/raised × desktop/mobile/AUTO variations — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect). **Dynamic-theme architecture** locked 2026-05-04 architecture revision: `NeoCadeTheme` superclass (`@tool extends Theme`) regenerates entries from `@export` props; per-theme subclasses contribute personality.
-**Current focus:** Phase 3 REDIRECTED 2026-05-04 → next is Phase 3.1 (MD3 visual research), then Phase 3.2 (Godot dynamic theme architecture research; parallel-eligible with 3.1), then Phase 3.3 (theme direction research — derive 5 candidate directions), then Phase 3.4 (mockup phase, was 3.3)
+**Current focus:** Phase 3.1 (MD3 + Flat-3D Game UI Research) — context gathered, ready for plan-review-convergence
 
 ## Current Position
 
-Phase: 3 REDIRECTED (visual-direction-mockup-approval-gate) — outputs preserved as v0 historical reference; functionality replaced by Phase 3.1 + 3.2 + 3.3 + 3.4
-Next: Phase 3.1 (MD3 visual research) and/or Phase 3.2 (Godot dynamic theme architecture research with feasibility spike) — parallel-eligible
-Status: Awaiting `/gsd-discuss-phase 3.1` and/or `/gsd-discuss-phase 3.2`
-Last activity: 2026-05-04 (theme-direction phase 3.3 inserted: derives 5 candidate directions FROM SCRATCH using user goals + restrictions + v0 DNA, NOT v0 carryovers)
+Phase: 3.1 (Source-Dive — MD3 + MD3 Expressive + Flat-3D Game UI Research) — CONTEXT.md committed (D-01..D-16); ready for planning
+Next: `/gsd-plan-review-convergence 3.1 --opencode` (then `/gsd-execute-phase 3.1` → `/gsd-verify-work 3.1` → `/clear` → Phase 3.2)
+Status: Phase 3.1 discuss-phase complete; awaiting plan-review-convergence
+Last activity: 2026-05-04 (Phase 3.1 context gathered: broad visual survey + theme-wide raised toggle with control-family matrix + light v0 DNA + concrete Godot visual recipes)
 
 Progress: [██░░░░░░░░░░░░] 14% (2 of 14 active phases complete; Phase 3 REDIRECTED — excluded from active count)
 
