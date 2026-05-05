@@ -4,14 +4,14 @@ milestone: v1.0.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 3.1 planning converged after 2 review cycles; ready for /gsd-execute-phase 3.1
-last_updated: "2026-05-05T04:23:19.913Z"
-last_activity: 2026-05-05 -- Phase 3.1 planning complete
+last_updated: "2026-05-05T04:51:23.614Z"
+last_activity: 2026-05-05
 progress:
   total_phases: 15
   completed_phases: 2
   total_plans: 21
-  completed_plans: 12
-  percent: 57
+  completed_plans: 13
+  percent: 62
 ---
 
 # Project State
@@ -21,16 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-04)
 
 **Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships **N approved theme subclass `.tres` files** (one per theme) extending a dynamic `NeoCadeTheme` superclass. Consumer toggles `raised` / `platform` / `base_color` / `accent_color` exports for flat/raised × desktop/mobile/AUTO variations — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect). **Dynamic-theme architecture** locked 2026-05-04 architecture revision: `NeoCadeTheme` superclass (`@tool extends Theme`) regenerates entries from `@export` props; per-theme subclasses contribute personality.
-**Current focus:** Phase 3.1 (MD3 + Flat-3D Game UI Research) — context gathered, ready for plan-review-convergence
+**Current focus:** Phase 03.1 — source-dive-md3-and-flat-3d-game-ui-research
 
 ## Current Position
 
-Phase: 3.1 (Source-Dive — MD3 + MD3 Expressive + Flat-3D Game UI Research) — CONTEXT.md committed (D-01..D-16); ready for planning
+Phase: 03.1 (source-dive-md3-and-flat-3d-game-ui-research) — EXECUTING
+Plan: 2 of 6
 Next: `/gsd-plan-review-convergence 3.1 --opencode` (then `/gsd-execute-phase 3.1` → `/gsd-verify-work 3.1` → `/clear` → Phase 3.2)
 Status: Ready to execute
-Last activity: 2026-05-05 -- Phase 3.1 planning complete
+Last activity: 2026-05-05
 
-Progress: [██░░░░░░░░░░░░] 14% (2 of 14 active phases complete; Phase 3 REDIRECTED — excluded from active count)
+Progress: [██████░░░░] 62%
 
 ## Performance Metrics
 
@@ -58,6 +59,7 @@ Progress: [██░░░░░░░░░░░░] 14% (2 of 14 active phase
 | Phase 01-source-dive-godot-minimal-theme-tres-dissection P02 | 16min | 8 tasks | 1 files |
 | Phase 03 P01 | 55min | 5 tasks | 6 files |
 | Phase 03 P02 | 70min | 5 tasks | 16 files |
+| Phase 03.1 P01 | 12 min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -107,9 +109,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-05T04:23:19.905Z
+Last session: 2026-05-05T04:51:23.606Z
 Stopped at: Phase 3.1 planning converged after 2 review cycles; ready for /gsd-execute-phase 3.1
-Resume file: .planning/phases/03.1-source-dive-md3-and-flat-3d-game-ui-research/03.1-REVIEWS.md
+Resume file: None
 
 ## Phase 3 → 3.1/3.2 Redirect Notes (2026-05-04)
 
