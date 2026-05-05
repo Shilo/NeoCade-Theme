@@ -579,6 +579,53 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 
 ---
 
+## 12. Flat-3D Game UI sources (added 2026-05-05 by Phase 3.1)
+
+**Source name + location:**
+- Final artifact: `.planning/research/FLAT-3D-UI-RESEARCH.md`
+- User exemplars: https://hcgamestudios.itch.io/flat-game-ui-for-mobile-games, https://fajrulaslim.itch.io/ui-button-flat-design/devlog/157464/ui-button-flat-design
+- Broad-survey examples: https://kenney.nl/assets/ui-pack, https://www.gameart2d.com/minimalist-game-gui.html, https://www.deviantart.com/sungraphica/art/Flat-GUI-game-asset-pack-for-game-designers-975580487, https://assetstore.unity.com/packages/2d/gui/6000-flat-buttons-icons-pack-190732, https://interfaceingame.com/screenshots/brawl-stars-menu/, https://www.mobygames.com/game/166470/royal-match/screenshots/, https://apps.apple.com/us/app/candy-crush-saga/id553834731, https://craftpix.net/freebies/free-christmas-game-gui/, https://gamedesignskills.com/game-design/ui/, https://dribbble.com/tags/game-ui-buttons
+
+**What was read (Phase 3.1, 2026-05-05):**
+- The two user-supplied itch.io asset-pack pages, including textual pack descriptions and image/visual preview notes.
+- Public asset-pack examples to identify common flat/extruded construction patterns.
+- Commercial mobile-game screenshot sources to calibrate hierarchy, friendliness, and action prominence.
+- Design-commentary source material to keep UI hierarchy/readability as the real design target.
+
+**Source-access status:**
+- Itch.io user exemplars: `directly extracted` and `browser/manual verified`, with screenshot/image link or visual-capture notes.
+- Asset packs and commercial screenshot pages: mostly `browser/manual verified`, because source value is visual evidence rather than prose.
+- Design commentary: `directly extracted`.
+
+**What NeoCade adopts:**
+- The construction evidence: solid top shape plus offset darker duplicate, simple rounded silhouettes, role-colored buttons, clear icon+label hierarchy, large friendly action targets, and mobile-game affordance clarity.
+- The matrix principle: buttons and button-like controls change most visibly under `raised=true`; inputs and panels mostly stay flat; popups/dialogs selectively gain raised actions; passive text/decorative controls have no visible raised delta.
+- Recipe B default recommendation: wrapper/two-layer composition for raised treatment, not direct soft shadows.
+
+**What NeoCade rejects:**
+- Copying asset artwork, sprites, icons, silhouettes, PSD/EPS/AI files, or commercial-game assets.
+- Any effect that depends on blur, soft shadow, glow, bevel gradient, texture, painterly material, chrome, seasonal illustration, or low-context mood-board copying.
+- Candy/holiday/themed decorative UI as reusable addon identity.
+
+**What remains open:**
+- Phase 3.2 must validate whether the recommended wrapper/two-layer raised recipe is architecture-feasible in a dynamic `NeoCadeTheme` system.
+- Phase 3.3/3.4 decide whether `RaisedButton` should become a formal requirement and whether each candidate direction uses raised treatment heavily or sparingly.
+- Direct `StyleBoxFlat.shadow_offset` remains a research note until Phase 3.2 proves it can create a hard duplicate without violating `shadow_size = -1` / no-soft-shadow rules.
+
+**source agreement / conflict notes:**
+- User exemplars and broad asset packs agree on flat game UI as solid, colorful, shape-driven button/panel composition.
+- Commercial examples agree that large readable action hierarchy matters, but often include painterly/illustrative/gradient/texture effects that NeoCade explicitly rejects.
+- Design commentary agrees with the adopted hierarchy/clarity principle, but does not override the hard visual filter.
+
+**construction evidence / visual-capture summary:**
+- Accepted survey rows include source URL, evidence role, source-access status, screenshot/image URL or visual-capture note, hard-filter audit, and adopt/reject/open decision.
+- Rejected rows are intentionally retained to keep the future design out of gradient, texture, seasonal illustration, candy-gloss, and low-context board territory.
+- Asset packs are inspiration and construction evidence only, not artwork to copy.
+
+**Confidence:** HIGH that the valid raised grammar is narrow and well-scoped; MEDIUM that the final raised intensity should be chosen before mockups, so Phase 3.4 must show both flat and raised variants.
+
+---
+
 ## Summary of Source-Dive Spike Recommendations
 
 Of the nine sources catalogued above, four have HIGH or HIGH-MEDIUM coverage from the initial parallel research pass; the other five have explicit gaps that the roadmap-level spike phases must close:
