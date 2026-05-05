@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
-status: redirected
-stopped_at: Phase 3 REDIRECTED 2026-05-04 at Plan 03-03 finalist-selection gate; user rejected painterly arcade-venue direction; replacement is Phase 3.1 (research) + Phase 3.2 (revised mockup)
-last_updated: "2026-05-04T19:00:00.000Z"
-last_activity: 2026-05-04
+status: Awaiting `/gsd-discuss-phase 3.1` and/or `/gsd-discuss-phase 3.2`
+stopped_at: Phase 3.1 context gathered
+last_updated: "2026-05-05T03:46:02.946Z"
+last_activity: "2026-05-04 (theme-direction phase 3.3 inserted: derives 5 candidate directions FROM SCRATCH using user goals + restrictions + v0 DNA, NOT v0 carryovers)"
 progress:
   total_phases: 15
   completed_phases: 2
-  total_plans: TBD
+  total_plans: 15
   completed_plans: 12
-  percent: 14
+  percent: 80
 ---
 
 # Project State
@@ -107,13 +107,14 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-04T19:00:00.000Z
-Stopped at: Phase 3 REDIRECTED — Phase 3.1 + 3.2 inserted; awaiting `/gsd-discuss-phase 3.1`
-Resume file: .planning/ROADMAP.md (see Phase 3.1 + 3.2 entries)
+Last session: 2026-05-05T03:46:02.938Z
+Stopped at: Phase 3.1 context gathered
+Resume file: .planning/phases/03.1-source-dive-md3-and-flat-3d-game-ui-research/03.1-CONTEXT.md
 
 ## Phase 3 → 3.1/3.2 Redirect Notes (2026-05-04)
 
 **What was preserved (do not delete):**
+
 - `.planning/phases/03-visual-direction-mockup-approval-gate/` — full Phase 3 v0 work (CONTEXT.md, RESEARCH.md, REVIEWS.md, 5 PLAN files, SUMMARY.md for completed plans)
 - `.planning/mockups/concepts/*.png` + `*-prompt.md` — 5 concept images + prompt files
 - `.planning/mockups/03-direction-boards.html/.md/.png` — direction-board comparison gallery
@@ -123,6 +124,7 @@ Resume file: .planning/ROADMAP.md (see Phase 3.1 + 3.2 entries)
 **Why preserved:** User explicitly requested historical retention so any v0 direction can be revisited later (e.g., re-rendered through the flat-MD3 filter in a future v1.x or v2 milestone). The five concept images alone took ~5-10 minutes per generation; reproducing them later would cost time.
 
 **What's stopped (do not advance):**
+
 - Plans 03-03, 03-04, 03-05 are obsolete in their current form — Phase 3 will not be re-executed.
 - The finalist-selection checkpoint from Plan 03-03 is **NOT** to be answered; it's been routed around by this redirect.
 
@@ -130,6 +132,7 @@ Resume file: .planning/ROADMAP.md (see Phase 3.1 + 3.2 entries)
 Phase 3.1 (MD3 visual research) and Phase 3.2 (Godot dynamic theme architecture research with feasibility spike) are **parallel-eligible** — different research domains, no shared deliverables. Phase 3.3 (theme direction research) depends on Phase 3.1 (uses MD3 findings as design vocabulary). Phase 3.4 (mockup gate) depends on all three.
 
 Recommended sequence (sequential, simpler):
+
 1. `/gsd-discuss-phase 3.1` → `/gsd-plan-review-convergence 3.1 --opencode` → `/gsd-execute-phase 3.1` → `/gsd-verify-work 3.1`
 2. `/clear` → `/gsd-discuss-phase 3.2` → `/gsd-plan-review-convergence 3.2 --opencode` → `/gsd-execute-phase 3.2` → `/gsd-verify-work 3.2`
 3. `/clear` → `/gsd-discuss-phase 3.3` → `/gsd-plan-review-convergence 3.3 --opencode` → `/gsd-execute-phase 3.3` → text-level user-approval of 5 candidate directions → `/gsd-verify-work 3.3`
@@ -137,6 +140,7 @@ Recommended sequence (sequential, simpler):
 5. Phase 3.4 mockup gate replaces the redirected Phase 3 gate; Phase 4 starts after approval
 
 Alternative parallel sequence (faster but more state to juggle):
+
 1. Run Phase 3.1 and Phase 3.2 in parallel sessions (each on its own branch ideally)
 2. Both complete → merge → Phase 3.3 begins with both research outputs available
 3. Phase 3.4 begins after Phase 3.3 closes
