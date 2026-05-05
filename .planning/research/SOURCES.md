@@ -530,6 +530,55 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 
 ---
 
+## 11. MD3 + MD3 Expressive sources (added 2026-05-05 by Phase 3.1)
+
+**Source name + location:**
+- Final artifact: `.planning/research/MD3-RESEARCH.md`
+- Material official pages: https://m3.material.io/styles/color/system/overview, https://m3.material.io/styles/typography/type-scale-tokens, https://m3.material.io/styles/shape/shape-scale-tokens, https://m3.material.io/foundations/interaction/states/state-layers, https://m3.material.io/blog/building-with-m3-expressive
+- Android Developers Material 3: https://developer.android.com/develop/ui/compose/designsystems/material3
+- Material Web token sources: https://github.com/material-components/material-web/tree/main/tokens/versions
+- Godot docs: https://docs.godotengine.org/en/stable/classes/class_styleboxflat.html, https://docs.godotengine.org/en/stable/classes/class_theme.html, https://docs.godotengine.org/en/stable/tutorials/ui/gui_theme_type_variations.html
+- Google/Android MD3 Expressive sources: https://blog.google/products/android/material-3-expressive-android-wearos-launch/, https://developer.android.com/jetpack/androidx/releases/compose-material3, https://developer.android.com/training/wearables/versions/6/features?hl=en, https://android-developers.googleblog.com/2025/08/introducing-material-3-expressive-for-wear-os.html
+
+**What was read (Phase 3.1, 2026-05-05):**
+- Material official URLs were retained as canonical entry points; direct non-JS extraction was limited and labeled as `browser/manual verified`, `fallback source used`, or `unresolved extraction gap`.
+- Android Developers Material 3 in Compose page for key colors, tonal palettes, dynamic color, semantic roles, typography, shape, accessibility, and current MD3 Expressive guidance.
+- Material Web raw SCSS token files for type scale, shape scale, state-layer values, color roles, elevation values, and filled/outlined button disabled opacity.
+- Godot official `StyleBoxFlat`, `Theme`, and Theme type variation documentation for visual recipe and mapping feasibility notes.
+- Google/Android MD3 Expressive launch/current sources, including a post-launch check after the 2025-05-13 announcement.
+
+**Source-access status:**
+- Official Material pages: `browser/manual verified` + `fallback source used`; several public pages require JavaScript in this runtime.
+- Android Developers and Godot docs: `directly extracted`.
+- Material Web token files: `upstream-token corroborated`.
+- Expressive official-page direct extraction: `unresolved extraction gap`, non-blocking because Android/Google/Material Web sources corroborate the facts used.
+
+**What NeoCade adopts:**
+- MD3 as a static design-system grammar: role colors, tonal surface ladder, 15-role type scale, shape scale, state-layer values, component hierarchy, and accessible on-role pairing.
+- Numeric state values: hover 8%, focus 12%, pressed 12%, dragged 16%, disabled 38% content, disabled container 12%, plus NeoCade's project-required 2px focus ring.
+- MD3 Expressive static principles: stronger personality, controlled saturated color, larger emphasis moments, expressive shape/scale, and glanceable hierarchy.
+- Exact/composed/NeoCade-owned Material-to-Godot mapping discipline.
+
+**What NeoCade rejects:**
+- Roboto or any new font family for v1; Inter Variable Roman remains the only assumption.
+- Android dynamic wallpaper color, Android/Wear OS system UI behavior, Live Updates, notification behavior, haptics, spring animation, blur/depth backgrounds, and motion-only behavior.
+- Soft shadow elevation, glow, bevel gradients, texture, painterly chrome, synthwave/cyberpunk drift, and fake Material equivalents for Godot-specific Controls.
+
+**What remains open:**
+- Phase 3.3 decides how much Expressive personality each candidate direction uses.
+- Phase 3.4 mockups decide which Controls can safely get larger, rounder, or more saturated without breaking desktop density.
+- Phase 3.2 validates architecture support for the mapped visual recipes; Phase 3.1 did not run an architecture spike.
+
+**source agreement / conflict notes:**
+- Material Web and Android Developers agree on the 15-role type scale and core state-layer values.
+- Material Web and Android Developers use the same shape-role family; one non-blocking numeric difference remains for extra-large shape sample/token values. NeoCade does not choose final radii in Phase 3.1.
+- Disabled 38% content and 12% container/outline values are corroborated by Material Web filled/outlined button token sources.
+- Official `m3.material.io` JavaScript extraction gaps are non-blocking because every numeric fact used downstream has an accessible fallback source.
+
+**Confidence:** HIGH for numeric MD3 token values and Godot API facts; MEDIUM-HIGH for MD3 Expressive synthesis because platform behavior must be filtered carefully for static Godot Theme scope.
+
+---
+
 ## Summary of Source-Dive Spike Recommendations
 
 Of the nine sources catalogued above, four have HIGH or HIGH-MEDIUM coverage from the initial parallel research pass; the other five have explicit gaps that the roadmap-level spike phases must close:
