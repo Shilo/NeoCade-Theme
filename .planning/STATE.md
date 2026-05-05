@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 03-02-five-concept-directions-PLAN.md; awaiting Plan 03 finalist-selection gate
-last_updated: "2026-05-05T00:12:06.141Z"
-last_activity: 2026-05-05
+status: redirected
+stopped_at: Phase 3 REDIRECTED 2026-05-04 at Plan 03-03 finalist-selection gate; user rejected painterly arcade-venue direction; replacement is Phase 3.1 (research) + Phase 3.2 (revised mockup)
+last_updated: "2026-05-04T19:00:00.000Z"
+last_activity: 2026-05-04
 progress:
-  total_phases: 11
+  total_phases: 13
   completed_phases: 2
   total_plans: 15
   completed_plans: 12
-  percent: 80
+  percent: 15
 ---
 
 # Project State
@@ -20,17 +20,17 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-04)
 
-**Core value:** A drop-in Godot 4.6 dark Theme resource at `res://addons/neocade_theme/neocade_theme.tres` that styles every built-in Control to a `godot-minimal-theme` bar of feature-completeness, with arcade-inspired neon visual identity, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets, with a sibling `neocade_mobile_theme.tres` mobile-tuned variant.
-**Current focus:** Phase 03 — visual-direction-mockup-approval-gate
+**Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships **N approved themes × 4 variations** (flat-desktop, flat-mobile, raised-desktop with extruded-flat depth, raised-mobile) produced from a single `@tool` TokenSet matrix — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect).
+**Current focus:** Phase 3 REDIRECTED 2026-05-04 → next is Phase 3.1 (MD3 + Flat-3D Game UI Research Spike), then Phase 3.2 (revised mockup phase)
 
 ## Current Position
 
-Phase: 03 (visual-direction-mockup-approval-gate) — EXECUTING
-Plan: 3 of 5
-Status: Ready to execute
-Last activity: 2026-05-05
+Phase: 3 REDIRECTED (visual-direction-mockup-approval-gate) — outputs preserved as v0 historical reference; functionality replaced by Phase 3.1 + 3.2
+Next: Phase 3.1 (Source-Dive — MD3 + MD3 Expressive + Flat-3D Game UI Research)
+Status: Awaiting `/gsd-discuss-phase 3.1`
+Last activity: 2026-05-04 (Phase 3 redirect captured)
 
-Progress: [████████░░] 80%
+Progress: [██░░░░░░░░░░░] 15% (2 of 13 phases complete; Phase 3 REDIRECTED — does not count toward percent)
 
 ## Performance Metrics
 
@@ -74,6 +74,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 1 Plan 01 (2026-05-04): Dissection skeleton MINIMAL-THEME-DISSECTION.md committed with SHA-256-pinned provenance, verbatim helper bodies, and runtime-validated line citations — Plans 02/03 unblocked.
 - [Phase ?]: Phase 1 Plan 02 (2026-05-04): Per-Control enumeration appended to MINIMAL-THEME-DISSECTION.md — 80-token Active Verification Audit + 25 user-facing class sections + 3 NeoCade-additive sections (MenuBar/Panel/Window) + 1 combined container-chrome section + Pitfall 1.7 evidence anchor; 225 enumeration rows total; D-08 reconciliation surfaces 3 user-facing classes upstream does not theme.
 - Phase 2 verification (2026-05-04): LDtk source mining passed UAT with 5/5 checks, 0 issues; LDtk coverage is HIGH for v1 UI-theme research, with source outputs explicitly non-binding inspiration for Phase 3 mockups.
+- **Phase 3 REDIRECTED (2026-05-04):** User rejected the painterly arcade-venue direction at Plan 03-03 finalist-selection checkpoint. **Boardwalk Sunset (the original recommended baseline) is rejected.** New direction: **flat MD3 / MD3 Expressive visual identity, no textures / no patterns / no embossing / no gradients on chrome.** Optional "extruded flat 3D" raised variation per the Flat-3D Game UI pattern (per user's itch.io references). Each theme delivers 4 `.tres` variations: flat-desktop, flat-mobile, raised-desktop, raised-mobile. Architecture supports undefined number of themes. Phase 3 outputs (mood-board, 5 concept images, direction boards) preserved as v0 historical reference. Replaced by Phase 3.1 (research spike) + Phase 3.2 (revised mockup phase).
 
 ### Pending Todos
 
@@ -104,6 +105,28 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-05T00:12:06.133Z
-Stopped at: Completed 03-02-five-concept-directions-PLAN.md; awaiting Plan 03 finalist-selection gate
-Resume file: None
+Last session: 2026-05-04T19:00:00.000Z
+Stopped at: Phase 3 REDIRECTED — Phase 3.1 + 3.2 inserted; awaiting `/gsd-discuss-phase 3.1`
+Resume file: .planning/ROADMAP.md (see Phase 3.1 + 3.2 entries)
+
+## Phase 3 → 3.1/3.2 Redirect Notes (2026-05-04)
+
+**What was preserved (do not delete):**
+- `.planning/phases/03-visual-direction-mockup-approval-gate/` — full Phase 3 v0 work (CONTEXT.md, RESEARCH.md, REVIEWS.md, 5 PLAN files, SUMMARY.md for completed plans)
+- `.planning/mockups/concepts/*.png` + `*-prompt.md` — 5 concept images + prompt files
+- `.planning/mockups/03-direction-boards.html/.md/.png` — direction-board comparison gallery
+- `.planning/mockups/03-direction-boards-check.md` — render-check report
+- `.planning/research/mood-board/` — 25 mood-board references with INDEX.md + references.json
+
+**Why preserved:** User explicitly requested historical retention so any v0 direction can be revisited later (e.g., re-rendered through the flat-MD3 filter in a future v1.x or v2 milestone). The five concept images alone took ~5-10 minutes per generation; reproducing them later would cost time.
+
+**What's stopped (do not advance):**
+- Plans 03-03, 03-04, 03-05 are obsolete in their current form — Phase 3 will not be re-executed.
+- The finalist-selection checkpoint from Plan 03-03 is **NOT** to be answered; it's been routed around by this redirect.
+
+**What's next:**
+1. `/gsd-discuss-phase 3.1` — gather context for the MD3 / MD3 Expressive / Flat-3D Game UI research spike
+2. `/gsd-plan-review-convergence 3.1 --opencode` — plan + cross-AI review
+3. `/gsd-execute-phase 3.1` — execute research
+4. `/gsd-verify-work 3.1` → `/clear` → `/gsd-discuss-phase 3.2`
+5. Phase 3.2 mockup phase replaces the redirected Phase 3

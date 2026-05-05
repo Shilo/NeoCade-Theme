@@ -2,13 +2,15 @@
 
 ## What This Is
 
-NeoCade is a Godot 4.6 native UI Theme resource, distributed as a drop-in addon, that styles every built-in Control with a polished neo/neon arcade aesthetic — modern, colorful, professional, accessibility-first. It works universally across the Godot Editor and game runtime, and is designed to scale from desktop to mobile. v1 ships a single dark theme; future variants (mobile-tuned, alternate palettes, light mode) are planned.
+NeoCade is a Godot 4.6 native UI Theme system, distributed as a drop-in addon, that styles every built-in Control with a **flat Material Design 3 / MD3 Expressive aesthetic** — modern, colorful, expressive, accessibility-first, with optional "extruded flat 3D" raised variation per the Flat-3D Game UI pattern. It works universally across the Godot Editor and game runtime, and is designed to scale from desktop to mobile. **v1 ships N user-approved themes × 4 variations** (flat-desktop, flat-mobile, raised-desktop with extruded-flat depth, raised-mobile). The architecture supports an undefined number of themes; future variants (light mode, alternate palettes, additional themes) plug in cleanly.
 
 The theme is built primarily to power the author's upcoming game (codename: **VirtuCade**) — a 2D tile-based pixel-art online multiplayer game set inside a large interior arcade environment with interactive booths and mini-games — but is designed as a standalone, reusable addon for the Godot community. The theme name is **NeoCade**; VirtuCade is the consuming game, not the theme.
 
+**Visual identity LOCKED 2026-05-04 (Phase 3 redirect):** Flat MD3 / MD3 Expressive language. **Hard rules:** no textures, no patterns, no embossing, no painterly/leather/wood/grunge backgrounds, no gradients on chrome. Solid colors + offset darker shape duplicates for depth on the raised variation only (extruded-flat per [hcgamestudios.itch.io](https://hcgamestudios.itch.io/flat-game-ui-for-mobile-games) and [fajrulaslim.itch.io](https://fajrulaslim.itch.io/ui-button-flat-design)). Anti-cyberpunk discipline preserved (no synthwave / no neon-noir / no dystopian). The earlier "neo/neon arcade" framing is **historical** — see Phase 3 redirect notes in ROADMAP.md and STATE.md.
+
 ## Core Value
 
-A drop-in Godot 4.6 dark Theme resource that styles **every** built-in Control to a Godot Minimal Theme bar of feature-completeness, with an arcade-inspired neon visual identity that is colorful, professional, accessible, and universal across editor and runtime — installable as a single addon, distributed as `res://addons/neocade_theme/neocade_theme.tres`.
+A drop-in Godot 4.6 **flat MD3 / MD3 Expressive Theme system** that styles **every** built-in Control to a Godot Minimal Theme bar of feature-completeness, with a colorful, expressive, professional, accessible, modern visual identity — universal across editor and runtime — installable as a single addon. **v1 ships N user-approved themes × 4 variations** (flat-desktop, flat-mobile, raised-desktop, raised-mobile) under `res://addons/neocade_theme/themes/`, all generated from a single `@tool` TokenSet matrix so drift is structurally impossible. Architecture supports undefined number of themes (extensible for v1.x and beyond).
 
 If everything else fails, this single deliverable must work: a polished, feature-complete `neocade_theme.tres` that "just works" when applied to any Godot Control tree.
 
