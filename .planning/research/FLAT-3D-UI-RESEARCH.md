@@ -99,7 +99,18 @@ Survey synthesis:
 
 ## Pattern Catalogue
 
-Reserved for Plan 03.1-04.
+Each pattern uses the same rule: accepted construction is solid, flat, and themeable; forbidden variants are sprite/material effects.
+
+| Pattern | Accepted construction | Forbidden variants | Likely Godot targets | Common or rare in NeoCade |
+|---|---|---|---|---|
+| Raised action button | Foreground rounded `StyleBoxFlat` solid fill; optional offset darker duplicate underneath; crisp text/icon on top; 2px focus ring outside the top shape. | Soft shadow, blurred shadow, glow, bevel highlight, gradient shine, texture, metallic/chrome edge, imported button sprites. | Button, PrimaryButton, DangerButton, OptionButton, MenuButton, ColorPickerButton, dialog action buttons. | Common when `raised=true`; strongest on primary/interactive button-like controls. |
+| Toggle / check button | Flat or raised thumb/track/check area with clear checked state; optional offset only on the clickable shell, not on every internal glyph. | 3D switch knobs, glossy toggles, embossed icons, texture, glow ring. | CheckButton, CheckBox, radio/check type variations if added, selected menu items. | Common but subtler than action buttons. |
+| Icon button | Small square/circle/pill top shape with high-contrast glyph; raised mode may show a 1-3px hard offset if target size remains stable. | Icon sprites copied from packs, glossy glyphs, neon halo, drop-shadow-only hit target. | IconButton variation, toolbar buttons, clear buttons, color picker actions, graph toolbar actions. | Common for toolbars; raised offset should be reserved for high-value icons. |
+| Pill / tab / chip | Flat pill or tab surface with selected/hover/focus state-layer fills; raised mode may use offset only for selected active chips/tabs. | Massive pillification of all controls, soft floating chips, bevel gradients, patterned fills. | TabBar tabs, CheckButton-style toggles, filter chips via Button type variations, MenuBar active items. | Moderate; tabs/chips should stay readable and dense. |
+| Dialog / modal action surface | Dialog shell remains mostly flat/highest surface; action buttons may be raised; header/footer can use tonal separation. | Raised whole modal with soft shadow, background blur, painterly frame, arcade-cabinet texture. | AcceptDialog, ConfirmationDialog, FileDialog, PopupPanel, PopupMenu action zones. | Rare/selective; raise the actions more than the panel. |
+| Progress / range affordance | Flat track and fill; handle may use a small raised top shape or offset duplicate while dragged; progress fill remains flat. | Glossy meter, beveled progress tube, textured fill, blurred handle shadow. | HSlider, VSlider, HScrollBar, VScrollBar, ProgressBar, GraphEdit connection handles if relevant. | Subtle; handles can lift, tracks normally stay flat. |
+
+Catalogue conclusion: raised treatment is an affordance amplifier. It should be strongest on things the user can press now, subtle on handles, rare on large surfaces, and absent from passive text/decorative controls.
 
 ## Construction Recipes
 
