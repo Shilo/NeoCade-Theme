@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 4 Plan 01 complete (class shell authored; atomic commit `d1d596c`)
-last_updated: "2026-05-06T23:29:27.074Z"
+stopped_at: Phase 4 Plan 03 complete (Button-family icons + import sidecars; atomic commit `ec27939`)
+last_updated: "2026-05-06T16:35:00.000Z"
 last_activity: 2026-05-06
 progress:
   total_phases: 15
   completed_phases: 6
   total_plans: 42
-  completed_plans: 33
-  percent: 79
+  completed_plans: 35
+  percent: 83
 ---
 
 # Project State
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-05-06)
 ## Current Position
 
 Phase: 04 (foundation-neocadetheme-superclass-per-theme-subclasses-font) — EXECUTING
-Plan: 3 of 8 (Plan 04-01 complete; next is Plan 04-02 fonts + OFL OR Plan 04-03 button-family icons — both Wave 1, parallel-eligible)
-Next: `/gsd-execute-phase 04` continues with Plan 04-02 (fonts + OFL) — does not depend on the class shell beyond file presence
+Plan: 4 of 8 (Plans 04-01 + 04-02 + 04-03 complete; next is Plan 04-04 color formulas + role tokens — Wave 2 begins)
+Next: `/gsd-execute-phase 04` continues with Plan 04-04 (color formulas + role tokens)
 Status: Ready to execute
 Last activity: 2026-05-06
 
-Progress: [█████████░] 76%
+Progress: [██████████] 83%
 
 ## Performance Metrics
 
@@ -72,6 +72,7 @@ Progress: [█████████░] 76%
 | Phase 03.4 P01 | 17 min | 4 tasks | 8 files |
 | Phase 03.4 P02 | re-executed 2026-05-06 | 5 tasks | mockup gallery + 15 concept PNGs |
 | Phase 04 P01 | 25 min | 3 tasks | 3 files (1 D, 1 M, 1 A) |
+| Phase 04 P03 | ~7 min | 3 tasks | 20 files (10 SVG + 10 .import sidecars, all A) |
 
 ## Accumulated Context
 
@@ -92,6 +93,7 @@ Recent decisions affecting current work:
 - **Architecture revision (2026-05-04, simplified 2026-05-06e/f):** Replaced "4 static `.tres` per theme generated from TokenSet matrix" with dynamic export-driven Theme regeneration. Phase 3.2 first validated the superclass/subclass hypothesis, but production is now **single concrete `NeoCadeTheme` class + data-only direction `.tres` files**. `NeoCadeTheme` is `@tool extends Theme` with 9 exports (`base_color`, `accent_color`, `raised`, `platform`, `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`). Setters dynamically regenerate theme entries via `_get_base_color`-style formulas ported from passivestar's editor theme (driven by exports, not `EditorSettings`). Per-direction personality lives in Theme Editor entry overrides per `.tres`, not per-direction `.gd` classes. `platform=AUTO` auto-detects via `OS.has_feature("mobile")` at runtime; `DESKTOP` and `MOBILE` are forced sizes. **NEW Phase 3.2 inserted** between Phase 3.1 and Phase 3.4 to validate this dynamic-theme feasibility.
 - **Theme-direction phase insertion (2026-05-04; completed 2026-05-06):** **NEW Phase 3.3 inserted** to address gap — original phases 3.1/3.2/3.3 covered design language + architecture + mockups, but NO phase explicitly researched/derived theme directions. Phase 3.3 (Theme Direction Research) derived 5 candidate directions using user's new goals/restrictions + per-v0-direction reactions as DNA + Phase 3.1 findings + commercial flat-MD3 example survey. Outputs `.planning/research/THEME-DIRECTIONS.md` with text-level user approval. **Phase 3.4 Plan 02 selected Pulse as the recommended starter / implementation priority; Slate, Bubble, Daybreak, and Burst remain v1 personality variations.** Recommended starter affects showcase default + README "try this first" only; it does NOT bake Pulse into class defaults.
 - Phase 4 Plan 01 (2026-05-06): NeoCadeTheme class shell authored at `addons/neocade_theme/neocade_theme.gd` — `@tool class_name NeoCadeTheme extends Theme` with 9 @exports (4 Core + 5 Shape under `@export_group("Shape")`), `enum Platform { DESKTOP, MOBILE, AUTO }`, `is_light` luminance-derivation, `_regenerating` reentry guard, `_regenerate_theme()` skeleton, no-`Theme.clear` invariant from day 1, D-03/D-31/D-04/REVISABLE/binding docstring anchors. Empty scaffold `addons/neocade_theme/neocade_theme.tres` deleted; `main.tscn` `theme = ExtResource(...)` line removed entirely (Cycle 6 F2 fix — no placeholder comment because Godot discards `.tscn` comments on save). Atomic commit `d1d596c`.
+- Phase 4 Plan 03 (2026-05-06): Button-family bespoke icons authored — 10 monochrome SVGs at 32×32 reference (`check`, `checkbox_checked/unchecked`, `radio_checked/unchecked`, `checkbutton_checked/unchecked`, `arrow_down`, `clear`, `close`) under `addons/neocade_theme/icons/`. Strict single-color `#FFFFFF` policy (Cross-AI Cycle 1 MEDIUM fix). 10 `.import` sidecars locking `svg/scale=2.0` + `mipmaps/generate=true` + `compress/mode=0` + `process/fix_alpha_border=true`, normalized via `godot --headless --import` (Cycle 6 F5 three-stage workflow) so committed paths use real `.ctex` md5 hashes and Godot-issued `uid://` UUIDs. Atomic commit `ec27939`. ICON-03 + ICON-04 → Complete; ICON-01 + ICON-02 → In Progress (remaining slots land in Phases 6/7 under the same contract).
 
 ### Pending Todos
 
@@ -122,9 +124,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-06T23:30:00.000Z
-Stopped at: Phase 4 Plan 01 complete (class shell authored; atomic commit `d1d596c`)
-Resume file: .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-02-fonts-and-OFL-PLAN.md
+Last session: 2026-05-06T16:35:00.000Z
+Stopped at: Phase 4 Plan 03 complete (Button-family icons + .import sidecars; atomic commit `ec27939`)
+Resume file: .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-04-color-formulas-and-role-tokens-PLAN.md
 
 ## Phase 3.4 Plan 02 redirect (2026-05-06b)
 

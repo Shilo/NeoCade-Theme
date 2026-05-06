@@ -80,8 +80,8 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 - [ ] **ICON-01**: ~25-40 bespoke SVG icons authored at 32×32 reference, imported with `Scale = 2.0` and `Linear With Mipmaps` filter explicitly set per resource. Stored at `addons/neocade_theme/icons/`.
 - [ ] **ICON-02**: Icon coverage maps 1:1 to Godot's hard-coded theme icon slots: Button check / radio / toggle / arrow_down / clear / close; OptionButton arrow; CheckBox/CheckButton on/off; Tree expand/collapse; TabBar/TabContainer increment/decrement/menu; ColorPicker preset/screen-pick/sample-bg/recent; FileDialog parent/folder/file/file-up/back/forward/reload; ScrollBar increment/decrement/grabber. Per FEATURES.md icon coverage list.
-- [ ] **ICON-03**: Icons are monochrome SVGs (single-color or with a small fixed accent palette mapped via Godot's icon `modulate` rather than baked color); allows tinting per accent role.
-- [ ] **ICON-04**: NO bundled Material Symbols / Lucide / Phosphor / external icon library (per STACK "What NOT to Use"). Texture2D-per-slot mismatch + bundle size cost.
+- [x] **ICON-03**: Icons are monochrome SVGs (single-color or with a small fixed accent palette mapped via Godot's icon `modulate` rather than baked color); allows tinting per accent role. *(Plan 04-03 locked the strict single-color `#FFFFFF` policy across the Button family; future icon plans (Phases 6/7) follow the same contract.)*
+- [x] **ICON-04**: NO bundled Material Symbols / Lucide / Phosphor / external icon library (per STACK "What NOT to Use"). Texture2D-per-slot mismatch + bundle size cost. *(Plan 04-03 ships hand-authored SVGs only.)*
 
 ### Design System Tokens (TOKEN)
 
@@ -293,10 +293,10 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | FONT-07 | Phase 4 (synthetic italic policy + CHANGELOG note) | — | Pending |
 | FONT-08 | Phase 4 (Plan 04-02 set Grayscale AA + Light hinting + Auto subpixel + mipmaps + system fallback in Inter-Variable.ttf.import for GL Compatibility per PITFALLS 5.5) | — | Complete |
 | FONT-09 | Phase 4 (CJK exclusion + README override pattern) | — | Pending |
-| ICON-01 | Phase 4 | — | Pending |
-| ICON-02 | Phase 4 (1:1 icon-slot mapping) | — | Pending |
-| ICON-03 | Phase 4 (monochrome SVG policy) | — | Pending |
-| ICON-04 | Phase 4 (no external icon library) | — | Pending |
+| ICON-01 | Phase 4 (Plan 04-03 authored 10 Button-family bespoke SVGs at 32×32 reference + .import sidecars locking svg/scale=2.0 + mipmaps/generate=true; Phases 6/7 add Tree/TabBar/ColorPicker/FileDialog/ScrollBar icons under the same contract) | — | In Progress |
+| ICON-02 | Phase 4 (Plan 04-03 covers Button family + CheckBox/CheckButton on/off + OptionButton arrow + LineEdit clear + dialog close — 10 of ~25-40 icon slots; Tree/TabBar/ColorPicker/FileDialog/ScrollBar slots land in Phases 6/7) | — | In Progress |
+| ICON-03 | Phase 4 (Plan 04-03 locked monochrome SVG policy: every Button-family icon strictly single-color #FFFFFF for predictable Godot icon `modulate` tinting; Cross-AI Cycle 1 MEDIUM fix). Pattern applies to all future icons | — | Complete |
+| ICON-04 | Phase 4 (Plan 04-03 ships zero external icon library binaries — Material Symbols / Lucide / Phosphor all excluded per STACK Decision 5 + D-12; only hand-authored SVGs in `addons/neocade_theme/icons/`) | — | Complete |
 | TOKEN-01 | Phase 3 (token values defined) | Phase 4 (generator implements) | Pending |
 | TOKEN-02 | Phase 3 | Phase 4 | Pending |
 | TOKEN-03 | Phase 3 (WCAG AA verification) | Phase 4 | Pending |
