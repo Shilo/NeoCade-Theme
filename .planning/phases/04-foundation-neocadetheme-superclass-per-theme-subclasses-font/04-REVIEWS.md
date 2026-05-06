@@ -1374,3 +1374,219 @@ The cycle-5 "CONVERGED" verdict was premature. The fresh pass identified 7 real 
 Risk assessment: **HIGH** (Codex), **HIGH** (validated against Claude's spot-checks), **MEDIUM-LOW** (OpenCode — but OpenCode's earlier verdicts proven unreliable, so down-weight).
 
 **Recommendation: run cycle 7 replan to address all 7 validated HIGHs.** Each is mechanically fixable with specific edits to specific plans; none requires architectural rework.
+
+---
+
+# Cross-AI Plan Review — Phase 4 (Cycle 7 — F1-F7 verification)
+
+**Reviewed:** 2026-05-06 (post-cycle-7 replan, commit 7509ced)
+**Reviewers:** OpenCode (DeepSeek V4 Pro), Codex
+**Scope:** Verify F1-F7 from cycle 6 fresh pass are FULLY RESOLVED.
+
+## OpenCode Cycle 7 Review
+
+## F1 — DIRECTION_PRESETS values → **FULLY RESOLVED**
+
+**Evidence:**
+- `04-04` Task 3.5 DIRECTION_PRESETS const now contains per-direction values matching DESIGN_TOKENS §5.1–§5.5 verbatim:
+  - Pulse: `hover_pct: 6.0, pressed_pct: -10.0, disabled_opacity: 0.42` (§5.1)
+  - Slate: `hover_pct: 4.0, pressed_pct: -6.0, disabled_opacity: 0.50` (§5.2)
+  - Bubble: `hover_pct: 8.0, pressed_pct: -10.0, disabled_opacity: 0.45` (§5.3)
+  - Daybreak: `hover_pct: 6.0, pressed_pct: -6.0, disabled_opacity: 0.50` (§5.4)
+  - Burst: `hover_pct: 8.0, pressed_pct: -12.0, disabled_opacity: 0.45` (§5.5)
+- `04-04` Task 3.5 acceptance criteria assert each direction's `hover_pct` / `pressed_pct` / `disabled_opacity` individually.
+- `04-06` Task 2 verifier (both EditorScript and headless) includes F1 fix block that probes all 5 directions with transient `NeoCadeTheme.new()` and asserts each value against DESIGN_TOKENS §5.
+
+---
+
+## F2 — main.tscn placeholder → **FULLY RESOLVED**
+
+**Evidence:**
+- `04-01` Task 1: Both the `[ext_resource ...]` line and `theme = ExtResource(...)` property line are **removed entirely** — no placeholder comment of any form (`#` or `;`).
+- Rationale documented: Godot 4.6 `.tscn` uses `;` for comments, AND comments are discarded on save — making any placeholder strategy fragile.
+- Acceptance criteria: `main.tscn does not contain ANY theme = ExtResource(` line; `main.tscn does not contain a placeholder ... comment line`.
+- `04-07` Task 2 re-adds a **live** `theme = ExtResource("1_pulse_theme")` pointing at Pulse, not a comment.
+
+---
+
+## F3 — Helper scripts at addon root → **FULLY RESOLVED**
+
+**Evidence:**
+- All 4 helpers now live at `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/`:
+  - `_phase4_import.gd` (`04-02` Task 2 + `04-06`/`04-07` extensions)
+  - `_phase4_introspect.gd` (`04-05` Task 2.0)
+  - `_phase4_verify.gd` (`04-06` Task 2)
+  - `_phase4_verify_headless.gd` (`04-06` Task 2)
+- `04-08` Task 5 (layout verifier) explicitly asserts:
+  - `addons/neocade_theme/` contains **exactly 1** `.gd` file (`neocade_theme.gd`)
+  - `_phase4_import.gd`, `_phase4_verify.gd`, `_phase4_verify_headless.gd` are **forbidden** at addon root
+  - All 3 helpers exist under the `.planning/phases/04-.../helpers/` path
+
+---
+
+## F4 — CheckButton slot binding `on`/`off` → **FULLY RESOLVED**
+
+**Evidence:**
+- `04-03` Task 1: Icons renamed from `toggle_on.svg`/`toggle_off.svg` to `checkbutton_checked.svg`/`checkbutton_unchecked.svg`.
+- `04-05` Task 2.5 CANONICAL_SLOT_NAMES:
+  ```
+  "CheckButton": {
+      "icon": ["checked", "unchecked"],  // Cycle 6 F4 fix: was "on"/"off"
+  ```
+  With inline comment: "Godot 4.6 class_checkbutton.md mandates `checked`/`unchecked`"
+- `04-05` Task 2.0: BINDING_TABLE_SEED.txt acceptance criteria explicitly check that the seed's `## CheckButton` section includes `checked` AND `unchecked` slot names — the empirical source confirming Godot 4.6's actual API.
+- `04-05` Task 2: "Cycle 6 F7 fix: Where the seed and the dissection disagree, the seed wins — closes the F4 root cause."
+
+---
+
+## F5 — SVG `.import` placeholders → **FULLY RESOLVED**
+
+**Evidence:**
+- `04-03` Task 2: Three-stage workflow explicitly described:
+  - **Stage A** — Author placeholder `.import` files
+  - **Stage B** — Run `godot --headless --import` to normalize hashes/UUIDs/path values
+  - **Stage C** — Recommit the normalized files
+- Acceptance criteria enforce:
+  - No `.import` file contains literal `<` or `>` characters (placeholders must be gone)
+  - Each `path=` line matches regex `res://\.godot/imported/[A-Za-z0-9_]+\.svg-[0-9a-f]{32}\.ctex` (real md5 hash)
+  - Each `uid=` line matches `uid://[a-z0-9]+` (Godot-issued UUID, not synthetic)
+
+---
+
+## F6 — `default_font` type mismatch → **FULLY RESOLVED**
+
+**Evidence:**
+- `04-05` Task 1 now sets:
+  ```gdscript
+  var inter_file := preload("res://addons/neocade_theme/fonts/Inter-Variable.tres") as FontFile
+  default_font = inter_file
+  ```
+  NOT `default_font = body_font` (FontVariation).
+- Acceptance criteria explicitly check: `preload("res://addons/neocade_theme/fonts/Inter-Variable.tres") as FontFile` AND a negative check for `default_font = body_font`.
+- `04-08` README explicitly documents: "theme.default_font is the FontFile (Inter-Variable.tres) per FONT-06; the cast succeeds. Cycle 6 F6 fix 2026-05-06: confirmed default_font is FontFile, not FontVariation."
+- `body_font` (Inter-Body.tres FontVariation) is preserved as a separate variable for explicit `set_font()` calls on Controls/variations needing body weight — NOT as the theme default.
+
+---
+
+## F7 — BINDING_TABLE delegation → **FULLY RESOLVED**
+
+**Evidence:**
+- `04-05` Task 2.0: New `_phase4_introspect.gd` at `.planning/phases/04-.../helpers/` that calls `ThemeDB.get_default_theme().get_<datatype>_list("Type")` for all 5 data types, emitting `BINDING_TABLE_SEED.txt`.
+- Task 2's action section: "Cycle 6 F7 fix 2026-05-06: slot-name source-of-truth changed from MINIMAL-THEME-DISSECTION.md (curated) to `helpers/BINDING_TABLE_SEED.txt` (empirically introspected from Godot 4.6's actual Theme API)."
+- "Where the seed and the dissection disagree, the seed wins."
+- Seed acceptance criteria explicitly verify the `## CheckButton` section contains `checked` and `unchecked` — closing the F4 root cause.
+- Both introspection helper and seed file are committed alongside in `04-05`'s Task 4 commit.
+
+---
+
+## New Concerns from Cycle 7 Replan
+
+### MEDIUM concerns
+
+**M1 — `_strip_theme_entries` section-state machine edge case.** The function in `04-06` Task 1 uses a `section` string variable to track which `[...]` block is active. When it encounters `[ext_resource type="Script" ...]`, it sets `section = "ext_resource_script"` and appends the line. But if the *next* line is a section header (e.g., `[resource]`), the `section` is correctly reset. However, if Godot 4.6 ever emits multi-line `[ext_resource ...]` blocks (which it does NOT for ext_resource — those are single-line), the state machine would misparse. This is safe because Godot's `.tres` format never emits multi-line `[ext_resource ...]` blocks.
+
+**M2 — `_strip_load_steps_attr` regex may leave trailing space.** The regex `\s*load_steps=\d+` strips ` load_steps=42` but leaves the preceding space. The double-space tidy regex then collapses. However, the order matters: `[gd_resource type="Theme" load_steps=42 format=3]` → after first regex: `[gd_resource type="Theme" format=3]` (the `\s*` consumed the space BEFORE `load_steps`). This actually works fine because `\s*` is greedy for the space before `load_steps`. But if the format is `[gd_resource type="Theme" format=3 load_steps=42]`, the regex would produce `[gd_resource type="Theme" format=3]` — correct. This is a build-time helper; incorrect output would be caught by the verifier's `loaded is NeoCadeTheme` check. Acceptable risk.
+
+### LOW concerns
+
+**L1 — 10× regeneration on .tres load.** `_init()` calls `_regenerate_theme()` (with defaults), then `.tres` deserialization triggers each of the 9 setters sequentially (each calling `_regenerate_theme()` again). Result: 10 full regenerations on load. Not a correctness bug (reentry guard prevents nested calls, results converge), but a performance note. This existed since Plan 04-01 — not new from Cycle 7.
+
+**L2 — `BINDING_TABLE_SEED.txt` may have empty sections for NeoCade-additive Controls.** The introspection script calls `ThemeDB.get_default_theme().get_*_list(t)` which returns the editor's built-in theme slots. NeoCade-additive Controls (CodeEdit, ColorPickerButton, etc.) may have zero slots in the editor's default theme, yielding empty `## CodeEdit` sections. The plan already addresses this: "For NeoCade-additive Controls — no upstream baseline exists; the executor uses... Godot 4.6 source class definitions." Documented limitation, LOW risk.
+
+**L3 — `_strip_theme_entries` blank-line collapsing in `[resource]`.** The function skips blank lines inside `[resource]` but preserves them in the preamble (before `[gd_resource]`). This changes the file's whitespace but Godot's parser handles it. Post-strip files are clean. Build-time only.
+
+---
+
+## Summary
+
+| Finding | Verdict |
+|---|---|
+| F1 — DIRECTION_PRESETS values | **FULLY RESOLVED** |
+| F2 — main.tscn placeholder | **FULLY RESOLVED** |
+| F3 — Helper scripts at addon root | **FULLY RESOLVED** |
+| F4 — CheckButton slot binding | **FULLY RESOLVED** |
+| F5 — SVG `.import` placeholders | **FULLY RESOLVED** |
+| F6 — `default_font` type mismatch | **FULLY RESOLVED** |
+| F7 — BINDING_TABLE delegation | **FULLY RESOLVED** |
+
+**New concerns:** 2 MEDIUM (M1, M2 — build-time helper edge cases, both with mitigations), 3 LOW (L1-L3 — performance note + known documentation gaps). No HIGH concerns introduced. No concerns block proceeding to execution.
+
+---
+
+## Codex Cycle 7 Review
+
+**F1-F7 Verdicts**
+
+| Item | Verdict | Evidence |
+|---|---|---|
+| F1 — `DIRECTION_PRESETS` values | FULLY RESOLVED | `04-04...PLAN.md:293-301` has Pulse/Slate/Bubble/Daybreak/Burst values exactly as requested; `04-04...PLAN.md:411-413` consumes `hover_pct`, `pressed_pct`, `disabled_opacity` from presets; `04-06...PLAN.md:505-522` and `:640-656` add editor + headless verifier assertions for all five directions. |
+| F2 — `main.tscn` placeholder | FULLY RESOLVED | `04-01...PLAN.md:92-98` says delete both lines and do not replace with a placeholder; `:107-108` acceptance forbids live or commented placeholder `theme = ExtResource`; `:114` verifier rejects both `#` and `;` placeholder forms. `04-07...PLAN.md:299-322` later re-adds a live Pulse theme line. |
+| F3 — helper scripts out of addon root | FULLY RESOLVED | `04-08...PLAN.md:549-560` required addon-root files exclude helpers; `:566-569` requires helpers under `.planning/.../helpers`; `:571-579` forbids `_phase4_import.gd`, `_phase4_verify.gd`, `_phase4_verify_headless.gd` at addon root; `:589-593` accepts exactly one addon-root `.gd`. |
+| F4 — CheckButton `checked`/`unchecked` | FULLY RESOLVED | `04-03...PLAN.md:36` renames assets to `checkbutton_checked` / `checkbutton_unchecked`; `04-05...PLAN.md:36` binds CheckButton `checked`/`unchecked`; `:556-563` freezes `CANONICAL_SLOT_NAMES.CheckButton.icon = ["checked", "unchecked"]`; `:673` verifies those slots. Godot stable 4.6 docs list CheckButton texture theme properties `checked` and `unchecked`, not `on`/`off`. |
+| F5 — SVG `.import` placeholder workflow | FULLY RESOLVED | `04-03...PLAN.md:279-289` defines Stage A placeholder, Stage B `godot --headless --import`, Stage C recommit normalized files; `:305-307` acceptance forbids `<`/`>` and requires normalized `.ctex` path + Godot UID; `:311` verifier enforces it. |
+| F6 — `default_font` FontFile | FULLY RESOLVED | `04-05...PLAN.md:33` states `default_font` is `Inter-Variable.tres` FontFile, not `Inter-Body.tres`; `:143-146` implements `inter_file as FontFile`, `default_font = inter_file`, and keeps `body_font` only for variation fonts; `:195-197` and `:211` verify no `default_font = body_font` regression. `04-08...PLAN.md:417-419` README cast now expects `theme.default_font as FontFile`. |
+| F7 — empirical BINDING_TABLE seed | FULLY RESOLVED | `04-05...PLAN.md:218-226` adds `_phase4_introspect.gd` and `BINDING_TABLE_SEED.txt`; `:277-287` uses `ThemeDB.get_default_theme()` and `get_*_list`; `:307-309` runs the helper and emits the seed; `:323-325` verifies seed output includes CheckButton `checked`/`unchecked`; `:961-966` commits both helper and seed. |
+
+**New Concerns**
+
+| Severity | Concern | Evidence |
+|---|---|---|
+| MEDIUM | Residual F7 wording conflict: Task 2 still says `MINIMAL-THEME-DISSECTION.md` is the canonical slot-name baseline, which contradicts the new “seed wins” strategy. This can steer executor behavior back toward curated slot names. | `04-05...PLAN.md:368` says dissection is canonical; `:404-406` says `BINDING_TABLE_SEED.txt` is authoritative and copied into BINDING_TABLE. |
+| MEDIUM | The introspection helper claims “37 Control types” but its `types` array includes non-canonical extras (`PanelContainer`, `HSeparator`, `VSeparator`, `HFlowContainer`, `GraphFrame`, `GraphNode`). Because Task 2 says to copy seed slot arrays verbatim, this can conflict with the exact-37 BINDING_TABLE contract. | `04-05...PLAN.md:251-263` lists extras; `:366` and `:406` require exact 37. |
+| MEDIUM | `04-08` CHANGELOG task is self-contradictory: the proposed text includes forbidden non-canonical names, while the acceptance/verifier rejects those names anywhere in the generated CHANGELOG. This will fail its own verifier unless rewritten. | Text includes `GraphFrame / GraphNode / HFlowContainer / HSeparator / VSeparator` at `04-08...PLAN.md:196-200`; acceptance/verifier rejects them at `:275-281`. |
+| LOW | F6 implementation is fixed, but `04-06` verifier prose/assertions are stale: it still says default_font is `Inter-Body.tres` and only asserts non-null, not `FontFile`. | `04-06...PLAN.md:337` stale prose; `:435-436` and `:563-564` only assert default font exists. |
+
+No new HIGH concerns found.
+
+Source used for Godot slot confirmation: official Godot stable CheckButton docs list `checked`, `checked_disabled`, `checked_mirrored`, `unchecked`, etc. as CheckButton theme texture properties: https://docs.godotengine.org/en/stable/classes/class_checkbutton.html
+
+---
+
+## Cycle 7 Consensus — CONVERGED
+
+| Concern | OpenCode | Codex | Aggregate |
+|---|---|---|---|
+| **F1** DIRECTION_PRESETS values | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **F2** main.tscn placeholder | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **F3** Helper scripts at addon root | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **F4** CheckButton checked/unchecked | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **F5** SVG .import workflow | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **F6** default_font FontFile type | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **F7** Empirical BINDING_TABLE seed | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+
+### NEW Concerns from Cycle 7 Replan
+
+**MEDIUM (Codex — self-contradictions in plan; could trip executor):**
+
+1. **MED-1 (slot-name authority wording conflict).** Plan 04-05 Task 2 line 368 still labels MINIMAL-THEME-DISSECTION.md as "canonical baseline" while lines 404-406 say "BINDING_TABLE_SEED.txt is authoritative; where seed and dissection disagree, seed wins". Wording conflict could steer executor toward curated slot names.
+2. **MED-2 (introspect helper's types array drift).** Plan 04-05 Task 2.0 introspection helper enumerates ~43 types including non-canonical extras (PanelContainer, HSeparator, VSeparator, HFlowContainer, GraphFrame, GraphNode). Task 2 says "copy seed verbatim" — but Task 2's exact-37 contract (lines 366, 406) would reject the extras. Helper's types array should be trimmed to the 37 canonical Control names.
+3. **MED-3 (Plan 04-08 CHANGELOG self-contradiction).** Lines 196-200 of Plan 04-08 contain the forbidden non-canonical names (GraphFrame/GraphNode/HFlowContainer/HSeparator/VSeparator) in the CHANGELOG text body, while the same plan's verifier (lines 275-281) explicitly rejects those names. CHANGELOG body must be rewritten to remove the non-canonical names.
+
+**MEDIUM (OpenCode — strip helper edge cases):**
+
+4. **OC-MED-1**: `_strip_theme_entries` section state machine assumes single-line `[ext_resource]` blocks (Godot 4.6 emits these as single-line; safe in practice).
+5. **OC-MED-2**: `_strip_load_steps_attr` regex behavior; verified safe via runtime `loaded is NeoCadeTheme` check.
+
+**LOW concerns (4):** 10× regeneration on .tres load (existing since Plan 04-01, not new); BINDING_TABLE_SEED.txt may have empty sections for NeoCade-additive Controls (documented limitation); strip helper blank-line collapsing in [resource] (Godot's parser handles); Plan 04-06 stale prose about default_font as Inter-Body.tres (cleanup; doesn't affect verifier behavior).
+
+### Risk Assessment Summary
+
+- **OpenCode:** LOW (no HIGH; 2 MEDIUM are build-time helper edge cases with mitigations)
+- **Codex:** LOW-MEDIUM (no HIGH; 3 MEDIUM are plan self-contradictions worth tidying but executor could resolve in-flight)
+- **Aggregate: CONVERGED at HIGH=0.** Cleanup of Codex's MED-1/MED-2/MED-3 recommended but not blocking.
+
+### Convergence Trajectory (Final)
+
+| Cycle | HIGH | Notes |
+|---|---|---|
+| 1 | 7 | Initial plans |
+| 2 | 3 | After replan |
+| 3 | 1 | N4 (.tres bloat) emerges from C5/C6 fix |
+| 4 | 1 (override) | N5 (script linkage) emerges from N4 fix |
+| 5 | 0 (PREMATURE CONVERGE) | Cycle-5 verdict was premature |
+| 6 | 7 (FRESH PASS) | Independent re-review found 7 HIGHs the loop missed |
+| 7 | **0** (TRUE CONVERGE) | All 7 fresh-pass HIGHs resolved; both reviewers agree |
+
+**Final verdict: CONVERGED — Phase 4 plans are execution-ready.**
+
+The 5-cycle "premature convergence" lesson: external AI reviewers can fall into a self-reinforcing loop where each cycle introduces fixes that they themselves verify, without questioning whether the broader plan still holds. A fresh independent pass with explicit "review like you've never seen these plans" framing surfaces the issues the verification-mode framing misses. Three self-contradictions remain (MED-1/-2/-3) but are within an executor's capacity to resolve in-flight.
