@@ -12,22 +12,77 @@
       <div>
         <p class="nc-kicker">Phase 3.4 concept boards</p>
         <h1>Pulse, Slate, Bubble, Daybreak, Burst</h1>
-        <p class="nc-lede">Each direction is rendered twice from the same formula model: `raised=false` flat and `raised=true` extruded-flat. Stage 1 uses a representative Control slice for the finalist user gate.</p>
+        <p class="nc-lede">Each direction includes a fixed-order generated concept image plus matching `raised=false` and `raised=true` support boards. The concept images use the same control order so palette and treatment are the only comparison variables.</p>
       </div>
       <aside class="nc-contract">
-        <b>Dynamic contract</b>
-        <span>`base_color`, `accent_color`, `raised`, and `platform` drive every board. Default preview platform is desktop; mobile constants are included for the finalist 4-grid.</span>
+        <b>Fixed comparison contract</b>
+        <span>Each concept image uses the same control order. `base_color`, `accent_color`, `raised`, and `platform` still drive the support boards.</span>
       </aside>
     </header>
 
     <section class="nc-legend" aria-label="Concept board checks">
-      <div><b>10</b><span>concept boards</span></div>
+      <div><b>5</b><span>fixed-order concept images</span></div>
       <div><b>5</b><span>peer directions</span></div>
-      <div><b>2</b><span>flat / raised modes</span></div>
+      <div><b>10</b><span>flat / raised support boards</span></div>
       <div><b>1-3</b><span>finalists selected after review</span></div>
     </section>
 
-    <section id="conceptBoards" class="nc-board-list" aria-live="polite"></section>
+    <section id="conceptBoards" class="nc-board-list" aria-live="polite">
+      <section class="nc-direction-section" data-direction="Pulse">
+        <div class="nc-concept-layout">
+          <figure class="nc-concept-hero">
+            <img src="concepts/pulse-concept.png" alt="Pulse fixed-order generated dark arcade UI concept">
+            <figcaption>Fixed control order: header/tabs, action panel, dialog stack, list/tree, state strip, palette.</figcaption>
+          </figure>
+          <div class="nc-concept-brief" data-concept-brief></div>
+        </div>
+        <div class="nc-variant-pair" data-variant-pair></div>
+      </section>
+
+      <section class="nc-direction-section" data-direction="Slate">
+        <div class="nc-concept-layout">
+          <figure class="nc-concept-hero">
+            <img src="concepts/slate-concept.png" alt="Slate fixed-order generated dark arcade UI concept">
+            <figcaption>Fixed control order: header/tabs, action panel, dialog stack, list/tree, state strip, palette.</figcaption>
+          </figure>
+          <div class="nc-concept-brief" data-concept-brief></div>
+        </div>
+        <div class="nc-variant-pair" data-variant-pair></div>
+      </section>
+
+      <section class="nc-direction-section" data-direction="Bubble">
+        <div class="nc-concept-layout">
+          <figure class="nc-concept-hero">
+            <img src="concepts/bubble-concept.png" alt="Bubble fixed-order generated dark arcade UI concept">
+            <figcaption>Fixed control order: header/tabs, action panel, dialog stack, list/tree, state strip, palette.</figcaption>
+          </figure>
+          <div class="nc-concept-brief" data-concept-brief></div>
+        </div>
+        <div class="nc-variant-pair" data-variant-pair></div>
+      </section>
+
+      <section class="nc-direction-section" data-direction="Daybreak">
+        <div class="nc-concept-layout">
+          <figure class="nc-concept-hero">
+            <img src="concepts/daybreak-concept.png" alt="Daybreak fixed-order generated dark arcade UI concept">
+            <figcaption>Fixed control order: header/tabs, action panel, dialog stack, list/tree, state strip, palette.</figcaption>
+          </figure>
+          <div class="nc-concept-brief" data-concept-brief></div>
+        </div>
+        <div class="nc-variant-pair" data-variant-pair></div>
+      </section>
+
+      <section class="nc-direction-section" data-direction="Burst">
+        <div class="nc-concept-layout">
+          <figure class="nc-concept-hero">
+            <img src="concepts/burst-concept.png" alt="Burst fixed-order generated dark arcade UI concept">
+            <figcaption>Fixed control order: header/tabs, action panel, dialog stack, list/tree, state strip, palette.</figcaption>
+          </figure>
+          <div class="nc-concept-brief" data-concept-brief></div>
+        </div>
+        <div class="nc-variant-pair" data-variant-pair></div>
+      </section>
+    </section>
   </main>
   <script src="src/neocade-mockups.js"></script>
 </body>

@@ -129,7 +129,62 @@ h3 {
 
 .nc-board-list {
   display: grid;
+  gap: 24px;
+}
+
+.nc-direction-section {
+  --base_color: #151a2e;
+  --accent_color: #8bff6a;
+  color: var(--ink-local);
+  background: var(--surface-base);
+  border: 1px solid var(--outline-local);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.nc-concept-layout {
+  display: grid;
+  grid-template-columns: minmax(520px, 1.05fr) minmax(320px, 0.95fr);
   gap: 18px;
+  align-items: stretch;
+  padding: 18px;
+  background: var(--surface-low);
+  border-bottom: 1px solid var(--outline-local);
+}
+
+.nc-concept-hero {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.nc-concept-hero img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: 1px solid var(--outline-local);
+  border-radius: var(--radius);
+  background: var(--surface-panel);
+}
+
+.nc-concept-hero figcaption {
+  color: var(--muted-local);
+  font-size: 0.84rem;
+}
+
+.nc-concept-brief {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+}
+
+.nc-variant-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: 18px;
 }
 
 .nc-board {
@@ -150,6 +205,33 @@ h3 {
   border: 1px solid var(--outline-local);
   border-radius: 8px;
   overflow: hidden;
+}
+
+.nc-direction-section .nc-board {
+  border-radius: 8px;
+}
+
+.nc-board.compact .nc-board-head {
+  grid-template-columns: 1fr;
+  padding: 14px;
+}
+
+.nc-board.compact .nc-samples {
+  grid-template-columns: 1fr;
+  padding: 14px;
+}
+
+.nc-board.compact .nc-specs {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.nc-board.compact .nc-panel {
+  padding: 12px;
+}
+
+.nc-board.compact .nc-dialog p,
+.nc-board.compact .nc-swatch-grid {
+  display: none;
 }
 
 .nc-board-head {
@@ -541,6 +623,326 @@ h3 {
   background: var(--accent_color);
 }
 
+.nc-artboard-page {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  background: #0b0f14;
+}
+
+.nc-artboard {
+  width: 1280px;
+  height: 720px;
+  display: grid;
+  grid-template-rows: 92px 1fr 104px;
+  gap: 14px;
+  padding: 22px;
+  color: var(--ink-local);
+  background: var(--surface-base);
+  border: 1px solid var(--outline-local);
+  overflow: hidden;
+}
+
+.nc-art-top {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.nc-art-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.nc-art-mark {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius);
+  background: var(--accent_color);
+  border: 4px solid var(--surface-high);
+}
+
+.nc-art-brand b {
+  display: block;
+  font-size: 36px;
+  line-height: 1;
+}
+
+.nc-art-brand small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted-local);
+  font-size: 14px;
+}
+
+.nc-art-tabs,
+.nc-art-segments,
+.nc-art-button-row,
+.nc-art-toggle-line,
+.nc-art-states,
+.nc-art-palette {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nc-art-tabs {
+  justify-content: flex-end;
+}
+
+.nc-art-tabs span,
+.nc-art-segments span {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--outline-local);
+  color: var(--muted-local);
+  background: var(--surface-low);
+  font-weight: 720;
+}
+
+.nc-art-tabs .selected,
+.nc-art-segments .selected {
+  color: var(--surface-base);
+  background: var(--accent_color);
+  border-color: transparent;
+}
+
+.nc-art-grid {
+  display: grid;
+  grid-template-columns: 0.86fr 1.12fr 0.82fr;
+  gap: 16px;
+  min-height: 0;
+}
+
+.nc-art-card {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+  border: 1px solid var(--outline-local);
+  border-radius: var(--radius);
+  background: var(--surface-panel);
+  padding: 18px;
+}
+
+.nc-art-card h2 {
+  margin: 0;
+  color: var(--accent_color);
+  font-size: 18px;
+}
+
+.nc-art-button {
+  min-height: 46px;
+  min-width: 102px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--outline-local);
+  background: var(--surface-high);
+  color: var(--ink-local);
+  font-weight: 800;
+}
+
+.nc-art-button.primary {
+  border-color: transparent;
+  background: var(--accent_color);
+  color: var(--surface-base);
+}
+
+.nc-art-button.ghost {
+  border-color: var(--accent_color);
+  background: transparent;
+  color: var(--accent_color);
+}
+
+.nc-art-label {
+  color: var(--muted-local);
+  font-size: 13px;
+  font-weight: 760;
+  text-transform: uppercase;
+}
+
+.nc-art-input {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  border: 2px solid var(--outline-local);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--surface-low);
+}
+
+.nc-art-input.focused {
+  border-color: var(--accent_color);
+  outline: 2px solid var(--accent_color);
+  outline-offset: 2px;
+}
+
+.nc-art-toggle-line {
+  min-height: 46px;
+  flex-wrap: wrap;
+}
+
+.nc-art-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  border: 2px solid var(--accent_color);
+  background: var(--accent_color);
+}
+
+.nc-art-switch {
+  width: 50px;
+  height: 28px;
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--outline-local);
+  background: var(--surface-high);
+}
+
+.nc-art-switch i {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--accent_color);
+}
+
+.nc-art-dialog {
+  display: grid;
+  gap: 13px;
+  border: 1px solid var(--outline-local);
+  border-radius: calc(var(--radius) + 2px);
+  background: var(--surface-overlay);
+  padding: 18px;
+}
+
+.nc-art-dialog p {
+  color: var(--muted-local);
+  margin: 0;
+}
+
+.nc-art-progress {
+  height: 16px;
+  overflow: hidden;
+  border-radius: 999px;
+  border: 1px solid var(--outline-local);
+  background: var(--surface-low);
+}
+
+.nc-art-progress span {
+  display: block;
+  width: 62%;
+  height: 100%;
+  background: var(--accent_color);
+}
+
+.nc-art-list-row {
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid var(--outline-local);
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--surface-low);
+}
+
+.nc-art-list-row.selected {
+  border-color: var(--accent_color);
+  background: var(--surface-high);
+}
+
+.nc-art-list-row span {
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: var(--accent_color);
+}
+
+.nc-art-list-row small {
+  color: var(--muted-local);
+}
+
+.nc-art-scrollbar {
+  height: 104px;
+  width: 14px;
+  justify-self: end;
+  border-radius: 999px;
+  background: var(--surface-low);
+  border: 1px solid var(--outline-local);
+  padding: 3px;
+}
+
+.nc-art-scrollbar i {
+  display: block;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--accent_color);
+}
+
+.nc-art-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.nc-art-states {
+  align-items: stretch;
+}
+
+.nc-art-states span {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--outline-local);
+  border-radius: 8px;
+  background: var(--surface-high);
+  color: var(--ink-local);
+  font-weight: 740;
+}
+
+.nc-art-states .hover {
+  background: var(--state-hover);
+}
+
+.nc-art-states .focus {
+  outline: 2px solid var(--accent_color);
+  outline-offset: 2px;
+}
+
+.nc-art-states .pressed {
+  background: var(--state-pressed);
+}
+
+.nc-art-states .disabled {
+  opacity: 0.48;
+}
+
+.nc-art-palette {
+  align-items: stretch;
+}
+
+.nc-art-palette span {
+  flex: 1;
+  border: 1px solid var(--outline-local);
+  border-radius: 8px;
+}
+
 .mobile-preview {
   min-height: 48px;
   padding: 0 16px;
@@ -556,6 +958,8 @@ h3 {
 
 @media (max-width: 1100px) {
   .nc-header,
+  .nc-concept-layout,
+  .nc-variant-pair,
   .nc-board-head,
   .nc-samples {
     grid-template-columns: 1fr;

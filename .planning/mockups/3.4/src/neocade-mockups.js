@@ -5,6 +5,7 @@ const NEOCADE_DIRECTIONS = [
     name: "Pulse",
     className: "PulseNeoCadeTheme",
     fileStem: "pulse_neocade_theme",
+    conceptImage: "concepts/pulse-concept.png",
     base_color: "#151A2E",
     accent_color: "#8BFF6A",
     contrast: "13.62:1",
@@ -20,6 +21,7 @@ const NEOCADE_DIRECTIONS = [
     name: "Slate",
     className: "SlateNeoCadeTheme",
     fileStem: "slate_neocade_theme",
+    conceptImage: "concepts/slate-concept.png",
     base_color: "#111820",
     accent_color: "#8BD3FF",
     contrast: "10.94:1",
@@ -35,14 +37,15 @@ const NEOCADE_DIRECTIONS = [
     name: "Bubble",
     className: "BubbleNeoCadeTheme",
     fileStem: "bubble_neocade_theme",
-    base_color: "#FFF4FA",
-    accent_color: "#7B1B55",
-    contrast: "9.19:1",
+    conceptImage: "concepts/bubble-concept.png",
+    base_color: "#241326",
+    accent_color: "#FFB3E6",
+    contrast: "10.74:1",
     radius: 16,
     raisedOffset: 5,
-    summary: "Friendly mobile-game brightness with soft candy-counter surfaces and berry actions.",
+    summary: "Friendly mobile-game brightness on a dark berry arcade base with light pink actions.",
     target: "Casual games, cozy menus, tutorials, family-friendly mobile-first UI.",
-    flat: "Rounded solid fills, generous state contrast, cheerful but sparse accent placement.",
+    flat: "Rounded dark berry solid fills, generous state contrast, cheerful but sparse pink accent placement.",
     raised: "Buttons and selected playful affordances get 3-5px hard offsets; fields stay flat.",
     mobile: "Larger buttons and toggles with 44pt / 48dp minimum target thinking."
   },
@@ -50,14 +53,15 @@ const NEOCADE_DIRECTIONS = [
     name: "Daybreak",
     className: "DaybreakNeoCadeTheme",
     fileStem: "daybreak_neocade_theme",
-    base_color: "#EAF7F1",
-    accent_color: "#006A68",
-    contrast: "5.85:1",
+    conceptImage: "concepts/daybreak-concept.png",
+    base_color: "#0B2420",
+    accent_color: "#76F2D1",
+    contrast: "11.96:1",
     radius: 12,
     raisedOffset: 3,
-    summary: "Welcoming daylight arcade mood with mint surfaces and teal wayfinding.",
+    summary: "Welcoming daylight arcade mood reworked as dark teal surfaces with mint wayfinding.",
     target: "Community hubs, onboarding flows, cozy game menus, bright mobile experiences.",
-    flat: "High-contrast teal for primary/focus/selection with quiet secondary surfaces.",
+    flat: "Dark teal tonal surfaces with high-contrast mint for primary/focus/selection.",
     raised: "Primary actions and cards-as-actions lift; ordinary panels, lists, and fields stay flat.",
     mobile: "44pt / 48dp floors with extra breathing room around touch clusters."
   },
@@ -65,6 +69,7 @@ const NEOCADE_DIRECTIONS = [
     name: "Burst",
     className: "BurstNeoCadeTheme",
     fileStem: "burst_neocade_theme",
+    conceptImage: "concepts/burst-concept.png",
     base_color: "#20112E",
     accent_color: "#FFD166",
     contrast: "12.33:1",
@@ -120,7 +125,7 @@ function luminance(hex) {
   const { r, g, b } = hexToRgb(hex);
   const channel = (value) => {
     const normalized = value / 255;
-    return normalized <= 0.03928
+    return normalized <= 0.04045
       ? normalized / 12.92
       : Math.pow((normalized + 0.055) / 1.055, 2.4);
   };
@@ -162,11 +167,11 @@ function styleVars(tokens) {
   return Object.entries(tokens).map(([key, value]) => `${key}: ${value}`).join("; ");
 }
 
-function controlPanel(direction, mode, platformName = "desktop") {
+function controlPanel(direction, mode, platformName = "desktop", compact = false) {
   const platform = PLATFORM_TOKENS[platformName] || PLATFORM_TOKENS.desktop;
   const raisedFlag = mode === "raised";
   return `
-    <article class="nc-board mode-${mode}" style="${styleVars(deriveTokens(direction, platformName))}" data-direction="${direction.name}" data-raised="${raisedFlag}" data-platform="${platformName}">
+    <article class="nc-board mode-${mode}${compact ? " compact" : ""}" style="${styleVars(deriveTokens(direction, platformName))}" data-direction="${direction.name}" data-raised="${raisedFlag}" data-platform="${platformName}">
       <div class="nc-board-head">
         <div>
           <div class="nc-title-row">
@@ -250,15 +255,170 @@ function controlPanel(direction, mode, platformName = "desktop") {
   `;
 }
 
+function findDirection(name) {
+  return NEOCADE_DIRECTIONS.find((direction) => direction.name.toLowerCase() === String(name).toLowerCase());
+}
+
+function conceptBrief(direction) {
+  return `
+    <div class="nc-title-row">
+      <h2>${direction.name}</h2>
+      <span class="nc-chip">base ${direction.base_color}</span>
+      <span class="nc-chip">accent ${direction.accent_color}</span>
+      <span class="nc-chip">WCAG ${direction.contrast}</span>
+    </div>
+    <p class="nc-board-copy">${direction.summary}</p>
+    <div class="nc-specs">
+      <div><b>Future class</b><span>${direction.className}</span></div>
+      <div><b>Target</b><span>${direction.target}</span></div>
+      <div><b>Flat behavior</b><span>${direction.flat}</span></div>
+      <div><b>Raised behavior</b><span>${direction.raised}</span></div>
+    </div>
+  `;
+}
+
+function fillDirectionSection(section, direction) {
+  section.setAttribute("style", styleVars(deriveTokens(direction, "desktop")));
+  const brief = section.querySelector("[data-concept-brief]");
+  const variants = section.querySelector("[data-variant-pair]");
+  if (brief) {
+    brief.innerHTML = conceptBrief(direction);
+  }
+  if (variants) {
+    variants.innerHTML = `
+      ${controlPanel(direction, "flat", "desktop", true)}
+      ${controlPanel(direction, "raised", "desktop", true)}
+    `;
+  }
+}
+
+function directionConcept(direction) {
+  const tokens = deriveTokens(direction, "desktop");
+  return `
+    <section class="nc-direction-section" style="${styleVars(tokens)}" data-direction="${direction.name}">
+      <div class="nc-concept-layout">
+        <figure class="nc-concept-hero">
+          <img src="${direction.conceptImage}" alt="${direction.name} generated dark arcade UI concept">
+          <figcaption>Generated concept image - dark base ${direction.base_color}, accent ${direction.accent_color}, accent contrast ${direction.contrast}</figcaption>
+        </figure>
+        <div class="nc-concept-brief">
+          ${conceptBrief(direction)}
+        </div>
+      </div>
+      <div class="nc-variant-pair">
+        ${controlPanel(direction, "flat", "desktop", true)}
+        ${controlPanel(direction, "raised", "desktop", true)}
+      </div>
+    </section>
+  `;
+}
+
+function conceptArtboard(direction) {
+  const tokens = deriveTokens(direction, "desktop");
+  return `
+    <article class="nc-artboard" style="${styleVars(tokens)}" data-direction="${direction.name}" data-fixed-control-order="header-tabs action-panel dialog-stack list-tree states-palette">
+      <header class="nc-art-top">
+        <div class="nc-art-brand">
+          <span class="nc-art-mark"></span>
+          <div>
+            <b>${direction.name}</b>
+            <small>${direction.base_color} / ${direction.accent_color} / ${direction.contrast}</small>
+          </div>
+        </div>
+        <nav class="nc-art-tabs" aria-label="Fixed tabs">
+          <span class="selected">Lobby</span>
+          <span>Cabinets</span>
+          <span>Profile</span>
+          <span>Settings</span>
+        </nav>
+      </header>
+
+      <div class="nc-art-grid">
+        <section class="nc-art-card nc-art-actions">
+          <h2>01 Action panel</h2>
+          <div class="nc-art-button-row">
+            <span class="nc-art-button primary">Start</span>
+            <span class="nc-art-button">Options</span>
+            <span class="nc-art-button ghost">Cancel</span>
+          </div>
+          <label class="nc-art-label">Input focus</label>
+          <div class="nc-art-input focused">Player alias</div>
+          <div class="nc-art-toggle-line">
+            <span class="nc-art-check"></span>
+            <span>Checked</span>
+            <span class="nc-art-switch"><i></i></span>
+            <span>Voice</span>
+          </div>
+        </section>
+
+        <section class="nc-art-card nc-art-dialog-stack">
+          <h2>02 Dialog stack</h2>
+          <div class="nc-art-segments">
+            <span class="selected">Lobby</span>
+            <span>Match</span>
+            <span>Audio</span>
+          </div>
+          <div class="nc-art-dialog">
+            <b>Popup surface</b>
+            <p>Primary action, secondary action, stable text field, and focus ring.</p>
+            <div class="nc-art-progress"><span></span></div>
+            <div class="nc-art-button-row">
+              <span class="nc-art-button primary">Confirm</span>
+              <span class="nc-art-button ghost">Back</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="nc-art-card nc-art-list-tree">
+          <h2>03 List / tree</h2>
+          <div class="nc-art-list-row selected"><span></span><b>Cabinet A</b><small>ready</small></div>
+          <div class="nc-art-list-row"><span></span><b>Mini-game list</b><small>3 new</small></div>
+          <div class="nc-art-list-row"><span></span><b>Settings row</b><small>stable</small></div>
+          <div class="nc-art-scrollbar"><i></i></div>
+        </section>
+      </div>
+
+      <footer class="nc-art-bottom">
+        <div class="nc-art-states">
+          <span>normal</span>
+          <span class="hover">hover</span>
+          <span class="focus">focus</span>
+          <span class="pressed">pressed</span>
+          <span class="disabled">disabled</span>
+        </div>
+        <div class="nc-art-palette">
+          <span style="background: var(--surface-low)"></span>
+          <span style="background: var(--surface-panel)"></span>
+          <span style="background: var(--surface-high)"></span>
+          <span style="background: var(--accent_color)"></span>
+        </div>
+      </footer>
+    </article>
+  `;
+}
+
 function renderConceptGallery() {
   const target = document.getElementById("conceptBoards");
   if (!target) return;
-  target.innerHTML = NEOCADE_DIRECTIONS
-    .flatMap((direction) => [
-      controlPanel(direction, "flat", "desktop"),
-      controlPanel(direction, "raised", "desktop")
-    ])
-    .join("");
+  const staticSections = [...target.querySelectorAll(".nc-direction-section[data-direction]")];
+  if (staticSections.length > 0) {
+    staticSections.forEach((section) => {
+      const direction = findDirection(section.dataset.direction);
+      if (direction) {
+        fillDirectionSection(section, direction);
+      }
+    });
+    return;
+  }
+  target.innerHTML = NEOCADE_DIRECTIONS.map(directionConcept).join("");
+}
+
+function renderConceptImage() {
+  const target = document.getElementById("conceptImageMount");
+  if (!target) return;
+  const params = new URLSearchParams(window.location.search);
+  const direction = findDirection(params.get("direction")) || NEOCADE_DIRECTIONS[0];
+  target.innerHTML = conceptArtboard(direction);
 }
 
 function renderFinalistPlaceholder() {
@@ -281,6 +441,9 @@ function boot() {
   if (!page) return;
   if (page.dataset.gallery === "concept") {
     renderConceptGallery();
+  }
+  if (page.dataset.gallery === "concept-image") {
+    renderConceptImage();
   }
   if (page.dataset.gallery === "finalist") {
     renderFinalistPlaceholder();
