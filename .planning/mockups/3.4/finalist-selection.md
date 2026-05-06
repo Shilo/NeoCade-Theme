@@ -27,7 +27,7 @@ No Pulse values change as a result of this confirmation. The `pulse_neocade_them
 
 Per the user's framing *"i eventually want to use all of them as theme variations,"* Slate, Bubble, Daybreak, and Burst remain approved for v1 ship as personality variations. The locked single-concrete-class-plus-N-data-tres architecture (Track 5, 2026-05-06e/f) makes "1 starter direction + 4 personality variations" the natural shape — no `.gd` per direction, no class hierarchy. v1 ships **1 `.gd` + 5 `.tres`** at the addon root (`addons/neocade_theme/neocade_theme.gd` plus `pulse_neocade_theme.tres`, `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`, `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`).
 
-Pulse's role as recommended starter does NOT bake any of its values into `NeoCadeTheme` superclass defaults. The @export set is intentionally minimal (4 core + 5 shape = 9 properties), and per-direction personality lives in Theme Editor entry overrides per `.tres`. The "recommended starter" designation is two soft commitments only:
+Pulse's role as recommended starter does NOT bake any of its values into `NeoCadeTheme` class defaults. The @export set is intentionally minimal (4 core + 5 shape = 9 properties), and per-direction personality lives in Theme Editor entry overrides per `.tres`. The "recommended starter" designation is two soft commitments only:
 
 1. The showcase scene's default theme is `pulse_neocade_theme.tres`.
 2. The README's "try this first" suggestion points to Pulse.
@@ -40,7 +40,7 @@ Pulse's role as recommended starter does NOT bake any of its values into `NeoCad
 | Daybreak | ship as personality variation | implement after Pulse |
 | Burst    | ship as personality variation | implement after Pulse |
 
-The CLAUDE.md "v1 ships N user-approved theme subclass `.tres` files" wording resolves to **N = 5** for v1.
+Older project wording of "v1 ships N user-approved theme subclass `.tres` files" resolves under the current architecture to **N = 5 data-only direction `.tres` files** for v1.
 
 ## Future revision notes
 
