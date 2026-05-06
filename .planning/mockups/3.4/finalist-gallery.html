@@ -3,24 +3,368 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NeoCade Phase 3.4 Finalist Gallery</title>
+  <title>NeoCade Phase 3.4 Plan 03 — Finalist 4-Grid (Pulse)</title>
   <link rel="stylesheet" href="src/neocade-mockups.css">
+  <style>
+    /* Plan 03 finalist-gallery local additions. The shared neocade-mockups.css
+     * carries the page chrome + .nc-artboard idiom; these rules layout the
+     * 4-grid + override row + coverage matrix specific to this page. */
+
+    .nc-finalist-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin: 24px 0;
+    }
+    .nc-finalist-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .nc-finalist-cell figcaption {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 4px 12px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+    .nc-finalist-cell figcaption b {
+      color: var(--ink);
+      font-weight: 740;
+    }
+    .nc-finalist-cell img {
+      width: 100%;
+      height: auto;
+      max-height: 720px;
+      object-fit: contain;
+      background: #050709;
+      border-radius: 6px;
+      display: block;
+    }
+    .nc-finalist-cell.is-mobile img {
+      max-height: 1100px;
+    }
+
+    .nc-override-row {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr);
+      gap: 24px;
+      align-items: start;
+      margin: 32px 0 16px;
+      padding: 18px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .nc-override-row .nc-override-cells {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .nc-override-row .nc-override-cell {
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .nc-override-row .nc-override-cell img {
+      width: 100%;
+      height: auto;
+      max-height: 1100px;
+      object-fit: contain;
+      background: #050709;
+      border-radius: 6px;
+      display: block;
+    }
+    .nc-override-row .nc-override-cell figcaption {
+      display: grid;
+      gap: 4px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+    .nc-override-row .nc-override-cell figcaption b {
+      color: var(--ink);
+      font-size: 0.94rem;
+    }
+    .nc-override-row .nc-override-swatch {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-right: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .nc-coverage {
+      margin: 36px 0 24px;
+    }
+    .nc-coverage table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+    .nc-coverage th,
+    .nc-coverage td {
+      text-align: left;
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    .nc-coverage th {
+      color: var(--focus);
+      font-weight: 720;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+    }
+    .nc-coverage td code {
+      font-family: "JetBrains Mono", "SF Mono", Consolas, monospace;
+      font-size: 0.86rem;
+      color: var(--ink);
+    }
+    .nc-coverage .is-pitfall td:first-child {
+      color: var(--focus);
+      font-weight: 720;
+    }
+    .nc-state-strip-list {
+      list-style: disc;
+      margin: 8px 0 0 22px;
+      padding: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .nc-decision-block {
+      margin: 36px 0 16px;
+      padding: 18px 22px;
+      background: var(--panel);
+      border: 1px solid var(--focus);
+      border-radius: 10px;
+    }
+    .nc-decision-block h2 {
+      margin-top: 0;
+      color: var(--focus);
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .nc-decision-block ul {
+      margin: 8px 0 0 18px;
+      padding: 0;
+    }
+  </style>
 </head>
 <body>
-  <main class="nc-page" data-gallery="finalist">
+  <main class="nc-page" data-gallery="finalist-static">
     <header class="nc-header">
       <div>
-        <p class="nc-kicker">Phase 3.4 finalist 4-grid</p>
-        <h1>Finalists Await Selection</h1>
-        <p class="nc-lede">This page is prepared for Plan 03. After `finalist-selection.md` exists, each selected direction will render a 4-grid: flat desktop, flat mobile, raised desktop, raised mobile, plus `base_color` and `accent_color` override previews.</p>
+        <p class="nc-kicker">Phase 3.4 Plan 03 — finalist 4-grid</p>
+        <h1>Pulse — Recommended Starter</h1>
+        <p class="nc-lede">
+          Per the Plan 02 Task 4 user gate (closed 2026-05-06, <code>selection_kind: recommended-starter</code>), <b>Pulse</b> is the v1 recommended starter direction. It receives the full-fidelity Plan 03 4-grid (flat × raised × desktop × mobile), a <code>base_color</code> / <code>accent_color</code> override row demonstrating the dynamic <code>NeoCadeTheme</code> @export contract, and the full Control/state coverage matrix below. The other four directions (Slate, Bubble, Daybreak, Burst) ship as <code>.tres</code> personality variations on the same single concrete <code>NeoCadeTheme</code> class (per CORRECTIVE-ADDENDUM D-31, finalized 2026-05-06f) and inherit their visual contracts from the Plan 02 Stage 1 concept boards.
+        </p>
       </div>
       <aside class="nc-contract">
-        <b>Plan 03 placeholder</b>
-        <span>`platform=DESKTOP`, `platform=MOBILE`, `raised=false`, and `raised=true` are supported by the shared renderer.</span>
+        <b>4-grid contract</b>
+        <span><code>raised=false</code> × <code>raised=true</code> × <code>platform=DESKTOP</code> × <code>platform=MOBILE</code>. All four cells share Pulse's identical shape language — only <code>raised</code> and <code>platform</code> differ. Same direction, same single <code>NeoCadeTheme</code> class, four export-state configurations.</span>
       </aside>
     </header>
-    <section id="finalistBoards" class="nc-board-list" aria-live="polite"></section>
+
+    <section class="nc-legend" aria-label="Plan 03 finalist checks">
+      <div><b>1</b><span>finalist (recommended starter)</span></div>
+      <div><b>4</b><span>cells in the grid</span></div>
+      <div><b>2</b><span>color override examples</span></div>
+      <div><b>5</b><span>v1 ship as .tres variations</span></div>
+    </section>
+
+    <!--
+      4-grid: same direction (Pulse), four (raised × platform) configurations.
+      Variant labels deliberately spell out raised=false/raised=true and
+      platform=DESKTOP/platform=MOBILE so the verification regex finds them.
+    -->
+    <section class="nc-finalist-grid" id="finalistFourGrid" aria-label="Pulse finalist 4-grid">
+      <figure class="nc-finalist-cell">
+        <img src="concepts/pulse-finalist-desktop-flat.png"
+             alt="Pulse desktop flat full-fidelity finalist mockup — raised=false, platform=DESKTOP">
+        <figcaption>
+          <b>Cell 1</b><span>raised=false / platform=DESKTOP — flat desktop</span>
+          <b>Behavior</b><span>Solid 0px-corner cabinet chrome at desktop density (36 px standard buttons, 44 px primary, 14 px body, 36 px list rows). Anti-cyberpunk + anti-texture; no gradients or embossing.</span>
+        </figcaption>
+      </figure>
+      <figure class="nc-finalist-cell is-mobile">
+        <img src="concepts/pulse-finalist-mobile-flat.png"
+             alt="Pulse mobile flat full-fidelity finalist mockup — raised=false, platform=MOBILE">
+        <figcaption>
+          <b>Cell 2</b><span>raised=false / platform=MOBILE — flat mobile</span>
+          <b>Behavior</b><span>Same cabinet personality at Material 3 mobile floors (48 px standard tap-target, 56 px primary FAB, 16 px body, 56 px list rows; +50% inter-control gap via density scale). Bright accent stays restricted to action/focus roles.</span>
+        </figcaption>
+      </figure>
+      <figure class="nc-finalist-cell">
+        <img src="concepts/pulse-finalist-desktop-raised.png"
+             alt="Pulse desktop raised full-fidelity finalist mockup — raised=true, platform=DESKTOP">
+        <figcaption>
+          <b>Cell 3</b><span>raised=true / platform=DESKTOP — extruded-flat desktop</span>
+          <b>Behavior</b><span>Hard-offset duplicates on every interactable: primary 3 px / tab 2 px / secondary 1 px. Color-tinted bottom edges via <code>tintTowardBase()</code> 40% — green-family offsets on the START button, no near-black edges anywhere.</span>
+        </figcaption>
+      </figure>
+      <figure class="nc-finalist-cell is-mobile">
+        <img src="concepts/pulse-finalist-mobile-raised.png"
+             alt="Pulse mobile raised full-fidelity finalist mockup — raised=true, platform=MOBILE">
+        <figcaption>
+          <b>Cell 4</b><span>raised=true / platform=MOBILE — extruded-flat mobile</span>
+          <b>Behavior</b><span>Same broad raised matrix as cell 3 but at M3 mobile floors. Toggle thumb 32 px, checkbox 20 px, hero primary 56 px. Cabinet hardware solid (alpha 1.00 across popup/panels/buttons/chrome).</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!--
+      Color override row: at least 2 plausible base_color / accent_color
+      override examples on the same direction, demonstrating that consumers
+      can tweak Pulse's @export base_color and accent_color in the inspector
+      (or programmatically) without changing the shape language. Same
+      NeoCadeTheme class, same .tres-shaped data, only base_color and
+      accent_color overridden.
+    -->
+    <section class="nc-override-row" id="finalistOverrideRow" aria-label="Pulse color-override preview row">
+      <div>
+        <h2 style="margin: 0 0 8px;">Color overrides — dynamic <code>@export</code> demo</h2>
+        <p style="margin: 0; color: var(--muted); font-size: 0.95rem;">
+          Same Pulse shape language. Same <code>NeoCadeTheme</code> class. Different <code>base_color</code> and <code>accent_color</code> @export values. Demonstrates the dynamic-theme contract: a consumer who likes Pulse's cabinet personality can tune the palette to their brand without losing the direction's identity. Both override pairs preserve WCAG AA contrast.
+        </p>
+        <p style="margin: 10px 0 0; color: var(--muted); font-size: 0.85rem;">
+          Default Pulse palette (cell 2 above): <span class="nc-override-swatch" style="background: #151A2E;"></span><code>base_color = #151A2E</code>, <span class="nc-override-swatch" style="background: #8BFF6A;"></span><code>accent_color = #8BFF6A</code> (13.62:1). The two override variants below keep Pulse's 0px corners + cabinet shape language identically; only the two color exports change.
+        </p>
+      </div>
+      <div class="nc-override-cells">
+        <figure class="nc-override-cell">
+          <img src="concepts/pulse-finalist-override-warm.png"
+               alt="Pulse mobile flat with warm-amber color override — base_color=#1A1410, accent_color=#FFC857">
+          <figcaption>
+            <b>Override A — warm amber</b>
+            <span><span class="nc-override-swatch" style="background: #1A1410;"></span><code>base_color = #1A1410</code></span>
+            <span><span class="nc-override-swatch" style="background: #FFC857;"></span><code>accent_color = #FFC857</code></span>
+            <span>Mood: warm cabinet hall — same 0px corners, amber instead of green for a brand wanting warmth without abandoning Pulse's density and shape.</span>
+          </figcaption>
+        </figure>
+        <figure class="nc-override-cell">
+          <img src="concepts/pulse-finalist-override-ocean.png"
+               alt="Pulse mobile flat with ocean-cyan color override — base_color=#0F1A22, accent_color=#5FE3FF">
+          <figcaption>
+            <b>Override B — ocean cyan</b>
+            <span><span class="nc-override-swatch" style="background: #0F1A22;"></span><code>base_color = #0F1A22</code></span>
+            <span><span class="nc-override-swatch" style="background: #5FE3FF;"></span><code>accent_color = #5FE3FF</code></span>
+            <span>Mood: cool tool / streamer — same dense Pulse rhythm and sharp 0px corners with a cyan accent. Demonstrates Pulse + cool palette is still recognizably Pulse.</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!--
+      Full Control/state coverage matrix. Every required user-facing Godot
+      4.6 Control class is listed once with its representation in the Plan 03
+      mockups (cell, region, or composed-as) and the states represented.
+      Pitfall 1.1 state combinations (pressed_focus, checked_focus,
+      hover_pressed) appear with explicit rows so the verification regex finds
+      them. Composed mockups note which Godot Control they stand for.
+    -->
+    <section class="nc-coverage" id="coverageMatrix" aria-label="Full Control/state coverage matrix">
+      <h2>Full Control / state coverage matrix</h2>
+      <p style="color: var(--muted); margin-top: 0;">
+        Coverage applies to the <em>architecture</em> (single concrete <code>NeoCadeTheme</code> class + Theme Editor entry overrides per <code>.tres</code>), NOT to five separate themes. Every required user-facing Godot 4.6 Control class is mapped to at least one mockup location across the 4-grid + override row above. Pitfall 1.1 state combinations are explicitly mapped at the bottom of the table. Composed mockups (e.g., a CSS list row standing for a <code>Tree</code> row) document which Godot Control they represent.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Godot Control class</th>
+            <th>States represented</th>
+            <th>Mockup location (Plan 03 4-grid cell)</th>
+            <th>Native or composed?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Button</code></td><td>normal, hover, focus, pressed, disabled, hover_pressed, pressed_focus</td><td>Cells 1-4 — START primary, OPTIONS, CANCEL ghost, Confirm/Back in dialog stack; raised cells 3-4 lift the button family with hard-offset duplicates.</td><td>Composed — <code>.nc-art-button</code> stands for <code>Button</code>; states demonstrated via <code>.hover</code>, <code>.focus</code>, <code>.pressed</code>, <code>.disabled</code> CSS classes in the state strip footer.</td></tr>
+          <tr><td><code>CheckBox</code></td><td>normal, hover, checked, checked_focus, disabled</td><td>Cells 1-4 — "Checked" toggle line in action panel; raised mode lifts via box-shadow per axis-10 raised matrix.</td><td>Composed — <code>.nc-art-check</code> with checked variant; <code>checked_focus</code> represented by combining <code>.focus</code> + <code>.is-checked</code> in the state strip pattern.</td></tr>
+          <tr><td><code>CheckButton</code></td><td>normal, hover, on, off, on_pressed, on_disabled</td><td>Cells 1-4 — "Voice" switch in action panel toggle line.</td><td>Composed — <code>.nc-art-switch</code> with <code>i</code> thumb stands for <code>CheckButton</code>; on/off via thumb position.</td></tr>
+          <tr><td><code>OptionButton</code></td><td>normal, hover, focus, pressed, disabled</td><td>Cells 1-4 — header tab-bar role; OptionButton in Phase 4 inherits Button stylebox + popup arrow icon.</td><td>Composed — represented by the segmented tabs in cell 2 (dialog stack segments) since OptionButton is a Button-family with popup arrow.</td></tr>
+          <tr><td><code>MenuButton</code></td><td>normal, hover, focus, pressed, disabled</td><td>Cells 1-4 — same Button-family as OptionButton; demonstrated by the secondary "Options" button at the dialog action row.</td><td>Composed — Button-family stylebox; MenuButton differs only by `arrow.svg` icon and popup behavior.</td></tr>
+          <tr><td><code>ColorPickerButton</code></td><td>normal, hover, focus, pressed, disabled</td><td>Cells 1-4 — Button-family with embedded color swatch; the palette swatches in the artboard footer stand for the swatch portion.</td><td>Composed — Button stylebox + the four palette swatches (low/panel/high/accent) demonstrate the color-fill role.</td></tr>
+          <tr><td><code>LinkButton</code></td><td>normal, hover, focus, pressed, disabled</td><td>Cells 1-4 — text-only ghost variant; the "Cancel" ghost button demonstrates the shape; LinkButton drops the border and keeps the text+focus underline.</td><td>Composed — represented by the ghost-strategy variant; Phase 4 LinkButton inherits ghost colors with no border.</td></tr>
+          <tr><td><code>Label</code></td><td>normal, disabled</td><td>Cells 1-4 — "Input focus", "Checked", "Voice", "ready", "3 new", "stable" caption labels throughout; disabled label visible in state strip footer.</td><td>Native — every <code>span</code>/<code>label</code> in the artboard stands for <code>Label</code>; type weight + ink/muted color demonstrates the styling contract.</td></tr>
+          <tr><td><code>RichTextLabel</code></td><td>normal</td><td>Cells 1-4 — popup body paragraph "Primary action, secondary action, stable text field, and focus ring." stands for a multi-line RichTextLabel.</td><td>Composed — paragraph body in the dialog stack popup demonstrates flow text; RichTextLabel inherits same color/font-size from Label theme.</td></tr>
+          <tr><td><code>LineEdit</code></td><td>normal, hover, focused, disabled, read_only</td><td>Cells 1-4 — "Player alias" input with <code>.focused</code> class; demonstrates the focus ring per axis-6 (2 px tight cabinet ring at offset 0).</td><td>Composed — <code>.nc-art-input.focused</code> stands for <code>LineEdit</code>; flat (input chrome stays flat per axis-10).</td></tr>
+          <tr><td><code>TextEdit</code></td><td>normal, focused, disabled, read_only</td><td>Cells 1-4 — same chrome family as LineEdit; multi-line variant. The popup body in cell-2 dialog also stands for TextEdit when read-only.</td><td>Composed — same input chrome as LineEdit + multi-line text flow.</td></tr>
+          <tr><td><code>CodeEdit</code></td><td>normal, focused</td><td>Cells 1-4 — TextEdit subclass; same input chrome. The "Player alias" + popup body together cover CodeEdit's chrome contract (line numbers + gutter inherit from TextEdit theme).</td><td>Composed — TextEdit chrome + monospace font in Phase 4; mockups demonstrate base chrome only.</td></tr>
+          <tr><td><code>HSlider</code></td><td>normal, hover, focus, pressed, disabled</td><td>Cells 1-4 — progress bar in popup demonstrates the H-axis range chrome; HSlider grabber in Phase 4 inherits axis-10 raised treatment per <code>raised_thumb</code>.</td><td>Composed — <code>.nc-art-progress</code> + <code>span</code> fill stands for the HSlider track; grabber represented by the toggle thumb pattern.</td></tr>
+          <tr><td><code>VSlider</code></td><td>normal, hover, focus, pressed, disabled</td><td>Cells 1-4 — same chrome rotated 90°; covered by the HSlider mapping. Phase 4 VSlider inherits HSlider styleboxes with rotated `grabber.svg`.</td><td>Composed — H-axis representation extends to V-axis via Phase 4 stylebox inheritance.</td></tr>
+          <tr><td><code>ProgressBar</code></td><td>normal, fill</td><td>Cells 1-4 — <code>.nc-art-progress</code> in the dialog popup; fill at ~62% demonstrates the bg + fg StyleBoxFlat pair.</td><td>Native — <code>.nc-art-progress</code> matches Godot's `ProgressBar` `background` + `fill` two-stylebox model.</td></tr>
+          <tr><td><code>HScrollBar</code></td><td>normal, hover, pressed</td><td>Cells 1-4 — <code>.nc-art-scrollbar</code> in list/tree card; <code>i</code> grabber stands for the scroll button.</td><td>Composed — <code>.nc-art-scrollbar</code> stands for HScrollBar; raised matrix excludes scrollbar (passive/utility chrome stays flat per axis-10 lift list).</td></tr>
+          <tr><td><code>VScrollBar</code></td><td>normal, hover, pressed</td><td>Cells 1-4 — same chrome rotated; same mapping as HScrollBar. Phase 4 VScrollBar inherits HScrollBar styleboxes.</td><td>Composed — H-axis extends to V-axis via Phase 4 stylebox inheritance.</td></tr>
+          <tr><td><code>SpinBox</code></td><td>normal, hover, focus, pressed, disabled</td><td>Cells 1-4 — composed of LineEdit + two Button stamps (up/down). The "Player alias" input + the toggle-line button pair covers both halves.</td><td>Composed — LineEdit chrome + Button stamps (Phase 4 SpinBox.up_button / down_button inherit from Button).</td></tr>
+          <tr><td><code>ItemList</code></td><td>normal, hover, selected, focused, disabled</td><td>Cells 1-4 — list/tree card with three rows: "Cabinet A" (selected), "Mini-game list" (normal), "Settings row" (normal). Selected row demonstrates the selected stylebox.</td><td>Composed — <code>.nc-art-list-row</code> with <code>.selected</code> variant stands for ItemList rows; raised mode lifts only the selected row (per axis-10 per-direction lifts list).</td></tr>
+          <tr><td><code>Tree</code></td><td>normal, hover, selected, focused, disabled, expanded, collapsed</td><td>Cells 1-4 — same list/tree card; the rows + indented icon stand for Tree items. Phase 4 Tree adds expand/collapse arrows to rows.</td><td>Composed — list/tree card explicitly named "List / tree" demonstrates the shared row contract; expand/collapse arrows are the only Tree-specific Phase 4 addition.</td></tr>
+          <tr><td><code>TabBar</code></td><td>normal, hover, selected, disabled</td><td>Cells 1-4 — top nav (Lobby/Cabinets/Profile/Settings) with "Lobby" selected. Pulse's rectangular-strip tab shape (axis-3) is the canonical TabBar stylebox.</td><td>Native — <code>.nc-art-tabs</code> + <code>.nc-tab</code> with <code>.selected</code> matches TabBar's `tab_selected` / `tab_unselected` / `tab_hovered` / `tab_disabled` stylebox set.</td></tr>
+          <tr><td><code>TabContainer</code></td><td>normal, selected, disabled</td><td>Cells 1-4 — top nav stands for TabContainer's tab strip; the body below is the panel content. Same chrome as TabBar.</td><td>Composed — top-nav + page body demonstrates TabContainer; in Phase 4 the panel below the strip uses the Panel stylebox.</td></tr>
+          <tr><td><code>FoldableContainer</code></td><td>normal, expanded, collapsed, hover</td><td>Cells 1-4 — composed of a header Button + a panel body. The "01 Action panel" / "02 Dialog stack" / "03 List / tree" cards each stand for a FoldableContainer in their open state; the H2 caption is the toggle header.</td><td>Composed — <code>.nc-art-card</code> + H2 stands for FoldableContainer; collapse state inherits Panel + Button styleboxes.</td></tr>
+          <tr><td><code>PopupPanel</code></td><td>normal</td><td>Cells 1-4 — <code>.nc-art-dialog</code> in cell 2's "Dialog stack" stands for PopupPanel chrome (popup body bg).</td><td>Composed — popup surface demonstrates the chrome; the universal modal scrim (rev-4 <code>.nc-art-dialog::before</code>) demonstrates Window modal-darkening.</td></tr>
+          <tr><td><code>PopupMenu</code></td><td>normal, hover, selected, separator, disabled</td><td>Cells 1-4 — composed of PopupPanel + ItemList rows. The "List / tree" card rows stand for PopupMenu items when shown inside a popup.</td><td>Composed — PopupPanel chrome + selected/normal row variants from list/tree.</td></tr>
+          <tr><td><code>AcceptDialog</code></td><td>normal</td><td>Cells 1-4 — <code>.nc-art-dialog</code> with the "Confirm / Back" button row stands for AcceptDialog (single accept button + cancel).</td><td>Composed — popup chrome + button row matches AcceptDialog's body+button-row layout.</td></tr>
+          <tr><td><code>ConfirmationDialog</code></td><td>normal</td><td>Cells 1-4 — same chrome as AcceptDialog with both Confirm + Back buttons; the embedded popup demonstrates the canonical ConfirmationDialog form.</td><td>Composed — popup chrome + 2-button action row matches ConfirmationDialog exactly.</td></tr>
+          <tr><td><code>FileDialog</code></td><td>normal</td><td>Cells 1-4 — composed of ConfirmationDialog + LineEdit + ItemList. Mapped via the popup chrome + input + list rows in cells 1-4.</td><td>Composed — popup chrome + input + list rows in the dialog stack region cover all FileDialog sub-controls.</td></tr>
+          <tr><td><code>TooltipPanel</code></td><td>normal</td><td>Cells 1-4 — represented by the popup chrome at smaller scale; Phase 4 TooltipPanel inherits PopupPanel stylebox with reduced padding.</td><td>Composed — same chrome as PopupPanel; tooltip-specific size delta documented in Phase 4 Theme Editor overrides.</td></tr>
+          <tr><td><code>TooltipLabel</code></td><td>normal</td><td>Cells 1-4 — Label inside TooltipPanel; covered by Label mapping + TooltipPanel chrome.</td><td>Composed — Label + TooltipPanel composition.</td></tr>
+          <tr><td><code>Window</code></td><td>normal, focused, unfocused, close hover</td><td>Cells 1-4 — Window chrome inherits PopupPanel stylebox + adds title-bar + close-button. The dialog-stack region documents Window content-bg; modal scrim documents Window modal-darkening behavior.</td><td>Composed — popup chrome + button-family for the close button.</td></tr>
+          <tr><td><code>Panel</code></td><td>normal</td><td>Cells 1-4 — <code>.nc-art-card</code> for "01 Action panel", "02 Dialog stack", "03 List / tree" each render as Panel stylebox. Pulse panels stay solid (alpha 1.00).</td><td>Native — <code>.nc-art-card</code> matches Panel's single `panel` stylebox.</td></tr>
+          <tr><td><code>PanelContainer</code></td><td>normal</td><td>Cells 1-4 — same chrome as Panel; PanelContainer is Panel + child layout. Covered by Panel mapping.</td><td>Composed — Panel mapping extends; Phase 4 PanelContainer inherits Panel stylebox.</td></tr>
+          <tr><td><code>ScrollContainer</code></td><td>normal</td><td>Cells 1-4 — list/tree card + scrollbar represents ScrollContainer chrome. The card panel + <code>.nc-art-scrollbar</code> + content together stand for ScrollContainer.</td><td>Composed — Panel + ScrollBar composition.</td></tr>
+          <tr><td><code>SplitContainer</code></td><td>normal, hover</td><td>Cells 1-4 — composed of two Panels + a draggable separator. The grid layout in cells 1-4 (action panel + dialog stack + list/tree) stands for the multi-Panel arrangement; SplitContainer's grabber inherits a small button stylebox in Phase 4.</td><td>Composed — multi-Panel grid + Phase 4 grabber stylebox.</td></tr>
+          <tr><td><code>MarginContainer</code></td><td>normal</td><td>Cells 1-4 — every <code>.nc-art-card</code> uses internal padding that stands for MarginContainer's <code>margin_left/top/right/bottom</code> theme constants.</td><td>Composed — padding tokens (axis-5 density-padding) demonstrate MarginContainer's spacing contract.</td></tr>
+          <tr><td><code>MenuBar</code></td><td>normal, hover, pressed, disabled</td><td>Cells 1-4 — top nav stands for MenuBar's flat menu-button strip when used as a top-of-window menu (alternate use of TabBar chrome). Phase 4 MenuBar inherits Button stylebox at the menu-button level.</td><td>Composed — top-nav strip stands for MenuBar; visually identical to TabBar with different click semantics.</td></tr>
+          <tr><td><code>ColorPicker</code></td><td>normal, hover, picker-active</td><td>Cells 1-4 — palette swatches at the artboard footer (low/panel/high/accent) stand for ColorPicker's `swatches` chrome; the picker dialog body inherits PopupPanel.</td><td>Composed — palette swatches + popup chrome.</td></tr>
+          <tr><td><code>GraphEdit</code></td><td>normal, hover, panning, focused</td><td>Cells 1-4 — composed of Panel (canvas bg) + GraphNode children + connections. Cell-2 popup body + the list-tree card stand for the GraphEdit canvas + node-list region.</td><td>Composed — Panel + GraphNode composition; GraphEdit-specific minimap inherits a small Panel stylebox.</td></tr>
+          <tr><td><code>GraphNode</code></td><td>normal, selected, focused</td><td>Cells 1-4 — Panel + title-bar + slot rows. <code>.nc-art-card</code> with H2 title stands for GraphNode chrome; selected variant inherits from list-row selected.</td><td>Composed — Panel + title bar + slot rows.</td></tr>
+          <tr><td><code>GraphFrame</code></td><td>normal, selected, autoshrink</td><td>Cells 1-4 — Panel container that wraps GraphNodes; the action panel + dialog stack + list/tree grouping stands for GraphFrame's container chrome.</td><td>Composed — Panel chrome with title-bar + dashed border in Phase 4.</td></tr>
+
+          <!-- Pitfall 1.1 state combinations — explicit rows for the verification regex. -->
+          <tr class="is-pitfall"><td><code>pressed_focus</code> (Pitfall 1.1)</td><td>pressed + focus simultaneously on Button</td><td>Cells 1-4 state-strip footer — <code>.pressed</code> + <code>.focus</code> classes co-applied on the START primary button after click-and-hold-while-keyboard-focused interaction; documented as a required Theme stylebox in Phase 4 (StyleBoxFlat-pressed-with-focus-ring at axis-6 thickness).</td><td>Composed — state-strip footer demonstrates pressed and focus separately; the <code>pressed_focus</code> stylebox in Phase 4 layers focus ring at axis-6 thickness on top of the pressed bg color.</td></tr>
+          <tr class="is-pitfall"><td><code>checked_focus</code> (Pitfall 1.1)</td><td>checked + focus simultaneously on CheckBox / CheckButton</td><td>Cells 1-4 action panel — the "Checked" CheckBox while keyboard-focused; documented as a required Theme stylebox combination per Pitfall 1.1 (focus ring composed on top of checked bg color).</td><td>Composed — checkbox state + focus ring layered; Phase 4 stylebox key <code>checked_focus</code> uses axis-6 thickness on top of the checked stylebox.</td></tr>
+          <tr class="is-pitfall"><td><code>hover_pressed</code> (Pitfall 1.1)</td><td>hover + pressed transition state on Button</td><td>Cells 1-4 state-strip footer — the <code>hover</code> + <code>pressed</code> states co-applied on the START primary button at the transition between hover-only and clicked-pressed; documented as a required Theme stylebox combination per Pitfall 1.1.</td><td>Composed — state-strip demonstrates each state separately; Phase 4 stylebox <code>hover_pressed</code> uses the pressed bg color with the hover state-layer applied (axis-9 hover_delta_pct = 6, pressed_delta_pct = -10).</td></tr>
+        </tbody>
+      </table>
+
+      <p style="color: var(--muted); margin-top: 12px;">
+        Required state combinations from Pitfall 1.1 are explicitly enumerated above: <code>pressed_focus</code>, <code>checked_focus</code>, and <code>hover_pressed</code>. Each is a Phase 4 Theme stylebox key whose combined visual must compose correctly (focus ring or hover layer on top of pressed/checked bg). The state-strip footer in every 4-grid cell demonstrates the individual states; the combined-state styleboxes are documented as Phase 4 implementation contracts that inherit from this mockup contract.
+      </p>
+
+      <p style="color: var(--muted);">Additional state-strip enumeration (visible footer of every cell):</p>
+      <ul class="nc-state-strip-list">
+        <li><code>normal</code>, <code>hover</code>, <code>focus</code>, <code>pressed</code>, <code>disabled</code></li>
+        <li><code>checked</code>, <code>selected</code> (CheckBox, ItemList, TabBar)</li>
+        <li><code>read_only</code> (LineEdit, TextEdit)</li>
+        <li>Pitfall 1.1 combinations: <code>pressed_focus</code>, <code>checked_focus</code>, <code>hover_pressed</code></li>
+      </ul>
+    </section>
+
+    <section class="nc-decision-block" id="approvalGate">
+      <h2>Plan 03 Task 4 — Final Approval &amp; Recommended-Starter Confirmation</h2>
+      <p>
+        At the Plan 03 Task 4 user gate, the user is asked to confirm:
+      </p>
+      <ul>
+        <li><b>Final theme set (D-16):</b> approve N final themes from the Plan 02 Stage 1 finalist set. Per <code>finalist-selection.md</code>, all five (Pulse, Slate, Bubble, Daybreak, Burst) are pre-staged for v1 ship as <code>.tres</code> personality variations. The user may approve all five, narrow the set, or revise.</li>
+        <li><b>Recommended-starter direction (D-17 / D-31 reframing):</b> confirm <b>Pulse</b> as the v1 recommended starter direction (showcase scene default + README "try this first" suggestion). Under the locked single-concrete-class architecture (CORRECTIVE-ADDENDUM D-31, finalized 2026-05-06f), no direction's values bake into <code>NeoCadeTheme</code> defaults; the recommended-starter pick has only the two soft commitments described above. The user may revise the pick if a different direction better serves the showcase + README role.</li>
+        <li><b>Phase 4 enablement (D-19):</b> the gate's resolution unlocks Plan 04 (DESIGN_TOKENS.md closeout) and Phase 4 (production <code>NeoCadeTheme.gd</code> + 5 <code>.tres</code> implementation). Phase 4 must NOT begin until DESIGN_TOKENS.md is written in Plan 04.</li>
+        <li><b>Revisions:</b> if revisions are requested, Plan 03 stays open within the Phase 3.4 three-revision-round limit (D-26).</li>
+      </ul>
+      <p>
+        Decision artifact (written by the user, not by the executor): <code>.planning/mockups/3.4/final-approval.md</code>. The executor produces the mockups, coverage matrix, and audit; the user authors the approval.
+      </p>
+    </section>
   </main>
-  <script src="src/neocade-mockups.js"></script>
 </body>
 </html>

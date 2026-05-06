@@ -795,7 +795,26 @@ function renderConceptImage() {
   const direction = findDirection(params.get("direction")) || NEOCADE_DIRECTIONS[0];
   const platformName = params.get("platform") === "mobile" ? "mobile" : "desktop";
   const raisedFlag = params.get("raised") === "true";
-  target.innerHTML = conceptArtboard(direction, platformName, raisedFlag);
+  // Plan 03 (finalist 4-grid): optional base_color / accent_color overrides via
+  // ?base=#RRGGBB&accent=#RRGGBB (URL-encoded if needed; %23 == "#"). When both
+  // are supplied the artboard renders a color-override variant of the named
+  // direction — same shape language, different palette. Demonstrates the
+  // dynamic NeoCadeTheme @export base_color / accent_color contract for D-14.
+  const baseOverride = params.get("base");
+  const accentOverride = params.get("accent");
+  let activeDirection = direction;
+  if (baseOverride && /^#[0-9a-fA-F]{6}$/.test(baseOverride) &&
+      accentOverride && /^#[0-9a-fA-F]{6}$/.test(accentOverride)) {
+    activeDirection = Object.assign({}, direction, {
+      base_color: baseOverride,
+      accent_color: accentOverride,
+      // Override label: distinguish color-override variants from the canonical
+      // direction render. The variant label still includes Desktop/Mobile and
+      // flat/raised so the artboard caption stays informative.
+      contrast: `${baseOverride} / ${accentOverride}`
+    });
+  }
+  target.innerHTML = conceptArtboard(activeDirection, platformName, raisedFlag);
 }
 
 function renderFinalistPlaceholder() {

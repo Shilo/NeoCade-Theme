@@ -1,6 +1,6 @@
 "use strict";
 
-/* Phase 3.4 Plan 02 mockup renderer
+/* Phase 3.4 Plan 02 / Plan 03 mockup renderer
  *
  * Re-execution 2026-05-06b: switched from bundled Codex `playwright` (with full
  * browser download) to local `playwright-core` driving the system Microsoft
@@ -8,10 +8,15 @@
  *
  * Modes:
  *   node render.js                  — captures the concept gallery overview
- *   node render.js concept-images   — captures all 15 per-direction PNGs
+ *   node render.js concept-images   — captures all 15 per-direction PNGs (Plan 02)
  *   node render.js color-overview   — captures src/color-overview.html composite
  *   node render.js greyscale        — captures src/greyscale-check.html composite (D-30)
- *   node render.js finalist         — captures the finalist gallery shell
+ *   node render.js finalist         — captures the finalist gallery shell (full page)
+ *   node render.js finalist-images  — Plan 03: renders 4-grid + 2 color-override PNGs
+ *                                     for the user-selected finalist (Pulse). Outputs
+ *                                     to concepts/{finalist}-finalist-{...}.png with
+ *                                     the `-finalist-` infix to avoid colliding with
+ *                                     Plan 02's Stage 1 PNGs.
  */
 
 const path = require("path");
@@ -109,6 +114,111 @@ async function renderConceptImages(playwright, browserPath, root) {
   console.log(`Rendered ${success} concept PNGs to concepts/`);
 }
 
+/* Plan 03 — finalist-images mode.
+ *
+ * The user-selected finalist (Pulse, per finalist-selection.md gate-closed
+ * 2026-05-06) gets the full 4-grid (flat × raised × desktop × mobile) plus
+ * two plausible base_color / accent_color override variants on mobile-flat
+ * to demonstrate the dynamic NeoCadeTheme @export contract (D-14, D-19).
+ *
+ * Output filenames use a `-finalist-` infix so Stage 1 PNGs from Plan 02
+ * (e.g., concepts/pulse-desktop-flat.png) are NOT overwritten:
+ *   concepts/pulse-finalist-desktop-flat.png       (1280×720, raised=false)
+ *   concepts/pulse-finalist-mobile-flat.png        (430×1500, raised=false)
+ *   concepts/pulse-finalist-desktop-raised.png     (1280×720, raised=true)
+ *   concepts/pulse-finalist-mobile-raised.png      (430×1500, raised=true)
+ *   concepts/pulse-finalist-override-warm.png      (430×1500, base_color override A)
+ *   concepts/pulse-finalist-override-ocean.png     (430×1500, base_color override B)
+ *
+ * Mobile viewport stays at 430×1500 (Plan 02 Issue 6 — M3-floored content
+ * needs more vertical space than 932 to fit a single image without scroll).
+ */
+const FINALIST_NAME = "Pulse";
+const FINALIST_SLUG = "pulse";
+const FINALIST_GRID = [
+  { name: "desktop-flat",   platform: "desktop", raised: false, viewport: { width: 1280, height: 720 } },
+  { name: "mobile-flat",    platform: "mobile",  raised: false, viewport: { width: 430,  height: 1500 } },
+  { name: "desktop-raised", platform: "desktop", raised: true,  viewport: { width: 1280, height: 720 } },
+  { name: "mobile-raised",  platform: "mobile",  raised: true,  viewport: { width: 430,  height: 1500 } }
+];
+/* Color-override examples — each pair preserves Pulse's WCAG-AA-or-better
+ * contrast (verified against the project's deliberate AA floor) so the
+ * override previews remain accessibility-compliant.
+ *
+ * Override A (warm-amber): #1A1410 base / #FFC857 accent — keeps Pulse's
+ *   cabinet personality but swaps the green for a warm amber, simulating a
+ *   brand that wants warmth without abandoning Pulse's shape language.
+ * Override B (ocean-cyan): #0F1A22 base / #5FE3FF accent — cooler navy
+ *   surface with a cool cyan accent, simulating a tool/streamer brand that
+ *   wants Pulse's density + sharp 0px corners with a cool palette.
+ */
+const FINALIST_OVERRIDES = [
+  { name: "override-warm",  platform: "mobile",  raised: false, viewport: { width: 430, height: 1500 },
+    base: "#1A1410", accent: "#FFC857", label: "Warm amber override" },
+  { name: "override-ocean", platform: "mobile",  raised: false, viewport: { width: 430, height: 1500 },
+    base: "#0F1A22", accent: "#5FE3FF", label: "Ocean cyan override" }
+];
+
+async function renderFinalistImages(playwright, browserPath, root) {
+  const browser = await playwright.chromium.launch({
+    headless: true,
+    executablePath: browserPath,
+    channel: undefined
+  });
+
+  const target = pathToFileURL(path.join(root, "concept-image.html")).href;
+  let success = 0;
+
+  // 4-grid renders (canonical Pulse colors).
+  for (const variant of FINALIST_GRID) {
+    const context = await browser.newContext({
+      viewport: variant.viewport,
+      deviceScaleFactor: 2
+    });
+    const page = await context.newPage();
+    const query = new URLSearchParams({
+      direction: FINALIST_NAME,
+      platform: variant.platform,
+      raised: String(variant.raised)
+    });
+    await page.goto(`${target}?${query.toString()}`);
+    await waitForReady(page);
+    const artboard = await page.locator(".nc-artboard").first();
+    const outPath = path.join(root, "concepts", `${FINALIST_SLUG}-finalist-${variant.name}.png`);
+    await artboard.screenshot({ path: outPath, omitBackground: false });
+    console.log(`  ✓ ${path.relative(root, outPath)}`);
+    await context.close();
+    success += 1;
+  }
+
+  // Color-override variants (same shape language, different base/accent).
+  for (const variant of FINALIST_OVERRIDES) {
+    const context = await browser.newContext({
+      viewport: variant.viewport,
+      deviceScaleFactor: 2
+    });
+    const page = await context.newPage();
+    const query = new URLSearchParams({
+      direction: FINALIST_NAME,
+      platform: variant.platform,
+      raised: String(variant.raised),
+      base: variant.base,
+      accent: variant.accent
+    });
+    await page.goto(`${target}?${query.toString()}`);
+    await waitForReady(page);
+    const artboard = await page.locator(".nc-artboard").first();
+    const outPath = path.join(root, "concepts", `${FINALIST_SLUG}-finalist-${variant.name}.png`);
+    await artboard.screenshot({ path: outPath, omitBackground: false });
+    console.log(`  ✓ ${path.relative(root, outPath)} — ${variant.label}`);
+    await context.close();
+    success += 1;
+  }
+
+  await browser.close();
+  console.log(`Rendered ${success} finalist PNGs to concepts/`);
+}
+
 async function renderGallery(playwright, browserPath, root, mode) {
   const gallery = mode === "finalist" ? "finalist-gallery.html" : "concept-gallery.html";
   const out = path.join(root, "screenshots", `${mode}-gallery.png`);
@@ -142,6 +252,10 @@ async function main() {
 
   if (mode === "concept-images") {
     await renderConceptImages(playwright, browserPath, root);
+    return;
+  }
+  if (mode === "finalist-images") {
+    await renderFinalistImages(playwright, browserPath, root);
     return;
   }
   if (mode === "color-overview") {
