@@ -46,7 +46,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Interaction-state transform conventions (e.g. how upstream darkens vs lightens on hover, how it handles pressed, how it draws focus) extracted as concrete numeric values, not prose impressions — feeds the M3 state-layer model decision in Phase 4.
   4. Popup/Window theming patterns (PopupMenu, PopupPanel, AcceptDialog, FileDialog, etc.) cataloged — confirms or refutes Pitfall 1.7's claim that popups need first-class type theming.
   5. Findings committed to `.planning/research/` as a dated artifact; SOURCES.md updated; no `.tres` styling commits made in this phase.
-**Plans**: TBD
+**Plans**:
+- **Wave 1:** `03.3-01-survey-provenance-and-filter-contract-PLAN.md` - Create the THEME-DIRECTIONS.md shell, filter contract, and commercial example survey.
+- **Wave 2 *(blocked on Wave 1 completion)*:** `03.3-02-direction-synthesis-and-filter-audit-PLAN.md` - Synthesize five peer candidate directions from survey evidence and v0 DNA, then run the per-direction filter audit.
+- **Wave 3 *(blocked on Wave 2 completion)*:** `03.3-03-sources-closeout-and-approval-gate-PLAN.md` - Add SOURCES.md Section 14, run the final coverage audit, and present the text-level user approval checkpoint.
 
 ### Phase 2: Source-Dive — LDtk Source UI Mining
 **Goal**: Mine `C:\Programming_Files\ldtk-master\src\electron.renderer\` for actual UI implementation patterns (sidebar tinting, layer panel chrome, tool-button conventions, modal flow, panel collapse, context menus, status indicators) so polish moves are anchored in a real polished UI rather than imagined ones.
