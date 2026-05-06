@@ -231,3 +231,219 @@ Sources checked: Godot Theme API (`set_*`, `has_*`, type variations), StyleBoxFl
 ### Overall Risk Assessment
 
 **HIGH** — both reviewers landed on HIGH overall risk. The architecture is sound and the plan structure is good, but the plans currently contain enough underspecification + Godot-API-correctness risks that execution-as-written would likely produce files that pass grep checks but fail Godot resource loading or fail SC#7 verification. Replanning to address the 7 agreed/strong HIGH concerns is the right next step.
+
+---
+
+# Cross-AI Plan Review — Phase 4 (Cycle 2)
+
+**Reviewed:** 2026-05-06 (re-review after replan commit `7d8226d`)
+**Reviewers:** OpenCode (DeepSeek V4 Pro), Codex
+**Scope:** Verify cycle-1 HIGH concerns C1-C7 are resolved; identify new concerns introduced by replan.
+
+## OpenCode Cycle 2 Review (DeepSeek V4 Pro)
+
+## 1. Summary
+
+All 7 Cycle 1 HIGH concerns are **FULLY RESOLVED** with concrete, verifiable acceptance criteria wired into each affected plan. The canon-37 freeze (C1), per-direction DIRECTION_PRESETS lookup (C2), theme-level `default_font`/`default_font_size` (C3), 14-variation count with CodeLabel restored (C4), Godot-serialized font/tres resource pipeline via ResourceSaver (C5/C6), and corrected Plan 04-08 dependency on 04-07 (C7) are each implemented and traceable to specific tasks, acceptance criteria, and verification commands. No new HIGH concerns were introduced. Two LOW concerns (stale comment remnant, fragile hex-key lookup) and one MEDIUM concern (the _phase4_import.gd manual executor edit on Plan 04-07's _run() re-extension) are noted below.
+
+---
+
+## 2. Per-Concern Resolution Status
+
+### C1 — Coverage matrix non-deterministic
+
+**Status: FULLY RESOLVED**
+
+- **Plan 04-05, Task 2** explicitly enumerates the canonical 37 Control names verbatim from `MINIMAL-THEME-COVERAGE-DELTA.md` with the binding instruction: "NO executor discretion to add or drop. NO 'select 37 from 39'."
+- **Plan 04-05 acceptance criteria** asserts `BINDING_TABLE` contains all 37 exact names as keys; verify command iterates the exact array and throws on any missing.
+- **Plan 04-06 Task 2** verifier (`_phase4_verify.gd` + headless variant) asserts `binding_table.size() == 37` (exact equality, not `>=`) and checks every canonical name is present via `assert(binding_table.has(t))`.
+
+### C2 — Per-direction spread_factor + state-layer deltas unimplemented
+
+**Status: FULLY RESOLVED**
+
+- **Plan 04-04, Task 3.5** introduces `const DIRECTION_PRESETS: Dictionary` keyed by `base_color` hex (5 entries: #151A2E, #111820, #241326, #0B2420, #20112E) with per-direction `spread_factor` (Pulse=1.3, Slate=0.7, Bubble=1.0, Daybreak=1.0, Burst=1.3), `hover_pct` (6/8/10/8/10), `pressed_pct` (-10/-12/-12/-12/-14), `disabled_opacity` (0.42/0.50/0.45/0.50/0.45). Includes `_resolve_direction_presets()` helper + `DIRECTION_PRESET_DEFAULT` fallback.
+- **Plan 04-04, Task 4** `_regenerate_theme()` body sources all four values from `presets`: `var spread_factor: float = presets.spread_factor`, `var hover_pct: float = presets.hover_pct`, `var pressed_pct: float = abs(presets.pressed_pct)`, `var disabled_opacity: float = presets.disabled_opacity`. Acceptance criteria assert NO hard-coded literals (specifically verifies `= 1.0`, `8.0`, `12.0`, `0.38` are NOT present on those lines).
+- 9-export surface preserved — `DIRECTION_PRESETS` is a `const`, not an `@export`.
+
+### C3 — theme.default_font / default_font_size never set
+
+**Status: FULLY RESOLVED**
+
+- **Plan 04-05, Task 1** adds to `_regenerate_theme()` body BEFORE the BINDING_TABLE walk:
+  ```gdscript
+  var body_font := preload("res://addons/neocade_theme/fonts/Inter-Body.tres") as FontVariation
+  default_font = body_font
+  default_font_size = tokens.body
+  ```
+- Acceptance criteria assert the presence of both lines.
+- **Plan 04-06 Task 2** verifier asserts `theme.default_font != null` and `theme.default_font_size > 0` (runtime check). FONT-06 closure documented in Plan 04-06 commit message.
+
+### C4 — Type variation count mismatch (13 vs 14)
+
+**Status: FULLY RESOLVED**
+
+- **Plan 04-05, Task 1** TYPE_VARIATIONS declares exactly **14** entries: 6 Button (Primary/Secondary/Ghost/Danger/Icon/Flat) + 5 Label (HeaderLarge/Medium/Small/Caption/**CodeLabel**) + 1 InfoText + 2 Panel (CardPanel/HeroPanel). CodeLabel is INCLUDED (Cross-AI Cycle 1 C4 fix).
+- Acceptance criteria verifies all 14 named entries + counts `set_font` calls ≥ 14 + `set_font_size` ≥ 12.
+- **Plan 04-06** verifier asserts `type_variations.size() == 14` exactly + `type_variations.has("CodeLabel")`.
+- **Plan 04-08 CHANGELOG.md** states "14 type variations" with CodeLabel listed.
+
+### C5 — Hand-authored Inter-Variable.tres + FontVariation .tres + .import with synthetic UIDs
+
+**Status: FULLY RESOLVED**
+
+- **Plan 04-02, Task 2** creates `_phase4_import.gd` — a `@tool extends EditorScript` build helper. It:
+  - Triggers Godot's TTF import by loading the .ttf (generating a real `.import` sidecar with Godot-assigned UIDs), then mutates only the `[params]` block values.
+  - Saves `Inter-Variable.tres` via `ResourceSaver.save(inter_ttf, ...)` — Godot-assigned UID, Godot-serialized header.
+  - Creates 5 `FontVariation` instances via `FontVariation.new()`, sets `base_font` to the loaded `Inter-Variable.tres`, and saves via `ResourceSaver.save()` — all UIDs are Godot-generated.
+- **Tasks 3 and 4** are explicitly marked "SUPERSEDED" with no-action bodies; Task 2 is authoritative.
+- Cross-AI Cycle 1 C5 explicitly named as this task's justification.
+
+### C6 — Hand-written .tres header may not match Godot format
+
+**Status: FULLY RESOLVED**
+
+- **Plan 04-06, Task 1** creates `_save_pulse_tres()` in `_phase4_import.gd` using `NeoCadeTheme.new()` + `ResourceSaver.save()`. Captures + logs the Godot-emitted first line as the canonical template.
+- **Plan 04-07, Task 1** creates `_save_peer_tres()` using the same pattern for all 4 peers: `NeoCadeTheme.new()` + `ResourceSaver.save()`. Headers match whatever Godot emitted for Pulse.
+- Plan 04-06 verifier asserts `ResourceLoader.load() is NeoCadeTheme` (runtime type check, not string matching).
+
+### C7 — Plan 04-08 wrong dependency declaration
+
+**Status: FULLY RESOLVED**
+
+- Plan 04-08 frontmatter: `depends_on: - "04-07"` with inline comment: `# Cross-AI Cycle 1 C7 fix: was [04-02]; Task 5 verifies files from 04-06 (Pulse) + 04-07 (peers + main.tscn). Depending only on 04-02 was wrong.`
+- Plan 04-08 interfaces section explicitly explains the dependency change.
+- Plan 04-08 Task 5 layout verification now correctly runs after all prior plans have landed their files.
+
+---
+
+## 3. New Concerns Introduced by Replan
+
+### MEDIUM
+
+**M1 — Plan 04-07 re-extension of `_phase4_import.gd` `_run()` is an inexact executor edit.**
+
+Plan 04-06 adds `_save_pulse_tres()` and its call in `_run()`. Plan 04-07 instructs the executor to "append a new function and call it from `_run()` AFTER `_save_pulse_tres()`" — `_save_peer_tres()`. This requires the executor to locate the `_save_pulse_tres()` call inside `_run()`, which may have changed layout (whitespace, comments, additional font setup lines) from the abstract form in Plan 04-06's action text. If the executor inserts at the wrong position or fails to add the call entirely, `_save_peer_tres()` is defined but never executed, and Plan 04-07's peer .tres files are never generated. The acceptance criteria don't verify `_save_peer_tres()` is **called** inside `_run()` — only that the function declaration exists and `_run()` calls `_save_peer_tres()`. The verify command checks for the substring `_save_peer_tres()` in the file (which passes if it's only in the function definition), but does not explicitly verify it's inside `_run()`.
+
+**Mitigation suggestion:** Plan 04-07 acceptance criteria or verify command should also check that `_run()` specifically contains the substring `_save_peer_tres()` (grep that `_save_peer_tres()` appears after `func _run()` and before the next `func` or EOF).
+
+### LOW
+
+**L1 — Stale NOTE in Plan 04-04 Task 4 contradicts the action code (C2 implementation).**
+
+Plan 04-04 Task 4's action block correctly implements C2 (uses `presets.spread_factor` etc.), but the NOTE at the bottom of the action still claims: *"NOTE on `spread_factor`, `hover_pct`, `pressed_pct`, `disabled_opacity`: these are intentionally hard-coded to sensible defaults in this plan. Plan 04-05 supersedes them with per-direction values via the BINDING_TABLE or by reading direction metadata. The current values let the engine be functional..."* This is a pre-replan remnant. The actual code code block reads `presets.spread_factor` (NOT hard-coded). The acceptance criteria verify `presets.spread_factor` (NOT `1.0` literal). An executor reading the NOTE might be confused about whether the code or the note is canonical. The acceptance criteria are specific enough to catch errors, but the note adds noise.
+
+**Mitigation suggestion:** Delete or update the NOTE to reflect that per-direction sourcing is now implemented via DIRECTION_PRESETS.
+
+**L2 — `_resolve_direction_presets()` hex-key lookup is fragile under float round-trip.**
+
+The lookup key is `base_color.to_html(false).to_upper()`. When a `.tres` is saved via `ResourceSaver`, `base_color` is serialized as `Color(0.0823529, 0.101961, 0.180392, 1)`. Upon reload, the Color is reconstructed from 32-bit floats. For the five approved direction hex values (#151A2E, #111820, #241326, #0B2420, #20112E), each channel value (0-255)÷255 can be represented exactly or near-exactly in 32-bit float, so the round-trip should produce the same `to_html()` output. However, there is no explicit verification in any plan that the round-trip is tested — the Plan 04-06 verifier checks `base_color == Color("#151A2E")` (equality test on Color, which uses float epsilon), but never verifies that `base_color.to_html(false)` resolves the correct DIRECTION_PRESETS entry. If a floating-point epsilon causes `to_html()` to output `151a2f` instead of `151a2e`, the lookup silently falls back to `DIRECTION_PRESET_DEFAULT` (spread=1.0, M3 baseline) — all 5 directions render identically, and no test catches it.
+
+**Mitigation suggestion:** Add an assertion to Plan 04-06 verifier that `spread_factor` differs between Pulse (1.3) and Slate (0.7) when their respective `.tres` files are loaded — a simple cross-direction differentiation smoke test.
+
+**L3 — Plan 04-06 verifier's `get_script().get_script_constant_map()` depends on script reflection in headless mode.**
+
+The `_phase4_verify_headless.gd` accesses `theme.get_script().get_script_constant_map()` in `--headless` mode. While `GDScript.get_script_constant_map()` is available in all contexts (not editor-only), this is verification code only (deleted in Phase 11) and does not affect production behavior. Acceptable risk.
+
+---
+
+## 4. Risk Assessment: **LOW**
+
+All 7 Cycle 1 HIGH concerns are fully resolved with verifiable, traceable implementations. The replan correctly freezes the canonical 37 coverage list, implements per-direction differentiation via DIRECTION_PRESETS, sets theme-level defaults, locks type variation count at 14 with CodeLabel, converts all font/tres file generation to Godot-serialized pipelines, and fixes the Plan 04-08 dependency. No new HIGH concerns were introduced. The one MEDIUM (Plan 04-07 `_run()` re-extension edit ambiguity) and three LOW concerns are correctable with minor acceptance-criteria additions or note cleanup — none block execution. The plan set is execution-ready.
+
+---
+
+## Codex Cycle 2 Review
+
+**Summary**  
+Cycle 2 resolves most of the resource-generation and dependency-ordering blockers, but I would not execute yet. The 37-row freeze, default font, 14 type variations, ResourceSaver `.tres` path, and Plan 04-08 dependency are materially fixed. Two execution blockers remain: C2 only partially fixes disabled opacity, and Plan 04-05’s BINDING_TABLE contract includes `font` entries but the iteration engine has no `font` branch.
+
+**Per-Concern Status**
+
+- **C1 — PARTIALLY RESOLVED.**  
+  The 37-row non-determinism is fixed: Plan 04-05 freezes the canonical list and says “Count = 37 exact” with no add/drop discretion (`04-05...PLAN.md:23`, `:215`, `:344`). Plan 04-06 verifies `binding_table.size() == 37` and iterates `canonical_37` (`04-06...PLAN.md:222-224`).  
+  Remaining gap: exact slot-name enumeration is still delegated to executor/dissection lookup, not frozen in the plan (`04-05...PLAN.md:235`, `:269`, `:288`, `:338`). The verifier only samples key types (`04-06...PLAN.md:227-229`), so wrong slot names can still pass broad row-count checks.
+
+- **C2 — PARTIALLY RESOLVED.**  
+  `DIRECTION_PRESETS` exists with per-direction `spread_factor`, `hover_pct`, `pressed_pct`, and `disabled_opacity` (`04-04...PLAN.md:290-305`), and `_regenerate_theme()` consumes spread/hover/pressed (`:363-409`).  
+  Missing: `disabled_opacity` is assigned but not actually used. Plan 04-05 still hard-codes disabled alpha as `0.38` in Button recipes and recipe docs (`04-05...PLAN.md:249`, `:257`, `:283`). This leaves the disabled-opacity part of C2 unresolved.
+
+- **C3 — FULLY RESOLVED.**  
+  Plan 04-05 sets `default_font = body_font` and `default_font_size = tokens.body` before the BINDING_TABLE walk (`04-05...PLAN.md:129-134`). Plan 04-06 verifies both (`04-06...PLAN.md:240-242`, `:309-310`).
+
+- **C4 — FULLY RESOLVED, with stale wording.**  
+  Plan 04-05 defines 14 variations with `CodeLabel` included (`04-05...PLAN.md:97-124`) and acceptance requires all 14 plus explicit `CodeLabel` font (`:180-187`). Plan 04-06 verifies `type_variations.size() == 14` and `CodeLabel` (`04-06...PLAN.md:231-234`, `:315-319`).  
+  Stale references to “13 variations” remain in prose (`04-05...PLAN.md:47`, `:49`, `:75`; `04-06...PLAN.md:21`, `:58`; `04-07...PLAN.md:25`). Treat as MEDIUM cleanup, not a blocker.
+
+- **C5 — FULLY RESOLVED.**  
+  Font `.tres` and FontVariation resources are now generated through `_phase4_import.gd` and `ResourceSaver.save()` (`04-02...PLAN.md:30-32`, `:215`, `:235`, `:288`, `:310`). Synthetic UID hand-authoring is removed from the font path.
+
+- **C6 — FULLY RESOLVED for header generation.**  
+  Pulse is generated via `NeoCadeTheme.new()` + `ResourceSaver.save()` (`04-06...PLAN.md:80-111`, `:131-147`) and verified with `ResourceLoader.load(path)` + `loaded is NeoCadeTheme` (`:202-204`). Peers use the same ResourceSaver path (`04-07...PLAN.md:87-123`, `:141-148`).  
+  Minor gap: Plan 04-07 claims peer runtime load checks by extending verify scripts, but does not list or task edits to those verify files (`04-07...PLAN.md:8-14`, `:152`). MEDIUM.
+
+- **C7 — FULLY RESOLVED.**  
+  Plan 04-08 now depends on `04-07` and explicitly explains the prior dependency error (`04-08...PLAN.md:6-7`, `:60`). Its layout verification covers Pulse and peer theme files (`:540-573`).
+
+**Cycle-1 Mediums**
+
+- Main scene placeholder: resolved (`04-01...PLAN.md:25`, `:94-98`; restored in `04-07...PLAN.md:179-204`).
+- Inter pin/SHA: resolved (`04-02...PLAN.md:103-115`, `:496`, `:521`).
+- SVG strict monochrome: resolved (`04-03...PLAN.md:37`, `:110`, `:190`, `:205`).
+- `Button.normal raised_intensity = 1`: resolved (`04-05...PLAN.md:245-267`, `:346`; verified in `04-06...PLAN.md:179`, `:326-330`).
+- Headless verifier: resolved (`04-06...PLAN.md:181-183`, `:277-346`, `:367-371`).
+
+**New Concerns**
+
+- **HIGH — BINDING_TABLE contract includes `font`, but iteration never handles `font`.**  
+  Plan 04-05 declares BINDING_TABLE data types include `font` (`04-05...PLAN.md:22`), but `_resolve_recipe` only supports stylebox/color/constant/font_size/icon and the walk only calls five setters, excluding `set_font(slot_name, theme_type, value)` (`:382`, `:493-495`, `:510`). If any base Control font entries are expected, they will not be applied or verified.
+
+- **MEDIUM — Platform MOBILE content-margin claim is unsupported.**  
+  Plan 04-06 says toggling MOBILE changes `Button.normal.content_margin_*` (`04-06...PLAN.md:24`), but Plan 04-05 sets margins from raw `spacing`, not platform tokens (`04-05...PLAN.md:425-428`). Either wire `tokens.densityScale`/`tapPadding` into stylebox resolution or remove that specific claim.
+
+- **MEDIUM — Peer `.tres` runtime verification is claimed but not implemented.**  
+  Plan 04-07 acceptance says peer files pass `ResourceLoader.load(path) is NeoCadeTheme`, “verified by extending” verify helpers (`04-07...PLAN.md:152`), but those helpers are not in `files_modified` or tasks.
+
+- **LOW — Stale contradictory prose remains.**  
+  `04-04` still says spread/state values are “intentionally hard-coded” and “Plan 04-05 supersedes” them (`04-04...PLAN.md:425`) even though the actual acceptance requires preset consumption. Also, `04-08` CHANGELOG lists non-canonical controls like `GraphFrame`, `GraphNode`, `HFlowContainer`, `HSeparator`, `VSeparator` (`04-08...PLAN.md:190-198`), reintroducing coverage-list noise in docs.
+
+**Risk Assessment — HIGH**  
+The replan is much stronger, but execution is not ready. C2 remains partially unresolved for disabled opacity, C1 still leaves exact slot names under-specified, and the missing `font` branch in the BINDING_TABLE walk is a new execution blocker for strict SC#7.
+
+---
+
+## Cycle 2 Consensus Summary
+
+### Per-Concern Resolution (orchestrator aggregation — stricter reading wins)
+
+| Concern | OpenCode | Codex | Aggregate |
+|---|---|---|---|
+| **C1** Coverage matrix freeze | FULLY RESOLVED | PARTIALLY RESOLVED (slot names still delegated to executor; verifier samples key types only) | **PARTIALLY RESOLVED** |
+| **C2** Per-direction presets | FULLY RESOLVED | PARTIALLY RESOLVED (`disabled_opacity` assigned but Plan 04-05 still hard-codes 0.38 in Button recipes) | **PARTIALLY RESOLVED** |
+| **C3** `default_font` + `default_font_size` | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **C4** 14 type variations + CodeLabel | FULLY RESOLVED | FULLY RESOLVED (stale "13 variations" prose remnants — MEDIUM cleanup, not a blocker) | **FULLY RESOLVED** |
+| **C5** Godot-serialized fonts via ResourceSaver | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **C6** Programmatic `.tres` via `NeoCadeTheme.new()` + `ResourceSaver.save()` | FULLY RESOLVED | FULLY RESOLVED (minor MEDIUM: peer verifier extension claimed but not in `files_modified`) | **FULLY RESOLVED** |
+| **C7** Plan 04-08 `depends_on: [04-07]` | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+
+### NEW HIGH Concern Introduced by Cycle 1 Replan
+
+- **N1 — BINDING_TABLE schema includes `font` data type but iteration engine has no `font` branch** (Codex HIGH).
+  Plan 04-05 line 22 declares BINDING_TABLE data types include `font`, but `_resolve_recipe()` only supports stylebox / color / constant / font_size / icon (Plan 04-05 line 382), and the iteration walk only calls five setters at lines 493-495, 510 (excluding `set_font(slot_name, theme_type, value)`).
+  **Impact:** if any base Control entries in BINDING_TABLE specify a `font` binding, those entries will be silently skipped — they will not be applied to the Theme and will not be verifiable by SC#7's "every type lists every expected slot" check. This blocks goal achievement for any Control where a per-Control font is required (likely few — most Controls inherit from `default_font` which IS set per C3 — but the schema gap is real).
+
+### NEW MEDIUM/LOW Concerns
+
+- **MEDIUM — Plan 04-07 `_phase4_import.gd._run()` re-extension is an inexact executor edit** (OpenCode M1). Verify command checks the substring `_save_peer_tres()` exists in the file, but doesn't verify it's CALLED inside `_run()`. If executor only adds the function definition, peer `.tres` files are never generated.
+- **MEDIUM — Platform=MOBILE content-margin claim unsupported** (Codex). Plan 04-06 line 24 says toggling MOBILE changes `Button.normal.content_margin_*`, but Plan 04-05 lines 425-428 set margins from raw `spacing`, not platform tokens. Either wire `tokens.densityScale`/`tapPadding` into stylebox resolution or remove the claim.
+- **MEDIUM — Peer `.tres` runtime verification claimed but not implemented in tasks** (Codex). Plan 04-07 line 152 acceptance says peers pass `ResourceLoader.load(path) is NeoCadeTheme` "verified by extending" verify helpers, but those helpers aren't listed in `files_modified` or tasks.
+- **LOW — `_resolve_direction_presets()` hex-key lookup is fragile under float round-trip** (OpenCode L2). Cross-direction differentiation smoke test recommended.
+- **LOW — Stale "13 variations" / "Plan 04-05 supersedes" / non-canonical CHANGELOG control names** in plan prose remnants (Codex + OpenCode). Doc cleanup, not execution-blocking.
+
+### Risk Assessment Summary
+
+- **OpenCode:** LOW (plan set is execution-ready)
+- **Codex:** HIGH (3 execution blockers remain: C1 slot names + C2 disabled_opacity + N1 font branch)
+- **Aggregate:** HIGH — strictest reviewer wins for execution gate.
+
+**Unresolved HIGH count for cycle 2: 3** (C1 partial + C2 partial + N1 new). Down from cycle 1's 7. No stall. Replan cycle 3 should freeze slot names per Control, wire `disabled_opacity` everywhere, and add the `font` branch to the iteration engine.
