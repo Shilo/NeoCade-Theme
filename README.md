@@ -6,95 +6,6 @@ The theme is built for the author's upcoming game, codename VirtuCade, but this 
 
 > Status: pre-release. The repository currently contains the Godot project scaffold, an empty `neocade_theme.tres`, and planning/research artifacts. The active roadmap is in Phase 2, LDtk source UI mining. The complete desktop theme, mobile theme, generator, fonts, icons, showcase scene, QA matrix, and release workflow are planned v1 deliverables.
 
-## Maintainer: create the addon split branch
-
-The public subtree branch is always named `addon`. After changing files under `addons/neocade_theme` on `main`, refresh and push the split branch from the NeoCade Theme repo root:
-
-```powershell
-git subtree split --prefix=addons/neocade_theme main --branch addon
-git push origin addon
-```
-
-The `addon` branch contains only the files that belong inside a dependent project's `addons/neocade_theme` directory.
-
-The `.github/workflows/sync-addon-branch.yml` workflow runs this split automatically whenever `main` receives changes under `addons/neocade_theme`. Use the manual commands above when creating the branch for the first time, repairing it, or refreshing it outside GitHub Actions.
-
-## Using NeoCade Theme as a subtree dependency
-
-Dependent Godot projects should keep these shared files at:
-
-```text
-addons/neocade_theme
-```
-
-Git subtree is useful here because the dependent repo gets real committed files instead of a submodule pointer. That means the project still opens normally in Godot and does not require an extra clone step.
-
-This repository is a full Godot demo project. The reusable addon files live in `addons/neocade_theme`, so subtree consumers should use the generated `addon` split branch.
-
-### Initialize the subtree
-
-From the root of the repo that depends on NeoCade Theme:
-
-```powershell
-git subtree add --prefix=addons/neocade_theme https://github.com/Shilo/NeoCade-Theme.git addon --squash
-```
-
-This adds the shared NeoCade Theme files into `addons/neocade_theme` and records enough subtree history for future updates.
-
-### Update to the latest NeoCade Theme commit
-
-From the dependent repo root:
-
-```powershell
-git subtree pull --prefix=addons/neocade_theme https://github.com/Shilo/NeoCade-Theme.git addon --squash
-```
-
-If Git reports conflicts, resolve them like a normal merge, then commit the result.
-
-## VS Code task for updating without typing the CLI command
-
-In any dependent repo, create `.vscode/tasks.json` with this task:
-
-```json
-{
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Update NeoCade Theme subtree",
-      "type": "shell",
-      "command": "git",
-      "args": [
-        "subtree",
-        "pull",
-        "--prefix=addons/neocade_theme",
-        "https://github.com/Shilo/NeoCade-Theme.git",
-        "addon",
-        "--squash"
-      ],
-      "problemMatcher": []
-    }
-  ]
-}
-```
-
-Then run it from VS Code:
-
-1. Open the Command Palette with `Ctrl+Shift+P`.
-2. Choose `Tasks: Run Task`.
-3. Choose `Update NeoCade Theme subtree`.
-
-Optional keyboard shortcut in VS Code `keybindings.json`:
-
-```json
-{
-  "key": "ctrl+alt+u",
-  "command": "workbench.action.tasks.runTask",
-  "args": "Update NeoCade Theme subtree"
-}
-```
-
-The task still runs Git under the hood, but you can trigger it from VS Code without retyping the subtree command.
-
 ## What v1 Will Ship
 
 - `addons/neocade_theme/neocade_theme.tres` - desktop dark theme.
@@ -385,3 +296,92 @@ NeoCade's research and planning reference:
 - LDtk as a polished UI craft reference.
 - Material Design 3 for token, spacing, type scale, state, and accessibility discipline.
 - Real arcade interiors and venue aesthetics for the arcade-by-day visual direction.
+
+## Maintainer: create the addon split branch
+
+The public subtree branch is always named `addon`. After changing files under `addons/neocade_theme` on `main`, refresh and push the split branch from the NeoCade Theme repo root:
+
+```powershell
+git subtree split --prefix=addons/neocade_theme main --branch addon
+git push origin addon
+```
+
+The `addon` branch contains only the files that belong inside a dependent project's `addons/neocade_theme` directory.
+
+The `.github/workflows/sync-addon-branch.yml` workflow runs this split automatically whenever `main` receives changes under `addons/neocade_theme`. Use the manual commands above when creating the branch for the first time, repairing it, or refreshing it outside GitHub Actions.
+
+## Using NeoCade Theme as a subtree dependency
+
+Dependent Godot projects should keep these shared files at:
+
+```text
+addons/neocade_theme
+```
+
+Git subtree is useful here because the dependent repo gets real committed files instead of a submodule pointer. That means the project still opens normally in Godot and does not require an extra clone step.
+
+This repository is a full Godot demo project. The reusable addon files live in `addons/neocade_theme`, so subtree consumers should use the generated `addon` split branch.
+
+### Initialize the subtree
+
+From the root of the repo that depends on NeoCade Theme:
+
+```powershell
+git subtree add --prefix=addons/neocade_theme https://github.com/Shilo/NeoCade-Theme.git addon --squash
+```
+
+This adds the shared NeoCade Theme files into `addons/neocade_theme` and records enough subtree history for future updates.
+
+### Update to the latest NeoCade Theme commit
+
+From the dependent repo root:
+
+```powershell
+git subtree pull --prefix=addons/neocade_theme https://github.com/Shilo/NeoCade-Theme.git addon --squash
+```
+
+If Git reports conflicts, resolve them like a normal merge, then commit the result.
+
+## VS Code task for updating without typing the CLI command
+
+In any dependent repo, create `.vscode/tasks.json` with this task:
+
+```json
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Update NeoCade Theme subtree",
+      "type": "shell",
+      "command": "git",
+      "args": [
+        "subtree",
+        "pull",
+        "--prefix=addons/neocade_theme",
+        "https://github.com/Shilo/NeoCade-Theme.git",
+        "addon",
+        "--squash"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}
+```
+
+Then run it from VS Code:
+
+1. Open the Command Palette with `Ctrl+Shift+P`.
+2. Choose `Tasks: Run Task`.
+3. Choose `Update NeoCade Theme subtree`.
+
+Optional keyboard shortcut in VS Code `keybindings.json`:
+
+```json
+{
+  "key": "ctrl+alt+u",
+  "command": "workbench.action.tasks.runTask",
+  "args": "Update NeoCade Theme subtree"
+}
+```
+
+The task still runs Git under the hood, but you can trigger it from VS Code without retyping the subtree command.
