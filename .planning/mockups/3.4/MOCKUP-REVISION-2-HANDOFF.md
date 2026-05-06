@@ -336,9 +336,11 @@ function boot() {
 }
 ```
 
-## Issue 5 — Mood differentiation: match v0 categorical distinction
+## Issue 5 — Mood differentiation: match v0's level of mood variation between directions
 
-The v0 atmospheric concepts (in `.planning/mockups/concepts/`) had radically different vibes per direction — Midnight Marquee was a cabinet hall, Prize Pop Plaza was a bright candy counter, Orbital Playdeck was a sci-fi-but-friendly lobby. Each one was instantly recognizable.
+The user's framing (paraphrased): "v0 had all kinds of unique theme directions and heavy mood variations. I want that level of variation back, just without textures and 3D depth." The v0 atmospheric concepts (in `.planning/mockups/concepts/`) had radically different vibes per direction — each one was instantly recognizable as its own world. The user does NOT want to copy any specific reference (LDtk, iOS, Steam, etc.); the mood-target anchors per direction below are *inspirational compass points*, not imitation contracts. Aim for "5 directions that feel like 5 different products" — that's the bar.
+
+Concrete bar to clear: a viewer scrolling through the 5 desktop-flat mockups should be able to articulate, in one phrase per direction, what kind of *vibe* each one has — and those phrases should be meaningfully different. If two directions get described with overlapping language (e.g., "polished dark UI" applies to both Slate and Pulse), differentiation needs to push harder.
 
 The current v1 mockups capture some of that personality through type weight, brand-mark shape, and chip shape — but the user feels they're still too uniform. After applying issues 1-3, do a final mood pass:
 
