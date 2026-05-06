@@ -15,6 +15,21 @@ Research summary (full version in chat history before this handoff):
 - **Mood fit varies per direction.** Solid wins for cabinet/candy/event personalities (Pulse, Bubble, Burst). Subtle alpha enhances iOS-clean and welcoming-lobby personalities (Slate, Daybreak).
 - **No 6th wireframe direction in v1.** Phase 3.3 approval is locked; reopening for a 6th is too disruptive. Architecture (single concrete class + data-only `.tres` per direction) supports adding it in v1.x without breaking changes.
 
+## Surface-alpha glossary (binding for both mockups and Phase 4)
+
+The abstract terms used in the per-direction `axis_11_surface_alpha` block below map to specific mockup elements and specific Godot Control classes. **Phase 4 implementation must respect this mapping** — it's the binding contract for which Theme styleboxes get alpha applied.
+
+| Abstract token | Mockup element (in CSS) | Godot Control class(es) the alpha applies to |
+|---|---|---|
+| `popup_surface` | `.nc-art-dialog` (the embedded popup with "Popup surface" / progress / Confirm-Back) | `PopupPanel`, `AcceptDialog`, `ConfirmationDialog`, `Window` chrome content (dialog body bg) |
+| `panels` | `.nc-art-card` (the three top-level container blocks: action panel, dialog stack, list/tree) | `Panel`, `PanelContainer`, `ScrollContainer` chrome, `MarginContainer` when given a panel stylebox |
+| `buttons` | `.nc-art-button` (Start, Options, Cancel, Confirm, Back) | `Button`, `OptionButton`, `MenuButton`, `LinkButton`, `CheckBox`, `CheckButton`, `ColorPickerButton` — ALL button-family controls |
+| `chrome` | Any other surface — input chrome, tab chips, list rows, range controls, brand mark | `LineEdit`, `TextEdit`, `CodeEdit`, `TabBar`, `TabContainer` chips, `ItemList` rows, `Tree` rows, `HSlider`/`VSlider`/`HScrollBar`/`VScrollBar`/`SpinBox`/`ProgressBar`, brand-mark badge |
+
+When `axis_11_surface_alpha.popup_surface = 0.92` (Slate), the alpha 0.92 applies to the bg_color alpha of every Godot Control class listed in the popup_surface row. Same for panels, buttons, chrome.
+
+A Control that isn't in any of those rows (e.g., `Label`, `RichTextLabel`, `Separator`) doesn't have a meaningful chrome to apply alpha to — they're pure type/lines and stay solid.
+
 ## Tier 1 — universal modal scrim (all 5 directions)
 
 Every direction's popup/dialog needs a translucent backdrop that dims the page behind it. This is Material 3 + iOS HIG standard practice and isn't really mood differentiation; it's just-good-UX.
