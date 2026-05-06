@@ -1,6 +1,6 @@
 {
   "source": ".planning/research/THEME-DIRECTIONS.md",
-  "revision": "Round 2/2 (2026-05-06b) — all dark; Bubble + Daybreak migrated from light to dark per project-wide dark-only constraint. See .planning/research/THEME-DIRECTIONS.md verification log entry 2026-05-06b and .planning/phases/03.4-visual-direction-flat-extruded-flat-mockup-approval-gate/03.4-CORRECTIVE-ADDENDUM.md (D-28).",
+  "revision": "Mockup revision 2 (2026-05-07) — wider corner-radius spread (0/14/26/8/18), broader raised matrix, per-color offset tokens (no near-black bottom edges), and platform-correct sizing (Material 3 mobile floors, Steam-style desktop density). Builds on Round 2/2 (2026-05-06b) which migrated Bubble + Daybreak to dark per the project-wide dark-only constraint. See MOCKUP-REVISION-2-HANDOFF.md (Issues 1-6), .planning/research/THEME-DIRECTIONS.md verification log entry 2026-05-06b, and .planning/phases/03.4-visual-direction-flat-extruded-flat-mockup-approval-gate/03.4-CORRECTIVE-ADDENDUM.md (D-28).",
   "shape_language_spec": ".planning/mockups/3.4/image-prompts/direction-shape-language-spec.md",
   "base_direction_selected": false,
   "directions": [
@@ -22,17 +22,18 @@
       "raised_behavior_note": "Filled buttons and selected chip/tab surfaces gain small extruded-flat offset duplicates in darker tonal variants; panels, inputs, lists, and passive labels stay flat for density.",
       "mobile_sizing_note": "Mobile keeps the same personality but increases button/toggle targets toward iOS 44pt and Android 48dp floors; bright accent use is limited to action/focus roles.",
       "shape_language": {
-        "axis_1_corner_radius_base_px": 5,
-        "axis_1_corner_radius_chip_px": 4,
-        "axis_2_button_radius_px": 5,
+        "axis_1_corner_radius_base_px": 0,
+        "axis_1_corner_radius_chip_px": 0,
+        "axis_2_button_radius_px": 0,
         "axis_2_button_padding_h_v": "14x10",
+        "axis_2_primary_button_radius_px": 0,
         "axis_2_primary_strategy": "bold-accent-fill-dark-text",
         "axis_2_ghost_strategy": "accent-outlined-accent-text",
         "axis_3_tab_shape": "rectangular-strip",
-        "axis_3_tab_radius_px": 4,
+        "axis_3_tab_radius_px": 0,
         "axis_3_tab_selected_indicator": "accent-fill-plus-2px-bottom-rule",
         "axis_4_brand_mark_shape": "square-cabinet-bezel",
-        "axis_4_brand_mark_radius_px": 4,
+        "axis_4_brand_mark_radius_px": 0,
         "axis_4_brand_mark_size_desktop_px": 54,
         "axis_5_density_padding_px": 18,
         "axis_5_density_inter_control_gap_px": 10,
@@ -49,7 +50,8 @@
         "axis_9_pressed_delta_pct": -10,
         "axis_9_disabled_opacity": 0.42,
         "axis_10_raised_primary_offset_px": 3,
-        "axis_10_raised_lifts": ["primary-buttons", "selected-tabs"]
+        "axis_10_raised_secondary_offset_px": 1,
+        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "chips"]
       }
     },
     {
@@ -70,17 +72,18 @@
       "raised_behavior_note": "Raised mode is restrained: 1-2px hard offset or stronger outline on primary/button-like controls only, with no lifted shells or decorative depth.",
       "mobile_sizing_note": "Mobile mode keeps the quiet palette but expands spacing and button-like constants toward 44pt/48dp floors; focus rings stay high-contrast because the accent is sparse.",
       "shape_language": {
-        "axis_1_corner_radius_base_px": 11,
+        "axis_1_corner_radius_base_px": 14,
         "axis_1_corner_radius_chip_px": 999,
-        "axis_2_button_radius_px": 11,
+        "axis_2_button_radius_px": 14,
         "axis_2_button_padding_h_v": "16x11",
+        "axis_2_primary_button_radius_px": 14,
         "axis_2_primary_strategy": "quiet-pill-primary",
         "axis_2_ghost_strategy": "thin-accent-outline",
         "axis_3_tab_shape": "rounded-pill",
         "axis_3_tab_radius_px": 999,
         "axis_3_tab_selected_indicator": "accent-fill-subdued",
         "axis_4_brand_mark_shape": "rounded-square",
-        "axis_4_brand_mark_radius_px": 11,
+        "axis_4_brand_mark_radius_px": 14,
         "axis_4_brand_mark_size_desktop_px": 54,
         "axis_5_density_padding_px": 22,
         "axis_5_density_inter_control_gap_px": 14,
@@ -97,7 +100,8 @@
         "axis_9_pressed_delta_pct": -6,
         "axis_9_disabled_opacity": 0.50,
         "axis_10_raised_primary_offset_px": 2,
-        "axis_10_raised_lifts": ["primary-buttons"]
+        "axis_10_raised_secondary_offset_px": 1,
+        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "selected-rows", "chips"]
       }
     },
     {
@@ -118,17 +122,18 @@
       "raised_behavior_note": "Buttons, stepper-like controls, and selected playful affordances can use 3-5px extruded-flat offsets; large panels and text inputs remain flat.",
       "mobile_sizing_note": "Mobile mode leans into larger buttons and toggles with 44pt/48dp minimum targets, while desktop mode tempers spacing for editor/runtime panels.",
       "shape_language": {
-        "axis_1_corner_radius_base_px": 18,
+        "axis_1_corner_radius_base_px": 26,
         "axis_1_corner_radius_chip_px": 999,
-        "axis_2_button_radius_px": 20,
+        "axis_2_button_radius_px": 26,
         "axis_2_button_padding_h_v": "20x14",
+        "axis_2_primary_button_radius_px": 999,
         "axis_2_primary_strategy": "pillowy-fully-rounded-primary",
         "axis_2_ghost_strategy": "rounded-ghost-thicker-outline",
         "axis_3_tab_shape": "fully-rounded-pill-large",
         "axis_3_tab_radius_px": 999,
         "axis_3_tab_selected_indicator": "accent-fill-plus-raised-offset-on-selected",
         "axis_4_brand_mark_shape": "circle-or-squircle",
-        "axis_4_brand_mark_radius_px": 22,
+        "axis_4_brand_mark_radius_px": 999,
         "axis_4_brand_mark_size_desktop_px": 54,
         "axis_5_density_padding_px": 22,
         "axis_5_density_inter_control_gap_px": 14,
@@ -144,8 +149,9 @@
         "axis_9_hover_delta_pct": 8,
         "axis_9_pressed_delta_pct": -10,
         "axis_9_disabled_opacity": 0.45,
-        "axis_10_raised_primary_offset_px": 5,
-        "axis_10_raised_lifts": ["primary-buttons", "selected-tabs", "selected-rows", "chips"]
+        "axis_10_raised_primary_offset_px": 6,
+        "axis_10_raised_secondary_offset_px": 3,
+        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "selected-rows", "chips"]
       }
     },
     {
@@ -166,17 +172,18 @@
       "raised_behavior_note": "Raised mode adds tactile depth mainly to primary actions and cards-as-actions; ordinary panels, lists, and text fields remain flat for readability.",
       "mobile_sizing_note": "Mobile mode uses 44pt iOS and 48dp Android floor language with slightly more breathing room around touch clusters to preserve the daylight calm.",
       "shape_language": {
-        "axis_1_corner_radius_base_px": 13,
-        "axis_1_corner_radius_chip_px": 12,
-        "axis_2_button_radius_px": 13,
+        "axis_1_corner_radius_base_px": 8,
+        "axis_1_corner_radius_chip_px": 8,
+        "axis_2_button_radius_px": 8,
         "axis_2_button_padding_h_v": "18x12",
+        "axis_2_primary_button_radius_px": 8,
         "axis_2_primary_strategy": "friendly-primary-generous-breathing",
         "axis_2_ghost_strategy": "soft-outline-ghost",
         "axis_3_tab_shape": "rounded-rect",
-        "axis_3_tab_radius_px": 12,
+        "axis_3_tab_radius_px": 8,
         "axis_3_tab_selected_indicator": "accent-fill-with-mint-halo-behind",
         "axis_4_brand_mark_shape": "rounded-square-with-halo",
-        "axis_4_brand_mark_radius_px": 13,
+        "axis_4_brand_mark_radius_px": 8,
         "axis_4_brand_mark_size_desktop_px": 54,
         "axis_5_density_padding_px": 24,
         "axis_5_density_inter_control_gap_px": 16,
@@ -193,7 +200,8 @@
         "axis_9_pressed_delta_pct": -6,
         "axis_9_disabled_opacity": 0.50,
         "axis_10_raised_primary_offset_px": 3,
-        "axis_10_raised_lifts": ["primary-buttons", "selected-tabs"]
+        "axis_10_raised_secondary_offset_px": 1,
+        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "selected-rows", "chips"]
       }
     },
     {
@@ -214,19 +222,19 @@
       "raised_behavior_note": "Raised mode can use stronger extruded-flat button offsets and bolder corner radii on button-like controls, but range controls, inputs, tree/list rows, and panels stay stable and flat.",
       "mobile_sizing_note": "Mobile mode preserves the celebratory accent but enlarges touch affordances to 44pt/48dp targets and avoids filling every row with gold.",
       "shape_language": {
-        "axis_1_corner_radius_base_px": 16,
-        "axis_1_corner_radius_chip_px": 14,
-        "axis_2_button_radius_px": 16,
+        "axis_1_corner_radius_base_px": 18,
+        "axis_1_corner_radius_chip_px": 16,
+        "axis_2_button_radius_px": 18,
         "axis_2_button_padding_h_v": "20x14",
-        "axis_2_primary_button_radius_px": 22,
-        "axis_2_primary_button_padding_h_v": "24x16",
+        "axis_2_primary_button_radius_px": 28,
+        "axis_2_primary_button_padding_h_v": "26x18",
         "axis_2_primary_strategy": "oversized-statement-primary",
         "axis_2_ghost_strategy": "normal-accent-ghost",
         "axis_3_tab_shape": "rounded-rect-asymmetric-on-selected",
-        "axis_3_tab_radius_px": 14,
+        "axis_3_tab_radius_px": 16,
         "axis_3_tab_selected_indicator": "accent-fill-plus-bigger-size-on-selected",
         "axis_4_brand_mark_shape": "chunky-asymmetric-badge",
-        "axis_4_brand_mark_radius_px": 16,
+        "axis_4_brand_mark_radius_px": 18,
         "axis_4_brand_mark_size_desktop_px": 60,
         "axis_5_density_padding_px": 22,
         "axis_5_density_inter_control_gap_px": 14,
@@ -244,7 +252,7 @@
         "axis_9_disabled_opacity": 0.45,
         "axis_10_raised_primary_offset_px": 5,
         "axis_10_raised_secondary_offset_px": 2,
-        "axis_10_raised_lifts": ["primary-buttons", "selected-tabs", "selected-rows"]
+        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "selected-rows", "chips"]
       }
     }
   ]

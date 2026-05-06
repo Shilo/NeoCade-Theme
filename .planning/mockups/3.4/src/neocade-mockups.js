@@ -29,8 +29,11 @@ const NEOCADE_DIRECTIONS = [
     raised: "Filled buttons and selected tabs gain small extruded offsets; panels stay flat for density.",
     mobile: "44pt / 48dp targets; bright accent restrained to action and focus roles.",
     shape: {
-      r_base: 5, r_chip: 4, r_button: 5, r_button_primary: 5,
-      r_tab: 4, r_mark: 4,
+      // Issue 3 (revision-2): radius spread is now 0/8/14/18/26 across the 5
+      // directions. Pulse takes the 0px slot — cabinet hardware has square
+      // edges and the most "sharp arcade" thing we can do is zero radius.
+      r_base: 0, r_chip: 0, r_button: 0, r_button_primary: 0,
+      r_tab: 0, r_mark: 0,
       btn_pad_h: 14, btn_pad_v: 10, btn_pad_h_primary: 14, btn_pad_v_primary: 10,
       mark_size_desktop: 54, mark_size_mobile: 42,
       density_padding: 18, density_gap: 10, card_gap: 14,
@@ -38,8 +41,8 @@ const NEOCADE_DIRECTIONS = [
       h1_weight: 800, h2_weight: 740, kicker: "uppercase-tracked-accent",
       surface_stops: 4, surface_spread: "wide",
       hover_pct: 6, pressed_pct: -10, disabled_opacity: 0.42,
-      raised_primary: 3, raised_tab: 2, raised_row: 0, raised_secondary: 0,
-      lift_tabs: true, lift_rows: false, lift_secondary: false,
+      raised_primary: 3, raised_tab: 2, raised_row: 0, raised_secondary: 1,
+      lift_tabs: true, lift_rows: false, lift_secondary: true,
       tab_shape: "rectangular-strip",
       mark_shape: "square-cabinet-bezel",
       primary_strategy: "bold-accent-fill-dark-text",
@@ -64,8 +67,11 @@ const NEOCADE_DIRECTIONS = [
     raised: "Restrained 1-2px hard offset on primary buttons only; tabs and rows stay flat.",
     mobile: "Quiet palette with expanded button targets and high-contrast focus rings.",
     shape: {
-      r_base: 11, r_chip: 999, r_button: 11, r_button_primary: 11,
-      r_tab: 999, r_mark: 11,
+      // Issue 3 (revision-2): bumped from 11 → 14 to lean further into the
+      // "premium iPhone Settings panel" mood; sits between Daybreak (8) and
+      // Burst (18) in the radius spread.
+      r_base: 14, r_chip: 999, r_button: 14, r_button_primary: 14,
+      r_tab: 999, r_mark: 14,
       btn_pad_h: 16, btn_pad_v: 11, btn_pad_h_primary: 18, btn_pad_v_primary: 12,
       mark_size_desktop: 54, mark_size_mobile: 42,
       density_padding: 22, density_gap: 14, card_gap: 18,
@@ -73,8 +79,8 @@ const NEOCADE_DIRECTIONS = [
       h1_weight: 720, h2_weight: 640, kicker: "small-caps-subtle",
       surface_stops: 3, surface_spread: "narrow",
       hover_pct: 4, pressed_pct: -6, disabled_opacity: 0.50,
-      raised_primary: 2, raised_tab: 0, raised_row: 0, raised_secondary: 0,
-      lift_tabs: false, lift_rows: false, lift_secondary: false,
+      raised_primary: 2, raised_tab: 1, raised_row: 1, raised_secondary: 1,
+      lift_tabs: true, lift_rows: true, lift_secondary: true,
       tab_shape: "rounded-pill",
       mark_shape: "rounded-square",
       primary_strategy: "quiet-pill-primary",
@@ -96,11 +102,14 @@ const NEOCADE_DIRECTIONS = [
     summary: "Playful candy-counter at night — pillowy chrome, fully-rounded chips, tactile cheerful warmth.",
     target: "Casual games, cozy menus, family-friendly mobile-first UI, tutorial-heavy flows.",
     flat: "Rounded dark berry surfaces; cheerful pink accent placement is sparse and meaningful.",
-    raised: "Buttons, selected tabs, selected rows and chips get 3-5px extruded offsets — pokes-out.",
+    raised: "Buttons, selected tabs, selected rows and chips get 3-6px extruded offsets — pokes-out.",
     mobile: "Larger button targets, thicker focus rings, bouncy hover feel.",
     shape: {
-      r_base: 18, r_chip: 999, r_button: 20, r_button_primary: 999,
-      r_tab: 999, r_mark: 22,
+      // Issue 3 (revision-2): bumped from 18 → 26 to push genuinely bubbly.
+      // Combined with the per-color offset fix this should read as candy.
+      // Brand mark uses 999 (true circle); primary button stays 999 (pill).
+      r_base: 26, r_chip: 999, r_button: 26, r_button_primary: 999,
+      r_tab: 999, r_mark: 999,
       btn_pad_h: 20, btn_pad_v: 14, btn_pad_h_primary: 22, btn_pad_v_primary: 15,
       mark_size_desktop: 54, mark_size_mobile: 42,
       density_padding: 22, density_gap: 14, card_gap: 18,
@@ -108,7 +117,7 @@ const NEOCADE_DIRECTIONS = [
       h1_weight: 800, h2_weight: 760, kicker: "uppercase-tracked-accent",
       surface_stops: 3, surface_spread: "medium",
       hover_pct: 8, pressed_pct: -10, disabled_opacity: 0.45,
-      raised_primary: 5, raised_tab: 3, raised_row: 2, raised_secondary: 2,
+      raised_primary: 6, raised_tab: 4, raised_row: 3, raised_secondary: 3,
       lift_tabs: true, lift_rows: true, lift_secondary: true,
       tab_shape: "fully-rounded-pill-large",
       mark_shape: "circle-or-squircle",
@@ -134,8 +143,10 @@ const NEOCADE_DIRECTIONS = [
     raised: "Primary actions and selected tabs lift; ordinary panels and lists stay flat for readability.",
     mobile: "Generous breathing room around touch clusters, mint glow on focus.",
     shape: {
-      r_base: 13, r_chip: 12, r_button: 13, r_button_primary: 13,
-      r_tab: 12, r_mark: 13,
+      // Issue 3 (revision-2): trimmed from 13 → 8 to let halo decorations + airy
+      // density + bright mint carry the daylight mood (not big radius).
+      r_base: 8, r_chip: 8, r_button: 8, r_button_primary: 8,
+      r_tab: 8, r_mark: 8,
       btn_pad_h: 18, btn_pad_v: 12, btn_pad_h_primary: 20, btn_pad_v_primary: 13,
       mark_size_desktop: 54, mark_size_mobile: 42,
       density_padding: 24, density_gap: 16, card_gap: 20,
@@ -143,8 +154,8 @@ const NEOCADE_DIRECTIONS = [
       h1_weight: 720, h2_weight: 660, kicker: "sentence-case-accent",
       surface_stops: 4, surface_spread: "medium",
       hover_pct: 6, pressed_pct: -6, disabled_opacity: 0.50,
-      raised_primary: 3, raised_tab: 2, raised_row: 0, raised_secondary: 0,
-      lift_tabs: true, lift_rows: false, lift_secondary: false,
+      raised_primary: 3, raised_tab: 2, raised_row: 1, raised_secondary: 1,
+      lift_tabs: true, lift_rows: true, lift_secondary: true,
       tab_shape: "rounded-rect",
       mark_shape: "rounded-square-with-halo",
       primary_strategy: "friendly-primary-generous-breathing",
@@ -169,9 +180,12 @@ const NEOCADE_DIRECTIONS = [
     raised: "Stronger 4-6px offsets on primary; smaller offsets on secondary; rows lift on selected.",
     mobile: "Large touch affordances; gold confined to high-value action and focus roles.",
     shape: {
-      r_base: 16, r_chip: 14, r_button: 16, r_button_primary: 22,
-      r_tab: 14, r_mark: 16,
-      btn_pad_h: 20, btn_pad_v: 14, btn_pad_h_primary: 24, btn_pad_v_primary: 16,
+      // Issue 3 (revision-2): base radius 18 (bold but not extreme); the drama
+      // comes from the oversized primary radius (28), asymmetric tab, and chunky
+      // brand mark — not from the base scalar.
+      r_base: 18, r_chip: 16, r_button: 18, r_button_primary: 28,
+      r_tab: 16, r_mark: 18,
+      btn_pad_h: 20, btn_pad_v: 14, btn_pad_h_primary: 26, btn_pad_v_primary: 18,
       mark_size_desktop: 60, mark_size_mobile: 48,
       density_padding: 22, density_gap: 14, card_gap: 20,
       focus_thickness: 3, focus_offset: 1,
@@ -189,9 +203,58 @@ const NEOCADE_DIRECTIONS = [
   }
 ];
 
+/* Platform sizing tokens — Issue 6 of MOCKUP-REVISION-2-HANDOFF.md.
+ *
+ * Desktop sits in the middle of "professional desktop game UI" density per
+ * Steam (settings/library), Battle.net launcher, Epic Games Launcher, Discord,
+ * Godot editor; mobile pulls floors directly from Material Design 3 component
+ * specs (and is always >= iOS HIG floors so a single mobile artboard satisfies
+ * both OSes).
+ *
+ * Sources verified at handoff time:
+ *   https://m3.material.io/foundations/accessible-design/accessibility-basics
+ *   https://m3.material.io/components/buttons/specs
+ *   https://m3.material.io/components/text-fields/specs
+ *   https://m3.material.io/components/lists/specs
+ *   https://m3.material.io/styles/typography/type-scale-tokens
+ *   https://developer.apple.com/design/human-interface-guidelines/buttons
+ *   https://developer.apple.com/design/human-interface-guidelines/typography
+ */
 const PLATFORM_TOKENS = {
-  desktop: { label: "platform=DESKTOP", buttonMin: 44, body: 14 },
-  mobile: { label: "platform=MOBILE", buttonMin: 48, body: 13 }
+  desktop: {
+    label: "platform=DESKTOP",
+    buttonMin: 36,           // Steam settings buttons + Battle.net default chrome
+    primaryButtonMin: 44,    // Battle.net Play / Steam Install hero button
+    inputMin: 34,            // Steam-style search/filter input
+    toggleMin: 22,           // Steam-comparable: small but visible
+    checkboxSize: 18,        // standard desktop checkbox
+    body: 14,                // Steam / Discord / Battle.net body
+    label_: 12,              // smaller secondary labels (kicker, helper text)
+    h1: 36,
+    h2: 22,
+    kicker: 12,
+    rowMin: 36,              // Steam list-row density
+    tabMin: 32,
+    tapPadding: 8,
+    densityScale: 1.0
+  },
+  mobile: {
+    label: "platform=MOBILE",
+    buttonMin: 48,           // M3 tap-target floor + WCAG 2.5.5 (AAA) + iOS HIG 44pt
+    primaryButtonMin: 56,    // M3 Extended FAB height — primary-action emphasis
+    inputMin: 56,            // M3 filled text field default
+    toggleMin: 32,           // M3 Switch track height
+    checkboxSize: 20,        // M3 visible box; full 48dp target via tapPadding
+    body: 16,                // M3 Body Large (≈ iOS 17pt body @1x)
+    label_: 14,              // M3 Label Medium (≈ iOS Footnote)
+    h1: 32,                  // M3 Headline Large
+    h2: 22,                  // M3 Title Large
+    kicker: 13,              // M3 Label Small
+    rowMin: 56,              // M3 list-item-one-line
+    tabMin: 48,              // M3 Tabs default
+    tapPadding: 12,          // hit-area expansion around small interactives
+    densityScale: 1.5        // +50% inter-control gap on space.4+ (per architecture revision 2026-05-04)
+  }
 };
 
 const CONCEPT_VARIANTS = [
@@ -235,6 +298,66 @@ function luminance(hex) {
   return ch(r) * 0.2126 + ch(g) * 0.7152 + ch(b) * 0.0722;
 }
 
+/* HSL conversion + darken() helper — Issue 2 of MOCKUP-REVISION-2-HANDOFF.md.
+ *
+ * mix(hex, "#000000", pct) was producing "near-black" bottom edges on raised
+ * elements regardless of element bg color (Neobrutalism look — explicitly
+ * rejected by the user). Reducing HSL lightness instead preserves hue, so a
+ * pink button gets a darker-pink offset (the user's PLAY-button reference).
+ */
+function rgbToHsl({ r, g, b }) {
+  const rn = r / 255, gn = g / 255, bn = b / 255;
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const l = (max + min) / 2;
+  let h = 0, s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case rn: h = (gn - bn) / d + (gn < bn ? 6 : 0); break;
+      case gn: h = (bn - rn) / d + 2; break;
+      case bn: h = (rn - gn) / d + 4; break;
+    }
+    h /= 6;
+  }
+  return { h, s, l };
+}
+
+function hslToRgb({ h, s, l }) {
+  if (s === 0) {
+    const v = Math.round(l * 255);
+    return { r: v, g: v, b: v };
+  }
+  const hueToRgb = (p, q, t) => {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  return {
+    r: Math.round(hueToRgb(p, q, h + 1 / 3) * 255),
+    g: Math.round(hueToRgb(p, q, h) * 255),
+    b: Math.round(hueToRgb(p, q, h - 1 / 3) * 255)
+  };
+}
+
+/**
+ * Returns hex `color` with HSL lightness reduced by `percent` (0..100).
+ * The bottom-edge offset of a raised element should be the SAME hue as the
+ * element bg, just darker — never near-black. ~22% is the default per the
+ * handoff; smaller for already-light surfaces (overlay) where 22% goes too far.
+ */
+function darken(hex, percent) {
+  const { h, s, l } = rgbToHsl(hexToRgb(hex));
+  const newL = Math.max(0, l - percent / 100);
+  return rgbToHex(hslToRgb({ h, s, l: newL }));
+}
+
 /* --- token derivation per direction + platform ----------------------------- */
 
 function spreadFactor(spread) {
@@ -246,15 +369,31 @@ function spreadFactor(spread) {
 
 function deriveSurfaceRamp(direction) {
   const base = direction.base_color;
+  const accent = direction.accent_color;
   const f = spreadFactor(direction.shape.surface_spread);
+  const surface_base = base;
+  const surface_low = mix(base, "#000000", 0.18 * f);
+  const surface_panel = mix(base, "#ffffff", 0.06 * f);
+  const surface_high = mix(base, "#ffffff", 0.13 * f);
+  const surface_overlay = mix(base, "#ffffff", 0.20 * f);
+  const outline = mix(base, "#ffffff", 0.24 * f);
   return {
-    surface_base: base,
-    surface_low: mix(base, "#000000", 0.18 * f),
-    surface_panel: mix(base, "#ffffff", 0.06 * f),
-    surface_high: mix(base, "#ffffff", 0.13 * f),
-    surface_overlay: mix(base, "#ffffff", 0.20 * f),
-    outline: mix(base, "#ffffff", 0.24 * f),
-    offset: mix(base, "#000000", 0.55)
+    surface_base,
+    surface_low,
+    surface_panel,
+    surface_high,
+    surface_overlay,
+    outline,
+    /* Per-color offset tokens — each raised element's bottom edge is a darker
+     * variant of its OWN background, not a single near-black token. ~22% HSL
+     * lightness reduction; 18% for surface_overlay (which is already light, so
+     * 22% would crush hue). */
+    accent_offset: darken(accent, 22),
+    surface_high_offset: darken(surface_high, 22),
+    surface_panel_offset: darken(surface_panel, 22),
+    surface_overlay_offset: darken(surface_overlay, 18),
+    surface_low_offset: darken(surface_low, 22),
+    base_offset: darken(base, 22)
   };
 }
 
@@ -267,10 +406,15 @@ function deriveTokens(direction, platformName, raisedFlag) {
   const s = direction.shape;
   const platform = PLATFORM_TOKENS[platformName];
   const markSize = platformName === "mobile" ? s.mark_size_mobile : s.mark_size_desktop;
+  /* Inner-highlight rim color for raised primary buttons (Issue 2 optional rim
+   * recommendation in the handoff). Half-mix with white reads as a 1px lighter
+   * top edge — the "inner highlight" you see on the user's PLAY-button reference. */
+  const accent_rim = mix(accent, "#ffffff", 0.5);
 
   return {
     "--base": base,
     "--accent": accent,
+    "--accent-rim": accent_rim,
     "--ink": ink,
     "--muted": muted,
     "--surface-base": ramp.surface_base,
@@ -279,7 +423,16 @@ function deriveTokens(direction, platformName, raisedFlag) {
     "--surface-high": ramp.surface_high,
     "--surface-overlay": ramp.surface_overlay,
     "--outline": ramp.outline,
-    "--offset": ramp.offset,
+    /* Per-color offset tokens — each raised element's bottom edge is a darker
+     * variant of its own bg color (Issue 2). The legacy --offset alias is
+     * retained at the base-darker variant for any rule that has not yet been
+     * migrated; new raised CSS targets the per-color offsets directly. */
+    "--accent-offset": ramp.accent_offset,
+    "--surface-high-offset": ramp.surface_high_offset,
+    "--surface-panel-offset": ramp.surface_panel_offset,
+    "--surface-overlay-offset": ramp.surface_overlay_offset,
+    "--surface-low-offset": ramp.surface_low_offset,
+    "--offset": ramp.base_offset,
     "--state-hover": mix(base, "#ffffff", Math.abs(s.hover_pct) / 100),
     "--state-pressed": mix(base, "#000000", Math.abs(s.pressed_pct) / 100),
     "--disabled-opacity": String(s.disabled_opacity),
@@ -289,7 +442,7 @@ function deriveTokens(direction, platformName, raisedFlag) {
     "--radius-button": s.r_button >= 999 ? "999px" : `${s.r_button}px`,
     "--radius-button-primary": s.r_button_primary >= 999 ? "999px" : `${s.r_button_primary}px`,
     "--radius-tab": s.r_tab >= 999 ? "999px" : `${s.r_tab}px`,
-    "--radius-mark": `${s.r_mark}px`,
+    "--radius-mark": s.r_mark >= 999 ? "999px" : `${s.r_mark}px`,
 
     "--button-pad-h": `${s.btn_pad_h}px`,
     "--button-pad-v": `${s.btn_pad_v}px`,
@@ -309,13 +462,32 @@ function deriveTokens(direction, platformName, raisedFlag) {
     "--h1-weight": String(s.h1_weight),
     "--h2-weight": String(s.h2_weight),
 
+    /* Raised offset depths per axis-10 of the direction's shape language.
+     * --raise-strength is the scalar; specific variant tokens are derived from
+     * it in the artboard CSS (e.g., --raise-dialog = strength * 1.3). */
+    "--raise-strength": `${s.raised_primary}px`,
     "--raised-primary-offset": `${s.raised_primary}px`,
     "--raised-tab-offset": `${s.raised_tab}px`,
     "--raised-row-offset": `${s.raised_row}px`,
     "--raised-secondary-offset": `${s.raised_secondary}px`,
 
+    /* Platform sizing variables — Issue 6. The .nc-artboard.mobile selector
+     * does NOT downward-override these; every variable carries the platform's
+     * floor and the base CSS rule consumes them directly. */
+    "--button-min": `${platform.buttonMin}px`,
+    "--button-min-primary": `${platform.primaryButtonMin}px`,
+    "--input-min": `${platform.inputMin}px`,
+    "--toggle-min": `${platform.toggleMin}px`,
+    "--checkbox-size": `${platform.checkboxSize}px`,
     "--body-size": `${platform.body}px`,
-    "--button-min": `${platform.buttonMin}px`
+    "--label-size": `${platform.label_}px`,
+    "--h1-size": `${platform.h1}px`,
+    "--h2-size": `${platform.h2}px`,
+    "--kicker-size": `${platform.kicker}px`,
+    "--row-min": `${platform.rowMin}px`,
+    "--tab-min": `${platform.tabMin}px`,
+    "--tap-padding": `${platform.tapPadding}px`,
+    "--density-scale": String(platform.densityScale)
   };
 }
 
@@ -554,10 +726,84 @@ function renderFinalistPlaceholder() {
   `;
 }
 
+/* Slideshow — Issue 4 of MOCKUP-REVISION-2-HANDOFF.md.
+ *
+ * Top-of-page A/B comparison view: ←/→ keys (or click) cycle through the 5
+ * desktop-flat PNGs with NO transition (instant swap). All 5 PNGs are
+ * preloaded on first paint so subsequent swaps are tab-cache fast.
+ *
+ * Per-direction "mood" phrases below are the *inspirational compass points*
+ * from Issue 5 of the handoff — short labels that tell the reviewer what
+ * vibe each direction is aiming for. They are not imitation contracts. */
+const SLIDESHOW_MOODS = {
+  Pulse: "cabinet control panel",
+  Slate: "premium tool app",
+  Bubble: "cozy mobile game",
+  Daybreak: "community lobby",
+  Burst: "achievement screen"
+};
+
+function bindSlideshow() {
+  const root = document.querySelector("[data-slideshow]");
+  if (!root) return;
+
+  const directions = NEOCADE_DIRECTIONS;
+  const img = root.querySelector("[data-slideshow-image]");
+  const name = root.querySelector("[data-slideshow-name]");
+  const mood = root.querySelector("[data-slideshow-mood]");
+  const tabs = root.querySelector("[data-slideshow-tabs]");
+  let i = 0;
+
+  // Build tab buttons once per direction.
+  directions.forEach((d, idx) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.role = "tab";
+    btn.textContent = d.name;
+    btn.dataset.index = String(idx);
+    btn.addEventListener("click", () => set(idx));
+    tabs.appendChild(btn);
+  });
+
+  function set(next) {
+    i = (next + directions.length) % directions.length;
+    const d = directions[i];
+    // Direct src swap — preloaded above, so the browser cache returns instantly.
+    img.src = d.conceptImages.desktopFlat;
+    img.alt = `${d.name} desktop flat mockup — ${SLIDESHOW_MOODS[d.name] || ""}`;
+    name.textContent = d.name;
+    mood.textContent = SLIDESHOW_MOODS[d.name] || "";
+    tabs.querySelectorAll("button").forEach((b, idx) => {
+      b.setAttribute("aria-selected", String(idx === i));
+    });
+  }
+
+  root.querySelector("[data-slideshow-prev]").addEventListener("click", () => set(i - 1));
+  root.querySelector("[data-slideshow-next]").addEventListener("click", () => set(i + 1));
+
+  // Global ←/→ shortcuts (skip when an input is focused).
+  document.addEventListener("keydown", (e) => {
+    if (e.target.matches("input, textarea")) return;
+    if (e.key === "ArrowLeft")  { e.preventDefault(); set(i - 1); }
+    if (e.key === "ArrowRight") { e.preventDefault(); set(i + 1); }
+  });
+
+  // Pre-load all 5 desktop PNGs so future swaps are instant.
+  directions.forEach((d) => {
+    const pre = new Image();
+    pre.src = d.conceptImages.desktopFlat;
+  });
+
+  set(0);
+}
+
 function boot() {
   const page = document.querySelector("[data-gallery]");
   if (!page) return;
-  if (page.dataset.gallery === "concept") renderConceptGallery();
+  if (page.dataset.gallery === "concept") {
+    renderConceptGallery();
+    bindSlideshow();
+  }
   if (page.dataset.gallery === "concept-image") renderConceptImage();
   if (page.dataset.gallery === "finalist") renderFinalistPlaceholder();
 }

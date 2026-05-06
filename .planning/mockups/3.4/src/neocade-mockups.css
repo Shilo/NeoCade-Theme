@@ -113,6 +113,102 @@ h3 {
 .nc-legend b { display: block; font-size: 1.5rem; line-height: 1; }
 .nc-legend span { display: block; color: var(--muted); margin-top: 8px; }
 
+/* --- Slideshow (Issue 4 of MOCKUP-REVISION-2-HANDOFF.md) -------------------
+ * Top-of-page A/B comparison view. Hard requirement: NO transition on the
+ * image — the user wants instant flips so categorical mood differences pop. */
+
+.nc-slideshow {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0;
+  padding: 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.nc-slideshow-frame {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+}
+.nc-slideshow-stage {
+  margin: 0;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  min-width: 0;
+}
+.nc-slideshow-stage img {
+  display: block;
+  width: 100%;
+  max-width: 1280px;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-high);
+  /* CRITICAL: no transition. Instant flips for A/B mood comparison. */
+  transition: none !important;
+}
+.nc-slideshow-stage figcaption {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  font-size: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.nc-slideshow-stage figcaption [data-slideshow-name] {
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+.nc-slideshow-stage figcaption [data-slideshow-mood] {
+  color: var(--muted);
+  font-style: italic;
+}
+.nc-slideshow-arrow {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel-high);
+  color: var(--ink);
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+.nc-slideshow-arrow:hover { background: var(--panel); }
+.nc-slideshow-arrow:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.nc-slideshow-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.nc-slideshow-tabs button {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 700;
+  font-family: inherit;
+}
+.nc-slideshow-tabs button[aria-selected="true"] {
+  background: var(--focus);
+  color: #0c0f15;
+  border-color: transparent;
+}
+.nc-slideshow-hint { color: var(--muted); margin: 0; font-size: 0.88rem; text-align: center; }
+.nc-slideshow-hint kbd {
+  background: var(--panel-high);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: inherit;
+  font-size: 0.85em;
+}
+
 .nc-board-list { display: grid; gap: 24px; }
 
 .nc-direction-section {
@@ -161,7 +257,7 @@ h3 {
 }
 .nc-concept-card[data-concept-variant="mobileFlat"] img,
 .nc-concept-card[data-concept-variant="mobileRaised"] img {
-  aspect-ratio: 430 / 932;
+  aspect-ratio: 430 / 1500;
   object-fit: contain;
 }
 
@@ -242,12 +338,35 @@ h3 {
  * specific selector and NO hard-coded radius/padding/density value. The
  * fallbacks here are deliberate placeholders that should never apply when a
  * direction is rendered (JS always supplies values).
+ *
+ * Platform-sizing contract (Issue 6, 2026-05-07):
+ *   Every control consumes platform sizing via CSS variables emitted by
+ *   `deriveTokens()` from `PLATFORM_TOKENS`. Desktop = compact game-UI density
+ *   (Steam-comparable: 36px standard / 44px primary / 14px body / 36px row).
+ *   Mobile = Material Design 3 floors (48dp tap floor / 56dp primary / 56dp
+ *   text field / 56dp list row / 16sp body) with --density-scale: 1.5 for the
+ *   "+50% mobile inter-control gap" rule. The .nc-artboard.mobile selector no
+ *   longer DOWNWARD-overrides sizes — it just changes physical dimensions.
+ *
+ * Raised contract (Issue 1+2, 2026-05-07):
+ *   When .nc-artboard has class `mode-raised`, the broad "raise matrix" lifts:
+ *     RAISES: primary/secondary/ghost buttons, selected & unselected tabs,
+ *             selected list rows, panel cards, dialog overlays, brand-mark
+ *             badge, segmented chips, toggle thumb, checkbox (when checked),
+ *             progress-bar fill.
+ *     STAYS FLAT: text inputs (recessed), passive labels/kickers/headers,
+ *                 scrollbar track + grabber, separators, unselected list rows,
+ *                 focus ring (already emphatic), state-strip demo swatches.
+ *   Each lifted element's bottom-edge offset is a darker variant of its OWN
+ *   background color (per-color offset tokens), never a single near-black
+ *   token. See `darken()` helper + `deriveSurfaceRamp()` in JS.
  * ============================================================================ */
 
 .nc-artboard {
   /* Fallbacks — JS overrides every variable per direction. */
   --base: #111820;
   --accent: #8BD3FF;
+  --accent-rim: #C4E5FF;
   --ink: #F5F7FB;
   --muted: #B8C2CF;
   --surface-base: var(--base);
@@ -257,6 +376,11 @@ h3 {
   --surface-overlay: #2a3340;
   --outline: #3a4150;
   --offset: #04060a;
+  --accent-offset: #2d6c99;
+  --surface-high-offset: #0d1219;
+  --surface-panel-offset: #07090e;
+  --surface-overlay-offset: #141a23;
+  --surface-low-offset: #02030a;
   --state-hover: #1c2436;
   --state-pressed: #14202c;
   --disabled-opacity: 0.5;
@@ -278,6 +402,7 @@ h3 {
   --density-padding: 22px;
   --density-gap: 14px;
   --card-gap: 18px;
+  --density-scale: 1;
 
   --focus-thickness: 2px;
   --focus-offset: 2px;
@@ -289,10 +414,26 @@ h3 {
   --kicker-spacing: 0.04em;
   --body-weight: 460;
 
+  --raise-strength: 3px;
   --raised-primary-offset: 3px;
   --raised-tab-offset: 2px;
-  --raised-row-offset: 0px;
-  --raised-secondary-offset: 0px;
+  --raised-row-offset: 1px;
+  --raised-secondary-offset: 1px;
+
+  /* Platform sizing fallbacks (desktop floors). JS overrides per platform. */
+  --button-min: 36px;
+  --button-min-primary: 44px;
+  --input-min: 34px;
+  --toggle-min: 22px;
+  --checkbox-size: 18px;
+  --body-size: 14px;
+  --label-size: 12px;
+  --h1-size: 36px;
+  --h2-size: 22px;
+  --kicker-size: 12px;
+  --row-min: 36px;
+  --tab-min: 32px;
+  --tap-padding: 8px;
 
   width: 1280px;
   height: 720px;
@@ -305,15 +446,22 @@ h3 {
   border: 1px solid var(--outline);
   font-weight: var(--body-weight);
   overflow: hidden;
-  font-size: 14px;
+  font-size: var(--body-size);
 }
 
+/* Mobile artboard: physical dimensions only. Sizing flows from CSS variables —
+ * no DOWNWARD overrides here (rev-2 fix per Issue 6). The +50% mobile spacing
+ * rule is carried by --density-scale.
+ *
+ * Width = iPhone 16 Pro Max viewport (430px). Height = 1500px (taller than the
+ * single-screen viewport) because Material 3 / iOS HIG component floors push
+ * each card to a real interactive size; three cards + header + footer don't
+ * fit in 932px without violating the +50% gap rule or shrinking targets back
+ * down. The mockup represents what a user sees as they scroll — the full
+ * mobile control inventory in one image makes direction comparison possible. */
 .nc-artboard.mobile {
   width: 430px;
-  height: 932px;
-  font-size: 13px;
-  gap: calc(var(--card-gap) * 0.7);
-  padding: calc(var(--density-padding) * 0.72);
+  height: 1500px;
 }
 
 /* --- Header (brand + tabs) -------------------------------------------------- */
@@ -324,9 +472,10 @@ h3 {
   gap: var(--density-gap);
   align-items: center;
 }
+/* Mobile structural override: stack brand row + tab row vertically because
+ * 430px is too narrow for a 2-column header. Sizing still flows from variables. */
 .nc-artboard.mobile .nc-art-top {
   grid-template-columns: 1fr;
-  gap: 12px;
   align-items: stretch;
 }
 
@@ -336,7 +485,6 @@ h3 {
   gap: 14px;
   min-width: 0;
 }
-.nc-artboard.mobile .nc-art-brand { gap: 10px; }
 
 .nc-art-mark {
   width: var(--mark-size);
@@ -346,11 +494,6 @@ h3 {
   border: 4px solid var(--surface-high);
   flex: 0 0 auto;
   position: relative;
-}
-.nc-artboard.mobile .nc-art-mark {
-  width: calc(var(--mark-size) * 0.78);
-  height: calc(var(--mark-size) * 0.78);
-  border-width: 3px;
 }
 
 /* Brand-mark shape variants */
@@ -384,17 +527,16 @@ h3 {
 .nc-art-brand-text { display: flex; flex-direction: column; min-width: 0; }
 .nc-art-brand-text b {
   display: block;
-  font-size: 36px;
+  font-size: var(--h1-size);
   line-height: 1;
   font-weight: var(--h1-weight);
   letter-spacing: -0.005em;
 }
-.nc-artboard.mobile .nc-art-brand-text b { font-size: 24px; }
 .nc-art-brand-text small {
   display: block;
   margin-top: 6px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--label-size);
   font-weight: 520;
   letter-spacing: 0.02em;
 }
@@ -404,39 +546,32 @@ h3 {
 .nc-art-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: calc(8px * var(--density-scale));
   align-items: stretch;
   justify-content: flex-end;
 }
 .nc-artboard.mobile .nc-art-tabs {
   justify-content: flex-start;
-  gap: 6px;
 }
 
 .nc-art-tabs .nc-tab,
 .nc-art-segments .nc-tab {
   position: relative;
   isolation: isolate;
-  min-height: 38px;
+  min-height: var(--tab-min);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 18px;
+  padding: 0 calc(14px * var(--density-scale));
   border-radius: var(--radius-tab);
   border: 1px solid var(--outline);
   color: var(--muted);
   background: var(--surface-low);
   font-weight: 660;
-  font-size: 13px;
+  font-size: var(--label-size);
   letter-spacing: 0.005em;
   text-transform: none;
   transition: none;
-}
-.nc-artboard.mobile .nc-art-tabs .nc-tab,
-.nc-artboard.mobile .nc-art-segments .nc-tab {
-  min-height: 32px;
-  padding: 0 12px;
-  font-size: 11px;
 }
 
 /* Tab shape variants -------------------------------------------------------- */
@@ -505,17 +640,25 @@ h3 {
   border-color: transparent;
 }
 
-/* Raised offset on selected tab — uses hard box-shadow (the classic flat-3D
- * pattern). Stacks with the inset bottom-rule on the rectangular cabinet strip. */
-.mode-raised[data-lift-tabs="true"]:not([data-tab-shape="rectangular-strip"]) .nc-art-tabs .nc-tab.selected,
-.mode-raised[data-lift-tabs="true"]:not([data-tab-shape="rectangular-strip"]) .nc-art-segments .nc-tab.selected {
-  box-shadow: 0 var(--raised-tab-offset) 0 0 var(--offset);
+/* Raised tabs — selected uses --accent-offset (bg=accent), unselected uses
+ * --surface-low-offset (bg=surface-low). Both fire universally in mode-raised
+ * because tabs are always interactable; unselected gets half the strength of
+ * the per-direction raised-tab-offset to keep emphasis on the active tab.
+ * Stacks with the inset bottom-rule on the rectangular cabinet strip. */
+.mode-raised:not([data-tab-shape="rectangular-strip"]) .nc-art-tabs .nc-tab.selected,
+.mode-raised:not([data-tab-shape="rectangular-strip"]) .nc-art-segments .nc-tab.selected {
+  box-shadow: 0 var(--raised-tab-offset) 0 0 var(--accent-offset);
   margin-bottom: var(--raised-tab-offset);
 }
-.mode-raised[data-lift-tabs="true"][data-tab-shape="rectangular-strip"] .nc-art-tabs .nc-tab.selected,
-.mode-raised[data-lift-tabs="true"][data-tab-shape="rectangular-strip"] .nc-art-segments .nc-tab.selected {
-  box-shadow: inset 0 -3px 0 0 var(--accent), 0 var(--raised-tab-offset) 0 0 var(--offset);
+.mode-raised[data-tab-shape="rectangular-strip"] .nc-art-tabs .nc-tab.selected,
+.mode-raised[data-tab-shape="rectangular-strip"] .nc-art-segments .nc-tab.selected {
+  box-shadow: inset 0 -3px 0 0 var(--accent), 0 var(--raised-tab-offset) 0 0 var(--accent-offset);
   margin-bottom: var(--raised-tab-offset);
+}
+.mode-raised .nc-art-tabs .nc-tab:not(.selected),
+.mode-raised .nc-art-segments .nc-tab:not(.selected) {
+  box-shadow: 0 calc(var(--raised-tab-offset) * 0.5) 0 0 var(--surface-low-offset);
+  margin-bottom: calc(var(--raised-tab-offset) * 0.5);
 }
 
 /* --- Body grid (3-card layout) --------------------------------------------- */
@@ -527,9 +670,9 @@ h3 {
   min-height: 0;
   align-items: stretch;
 }
+/* Mobile structural override: 430px is too narrow for 3 columns; stack. */
 .nc-artboard.mobile .nc-art-grid {
   grid-template-columns: 1fr;
-  gap: calc(var(--card-gap) * 0.55);
 }
 
 .nc-art-card {
@@ -542,15 +685,19 @@ h3 {
   background: var(--surface-panel);
   padding: var(--density-padding);
 }
-.nc-artboard.mobile .nc-art-card {
-  gap: calc(var(--density-gap) * 0.7);
-  padding: calc(var(--density-padding) * 0.6);
+
+/* Raised: panel cards lift on a darker variant of their own surface_panel bg
+ * (Issue 1+2). raised_secondary scalar drives the strength because panels are
+ * a "secondary" depth tier — not as prominent as primary buttons. */
+.mode-raised .nc-art-card {
+  box-shadow: 0 var(--raised-secondary-offset) 0 0 var(--surface-panel-offset);
+  margin-bottom: var(--raised-secondary-offset);
 }
 
 .nc-art-card h2 {
   margin: 0;
   color: var(--accent);
-  font-size: 16px;
+  font-size: var(--h2-size);
   font-weight: var(--h2-weight);
   text-transform: var(--kicker-transform, none);
   letter-spacing: var(--kicker-spacing);
@@ -558,27 +705,27 @@ h3 {
 [data-kicker-style="uppercase-tracked-accent"] .nc-art-card h2 {
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  font-size: 13px;
+  font-size: var(--label-size);
   font-weight: 800;
 }
 [data-kicker-style="small-caps-subtle"] .nc-art-card h2 {
   text-transform: lowercase;
   font-variant: small-caps;
   letter-spacing: 0.04em;
-  font-size: 14px;
+  font-size: var(--body-size);
   color: var(--muted);
   font-weight: 660;
 }
 [data-kicker-style="sentence-case-accent"] .nc-art-card h2 {
   text-transform: none;
   letter-spacing: 0;
-  font-size: 16px;
+  font-size: calc(var(--body-size) + 2px);
   font-weight: 720;
 }
 [data-kicker-style="uppercase-bold-larger-scale"] .nc-art-card h2 {
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-size: 18px;
+  font-size: calc(var(--body-size) + 4px);
   font-weight: 820;
 }
 
@@ -587,15 +734,14 @@ h3 {
 .nc-art-button-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: calc(10px * var(--density-scale));
   align-items: center;
 }
-.nc-artboard.mobile .nc-art-button-row { gap: 7px; }
 
 .nc-art-button {
   position: relative;
   isolation: isolate;
-  min-height: 44px;
+  min-height: var(--button-min);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -605,13 +751,8 @@ h3 {
   background: var(--surface-high);
   color: var(--ink);
   font-weight: 760;
-  font-size: 13px;
+  font-size: var(--body-size);
   white-space: nowrap;
-}
-.nc-artboard.mobile .nc-art-button {
-  min-height: 38px;
-  padding: 0 calc(var(--button-pad-h) * 0.7);
-  font-size: 12px;
 }
 
 .nc-art-button.primary {
@@ -621,7 +762,7 @@ h3 {
   font-weight: 800;
   padding: 0 var(--button-pad-h-primary);
   border-radius: var(--radius-button-primary);
-  min-height: calc(44px + (var(--button-pad-v-primary) - var(--button-pad-v)) * 1.5);
+  min-height: var(--button-min-primary);
 }
 
 .nc-art-button.ghost {
@@ -671,28 +812,40 @@ h3 {
   letter-spacing: 0.005em;
 }
 
-/* Raised primary lift — hard box-shadow offset */
+/* Raised buttons — Issue 1+2 broadened matrix with per-color offset tokens.
+ * Primary: bg=accent → --accent-offset (darker variant of THE BUTTON's hue).
+ *          Optional 1px lighter top rim mimics the user's PLAY-button reference
+ *          (extruded-flat 3D done well — not Neobrutalism).
+ * Secondary: bg=surface-high → --surface-high-offset (darker variant of bg).
+ * Ghost:   transparent bg, accent border → uses --accent-offset to extend the
+ *          accent edge downward as a faint slab. */
 .mode-raised .nc-art-button.primary {
-  box-shadow: 0 var(--raised-primary-offset) 0 0 var(--offset);
+  box-shadow:
+    0 var(--raised-primary-offset) 0 0 var(--accent-offset),
+    inset 0 1px 0 0 var(--accent-rim);
   margin-bottom: var(--raised-primary-offset);
 }
-.mode-raised[data-lift-secondary="true"] .nc-art-button:not(.primary):not(.ghost) {
-  box-shadow: 0 var(--raised-secondary-offset) 0 0 var(--offset);
+.mode-raised .nc-art-button:not(.primary):not(.ghost) {
+  box-shadow: 0 var(--raised-secondary-offset) 0 0 var(--surface-high-offset);
+  margin-bottom: var(--raised-secondary-offset);
+}
+.mode-raised .nc-art-button.ghost {
+  box-shadow: 0 var(--raised-secondary-offset) 0 0 var(--accent-offset);
   margin-bottom: var(--raised-secondary-offset);
 }
 
-/* --- Input --- */
+/* --- Input — STAYS FLAT in raised mode (inputs read recessed) -------------- */
 
 .nc-art-label {
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--label-size);
   font-weight: 720;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
 .nc-art-input {
-  min-height: 46px;
+  min-height: var(--input-min);
   display: flex;
   align-items: center;
   padding: 0 14px;
@@ -700,9 +853,8 @@ h3 {
   border-radius: calc(var(--radius-base) - 2px);
   background: var(--surface-low);
   color: var(--ink);
-  font-size: 14px;
+  font-size: var(--body-size);
 }
-.nc-artboard.mobile .nc-art-input { min-height: 40px; font-size: 13px; }
 
 .nc-art-input.focused {
   border-color: var(--accent);
@@ -722,17 +874,16 @@ h3 {
 .nc-art-toggle-line {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: calc(10px * var(--density-scale));
   align-items: center;
-  min-height: 44px;
-  font-size: 13px;
+  min-height: var(--button-min);
+  font-size: var(--body-size);
   color: var(--ink);
 }
-.nc-artboard.mobile .nc-art-toggle-line { font-size: 12px; min-height: 36px; gap: 8px; }
 
 .nc-art-check {
-  width: 22px;
-  height: 22px;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
   border-radius: calc(var(--radius-base) * 0.45);
   border: 2px solid var(--accent);
   background: var(--accent);
@@ -747,9 +898,15 @@ h3 {
   clip-path: polygon(15% 50%, 0 65%, 38% 100%, 100% 25%, 85% 10%, 38% 70%);
 }
 
+/* Raised: checkbox lifts when checked (a small accent-darker slab). */
+.mode-raised .nc-art-check {
+  box-shadow: 0 1px 0 0 var(--accent-offset);
+  margin-bottom: 1px;
+}
+
 .nc-art-switch {
-  width: 50px;
-  height: 28px;
+  min-width: calc(var(--toggle-min) * 1.6);
+  min-height: var(--toggle-min);
   display: inline-flex;
   justify-content: flex-end;
   align-items: center;
@@ -760,11 +917,18 @@ h3 {
   flex: 0 0 auto;
 }
 .nc-art-switch i {
-  width: 18px;
-  height: 18px;
+  width: calc(var(--toggle-min) - 10px);
+  height: calc(var(--toggle-min) - 10px);
   border-radius: 999px;
   background: var(--accent);
   display: block;
+}
+
+/* Raised: switch TRACK stays flat (it's a recessed surface), THUMB lifts on
+ * a darker variant of the accent (since thumb bg = accent). */
+.mode-raised .nc-art-switch i {
+  box-shadow: 0 1px 0 0 var(--accent-offset);
+  margin-bottom: 1px;
 }
 
 /* --- Dialog stack (segments + popup + progress + actions) ------------------ */
@@ -772,36 +936,38 @@ h3 {
 .nc-art-segments {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: calc(8px * var(--density-scale));
   align-items: stretch;
 }
 
 .nc-art-dialog {
   display: grid;
-  gap: 12px;
+  gap: calc(12px * var(--density-scale));
   border: 1px solid var(--outline);
   border-radius: calc(var(--radius-base) + 2px);
   background: var(--surface-overlay);
   padding: calc(var(--density-padding) * 0.85);
 }
-.nc-artboard.mobile .nc-art-dialog {
-  gap: 8px;
-  padding: calc(var(--density-padding) * 0.55);
-  border-radius: var(--radius-base);
+
+/* Raised: dialog overlay sits highest in the depth hierarchy. Use a stronger
+ * offset (1.3× primary) to make the modal float clearly above panels. Color
+ * is a darker variant of surface-overlay (the dialog's own bg). */
+.mode-raised .nc-art-dialog {
+  box-shadow: 0 calc(var(--raised-primary-offset) * 1.3) 0 0 var(--surface-overlay-offset);
+  margin-bottom: calc(var(--raised-primary-offset) * 1.3);
 }
 
 .nc-art-dialog b {
   font-weight: var(--h2-weight);
   color: var(--ink);
-  font-size: 14px;
+  font-size: var(--body-size);
 }
 .nc-art-dialog p {
   color: var(--muted);
   margin: 0;
-  font-size: 13px;
+  font-size: var(--body-size);
   line-height: 1.4;
 }
-.nc-artboard.mobile .nc-art-dialog p { font-size: 11px; }
 
 .nc-art-progress {
   height: 14px;
@@ -815,33 +981,31 @@ h3 {
   width: 62%;
   height: 100%;
   background: var(--accent);
+  /* Raised: progress fill (bg=accent) gets a small accent-darker offset on
+   * its own bottom edge — the bar reads as a tactile fill, not a flat sliver. */
+  box-shadow: 0 0 0 0 transparent;
 }
-.nc-artboard.mobile .nc-art-progress { height: 10px; }
+.mode-raised .nc-art-progress span {
+  box-shadow: inset 0 -2px 0 0 var(--accent-offset);
+}
 
 /* --- List / tree ----------------------------------------------------------- */
 
-.nc-art-list { display: grid; gap: 8px; }
-.nc-artboard.mobile .nc-art-list { gap: 6px; }
+.nc-art-list { display: grid; gap: calc(8px * var(--density-scale)); }
 
 .nc-art-list-row {
   position: relative;
   isolation: isolate;
-  min-height: 50px;
+  min-height: var(--row-min);
   display: grid;
   grid-template-columns: 14px minmax(0, 1fr) auto;
-  gap: 12px;
+  gap: calc(12px * var(--density-scale));
   align-items: center;
   padding: 0 14px;
   border: 1px solid var(--outline);
   border-radius: calc(var(--radius-base) - 2px);
   background: var(--surface-low);
-  font-size: 13px;
-}
-.nc-artboard.mobile .nc-art-list-row {
-  min-height: 40px;
-  gap: 9px;
-  padding: 0 10px;
-  font-size: 12px;
+  font-size: var(--body-size);
 }
 
 .nc-art-list-row.selected {
@@ -857,14 +1021,16 @@ h3 {
 }
 
 .nc-art-list-row b { font-weight: 720; }
-.nc-art-list-row small { color: var(--muted); font-size: 11px; }
+.nc-art-list-row small { color: var(--muted); font-size: var(--label-size); }
 
-/* Raised lift on selected row when direction lifts rows */
-.mode-raised[data-lift-rows="true"] .nc-art-list-row.selected {
-  box-shadow: 0 var(--raised-row-offset) 0 0 var(--offset);
+/* Raised: ONLY selected rows lift; unselected rows STAY FLAT (do-not-raise
+ * matrix). Selected bg = surface-high → use --surface-high-offset. */
+.mode-raised .nc-art-list-row.selected {
+  box-shadow: 0 var(--raised-row-offset) 0 0 var(--surface-high-offset);
   margin-bottom: var(--raised-row-offset);
 }
 
+/* Scrollbar — STAYS FLAT in raised mode (tracks are recessed). */
 .nc-art-scrollbar {
   width: 12px;
   height: 88px;
@@ -883,7 +1049,15 @@ h3 {
 }
 .nc-artboard.mobile .nc-art-scrollbar { display: none; }
 
-/* --- Footer (state strip + palette swatches) ------------------------------- */
+/* Raised brand mark — bg=accent → accent-darker offset, matching primary. */
+.mode-raised .nc-art-mark {
+  box-shadow: 0 var(--raised-primary-offset) 0 0 var(--accent-offset);
+  margin-bottom: var(--raised-primary-offset);
+}
+
+/* --- Footer (state strip + palette swatches) -----------------------------------
+ * State-strip swatches are demo labels, not real controls — they STAY FLAT in
+ * raised mode (do-not-raise matrix). Palette swatches similarly stay flat. */
 
 .nc-art-bottom {
   display: grid;
@@ -893,18 +1067,15 @@ h3 {
 }
 .nc-artboard.mobile .nc-art-bottom {
   grid-template-columns: 1fr;
-  gap: 8px;
 }
 
 .nc-art-states,
 .nc-art-palette {
   display: flex;
   align-items: stretch;
-  gap: 8px;
+  gap: calc(8px * var(--density-scale));
 }
 .nc-art-states { flex: 1; }
-.nc-artboard.mobile .nc-art-states { gap: 5px; }
-.nc-artboard.mobile .nc-art-palette { gap: 5px; min-height: 32px; }
 
 .nc-art-states span {
   flex: 1;
@@ -915,13 +1086,12 @@ h3 {
   background: var(--surface-high);
   color: var(--ink);
   font-weight: 700;
-  font-size: 11px;
+  font-size: var(--label-size);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  min-height: 38px;
+  min-height: var(--tab-min);
   padding: 0 6px;
 }
-.nc-artboard.mobile .nc-art-states span { font-size: 10px; min-height: 32px; }
 
 .nc-art-states .hover { background: var(--state-hover); }
 .nc-art-states .focus {
@@ -940,6 +1110,5 @@ h3 {
   flex: 1;
   border: 1px solid var(--outline);
   border-radius: calc(var(--radius-base) - 4px);
-  min-height: 38px;
+  min-height: var(--tab-min);
 }
-.nc-artboard.mobile .nc-art-palette span { min-height: 32px; }

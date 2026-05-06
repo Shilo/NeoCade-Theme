@@ -9,6 +9,8 @@
  * Modes:
  *   node render.js                  — captures the concept gallery overview
  *   node render.js concept-images   — captures all 15 per-direction PNGs
+ *   node render.js color-overview   — captures src/color-overview.html composite
+ *   node render.js greyscale        — captures src/greyscale-check.html composite (D-30)
  *   node render.js finalist         — captures the finalist gallery shell
  */
 
@@ -35,8 +37,11 @@ const CONCEPT_IMAGE_DIRECTIONS = [
 
 const CONCEPT_IMAGE_VARIANTS = [
   { name: "desktop-flat", platform: "desktop", raised: false, viewport: { width: 1280, height: 720 } },
-  { name: "mobile-flat", platform: "mobile", raised: false, viewport: { width: 430, height: 932 } },
-  { name: "mobile-raised", platform: "mobile", raised: true, viewport: { width: 430, height: 932 } }
+  // Mobile viewport bumped from 932 → 1500 to match the artboard's mobile
+  // physical height (Issue 6: M3 / iOS HIG floors push the full control inventory
+  // past a single-screen viewport — see .nc-artboard.mobile rule comment).
+  { name: "mobile-flat", platform: "mobile", raised: false, viewport: { width: 430, height: 1500 } },
+  { name: "mobile-raised", platform: "mobile", raised: true, viewport: { width: 430, height: 1500 } }
 ];
 
 async function waitForReady(page) {
@@ -117,6 +122,18 @@ async function renderGallery(playwright, browserPath, root, mode) {
   console.log(`Rendered ${gallery} to ${out}`);
 }
 
+async function renderAuditComposite(playwright, browserPath, root, opts) {
+  const browser = await playwright.chromium.launch({ headless: true, executablePath: browserPath });
+  const context = await browser.newContext({ viewport: opts.viewport, deviceScaleFactor: 1 });
+  const page = await context.newPage();
+  await page.goto(pathToFileURL(path.join(root, opts.html)).href);
+  await waitForReady(page);
+  const outPath = path.join(root, opts.out);
+  await page.screenshot({ path: outPath, fullPage: true });
+  await browser.close();
+  console.log(`Rendered ${opts.html} → ${path.relative(root, outPath)}`);
+}
+
 async function main() {
   const mode = process.argv[2] || "concept";
   const root = __dirname;
@@ -125,6 +142,22 @@ async function main() {
 
   if (mode === "concept-images") {
     await renderConceptImages(playwright, browserPath, root);
+    return;
+  }
+  if (mode === "color-overview") {
+    await renderAuditComposite(playwright, browserPath, root, {
+      html: "src/color-overview.html",
+      out: "screenshots/color-overview.png",
+      viewport: { width: 1600, height: 900 }
+    });
+    return;
+  }
+  if (mode === "greyscale") {
+    await renderAuditComposite(playwright, browserPath, root, {
+      html: "src/greyscale-check.html",
+      out: "screenshots/greyscale-sufficiency-test.png",
+      viewport: { width: 1600, height: 900 }
+    });
     return;
   }
   await renderGallery(playwright, browserPath, root, mode);
