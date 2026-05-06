@@ -1,5 +1,9 @@
 # Phase 3.4 Render Check
 
+**Status (revision 3, 2026-05-06):** Mockup revision 3 complete per `MOCKUP-REVISION-3-HANDOFF.md` — surgical fix for the dark-surface near-black bottom-edge bug introduced by rev-2's `darken()` HSL helper. Surface-colored elements (panels, dialogs, popup overlays, brand-mark badge, state-strip cells, unselected tabs, selected list rows) now correctly land color-tinted offsets in their own hue family. 15 concept PNGs + 2 audit composites re-rendered. All other rev-2 decisions (wider radius spread, broader raised matrix, slideshow, platform sizing, mood differentiation) stand unchanged.
+
+**Rev-3 fix:** Replaced `darken(color, 22%)` with `tintTowardBase(color, base, 0.40)` (= `mix(element_color, page_base, 40%)`) for `--accent-offset`, `--surface-panel-offset`, `--surface-high-offset`, `--surface-overlay-offset`, `--surface-low-offset`. The previous formula floored at HSL lightness 0 on already-dark surfaces (e.g., Bubble's `surface_panel` ≈ L=10%; minus 22 clamps to L=0 → near-black), reading as Neobrutalism — the look the user explicitly rejected. The new formula shifts each element 40% toward the page background, preserving hue at every brightness and never crossing past the base. The legacy `--offset` alias still uses `darken()` for a distinct-from-base sentinel (no CSS rule consumes `var(--offset)` today).
+
 **Status (revision 2, 2026-05-07):** Mockup revision 2 complete per `MOCKUP-REVISION-2-HANDOFF.md`. 15 concept PNGs + 2 audit composites re-rendered. All six handoff issues addressed:
 
 1. **Issue 1 — Broad raised matrix.** Most interactables now lift in raised mode (primary/secondary/ghost buttons, selected & unselected tabs, panels, dialogs, list cards, brand mark, chips, selected list rows, toggle thumb, checkbox, progress fill). Explicit do-not-raise list (text inputs, passive labels, kickers, h2 headers, scrollbar, separators, unselected list rows, focus ring, state-strip demo swatches) stays flat.
@@ -23,7 +27,7 @@
 | Per-direction shape-language tokens encoded | PASS | All 10 axes per direction; `shape_language` block in `directions.json`, mirrored in `NEOCADE_DIRECTIONS[*].shape` in JS for file:// runtime. Revision-2 radius spread (0/8/14/18/26) committed. |
 | Artboard CSS does NOT hard-code shape tokens | PASS | `.nc-artboard` reads `var(--radius-base)`, `var(--button-pad-h)`, etc.; no `--radius: 12px` literal anywhere on the artboard or board path. |
 | Artboard CSS does NOT hard-code platform sizes | PASS | `.nc-art-button` reads `var(--button-min)`; `.nc-art-input` reads `var(--input-min)`; `.nc-art-list-row` reads `var(--row-min)`; etc. `.nc-artboard.mobile` only overrides physical width/height, not control sizes. |
-| Per-color offset tokens emitted | PASS | `deriveSurfaceRamp()` emits `accent_offset`, `surface_high_offset`, `surface_panel_offset`, `surface_overlay_offset`, `surface_low_offset` via `darken(hex, pct)` HSL helper at ~22% lightness reduction. |
+| Per-color offset tokens emitted | PASS | `deriveSurfaceRamp()` emits `accent_offset`, `surface_high_offset`, `surface_panel_offset`, `surface_overlay_offset`, `surface_low_offset` via `tintTowardBase(hex, base, 0.40)` (rev-3 — replaces rev-2's `darken()` which clamped to near-black on already-dark surfaces). Each offset is `mix(element_color, page_base, 40%)`, preserving hue at every brightness. |
 | Slideshow component bound | PASS | `concept-gallery.html` includes `<section class="nc-slideshow">`; `bindSlideshow()` wires arrows + keyboard + tabs; image transition is `none !important`. |
 | Flat concept output path | PASS | `concept-image.html?raised=false` renders the flat artboard. |
 | Raised concept output path | PASS | `concept-image.html?raised=true` renders the raised artboard with broad raise matrix and per-color offsets. |
@@ -57,8 +61,8 @@
 | anti-cyberpunk | PASS | No glow, no neon outlines, no synthwave tropes; bright green is daylight cabinet, not nightclub. |
 | anti-texture | PASS | Solid fills only; no patterns, gradients, embossing, or painterly chrome. |
 | anti-painterly-chrome / anti-embossing | PASS | All depth via hard offset, never via gradient or inner-shadow embossing. |
-| raised-mode feel | appropriate | 3px primary / 2px tab offsets read tactile without becoming toy-like; broad matrix lifts the interactable surfaces but inputs / scrollbars / unselected rows / passive labels stay flat. |
-| per-color offset (Issue 2) | PASS | START button bottom edge is darker green (matches the green hue, not near-black). Brand mark lifts on darker green. Selected tab lifts on darker green. Verified at full PNG resolution. |
+| raised-mode feel | appropriate | 3px primary / 2px tab offsets read tactile without becoming toy-like; broad matrix lifts the interactable surfaces but inputs / scrollbars / unselected rows / passive labels stay flat. All raised elements use color-tinted offsets in their own hue family — no near-black bottom edges anywhere (rev-3 fix landed for non-accent surfaces specifically). |
+| per-color offset (Issue 2 + rev-3) | PASS | START button bottom edge ≈ `#5CA352` (`mix(#8BFF6A, #151A2E, 40%)` — green family, not near-black). Cabinet-bezel brand mark, selected Lobby tab (offset stacks under the inset bottom-rule), Confirm primary in dialog all lift on green-tinted edges. Action-panel + dialog-stack + list-tree containers use `--surface-panel-offset` = `mix(surface_panel, base, 40%)`; popup overlay uses `--surface-overlay-offset` = `mix(surface_overlay, base, 40%)`; state-strip cells use `--surface-high-offset`. None near-black. |
 | dark-only compliance (D-28) | PASS | base `#151A2E`. |
 | shape-language differentiation (D-29) | 10/10 axes | Distinct on every axis from at least 3 of 4 siblings. 0px corners are categorically unique. |
 | greyscale sufficiency (D-30) | PASS | Reads as CABINET CONTROL PANEL. Sharp 0px corners + flush rectangular tab strip + square cabinet-bezel mark + uppercase-tracked kickers are unmistakable in greyscale. |
@@ -84,8 +88,8 @@
 | anti-cyberpunk | PASS | Restraint is the personality; cool sky-blue is professional, not neon. |
 | anti-texture | PASS | Solid fills, no decorative chrome. |
 | anti-painterly-chrome / anti-embossing | PASS | No gradients on chrome surfaces. |
-| raised-mode feel | appropriate | 2px primary, 1px tab/row/secondary — quiet broad matrix matches premium-tool restraint. |
-| per-color offset (Issue 2) | PASS | Start primary bottom edge is darker sky-blue (same hue, darker). Selected tab and brand-mark lifts also accent-darker. Inputs stay flat. |
+| raised-mode feel | appropriate | 2px primary, 1px tab/row/secondary — quiet broad matrix matches premium-tool restraint. All raised elements use color-tinted offsets in their own hue family — no near-black bottom edges anywhere (rev-3 fix landed for non-accent surfaces specifically). |
+| per-color offset (Issue 2 + rev-3) | PASS | Start primary bottom edge ≈ `#5A88A6` (`mix(#8BD3FF, #111820, 40%)` — sky-blue family, not near-black). Selected pill tab, rounded-square brand mark, Confirm primary all lift on subtle blue-tinted edges. Action panel + dialog stack + list/tree containers lift on `mix(surface_panel, base, 40%)` (cool slate-tinted, not black). Popup overlay lifts on `mix(surface_overlay, base, 40%)`. Selected list row uses `--surface-high-offset`. Inputs stay flat. Quiet 1-2px depths preserve premium-tool restraint while fixing the rev-2 black-edge issue. |
 | dark-only compliance (D-28) | PASS | base `#111820`. |
 | shape-language differentiation (D-29) | 10/10 axes | Pill chips + small-caps "01 action panel" kickers + narrow-spread surface ramp uniquely identify Slate. |
 | greyscale sufficiency (D-30) | PASS | Reads as PREMIUM TOOL APP. Pill chips + small-caps subtle kickers + smallest button surface deltas + narrowest surface ramp set it apart even without color. |
@@ -111,8 +115,8 @@
 | anti-cyberpunk | PASS | Friendly mobile-game brightness on dark berry, not nightclub. |
 | anti-texture | PASS | Solid berry surfaces, no patterns or stickers. |
 | anti-painterly-chrome / anti-embossing | PASS | Box-shadow hard offset only — no soft inner shadow / no fake bevels. The 1px accent-rim inner highlight on primary mimics the PLAY-button reference but stays in the flat-3D pattern. |
-| raised-mode feel | appropriate | 6px primary is the bubbliest in the set; broad matrix lifts buttons + panels + dialog + tabs + brand mark + thumb + check + progress; inputs / scrollbars / unselected rows / passive labels stay flat. |
-| per-color offset (Issue 2) | PASS — fidelity check passed | Start primary bottom edge is darker pink (`darken(#FFB3E6, 22%)` = `~#CC8BB8`), NOT near-black. Verified at full PNG resolution. Brand-mark circle, selected pill tabs, and Confirm primary in dialog all lift on darker-pink edges matching the user's PLAY-button reference. |
+| raised-mode feel | appropriate | 6px primary is the bubbliest in the set; broad matrix lifts buttons + panels + dialog + tabs + brand mark + thumb + check + progress; inputs / scrollbars / unselected rows / passive labels stay flat. All raised elements use color-tinted offsets in their own hue family — no near-black bottom edges anywhere (rev-3 fix landed for non-accent surfaces specifically). |
+| per-color offset (Issue 2 + rev-3) | PASS — fidelity check passed | Start primary bottom edge ≈ `#A77399` (`mix(#FFB3E6, #241326, 40%)` — darker berry-pink, pink family). Action-panel container, popup-surface dialog, brand-mark true-circle, state-strip cells, selected Cabinet A row, fully-rounded pill tabs, Confirm primary all lift on darker-berry tinted edges in the same hue family. Side-by-side compare against v0 `prize-pop-plaza-concept.png`: the candy-counter mood is recovered — every offset reads as a darker berry, never as a black slab. The rev-2 black-edge bug on dark-surface elements (panels, dialog, brand, state-strip) is gone. |
 | dark-only compliance (D-28) | PASS | base `#241326` (dark berry). |
 | shape-language differentiation (D-29) | 10/10 axes | Largest base radii (26px), true-circle brand mark (999px), fully-rounded pill chips, biggest raised offsets, fully-rounded primary — uniquely Bubble. |
 | greyscale sufficiency (D-30) | PASS | Reads as COZY MOBILE GAME. Circle brand mark + fully-rounded pill chips + biggest raised offsets are unmistakable in greyscale. |
@@ -138,8 +142,8 @@
 | anti-cyberpunk | PASS | Mint accent is daylight, not neon; halo decorations are soft auras, not glow rims. |
 | anti-texture | PASS | Solid teal surfaces, no patterns. |
 | anti-painterly-chrome / anti-embossing | PASS | Halos are CSS color-mix box-shadow, not painted gradient surfaces. |
-| raised-mode feel | appropriate | 3px primary, 2px tab — tactile without floating shells; sentence-case kickers reinforce calm tone. |
-| per-color offset (Issue 2) | PASS | Start primary bottom edge is darker mint (`darken(#76F2D1, 22%)` = ~`#3FBF99`), NOT near-black. Brand mark, selected tab with halo, and Confirm primary all lift on mint-darker. |
+| raised-mode feel | appropriate | 3px primary, 2px tab — tactile without floating shells; sentence-case kickers reinforce calm tone. All raised elements use color-tinted offsets in their own hue family — no near-black bottom edges anywhere (rev-3 fix landed for non-accent surfaces specifically). |
+| per-color offset (Issue 2 + rev-3) | PASS | Start primary bottom edge ≈ `#4BA08A` (`mix(#76F2D1, #0B2420, 40%)` — mint/teal family). Brand mark with halo, selected halo-tab, Confirm primary all lift on mint-tinted edges. Action panel + dialog stack + list/tree containers lift on `mix(surface_panel, base, 40%)` (deep teal-tinted, not black). Popup overlay lifts on `mix(surface_overlay, base, 40%)`. State-strip cells lift on `--surface-high-offset` in the teal family. The airy-lobby mood is preserved. |
 | dark-only compliance (D-28) | PASS | base `#0B2420`. |
 | shape-language differentiation (D-29) | 10/10 axes | Sentence-case kickers + brand-mark halo aura + mint-glow focus ring + 8px subtle rounding + airiest density distinguish Daybreak. |
 | greyscale sufficiency (D-30) | PASS | Reads as COMMUNITY LOBBY. Halos behind selected tab and brand mark are visible in greyscale; sentence-case kickers contrast Pulse / Bubble / Burst's uppercase. |
@@ -165,8 +169,8 @@
 | anti-cyberpunk | PASS | Celebratory bold gold reads achievement screen, not casino glow; no painted shine. |
 | anti-texture | PASS | Solid surfaces, no patterns. |
 | anti-painterly-chrome / anti-embossing | PASS | All emphasis via radius / size / weight / hard offset — never via faux 3D bevels. |
-| raised-mode feel | appropriate | 5px primary + 2px secondary creates clear depth hierarchy without becoming gimmicky; oversized 28px primary radius keeps the "event launcher" feel. |
-| per-color offset (Issue 2) | PASS | Start primary bottom edge is darker gold (`darken(#FFD166, 22%)` = ~`#CC9933`), NOT near-black. Asymmetric brand mark, oversized Confirm primary in dialog all lift on gold-darker. |
+| raised-mode feel | appropriate | 5px primary + 2px secondary creates clear depth hierarchy without becoming gimmicky; oversized 28px primary radius keeps the "event launcher" feel. All raised elements use color-tinted offsets in their own hue family — no near-black bottom edges anywhere (rev-3 fix landed for non-accent surfaces specifically). |
+| per-color offset (Issue 2 + rev-3) | PASS | Start primary bottom edge ≈ `#A68450` (`mix(#FFD166, #20112E, 40%)` — gold family). Asymmetric brand mark, oversized Confirm primary, asymmetric selected tab all lift on gold-tinted edges. Action panel + dialog stack + list/tree containers lift on `mix(surface_panel, base, 40%)` (dark plum-tinted, not black). Popup overlay lifts on `mix(surface_overlay, base, 40%)`. State-strip cells lift on `--surface-high-offset` in the plum family. Achievement-screen drama is preserved. |
 | dark-only compliance (D-28) | PASS | base `#20112E` (dark plum). |
 | shape-language differentiation (D-29) | 10/10 axes | Asymmetric brand mark + asymmetric selected tab + oversized 28px primary radius + biggest type weights uniquely identify Burst. |
 | greyscale sufficiency (D-30) | PASS | Reads as ACHIEVEMENT SCREEN. Asymmetric (visibly wider) selected Lobby tab + chunky asymmetric/tilted brand mark + biggest H1 + oversized primary radius. |
@@ -231,7 +235,7 @@ Each direction now visibly differentiates desktop and mobile, per Issue 6. The c
 - Mobile file-size sanity: every mobile PNG between ~200KB and ~400KB (taller than rev 1).
 - Anti-aliasing: text rendered via Inter system fallback. Shape-language differentiation does not depend on the specific font; type WEIGHT and KICKER STYLE are the differentiators, both of which render correctly.
 - Per-direction shape-language source-of-truth lives in `data/directions.json` `shape_language` blocks AND in JS `NEOCADE_DIRECTIONS[*].shape` (mirrored intentionally for file:// runtime). Revision-2 corner_radius and raised matrix changes committed in both.
-- Artboard CSS variable injection: every `.nc-artboard` element receives an inline `style="--radius-base: <r>px; --accent: <hex>; --button-min: <p>px; --accent-offset: <darkened-hex>; ..."` declaration set by `deriveTokens(direction, platform, raised)` in `src/neocade-mockups.js`. Revision-2 adds per-color offset tokens and platform sizing variables.
+- Artboard CSS variable injection: every `.nc-artboard` element receives an inline `style="--radius-base: <r>px; --accent: <hex>; --button-min: <p>px; --accent-offset: <tinted-hex>; ..."` declaration set by `deriveTokens(direction, platform, raised)` in `src/neocade-mockups.js`. Revision-2 added per-color offset tokens + platform sizing variables; revision-3 reformulated the offsets via `tintTowardBase()` (mix-toward-base 40%) so already-dark surfaces no longer floor at near-black.
 
 ## Forbidden-Surface Audit
 

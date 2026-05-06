@@ -302,9 +302,17 @@ function luminance(hex) {
  *
  * mix(hex, "#000000", pct) was producing "near-black" bottom edges on raised
  * elements regardless of element bg color (Neobrutalism look — explicitly
- * rejected by the user). Reducing HSL lightness instead preserves hue, so a
- * pink button gets a darker-pink offset (the user's PLAY-button reference).
- */
+ * rejected by the user). Reducing HSL lightness preserves hue, so a pink
+ * button gets a darker-pink offset (the user's PLAY-button reference).
+ *
+ * SUPERSEDED FOR OFFSET TOKENS by tintTowardBase() — see rev-3 handoff.
+ * darken() relied on HSL lightness subtraction, which clamps to 0 on already-
+ * dark surface colors (e.g. surface_panel ≈ L=10% minus 22 → L=0 → near-black).
+ * tintTowardBase() mixes the element color toward the page base instead,
+ * which never goes past the base lightness and preserves hue for both bright
+ * accent fills AND already-dark surface colors. darken() is retained because
+ * the legacy --offset alias (base_offset) still uses it for a distinct-from-
+ * base sentinel color (no CSS rule actually consumes var(--offset) today). */
 function rgbToHsl({ r, g, b }) {
   const rn = r / 255, gn = g / 255, bn = b / 255;
   const max = Math.max(rn, gn, bn);
@@ -351,11 +359,34 @@ function hslToRgb({ h, s, l }) {
  * The bottom-edge offset of a raised element should be the SAME hue as the
  * element bg, just darker — never near-black. ~22% is the default per the
  * handoff; smaller for already-light surfaces (overlay) where 22% goes too far.
+ *
+ * NOTE (rev-3): no longer used for the per-color offset tokens. See
+ * tintTowardBase() below. Retained for the legacy --offset alias.
  */
 function darken(hex, percent) {
   const { h, s, l } = rgbToHsl(hexToRgb(hex));
   const newL = Math.max(0, l - percent / 100);
   return rgbToHex(hslToRgb({ h, s, l: newL }));
+}
+
+/**
+ * Returns `elementHex` mixed `ratio` of the way toward `baseHex` — i.e., the
+ * element's color shifted partway toward the page background. This is the
+ * rev-3 replacement for `darken()` on the per-color offset tokens.
+ *
+ * Why mix-with-base, not HSL-darken:
+ *   darken() floors at L=0, so already-dark surface colors (e.g., Bubble's
+ *   surface_panel ≈ L=10%) lose hue and render near-black at -22%, which the
+ *   user calls "Neobrutalism" and rejects. Mixing toward base preserves hue
+ *   at every brightness — bright accents shift toward base (= darker accent in
+ *   the same hue family), already-dark surfaces shift gently toward base
+ *   (= subtly different in the same family, never past base, never black).
+ *
+ * Default ratio 0.40 per MOCKUP-REVISION-3-HANDOFF.md. Tune to 0.30..0.55 if
+ * surface offsets read too prominent (lower) or too subtle (higher).
+ */
+function tintTowardBase(elementHex, baseHex, ratio = 0.40) {
+  return mix(elementHex, baseHex, ratio);
 }
 
 /* --- token derivation per direction + platform ----------------------------- */
@@ -384,15 +415,23 @@ function deriveSurfaceRamp(direction) {
     surface_high,
     surface_overlay,
     outline,
-    /* Per-color offset tokens — each raised element's bottom edge is a darker
-     * variant of its OWN background, not a single near-black token. ~22% HSL
-     * lightness reduction; 18% for surface_overlay (which is already light, so
-     * 22% would crush hue). */
-    accent_offset: darken(accent, 22),
-    surface_high_offset: darken(surface_high, 22),
-    surface_panel_offset: darken(surface_panel, 22),
-    surface_overlay_offset: darken(surface_overlay, 18),
-    surface_low_offset: darken(surface_low, 22),
+    /* Per-color offset tokens (rev-3) — each raised element's bottom edge is a
+     * tinted variant of its OWN bg, mixed 40% toward the page base. Preserves
+     * hue at every brightness AND never goes past base on already-dark
+     * surfaces (the rev-2 darken-floored-at-0 → near-black panel-edge bug
+     * called out in MOCKUP-REVISION-3-HANDOFF.md). Verify visually: every
+     * raised element's bottom edge sits in its own hue family, never black.
+     *
+     * base_offset is intentionally left on darken() — it backs the legacy
+     * --offset alias and should remain distinct from base; tintTowardBase
+     * (base, base, 0.40) would degenerate to base itself. No CSS rule consumes
+     * var(--offset) today, but a future rule's fallback should not be the
+     * exact page color. */
+    accent_offset: tintTowardBase(accent, base, 0.40),
+    surface_high_offset: tintTowardBase(surface_high, base, 0.40),
+    surface_panel_offset: tintTowardBase(surface_panel, base, 0.40),
+    surface_overlay_offset: tintTowardBase(surface_overlay, base, 0.40),
+    surface_low_offset: tintTowardBase(surface_low, base, 0.40),
     base_offset: darken(base, 22)
   };
 }

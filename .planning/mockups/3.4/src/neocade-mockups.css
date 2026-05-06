@@ -357,9 +357,12 @@ h3 {
  *     STAYS FLAT: text inputs (recessed), passive labels/kickers/headers,
  *                 scrollbar track + grabber, separators, unselected list rows,
  *                 focus ring (already emphatic), state-strip demo swatches.
- *   Each lifted element's bottom-edge offset is a darker variant of its OWN
- *   background color (per-color offset tokens), never a single near-black
- *   token. See `darken()` helper + `deriveSurfaceRamp()` in JS.
+ *   Each lifted element's bottom-edge offset is a tinted variant of its OWN
+ *   background color (per-color offset tokens), mixed 40% toward the page
+ *   base — never a single near-black token. See `tintTowardBase()` helper +
+ *   `deriveSurfaceRamp()` in JS (rev-3 replaces rev-2's `darken()` which
+ *   floored at lightness 0 on already-dark surfaces, producing the black
+ *   panel edges the user called out).
  * ============================================================================ */
 
 .nc-artboard {
