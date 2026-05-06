@@ -1,9 +1,9 @@
 # Requirements: NeoCade Theme
 
 **Defined:** 2026-05-04
-**Core Value:** A drop-in Godot 4.6 dark Theme resource that styles every built-in user-facing Control to a `godot-minimal-theme` bar of feature-completeness, with an arcade-inspired neon visual identity that is colorful, professional, accessible, and universal across editor + runtime + all 6 Godot export targets, distributed as a single addon at `res://addons/neocade_theme/`, with a sibling `neocade_mobile_theme.tres` mobile-tuned variant.
+**Core Value:** A drop-in Godot 4.6 flat-MD3/MD3-Expressive Theme system that styles every built-in user-facing Control to a `godot-minimal-theme` bar of feature-completeness, with a colorful, professional, accessible arcade identity and universal editor + runtime + all-6-export-target support. v1 ships one concrete `NeoCadeTheme` class at `res://addons/neocade_theme/neocade_theme.gd` plus 5 data-only direction `.tres` resources at the addon root (`pulse`, `slate`, `bubble`, `daybreak`, `burst`); mobile is an `@export platform=MOBILE` mode on the same resources, not a sibling `neocade_mobile_theme.tres`.
 
-> **Authoritative inputs:** PROJECT.md (constraints + hard rules), `.planning/research/SUMMARY.md` (synthesis + Conflict resolutions + 11-phase plan + UD-1..6), `.planning/research/FEATURES.md` (35-class coverage matrix + 13 type variations + anti-features), `.planning/research/CROSS-PLATFORM.md` (mobile spec + per-target validation), `.planning/research/PITFALLS.md` (10 categories of gotchas + prevention), `.planning/research/EDITOR-COVERAGE.md` (themed-vs-default editor surfaces), `.planning/research/SOURCES.md` (per-source dossier).
+> **Authoritative inputs:** PROJECT.md (constraints + hard rules), `.planning/ROADMAP.md` (15-phase redirected roadmap), `.planning/research/SUMMARY.md` (original synthesis + Conflict resolutions + UD-1..6; superseded where later Phase 3.x artifacts explicitly say so), `.planning/research/FEATURES.md` (35-class coverage matrix + 13 type variations + anti-features), `.planning/research/MINIMAL-THEME-COVERAGE-DELTA.md` (37-row scorecard reconciliation), `.planning/research/CROSS-PLATFORM.md` (mobile spec + per-target validation), `.planning/research/PITFALLS.md` (10 categories of gotchas + prevention), `.planning/research/EDITOR-COVERAGE.md` (themed-vs-default editor surfaces), `.planning/research/SOURCES.md` (per-source dossier).
 
 ## v1 Requirements
 
@@ -19,18 +19,18 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Design Mockups & Approval Gate (DESIGN)
 
-- [x] **DESIGN-01**: Phase 3 produces 3 HTML/SVG palette mockups in `.planning/mockups/` showing surface ramp + accent palette + sample Controls for each of the 3 candidate palettes (A: Midnight Marquee, B: Boardwalk Sunset recommended, C: Cabinet Chrome). User selects one at Step 1 approval.
-- [x] **DESIGN-02**: Phase 3 produces 2 typography mockups exploring Variant A (Inter-only — recommended per FONT-REVIEW.md applying consistency principle) vs Variant B (Inter + Outfit headings — override option if user prefers two-stylistic-face design at the gate). User selects one at Step 2 approval.
-- [ ] **DESIGN-03**: Phase 3 produces 1 full-fidelity desktop Control gallery HTML mockup showing every Godot Control class with realistic content, all states visible, ~1500 lines HTML+CSS. Approved by user at Step 3.
-- [ ] **DESIGN-04**: Phase 3 produces 1 mobile-variant mockup (per ARCHITECTURE Section 6 Step 5b) showing the same Controls at mobile sizes (360×800 + 768×1024 viewports) with tap-target overlays visible (≥48px); approved together with DESIGN-03.
-- [ ] **DESIGN-05**: `DESIGN_TOKENS.md` finalized with both desktop and mobile token blocks (color tokens, typography scale, spacing scale, corner radius scale, stroke widths, elevation/surface ramp, interaction state opacities). Committed before any `.tres` styling work begins.
+- [x] **DESIGN-01** *(superseded by Phase 3 redirect, preserved historically)*: Phase 3 v0 produced palette/direction artifacts in `.planning/mockups/`; user rejected the painterly direction and the requirement was replaced by Phase 3.3's approved five dark flat-MD3 directions plus Phase 3.4 Stage 1 concept boards.
+- [x] **DESIGN-02** *(superseded by UD-4 Option D, preserved historically)*: Typography gate resolved to Inter Variable Roman only in v1; Outfit, Inter Italic, Noto Sans, and JetBrains Mono are deferred/consumer-side.
+- [ ] **DESIGN-03** *(now Phase 3.4 Plan 03, in progress)*: Full-fidelity Pulse 4-grid HTML mockup shows the implementation-priority direction across flat desktop, flat mobile, raised desktop, and raised mobile with realistic Control content and required state combinations. Approved by user at the Phase 3.4 final approval checkpoint.
+- [ ] **DESIGN-04** *(now Phase 3.4 Plan 03, in progress)*: Mobile mockup evidence is included in the Pulse 4-grid with mobile sizing/tap-target audit notes; approved together with DESIGN-03.
+- [ ] **DESIGN-05** *(Phase 3.4 Plan 04)*: `DESIGN_TOKENS.md` finalized with desktop/mobile, flat/raised, and per-direction data-resource token blocks (color tokens, typography scale, spacing scale, corner radius/shape values, stroke widths, elevation/surface ramp, interaction state opacities). Committed before any addon `.tres`/`.gd` styling work begins.
 - [x] **DESIGN-06**: Mockup approval gate is an explicit blocker — no `.tres` styling commits until approved. Maximum 3 revision rounds; if not approved by round 3, escalation discussion before proceeding.
 
 ### Theme Foundation (FOUND)
 
 - [ ] **FOUND-01** *(rewritten 2026-05-06e for single-class data-driven architecture; supersedes prior versions)*: `addons/neocade_theme/` directory layout: `fonts/` and `icons/` subdirs (preserved for asset organization); addon root contains exactly **1 `.gd` file** (`neocade_theme.gd` — `@tool class_name NeoCadeTheme extends Theme`, concrete and instantiable, NOT abstract), **N `.tres` files** (`{name}_neocade_theme.tres`, one per approved direction, each `[gd_resource type="NeoCadeTheme" format=3]` with its direction's `@export` values saved), and addon metadata (`OFL.txt`, `LICENSE.md`, `README.md`, `CHANGELOG.md`, `VERSION`). For the v1 approved set {Pulse, Slate, Bubble, Daybreak, Burst}: **1 `.gd` + 5 `.tres` at the addon root**. **No per-direction `.gd` files** (each direction is purely data on the single class). **No `_dev/` subfolder.** **No `themes/` subfolder.** **No root `neocade_theme.tres`.** **No `neocade_mobile_theme.tres`** (mobile is a `@export platform=MOBILE` toggle on `NeoCadeTheme`). **No `plugin.cfg`** (per STACK Decision 5).
 - [ ] **FOUND-02** *(rewritten 2026-05-06f for finalized 9-property `@export` set + `is_light` semantics)*: `addons/neocade_theme/neocade_theme.gd` is `@tool class_name NeoCadeTheme extends Theme` — the **single, concrete, instantiable** class with **9 `@export` properties total**. **Core (4):** `base_color: Color`, `accent_color: Color`, `raised: bool`, `platform: {DESKTOP, MOBILE, AUTO}`. **Shape (5, under `@export_group("Shape")`):** `corner_radius: int`, `spacing: int`, `raised_strength: int`, `focus_thickness: int`, `outline_width: int`. The `@export` set is intentionally minimal — limited to values that should be consistent across the entire theme. Per-direction unique mood lives in Theme Editor entry overrides per `.tres` (StyleBoxFlat per Control state with direction-specific bg/border/padding/content_margin/icons), NOT in a long list of exports. The `_regenerate_theme()` method dynamically populates derived theme entry color/state values from the `@export` values via formulas; computes `var is_light: bool = base_color.get_luminance() >= 0.5` internally (dark default; `is_light` flags deviation) and branches all conditional formulas on `is_light` (godot-minimal-theme line-56 pattern with renamed/inverted variable for project-default-dark clarity). Setters on every `@export` property trigger `_regenerate_theme()`. The class is **NOT abstract** — users can instance it directly (`NeoCadeTheme.new()`) or save custom `.tres` files of type `NeoCadeTheme` to author their own themes. Convention: any future paired x/y `@export` values use `Vector2i`.
-- [ ] **FOUND-03** *(rewritten 2026-05-06e for single-class data-driven architecture)*: Each per-direction `.tres` at `addons/neocade_theme/{name}_neocade_theme.tres` is `[gd_resource type="NeoCadeTheme" format=3]` with its direction's `@export` values saved. Loading any of these into a Godot scene yields a `NeoCadeTheme` instance that automatically calls `_regenerate_theme()` to populate entries for ALL 35 user-facing Control classes + Window + tooltip types + 13 type variations. **No per-Control entry blocks are serialized** — entries are computed at load time. Optional per-`.tres` Theme Editor entry overrides are stored as additional sections in the `.tres` and survive `_regenerate_theme()` if Phase 4 designs the regenerate logic to preserve manual overrides on a flagged subset of entries.
+- [ ] **FOUND-03** *(rewritten 2026-05-06e for single-class data-driven architecture)*: Each per-direction `.tres` at `addons/neocade_theme/{name}_neocade_theme.tres` is `[gd_resource type="NeoCadeTheme" format=3]` with its direction's `@export` values saved. Loading any of these into a Godot scene yields a `NeoCadeTheme` instance that automatically calls `_regenerate_theme()` to populate entries for ALL 37 scorecard Control rows + 13 type variations. Optional per-`.tres` Theme Editor entry overrides are stored as additional sections in the `.tres` and survive `_regenerate_theme()` if Phase 4 designs the regenerate logic to preserve manual overrides on a flagged subset of entries.
 
 ### Fonts (FONT)
 
@@ -120,7 +120,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Mobile Variant (MOBILE)
 
-- [ ] **MOBILE-01** *(rewritten 2026-05-06d; superseded the separate-mobile-tres approach)*: Mobile sizing is a `@export platform=MOBILE` toggle on the abstract `NeoCadeTheme` base class — NOT a separate `.tres` file. Setting `platform=MOBILE` (or `platform=AUTO` on a mobile target) triggers `_regenerate_theme()` to use mobile-tuned constants (44pt iOS / 48dp Android tap targets, 16px body vs 14px desktop, +50% spacing on `space.4+` per Phase 8 mobile-sizing branch). Every concrete subclass `.tres` exposes `platform` as an inherited inspector property; consumers can ship the same subclass `.tres` and switch platforms at instantiation or via `@export platform=AUTO` for runtime detection.
+- [ ] **MOBILE-01** *(rewritten 2026-05-06d/f; supersedes the separate-mobile-tres and abstract-base approaches)*: Mobile sizing is a `@export platform=MOBILE` toggle on the single concrete `NeoCadeTheme` class — NOT a separate `.tres` file. Setting `platform=MOBILE` (or `platform=AUTO` on a mobile target) triggers `_regenerate_theme()` to use mobile-tuned constants (44pt iOS / 48dp Android tap targets, 16px body vs 14px desktop, +50% spacing on `space.4+` per Phase 8 mobile-sizing branch). Every direction `.tres` exposes `platform`; consumers can ship the same direction `.tres` and switch platforms at instantiation or via `platform=AUTO` for runtime detection.
 - [ ] **MOBILE-02**: Tap targets ≥48px (Godot pixels at base scale 1.0) on every interactive Control in the mobile theme. Satisfies iOS HIG 44pt minimum + Material 3 48dp minimum simultaneously.
 - [ ] **MOBILE-03**: Body text 16px on mobile vs 14px desktop. Headings retain their desktop sizes (Inter at opsz=32 + wght=700-800; no scale change for headings).
 - [ ] **MOBILE-04**: Spacing scale +50% on `space.4` and above on mobile. Corner radii STAY IDENTICAL across desktop/mobile (brand identity, not platform-specific).
@@ -132,13 +132,13 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 ### Showcase Scene (SHOW)
 
 - [ ] **SHOW-01**: `res://main.tscn` is the showcase scene; applied as project main scene. Uses NeoCade Theme as project theme (or per-scene `theme` override if leak avoidance preferred).
-- [ ] **SHOW-02**: Showcase scene contains 9 sections covering all 35 Control classes + Token Gallery + Coverage Verification: Buttons / Text Inputs / Numbers & Range / Selection & Lists / Containers & Layout / Dialogs & Popups / Advanced & Graph / Token Gallery / Coverage 35/35.
+- [ ] **SHOW-02**: Showcase scene contains 9 sections covering all 37 scorecard Control rows + Token Gallery + Coverage Verification: Buttons / Text Inputs / Numbers & Range / Selection & Lists / Containers & Layout / Dialogs & Popups / Advanced & Graph / Token Gallery / Coverage 37/37.
 - [ ] **SHOW-03**: Realistic sample content per Control (Tree with multi-level items, ItemList with options, OptionButton with multiple options, etc.) per PITFALLS 10.1 — empty controls render invisibly.
-- [ ] **SHOW-04**: Three-way prominent floating theme toggle button: NeoCade desktop ↔ NeoCade mobile ↔ Godot default. Bigger than other controls so its purpose is obvious. Toggles via inline `theme_overrides` (per PITFALLS 10.3 — clean state switching).
+- [ ] **SHOW-04**: Prominent floating theme/variation control panel: direction picker (Pulse/Slate/Bubble/Daybreak/Burst + Godot default), raised toggle, and platform selector (DESKTOP/MOBILE/AUTO). Bigger than other controls so its purpose is obvious. Toggles mutate the active `NeoCadeTheme` resource exports and verify clean state switching (per PITFALLS 10.3).
 - [ ] **SHOW-05**: BBCode demo in RichTextLabel section showcasing inline color/weight/italic.
 - [ ] **SHOW-06**: `accessibility_name` set on every interactive Control in showcase (per PITFALLS 2.5 + 4.4 — minimum bar for screen-reader sanity in v1).
 - [ ] **SHOW-07**: Token Gallery section displays each design token visually (color swatches with hex + role label, type scale samples, spacing/radius scale visualizations).
-- [ ] **SHOW-08**: Coverage Verification strip displays "35/35 Controls themed ✓" or accurate count if any deferred.
+- [ ] **SHOW-08**: Coverage Verification strip displays "37/37 Controls themed ✓" or accurate count if any deferred.
 
 ### Cross-Platform Export (EXPORT)
 
@@ -157,7 +157,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [ ] **A11Y-02**: Visible focus indicator on every focusable Control (covers SC 2.4.7 + SC 1.4.11). Drawn as 2px outer ring outside `corner_radius` so it doesn't lose to pressed/checked replacement styleboxes (PITFALLS 1.1).
 - [ ] **A11Y-03**: No information conveyed by color alone. Status states (success/warning/danger) include icon + text label + color cue.
 - [ ] **A11Y-04**: Color-blindness verification pass: showcase rendered through deuteranopia, protanopia, tritanopia simulation; legibility confirmed for status/role colors.
-- [ ] **A11Y-05**: Multi-script label test: Latin / Cyrillic / Arabic / Hebrew / Devanagari labels render correctly via `default_font.fallbacks` chain through Inter + Noto Sans.
+- [ ] **A11Y-05**: Multi-script label test: Latin / Cyrillic / Arabic / Hebrew / Devanagari labels render correctly via Inter plus `Font.allow_system_fallback = true`, with optional consumer-supplied Noto Sans fallbacks documented for projects that need designed-together script harmony.
 - [ ] **A11Y-06**: `accessibility_name` set on every interactive Control in showcase (Godot 4.5 API, partial AccessKit integration in 4.6). Deeper screen-reader QA (VoiceOver/TalkBack) deferred to v1.x per UD-6.
 
 ### QA & Visual Regression (QA)
@@ -206,7 +206,7 @@ Deferred to future release. Tracked but not in v1 roadmap.
 ### Light Mode
 
 - **LIGHT-01**: Light color mode for desktop theme (`neocade_theme_light.tres`)
-- **LIGHT-02**: Light color mode for mobile theme (`neocade_mobile_theme_light.tres`) — IF mobile-light is in v2 scope (per PROJECT.md note that mobile-light may stay deferred even in v2)
+- **LIGHT-02**: Light color mode behavior for `platform=MOBILE` on light direction resources — IF mobile-light is in v2 scope (per PROJECT.md note that mobile-light may stay deferred even in v2)
 
 ### Alternate Palettes
 
@@ -266,21 +266,21 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Phase mapping per ROADMAP.md (which adopts SUMMARY.md's 11-phase plan verbatim). Every v1 REQ-ID maps to exactly ONE primary phase. Cumulative requirements (those whose work accrues across multiple phases) are assigned a primary phase with explicit cumulative reasoning.
+Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by SUMMARY.md's 11-phase plan, then updated by Phase 3 redirect and 2026-05-06e/f architecture simplification). Every v1 REQ-ID maps to exactly ONE primary phase. Cumulative requirements (those whose work accrues across multiple phases) are assigned a primary phase with explicit cumulative reasoning.
 
 | Requirement | Primary Phase | Cumulative Contributors | Status |
 |-------------|---------------|------------------------|--------|
-| RES-01 | Phase 1 (Source-Dive: godot-minimal-theme `.tres` dissection) | — | Pending |
+| RES-01 | Phase 1 (Source-Dive: godot-minimal-theme `.tres` dissection) | — | Complete |
 | RES-02 | Phase 2 (Source-Dive: LDtk source UI mining) | — | Complete |
-| RES-03 | Phase 3 (mood-board sub-spike) | — | Pending |
-| RES-04 | Phase 3 (MCP tooling baseline sub-spike — UD-1) | — | Pending |
+| RES-03 | Phase 3 (mood-board sub-spike) | — | Complete |
+| RES-04 | Phase 3 (MCP tooling baseline sub-spike — UD-1) | — | Complete |
 | ~~RES-05~~ | _STRICKEN 2026-05-04 — no AssetLib in v1_ | — | _N/A_ |
-| DESIGN-01 | Phase 3 (Step 1 palette mockups) | — | Pending |
-| DESIGN-02 | Phase 3 (Step 2 typography mockups) | — | Pending |
-| DESIGN-03 | Phase 3 (Step 3 desktop full-fidelity gallery) | — | Pending |
-| DESIGN-04 | Phase 3 (Step 3 mobile mockup) | — | Pending |
-| DESIGN-05 | Phase 3 (`DESIGN_TOKENS.md` finalized pre-Phase-4) | — | Pending |
-| DESIGN-06 | Phase 3 (gate enforcement) | — | Pending |
+| DESIGN-01 | Phase 3/3.4 (palette/direction mockups; v0 superseded, flat-MD3 replacement approved) | — | Complete / Superseded |
+| DESIGN-02 | Phase 3/3.4 (typography gate; Inter-only v1 locked) | — | Complete / Superseded |
+| DESIGN-03 | Phase 3.4 Plan 03 (Pulse full-fidelity 4-grid desktop evidence) | — | In Progress |
+| DESIGN-04 | Phase 3.4 Plan 03 (Pulse mobile 4-grid evidence) | — | In Progress |
+| DESIGN-05 | Phase 3.4 Plan 04 (`DESIGN_TOKENS.md` finalized pre-Phase-4) | — | Pending |
+| DESIGN-06 | Phase 3.4 (gate enforcement) | — | Active |
 | FOUND-01 | Phase 4 (addon directory layout) | — | Pending |
 | FOUND-02 | Phase 4 (`@tool` generator script) | — | Pending |
 | FOUND-03 | Phase 4 (empty-but-valid `.tres` scaffolds) | — | Pending |
@@ -307,7 +307,7 @@ Phase mapping per ROADMAP.md (which adopts SUMMARY.md's 11-phase plan verbatim).
 | TOKEN-08 | Phase 3 (no-shadows policy) | Phase 4 (`shadow_size = -1` everywhere) | Pending |
 | TOKEN-09 | Phase 3 (M3 state-layer model) | Phase 4 | Pending |
 | TOKEN-10 | Phase 3 (M3 type scale spine) | Phase 4 | Pending |
-| COV-01 | Phase 7 (35/35 desktop coverage closes here) | Phase 5 + Phase 6 (cumulative authoring) | Pending |
+| COV-01 | Phase 7 (37/37 scorecard desktop coverage closes here) | Phase 5 + Phase 6 (cumulative authoring) | Pending |
 | COV-02 | Phase 5 (Core Controls — BaseButton family) | — | Pending |
 | COV-03 | Phase 5 (Core Controls — text classes) | — | Pending |
 | COV-04 | Phase 6 (range controls) | — | Pending |
@@ -332,7 +332,7 @@ Phase mapping per ROADMAP.md (which adopts SUMMARY.md's 11-phase plan verbatim).
 | MOBILE-07 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Pending |
 | MOBILE-08 | Phase 8 (NeoCade identity preservation) | — | Pending |
 | SHOW-01 | Phase 9 (`res://main.tscn` as project main scene) | — | Pending |
-| SHOW-02 | Phase 9 (9 sections / 35 classes covered) | — | Pending |
+| SHOW-02 | Phase 9 (9 sections / 37 scorecard rows covered) | — | Pending |
 | SHOW-03 | Phase 9 (realistic sample content) | — | Pending |
 | SHOW-04 | Phase 9 (three-way theme toggle) | — | Pending |
 | SHOW-05 | Phase 9 (BBCode demo) | — | Pending |
@@ -382,7 +382,7 @@ Phase mapping per ROADMAP.md (which adopts SUMMARY.md's 11-phase plan verbatim).
 | DOCS-02 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Pending |
 | DOCS-03 | Already complete (EDITOR-COVERAGE.md exists) | — | Complete |
 | DOCS-04 | Phase 11 (README — closes DIST-04) | — | Pending |
-| DOCS-05 | Phase 1 (initial SOURCES.md update) | Phase 2 + Phase 3 (continuous update through source-dive spikes) | Pending |
+| DOCS-05 | Phase 1 (initial SOURCES.md update) | Phase 2 + Phase 3.x (continuous update through source-dive spikes) | Complete / Ongoing |
 
 **Coverage:**
 - v1 requirements: 99 total (RES-5, DESIGN-6, FOUND-3, FONT-9, ICON-4, TOKEN-10, COV-10, TYPEVAR-6, MOBILE-8, SHOW-8, EXPORT-8, A11Y-6, QA-6, DIST-5, DOCS-5)
@@ -403,11 +403,11 @@ Phase mapping per ROADMAP.md (which adopts SUMMARY.md's 11-phase plan verbatim).
 - Phase 10: 21 (COV-10, EXPORT-01..08, A11Y-01..06, QA-01..06)
 - Phase 11: 7 (RES-05, DIST-01..05, DOCS-04)
 
-**Mockup approval gate:** Hard blocker between Phase 3 and Phase 4. No `.tres` styling commits permitted before Step 3 user approval is logged in writing.
+**Mockup approval gate:** Hard blocker between Phase 3.4 and Phase 4. No addon `.tres`/`.gd` styling commits permitted before Phase 3.4 final approval is logged and DESIGN_TOKENS.md is written.
 
 **Open user decisions (UD-1..UD-6):** Tracked in-phase per ROADMAP.md "Coverage Summary" section. None block roadmap creation.
 
 ---
 *Requirements defined: 2026-05-04*
-*Last updated: 2026-05-04 after ROADMAP.md authoring — Traceability finalized to primary-phase + cumulative-contributors model*
-*Next update trigger: Phase plan authoring may surface additional requirements or move some to v1.x*
+*Last updated: 2026-05-06 — synchronized with Phase 3.4 Plan 02 closeout, current Plan 03 execution, 37-row scorecard wording, and single-class/data-`.tres` architecture*
+*Next update trigger: Phase 3.4 Plan 04 DESIGN_TOKENS.md closeout or Phase 4 planning*

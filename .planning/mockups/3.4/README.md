@@ -1,6 +1,6 @@
 # Phase 3.4 Mockup Pipeline
 
-> **Status (2026-05-06):** Plan 02 re-executed by Claude Code under the per-direction shape-language contract. 15 concept PNGs in `concepts/` pass D-28 (dark-only), D-29 (10-axis differentiation), and D-30 (greyscale sufficiency — each direction reads as the right mood without color). **Awaiting user finalist selection** at the Plan 02 Task 4 gate. See `render-check.md` for the per-direction audit and `screenshots/greyscale-sufficiency-test.png` for the D-30 composite. Plan 03 (finalist 4-grid) does NOT start until `finalist-selection.md` exists.
+> **Status (2026-05-06):** Plan 02 re-executed by Claude Code under the per-direction shape-language contract and is closed. 15 concept PNGs in `concepts/` pass D-28 (dark-only), D-29 (10-axis differentiation), and D-30 (greyscale sufficiency — each direction reads as the right mood without color). User selected **Pulse** as the v1 recommended starter / implementation priority, while Slate, Bubble, Daybreak, and Burst remain v1 personality variations. **Plan 03 is paused at the final approval gate**: Pulse full-fidelity 4-grid + full Control/state matrix + color override row are complete; `.planning/mockups/3.4/final-approval.md` is still missing.
 
 This directory contains the visual contract workspace for Phase 3.4. It is planning-only: no production theme resources, scene files, project settings, fonts, icons, or files under `addons/neocade_theme/` are edited here.
 
@@ -28,7 +28,7 @@ Directions: Pulse, Slate, Bubble, Daybreak, Burst. Every direction shows both fl
 
 ## User Gate 1
 
-After the 10 boards are reviewable, the user gate asks for 1-3 finalist directions. Selecting a finalist chooses the direction itself; both flat and raised variants remain supported.
+After the 15 boards are reviewable, the user gate asks for finalist directions. This gate is closed: Pulse is the recommended starter / implementation priority, and all five directions remain approved for v1 ship as personality variations.
 
 The decision file is:
 
@@ -47,7 +47,7 @@ The finalist gallery also includes `base_color` and `accent_color` override prev
 
 ## User Gate 2
 
-After finalist review, the user approves N final themes and chooses exactly one approved direction as the `NeoCadeTheme` base direction. That decision unlocks `DESIGN_TOKENS.md`.
+After finalist review, the user approves final themes and confirms exactly one approved direction as the recommended starter direction. This has no architectural privilege; it only sets the showcase default and README "try this first" suggestion. That decision unlocks `DESIGN_TOKENS.md`.
 
 The decision file is:
 
@@ -84,6 +84,6 @@ Outputs land in `.planning/mockups/3.4/concepts/` (per-direction PNGs) and `.pla
 Phase 4 may begin only after:
 
 - finalist selection is recorded;
-- final approval and base direction are recorded;
+- final approval and recommended starter are recorded;
 - `DESIGN_TOKENS.md` exists;
 - the closeout audit confirms no production files changed.
