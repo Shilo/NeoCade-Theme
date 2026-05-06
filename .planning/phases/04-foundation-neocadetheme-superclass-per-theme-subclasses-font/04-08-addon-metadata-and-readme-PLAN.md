@@ -73,7 +73,8 @@ Per FOUND-01, the addon's distribution layout is:
   - `README.md` (this plan)
   - `fonts/` (Plan 04-02)
   - `icons/` (Plan 04-03)
-  - `_phase4_verify.gd` (Plan 04-06; deleted in Phase 11)
+
+NOTE (Cycle 6 F3 fix 2026-05-06): build-time helpers (`_phase4_import.gd`, `_phase4_verify.gd`, `_phase4_verify_headless.gd`) live UNDER `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/` — NOT in the addon root. FOUND-01 / Phase 4 SC#1 mandates exactly 1 .gd file at `addons/neocade_theme/`: `neocade_theme.gd`. Helpers are non-shipping by location; no Phase 11 cleanup is required.
 
 NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is not an editor plugin; consumers preload `.tres` files directly.
 </interfaces>
@@ -184,8 +185,12 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
       (wght=600, opsz=24), Body (wght=400), Caption (wght=400).
     - 10 bespoke monochrome SVG Button-family icons at `icons/`: check,
       checkbox_checked, checkbox_unchecked, radio_checked, radio_unchecked,
-      toggle_on, toggle_off, arrow_down, clear, close — all 32×32 reference,
-      Scale=2.0 + Linear With Mipmaps import.
+      checkbutton_checked, checkbutton_unchecked, arrow_down, clear, close —
+      all 32×32 reference, Scale=2.0 + Linear With Mipmaps import.
+      (Cycle 6 F4 fix 2026-05-06: was `toggle_on`/`toggle_off`; renamed to
+      `checkbutton_checked`/`checkbutton_unchecked` to match Godot 4.6
+      CheckButton's `checked`/`unchecked` icon slot names per class_checkbutton.md.
+      6 disabled/mirrored CheckButton variants deferred to v1.x.)
     - SIL OFL 1.1 license text + Inter Reserved Font Name notice in `OFL.txt`.
     - Dynamic `_regenerate_theme()` engine that walks BINDING_TABLE covering
       all 37 canonical scorecard Godot 4.6 Control types (Cross-AI Cycle 2 L3
@@ -409,6 +414,8 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
     ```gdscript
     func _ready() -> void:
         var theme: NeoCadeTheme = preload("res://addons/neocade_theme/pulse_neocade_theme.tres").duplicate()
+        # theme.default_font is the FontFile (Inter-Variable.tres) per FONT-06; the cast succeeds.
+        # Cycle 6 F6 fix 2026-05-06: confirmed default_font is FontFile, not FontVariation.
         var inter: FontFile = theme.default_font as FontFile
         var cjk_fallback: FontFile = preload("res://path/to/NotoSansCJK-Regular.ttf")
         inter.fallbacks = [cjk_fallback]
@@ -539,8 +546,8 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
   <action>
     Verify the `addons/neocade_theme/` root layout matches the FOUND-01 + STACK Decision 5 contract:
 
-    Required files at `addons/neocade_theme/`:
-    - `neocade_theme.gd` ✓ (Plan 04-01/04/05)
+    Required files at `addons/neocade_theme/` (Cycle 6 F3 fix 2026-05-06: ONLY `neocade_theme.gd` at addon root — build-time helpers live OUTSIDE under `.planning/phases/04-.../helpers/`):
+    - `neocade_theme.gd` ✓ (Plan 04-01/04/05) — **the ONLY .gd file at addon root per FOUND-01 SC#1**
     - `pulse_neocade_theme.tres` ✓ (Plan 04-06)
     - `slate_neocade_theme.tres` ✓ (Plan 04-07)
     - `bubble_neocade_theme.tres` ✓ (Plan 04-07)
@@ -551,20 +558,26 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
     - `CHANGELOG.md` ✓ (this plan)
     - `VERSION` ✓ (this plan)
     - `README.md` ✓ (this plan)
-    - `_phase4_import.gd` ✓ (Plan 04-02/06/07 build-time helper; DELETED IN PHASE 11)
-    - `_phase4_verify.gd` ✓ (Plan 04-06; DELETED IN PHASE 11)
-    - `_phase4_verify_headless.gd` ✓ (Plan 04-06 Cross-AI Cycle 1 MEDIUM fix; DELETED IN PHASE 11)
 
     Required subdirectories:
     - `fonts/` ✓ (Plan 04-02)
     - `icons/` ✓ (Plan 04-03)
 
-    Forbidden (must NOT exist):
+    Required helpers OUTSIDE addon root (Cycle 6 F3 fix; verifier asserts these are NOT under `addons/neocade_theme/`):
+    - `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd` (Plan 04-02/06/07; non-shipping by location)
+    - `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd` (Plan 04-06)
+    - `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd` (Plan 04-06)
+
+    Forbidden at addon root (must NOT exist; Cycle 6 F3 explicitly enforced):
     - `addons/neocade_theme/plugin.cfg` (STACK Decision 5 / D-05)
     - `addons/neocade_theme/neocade_theme.tres` (deleted in Plan 04-01)
     - `addons/neocade_theme/_dev/` (per CONTEXT.md "Track 4")
     - `addons/neocade_theme/themes/` (per CONTEXT.md "Track 4")
     - `addons/neocade_theme/neocade_mobile_theme.tres` (per architecture revision; mobile is `@export`)
+    - `addons/neocade_theme/_phase4_import.gd` (Cycle 6 F3: helper must live under `.planning/phases/04-.../helpers/`)
+    - `addons/neocade_theme/_phase4_verify.gd` (Cycle 6 F3: helper must live under `.planning/phases/04-.../helpers/`)
+    - `addons/neocade_theme/_phase4_verify_headless.gd` (Cycle 6 F3: helper must live under `.planning/phases/04-.../helpers/`)
+    - **Cycle 6 F3 hardening:** the verifier ALSO asserts `addons/neocade_theme/` contains EXACTLY 1 `.gd` file (filtered by `Get-ChildItem -Filter *.gd`), and that file is `neocade_theme.gd` — catches future regressions where any helper or auxiliary .gd creeps back into the addon root.
 
     The verify command checks the presence of required files + absence of forbidden files. This task does NOT modify any files; it is a structural assertion that all prior plans landed correctly.
 
@@ -573,14 +586,16 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
     **Cross-AI Cycle 4 N5 fix (size assertion still holds with preserved script linkage):** Plan 04-06 Task 1's `_strip_theme_entries()` helper was updated to preserve `[ext_resource type="Script" ...]` blocks + `script = ExtResource(...)` / `script_class =` lines + strip stale `load_steps=N`. Preserved script ext_resource adds ~80-150 bytes per file; the < 2048-byte cap holds with margin. No change to Task 5's verify command — the size assertion is unchanged. Runtime `loaded is NeoCadeTheme` validation lives in Plan 04-06/04-07 verifiers (already in place), not here.
   </action>
   <acceptance_criteria>
-    - All 12 required files exist at the listed paths.
+    - All 11 required files exist at the listed paths under `addons/neocade_theme/` (Cycle 6 F3: down from 14 — 3 helpers relocated outside).
     - Both required subdirectories exist (`fonts/`, `icons/`).
-    - The 5 forbidden paths do NOT exist.
+    - The 8 forbidden paths do NOT exist (Cycle 6 F3: includes 3 helper paths at addon root).
+    - **Cycle 6 F3 fix:** `addons/neocade_theme/` contains EXACTLY 1 `.gd` file (filename: `neocade_theme.gd`).
+    - **Cycle 6 F3 fix:** All 3 helpers exist under `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/`.
     - **Cross-AI Cycle 3 N4 fix:** Each of the 5 direction `.tres` files (`pulse_neocade_theme.tres`, `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`, `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`) is < 2048 bytes (2 KiB) — data-only per SC#6.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$base='addons/neocade_theme'; $required=@('neocade_theme.gd','pulse_neocade_theme.tres','slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres','OFL.txt','LICENSE.md','CHANGELOG.md','VERSION','README.md','_phase4_import.gd','_phase4_verify.gd','_phase4_verify_headless.gd'); foreach($f in $required) { if (-not (Test-Path \"$base/$f\")) { throw \"required file missing: $f\" } }; foreach($d in 'fonts','icons') { if (-not (Test-Path -PathType Container \"$base/$d\")) { throw \"required dir missing: $d\" } }; foreach($forbidden in 'plugin.cfg','neocade_theme.tres','_dev','themes','neocade_mobile_theme.tres') { if (Test-Path \"$base/$forbidden\") { throw \"forbidden path exists: $forbidden\" } }; foreach($tres in 'pulse_neocade_theme.tres','slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres') { $sz=(Get-Item \"$base/$tres\").Length; if ($sz -ge 2048) { throw \"N4 fix layout-time check: $tres size $sz bytes >= 2048 (SC#6 < 2 KiB violated)\" } }"
+      powershell -NoProfile -Command "$base='addons/neocade_theme'; $required=@('neocade_theme.gd','pulse_neocade_theme.tres','slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres','OFL.txt','LICENSE.md','CHANGELOG.md','VERSION','README.md'); foreach($f in $required) { if (-not (Test-Path \"$base/$f\")) { throw \"required file missing: $f\" } }; foreach($d in 'fonts','icons') { if (-not (Test-Path -PathType Container \"$base/$d\")) { throw \"required dir missing: $d\" } }; foreach($forbidden in 'plugin.cfg','neocade_theme.tres','_dev','themes','neocade_mobile_theme.tres','_phase4_import.gd','_phase4_verify.gd','_phase4_verify_headless.gd') { if (Test-Path \"$base/$forbidden\") { throw \"Cycle 6 F3 / FOUND-01 SC#1 violation: forbidden path at addon root: $forbidden\" } }; $gdFiles = @(Get-ChildItem -Path $base -Filter '*.gd' -File); if ($gdFiles.Count -ne 1) { throw \"Cycle 6 F3 / FOUND-01 SC#1: addon root contains $($gdFiles.Count) .gd files, expected exactly 1 (neocade_theme.gd). Found: $($gdFiles.Name -join ', ')\" }; if ($gdFiles[0].Name -ne 'neocade_theme.gd') { throw \"Cycle 6 F3: the lone .gd at addon root is $($gdFiles[0].Name), expected neocade_theme.gd\" }; $helpersDir='.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers'; foreach($h in '_phase4_import.gd','_phase4_verify.gd','_phase4_verify_headless.gd') { if (-not (Test-Path \"$helpersDir/$h\")) { throw \"Cycle 6 F3: required helper missing at $helpersDir/$h\" } }; foreach($tres in 'pulse_neocade_theme.tres','slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres') { $sz=(Get-Item \"$base/$tres\").Length; if ($sz -ge 2048) { throw \"N4 fix layout-time check: $tres size $sz bytes >= 2048 (SC#6 < 2 KiB violated)\" } }"
     </automated>
   </verify>
   <done>Addon layout matches the FOUND-01 + STACK Decision 5 contract; no `plugin.cfg`; no scaffold residue; flat layout per CONTEXT.md "Track 4". Each direction `.tres` is data-only (< 2 KiB; SC#6 satisfied at layout time).</done>

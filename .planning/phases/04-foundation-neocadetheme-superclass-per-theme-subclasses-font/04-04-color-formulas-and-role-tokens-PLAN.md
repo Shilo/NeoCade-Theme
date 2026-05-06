@@ -24,7 +24,7 @@ must_haves:
     - "`_regenerate_theme()` derives `text_strong`, `text_default`, `text_muted` with the `is_light` branch values per DESIGN_TOKENS §6.4 (`#1B2230` / `#5A6478` for light; `#F7F8FB` / `#B9C1D0` for dark)."
     - "`_regenerate_theme()` derives `state_hover` and `state_pressed` per DESIGN_TOKENS §6.5; `state_hover` flips target with `is_light`; `state_pressed` always mixes toward BLACK."
     - "Helper `_make_raised_stylebox(bg: Color, offset_color: Color, raised_intensity: int) -> StyleBoxFlat` exists; sets `shadow_color = offset_color`, `shadow_size = raised_intensity` (or `-1` when `raised=false`), `shadow_offset = Vector2(0, raised_intensity)` (or `Vector2.ZERO` when flat)."
-    - "Cross-AI Cycle 1 C2 fix: a private const `DIRECTION_PRESETS: Dictionary` keyed by base_color hex string (`'#151A2E'`, `'#111820'`, `'#241326'`, `'#0B2420'`, `'#20112E'`) maps to a sub-dictionary with `spread_factor: float`, `hover_pct: float`, `pressed_pct: float`, `disabled_opacity: float` per DESIGN_TOKENS §5/§6 + directions.json: Pulse=1.3/6/-10/0.42, Slate=0.7/8/-12/0.50, Bubble=1.0/10/-12/0.45, Daybreak=1.0/8/-12/0.50, Burst=1.3/10/-14/0.45. Helper `_resolve_direction_presets() -> Dictionary` returns the sub-dict for `base_color.to_html(false)` (uppercased hex without alpha) or a fallback default if no match."
+    - "Cross-AI Cycle 1 C2 fix (F1 reconciliation 2026-05-06): a private const `DIRECTION_PRESETS: Dictionary` keyed by base_color hex string (`'#151A2E'`, `'#111820'`, `'#241326'`, `'#0B2420'`, `'#20112E'`) maps to a sub-dictionary with `spread_factor: float`, `hover_pct: float`, `pressed_pct: float`, `disabled_opacity: float` per DESIGN_TOKENS §5.1-§5.5 verbatim: Pulse=1.3/6/-10/0.42, Slate=0.7/4/-6/0.50, Bubble=1.0/8/-10/0.45, Daybreak=1.0/6/-6/0.50, Burst=1.3/8/-12/0.45. Helper `_resolve_direction_presets() -> Dictionary` returns the sub-dict for `base_color.to_html(false)` (uppercased hex without alpha) or a fallback default if no match."
     - "`_regenerate_theme()` consumes `_resolve_direction_presets()` to source `spread_factor`, `hover_pct`, `pressed_pct`, `disabled_opacity` per direction (no longer hard-coded 1.0 / 8 / 12 / 0.38). Cross-AI Cycle 1 C2 fix: per-direction surface ramp + state-layer deltas now actually differentiate the 5 directions."
     - "Helper `_resolve_platform() -> Platform` resolves `Platform.AUTO` to MOBILE/DESKTOP via `OS.has_feature(\"mobile\")` per DESIGN_TOKENS §10.2."
     - "Helper `_platform_tokens(p: Platform) -> Dictionary` returns the 14 platform tokens (buttonMin, primaryButtonMin, inputMin, toggleMin, checkboxSize, body, label_, h1, h2, kicker, rowMin, tabMin, tapPadding, densityScale) per DESIGN_TOKENS §10.1 with the correct desktop/mobile values."
@@ -288,16 +288,17 @@ Wave 2 — depends on Plan 04-01 only. Parallel-eligible with Plan 04-05 if 04-0
     ## Lookup is by base_color hex (uppercased, no alpha — matches `Color.to_html(false)`).
     ## Fallback default is medium-spread / M3-baseline if no match.
     const DIRECTION_PRESETS: Dictionary = {
-        # Pulse — base=#151A2E, accent=#8BFF6A, spread=wide, hover=6 (subtle), pressed=-10, disabled=0.42
-        "151A2E": {"spread_factor": 1.3, "hover_pct": 6.0,  "pressed_pct": -10.0, "disabled_opacity": 0.42},
-        # Slate — base=#111820, accent=#8BD3FF, spread=narrow, hover=8 (M3 baseline), pressed=-12, disabled=0.50
-        "111820": {"spread_factor": 0.7, "hover_pct": 8.0,  "pressed_pct": -12.0, "disabled_opacity": 0.50},
-        # Bubble — base=#241326, accent=#FFB3E6, spread=medium, hover=10 (lifted), pressed=-12, disabled=0.45
-        "241326": {"spread_factor": 1.0, "hover_pct": 10.0, "pressed_pct": -12.0, "disabled_opacity": 0.45},
-        # Daybreak — base=#0B2420, accent=#76F2D1, spread=medium, hover=8, pressed=-12, disabled=0.50
-        "0B2420": {"spread_factor": 1.0, "hover_pct": 8.0,  "pressed_pct": -12.0, "disabled_opacity": 0.50},
-        # Burst — base=#20112E, accent=#FFD166, spread=wide, hover=10, pressed=-14 (deeper), disabled=0.45
-        "20112E": {"spread_factor": 1.3, "hover_pct": 10.0, "pressed_pct": -14.0, "disabled_opacity": 0.45},
+        # Per-direction values reconciled to DESIGN_TOKENS §5.1-§5.5 verbatim (Cycle 6 F1 fix 2026-05-06).
+        # Pulse — base=#151A2E, accent=#8BFF6A, spread=wide, hover=+6, pressed=-10, disabled=0.42 (DESIGN_TOKENS §5.1)
+        "151A2E": {"spread_factor": 1.3, "hover_pct": 6.0, "pressed_pct": -10.0, "disabled_opacity": 0.42},
+        # Slate — base=#111820, accent=#8BD3FF, spread=narrow, hover=+4 (subdued), pressed=-6, disabled=0.50 (DESIGN_TOKENS §5.2)
+        "111820": {"spread_factor": 0.7, "hover_pct": 4.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50},
+        # Bubble — base=#241326, accent=#FFB3E6, spread=medium, hover=+8, pressed=-10, disabled=0.45 (DESIGN_TOKENS §5.3)
+        "241326": {"spread_factor": 1.0, "hover_pct": 8.0, "pressed_pct": -10.0, "disabled_opacity": 0.45},
+        # Daybreak — base=#0B2420, accent=#76F2D1, spread=medium, hover=+6, pressed=-6, disabled=0.50 (DESIGN_TOKENS §5.4)
+        "0B2420": {"spread_factor": 1.0, "hover_pct": 6.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50},
+        # Burst — base=#20112E, accent=#FFD166, spread=wide, hover=+8, pressed=-12, disabled=0.45 (DESIGN_TOKENS §5.5)
+        "20112E": {"spread_factor": 1.3, "hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.45},
     }
 
     ## Default (when base_color doesn't match any of the 5 approved directions — custom themes).
@@ -325,16 +326,22 @@ Wave 2 — depends on Plan 04-01 only. Parallel-eligible with Plan 04-05 if 04-0
     - File contains `"hover_pct":` (state-layer hover % per direction).
     - File contains `"pressed_pct":` (state-layer pressed % per direction).
     - File contains `"disabled_opacity":` (state-layer disabled alpha per direction).
+    - **F1 reconciliation 2026-05-06 (per-direction value asserts vs DESIGN_TOKENS §5.1-§5.5):**
+      - Pulse line (`"151A2E"`) contains `"hover_pct": 6.0` AND `"pressed_pct": -10.0` AND `"disabled_opacity": 0.42`.
+      - Slate line (`"111820"`) contains `"hover_pct": 4.0` AND `"pressed_pct": -6.0` AND `"disabled_opacity": 0.50`.
+      - Bubble line (`"241326"`) contains `"hover_pct": 8.0` AND `"pressed_pct": -10.0` AND `"disabled_opacity": 0.45`.
+      - Daybreak line (`"0B2420"`) contains `"hover_pct": 6.0` AND `"pressed_pct": -6.0` AND `"disabled_opacity": 0.50`.
+      - Burst line (`"20112E"`) contains `"hover_pct": 8.0` AND `"pressed_pct": -12.0` AND `"disabled_opacity": 0.45`.
     - File contains `const DIRECTION_PRESET_DEFAULT: Dictionary = {`.
     - File contains `func _resolve_direction_presets() -> Dictionary:`.
     - The body of `_resolve_direction_presets` calls `base_color.to_html(false)` (or equivalent — `to_html()` then `.substr(0, 6)` etc.).
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; foreach($n in 'const DIRECTION_PRESETS: Dictionary = {','\"151A2E\":','\"111820\":','\"241326\":','\"0B2420\":','\"20112E\":','\"spread_factor\": 1.3','\"spread_factor\": 0.7','\"spread_factor\": 1.0','\"hover_pct\":','\"pressed_pct\":','\"disabled_opacity\":','const DIRECTION_PRESET_DEFAULT: Dictionary = {','func _resolve_direction_presets() -> Dictionary:') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; if (-not (($g -match 'base_color\\.to_html\\(false\\)') -or ($g -match 'base_color\\.to_html\\(\\)'))) { throw '_resolve_direction_presets does not call to_html()' }"
+      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; foreach($n in 'const DIRECTION_PRESETS: Dictionary = {','\"151A2E\":','\"111820\":','\"241326\":','\"0B2420\":','\"20112E\":','\"spread_factor\": 1.3','\"spread_factor\": 0.7','\"spread_factor\": 1.0','\"hover_pct\":','\"pressed_pct\":','\"disabled_opacity\":','const DIRECTION_PRESET_DEFAULT: Dictionary = {','func _resolve_direction_presets() -> Dictionary:') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; if (-not (($g -match 'base_color\\.to_html\\(false\\)') -or ($g -match 'base_color\\.to_html\\(\\)'))) { throw '_resolve_direction_presets does not call to_html()' }; $lines = $g -split \"`n\"; function AssertLine([string]$key, [string[]]$mustHave) { $line = $lines | Where-Object { $_ -match ('\"' + $key + '\":') } | Select-Object -First 1; if (-not $line) { throw (\"DIRECTION_PRESETS line for \" + $key + \" not found\") }; foreach ($t in $mustHave) { if ($line -notmatch [regex]::Escape($t)) { throw (\"DIRECTION_PRESETS \" + $key + \" missing token: \" + $t) } } }; AssertLine '151A2E' @('\"hover_pct\": 6.0','\"pressed_pct\": -10.0','\"disabled_opacity\": 0.42'); AssertLine '111820' @('\"hover_pct\": 4.0','\"pressed_pct\": -6.0','\"disabled_opacity\": 0.50'); AssertLine '241326' @('\"hover_pct\": 8.0','\"pressed_pct\": -10.0','\"disabled_opacity\": 0.45'); AssertLine '0B2420' @('\"hover_pct\": 6.0','\"pressed_pct\": -6.0','\"disabled_opacity\": 0.50'); AssertLine '20112E' @('\"hover_pct\": 8.0','\"pressed_pct\": -12.0','\"disabled_opacity\": 0.45')"
     </automated>
   </verify>
-  <done>DIRECTION_PRESETS lookup table + _resolve_direction_presets() helper exist; per-direction differentiation is now sourceable, not hard-coded.</done>
+  <done>DIRECTION_PRESETS lookup table + _resolve_direction_presets() helper exist; per-direction differentiation is now sourceable, not hard-coded; F1 reconciles values to DESIGN_TOKENS §5.1-§5.5 verbatim.</done>
 </task>
 
 <task type="auto">
@@ -472,10 +479,12 @@ Wave 2 — depends on Plan 04-01 only. Parallel-eligible with Plan 04-05 if 04-0
     - Helpers: _mix, _tint_toward_base (DESIGN_TOKENS §6.1)
     - Helpers: _resolve_platform, _platform_tokens (DESIGN_TOKENS §10.1, §10.2)
     - Helper: _make_raised_stylebox (DESIGN_TOKENS §9)
-    - DIRECTION_PRESETS const + _resolve_direction_presets() (Cross-AI Cycle 1 C2 fix):
-      per-direction spread_factor, hover_pct, pressed_pct, disabled_opacity sourced
-      by base_color hex lookup. Pulse=1.3/6/-10/0.42, Slate=0.7/8/-12/0.50,
-      Bubble=1.0/10/-12/0.45, Daybreak=1.0/8/-12/0.50, Burst=1.3/10/-14/0.45.
+    - DIRECTION_PRESETS const + _resolve_direction_presets() (Cross-AI Cycle 1 C2 fix
+      + Cycle 6 F1 reconciliation 2026-05-06): per-direction spread_factor,
+      hover_pct, pressed_pct, disabled_opacity sourced by base_color hex lookup.
+      Values reconciled to DESIGN_TOKENS §5.1-§5.5 verbatim:
+      Pulse=1.3/6/-10/0.42, Slate=0.7/4/-6/0.50, Bubble=1.0/8/-10/0.45,
+      Daybreak=1.0/6/-6/0.50, Burst=1.3/8/-12/0.45.
       9-export surface intact (DIRECTION_PRESETS is a const, not @export).
     - _regenerate_theme() body now derives: 5-stop surface ramp (per-direction
       spread_factor) + 5 raised offsets + text colors (is_light flip) + state

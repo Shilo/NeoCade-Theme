@@ -10,8 +10,8 @@ files_modified:
   - addons/neocade_theme/icons/checkbox_unchecked.svg
   - addons/neocade_theme/icons/radio_checked.svg
   - addons/neocade_theme/icons/radio_unchecked.svg
-  - addons/neocade_theme/icons/toggle_on.svg
-  - addons/neocade_theme/icons/toggle_off.svg
+  - addons/neocade_theme/icons/checkbutton_checked.svg
+  - addons/neocade_theme/icons/checkbutton_unchecked.svg
   - addons/neocade_theme/icons/arrow_down.svg
   - addons/neocade_theme/icons/clear.svg
   - addons/neocade_theme/icons/close.svg
@@ -20,8 +20,8 @@ files_modified:
   - addons/neocade_theme/icons/checkbox_unchecked.svg.import
   - addons/neocade_theme/icons/radio_checked.svg.import
   - addons/neocade_theme/icons/radio_unchecked.svg.import
-  - addons/neocade_theme/icons/toggle_on.svg.import
-  - addons/neocade_theme/icons/toggle_off.svg.import
+  - addons/neocade_theme/icons/checkbutton_checked.svg.import
+  - addons/neocade_theme/icons/checkbutton_unchecked.svg.import
   - addons/neocade_theme/icons/arrow_down.svg.import
   - addons/neocade_theme/icons/clear.svg.import
   - addons/neocade_theme/icons/close.svg.import
@@ -33,7 +33,7 @@ requirements:
   - ICON-04
 must_haves:
   truths:
-    - "10 bespoke monochrome SVG icons exist at `addons/neocade_theme/icons/{name}.svg`: `check`, `checkbox_checked`, `checkbox_unchecked`, `radio_checked`, `radio_unchecked`, `toggle_on`, `toggle_off`, `arrow_down`, `clear`, `close`."
+    - "10 bespoke monochrome SVG icons exist at `addons/neocade_theme/icons/{name}.svg`: `check`, `checkbox_checked`, `checkbox_unchecked`, `radio_checked`, `radio_unchecked`, `checkbutton_checked`, `checkbutton_unchecked`, `arrow_down`, `clear`, `close`. (Cycle 6 F4 fix 2026-05-06: was `toggle_on`/`toggle_off`; renamed to `checkbutton_checked`/`checkbutton_unchecked` for slot-name clarity. The CheckButton Theme icon slots are `checked`/`unchecked` per Godot 4.6 class_checkbutton.md — file names mirror the slot names. The icons still render the visual TOGGLE/SWITCH style — pill track + sliding knob — that's how Godot draws CheckButton.)"
     - "Every SVG is authored at 32×32 reference (`viewBox=\"0 0 32 32\"`), STRICTLY monochrome — every fill/stroke is `#FFFFFF` ONLY (no `#000000`, no other colors). Reason: Godot icon `modulate` multiplies — `Color.BLACK * accent = BLACK` (stays black under any tint). Cross-AI Cycle 1 MEDIUM fix (OpenCode + Codex agreed): all 10 icons are single-color so `modulate` produces predictable accent-tinted output."
     - "Every SVG has a corresponding `.import` sidecar that explicitly sets `svg/scale=2.0` and `mipmaps/generate=true` (Linear With Mipmaps filter) per ICON-01 + STACK + PITFALLS."
     - "No Material Symbols / Lucide / Phosphor / external icon library binaries are bundled (per ICON-04 + STACK Decision 5 + D-12)."
@@ -89,8 +89,8 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
     - addons/neocade_theme/icons/checkbox_unchecked.svg (NEW)
     - addons/neocade_theme/icons/radio_checked.svg (NEW)
     - addons/neocade_theme/icons/radio_unchecked.svg (NEW)
-    - addons/neocade_theme/icons/toggle_on.svg (NEW)
-    - addons/neocade_theme/icons/toggle_off.svg (NEW)
+    - addons/neocade_theme/icons/checkbutton_checked.svg (NEW)
+    - addons/neocade_theme/icons/checkbutton_unchecked.svg (NEW)
     - addons/neocade_theme/icons/arrow_down.svg (NEW)
     - addons/neocade_theme/icons/clear.svg (NEW)
     - addons/neocade_theme/icons/close.svg (NEW)
@@ -138,14 +138,14 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
        <circle cx="16" cy="16" r="12" stroke="#FFFFFF" stroke-width="2" fill="none"/>
        ```
 
-    6. **toggle_on.svg** — rounded pill outline + filled knob to the right (CheckButton on-state; single-color per Cross-AI Cycle 1 fix):
+    6. **checkbutton_checked.svg** — rounded pill outline + filled knob to the right (CheckButton on-state; single-color per Cross-AI Cycle 1 fix):
        ```xml
        <rect x="2" y="8" width="28" height="16" rx="8" stroke="#FFFFFF" stroke-width="2" fill="none"/>
        <circle cx="22" cy="16" r="5" fill="#FFFFFF"/>
        ```
        Rationale: the on-state visually reads as "track empty + knob on right side"; the BackgroundStyleBoxFlat behind CheckButton (set by the BINDING_TABLE in Plan 04-05 with bg=accent_color when on) provides the colored fill behind the icon. The icon ITSELF is single-color so `icon_modulate` tints it predictably; the contrasting "filled track" effect is composed via the StyleBoxFlat backing.
 
-    7. **toggle_off.svg** — rounded pill with knob to the left (CheckButton off-state):
+    7. **checkbutton_unchecked.svg** — rounded pill with knob to the left (CheckButton off-state):
        ```xml
        <rect x="2" y="8" width="28" height="16" rx="8" stroke="#FFFFFF" stroke-width="2" fill="none"/>
        <circle cx="10" cy="16" r="5" fill="#FFFFFF"/>
@@ -177,8 +177,8 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
     - `checkbox_unchecked.svg`: outlined box only, `stroke="#FFFFFF"`, no fill.
     - `radio_checked.svg`: outlined circle + filled inner dot, `stroke="#FFFFFF"` outer, `fill="#FFFFFF"` inner.
     - `radio_unchecked.svg`: outlined circle, `stroke="#FFFFFF"`, no fill.
-    - `toggle_on.svg`: outlined track + filled knob on right side, all `#FFFFFF`. Backing StyleBoxFlat (Plan 04-05) provides accent fill.
-    - `toggle_off.svg`: outlined track + filled knob on left side, all `#FFFFFF`.
+    - `checkbutton_checked.svg`: outlined track + filled knob on right side, all `#FFFFFF`. Backing StyleBoxFlat (Plan 04-05) provides accent fill.
+    - `checkbutton_unchecked.svg`: outlined track + filled knob on left side, all `#FFFFFF`.
     - `arrow_down.svg`: chevron path, `stroke="#FFFFFF"`, no fill.
     - `clear.svg`: outlined circle + inset X, both `stroke="#FFFFFF"`, no fill.
     - `close.svg`: bare X, `stroke="#FFFFFF"`, no fill.
@@ -196,13 +196,13 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
     - File `radio_unchecked.svg` contains 1 `<circle` element.
     - File `checkbox_checked.svg` contains 1 `<rect` element AND 1 `<path` element.
     - File `checkbox_unchecked.svg` contains 1 `<rect` element AND 0 `<path` elements (rect outline only).
-    - File `toggle_on.svg` contains 1 `<rect` element AND 1 `<circle` element.
-    - File `toggle_off.svg` contains 1 `<rect` element AND 1 `<circle` element.
+    - File `checkbutton_checked.svg` contains 1 `<rect` element AND 1 `<circle` element.
+    - File `checkbutton_unchecked.svg` contains 1 `<rect` element AND 1 `<circle` element.
     - File `clear.svg` contains 1 `<circle` element AND 1 `<path` element.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$base='addons/neocade_theme/icons'; $names=@('check','checkbox_checked','checkbox_unchecked','radio_checked','radio_unchecked','toggle_on','toggle_off','arrow_down','clear','close'); foreach($n in $names) { $p=\"$base/$n.svg\"; if (-not (Test-Path $p)) { throw \"$n.svg missing\" }; $g=Get-Content -Raw $p; if ($g -notmatch '^<\\?xml version=\"1\\.0\"') { throw \"$n.svg missing XML decl\" }; if ($g -notmatch 'width=\"32\"') { throw \"$n.svg missing width=32\" }; if ($g -notmatch 'height=\"32\"') { throw \"$n.svg missing height=32\" }; if ($g -notmatch 'viewBox=\"0 0 32 32\"') { throw \"$n.svg missing viewBox\" }; if ($g -match '#000000|#000\"|black') { throw \"$n.svg contains a non-white color (Cross-AI Cycle 1 forbids dual-color icons)\" }; if ((Get-Item $p).Length -gt 2048) { throw \"$n.svg too large (>2KB)\" } }; foreach($n in 'radio_checked','radio_unchecked','toggle_on','toggle_off','clear') { $g=Get-Content -Raw \"$base/$n.svg\"; if ($g -notmatch '<circle') { throw \"$n.svg missing <circle>\" } }; foreach($n in 'checkbox_checked','checkbox_unchecked','toggle_on','toggle_off') { $g=Get-Content -Raw \"$base/$n.svg\"; if ($g -notmatch '<rect') { throw \"$n.svg missing <rect>\" } }; foreach($n in 'check','arrow_down','close','checkbox_checked','clear') { $g=Get-Content -Raw \"$base/$n.svg\"; if ($g -notmatch '<path') { throw \"$n.svg missing <path>\" } }"
+      powershell -NoProfile -Command "$base='addons/neocade_theme/icons'; $names=@('check','checkbox_checked','checkbox_unchecked','radio_checked','radio_unchecked','checkbutton_checked','checkbutton_unchecked','arrow_down','clear','close'); foreach($n in $names) { $p=\"$base/$n.svg\"; if (-not (Test-Path $p)) { throw \"$n.svg missing\" }; $g=Get-Content -Raw $p; if ($g -notmatch '^<\\?xml version=\"1\\.0\"') { throw \"$n.svg missing XML decl\" }; if ($g -notmatch 'width=\"32\"') { throw \"$n.svg missing width=32\" }; if ($g -notmatch 'height=\"32\"') { throw \"$n.svg missing height=32\" }; if ($g -notmatch 'viewBox=\"0 0 32 32\"') { throw \"$n.svg missing viewBox\" }; if ($g -match '#000000|#000\"|black') { throw \"$n.svg contains a non-white color (Cross-AI Cycle 1 forbids dual-color icons)\" }; if ((Get-Item $p).Length -gt 2048) { throw \"$n.svg too large (>2KB)\" } }; foreach($n in 'radio_checked','radio_unchecked','checkbutton_checked','checkbutton_unchecked','clear') { $g=Get-Content -Raw \"$base/$n.svg\"; if ($g -notmatch '<circle') { throw \"$n.svg missing <circle>\" } }; foreach($n in 'checkbox_checked','checkbox_unchecked','checkbutton_checked','checkbutton_unchecked') { $g=Get-Content -Raw \"$base/$n.svg\"; if ($g -notmatch '<rect') { throw \"$n.svg missing <rect>\" } }; foreach($n in 'check','arrow_down','close','checkbox_checked','clear') { $g=Get-Content -Raw \"$base/$n.svg\"; if ($g -notmatch '<path') { throw \"$n.svg missing <path>\" } }"
     </automated>
   </verify>
   <done>10 monochrome Button-family SVG icons authored at 32×32 reference per the locked NeoCade icon contract.</done>
@@ -221,8 +221,8 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
     - addons/neocade_theme/icons/checkbox_unchecked.svg.import (NEW)
     - addons/neocade_theme/icons/radio_checked.svg.import (NEW)
     - addons/neocade_theme/icons/radio_unchecked.svg.import (NEW)
-    - addons/neocade_theme/icons/toggle_on.svg.import (NEW)
-    - addons/neocade_theme/icons/toggle_off.svg.import (NEW)
+    - addons/neocade_theme/icons/checkbutton_checked.svg.import (NEW)
+    - addons/neocade_theme/icons/checkbutton_unchecked.svg.import (NEW)
     - addons/neocade_theme/icons/arrow_down.svg.import (NEW)
     - addons/neocade_theme/icons/clear.svg.import (NEW)
     - addons/neocade_theme/icons/close.svg.import (NEW)
@@ -276,9 +276,21 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
     - `compress/mode=0` (lossless — these are vector-derived bitmaps, lossy compression would degrade edge crispness).
     - `process/fix_alpha_border=true` (cleans premultiplied-alpha bleed at icon edges).
 
-    The synthetic UIDs and `<hash>` placeholders will be normalized by Godot on first import; the verification checks param values, not UID format.
+    **Cycle 6 F5 fix 2026-05-06: Three-stage workflow REQUIRED — placeholder commit + Godot import + normalized recommit (option (a) of F5):**
 
-    Step-by-step: write each `.import` sidecar with PowerShell `Set-Content -Encoding UTF8`. Substitute `<name>` and the path-references for each of the 10 icons. The `[params]` block is identical across all 10 files.
+    The literal `<name>` and `<hash>` placeholders MUST be normalized by Godot before final commit. Committing the placeholder file as-authored ships the addon with broken `path=` and `dest_files=` strings (`<hash>` is not a valid filename character on Windows; `<name>` is a literal placeholder). Plan 04-03 (pre-Cycle-6) said "placeholders normalize on first import" but did not enforce the recommit step — F5 closes that gap by structuring the workflow as three explicit stages:
+
+    - **Stage A — Author placeholder.** Write each `.import` file with PowerShell `Set-Content -Encoding UTF8`. Substitute `<name>` and the path-references for each of the 10 icons. The `[params]` block is identical across all 10 files. The `path=`, `dest_files=`, and `uid=` lines may contain literal `<hash>` and synthetic-UID placeholders at this stage. DO NOT COMMIT yet.
+    - **Stage B — Run Godot import to materialize sidecars.** From the project root run:
+      ```
+      godot --headless --import
+      ```
+      Godot 4.6 reads each placeholder `.import`, generates the actual `.ctex` cache file under `res://.godot/imported/`, computes a real `md5` hash, and rewrites BOTH `path=` and `dest_files=` with the real `.godot/imported/<name>-<real-md5>.ctex` filename. The `uid=` is also normalized to a Godot-issued UUID (e.g., `uid://b1c5xyz...`). After this step the `.import` files contain ONLY normalized values — NO `<hash>` and NO `<name>` literal placeholder.
+    - **Stage C — Recommit the normalized `.import` files.** Verify each file has zero literal `<` or `>` characters, then `git add` + commit. Task 3's commit MUST stage the post-Stage-B versions, not the Stage-A placeholders.
+
+    The verifier in `<acceptance_criteria>` below explicitly asserts NO `<` or `>` characters appear in any `.import` file, catching regressions where Stage B was skipped or partially completed.
+
+    **Workflow rationale:** the same Godot-driven materialization pattern is used for the Inter font in Plan 04-02 (`_phase4_import.gd` runs Godot to generate `.ttf.import`); Phase 4 already requires Godot for font import, so the icon import pass is in scope. The alternative — having `_phase4_import.gd` programmatically generate icon `.import` sidecars via Godot's import API — is option (b) of F5 and is more invasive; option (a) (this workflow) is preferred for simplicity.
   </action>
   <acceptance_criteria>
     - All 10 `.svg.import` files exist at `addons/neocade_theme/icons/{name}.svg.import`.
@@ -290,10 +302,13 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
     - Every file contains `process/fix_alpha_border=true`.
     - Every file's `source_file` line correctly points at the matching `.svg` file.
     - Every file is under 2 KB.
+    - **Cycle 6 F5 fix 2026-05-06:** No `.import` file contains literal `<` or `>` characters. The placeholder values (`<name>`, `<hash>`) MUST be normalized via `godot --headless --import` (Stage B) before the file is committed. Catches the regression where the Stage-A placeholder is committed without running Godot import.
+    - **Cycle 6 F5 fix:** Each `.import` file's `path=` line points at a real `.godot/imported/<filename>-<32-hex-chars>.ctex` filename (Godot's md5 hash is 32 hex chars). The verifier asserts the path matches the regex `path="res://\.godot/imported/[A-Za-z0-9_]+\.svg-[0-9a-f]{32}\.ctex"`.
+    - **Cycle 6 F5 fix:** Each `.import` file's `uid=` line points at a Godot-issued UUID matching `uid://[a-z0-9]+` (NOT a synthetic placeholder like `uid://neocade_icon_<name>_v1`).
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$base='addons/neocade_theme/icons'; $names=@('check','checkbox_checked','checkbox_unchecked','radio_checked','radio_unchecked','toggle_on','toggle_off','arrow_down','clear','close'); foreach($n in $names) { $p=\"$base/$n.svg.import\"; if (-not (Test-Path $p)) { throw \"$n.svg.import missing\" }; $g=Get-Content -Raw $p; foreach($req in 'importer=\"texture\"','type=\"CompressedTexture2D\"','svg/scale=2.0','mipmaps/generate=true','compress/mode=0','process/fix_alpha_border=true',\"source_file=`\"res://addons/neocade_theme/icons/$n.svg`\"\") { if ($g -notmatch [regex]::Escape($req)) { throw \"$n.svg.import missing: $req\" } }; if ((Get-Item $p).Length -gt 2048) { throw \"$n.svg.import too large\" } }"
+      powershell -NoProfile -Command "$base='addons/neocade_theme/icons'; $names=@('check','checkbox_checked','checkbox_unchecked','radio_checked','radio_unchecked','checkbutton_checked','checkbutton_unchecked','arrow_down','clear','close'); foreach($n in $names) { $p=\"$base/$n.svg.import\"; if (-not (Test-Path $p)) { throw \"$n.svg.import missing\" }; $g=Get-Content -Raw $p; foreach($req in 'importer=\"texture\"','type=\"CompressedTexture2D\"','svg/scale=2.0','mipmaps/generate=true','compress/mode=0','process/fix_alpha_border=true',\"source_file=`\"res://addons/neocade_theme/icons/$n.svg`\"\") { if ($g -notmatch [regex]::Escape($req)) { throw \"$n.svg.import missing: $req\" } }; if ((Get-Item $p).Length -gt 2048) { throw \"$n.svg.import too large\" }; if ($g -match '[<>]') { throw \"Cycle 6 F5 regression: $n.svg.import contains literal '<' or '>' (placeholder normalization skipped — run 'godot --headless --import' before committing)\" }; if ($g -notmatch 'path=\"res://\\.godot/imported/[A-Za-z0-9_]+\\.svg-[0-9a-f]{32}\\.ctex\"') { throw \"Cycle 6 F5 regression: $n.svg.import path= line is not a Godot-normalized .ctex hash path (got: placeholder or malformed)\" }; if ($g -notmatch 'uid=\"uid://[a-z0-9]+\"') { throw \"Cycle 6 F5 regression: $n.svg.import uid= line is not a Godot-issued UUID (got: synthetic placeholder)\" } }"
     </automated>
   </verify>
   <done>All 10 icons have correctly-configured import sidecars locking in Scale=2.0 + Linear With Mipmaps + lossless compression.</done>
@@ -315,7 +330,7 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
     Plan 04-03 wave-1 icons:
     - 10 monochrome SVGs at 32×32 reference at addons/neocade_theme/icons/:
       check, checkbox_checked, checkbox_unchecked, radio_checked, radio_unchecked,
-      toggle_on, toggle_off, arrow_down, clear, close
+      checkbutton_checked, checkbutton_unchecked, arrow_down, clear, close
     - 10 .import sidecars enforcing svg/scale=2.0 + mipmaps/generate=true
       (Linear With Mipmaps) + lossless compression per ICON-01 + STACK + PITFALLS
     - No external icon library bundled (per ICON-04 + STACK Decision 5 + D-12)
@@ -333,7 +348,7 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$msg = git log -1 --pretty=%s; if ($msg -notmatch '^feat\\(04-03\\):') { throw \"commit subject wrong: $msg\" }; $ns = git log -1 --name-status; $names=@('check','checkbox_checked','checkbox_unchecked','radio_checked','radio_unchecked','toggle_on','toggle_off','arrow_down','clear','close'); foreach($n in $names) { foreach($ext in '.svg','.svg.import') { $f = \"addons/neocade_theme/icons/$n$ext\"; $pattern = \"A\\s+$([regex]::Escape($f))\"; if ($ns -notmatch $pattern) { throw \"commit missing $f\" } } }"
+      powershell -NoProfile -Command "$msg = git log -1 --pretty=%s; if ($msg -notmatch '^feat\\(04-03\\):') { throw \"commit subject wrong: $msg\" }; $ns = git log -1 --name-status; $names=@('check','checkbox_checked','checkbox_unchecked','radio_checked','radio_unchecked','checkbutton_checked','checkbutton_unchecked','arrow_down','clear','close'); foreach($n in $names) { foreach($ext in '.svg','.svg.import') { $f = \"addons/neocade_theme/icons/$n$ext\"; $pattern = \"A\\s+$([regex]::Escape($f))\"; if ($ns -notmatch $pattern) { throw \"commit missing $f\" } } }"
     </automated>
   </verify>
   <done>The Button-family icon set lands as a single atomic commit; Wave 1 icons portion of Phase 4 is complete.</done>

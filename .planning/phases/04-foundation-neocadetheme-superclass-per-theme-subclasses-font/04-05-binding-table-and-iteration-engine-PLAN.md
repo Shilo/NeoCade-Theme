@@ -10,6 +10,8 @@ depends_on:
   - "04-04"
 files_modified:
   - addons/neocade_theme/neocade_theme.gd
+  - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_introspect.gd  # Cycle 6 F7: empirical BINDING_TABLE seed generator
+  - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/BINDING_TABLE_SEED.txt  # Cycle 6 F7: introspection output, consumed by Task 2
 autonomous: true
 requirements:
   - FOUND-02
@@ -24,14 +26,14 @@ must_haves:
     - "`TYPE_VARIATIONS` constant declares all **14** NeoCade type variations (Cross-AI Cycle 1 C4 fix: pick 14 with CodeLabel INCLUDED — the correct enumeration of TYPEVAR-01..04 + TYPEVAR-05): PrimaryButton, SecondaryButton, GhostButton, DangerButton, IconButton, FlatButton (6 Button) + HeaderLarge, HeaderMedium, HeaderSmall, Caption, CodeLabel (5 Label) + InfoText (1 RichTextLabel/Label) + CardPanel, HeroPanel (2 PanelContainer) = 14."
     - "`_regenerate_theme()` body now walks `BINDING_TABLE`: for each `(theme_type, data_type, slot_name)`, computes the recipe value from the derived locals (Plan 04-04) + the per-Control parameter context, and calls `set_stylebox(slot_name, theme_type, sb)` / `set_color(...)` / `set_constant(...)` / `set_font_size(...)` / `set_icon(...)`. (Cross-AI Cycle 2 N1 fix: NO `set_font` branch — per-Control fonts are NOT a BINDING_TABLE concept; the only font bindings come from `default_font` + the 14 explicit type-variation `set_font` calls in Task 1.)"
     - "Iteration is ADDITIVE — entries not in BINDING_TABLE are LEFT UNTOUCHED (D-04 escape hatch). The walk uses `set_*(name, type, value)` directly and does NOT call `clear()` (D-01 invariant)."
-    - "**Cross-AI Cycle 2 C1 fix — CANONICAL_SLOT_NAMES freeze.** A sibling const `CANONICAL_SLOT_NAMES: Dictionary` declares the EXACT slot-name list per Control type for the most-complex Controls (Tree 16 styleboxes; Button 6 styleboxes + 5 colors; LineEdit 3 styleboxes; PopupMenu 5 styleboxes + 3 constants; Window 2 styleboxes; HScrollBar 4 styleboxes; VScrollBar 4 styleboxes; OptionButton 6 styleboxes + 1 constant + arrow icon; CheckBox 4 icons; CheckButton 2 icons; ItemList 6+ styleboxes; TabBar 5 styleboxes + 8 colors). Slot names are sourced VERBATIM from `MINIMAL-THEME-DISSECTION.md` (the live-verified-from-godot-minimal-theme dissection). Plan 04-06's verifier iterates `CANONICAL_SLOT_NAMES` and asserts each declared slot exists on the loaded theme via `theme.has_stylebox/color/constant/font_size/icon(slot_name, theme_type)` — this guarantees correct slot-name strings, not just row counts."
+    - "**Cross-AI Cycle 2 C1 fix — CANONICAL_SLOT_NAMES freeze + Cycle 6 F7 fix 2026-05-06: empirical slot-name source.** A sibling const `CANONICAL_SLOT_NAMES: Dictionary` declares the EXACT slot-name list per Control type for the most-complex Controls (Tree 16 styleboxes; Button 6 styleboxes + 5 colors; LineEdit 3 styleboxes; PopupMenu 5 styleboxes + 3 constants; Window 2 styleboxes; HScrollBar 4 styleboxes; VScrollBar 4 styleboxes; OptionButton 6 styleboxes + 1 constant + arrow icon; CheckBox 4 icons; **CheckButton 2 icons (`checked`/`unchecked` per Godot 4.6 — Cycle 6 F4 fix; was wrongly `on`/`off`)**; ItemList 6+ styleboxes; TabBar 5 styleboxes + 8 colors). **Cycle 6 F7 fix:** slot names are sourced from `helpers/BINDING_TABLE_SEED.txt` (empirically introspected from Godot 4.6's `Theme.get_<datatype>_list()` API by Task 2.0), NOT from `MINIMAL-THEME-DISSECTION.md` curation. Where the seed and the dissection disagree, the seed wins (root-causes the F4 CheckButton bug). Plan 04-06's verifier iterates `CANONICAL_SLOT_NAMES` and asserts each declared slot exists on the loaded theme via `theme.has_stylebox/color/constant/font_size/icon(slot_name, theme_type)` — this guarantees correct slot-name strings, not just row counts."
     - "**Cross-AI Cycle 2 C2 fix — disabled alpha sourced from presets.** `_resolve_recipe()` reads `disabled_opacity` from the per-direction `presets` dictionary (Plan 04-04 DIRECTION_PRESETS). The Button.disabled / Button.font_disabled_color / etc. recipes use `disabled_opacity` (a float passed in) instead of hard-coded `0.38`. Recipes carry a `\"disabled\": true` flag (or equivalent) to opt into the per-direction alpha, replacing the previous `\"alpha\": 0.38` literal."
     - "**Cross-AI Cycle 2 M2 fix — platform-aware stylebox margins.** `_resolve_recipe()`'s stylebox branch multiplies content_margin by `tokens.densityScale` and adds `tokens.tapPadding` so MOBILE platform produces visibly larger Button.normal margins than DESKTOP (Plan 04-06's MOBILE-toggle assertion can now observe the change)."
     - "`_regenerate_theme()` calls `set_type_variation(variation, base_type)` for all 14 variations registered in `TYPE_VARIATIONS`."
-    - "**Cross-AI Cycle 1 C3 fix:** `_regenerate_theme()` sets `default_font = preload(\"res://addons/neocade_theme/fonts/Inter-Body.tres\")` and `default_font_size = tokens.body` BEFORE the BINDING_TABLE walk, so any Control type that lacks an explicit per-type font entry still renders in Inter at the correct platform size (FONT-06 closure)."
+    - "**Cross-AI Cycle 1 C3 fix + Cycle 6 F6 fix 2026-05-06:** `_regenerate_theme()` sets `default_font = preload(\"res://addons/neocade_theme/fonts/Inter-Variable.tres\")` (the **FontFile** wrapper, NOT the `Inter-Body.tres` FontVariation) and `default_font_size = tokens.body` BEFORE the BINDING_TABLE walk, so any Control type that lacks an explicit per-type font entry still renders in Inter at the correct platform size (FONT-06 closure). Per FONT-06: 'Theme `default_font` is Inter Variable Roman; `default_font.fallbacks = []`' — implies `FontFile` (the .ttf wrapper). The Plan 04-08 README cast `theme.default_font as FontFile` then succeeds. `Inter-Body.tres` (FontVariation wght=400) becomes a body-text-specific resource for `set_font` calls on specific Controls/variations needing body weight, not the theme-level default."
     - "Each variation that needs a font has an explicit `set_font(\"font\", variation, ...)` call (PITFALLS 1.2 — variations don't inherit fonts from base type). HeaderLarge/HeaderMedium/HeaderSmall reference the matching FontVariation from Plan 04-02; Caption + InfoText reference Inter-Caption.tres / Inter-Body.tres; CodeLabel uses Inter-Body.tres + a CHANGELOG note that consumers can override with their preferred mono per FONT-04 stricken (consumer override pattern documented in README, Plan 04-08)."
     - "Font sizes are read from `_platform_tokens(p)` per DESIGN_TOKENS §8.5 type scale; `Theme.set_font_size` sets per-type / per-variation sizes."
-    - "Icon binding wires the 10 Button-family SVGs (Plan 04-03) to the appropriate Theme slots: CheckBox checked/unchecked, RadioButton checked/unchecked (CheckBox alternate slot), CheckButton on/off, OptionButton arrow, LineEdit clear, etc."
+    - "Icon binding wires the 10 Button-family SVGs (Plan 04-03) to the appropriate Theme slots: CheckBox checked/unchecked, RadioButton checked/unchecked (CheckBox alternate slot), **CheckButton checked/unchecked (Cycle 6 F4 fix 2026-05-06: was on/off; Godot 4.6 class_checkbutton.md mandates `checked`/`unchecked`)**, OptionButton arrow, LineEdit clear, etc."
     - "PITFALLS-aligned slots present: `Tree` has all 16 styleboxes; `LineEdit` has normal/focus/read_only; `PopupMenu` has panel/hover/separator + labeled separators; `Window` has embedded_border/embedded_unfocused_border; HScrollBar/VScrollBar have scroll/grabber/grabber_highlight/grabber_pressed."
     - "Class-header docstring explicitly notes that BINDING_TABLE structure is REVISABLE per CONTEXT.md D-03."
     - "No `clear()` call anywhere in the regeneration path."
@@ -129,12 +131,19 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
     Then in `_regenerate_theme()` body, AFTER the derivation block (Plan 04-04) and BEFORE the `_last_regeneration_usec` line, add the default-font block + variation-registration block:
 
     ```gdscript
-        # ── Theme defaults (Cross-AI Cycle 1 C3 fix; FONT-06 closure) ──
+        # ── Theme defaults (Cross-AI Cycle 1 C3 fix + Cycle 6 F6 fix 2026-05-06; FONT-06 closure) ──
         # Set the theme-level default_font + default_font_size BEFORE the BINDING_TABLE walk
         # so any Control type without an explicit per-type font entry still renders in Inter.
-        var body_font := preload("res://addons/neocade_theme/fonts/Inter-Body.tres") as FontVariation
-        default_font = body_font
+        # F6 fix: default_font is the FontFile (Inter-Variable.tres), NOT a FontVariation.
+        # FontVariation and FontFile both extend Font but are NOT cast-compatible — Plan 04-08
+        # README's `theme.default_font as FontFile` only works if default_font IS a FontFile.
+        # Per FONT-06: "Theme default_font is Inter Variable Roman; default_font.fallbacks = []"
+        # — implies FontFile (the .ttf wrapper). Inter-Body.tres (FontVariation wght=400) is
+        # used below for explicit set_font calls on body-weight Controls/variations.
+        var inter_file := preload("res://addons/neocade_theme/fonts/Inter-Variable.tres") as FontFile
+        default_font = inter_file
         default_font_size = tokens.body
+        var body_font := preload("res://addons/neocade_theme/fonts/Inter-Body.tres") as FontVariation
 
         # ── Register type variations (DESIGN_TOKENS §8.5; PITFALLS 1.2) ──
         for variation_name in TYPE_VARIATIONS.keys():
@@ -183,7 +192,9 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
     - File contains `const TYPE_VARIATIONS: Dictionary = {`.
     - The TYPE_VARIATIONS dict contains all **14** entries (Cross-AI Cycle 1 C4 fix): `"PrimaryButton"`, `"SecondaryButton"`, `"GhostButton"`, `"DangerButton"`, `"IconButton"`, `"FlatButton"`, `"HeaderLarge"`, `"HeaderMedium"`, `"HeaderSmall"`, `"Caption"`, `"CodeLabel"`, `"InfoText"`, `"CardPanel"`, `"HeroPanel"`.
     - The Button-family entries map to `"Button"`; the Label-family entries map to `"Label"`; the Panel-family entries map to `"PanelContainer"`; InfoText maps to `"RichTextLabel"`.
-    - `_regenerate_theme()` body contains `default_font = body_font` and `default_font_size = tokens.body` (Cross-AI Cycle 1 C3 fix; FONT-06 closure).
+    - `_regenerate_theme()` body contains `default_font = inter_file` and `default_font_size = tokens.body` (Cycle 6 F6 fix 2026-05-06: was `default_font = body_font` / FontVariation; now FontFile per FONT-06).
+    - `_regenerate_theme()` body contains `preload("res://addons/neocade_theme/fonts/Inter-Variable.tres") as FontFile` (Cycle 6 F6 fix: FontFile cast required so Plan 04-08 README's `theme.default_font as FontFile` succeeds).
+    - `_regenerate_theme()` body contains the auxiliary `var body_font := preload("res://addons/neocade_theme/fonts/Inter-Body.tres") as FontVariation` declaration (kept for body-weight `set_font` calls on Controls/variations that don't need a header weight).
     - `_regenerate_theme()` body contains `for variation_name in TYPE_VARIATIONS.keys():`.
     - `_regenerate_theme()` body contains `set_type_variation(variation_name, base_type)` (or equivalent wrapped call).
     - `_regenerate_theme()` body contains **14** `set_font("font", "<variation>", ...)` calls (14 explicit fonts on 14 variations).
@@ -197,14 +208,133 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; foreach($n in 'const TYPE_VARIATIONS: Dictionary = {','\"PrimaryButton\":   \"Button\"','\"SecondaryButton\": \"Button\"','\"GhostButton\":     \"Button\"','\"DangerButton\":    \"Button\"','\"IconButton\":      \"Button\"','\"FlatButton\":      \"Button\"','\"HeaderLarge\":  \"Label\"','\"HeaderMedium\": \"Label\"','\"HeaderSmall\":  \"Label\"','\"Caption\":      \"Label\"','\"CodeLabel\":    \"Label\"','\"InfoText\":     \"RichTextLabel\"','\"CardPanel\": \"PanelContainer\"','\"HeroPanel\": \"PanelContainer\"','for variation_name in TYPE_VARIATIONS.keys():','set_type_variation(variation_name, base_type)','default_font = body_font','default_font_size = tokens.body','set_font(\"font\", \"CodeLabel\"','preload(\"res://addons/neocade_theme/fonts/Inter-HeaderLarge.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-HeaderMedium.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-HeaderSmall.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-Body.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-Caption.tres\")') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; $font_calls = ([regex]::Matches($g, 'set_font\\(\"font\", \"\\w+\"')).Count; if ($font_calls -lt 14) { throw \"expected at least 14 set_font calls; got $font_calls\" }; $size_calls = ([regex]::Matches($g, 'set_font_size\\(\"font_size\"')).Count; if ($size_calls -lt 12) { throw \"expected at least 12 set_font_size calls; got $size_calls\" }"
+      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; foreach($n in 'const TYPE_VARIATIONS: Dictionary = {','\"PrimaryButton\":   \"Button\"','\"SecondaryButton\": \"Button\"','\"GhostButton\":     \"Button\"','\"DangerButton\":    \"Button\"','\"IconButton\":      \"Button\"','\"FlatButton\":      \"Button\"','\"HeaderLarge\":  \"Label\"','\"HeaderMedium\": \"Label\"','\"HeaderSmall\":  \"Label\"','\"Caption\":      \"Label\"','\"CodeLabel\":    \"Label\"','\"InfoText\":     \"RichTextLabel\"','\"CardPanel\": \"PanelContainer\"','\"HeroPanel\": \"PanelContainer\"','for variation_name in TYPE_VARIATIONS.keys():','set_type_variation(variation_name, base_type)','default_font = inter_file','default_font_size = tokens.body','set_font(\"font\", \"CodeLabel\"','preload(\"res://addons/neocade_theme/fonts/Inter-Variable.tres\") as FontFile','preload(\"res://addons/neocade_theme/fonts/Inter-HeaderLarge.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-HeaderMedium.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-HeaderSmall.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-Body.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-Caption.tres\")') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; if ($g -match 'default_font = body_font\\b') { throw 'Cycle 6 F6 regression: default_font assigned a FontVariation (Inter-Body.tres) — must be FontFile (Inter-Variable.tres) per FONT-06 + Plan 04-08 README cast' }; $font_calls = ([regex]::Matches($g, 'set_font\\(\"font\", \"\\w+\"')).Count; if ($font_calls -lt 14) { throw \"expected at least 14 set_font calls; got $font_calls\" }; $size_calls = ([regex]::Matches($g, 'set_font_size\\(\"font_size\"')).Count; if ($size_calls -lt 12) { throw \"expected at least 12 set_font_size calls; got $size_calls\" }"
     </automated>
   </verify>
   <done>14 type variations registered with explicit fonts + sizes (CodeLabel included); theme `default_font` / `default_font_size` set; PITFALLS 1.2 + FONT-06 satisfied; SC#7's variation requirement met.</done>
 </task>
 
 <task type="auto">
-  <name>Task 2: Author BINDING_TABLE covering all 37 scorecard Controls (CANONICAL FREEZE — Cross-AI Cycle 1 C1 fix)</name>
+  <name>Task 2.0: Empirically generate BINDING_TABLE_SEED.txt by introspecting Godot 4.6 Theme.get_*_list (Cycle 6 F7 fix — empirical option (b))</name>
+  <read_first>
+    - .planning/research/MINIMAL-THEME-DISSECTION.md (37-row scorecard — informational baseline)
+    - .planning/research/MINIMAL-THEME-COVERAGE-DELTA.md
+    - addons/neocade_theme/neocade_theme.gd (the class shell from Plans 04-01/04 — the introspection target loads this class)
+  </read_first>
+  <files>
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_introspect.gd (NEW — temp introspection helper, lives outside addon root per Cycle 6 F3)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/BINDING_TABLE_SEED.txt (NEW — generated artifact; copied verbatim into Task 2)
+  </files>
+  <action>
+    **Cycle 6 F7 fix 2026-05-06 (option b — empirical from Godot 4.6 introspection):**
+
+    Cycle 6 self-review found the BINDING_TABLE delegation in Task 2 produced bugs (e.g., F4's CheckButton on/off slot names were wrong). Curated lists from `MINIMAL-THEME-DISSECTION.md` are not authoritative — Godot 4.6's actual `Theme.get_<datatype>_list("Type")` API is. This task introduces a build-time introspection step that emits an empirical seed file that becomes the canonical input to Task 2 — Task 2's executor copies the seed verbatim into `BINDING_TABLE`'s slot lists, and adds recipes (the values).
+
+    **Stage A — Author the introspection helper.** Create `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_introspect.gd`:
+
+    ```gdscript
+    @tool
+    extends EditorScript
+
+    ## Phase 4 build-time helper. Empirically introspects every targeted Control's
+    ## Theme.get_<datatype>_list("Type") in Godot 4.6 and emits a BINDING_TABLE_SEED.txt
+    ## with the slot names per (Type, datatype) tuple. Task 2 of Plan 04-05 reads the
+    ## seed VERBATIM into BINDING_TABLE's slot keys; recipes (value formulas) are added
+    ## by hand per the M3 design system.
+    ##
+    ## NOT distributed (lives outside addons/neocade_theme/). Run via:
+    ##   godot --headless --editor --script .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_introspect.gd
+    ##
+    ## Output goes to .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/BINDING_TABLE_SEED.txt
+
+    func _run() -> void:
+        # The 37 Control types Phase 4 BINDING_TABLE must cover (from MINIMAL-THEME-COVERAGE-DELTA.md).
+        # Order matches CANONICAL_SLOT_NAMES freeze ordering.
+        var types: Array[String] = [
+            "Button", "CheckBox", "CheckButton", "OptionButton", "MenuButton", "MenuBar",
+            "LinkButton", "LineEdit", "TextEdit", "CodeEdit", "RichTextLabel", "Label",
+            "SpinBox", "ProgressBar", "HSlider", "VSlider", "HScrollBar", "VScrollBar",
+            "Tree", "ItemList", "TabBar", "TabContainer", "PanelContainer", "Panel",
+            "PopupPanel", "PopupMenu", "TooltipPanel", "TooltipLabel",
+            "AcceptDialog", "ConfirmationDialog", "FileDialog", "Window",
+            "HSeparator", "VSeparator", "HSplitContainer", "VSplitContainer",
+            "HFlowContainer", "ColorPicker", "ColorPickerButton",
+            "GraphEdit", "GraphFrame", "GraphNode", "FoldableContainer",
+        ]
+        var data_types: Array[String] = ["stylebox", "color", "constant", "font_size", "icon"]
+        var lines: Array[String] = []
+        lines.append("# BINDING_TABLE_SEED — empirically generated by _phase4_introspect.gd")
+        lines.append("# Source: Godot 4.6 ThemeDB / Theme.get_<datatype>_list API")
+        lines.append("# Generated: " + Time.get_datetime_string_from_system())
+        lines.append("# Consume: Task 2 of Plan 04-05 — slot lists per (Type, datatype) become BINDING_TABLE keys.")
+        lines.append("")
+
+        for t in types:
+            lines.append("## " + t)
+            for dt in data_types:
+                # Godot's ThemeDB exposes per-class default theme items via _get_default_theme().
+                # We probe each (Type, datatype) tuple by querying the editor default theme.
+                var default_theme: Theme = ThemeDB.get_default_theme()
+                if default_theme == null:
+                    push_error("ThemeDB.get_default_theme() returned null — re-run from editor")
+                    return
+                var slot_list: PackedStringArray
+                match dt:
+                    "stylebox":  slot_list = default_theme.get_stylebox_list(t)
+                    "color":     slot_list = default_theme.get_color_list(t)
+                    "constant":  slot_list = default_theme.get_constant_list(t)
+                    "font_size": slot_list = default_theme.get_font_size_list(t)
+                    "icon":      slot_list = default_theme.get_icon_list(t)
+                if slot_list.size() == 0:
+                    continue
+                var slots: Array[String] = []
+                for s in slot_list:
+                    slots.append(s)
+                slots.sort()  # deterministic ordering for diff-friendliness
+                lines.append("  " + dt + ": " + ", ".join(slots))
+            lines.append("")
+
+        var out_path := ".planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/BINDING_TABLE_SEED.txt"
+        var fa := FileAccess.open(out_path, FileAccess.WRITE)
+        assert(fa != null, "Failed to open %s for writing" % out_path)
+        fa.store_string("\n".join(lines))
+        fa.close()
+        print("✓ BINDING_TABLE_SEED.txt emitted at: ", out_path)
+    ```
+
+    **Stage B — Run the helper to emit the seed.**
+    ```
+    godot --headless --editor --script .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_introspect.gd
+    ```
+    Output: `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/BINDING_TABLE_SEED.txt` — a plain-text file listing every (ThemeType, datatype) → slot-name array in Godot 4.6's actual default theme.
+
+    **Stage C — Cross-reference + commit.** The executor opens the seed file alongside `MINIMAL-THEME-DISSECTION.md`. Where the two disagree, the EMPIRICAL SEED IS AUTHORITATIVE (Cycle 6 F7 root cause: dissection has slot-name accuracy issues; Godot's API is ground truth). The executor flags any divergences in Plan 04 SUMMARY.md for the audit trail (e.g., "CheckButton dissection said `on`/`off`; seed said `checked`/`unchecked`/[6 disabled+mirrored variants] — adopting seed values").
+
+    The seed file is NOT distributed with the addon (it's under `.planning/phases/.../helpers/`). It serves as the empirical input to Task 2 + as audit evidence that BINDING_TABLE keys match Godot 4.6's actual API surface.
+
+    **Why option (b) instead of inlining the table verbatim (option a):** option (a) requires hand-curating ~600 lines of slot names from possibly-stale documentation; option (b) sources slot names from Godot 4.6's runtime API, eliminating curation drift. The 14 lines of executor work (running the script + cross-referencing the output) are less error-prone than 600 hand-curated lines.
+  </action>
+  <acceptance_criteria>
+    - File `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_introspect.gd` exists with `@tool` + `extends EditorScript` + `func _run() -> void:`.
+    - File contains `ThemeDB.get_default_theme()` (the introspection target).
+    - File contains all 5 data-type branches in a `match dt:` block: `"stylebox"`, `"color"`, `"constant"`, `"font_size"`, `"icon"`.
+    - File contains `default_theme.get_stylebox_list(t)`, `.get_color_list(t)`, `.get_constant_list(t)`, `.get_font_size_list(t)`, `.get_icon_list(t)`.
+    - File contains a `types: Array[String]` declaration listing all 37 target Control types — at minimum: Button, CheckBox, CheckButton, OptionButton, LineEdit, TextEdit, CodeEdit, RichTextLabel, Label, SpinBox, ProgressBar, HSlider, VSlider, HScrollBar, VScrollBar, Tree, ItemList, TabBar, TabContainer, Panel, PanelContainer, PopupPanel, PopupMenu, TooltipPanel, AcceptDialog, ConfirmationDialog, FileDialog, Window.
+    - File `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/BINDING_TABLE_SEED.txt` exists after Stage B runs (the empirical output).
+    - The seed file has at least one section for `## Button` and `## Tree` (sanity check of API output).
+    - The seed file's `## CheckButton` section contains `icon: ` line listing slot names that include `checked` AND `unchecked` (proves Godot 4.6's actual slot names; closes the F4 root cause).
+    - The introspection helper is NOT at `addons/neocade_theme/_phase4_introspect.gd` (Cycle 6 F3 fix: helpers live outside addon root).
+  </acceptance_criteria>
+  <verify>
+    <automated>
+      powershell -NoProfile -Command "$h='.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_introspect.gd'; if (-not (Test-Path $h)) { throw 'Cycle 6 F7: _phase4_introspect.gd missing' }; if (Test-Path 'addons/neocade_theme/_phase4_introspect.gd') { throw 'Cycle 6 F3 regression: _phase4_introspect.gd at addon root (must live under .planning/phases/04-.../helpers/)' }; $g=Get-Content -Raw $h; foreach($n in '@tool','extends EditorScript','func _run() -> void:','ThemeDB.get_default_theme()','match dt:','\"stylebox\":','\"color\":','\"constant\":','\"font_size\":','\"icon\":','get_stylebox_list','get_color_list','get_constant_list','get_font_size_list','get_icon_list','BINDING_TABLE_SEED.txt','\"Button\"','\"CheckBox\"','\"CheckButton\"','\"OptionButton\"','\"LineEdit\"','\"Tree\"','\"ItemList\"','\"TabBar\"','\"PopupMenu\"','\"Window\"') { if ($g -notmatch [regex]::Escape($n)) { throw \"_phase4_introspect.gd missing: $n\" } }; $seed='.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/BINDING_TABLE_SEED.txt'; if (-not (Test-Path $seed)) { throw 'Cycle 6 F7: BINDING_TABLE_SEED.txt missing — Stage B (godot --headless --editor --script) must run before commit' }; $sg=Get-Content -Raw $seed; if ($sg -notmatch '## Button') { throw 'BINDING_TABLE_SEED.txt missing ## Button section' }; if ($sg -notmatch '## CheckButton') { throw 'BINDING_TABLE_SEED.txt missing ## CheckButton section' }; if ($sg -notmatch '## Tree') { throw 'BINDING_TABLE_SEED.txt missing ## Tree section' }"
+    </automated>
+  </verify>
+  <done>BINDING_TABLE_SEED.txt is empirically generated from Godot 4.6's actual Theme API. Task 2 below uses this seed verbatim for slot-name keys; recipes (values) are still hand-authored per the M3 design system. F7 root cause closed: slot-name accuracy is now Godot-sourced, not curation-sourced.</done>
+</task>
+
+<task type="auto">
+  <name>Task 2: Author BINDING_TABLE covering all 37 scorecard Controls (CANONICAL FREEZE — Cross-AI Cycle 1 C1 fix; Cycle 6 F7 sources slot names from BINDING_TABLE_SEED.txt)</name>
   <read_first>
     - addons/neocade_theme/neocade_theme.gd
     - .planning/research/MINIMAL-THEME-COVERAGE-DELTA.md (37 scorecard rows)
@@ -271,7 +401,9 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
 
     **MEDIUM reconcile fix (Codex Cycle 1):** previously `Button.normal` had `raised_intensity = 0`, but Plan 04-06's verifier expects `shadow_size > 0` when `raised = true`. **The fix:** `Button.normal` (and `Button.hover`) get `raised_intensity = 1`. `Button.pressed`/`hover_pressed`/`disabled` keep `raised_intensity = 0` (pressed visually SINKS not lifts; disabled is flat). Plan 04-06's `_phase4_verify.gd` raised-toggle test explicitly asserts `Button.normal` has `shadow_size > 0` when `raised = true`, which now passes.
 
-    The full BINDING_TABLE is too long to inline verbatim here, but the executor authors it directly using the 37-row scorecard from `MINIMAL-THEME-COVERAGE-DELTA.md` and the per-Control state lists from `MINIMAL-THEME-DISSECTION.md`. The executor MUST cover ALL 37 rows EXACTLY (no add/drop). The structure for each Control:
+    **Cycle 6 F7 fix 2026-05-06: slot-name source-of-truth changed from MINIMAL-THEME-DISSECTION.md (curated) to `helpers/BINDING_TABLE_SEED.txt` (empirically introspected from Godot 4.6's actual Theme API by Task 2.0).** Task 2's executor opens the seed file alongside this plan, copies the per-(Type, datatype) slot-name arrays VERBATIM into BINDING_TABLE keys, then ADDS recipes (`{"role": "..."}`, etc.) per the M3 design system. The seed is authoritative for slot NAMES; this plan's tables remain authoritative for slot VALUES (recipes). Where the seed and the dissection disagree, the seed wins (Cycle 6 F4 root cause: dissection had `on`/`off` for CheckButton; the seed has `checked`/`unchecked` because that's what Godot 4.6 actually uses).
+
+    The full BINDING_TABLE is too long to inline verbatim here, so the executor authors it directly using `helpers/BINDING_TABLE_SEED.txt` (slot names — Cycle 6 F7) and `MINIMAL-THEME-COVERAGE-DELTA.md` (37-row coverage scorecard). The executor MUST cover ALL 37 rows EXACTLY (no add/drop). The structure for each Control:
 
     ```gdscript
     "<ThemeType>": {
@@ -300,7 +432,7 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
     |---|---|---|
     | Button | 6 styleboxes (normal/hover/pressed/focus/disabled/hover_pressed) + 5+ font colors + h_separation constant | 10.3 (clean state switching); 1.1 (focus = ring not fill) |
     | CheckBox | 6 styleboxes + 4 icons (checked/unchecked + checkbox_disabled if needed) + colors | inherits Button states |
-    | CheckButton | 6 styleboxes + 2 icons (on/off) + colors | use toggle_on/toggle_off icons |
+    | CheckButton | 6 styleboxes + 2 icons (checked/unchecked per Godot 4.6) + colors | use checkbutton_checked/checkbutton_unchecked icons (Cycle 6 F4: was toggle_on/off) |
     | OptionButton | 6 styleboxes + 1 icon (arrow) + colors | use arrow_down |
     | MenuButton | 6 styleboxes + colors | similar to Button |
     | LinkButton | colors only (font_color + states); no styleboxes | TextButton variant |
@@ -421,9 +553,14 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
             "color": ["font_pressed_color", "font_hover_pressed_color"],
             "stylebox": ["normal"],
         },
-        # CheckButton — 2 icon slots (per MINIMAL-THEME-DISSECTION.md §CheckButton)
+        # CheckButton — 2 icon slots: `checked`/`unchecked` per Godot 4.6 class_checkbutton.md
+        # (Cycle 6 F4 fix 2026-05-06: was "on"/"off"; CheckButton has NO `on`/`off` slots —
+        # icon slots are checked, checked_disabled, checked_disabled_mirrored, checked_mirrored,
+        # unchecked, unchecked_disabled, unchecked_disabled_mirrored, unchecked_mirrored).
+        # Phase 4 ships only the 2 primary slots; the 6 disabled/mirrored variants are
+        # deferred to v1.x per CHANGELOG (Plan 04-08).
         "CheckButton": {
-            "icon": ["on", "off"],
+            "icon": ["checked", "unchecked"],
             "color": ["font_focus_color", "font_hover_pressed_color", "font_pressed_color"],
         },
         # OptionButton — 6 stylebox + 1 constant + 1 icon
@@ -533,7 +670,7 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
     - File contains `"HScrollBar":` with stylebox array including `"scroll"`, `"scroll_focus"`, `"grabber"`, `"grabber_highlight"`, `"grabber_pressed"`.
     - File contains `"VScrollBar":` with the same 5 slot names as HScrollBar.
     - File contains `"CheckBox":` with `"icon":` array including `"checked"`, `"unchecked"`.
-    - File contains `"CheckButton":` with `"icon":` array including `"on"`, `"off"`.
+    - File contains `"CheckButton":` with `"icon":` array including `"checked"`, `"unchecked"` (Cycle 6 F4 fix 2026-05-06: was `"on"`/`"off"`; the actual Godot 4.6 CheckButton icon slot names are `checked`/`unchecked`).
     - File contains `"OptionButton":` with `"icon":` array including `"arrow"`.
     - The CANONICAL_SLOT_NAMES dict declares at least 22 Control type keys (the freeze coverage scope).
   </acceptance_criteria>
@@ -781,8 +918,11 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
       (densityScale=1.5, tapPadding=12) yields larger Button.normal margins
       than DESKTOP (densityScale=1.0, tapPadding=8). Plan 04-06 verifier
       observes the MOBILE>DESKTOP difference.
-    - C3 fix: theme.default_font = Inter-Body.tres + default_font_size = tokens.body
-      set BEFORE the BINDING_TABLE walk (FONT-06 closure)
+    - C3 fix + Cycle 6 F6 fix 2026-05-06: theme.default_font = Inter-Variable.tres
+      (FontFile, NOT Inter-Body FontVariation) + default_font_size = tokens.body
+      set BEFORE the BINDING_TABLE walk (FONT-06 closure). FontVariation/FontFile
+      are sibling types both extending Font but NOT cast-compatible; Plan 04-08
+      README's `theme.default_font as FontFile` only succeeds with FontFile.
     - C4 fix: TYPE_VARIATIONS = 14 entries (PrimaryButton/SecondaryButton/
       GhostButton/DangerButton/IconButton/FlatButton + HeaderLarge/HeaderMedium/
       HeaderSmall/Caption/CodeLabel + InfoText + CardPanel/HeroPanel) — CodeLabel
@@ -797,26 +937,36 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
     - _regenerate_theme() walks BINDING_TABLE additively (D-01 invariant: no clear();
       D-04 escape hatch: entries not in table are untouched)
     - Icon binding wires the 10 Button-family SVGs from Plan 04-03 to CheckBox /
-      RadioButton / CheckButton / OptionButton / LineEdit clear / dialog close slots
+      RadioButton / CheckButton (`checked`/`unchecked` per Cycle 6 F4) /
+      OptionButton / LineEdit clear / dialog close slots
+    - Cycle 6 F7 fix 2026-05-06: NEW Task 2.0 added — empirical
+      `helpers/_phase4_introspect.gd` introspects Godot 4.6's
+      `Theme.get_<datatype>_list("Type")` API and emits
+      `helpers/BINDING_TABLE_SEED.txt`. Task 2 reads the seed VERBATIM for slot-name
+      keys; recipes (values) are still hand-authored per the M3 design. Where the
+      seed and MINIMAL-THEME-DISSECTION.md disagree, the seed wins — closes the
+      F4 root cause (CheckButton dissection said `on`/`off`; Godot 4.6 uses
+      `checked`/`unchecked`).
 
     Refs: FOUND-02 (full _regenerate_theme body), FONT-06 (default_font),
       ICON-02 (wiring), TYPEVAR-01..05
     Plan: 04-05
     ```
 
-    `git add addons/neocade_theme/neocade_theme.gd`; `git commit -m "..."`. Do NOT push.
+    `git add` the modified `addons/neocade_theme/neocade_theme.gd` AND the new helper files at `.planning/phases/04-.../helpers/_phase4_introspect.gd` + `BINDING_TABLE_SEED.txt`; `git commit -m "..."`. Do NOT push.
   </action>
   <acceptance_criteria>
     - `git log -1 --pretty=%s` returns a subject line starting with `feat(04-05):`.
     - `git log -1 --name-status` shows `M addons/neocade_theme/neocade_theme.gd`.
-    - `git status --porcelain` is empty for `addons/neocade_theme/neocade_theme.gd`.
+    - **Cycle 6 F7 fix:** `git log -1 --name-status` ALSO shows `A .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_introspect.gd` AND `A .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/BINDING_TABLE_SEED.txt`.
+    - `git status --porcelain` is empty for all changed files.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$msg = git log -1 --pretty=%s; if ($msg -notmatch '^feat\\(04-05\\):') { throw \"commit subject wrong: $msg\" }; $ns = git log -1 --name-status; if ($ns -notmatch 'M\\s+addons/neocade_theme/neocade_theme\\.gd') { throw 'commit missing neocade_theme.gd modification' }; $st = git status --porcelain | Where-Object { $_ -match 'addons/neocade_theme/neocade_theme\\.gd' }; if ($st) { throw 'unexpected leftover changes' }"
+      powershell -NoProfile -Command "$msg = git log -1 --pretty=%s; if ($msg -notmatch '^feat\\(04-05\\):') { throw \"commit subject wrong: $msg\" }; $ns = git log -1 --name-status; if ($ns -notmatch 'M\\s+addons/neocade_theme/neocade_theme\\.gd') { throw 'commit missing neocade_theme.gd modification' }; if ($ns -notmatch 'A\\s+\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_introspect\\.gd') { throw 'Cycle 6 F7: commit missing helpers/_phase4_introspect.gd' }; if ($ns -notmatch 'A\\s+\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/BINDING_TABLE_SEED\\.txt') { throw 'Cycle 6 F7: commit missing helpers/BINDING_TABLE_SEED.txt' }; $st = git status --porcelain | Where-Object { $_ -match 'addons/neocade_theme/neocade_theme\\.gd|helpers/_phase4_introspect\\.gd|helpers/BINDING_TABLE_SEED\\.txt' }; if ($st) { throw 'unexpected leftover changes' }"
     </automated>
   </verify>
-  <done>The iteration engine + BINDING_TABLE + variations + icon binding land as a single atomic Wave 2 commit. The class is feature-complete; Plans 04-06/07 ship `.tres` data only.</done>
+  <done>The iteration engine + BINDING_TABLE + variations + icon binding land as a single atomic Wave 2 commit. Cycle 6 F7: the BINDING_TABLE_SEED.txt artifact is committed alongside as audit evidence that slot names are sourced empirically from Godot 4.6 (not from a possibly-stale dissection). The class is feature-complete; Plans 04-06/07 ship `.tres` data only.</done>
 </task>
 
 </tasks>

@@ -8,9 +8,9 @@ depends_on:
   - "04-05"
 files_modified:
   - addons/neocade_theme/pulse_neocade_theme.tres
-  - addons/neocade_theme/_phase4_import.gd  # extended with _save_pulse_tres()
-  - addons/neocade_theme/_phase4_verify.gd  # EditorScript verifier
-  - addons/neocade_theme/_phase4_verify_headless.gd  # SceneTree headless variant (Cross-AI Cycle 1 MEDIUM)
+  - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd  # extended with _save_pulse_tres() (Cycle 6 F3: helper relocated)
+  - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd  # EditorScript verifier (Cycle 6 F3: outside addon root)
+  - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd  # SceneTree headless variant (Cycle 6 F3: outside addon root; Cycle 1 MEDIUM)
 autonomous: true
 requirements:
   - FOUND-03
@@ -26,8 +26,8 @@ must_haves:
     - "Setting `base_color = Color(\"#F0F0F0\")` (a forced-light test) on the loaded `.tres` triggers regeneration; `theme.get_color(\"font_color\", \"Button\")` returns `Color(\"#1B2230\")` (the dark text on light surface, per DESIGN_TOKENS §6.4 `is_light` flip). After this verification the `.tres` is reverted to `Color(\"#151A2E\")`."
   artifacts:
     - addons/neocade_theme/pulse_neocade_theme.tres (Pulse direction; recommended starter; ResourceSaver-generated)
-    - addons/neocade_theme/_phase4_verify.gd (EditorScript verifier; DELETE BEFORE v1)
-    - addons/neocade_theme/_phase4_verify_headless.gd (SceneTree headless verifier; DELETE BEFORE v1)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd (EditorScript verifier; OUTSIDE addon root per Cycle 6 F3)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd (SceneTree headless verifier; OUTSIDE addon root per Cycle 6 F3)
   key_links:
     - ".planning/DESIGN_TOKENS.md §5.1 (Pulse @export values)"
     - ".planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-CONTEXT.md D-13, D-14 step 7-8"
@@ -69,12 +69,12 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
   <read_first>
     - .planning/DESIGN_TOKENS.md (§5.1 Pulse table)
     - addons/neocade_theme/neocade_theme.gd (verify NeoCadeTheme class is loadable as a resource type)
-    - addons/neocade_theme/_phase4_import.gd (Plan 04-02 — extend this helper)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd (Plan 04-02 — extend this helper)
     - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-CONTEXT.md (D-14 step 7)
     - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-REVIEWS.md (Cycle 1 HIGH C6)
   </read_first>
   <files>
-    - addons/neocade_theme/_phase4_import.gd (modify — extend with Pulse .tres save block)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd (modify — extend with Pulse .tres save block)
     - addons/neocade_theme/pulse_neocade_theme.tres (GENERATED via ResourceSaver.save)
   </files>
   <action>
@@ -274,7 +274,7 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
 
     **Stage B — Run the helper:**
 
-    Run `_phase4_import.gd` via Godot Editor's File → Run, OR `godot --headless --editor --script addons/neocade_theme/_phase4_import.gd`. The Pulse `.tres` file is materialized at `addons/neocade_theme/pulse_neocade_theme.tres`. Capture the printed first line — that's the canonical header Godot emits for `NeoCadeTheme` resources, and Plan 04-07 will use the EXACT same form for Slate/Bubble/Daybreak/Burst.
+    Run `_phase4_import.gd` via Godot Editor's File → Run, OR `godot --headless --editor --script .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd`. The Pulse `.tres` file is materialized at `addons/neocade_theme/pulse_neocade_theme.tres`. Capture the printed first line — that's the canonical header Godot emits for `NeoCadeTheme` resources, and Plan 04-07 will use the EXACT same form for Slate/Bubble/Daybreak/Burst.
 
     Color value reference (informational; Godot's serializer produces these float values):
     - `base_color = Color("#151A2E")` → `Color(0.0823529, 0.101961, 0.180392, 1)`.
@@ -285,7 +285,7 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
     The Plan 04-06 commit captures the actual saved file. Future Plan 04-07 commits use the same saved-file-as-template approach for the peer themes.
   </action>
   <acceptance_criteria>
-    - `addons/neocade_theme/_phase4_import.gd` contains a `func _save_pulse_tres() -> void:` declaration.
+    - `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd` contains a `func _save_pulse_tres() -> void:` declaration.
     - `_phase4_import.gd` `_save_pulse_tres` body contains `NeoCadeTheme.new()`, sets all 9 @export values, and calls `ResourceSaver.save(pulse, "res://addons/neocade_theme/pulse_neocade_theme.tres")`.
     - **Cross-AI Cycle 3 N4 Fix A:** `_phase4_import.gd` contains a `static func _strip_theme_entries(path: String) -> void:` declaration.
     - **Cross-AI Cycle 3 N4 Fix A:** `_save_pulse_tres()` body invokes `_strip_theme_entries(path)` AFTER `ResourceSaver.save(...)` and AFTER the C6 first-line capture.
@@ -314,21 +314,21 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$h='addons/neocade_theme/_phase4_import.gd'; if (-not (Test-Path $h)) { throw '_phase4_import.gd missing — Plan 04-02 must run first' }; $hg=Get-Content -Raw $h; foreach($n in 'func _save_pulse_tres() -> void:','NeoCadeTheme.new()','base_color = Color(\"#151A2E\")','accent_color = Color(\"#8BFF6A\")','ResourceSaver.save(pulse, \"res://addons/neocade_theme/pulse_neocade_theme.tres\")','_save_pulse_tres()','static func _strip_theme_entries(path: String) -> void:','_strip_theme_entries(path)','EXPORT_KEYS','[sub_resource','< 2048','[ext_resource','type=\"Script\"','script = ExtResource(','script_class =','_strip_load_steps_attr','static func _strip_load_steps_attr(header_line: String) -> String:','load_steps=') { if ($hg -notmatch [regex]::Escape($n)) { throw \"_phase4_import.gd missing: $n\" } }; $p='addons/neocade_theme/pulse_neocade_theme.tres'; if (-not (Test-Path $p)) { throw 'pulse_neocade_theme.tres missing — run _phase4_import.gd' }; $g=Get-Content -Raw $p; foreach($n in '[gd_resource','format=3','[resource]','base_color = Color(0.0823529, 0.101961, 0.180392, 1)','accent_color = Color(0.545098, 1, 0.415686, 1)','raised = false','platform = 2','corner_radius = 0','spacing = 18','raised_strength = 3','focus_thickness = 2','outline_width = 1') { if ($g -notmatch [regex]::Escape($n)) { throw \"pulse .tres missing: $n\" } }; if ($g -notmatch 'NeoCadeTheme') { throw 'NeoCadeTheme reference missing in pulse .tres header' }; if ($g -match '\\[sub_resource') { throw 'N4 fix regression: pulse .tres contains [sub_resource ...] blocks (strip pass did not run)' }; if ($g -match 'theme_data/') { throw 'N4 fix regression: pulse .tres contains theme_data/ lines (strip pass did not run)' }; if ($g -match 'load_steps=') { throw 'N5 fix regression: pulse .tres header still contains load_steps= attribute (should be stripped so Godot recomputes on load)' }; $size=(Get-Item $p).Length; if ($size -ge 2048) { throw \"N4 fix regression: file size $size bytes >= 2048 (SC#6 < 2 KiB violated)\" }"
+      powershell -NoProfile -Command "$h='.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd'; if (-not (Test-Path $h)) { throw '_phase4_import.gd missing — Plan 04-02 must run first' }; $hg=Get-Content -Raw $h; foreach($n in 'func _save_pulse_tres() -> void:','NeoCadeTheme.new()','base_color = Color(\"#151A2E\")','accent_color = Color(\"#8BFF6A\")','ResourceSaver.save(pulse, \"res://addons/neocade_theme/pulse_neocade_theme.tres\")','_save_pulse_tres()','static func _strip_theme_entries(path: String) -> void:','_strip_theme_entries(path)','EXPORT_KEYS','[sub_resource','< 2048','[ext_resource','type=\"Script\"','script = ExtResource(','script_class =','_strip_load_steps_attr','static func _strip_load_steps_attr(header_line: String) -> String:','load_steps=') { if ($hg -notmatch [regex]::Escape($n)) { throw \"_phase4_import.gd missing: $n\" } }; $p='addons/neocade_theme/pulse_neocade_theme.tres'; if (-not (Test-Path $p)) { throw 'pulse_neocade_theme.tres missing — run _phase4_import.gd' }; $g=Get-Content -Raw $p; foreach($n in '[gd_resource','format=3','[resource]','base_color = Color(0.0823529, 0.101961, 0.180392, 1)','accent_color = Color(0.545098, 1, 0.415686, 1)','raised = false','platform = 2','corner_radius = 0','spacing = 18','raised_strength = 3','focus_thickness = 2','outline_width = 1') { if ($g -notmatch [regex]::Escape($n)) { throw \"pulse .tres missing: $n\" } }; if ($g -notmatch 'NeoCadeTheme') { throw 'NeoCadeTheme reference missing in pulse .tres header' }; if ($g -match '\\[sub_resource') { throw 'N4 fix regression: pulse .tres contains [sub_resource ...] blocks (strip pass did not run)' }; if ($g -match 'theme_data/') { throw 'N4 fix regression: pulse .tres contains theme_data/ lines (strip pass did not run)' }; if ($g -match 'load_steps=') { throw 'N5 fix regression: pulse .tres header still contains load_steps= attribute (should be stripped so Godot recomputes on load)' }; $size=(Get-Item $p).Length; if ($size -ge 2048) { throw \"N4 fix regression: file size $size bytes >= 2048 (SC#6 < 2 KiB violated)\" }"
     </automated>
   </verify>
   <done>Pulse `.tres` ships the recommended-starter direction's `@export` values; the engine produces a renderable theme on load.</done>
 </task>
 
 <task type="auto">
-  <name>Task 2: Author a verification helper at addons/neocade_theme/_phase4_verify.gd and run smoke checks</name>
+  <name>Task 2: Author a verification helper at .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd and run smoke checks</name>
   <read_first>
     - addons/neocade_theme/pulse_neocade_theme.tres
     - addons/neocade_theme/neocade_theme.gd
     - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-RESEARCH.md (§7 verification methodology, §11 verification gates)
   </read_first>
   <files>
-    - addons/neocade_theme/_phase4_verify.gd (NEW — temp helper, deleted in Phase 11)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd (NEW — temp helper; lives outside addon root per Cycle 6 F3, so no Phase 11 cleanup is required — it's already non-shipping)
   </files>
   <action>
     Author a verification helper that loads `pulse_neocade_theme.tres` and asserts:
@@ -346,10 +346,11 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
     12. **Cross-AI Cycle 2 M2 fix — platform margin observable change.** Toggling `platform = MOBILE` then `platform = DESKTOP` on the loaded `.tres` produces measurably different `Button.normal` `content_margin_left` values (MOBILE > DESKTOP), proving `tokens.densityScale` + `tokens.tapPadding` reach the stylebox layer.
     13. **Cross-AI Cycle 2 L2 fix — cross-direction differentiation smoke test.** Load `slate_neocade_theme.tres` (when Plan 04-07 has shipped it; OR construct a transient in-memory NeoCadeTheme with `base_color = Color("#111820")`) and assert its `_resolve_direction_presets().spread_factor` differs from Pulse's 1.3 (Slate's 0.7). This catches hex-key float round-trip silent-fallback regressions where all directions collapse to DEFAULT (1.0).
     14. **Cross-AI Cycle 2 C2 fix — disabled alpha sourced from presets.** Assert that `theme.get_color("font_disabled_color", "Button").a` equals Pulse's `disabled_opacity` (0.42), NOT 0.38. Catches regressions where the recipe still hard-codes 0.38.
+    15. **Cross-AI Cycle 6 F1 fix — per-direction hover/pressed/disabled value assertions.** For each of the 5 approved directions, construct a transient NeoCadeTheme with that base_color and assert `_resolve_direction_presets()` returns the DESIGN_TOKENS §5.1-§5.5 values exactly. Per-direction expected sub-dicts: Pulse `#151A2E` → hover 6.0 / pressed -10.0 / disabled 0.42; Slate `#111820` → hover 4.0 / pressed -6.0 / disabled 0.50; Bubble `#241326` → hover 8.0 / pressed -10.0 / disabled 0.45; Daybreak `#0B2420` → hover 6.0 / pressed -6.0 / disabled 0.50; Burst `#20112E` → hover 8.0 / pressed -12.0 / disabled 0.45. Catches the Cycle 6 regression where 4 of 5 directions had wrong state-layer pcts that passed the `spread_factor`-only smoke test but shipped with mockup-incorrect state layers. The L2 smoke test alone is INSUFFICIENT — this asserts each value, not just spread differentiation.
 
     **Cross-AI Cycle 1 MEDIUM fix (headless verification):** the helper is split into TWO files for autonomous-executor friendliness:
-    - `addons/neocade_theme/_phase4_verify.gd` — `extends EditorScript` (run via Godot Editor; the original).
-    - `addons/neocade_theme/_phase4_verify_headless.gd` — `extends SceneTree` (run via `godot --headless --script` WITHOUT `--editor`; CI-friendly).
+    - `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd` — `extends EditorScript` (run via Godot Editor; the original).
+    - `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd` — `extends SceneTree` (run via `godot --headless --script` WITHOUT `--editor`; CI-friendly).
 
     Both files share the same assertion logic (extracted into a shared inner function); the editor variant prints to the Output panel, the headless variant prints to stdout + `quit()`s.
 
@@ -360,7 +361,11 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
     extends EditorScript
 
     ## Phase 4 verification helper (EditorScript variant). Run via Godot Editor → File → Run.
-    ## DELETE this file in Phase 11 before distribution (alongside _phase4_verify_headless.gd
+    ## NOT distributed with the addon (lives outside addons/neocade_theme/ per Cycle 6 F3 fix —
+    ## FOUND-01 / Phase 4 SC#1 requires exactly 1 .gd file at addon root: neocade_theme.gd).
+    ## DELETE BEFORE v1 PUBLICATION marker retained for Phase 11 grep audit (no actual cleanup
+    ## required since the file is already outside the addon).
+    ## (Companion: _phase4_verify_headless.gd
     ## and _phase4_import.gd).
 
     func _run() -> void:
@@ -493,19 +498,44 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
         assert(abs(pulse_presets.spread_factor - slate_presets.spread_factor) > 0.5,
             "L2 fix: Pulse and Slate spread_factor too close (%f vs %f) — directions not differentiated" % [pulse_presets.spread_factor, slate_presets.spread_factor])
 
+        # 11. Cross-AI Cycle 6 F1 fix — per-direction hover_pct / pressed_pct / disabled_opacity
+        # value assertions vs DESIGN_TOKENS §5.1-§5.5. The L2 smoke test only checks spread_factor;
+        # F1 caught state-layer pct regressions that passed L2 but shipped wrong values. Per-direction
+        # expected values (DESIGN_TOKENS §5.x verbatim):
+        var f1_expected: Dictionary = {
+            "151A2E": {"hover_pct": 6.0, "pressed_pct": -10.0, "disabled_opacity": 0.42},  # Pulse §5.1
+            "111820": {"hover_pct": 4.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50},  # Slate §5.2
+            "241326": {"hover_pct": 8.0, "pressed_pct": -10.0, "disabled_opacity": 0.45},  # Bubble §5.3
+            "0B2420": {"hover_pct": 6.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50},  # Daybreak §5.4
+            "20112E": {"hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.45},  # Burst §5.5
+        }
+        for hex_key in f1_expected.keys():
+            var probe: NeoCadeTheme = NeoCadeTheme.new()
+            probe.base_color = Color("#" + hex_key)
+            var got: Dictionary = probe._resolve_direction_presets()
+            var want: Dictionary = f1_expected[hex_key]
+            assert(abs(got.hover_pct - want.hover_pct) < 0.001,
+                "F1 fix: direction %s hover_pct %f != expected %f (DESIGN_TOKENS §5)" % [hex_key, got.hover_pct, want.hover_pct])
+            assert(abs(got.pressed_pct - want.pressed_pct) < 0.001,
+                "F1 fix: direction %s pressed_pct %f != expected %f (DESIGN_TOKENS §5)" % [hex_key, got.pressed_pct, want.pressed_pct])
+            assert(abs(got.disabled_opacity - want.disabled_opacity) < 0.001,
+                "F1 fix: direction %s disabled_opacity %f != expected %f (DESIGN_TOKENS §5)" % [hex_key, got.disabled_opacity, want.disabled_opacity])
+
         print("✓ Phase 4 verification: pulse_neocade_theme.tres passes all gates.")
     ```
 
     **Headless-friendly variant — `_phase4_verify_headless.gd` (Cross-AI Cycle 1 MEDIUM fix):**
 
-    Author a second file `addons/neocade_theme/_phase4_verify_headless.gd` that uses `extends SceneTree` (NOT EditorScript) so it can run via `godot --headless --script ...` WITHOUT needing the editor:
+    Author a second file `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd` that uses `extends SceneTree` (NOT EditorScript) so it can run via `godot --headless --script ...` WITHOUT needing the editor:
 
     ```gdscript
     extends SceneTree
 
     ## Phase 4 verification helper (headless variant). Run autonomously via:
-    ##   godot --headless --quit --script addons/neocade_theme/_phase4_verify_headless.gd
-    ## DELETE this file in Phase 11 (alongside _phase4_verify.gd + _phase4_import.gd).
+    ##   godot --headless --quit --script .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd
+    ## NOT distributed with the addon (lives outside addons/neocade_theme/ per Cycle 6 F3 fix —
+    ## FOUND-01 / Phase 4 SC#1 requires exactly 1 .gd file at addon root: neocade_theme.gd).
+    ## DELETE BEFORE v1 PUBLICATION marker retained for Phase 11 audit.
 
     func _init() -> void:
         var path := "res://addons/neocade_theme/pulse_neocade_theme.tres"
@@ -603,6 +633,28 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
         if abs(pulse_presets.spread_factor - slate_presets.spread_factor) <= 0.5:
             failures.append("L2 fix: Pulse and Slate spread_factor not differentiated (%f vs %f)" % [pulse_presets.spread_factor, slate_presets.spread_factor])
 
+        # Cross-AI Cycle 6 F1 fix — per-direction hover_pct/pressed_pct/disabled_opacity assertions
+        # vs DESIGN_TOKENS §5.1-§5.5. Catches state-layer regressions that pass L2's spread_factor
+        # smoke test but ship visibly-wrong state layers.
+        var f1_expected: Dictionary = {
+            "151A2E": {"hover_pct": 6.0, "pressed_pct": -10.0, "disabled_opacity": 0.42},  # Pulse §5.1
+            "111820": {"hover_pct": 4.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50},  # Slate §5.2
+            "241326": {"hover_pct": 8.0, "pressed_pct": -10.0, "disabled_opacity": 0.45},  # Bubble §5.3
+            "0B2420": {"hover_pct": 6.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50},  # Daybreak §5.4
+            "20112E": {"hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.45},  # Burst §5.5
+        }
+        for hex_key in f1_expected.keys():
+            var probe: NeoCadeTheme = NeoCadeTheme.new()
+            probe.base_color = Color("#" + hex_key)
+            var got: Dictionary = probe._resolve_direction_presets()
+            var want: Dictionary = f1_expected[hex_key]
+            if abs(got.hover_pct - want.hover_pct) > 0.001:
+                failures.append("F1 fix: direction %s hover_pct %f != expected %f (DESIGN_TOKENS §5)" % [hex_key, got.hover_pct, want.hover_pct])
+            if abs(got.pressed_pct - want.pressed_pct) > 0.001:
+                failures.append("F1 fix: direction %s pressed_pct %f != expected %f (DESIGN_TOKENS §5)" % [hex_key, got.pressed_pct, want.pressed_pct])
+            if abs(got.disabled_opacity - want.disabled_opacity) > 0.001:
+                failures.append("F1 fix: direction %s disabled_opacity %f != expected %f (DESIGN_TOKENS §5)" % [hex_key, got.disabled_opacity, want.disabled_opacity])
+
         if failures.size() > 0:
             print("FAIL — Phase 4 headless verify failures:")
             for f in failures:
@@ -616,14 +668,14 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
 
     Run paths (the executor picks whichever the environment supports; both are valid evidence):
     1. **Editor variant:** `_phase4_verify.gd` via Godot Editor → File → Run.
-    2. **Headless variant (preferred for autonomous execution):** `godot --headless --quit --script addons/neocade_theme/_phase4_verify_headless.gd` — exits 0 on PASS, 1 on FAIL.
+    2. **Headless variant (preferred for autonomous execution):** `godot --headless --quit --script .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd` — exits 0 on PASS, 1 on FAIL.
 
     Capture the stdout output (PASS line + any failure log) and include in Plan 04-06's commit message + Plan 04 SUMMARY.
 
-    NOTE: BOTH helper files live at `addons/neocade_theme/` (NOT distributed) and are deleted in Phase 11 before publication, alongside `_phase4_import.gd`. Each file MUST contain a comment header with the literal substring `DELETE BEFORE v1 PUBLICATION` so a Phase 11 grep can locate them.
+    NOTE (Cycle 6 F3 fix 2026-05-06): BOTH helper files live OUTSIDE `addons/neocade_theme/` — at `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/` — to satisfy FOUND-01 / Phase 4 SC#1 (addon root contains exactly 1 .gd file: `neocade_theme.gd`). The helpers are NOT distributed with the addon and do NOT require Phase 11 cleanup — they're already outside the addon. Each file MUST still contain a comment header with the literal substring `DELETE BEFORE v1 PUBLICATION` as an audit anchor (informational, not actionable).
   </action>
   <acceptance_criteria>
-    - File `addons/neocade_theme/_phase4_verify.gd` exists.
+    - File `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd` exists.
     - File contains `@tool` and `extends EditorScript`.
     - File contains `func _run() -> void:` and `func _verify_pulse() -> void:`.
     - File contains header comment with `DELETE BEFORE v1 PUBLICATION` (anchors Phase 11 cleanup).
@@ -642,17 +694,20 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
     - **Cross-AI Cycle 2 C2 fix:** File contains assertion that `Button.font_disabled_color.a` equals Pulse's `0.42` (literal `0.42`), NOT `0.38`.
     - **Cross-AI Cycle 2 M2 fix:** File contains `theme.platform = NeoCadeTheme.Platform.DESKTOP` AND `theme.platform = NeoCadeTheme.Platform.MOBILE` toggles + a `mobile_margin > desktop_margin` assertion.
     - **Cross-AI Cycle 2 L2 fix:** File contains the cross-direction smoke test — constructs a `slate_test: NeoCadeTheme` with `base_color = Color("#111820")` and asserts its `_resolve_direction_presets().spread_factor` differs from Pulse's by > 0.5.
-    - File `addons/neocade_theme/_phase4_verify_headless.gd` exists (Cross-AI Cycle 1 MEDIUM headless fix).
+    - **Cross-AI Cycle 6 F1 fix:** File contains a `f1_expected: Dictionary` with all 5 base_color hex keys (`"151A2E"`, `"111820"`, `"241326"`, `"0B2420"`, `"20112E"`) mapping to `{"hover_pct": ..., "pressed_pct": ..., "disabled_opacity": ...}` sub-dicts AND a `for hex_key in f1_expected.keys():` loop that probes each direction with a transient `NeoCadeTheme.new()` and asserts `hover_pct`, `pressed_pct`, `disabled_opacity` match DESIGN_TOKENS §5 verbatim.
+    - File `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd` exists (Cross-AI Cycle 1 MEDIUM headless fix).
     - Headless file contains `extends SceneTree` (NOT EditorScript).
     - Headless file contains `func _init() -> void:` and `quit(0)` / `quit(1)` exit paths.
     - Headless file contains `BINDING_TABLE.size() != 37` failure check and `TYPE_VARIATIONS.size() != 14` failure check.
     - **Headless file ALSO contains the same Cross-AI Cycle 2 C1/C2/M2/L2 assertions** as the EditorScript variant (CANONICAL_SLOT_NAMES iteration, 0.42 disabled-alpha check, MOBILE>DESKTOP margin check, Pulse vs Slate spread differentiation check).
+    - **Headless file ALSO contains the Cross-AI Cycle 6 F1 fix block** — same `f1_expected: Dictionary` with 5 hex keys + `for hex_key in f1_expected.keys():` loop asserting `hover_pct` / `pressed_pct` / `disabled_opacity` per direction.
     - When the headless variant is run via `godot --headless --quit --script ...`, it prints the PASS line on success and exits with status 0.
     - When the EditorScript variant is run via Godot Editor's File → Run, it completes without assertion failures.
+    - **Cycle 6 F3 fix:** No `_phase4_verify.gd` OR `_phase4_verify_headless.gd` file exists at `addons/neocade_theme/` (forbidden — addon root must have exactly 1 .gd file per FOUND-01 / SC#1; helpers live under `.planning/phases/04-.../helpers/`).
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='addons/neocade_theme/_phase4_verify.gd'; if (-not (Test-Path $p)) { throw '_phase4_verify.gd missing' }; $g=Get-Content -Raw $p; foreach($n in '@tool','extends EditorScript','func _run() -> void:','func _verify_pulse() -> void:','DELETE BEFORE','ResourceLoader.load(path)','loaded is NeoCadeTheme','theme.default_font != null','base_color == Color(\"#151A2E\")','accent_color == Color(\"#8BFF6A\")','raised == false','corner_radius == 0','spacing == 18','raised_strength == 3','focus_thickness == 2','outline_width == 1','is_light == false','binding_table.size() == 37','type_variations.size() == 14','type_variations.has(\"CodeLabel\")','theme.raised = true','theme.raised = false','theme.base_color = Color(\"#F0F0F0\")','theme.is_light == true','CANONICAL_SLOT_NAMES','for theme_type in canonical_slots.keys():','match dt:','\"stylebox\":  present = theme.has_stylebox','\"color\":     present = theme.has_color','\"constant\":  present = theme.has_constant','\"font_size\": present = theme.has_font_size','\"icon\":      present = theme.has_icon','CANONICAL_SLOT_NAMES freeze fail','0.42','NeoCadeTheme.Platform.DESKTOP','NeoCadeTheme.Platform.MOBILE','mobile_margin > desktop_margin','slate_test: NeoCadeTheme','Color(\"#111820\")','spread_factor') { if ($g -notmatch [regex]::Escape($n)) { throw \"_phase4_verify.gd missing: $n\" } }; $h='addons/neocade_theme/_phase4_verify_headless.gd'; if (-not (Test-Path $h)) { throw '_phase4_verify_headless.gd missing (Cross-AI Cycle 1 MEDIUM)' }; $hg=Get-Content -Raw $h; foreach($n in 'extends SceneTree','func _init() -> void:','ResourceLoader.load(path)','loaded is NeoCadeTheme','binding_table.size() != 37','type_variations.size() != 14','type_variations.has(\"CodeLabel\")','quit(0)','quit(1)','DELETE BEFORE','CANONICAL_SLOT_NAMES','for theme_type in canonical_slots.keys():','CANONICAL_SLOT_NAMES freeze fail','0.42','NeoCadeTheme.Platform.DESKTOP','NeoCadeTheme.Platform.MOBILE','mobile_margin <= desktop_margin','slate_test: NeoCadeTheme','Color(\"#111820\")','spread_factor') { if ($hg -notmatch [regex]::Escape($n)) { throw \"_phase4_verify_headless.gd missing: $n\" } }"
+      powershell -NoProfile -Command "if (Test-Path 'addons/neocade_theme/_phase4_verify.gd') { throw 'Cycle 6 F3 regression: _phase4_verify.gd exists at addons/neocade_theme/ — must live under .planning/phases/04-.../helpers/' }; if (Test-Path 'addons/neocade_theme/_phase4_verify_headless.gd') { throw 'Cycle 6 F3 regression: _phase4_verify_headless.gd exists at addons/neocade_theme/ — must live under .planning/phases/04-.../helpers/' }; $p='.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd'; if (-not (Test-Path $p)) { throw '_phase4_verify.gd missing' }; $g=Get-Content -Raw $p; foreach($n in '@tool','extends EditorScript','func _run() -> void:','func _verify_pulse() -> void:','DELETE BEFORE','ResourceLoader.load(path)','loaded is NeoCadeTheme','theme.default_font != null','base_color == Color(\"#151A2E\")','accent_color == Color(\"#8BFF6A\")','raised == false','corner_radius == 0','spacing == 18','raised_strength == 3','focus_thickness == 2','outline_width == 1','is_light == false','binding_table.size() == 37','type_variations.size() == 14','type_variations.has(\"CodeLabel\")','theme.raised = true','theme.raised = false','theme.base_color = Color(\"#F0F0F0\")','theme.is_light == true','CANONICAL_SLOT_NAMES','for theme_type in canonical_slots.keys():','match dt:','\"stylebox\":  present = theme.has_stylebox','\"color\":     present = theme.has_color','\"constant\":  present = theme.has_constant','\"font_size\": present = theme.has_font_size','\"icon\":      present = theme.has_icon','CANONICAL_SLOT_NAMES freeze fail','0.42','NeoCadeTheme.Platform.DESKTOP','NeoCadeTheme.Platform.MOBILE','mobile_margin > desktop_margin','slate_test: NeoCadeTheme','Color(\"#111820\")','spread_factor','f1_expected: Dictionary','for hex_key in f1_expected.keys():','\"151A2E\":','\"241326\":','\"0B2420\":','\"20112E\":','F1 fix: direction','hover_pct','pressed_pct','disabled_opacity') { if ($g -notmatch [regex]::Escape($n)) { throw \"_phase4_verify.gd missing: $n\" } }; $h='.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd'; if (-not (Test-Path $h)) { throw '_phase4_verify_headless.gd missing (Cross-AI Cycle 1 MEDIUM)' }; $hg=Get-Content -Raw $h; foreach($n in 'extends SceneTree','func _init() -> void:','ResourceLoader.load(path)','loaded is NeoCadeTheme','binding_table.size() != 37','type_variations.size() != 14','type_variations.has(\"CodeLabel\")','quit(0)','quit(1)','DELETE BEFORE','CANONICAL_SLOT_NAMES','for theme_type in canonical_slots.keys():','CANONICAL_SLOT_NAMES freeze fail','0.42','NeoCadeTheme.Platform.DESKTOP','NeoCadeTheme.Platform.MOBILE','mobile_margin <= desktop_margin','slate_test: NeoCadeTheme','Color(\"#111820\")','spread_factor','f1_expected: Dictionary','for hex_key in f1_expected.keys():','\"151A2E\":','\"241326\":','\"0B2420\":','\"20112E\":','F1 fix: direction') { if ($hg -notmatch [regex]::Escape($n)) { throw \"_phase4_verify_headless.gd missing: $n\" } }"
     </automated>
   </verify>
   <done>BOTH the EditorScript and headless verification variants exist; Pulse loads, regenerates, populates 37 Controls + 14 variations, raised + is_light toggles work; canonical 37 + 14 counts asserted exactly. Cross-AI Cycle 1 C4/C6/MEDIUM/LOW addressed.</done>
@@ -662,7 +717,7 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
   <name>Task 3: Atomic commit — Pulse .tres + verification helper</name>
   <read_first>
     - addons/neocade_theme/pulse_neocade_theme.tres
-    - addons/neocade_theme/_phase4_verify.gd
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd
   </read_first>
   <files>(commit only)</files>
   <action>
@@ -690,16 +745,18 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
       header so Godot recomputes on load (preserved-block count differs from
       originally-serialized count). Other [ext_resource ...] blocks (non-script)
       are still dropped — defensive against future sub-asset refs.
-    - addons/neocade_theme/_phase4_import.gd — extended with _save_pulse_tres()
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd — extended with _save_pulse_tres()
       AND with the static _strip_theme_entries(path) helper (N4 Fix A) AND with
       the static _strip_load_steps_attr(header_line) RegEx helper (N5 Fix)
-    - addons/neocade_theme/_phase4_verify.gd — EditorScript helper; asserts
+    - .planning/phases/04-.../helpers/_phase4_verify.gd — EditorScript helper; asserts
       BINDING_TABLE.size() == 37 (C1), TYPE_VARIATIONS.size() == 14 (C4),
       CodeLabel present, theme.default_font set (C3), explicit header fonts,
-      raised toggle behavior, is_light flip on #F0F0F0; DELETED IN PHASE 11.
-    - addons/neocade_theme/_phase4_verify_headless.gd — SceneTree-based variant
-      runs via `godot --headless --quit --script ...` for autonomous CI
-      verification (Cross-AI Cycle 1 MEDIUM); DELETED IN PHASE 11.
+      raised toggle behavior, is_light flip on #F0F0F0. Cycle 6 F3: relocated
+      OUT of addon root (FOUND-01 SC#1 forbids extra .gd files). Helper is
+      NOT distributed and does NOT need a Phase 11 cleanup step.
+    - .planning/phases/04-.../helpers/_phase4_verify_headless.gd — SceneTree-based
+      variant runs via `godot --headless --quit --script ...` for autonomous CI
+      verification (Cross-AI Cycle 1 MEDIUM; Cycle 6 F3 path).
     - Cycle 2 C1 fix: BOTH verifiers now iterate CANONICAL_SLOT_NAMES (Plan
       04-05 Task 2.5) and assert each frozen slot exists per Control type —
       catches wrong slot names that would pass row-count checks alone.
@@ -730,12 +787,12 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
   </action>
   <acceptance_criteria>
     - `git log -1 --pretty=%s` returns a subject line starting with `feat(04-06):`.
-    - `git log -1 --name-status` shows `A addons/neocade_theme/pulse_neocade_theme.tres`, `A addons/neocade_theme/_phase4_verify.gd`, `A addons/neocade_theme/_phase4_verify_headless.gd`, and `M addons/neocade_theme/_phase4_import.gd`.
+    - `git log -1 --name-status` shows `A addons/neocade_theme/pulse_neocade_theme.tres`, `A .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd`, `A .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd`, and `M .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd`.
     - `git status --porcelain` is empty for all 4 files.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$msg = git log -1 --pretty=%s; if ($msg -notmatch '^feat\\(04-06\\):') { throw \"commit subject wrong: $msg\" }; $ns = git log -1 --name-status; foreach($f in 'addons/neocade_theme/pulse_neocade_theme\\.tres','addons/neocade_theme/_phase4_verify\\.gd','addons/neocade_theme/_phase4_verify_headless\\.gd') { if ($ns -notmatch \"A\\s+$f\") { throw \"commit missing $f\" } }; if ($ns -notmatch 'M\\s+addons/neocade_theme/_phase4_import\\.gd') { throw 'commit missing _phase4_import.gd modification' }"
+      powershell -NoProfile -Command "$msg = git log -1 --pretty=%s; if ($msg -notmatch '^feat\\(04-06\\):') { throw \"commit subject wrong: $msg\" }; $ns = git log -1 --name-status; foreach($f in 'addons/neocade_theme/pulse_neocade_theme\\.tres','\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify\\.gd','\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless\\.gd') { if ($ns -notmatch \"A\\s+$f\") { throw \"commit missing $f (Cycle 6 F3 helpers in .planning/phases/04-.../helpers/)\" } }; if ($ns -notmatch 'M\\s+\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import\\.gd') { throw 'commit missing _phase4_import.gd modification under .planning/phases/04-.../helpers/' }; if ($ns -match 'A\\s+addons/neocade_theme/_phase4_(import|verify|verify_headless)\\.gd') { throw 'Cycle 6 F3 regression: helper .gd file added at addons/neocade_theme/ — must live under .planning/phases/04-.../helpers/' }"
     </automated>
   </verify>
   <done>Pulse + dual verification helpers land as a single atomic commit. Pulse is Godot-serialized (C6); BINDING_TABLE asserts 37 (C1) + TYPE_VARIATIONS asserts 14 (C4) + default_font asserted (C3); headless variant supports autonomous CI (MEDIUM); ResourceLoader assertion satisfied (LOW).</done>

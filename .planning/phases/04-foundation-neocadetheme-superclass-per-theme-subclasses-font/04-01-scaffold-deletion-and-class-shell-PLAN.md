@@ -22,7 +22,7 @@ must_haves:
     - "Every `@export` setter fires `_regenerate_theme()` and applies an equality short-circuit to avoid no-op regenerations."
     - "`_regenerate_theme()` exists with a skeleton body that sets `is_light = base_color.get_luminance() >= 0.5` and uses a reentry guard `_regenerating: bool`. NO `clear()` call anywhere in the regeneration path (D-01)."
     - "Class header docstring documents the binding-mechanism choice (slot-name + property-name table compiled into `.gd`) as REVISABLE per CONTEXT.md `<specifics>` and D-03."
-    - "`main.tscn` no longer references the deleted `neocade_theme.tres`; the theme override line is replaced with a single placeholder comment line (`# theme = ExtResource(...) - reassigned in Plan 04-07`) on the root Control block so reviewers reading the scene mid-phase see the deliberate gap. Plan 04-07 deletes the placeholder comment and re-adds the live `theme = ExtResource(...)` line pointing at Pulse. The scene still loads without a missing-resource error during Plans 04-02..06."
+    - "`main.tscn` no longer references the deleted `neocade_theme.tres`; both the `[ext_resource ...]` line for the scaffold and the `theme = ExtResource(...)` property line on the root Control block are REMOVED entirely (Cycle 6 F2 fix 2026-05-06: no placeholder comment — Godot 4.6 .tscn comments use `;` not `#`, AND comments are discarded on save, so the placeholder strategy is fragile per `engine_details/file_formats/tscn.md`). The root `[node ...]` block parses cleanly without a `theme` line at all. Plan 04-07 reintroduces a live `theme = ExtResource(\"1_pulse_theme\")` property line pointing at Pulse. The scene loads without a missing-resource error during Plans 04-02..06."
     - "Class defaults match DESIGN_TOKENS §3 / CONTEXT.md D-13 sensible-neutral values (NOT Pulse-flavored): `base_color=#111820`, `accent_color=#8BD3FF`, `raised=false`, `platform=AUTO`, `corner_radius=12`, `spacing=4`, `raised_strength=3`, `focus_thickness=2`, `outline_width=1`."
   artifacts:
     - addons/neocade_theme/neocade_theme.gd
@@ -89,13 +89,13 @@ The class shell is intentionally MINIMAL in this plan. The full `_regenerate_the
 
     Step 2. Delete the file at `addons/neocade_theme/neocade_theme.tres` from the working tree (using `git rm` so the deletion is staged).
 
-    Step 3. Edit `main.tscn`:
+    Step 3. Edit `main.tscn` (Cycle 6 F2 fix 2026-05-06: no placeholder comment, just remove both lines cleanly):
       a) DELETE the `[ext_resource type="Theme" uid="..." path="res://addons/neocade_theme/neocade_theme.tres" id="..."]` line entirely (the dangling reference must go).
-      b) REPLACE the `theme = ExtResource("...")` property line on the root `[node ...]` Control block with the single literal placeholder line `# theme = ExtResource(...) - reassigned in Plan 04-07` (a Godot `.tscn` comment line; Godot's scene parser tolerates `#`-prefixed lines inside node blocks).
+      b) DELETE the `theme = ExtResource("...")` property line from the root `[node ...]` Control block entirely. Do NOT replace with a placeholder comment.
 
-       Result: `main.tscn` opens cleanly in Godot Editor without a "missing resource" error and without any reference to the deleted scaffold. The placeholder comment communicates intent during Plans 04-02..06 (mid-phase reviewers see "this is deliberately blank, Plan 04-07 fills it" instead of guessing). Plan 04-07 deletes the placeholder comment and re-adds a real `theme = ExtResource("1_pulse_theme")` line pointing at Pulse.
+       Rationale: Godot 4.6 `.tscn` files use `;` (semicolon), not `#` (hash), for single-line comments per `engine_details/file_formats/tscn.md` ("A TSCN file may contain single-line comments starting with a semicolon (;)"). Beyond syntax, comments are DISCARDED on save by Godot's parser — any placeholder comment vanishes the first time a user opens and saves the scene in the editor, which makes the placeholder strategy brittle. The cleanest contract is: remove the line entirely; the `[node ...]` block remains valid `.tscn` without a `theme` property; Plan 04-07 re-adds the live `theme = ExtResource("1_pulse_theme")` line pointing at Pulse. The scene parses and loads without missing-resource errors.
 
-       NOTE on `.tscn` comments: Godot's text-resource parser supports `#` line comments at the top level. If the comment-on-property-line approach causes parser issues in 4.6 (verify by opening `main.tscn` in the editor; the file MUST still parse), fall back to no placeholder line — leave a blank line between the previous property and `[ext_resource]` blocks instead. The plan accepts either form; the verify command treats the placeholder as optional.
+       Result: `main.tscn` opens cleanly in Godot Editor without a "missing resource" error and without any reference to the deleted scaffold. No placeholder comment — Plan 04-07 reintroduces the line.
 
     Step 4. Verify both file states via PowerShell test commands.
 
@@ -103,14 +103,15 @@ The class shell is intentionally MINIMAL in this plan. The full `_regenerate_the
   </action>
   <acceptance_criteria>
     - `addons/neocade_theme/neocade_theme.tres` does not exist (PowerShell `Test-Path` returns `False`).
-    - `main.tscn` does not contain the literal substring `neocade_theme.tres` anywhere on a non-comment line.
-    - `main.tscn` does not contain a non-commented `theme = ExtResource(` line (a `# theme = ExtResource(...) - reassigned in Plan 04-07` comment line is acceptable; Plan 04-07 will reassign as a real property line).
+    - `main.tscn` does not contain the literal substring `neocade_theme.tres` anywhere in the file.
+    - `main.tscn` does not contain ANY `theme = ExtResource(` line (Cycle 6 F2 fix: line removed entirely, no placeholder comment — Godot discards comments on save).
+    - `main.tscn` does not contain a placeholder `# theme = ExtResource` or `; theme = ExtResource` comment line referencing the removal (the line is gone, not commented).
     - `main.tscn` parses as a valid `.tscn` (the file's first line is `[gd_scene ...]` and the root node block is intact).
     - Git status shows `D addons/neocade_theme/neocade_theme.tres` and `M main.tscn`.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "if (Test-Path 'addons/neocade_theme/neocade_theme.tres') { throw 'scaffold .tres still exists' }; $tscn = Get-Content -Raw 'main.tscn'; if ($tscn -match '(?m)^[^#]*neocade_theme\.tres') { throw 'main.tscn still references deleted scaffold on a non-comment line' }; if ($tscn -match '(?m)^\s*theme = ExtResource\(') { throw 'main.tscn still has live theme override line (a leading-# comment is allowed)' }; if ($tscn -notmatch '^\[gd_scene') { throw 'main.tscn is not a valid scene file' }"
+      powershell -NoProfile -Command "if (Test-Path 'addons/neocade_theme/neocade_theme.tres') { throw 'scaffold .tres still exists' }; $tscn = Get-Content -Raw 'main.tscn'; if ($tscn -match 'neocade_theme\.tres') { throw 'main.tscn still references deleted scaffold (Cycle 6 F2: line must be removed entirely, no placeholder)' }; if ($tscn -match 'theme = ExtResource\(') { throw 'main.tscn still has theme override line (Cycle 6 F2: line must be removed entirely, not commented)' }; if ($tscn -match '(?m)^\s*[#;]\s*theme = ExtResource') { throw 'main.tscn still has placeholder comment for theme override (Cycle 6 F2: must be removed, not commented — Godot discards comments on save)' }; if ($tscn -notmatch '^\[gd_scene') { throw 'main.tscn is not a valid scene file' }"
     </automated>
   </verify>
   <done>The scaffold `.tres` is deleted; `main.tscn` no longer references it; the scene file remains parseable.</done>
@@ -279,9 +280,11 @@ The class shell is intentionally MINIMAL in this plan. The full `_regenerate_the
     ```
     feat(04-01): delete scaffold .tres + scene ref + author NeoCadeTheme class shell
 
-    Plan 04-01 wave-1 foundation:
+    Plan 04-01 wave-1 foundation (Cycle 6 F2 fix incorporated 2026-05-06):
     - Deleted addons/neocade_theme/neocade_theme.tres (empty scaffold from project init)
-    - Cleared main.tscn theme reference (Plan 04-07 will reassign Pulse)
+    - Removed main.tscn theme override + ext_resource lines entirely (no placeholder
+      comment — Godot 4.6 .tscn comments use `;` not `#` AND comments are discarded
+      on save per engine_details/file_formats/tscn.md). Plan 04-07 reassigns Pulse.
     - Authored addons/neocade_theme/neocade_theme.gd with @tool class_name NeoCadeTheme
       extends Theme, 9 @export properties (4 Core + 5 Shape), Platform enum, is_light
       derivation, _regenerating reentry guard, no-clear() invariant, binding-mechanism

@@ -10,9 +10,9 @@ files_modified:
   - addons/neocade_theme/bubble_neocade_theme.tres
   - addons/neocade_theme/daybreak_neocade_theme.tres
   - addons/neocade_theme/burst_neocade_theme.tres
-  - addons/neocade_theme/_phase4_import.gd  # extended with _save_peer_tres() block
-  - addons/neocade_theme/_phase4_verify.gd  # Cross-AI Cycle 2 M3: extended for peer-load checks
-  - addons/neocade_theme/_phase4_verify_headless.gd  # Cross-AI Cycle 2 M3: same
+  - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd  # extended with _save_peer_tres() (Cycle 6 F3: helper relocated)
+  - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd  # Cross-AI Cycle 2 M3: extended for peer-load checks (Cycle 6 F3 path)
+  - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd  # Cross-AI Cycle 2 M3: same (Cycle 6 F3 path)
   - main.tscn
 autonomous: true
 requirements:
@@ -78,11 +78,11 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
   <read_first>
     - .planning/DESIGN_TOKENS.md (§5.2 Slate, §5.3 Bubble, §5.4 Daybreak, §5.5 Burst)
     - addons/neocade_theme/pulse_neocade_theme.tres (Godot-emitted reference template — first line is canonical for the peer `.tres` files)
-    - addons/neocade_theme/_phase4_import.gd (Plan 04-02/06 — extend with peer save block)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd (Plan 04-02/06 — extend with peer save block)
     - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-REVIEWS.md (Cycle 1 HIGH C6)
   </read_first>
   <files>
-    - addons/neocade_theme/_phase4_import.gd (modify — extend with peer save block)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd (modify — extend with peer save block)
     - addons/neocade_theme/slate_neocade_theme.tres (GENERATED via ResourceSaver.save)
     - addons/neocade_theme/bubble_neocade_theme.tres (GENERATED via ResourceSaver.save)
     - addons/neocade_theme/daybreak_neocade_theme.tres (GENERATED via ResourceSaver.save)
@@ -138,7 +138,7 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
         _save_peer_tres()  # Plan 04-07
     ```
 
-    **Stage B — Run the helper.** Same as Plan 04-06: Godot Editor → File → Run, OR `godot --headless --editor --script addons/neocade_theme/_phase4_import.gd`. The 4 peer files materialize at the addon root.
+    **Stage B — Run the helper.** Same as Plan 04-06: Godot Editor → File → Run, OR `godot --headless --editor --script .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd`. The 4 peer files materialize at the addon root.
 
     Color value reference (Godot's serializer produces these float values; informational):
 
@@ -158,7 +158,7 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
     **Implementation:** EXTEND `_phase4_import.gd` with `_save_peer_tres()` per Stage A above, then re-run the helper. Do NOT use `Set-Content` to hand-write the `.tres` files (Cross-AI Cycle 1 C6 expressly forbids this).
   </action>
   <acceptance_criteria>
-    - `addons/neocade_theme/_phase4_import.gd` contains a `func _save_peer_tres() -> void:` declaration.
+    - `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd` contains a `func _save_peer_tres() -> void:` declaration.
     - `_phase4_import.gd` `_save_peer_tres` body uses `NeoCadeTheme.new()` for each of the 4 peers (Slate, Bubble, Daybreak, Burst) and calls `ResourceSaver.save(t, path)` for each.
     - **Cross-AI Cycle 3 N4 Fix A:** `_save_peer_tres()` body invokes `_strip_theme_entries(path)` AFTER `ResourceSaver.save(t, path)` for each peer (re-uses the static helper authored in Plan 04-06).
     - **Cross-AI Cycle 2 M1 fix:** `_phase4_import.gd` `_run()` body MUST contain a literal `_save_peer_tres()` call. The verifier extracts the `_run()` body via regex (from `func _run()` declaration to the next `func` declaration or end-of-file) and asserts the call substring appears WITHIN that extracted body (not merely in the file at large). This catches the regression where the function is defined but never invoked, so peer .tres files are silently never generated.
@@ -175,7 +175,7 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$base='addons/neocade_theme'; $checks=@{ 'slate_neocade_theme.tres' = @('Color(0.0666667, 0.0941176, 0.12549, 1)','Color(0.545098, 0.827451, 1, 1)','corner_radius = 14','spacing = 22','raised_strength = 2','focus_thickness = 2'); 'bubble_neocade_theme.tres' = @('Color(0.141176, 0.0745098, 0.14902, 1)','Color(1, 0.701961, 0.901961, 1)','corner_radius = 26','raised_strength = 6','focus_thickness = 3'); 'daybreak_neocade_theme.tres' = @('Color(0.0431373, 0.141176, 0.12549, 1)','Color(0.462745, 0.94902, 0.819608, 1)','corner_radius = 8','spacing = 24','raised_strength = 3'); 'burst_neocade_theme.tres' = @('Color(0.12549, 0.0666667, 0.180392, 1)','Color(1, 0.819608, 0.4, 1)','corner_radius = 18','raised_strength = 5','focus_thickness = 3') }; foreach($k in $checks.Keys) { $p=\"$base/$k\"; if (-not (Test-Path $p)) { throw \"$k missing\" }; $g=Get-Content -Raw $p; if ($g -notmatch '^\\[gd_resource') { throw \"$k bad header\" }; if ($g -notmatch 'NeoCadeTheme') { throw \"$k missing NeoCadeTheme reference\" }; foreach($req in $checks[$k]) { if ($g -notmatch [regex]::Escape($req)) { throw \"$k missing: $req\" } }; if ($g -match '\\[sub_resource') { throw \"N4 fix regression: $k contains [sub_resource ...] blocks (strip pass did not run)\" }; if ($g -match 'theme_data/') { throw \"N4 fix regression: $k contains theme_data/ lines (strip pass did not run)\" }; if ($g -match 'load_steps=') { throw \"N5 fix regression: $k header still contains load_steps= attribute (should be stripped so Godot recomputes on load)\" }; $sz=(Get-Item $p).Length; if ($sz -ge 2048) { throw \"N4 fix regression: $k size $sz bytes >= 2048 (SC#6 < 2 KiB violated)\" } }; $imp='addons/neocade_theme/_phase4_import.gd'; if (-not (Test-Path $imp)) { throw '_phase4_import.gd missing' }; $impg=Get-Content -Raw $imp; if ($impg -notmatch 'func _save_peer_tres\\(\\) -> void:') { throw '_save_peer_tres declaration missing' }; $peer_body_match = [regex]::Match($impg, '(?s)func _save_peer_tres\\(\\)[^\\n]*\\n(.*?)(?=^func |\\Z)', 'Multiline'); if (-not $peer_body_match.Success) { throw 'N4 fix verify: cannot extract _save_peer_tres() body' }; if ($peer_body_match.Groups[1].Value -notmatch '_strip_theme_entries\\(path\\)') { throw 'N4 fix verify: _strip_theme_entries(path) not called inside _save_peer_tres() body — peers will retain serialized theme entries' }; $run_body_match = [regex]::Match($impg, '(?s)func _run\\(\\)[^\\n]*\\n(.*?)(?=^func |\\Z)', 'Multiline'); if (-not $run_body_match.Success) { throw 'M1 fix verify: cannot extract _run() body' }; $run_body = $run_body_match.Groups[1].Value; if ($run_body -notmatch '_save_peer_tres\\(\\)') { throw 'M1 fix verify: _save_peer_tres() not called INSIDE _run() body (function defined but never invoked - peer .tres would not be generated)' }; if ($run_body -notmatch '_save_pulse_tres\\(\\)') { throw 'M1 fix verify: _save_pulse_tres() also not called inside _run() body' }"
+      powershell -NoProfile -Command "$base='addons/neocade_theme'; $checks=@{ 'slate_neocade_theme.tres' = @('Color(0.0666667, 0.0941176, 0.12549, 1)','Color(0.545098, 0.827451, 1, 1)','corner_radius = 14','spacing = 22','raised_strength = 2','focus_thickness = 2'); 'bubble_neocade_theme.tres' = @('Color(0.141176, 0.0745098, 0.14902, 1)','Color(1, 0.701961, 0.901961, 1)','corner_radius = 26','raised_strength = 6','focus_thickness = 3'); 'daybreak_neocade_theme.tres' = @('Color(0.0431373, 0.141176, 0.12549, 1)','Color(0.462745, 0.94902, 0.819608, 1)','corner_radius = 8','spacing = 24','raised_strength = 3'); 'burst_neocade_theme.tres' = @('Color(0.12549, 0.0666667, 0.180392, 1)','Color(1, 0.819608, 0.4, 1)','corner_radius = 18','raised_strength = 5','focus_thickness = 3') }; foreach($k in $checks.Keys) { $p=\"$base/$k\"; if (-not (Test-Path $p)) { throw \"$k missing\" }; $g=Get-Content -Raw $p; if ($g -notmatch '^\\[gd_resource') { throw \"$k bad header\" }; if ($g -notmatch 'NeoCadeTheme') { throw \"$k missing NeoCadeTheme reference\" }; foreach($req in $checks[$k]) { if ($g -notmatch [regex]::Escape($req)) { throw \"$k missing: $req\" } }; if ($g -match '\\[sub_resource') { throw \"N4 fix regression: $k contains [sub_resource ...] blocks (strip pass did not run)\" }; if ($g -match 'theme_data/') { throw \"N4 fix regression: $k contains theme_data/ lines (strip pass did not run)\" }; if ($g -match 'load_steps=') { throw \"N5 fix regression: $k header still contains load_steps= attribute (should be stripped so Godot recomputes on load)\" }; $sz=(Get-Item $p).Length; if ($sz -ge 2048) { throw \"N4 fix regression: $k size $sz bytes >= 2048 (SC#6 < 2 KiB violated)\" } }; $imp='.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd'; if (-not (Test-Path $imp)) { throw '_phase4_import.gd missing' }; $impg=Get-Content -Raw $imp; if ($impg -notmatch 'func _save_peer_tres\\(\\) -> void:') { throw '_save_peer_tres declaration missing' }; $peer_body_match = [regex]::Match($impg, '(?s)func _save_peer_tres\\(\\)[^\\n]*\\n(.*?)(?=^func |\\Z)', 'Multiline'); if (-not $peer_body_match.Success) { throw 'N4 fix verify: cannot extract _save_peer_tres() body' }; if ($peer_body_match.Groups[1].Value -notmatch '_strip_theme_entries\\(path\\)') { throw 'N4 fix verify: _strip_theme_entries(path) not called inside _save_peer_tres() body — peers will retain serialized theme entries' }; $run_body_match = [regex]::Match($impg, '(?s)func _run\\(\\)[^\\n]*\\n(.*?)(?=^func |\\Z)', 'Multiline'); if (-not $run_body_match.Success) { throw 'M1 fix verify: cannot extract _run() body' }; $run_body = $run_body_match.Groups[1].Value; if ($run_body -notmatch '_save_peer_tres\\(\\)') { throw 'M1 fix verify: _save_peer_tres() not called INSIDE _run() body (function defined but never invoked - peer .tres would not be generated)' }; if ($run_body -notmatch '_save_pulse_tres\\(\\)') { throw 'M1 fix verify: _save_pulse_tres() also not called inside _run() body' }"
     </automated>
   </verify>
   <done>4 peer direction `.tres` files ship; the FOUND-03 5-direction set is complete (Pulse + 4 peers).</done>
@@ -184,15 +184,15 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
 <task type="auto">
   <name>Task 1.5: Extend _phase4_verify.gd + _phase4_verify_headless.gd with peer-load checks (Cross-AI Cycle 2 M3 fix)</name>
   <read_first>
-    - addons/neocade_theme/_phase4_verify.gd (created in Plan 04-06)
-    - addons/neocade_theme/_phase4_verify_headless.gd (created in Plan 04-06)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd (created in Plan 04-06)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd (created in Plan 04-06)
     - addons/neocade_theme/{slate,bubble,daybreak,burst}_neocade_theme.tres (Task 1 output)
     - addons/neocade_theme/neocade_theme.gd (DIRECTION_PRESETS constant — verifier reads spread_factor expectations)
     - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-REVIEWS.md (Cycle 2 M3)
   </read_first>
   <files>
-    - addons/neocade_theme/_phase4_verify.gd (modify — append _verify_peers function + call from _run)
-    - addons/neocade_theme/_phase4_verify_headless.gd (modify — append peer-load checks to _init body)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd (modify — append _verify_peers function + call from _run)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd (modify — append peer-load checks to _init body)
   </files>
   <action>
     **Cross-AI Cycle 2 M3 fix.** Plan 04-06 acceptance previously claimed peer .tres files would be runtime-validated by extending the verify helpers, but those edits were never assigned as tasks. This task makes the extension explicit.
@@ -264,23 +264,23 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
 
     Insert this block in `_init()` AFTER the existing Cycle 1/Cycle 2 in-memory checks (around the `slate_test` block from the Cycle 2 L2 fix) but BEFORE the `if failures.size() > 0:` block. The headless variant accumulates failures and quits with status 1 if any peer fails.
 
-    **Run path (executor)**: after Plan 04-07 Task 1 has materialized the 4 peer .tres files via `_save_peer_tres()`, run the EditorScript variant via Godot Editor → File → Run, AND/OR run the headless variant via `godot --headless --quit --script addons/neocade_theme/_phase4_verify_headless.gd`. Capture the PASS line.
+    **Run path (executor)**: after Plan 04-07 Task 1 has materialized the 4 peer .tres files via `_save_peer_tres()`, run the EditorScript variant via Godot Editor → File → Run, AND/OR run the headless variant via `godot --headless --quit --script .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd`. Capture the PASS line.
 
     Both verify helpers will be DELETED in Phase 11 (the `DELETE BEFORE v1 PUBLICATION` header survives this extension).
   </action>
   <acceptance_criteria>
-    - `addons/neocade_theme/_phase4_verify.gd` contains a `func _verify_peers() -> void:` declaration.
+    - `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd` contains a `func _verify_peers() -> void:` declaration.
     - `_phase4_verify.gd` `_run()` body calls BOTH `_verify_pulse()` AND `_verify_peers()`.
     - `_verify_peers()` body iterates an array containing all 4 peer file names: `"slate_neocade_theme.tres"`, `"bubble_neocade_theme.tres"`, `"daybreak_neocade_theme.tres"`, `"burst_neocade_theme.tres"`.
     - `_verify_peers()` body asserts `loaded is NeoCadeTheme` for each peer.
     - `_verify_peers()` body asserts `t.has_stylebox("normal", "Button")` for each peer.
     - `_verify_peers()` body asserts each peer's `_resolve_direction_presets().spread_factor` matches the expected per-direction value (0.7/1.0/1.0/1.3 for Slate/Bubble/Daybreak/Burst).
-    - `addons/neocade_theme/_phase4_verify_headless.gd` `_init()` body contains a peer-iteration block referencing all 4 peer file names.
+    - `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd` `_init()` body contains a peer-iteration block referencing all 4 peer file names.
     - The headless variant accumulates peer failures into the existing `failures: Array[String]` so the `quit(1)` exit path covers peer regressions.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='addons/neocade_theme/_phase4_verify.gd'; if (-not (Test-Path $p)) { throw '_phase4_verify.gd missing — Plan 04-06 must run first' }; $g=Get-Content -Raw $p; foreach($n in 'func _verify_peers() -> void:','_verify_peers()','slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres','loaded is NeoCadeTheme','has_stylebox(\"normal\", \"Button\")','_resolve_direction_presets()','expected_spread') { if ($g -notmatch [regex]::Escape($n)) { throw \"_phase4_verify.gd missing M3 fix piece: $n\" } }; $run_body_match = [regex]::Match($g, '(?s)func _run\\(\\)[^\\n]*\\n(.*?)(?=^func |\\Z)', 'Multiline'); if (-not $run_body_match.Success) { throw 'M3: cannot extract _phase4_verify.gd._run() body' }; $rb = $run_body_match.Groups[1].Value; if ($rb -notmatch '_verify_peers\\(\\)') { throw 'M3: _verify_peers() not called inside _run() body' }; $h='addons/neocade_theme/_phase4_verify_headless.gd'; $hg=Get-Content -Raw $h; foreach($n in 'slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres','peer not NeoCadeTheme','spread_factor') { if ($hg -notmatch [regex]::Escape($n)) { throw \"_phase4_verify_headless.gd missing M3 fix piece: $n\" } }"
+      powershell -NoProfile -Command "$p='.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd'; if (-not (Test-Path $p)) { throw '_phase4_verify.gd missing — Plan 04-06 must run first' }; $g=Get-Content -Raw $p; foreach($n in 'func _verify_peers() -> void:','_verify_peers()','slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres','loaded is NeoCadeTheme','has_stylebox(\"normal\", \"Button\")','_resolve_direction_presets()','expected_spread') { if ($g -notmatch [regex]::Escape($n)) { throw \"_phase4_verify.gd missing M3 fix piece: $n\" } }; $run_body_match = [regex]::Match($g, '(?s)func _run\\(\\)[^\\n]*\\n(.*?)(?=^func |\\Z)', 'Multiline'); if (-not $run_body_match.Success) { throw 'M3: cannot extract _phase4_verify.gd._run() body' }; $rb = $run_body_match.Groups[1].Value; if ($rb -notmatch '_verify_peers\\(\\)') { throw 'M3: _verify_peers() not called inside _run() body' }; $h='.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd'; $hg=Get-Content -Raw $h; foreach($n in 'slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres','peer not NeoCadeTheme','spread_factor') { if ($hg -notmatch [regex]::Escape($n)) { throw \"_phase4_verify_headless.gd missing M3 fix piece: $n\" } }"
     </automated>
   </verify>
   <done>Both verify helpers now load + validate the 4 peer .tres files at runtime; Cycle 2 M3 closes the "claimed but unimplemented peer verification" gap.</done>
@@ -296,19 +296,18 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
     - main.tscn (modify — re-add theme reference)
   </files>
   <action>
-    Plan 04-01 removed the theme override line from `main.tscn` AND replaced it with a placeholder comment line (`# theme = ExtResource(...) - reassigned in Plan 04-07`). Plan 04-01 also removed the corresponding `[ext_resource ...]` declaration. This task restores the live reference (deleting the placeholder comment) and points it at `pulse_neocade_theme.tres` instead of the deleted scaffold.
+    Plan 04-01 (Cycle 6 F2 fix) removed the theme override line from `main.tscn` ENTIRELY (no placeholder comment — Godot 4.6 .tscn comments use `;` not `#` AND comments are discarded on save, making any placeholder strategy fragile). Plan 04-01 also removed the corresponding `[ext_resource ...]` declaration. This task restores the live reference and points it at `pulse_neocade_theme.tres` instead of the deleted scaffold.
 
     Steps:
     1. Read current `main.tscn`.
-    2. DELETE the placeholder comment line (`# theme = ExtResource(...) - reassigned in Plan 04-07`) on the root Control node block — replacing it with the live property line in step 4.
-    3. Add a new `[ext_resource]` line (typically near the top of the file, in the same block as any other ext_resource declarations) referencing the Pulse `.tres`:
+    2. Add a new `[ext_resource]` line (typically near the top of the file, in the same block as any other ext_resource declarations) referencing the Pulse `.tres`:
        ```
        [ext_resource type="Theme" path="res://addons/neocade_theme/pulse_neocade_theme.tres" id="1_pulse_theme"]
        ```
        (`uid` is optional in `[ext_resource]` and is auto-generated by Godot on first save; `path` + `type` + `id` are sufficient.)
        NOTE: depending on how Godot 4.6 serializes `NeoCadeTheme`-typed resources in `.tscn` files, the `type` may need to be `"NeoCadeTheme"` instead of `"Theme"`. Either form should resolve correctly because `NeoCadeTheme extends Theme`. Use `type="Theme"` for maximum compatibility (the resource will load as its actual subclass at runtime).
-    4. Add `theme = ExtResource("1_pulse_theme")` to the root node block (the `[node ...]` block representing the scene's root Control). Place it where Plan 04-01's placeholder comment was.
-    5. Verify: `main.tscn` parses, opens in Godot Editor without errors, and the root node's theme override resolves to the Pulse `.tres`.
+    3. Add `theme = ExtResource("1_pulse_theme")` to the root node block (the `[node ...]` block representing the scene's root Control). Plan 04-01 left no `theme = ...` line at all (no placeholder); add the live property line now.
+    4. Verify: `main.tscn` parses, opens in Godot Editor without errors, and the root node's theme override resolves to the Pulse `.tres`.
 
     Implementation note: the existing `main.tscn` may have a `load_steps` count that needs to be incremented when adding a new `[ext_resource]`. Godot 4.6 expects `load_steps = N+1` where N is the count of `[ext_resource]` and `[sub_resource]` blocks. The executor MUST update `load_steps` accordingly OR remove it entirely (Godot's parser tolerates a missing `load_steps`).
 
@@ -320,11 +319,11 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
     - The `[ext_resource]` and `theme = ExtResource("...")` lines reference the same id.
     - `main.tscn` first line is still `[gd_scene` and the file parses as a valid scene.
     - `main.tscn` does NOT contain any reference to the deleted `neocade_theme.tres` scaffold (sanity check: Plan 04-01's deletion stays intact).
-    - `main.tscn` does NOT contain the placeholder comment `# theme = ExtResource(...) - reassigned in Plan 04-07` (Plan 04-07 deletes it).
+    - `main.tscn` does NOT contain any placeholder comment for the theme override (Plan 04-01 Cycle 6 F2 fix removed the line entirely; this task adds a live `theme = ExtResource(...)` property line, not a comment).
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='main.tscn'; $g=Get-Content -Raw $p; if ($g -notmatch '^\\[gd_scene') { throw 'main.tscn header broken' }; if ($g -notmatch 'res://addons/neocade_theme/pulse_neocade_theme\\.tres') { throw 'pulse_neocade_theme.tres ext_resource missing' }; if ($g -notmatch '(?m)^\\s*theme = ExtResource\\(') { throw 'live theme override line missing' }; if ($g -match '(?m)^[^#]*neocade_theme/neocade_theme\\.tres\\b') { throw 'main.tscn still references deleted scaffold (non-comment line)' }; if ($g -match '# theme = ExtResource\\(\\.\\.\\.\\) - reassigned') { throw 'placeholder comment from Plan 04-01 still present' }; $ext_match = [regex]::Match($g, 'ext_resource type=\"(?:Theme|NeoCadeTheme)\"[^]]*?id=\"([^\"]+)\"[^]]*?path=\"res://addons/neocade_theme/pulse_neocade_theme\\.tres\"'); $theme_match = [regex]::Match($g, 'theme = ExtResource\\(\"([^\"]+)\"\\)'); if (-not $ext_match.Success) { $ext_match = [regex]::Match($g, 'ext_resource type=\"(?:Theme|NeoCadeTheme)\"[^]]*?path=\"res://addons/neocade_theme/pulse_neocade_theme\\.tres\"[^]]*?id=\"([^\"]+)\"') }; if ($ext_match.Success -and $theme_match.Success) { if ($ext_match.Groups[1].Value -ne $theme_match.Groups[1].Value) { throw \"ext_resource id $($ext_match.Groups[1].Value) does not match theme= id $($theme_match.Groups[1].Value)\" } }"
+      powershell -NoProfile -Command "$p='main.tscn'; $g=Get-Content -Raw $p; if ($g -notmatch '^\\[gd_scene') { throw 'main.tscn header broken' }; if ($g -notmatch 'res://addons/neocade_theme/pulse_neocade_theme\\.tres') { throw 'pulse_neocade_theme.tres ext_resource missing' }; if ($g -notmatch '(?m)^\\s*theme = ExtResource\\(') { throw 'live theme override line missing' }; if ($g -match 'neocade_theme/neocade_theme\\.tres') { throw 'main.tscn still references deleted scaffold' }; if ($g -match '(?m)^\\s*[#;]\\s*theme = ExtResource') { throw 'main.tscn contains a comment-form placeholder for theme override (Plan 04-01 Cycle 6 F2 fix removes line entirely; this task adds a live property line)' }; $ext_match = [regex]::Match($g, 'ext_resource type=\"(?:Theme|NeoCadeTheme)\"[^]]*?id=\"([^\"]+)\"[^]]*?path=\"res://addons/neocade_theme/pulse_neocade_theme\\.tres\"'); $theme_match = [regex]::Match($g, 'theme = ExtResource\\(\"([^\"]+)\"\\)'); if (-not $ext_match.Success) { $ext_match = [regex]::Match($g, 'ext_resource type=\"(?:Theme|NeoCadeTheme)\"[^]]*?path=\"res://addons/neocade_theme/pulse_neocade_theme\\.tres\"[^]]*?id=\"([^\"]+)\"') }; if ($ext_match.Success -and $theme_match.Success) { if ($ext_match.Groups[1].Value -ne $theme_match.Groups[1].Value) { throw \"ext_resource id $($ext_match.Groups[1].Value) does not match theme= id $($theme_match.Groups[1].Value)\" } }"
     </automated>
   </verify>
   <done>main.tscn loads with Pulse as the recommended-starter theme, restoring the showcase scene's theme reference (Plan 04-01 cleared, Plan 04-07 reassigns).</done>
@@ -348,7 +347,7 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
 
     Plan 04-07 wave-4 (depends on Plan 04-06 Pulse; Cross-AI Cycle 1 C6 +
     Cycle 2 M1/M3 + Cycle 3 N4 fixes):
-    - addons/neocade_theme/_phase4_import.gd — extended with _save_peer_tres()
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd — extended with _save_peer_tres()
       (Cycle 2 M1: also called inside _run() body — verifier asserts call
       lives WITHIN _run() body, not just in the file)
     - N4 fix (Cycle 3) + N5 fix (Cycle 4): _save_peer_tres() body now invokes
@@ -372,16 +371,17 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
         corner_radius=8, spacing=24, raised_strength=3, focus_thickness=2
       * burst_neocade_theme.tres — §5.5: base=#20112E, accent=#FFD166,
         corner_radius=18, spacing=22, raised_strength=5, focus_thickness=3
-    - addons/neocade_theme/_phase4_verify.gd — extended with _verify_peers()
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd — extended with _verify_peers()
       (Cycle 2 M3: previously only-claimed peer validation now actually
       implemented; loads each peer via ResourceLoader, asserts is NeoCadeTheme,
       asserts has_stylebox("normal", "Button"), asserts spread_factor matches
       DIRECTION_PRESETS per direction)
-    - addons/neocade_theme/_phase4_verify_headless.gd — extended with peer
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd — extended with peer
       load-checks in _init() body (Cycle 2 M3 — same)
-    - main.tscn — replace Plan 04-01's placeholder comment with live
-      theme = ExtResource(...) pointing at pulse_neocade_theme.tres
-      (recommended starter, per CONTEXT.md D-13).
+    - main.tscn — add ext_resource + live theme = ExtResource(...) line pointing
+      at pulse_neocade_theme.tres (recommended starter, per CONTEXT.md D-13).
+      Plan 04-01 (Cycle 6 F2 fix) removed the original theme line entirely (no
+      placeholder comment); this task reintroduces the live property line.
 
     Refs: FOUND-03 (full 5-direction set)
     Plan: 04-07
@@ -391,12 +391,12 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
   </action>
   <acceptance_criteria>
     - `git log -1 --pretty=%s` returns a subject line starting with `feat(04-07):`.
-    - `git log -1 --name-status` shows 4 `A` entries (the peer .tres files), `M main.tscn`, `M addons/neocade_theme/_phase4_import.gd`, `M addons/neocade_theme/_phase4_verify.gd` (Cycle 2 M3 fix), and `M addons/neocade_theme/_phase4_verify_headless.gd` (Cycle 2 M3 fix).
+    - `git log -1 --name-status` shows 4 `A` entries (the peer .tres files), `M main.tscn`, `M .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd`, `M .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd` (Cycle 2 M3 fix), and `M .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd` (Cycle 2 M3 fix).
     - `git status --porcelain` is empty for all 8 paths.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$msg = git log -1 --pretty=%s; if ($msg -notmatch '^feat\\(04-07\\):') { throw \"commit subject wrong: $msg\" }; $ns = git log -1 --name-status; foreach($f in 'addons/neocade_theme/slate_neocade_theme\\.tres','addons/neocade_theme/bubble_neocade_theme\\.tres','addons/neocade_theme/daybreak_neocade_theme\\.tres','addons/neocade_theme/burst_neocade_theme\\.tres') { if ($ns -notmatch \"A\\s+$f\") { throw \"commit missing $f\" } }; if ($ns -notmatch 'M\\s+main\\.tscn') { throw 'commit missing main.tscn modification' }; if ($ns -notmatch 'M\\s+addons/neocade_theme/_phase4_import\\.gd') { throw 'commit missing _phase4_import.gd modification' }; if ($ns -notmatch 'M\\s+addons/neocade_theme/_phase4_verify\\.gd') { throw 'commit missing _phase4_verify.gd (Cycle 2 M3 fix)' }; if ($ns -notmatch 'M\\s+addons/neocade_theme/_phase4_verify_headless\\.gd') { throw 'commit missing _phase4_verify_headless.gd (Cycle 2 M3 fix)' }"
+      powershell -NoProfile -Command "$msg = git log -1 --pretty=%s; if ($msg -notmatch '^feat\\(04-07\\):') { throw \"commit subject wrong: $msg\" }; $ns = git log -1 --name-status; foreach($f in 'addons/neocade_theme/slate_neocade_theme\\.tres','addons/neocade_theme/bubble_neocade_theme\\.tres','addons/neocade_theme/daybreak_neocade_theme\\.tres','addons/neocade_theme/burst_neocade_theme\\.tres') { if ($ns -notmatch \"A\\s+$f\") { throw \"commit missing $f\" } }; if ($ns -notmatch 'M\\s+main\\.tscn') { throw 'commit missing main.tscn modification' }; if ($ns -notmatch 'M\\s+\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import\\.gd') { throw 'commit missing _phase4_import.gd modification (Cycle 6 F3: helper relocated)' }; if ($ns -notmatch 'M\\s+\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify\\.gd') { throw 'commit missing _phase4_verify.gd (Cycle 2 M3 fix; Cycle 6 F3 path)' }; if ($ns -notmatch 'M\\s+\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless\\.gd') { throw 'commit missing _phase4_verify_headless.gd (Cycle 2 M3 fix; Cycle 6 F3 path)' }; if ($ns -match 'A\\s+addons/neocade_theme/_phase4_(import|verify|verify_headless)\\.gd') { throw 'Cycle 6 F3 regression: helper .gd added at addons/neocade_theme/ — must live under .planning/phases/04-.../helpers/' }"
     </automated>
   </verify>
   <done>4 peer themes + main.tscn reassignment land as a single atomic Wave 4 commit. The full 5-direction set ships.</done>
