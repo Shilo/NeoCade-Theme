@@ -447,3 +447,247 @@ The replan is much stronger, but execution is not ready. C2 remains partially un
 - **Aggregate:** HIGH — strictest reviewer wins for execution gate.
 
 **Unresolved HIGH count for cycle 2: 3** (C1 partial + C2 partial + N1 new). Down from cycle 1's 7. No stall. Replan cycle 3 should freeze slot names per Control, wire `disabled_opacity` everywhere, and add the `font` branch to the iteration engine.
+
+---
+
+# Cross-AI Plan Review — Phase 4 (Cycle 3 — FINAL at max-cycles gate)
+
+**Reviewed:** 2026-05-06 (re-review after replan commit `31903c8`)
+**Reviewers:** OpenCode (DeepSeek V4 Pro), Codex
+**Scope:** Verify cycle-2 HIGH concerns (C1/C2/N1) are FULLY RESOLVED; identify new concerns introduced by cycle-2-to-3 replan.
+
+## OpenCode Cycle 3 Review (DeepSeek V4 Pro)
+
+## 1. Summary
+
+All three cycle-2 unresolved HIGH concerns (C1, C2, N1) are **FULLY RESOLVED** with concrete, verifiable acceptance tests embedded in the plans. All six MEDIUM/LOW concerns are also fully addressed. One new MEDIUM concern identified (N2 — `.tres` serialization bloat), one new LOW concern (N3 — `get_script_constant_map()` runtime fragility). No HIGH concerns remain that would trigger the escalation gate. Phase 4 is ready to execute.
+
+---
+
+## 2. Per-Concern Resolution Status
+
+### C1 — Coverage matrix slot-name enumeration (Cycle 2: PARTIALLY RESOLVED)
+**FULLY RESOLVED**
+
+Evidence:
+- **Plan 04-05 Task 2.5** creates `CANONICAL_SLOT_NAMES: Dictionary` with verbatim slot-name arrays for 22 complex Controls (Tree's 16 styleboxes, Button's 6+12 slots, LineEdit's 3, PopupMenu's 5, Window's 2, both ScrollBars' 5, ItemList's 9, etc.). Remaining 15 simpler Controls verify via BINDING_TABLE key existence.
+- **Plan 04-06 Task 2** (both verifier variants) iterate `CANONICAL_SLOT_NAMES.keys()`, match on `"stylebox"/"color"/"constant"/"font_size"/"icon"`, and assert `theme.has_*(slot_name, theme_type)` for each frozen slot. Failures produce `"CANONICAL_SLOT_NAMES freeze fail: %s.%s.%s missing"` — wrong slot names cannot pass.
+- **Plan 04-06 acceptance criteria**: verifier contains CANONICAL_SLOT_NAMES reference, `for theme_type in canonical_slots.keys():`, `match dt:` branches, and the freeze-fail assertion message.
+- **Plan 04-06 verify command**: PowerShell checks both verifier files contain `'CANONICAL_SLOT_NAMES'`, `'for theme_type in canonical_slots.keys():'`, `'match dt:'`, all 5 has_* branch patterns, and `'CANONICAL_SLOT_NAMES freeze fail'`.
+
+### C2 — `disabled_opacity` hard-coded 0.38 despite DIRECTION_PRESETS (Cycle 2: PARTIALLY RESOLVED)
+**FULLY RESOLVED**
+
+Evidence:
+- **Plan 04-04 Task 4**: `_regenerate_theme()` sources `presets.disabled_opacity` per direction. `DIRECTION_PRESET_DEFAULT` holds `0.38` as custom-theme fallback ONLY.
+- **Plan 04-05 Task 3**: `_resolve_recipe` stylebox branch: `var is_disabled: bool = recipe.get("disabled", false)` → `alpha = presets.disabled_opacity`. Color branch: identical pattern. NO hard-coded `0.38` in either branch.
+- **Plan 04-05 BINDING_TABLE recipes**: use `"disabled": true` flag, no `"alpha": 0.38` literals.
+- **Plan 04-06 Task 2 verifiers**: assert `Button.font_disabled_color.a == 0.42` (Pulse's DIRECTION_PRESETS value). Headless variant: same check.
+- **Plan 04-05 Task 3 verify command**: extracts `_resolve_recipe` body via regex, asserts `0.38` does NOT appear inside it. Also extracts Button recipe section from BINDING_TABLE, asserts `"alpha": 0.38` does NOT appear.
+
+### N1 — `font` data type in BINDING_TABLE schema without handler (Cycle 2: HIGH, new)
+**FULLY RESOLVED**
+
+Evidence:
+- **Plan 04-05 schema**: "Cross-AI Cycle 2 N1 fix: the `font` data type is REMOVED from the schema — per-Control fonts go through `theme.default_font`... Explicit `set_font()` calls on the 14 type variations."
+- **Plan 04-05 Task 3 `_resolve_recipe`**: 5 branches only (stylebox/color/constant/font_size/icon). NO font branch. Unknown data_type returns null.
+- **Plan 04-05 Task 3 iteration walk**: 5 setter calls only (set_stylebox/set_color/set_constant/set_font_size/set_icon). NO set_font on per-slot walk.
+- **Plan 04-05 Task 1**: 14 explicit `set_font("font", variation, ...)` calls outside the BINDING_TABLE walk + `theme.default_font = body_font`.
+- **Plan 04-05 Task 3 verify command**: regex asserts `elif data_type == "font"` NOT in `_resolve_recipe` body. Regex asserts `set_font(slot_name, theme_type,` NOT in the BINDING_TABLE walk section.
+- **Plan 04-01 class docstring**: documents the binding mechanism as REVISABLE per D-03.
+
+### M1 — `_save_peer_tres()` defined but unverified as called inside `_run()`
+**FULLY RESOLVED**
+
+Evidence:
+- **Plan 04-07 Task 1 verify command**: Extracts `_run()` body via `(?s)func _run\\(\\)[^\\n]*\\n(.*?)(?=^func |\\Z)` regex, asserts `_save_peer_tres()` appears WITHIN the extracted body. Also checks `_save_pulse_tres()` similarly. Distinguished from mere file-level presence.
+
+### M2 — Platform tokens (densityScale + tapPadding) unwired to stylebox margins
+**FULLY RESOLVED**
+
+Evidence:
+- **Plan 04-05 Task 3 `_resolve_recipe`**: Stylebox branch computes `h_margin` and `v_margin` using `tokens.get("densityScale", 1.0)` and `tokens.get("tapPadding", 0)`. Formula: `int(spacing * density) + tap_pad` for horizontal, `int(spacing * 0.6 * density) + tap_pad` for vertical.
+- **Plan 04-05 Task 3 acceptance criteria** tag these as M2 fix wires.
+- **Plan 04-06 Task 2** (both verifiers): Toggles `NeoCadeTheme.Platform.DESKTOP` / `NeoCadeTheme.Platform.MOBILE`, captures `Button.normal.content_margin_left`, asserts `mobile_margin > desktop_margin`.
+- **Plan 04-06 acceptance criteria**: "File contains `tokens.get(\"densityScale\"` and `tokens.get(\"tapPadding\"` and `mobile_margin > desktop_margin` assertion."
+
+### M3 — Peer .tres file runtime validation only-claimed (not implemented)
+**FULLY RESOLVED**
+
+Evidence:
+- **Plan 04-07 Task 1.5 (NEW)**: Explicitly added task. Extends `_phase4_verify.gd` with `_verify_peers()` function called from `_run()`. Extends `_phase4_verify_headless.gd` with peer iteration in `_init()`.
+- Both iterate all 4 peer filenames, assert `ResourceLoader.load(path)`, `loaded is NeoCadeTheme`, `has_stylebox("normal", "Button")`, `_resolve_direction_presets().spread_factor` matches expected (0.7/1.0/1.0/1.3).
+- **Plan 04-07 Task 1.5 acceptance criteria**: Both files contain 4 filenames, `_verify_peers()`, `is NeoCadeTheme`, `spread_factor` checks. Headless variant accumulates failures.
+- **Plan 04-07 Task 1.5 verify command**: PowerShell confirms both files reference all 4 filenames + spread_factor assertions.
+
+### L1 — Stale "13 variations" + "Plan 04-05 supersedes" remnants
+**FULLY RESOLVED**
+
+Evidence:
+- Plan 04-05 TYPE_VARIATIONS: "14 entries exact" (6+5+1+2), "Cross-AI Cycle 1 C4 fix".
+- Plan 04-06 verifier: `type_variations.size() == 14`.
+- Plan 04-08 CHANGELOG: "14 type variations".
+- No "13 variations" nor "supersedes" text found in any plan.
+
+### L2 — No cross-direction differentiation smoke test in verify
+**FULLY RESOLVED**
+
+Evidence:
+- **Plan 04-06 Task 2** (both verifiers): Constructs in-memory Slate with `base_color = Color("#111820")`, calls `_resolve_direction_presets()`, asserts `abs(slate spread_factor - 0.7) < 0.001`, and asserts `|Pulse spread - Slate spread| > 0.5`.
+- **Plan 04-06 acceptance criteria**: "File contains the cross-direction smoke test" with `Color("#111820")` and spread_factor difference assertion.
+- **Plan 04-06 verify command**: PowerShell checks for `'slate_test: NeoCadeTheme'`, `'Color(\"#111820\")'`, `'spread_factor'`.
+
+### L3 — CHANGELOG lists non-canonical Controls (GraphFrame/GraphNode/etc.)
+**FULLY RESOLVED**
+
+Evidence:
+- **Plan 04-08 Task 2 CHANGELOG**: Explicitly lists all 37 canonical names. Has explicit L3 fix note: "list trimmed to the canonical 37."
+- **Plan 04-08 Task 2 acceptance criteria**: "File does NOT contain non-canonical names GraphFrame, GraphNode, HFlowContainer, HSeparator, VSeparator in the Phase 4 coverage prose."
+- **Plan 04-08 Task 2 verify command**: PowerShell asserts each of the 5 non-canonical names does NOT appear and each of the 37 canonical names DOES appear.
+
+---
+
+## 3. NEW Concerns from Cycle-2-to-3 Replan
+
+### N2 — `.tres` files are non-data-oriented due to `ResourceSaver.save()` serialization (MEDIUM)
+
+**What**: Plan 04-06 Task 1 and Plan 04-07 Task 1 generate `.tres` files via `NeoCadeTheme.new()` → set exports → `ResourceSaver.save()`. But `NeoCadeTheme.new()` triggers `_init()` → `_regenerate_theme()`, which populates thousands of theme entries. `ResourceSaver.save()` serializes ALL of them into the `.tres` — styleboxes, colors, constants, icons for all 37 Controls × multiple states. The resulting `.tres` files are NOT "data-oriented" (only `@export` values) as SC#6 requires. They carry a full copy of all regenerated entries alongside the 9 `@export` values.
+
+**Impact**: Files are bloated (potentially hundreds of KB instead of <1KB). Functionally correct — `_init()` regenerates on load and overwrites the stale entries. But contradicts SC#6 intent and creates brittle files where stale entries could mask regeneration bugs.
+
+**Mitigation**: Low — the plan is self-correcting (regeneration overwrites on load). A Phase 4 post-execute cleanup could regenerate files with `_init()` disabled. Or accept the bloat as v1 expedience and fix in a later phase. Does NOT block correctness.
+
+**Suggested fix**: After `NeoCadeTheme.new()` and `ResourceSaver.save()`, re-open the `.tres` file and strip out all theme-entry sections (keeping only `@export` properties). Or use a post-generation script. Not required to close this review — flag for executor awareness.
+
+### N3 — `get_script_constant_map()` reliance for runtime verification (LOW)
+
+**What**: Plan 04-06 and 04-07 verifiers access `BINDING_TABLE`, `TYPE_VARIATIONS`, and `CANONICAL_SLOT_NAMES` via `theme.get_script().get_script_constant_map().get("BINDING_TABLE", {})`. This depends on Godot 4.6 GDScript exposing class-level `const` values through `Object.get_script_constant_map()`.
+
+**Impact**: If this API doesn't include consts (only `const` enums or script constants), the fallback `{}` returns empty dicts causing false-negative assertions (e.g., `binding_table.size() != 37`). The verifier would FAIL-loud, not silently pass. The issue is self-detecting but may block automated CI.
+
+**Mitigation**: Fails-loud with clear messages. The executor can work around by directly referencing `NeoCadeTheme.BINDING_TABLE` (static access via class_name) if `get_script_constant_map()` doesn't work. LOW severity — does not affect theme correctness, only verification tooling.
+
+---
+
+## 4. Risk Assessment: LOW
+
+All three cycle-2 HIGHs are fully resolved with verifiable acceptance tests. No new HIGH concerns. Two new concerns (N2 MEDIUM — cosmetic bloating, N3 LOW — verification tooling) do not block execution or correctness. The Phase 4 plan set is converged and ready for `/gsd-execute-phase 4`.
+
+---
+
+## Codex Cycle 3 Review
+
+**Summary**
+
+C1, C2, N1 and the listed M/L concerns are resolved in the plan text with verifiable acceptance tests. However, I found one new HIGH outside those fixes: the `.tres` generation flow saves a `NeoCadeTheme` after `_regenerate_theme()` has populated Theme entries, which conflicts with the locked “data-only `.tres`” architecture and the Plan 04-06 file-size assertions.
+
+**Per-Concern Resolution Status**
+
+- **C1: FULLY RESOLVED**
+  Evidence: Plan 04-05 Task 2.5 adds `const CANONICAL_SLOT_NAMES: Dictionary = {` and states `BINDING_TABLE recipe slot-keys MUST match these arrays exactly.` Plan 04-06 Task 2 verifies this by iterating `CANONICAL_SLOT_NAMES` and calling `theme.has_stylebox/color/constant/font_size/icon(...)`.
+
+- **C2: FULLY RESOLVED**
+  Evidence: Plan 04-05 Task 2 changes disabled recipes to `"disabled": true`. Plan 04-05 Task 3 `_resolve_recipe()` passes `presets` and sets `alpha = presets.disabled_opacity` in both stylebox and color branches. Plan 04-06 Task 2 asserts `Button.font_disabled_color.a` equals Pulse `0.42`.
+
+- **N1: FULLY RESOLVED**
+  Evidence: Plan 04-05 must-haves say the `font` data type is removed from `BINDING_TABLE`. Plan 04-05 Task 3 says `_resolve_recipe` supports only `stylebox`, `color`, `constant`, `font_size`, `icon`, and the walk has no `set_font(slot_name, theme_type, ...)` branch. Fonts are handled by `default_font` plus 14 explicit `set_font("font", variation, ...)` calls.
+
+- **M1: FULLY RESOLVED**
+  Evidence: Plan 04-07 Task 1 acceptance explicitly requires `_run()` body extraction by regex and checks `_save_peer_tres()` is called inside that body.
+
+- **M2: FULLY RESOLVED**
+  Evidence: Plan 04-05 Task 3 wires `tokens.get("densityScale", 1.0)` and `tokens.get("tapPadding", 0)` into stylebox margins. Plan 04-06 Task 2 verifies `mobile_margin > desktop_margin`.
+
+- **M3: FULLY RESOLVED**
+  Evidence: Plan 04-07 Task 1.5 adds `_verify_peers()` and extends the headless verifier. Both load all 4 peers, assert `is NeoCadeTheme`, assert `has_stylebox("normal", "Button")`, and verify spread factors.
+
+- **L1: FULLY RESOLVED**
+  Evidence: Plan 04-05 Task 1 locks `TYPE_VARIATIONS` to 14 with `CodeLabel` included. Plan 04-06 Task 2 asserts `type_variations.size() == 14`. I found no stale “13 variations” or “Plan 04-05 supersedes” remnants in the provided 04-04 through 04-07 text.
+
+- **L2: FULLY RESOLVED**
+  Evidence: Plan 04-06 Task 2 constructs `slate_test: NeoCadeTheme`, sets `base_color = Color("#111820")`, and asserts Slate spread factor `0.7` differs from Pulse `1.3` by `> 0.5`.
+
+- **L3: FULLY RESOLVED**
+  Evidence: Plan 04-08 Task 2 lists the canonical 37 Controls and its verifier throws if `GraphFrame`, `GraphNode`, `HFlowContainer`, `HSeparator`, or `VSeparator` appear.
+
+**New Concerns**
+
+- **HIGH - `.tres` generation likely violates data-only architecture**
+  Evidence: Plan 04-01 Task 2 defines `_init() -> _regenerate_theme()`. Plan 04-05 Task 3 makes `_regenerate_theme()` populate Theme entries via `set_stylebox`, `set_color`, `set_constant`, `set_font_size`, and `set_icon`. Plan 04-06 Task 1 then does `var pulse: NeoCadeTheme = NeoCadeTheme.new()` and `ResourceSaver.save(pulse, ...)`.
+  
+  A Godot `Theme` resource with populated entries will normally serialize those entries into the `.tres`. That conflicts with Plan 04-06’s claim that `pulse_neocade_theme.tres` is 200-1500 bytes and saves only 9 export values. It also conflicts with the project’s “saved `.tres` files stay data-oriented” rule. This needs manual design review before execution.
+
+- **MEDIUM - Plan 04-06 Task 1 has a verify/template mismatch**
+  Evidence: the template uses `var path := "res://addons/neocade_theme/pulse_neocade_theme.tres"` then `ResourceSaver.save(pulse, path)`, but the automated verifier searches for literal `ResourceSaver.save(pulse, "res://addons/neocade_theme/pulse_neocade_theme.tres")`. A correct implementation following the template can fail the plan verifier.
+
+**Risk Assessment**
+
+Overall risk: **HIGH**, due to the new `.tres` serialization architecture conflict. The original Cycle 2 HIGHs are resolved, but this new issue can block Plan 04-06/04-07 execution or silently violate the locked resource format goal.
+
+---
+
+## Cycle 3 Consensus Summary
+
+### Per-Concern Resolution
+
+| Concern | OpenCode | Codex | Aggregate |
+|---|---|---|---|
+| **C1** Slot-name freeze | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **C2** `disabled_opacity` consumption | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **N1** `font` schema vs walk alignment | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **M1** `_save_peer_tres()` called inside `_run()` | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **M2** Platform tokens wired to margins | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **M3** Peer `.tres` runtime verification | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **L1** Stale "13 variations" prose | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **L2** Cross-direction differentiation smoke test | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **L3** CHANGELOG canonical 37 trim | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+
+### NEW Concerns from Cycle-2-to-3 Replan
+
+#### N4 — `.tres` serialization architecture conflict
+
+- **OpenCode:** flagged as **MEDIUM** ("N2 — `.tres` files are non-data-oriented due to `ResourceSaver.save()` serialization"). Self-correcting at runtime (regeneration overwrites stale entries on load).
+- **Codex:** flagged as **HIGH** (".tres generation likely violates data-only architecture"). Conflicts with locked SC#6 ("saved `.tres` files stay data-oriented") AND with Plan 04-06's own file-size assertions (200-1500 bytes claim).
+- **Aggregate (stricter reading wins): HIGH.**
+
+**Root cause:** Plan 04-06 Task 1 + Plan 04-07 Task 1 generate `.tres` via `NeoCadeTheme.new()` → `_init()` triggers `_regenerate_theme()` → populates thousands of Theme entries → `ResourceSaver.save()` serializes EVERYTHING into the `.tres`. Result: `.tres` files contain the 9 `@export` values PLUS a frozen snapshot of the regenerated stylebox/color/constant/font_size/icon entries.
+
+**Why this matters:**
+1. **Violates SC#6** (locked architecture decision): "saved `.tres` files stay data-oriented" — contradicted by serialized entry bloat.
+2. **Plan 04-06 file-size assertion contradicted:** the plan claims `pulse_neocade_theme.tres` will be ~200-1500 bytes; actual size with serialized entries will be much larger (10s-100s of KB).
+3. **Brittle:** stale serialized entries could mask `_regenerate_theme()` regression bugs (the file appears to "work" because it has entries baked in, even if regeneration is broken).
+4. **Self-correcting at runtime:** on load, `_init()` runs first and regenerates — so functionally the theme renders correctly. But the bloat + SC#6 violation remain.
+
+**Suggested fixes (Phase 4 must pick one):**
+- **A.** After `ResourceSaver.save()`, post-process the `.tres` file textually to strip everything except the `@export` block (preserving only 9 properties + the resource header). Verify file size < 2KB.
+- **B.** Save BEFORE `_regenerate_theme()` runs — gate the populate phase with `if not Engine.is_editor_hint(): return` or similar, so `NeoCadeTheme.new()` produces an empty Theme that `ResourceSaver` can save cleanly. But this contradicts D-01 (regenerate must run on @export setter, including `.new()` defaults).
+- **C.** Use a different save mechanism that captures only `@export` values. Hand-author the `.tres` text from a known Godot-emitted template (one-time captured at execute time) — re-introduces the cycle-1 C6 risk but with empirical Godot output as the template, not speculation.
+- **D.** Accept the bloat as v1 expedience, drop SC#6 wording from "data-oriented" to "regenerated-on-load", and update Plan 04-06 file-size assertion. Documents the architectural reality.
+
+#### N5 (Codex) — Plan 04-06 Task 1 verify/template path mismatch (MEDIUM)
+
+The template uses `var path := "res://addons/neocade_theme/pulse_neocade_theme.tres"` then `ResourceSaver.save(pulse, path)`, but the automated verifier searches for the literal `ResourceSaver.save(pulse, "res://addons/neocade_theme/pulse_neocade_theme.tres")` (variable inlined). A correct implementation following the template can fail the verifier.
+
+#### N3 / OpenCode — `get_script_constant_map()` runtime fragility (LOW)
+
+Verifier accesses `theme.get_script().get_script_constant_map()` to read `BINDING_TABLE` / `TYPE_VARIATIONS` / `CANONICAL_SLOT_NAMES`. If Godot 4.6 doesn't expose const dictionaries through this API, the fallback `{}` returns empty dicts and assertions fail-loud. Self-detecting; can be worked around by direct class-name access (`NeoCadeTheme.BINDING_TABLE`).
+
+### Risk Assessment
+
+- **OpenCode:** LOW (plan set is execution-ready; N2/N3 don't block)
+- **Codex:** HIGH (.tres serialization architecture conflict is a real blocker)
+- **Aggregate: HIGH** — N4 is real and contradicts a locked SC. Cannot ship as-is without explicit user decision.
+
+### Convergence Status
+
+- Cycle 1 HIGH: 7
+- Cycle 2 HIGH: 3 (decreasing)
+- Cycle 3 HIGH: 1 (decreasing — the original 7 + 3 are all resolved; one new HIGH introduced by the replan path itself)
+- **Stall: NO** (each cycle decreased; the path was C1-C7 → C1+C2+N1 → N4 — a new concern, not a recurring one)
+- **Max cycles reached:** YES (3/3)
+- **Escalation gate triggered.**
+
+The original 7 HIGHs and the cycle-2 emergent HIGH are all closed. The remaining HIGH (N4) is an architectural side-effect of resolving cycle-1's C5/C6 (Godot-serialized fonts + .tres files via ResourceSaver) — adopting that path conflicted with the locked SC#6 "data-oriented" constraint. The user must decide whether to:
+1. Run a 4th cycle (override max_cycles=3) to resolve N4,
+2. Proceed anyway with N4 acknowledged as a known issue (Phase 4 executor will discover it on first .tres save),
+3. Stop and review manually.
