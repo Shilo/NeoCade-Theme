@@ -877,3 +877,156 @@ Both reviewers agree on the trivial fix.
 - Cycle 4 HIGH: 1 (STALLED ON COUNT — N5 emerged from N4 fix path)
 
 The count is stalled at 1 but the SUBSTANCE is different each cycle (N4 was bloat; N5 is type-linkage). Each emergent HIGH has been a side-effect of the prior cycle's fix path. The remaining issue is genuinely trivial to fix — preserve `script` references in the strip — but requires another replan + review pass to close.
+
+---
+
+# Cross-AI Plan Review — Phase 4 (Cycle 5 — N5 verification, max-cycles +2 override)
+
+**Reviewed:** 2026-05-06 (re-review after replan commit `9ea0496`)
+**Reviewers:** OpenCode (DeepSeek V4 Pro), Codex
+**Scope:** Verify cycle-4 N5 (.tres script-linkage drop) is FULLY RESOLVED.
+
+## OpenCode Cycle 5 Review (DeepSeek V4 Pro)
+
+## 1. N5 Resolution Status: FULLY RESOLVED (one LOW regex note)
+
+The script-linkage preservation logic is correct in its three components:
+
+**Component (a) — Preserve `[ext_resource type="Script" ...]` blocks:** Correct. The check `begins_with("[ext_resource")` AND `find("type=\"Script\"") != -1` is evaluated BEFORE the general `[ext_resource]` drop, so script ext_resources survive. Godot 4.6 serializes `[ext_resource ...]` blocks as single lines — no multi-line edge case exists. ✓
+
+**Component (b) — Preserve `script = ExtResource(...)` / `script_class = ...` in `[resource]`:** Correct. Both prefix patterns (`begins_with("script = ExtResource(")` and `begins_with("script_class =")`) match Godot's actual serialization form. The prefix strategy correctly handles variable id values in `ExtResource("...")`. ✓
+
+**Component (c) — Strip `load_steps=N` from `[gd_resource ...]` header:** The `_strip_load_steps_attr()` helper is conceptually correct — Godot 4.x recomputes `load_steps` on load when the attribute is absent. The regex `r"\s*load_steps=\d+"` correctly matches the attribute. ✓
+
+**LOW concern — regex `rx.sub(header_line, "", true)` uses empty-string replacement, not a space.** If `load_steps` sits between two other attributes (Godot's format: `type="Theme" load_steps=42 format=3`), removing ` load_steps=42` without replacing it with a space produces `type="Theme"format=3` — fused attributes, which Godot would reject. The plan's double-space cleanup regex (`r" {2,}"`) cannot fix zero-space fusion. The fix is one character: `rx.sub(header_line, " ", true)` (replace with single space instead of empty string). This is LOW severity because (a) the runtime `loaded is NeoCadeTheme` verifier catches any file Godot refuses to parse, (b) `load_steps` may not even appear in headers without `[ext_resource]`/`[sub_resource]` blocks, and (c) the fix is trivial.
+
+**Size assertion:** Preserved script ext_resource adds ~80-150 bytes, well under the 2048-byte cap. ✓
+
+**Verdict:** The script-linkage preservation is structurally sound. The regex replacement value is a trivial pre-emptive fix — one character (`" "` instead of `""`). Does not block convergence.
+
+---
+
+## 2. Regression Check — All Prior Fixes Intact
+
+| Concern | Status | Evidence |
+|---------|--------|----------|
+| **C1** (37 canonical rows) | INTACT | Plan 04-05 BINDING_TABLE, unchanged |
+| **C2** (DIRECTION_PRESETS per-direction) | INTACT | Plan 04-04 Task 3.5/4, unchanged |
+| **C3** (default_font before walk) | INTACT | Plan 04-05 Task 1, unchanged |
+| **C4** (14 type variations + CodeLabel) | INTACT | Plan 04-05 Task 1, unchanged |
+| **C5** (Godot-serialized fonts) | INTACT | Plan 04-02, unchanged |
+| **C6** (ResourceSaver for .tres) | INTACT | Plan 04-06 Task 1 still uses `ResourceSaver.save()` then strips; header captured before strip |
+| **C7** (Plan 04-08 depends on 04-07) | INTACT | Plan 04-08 frontmatter, unchanged |
+| **N1** (no `font` branch in walk) | INTACT | Plan 04-05 Task 3, unchanged |
+| **N4** (data-only .tres via strip) | STRENGTHENED | Strip now also preserves script linkage |
+| **M1** (_save_peer_tres() called in _run()) | INTACT | Plan 04-07 verifier, unchanged |
+| **M2** (densityScale/tapPadding wired) | INTACT | Plan 04-05 _resolve_recipe, unchanged |
+| **M3** (peer-load verification) | INTACT | Plan 04-07 Task 1.5, unchanged |
+| **L1** (no stale "13 variations") | INTACT | Already resolved Cycle 3 |
+| **L2** (cross-direction smoke test) | INTACT | Plan 04-06 verifier, unchanged |
+| **L3** (CHANGELOG 37 canonical) | INTACT | Plan 04-08 Task 2, unchanged |
+
+Cycle 5 changes are scoped to Plans 04-06/04-07/04-08 and are additive only — no prior fix was modified. **Zero regressions.**
+
+---
+
+## 3. New Concerns Introduced by Cycle 5
+
+### LOW: `_strip_load_steps_attr() rx.sub(header_line, "", true)` — empty-string replacement can fuse tokens
+
+**Location:** Plan 04-06 Task 1, `_strip_load_steps_attr()`
+
+**What:** `rx.sub(header_line, "", true)` removes `load_steps=N` including its preceding spaces, but replaces with empty string. If `load_steps` is between `type="Theme"` and `format=3`, the result is `type="Theme"format=3` (fused). Godot's parser would reject this malformed header.
+
+**Fix:** `rx.sub(header_line, " ", true)` (one space instead of empty string). Then `r" {2,}" → " "` cleans double spaces.
+
+**Severity:** LOW. Self-detecting — the file fails to load, verifier catches it. Trivial one-character fix.
+
+### No other new concerns
+
+- ~~Regex quotes/escapes~~ — `begins_with("[ext_resource")` and `stripped.find("type=\"Script\"")` are syntactically correct GDScript. ✓
+- ~~Multiple script ext_resources~~ — if Godot emitted multiple `[ext_resource type="Script"]` blocks, all would be preserved (each is independently detected); non-script ext_resources are still dropped. ✓
+- ~~`load_steps` removal breaking Godot~~ — Godot 4.x recomputes `load_steps` when absent. Verified against Godot docs. ✓
+- ~~`script_class =` not matching~~ — Godot uses space-before-equals: `script_class = "..."`. `begins_with("script_class =")` is correct. ✓
+
+---
+
+## 4. Risk Assessment: LOW
+
+| Risk | Level | Blocking? |
+|------|-------|-----------|
+| `_strip_load_steps_attr` empty-replace fuses tokens | LOW | No (self-detecting + trivial fix) |
+| All prior fixes C1-C7/N1/N4/M1-M3/L1-L3 | None | Intact |
+| Script-linkage preservation (core N5) | None | Correct |
+| **HIGH count: 0** | | |
+
+---
+
+## 5. Convergence Verdict: **CONVERGE**
+
+Zero HIGH concerns remain. The one LOW concern (regex empty-replace → space-replace) is a self-detecting one-character fix that doesn't block execution. The plan set is ready for `/gsd-execute-phase 4`.
+
+---
+
+## Codex Cycle 5 Review
+
+**Findings**
+
+No HIGH findings. N5 is **FULLY RESOLVED** and the loop can converge.
+
+One LOW cleanup: [04-06 Plan](/C:/Programming_Files/Shilocity/Godot/NeoCade-Theme/.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-06-pulse-tres-and-verification-PLAN.md:317) still greps the stripped `.tres` for literal `NeoCadeTheme`. Runtime verification already asserts `loaded is NeoCadeTheme`, which is the stronger check. If Godot ever emits form-2 without a `script_class` string, the strip could be correct while this PowerShell grep false-fails. Not blocking; accepting `NeoCadeTheme|neocade_theme\.gd|script = ExtResource\(` would be more robust.
+
+**N5 Status**
+
+**FULLY RESOLVED.** The updated strip plan preserves the form-2 script linkage:
+
+- Keeps `[ext_resource type="Script" ...]` blocks instead of dropping all ext_resources: [04-06 Plan](/C:/Programming_Files/Shilocity/Godot/NeoCade-Theme/.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-06-pulse-tres-and-verification-PLAN.md:181)
+- Keeps `script = ExtResource(...)` and `script_class = ...` lines inside `[resource]`: [04-06 Plan](/C:/Programming_Files/Shilocity/Godot/NeoCade-Theme/.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-06-pulse-tres-and-verification-PLAN.md:221)
+- Strips `load_steps=N` from `[gd_resource ...]`: [04-06 Plan](/C:/Programming_Files/Shilocity/Godot/NeoCade-Theme/.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-06-pulse-tres-and-verification-PLAN.md:206)
+- Applies the same shared strip helper to peer themes: [04-07 Plan](/C:/Programming_Files/Shilocity/Godot/NeoCade-Theme/.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-07-peer-themes-and-main-tscn-PLAN.md:163)
+- Runtime verifiers assert `loaded is NeoCadeTheme` for Pulse and peers: [04-06 Plan](/C:/Programming_Files/Shilocity/Godot/NeoCade-Theme/.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-06-pulse-tres-and-verification-PLAN.md:373), [04-07 Plan](/C:/Programming_Files/Shilocity/Godot/NeoCade-Theme/.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-07-peer-themes-and-main-tscn-PLAN.md:219)
+
+The `load_steps` removal is acceptable. This repo already has valid Godot resources without `load_steps`, including `main.tscn` and the original scaffold `.tres`.
+
+**Regression Check**
+
+C1-C7, N1, N4, M1-M3, and L1-L3 remain intact.
+
+Key gates remain in place: canonical 37 coverage and slot freeze, disabled opacity from presets, no BINDING_TABLE font branch, Godot-serialized font/theme generation, N4 `< 2048` strip assertions, peer `_run()` invocation verification, peer runtime validation, canonical 37 docs, and Phase 04-08 dependency on 04-07.
+
+**Risk Assessment**
+
+Residual risk is low. The strip logic is line-based and conservative around script linkage. The critical failure mode, loading as plain `Theme`, is directly caught by runtime `ResourceLoader.load(...) is NeoCadeTheme` checks. No remaining HIGH concerns. Converged.
+
+---
+
+## Cycle 5 Consensus Summary — CONVERGED
+
+| Aspect | OpenCode | Codex | Aggregate |
+|---|---|---|---|
+| **N5** Script linkage preservation | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| All prior C1-C7, N1, N4, M1-M3, L1-L3 | INTACT | INTACT | **INTACT** |
+| New HIGH | 0 | 0 | **0** |
+| New MEDIUM | 0 | 0 | **0** |
+| New LOW | 1 | 1 | 2 minor |
+
+### LOW Concerns (Convergence-Compatible)
+
+1. **OpenCode L1** — `_strip_load_steps_attr()` `rx.sub(header_line, "", true)` uses empty-string replacement. If `load_steps` sits between two attributes (e.g., `type="Theme" load_steps=42 format=3`), zero-replace fuses tokens (`type="Theme"format=3`). One-char fix: replace with `" "` instead of `""`. Self-detecting via `loaded is NeoCadeTheme` runtime verifier — does not block convergence.
+2. **Codex L1** — Plan 04-06 verifier still greps stripped `.tres` for literal `NeoCadeTheme` string. Runtime `loaded is NeoCadeTheme` is the stronger check; if Godot uses form 2 without `script_class` string, the grep could false-fail while the load-check passes. Suggestion: accept `NeoCadeTheme|neocade_theme\.gd|script = ExtResource\(` as alternates. Not blocking.
+
+### Convergence Trajectory
+
+| Cycle | HIGH | Direction |
+|---|---|---|
+| 1 | 7 | initial review |
+| 2 | 3 | ↓ (4 fewer) |
+| 3 | 1 | ↓ (2 fewer; N4 emerged from C5/C6 fix) |
+| 4 | 1 | → (stalled count; N5 emerged from N4 fix) |
+| 5 | **0** | ↓ (all resolved) |
+
+### Final Verdict — CONVERGED
+
+Phase 4 plans are execution-ready. The 8 plans collectively address all 16 primary requirements (FOUND-01..03, FONT-01/05/06/07/08/09, ICON-01..04) plus the supporting TOKEN-01..10 implementation. The single-class + 5 data-only `.tres` architecture (D-31 / DESIGN_TOKENS.md) is faithfully implemented with the seamless `@exports` ↔ Theme Editor authoring model (CONTEXT.md D-01..D-14).
+
+**Phase 4 unblocked for `/gsd-execute-phase 4`.**
