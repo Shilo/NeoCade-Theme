@@ -16,16 +16,17 @@ requirements:
   - ICON-02
 must_haves:
   truths:
-    - "**D-06** Phase 4 baseline coverage achieved here: this plan ships the BINDING_TABLE + iteration engine that produces the 37/37 baseline pass — the binding table covers every one of the 37 scorecard Controls so SC#7 closes by Phase 4 end."
+    - "**D-06** Phase 4 baseline coverage achieved here: this plan ships the BINDING_TABLE + iteration engine that produces the 37/37 baseline pass — the binding table covers every one of the 37 scorecard Controls (CANONICAL list frozen below; Cross-AI Cycle 1 C1 fix) so SC#7 closes by Phase 4 end."
     - "**D-07** Baseline depth is full formula state coverage: the BINDING_TABLE entries authored by this plan populate Button's normal/hover/pressed/focus/disabled/hover_pressed; Tree's 16 styleboxes; LineEdit's normal/focus/read_only; PopupMenu's panel/hover/separator + labeled separators; Window's embedded_border/embedded_unfocused_border; HScrollBar's scroll/grabber/grabber_highlight/grabber_pressed. Phases 5/6/7 are POLISH passes only."
-    - "**D-09** SC#7 is read STRICTLY here: every Control type has every required slot present (formula-derived) + every variation type registered with its required fonts; verified visually in Theme Editor + via Plan 04-06's `_phase4_verify.gd` helper. Final COV-10 check happens in Phase 10."
+    - "**D-09** SC#7 is read STRICTLY here: every Control type has every required slot present (formula-derived) + every variation type registered with its required fonts; verified via Plan 04-06's `_phase4_verify.gd` helper. Final COV-10 check happens in Phase 10."
     - "`addons/neocade_theme/neocade_theme.gd` declares a constant `BINDING_TABLE` (a `Dictionary` compiled into the file) keyed by `theme_type` → `data_type` (`stylebox`/`color`/`constant`/`font`/`font_size`/`icon`) → `slot_name` → recipe metadata."
-    - "BINDING_TABLE covers ALL 37 scorecard Control rows from `MINIMAL-THEME-COVERAGE-DELTA.md`: AcceptDialog, Button, CheckBox, CheckButton, CodeEdit, ColorPicker, ColorPickerButton, ConfirmationDialog, FileDialog, GraphEdit, GraphFrame, GraphNode, HFlowContainer, HScrollBar, HSeparator, HSlider, ItemList, Label, LineEdit, LinkButton, MenuBar, MenuButton, OptionButton, PanelContainer, PopupMenu, PopupPanel, ProgressBar, RichTextLabel, SpinBox, SplitContainer, TabBar, TabContainer, TextEdit, TooltipPanel, Tree, VScrollBar, VSeparator, VSlider, Window."
-    - "`TYPE_VARIATIONS` constant declares all 13 NeoCade type variations (PrimaryButton, SecondaryButton, GhostButton, DangerButton, IconButton, FlatButton, HeaderLarge, HeaderMedium, HeaderSmall, Caption, CodeLabel, InfoText, CardPanel, HeroPanel — adjusted to actual 13 per TYPEVAR-01..04 + TYPEVAR-05 if applicable; planner authoring may add HeroPanel as the 13th if listed in TYPEVAR-05) with their base type."
+    - "**CANONICAL 37 ROW FREEZE (Cross-AI Cycle 1 C1 fix; sourced verbatim from MINIMAL-THEME-COVERAGE-DELTA.md §Coverage Scorecard):** AcceptDialog, Button, CheckBox, CheckButton, CodeEdit, ColorPicker, ColorPickerButton, ConfirmationDialog, FileDialog, FoldableContainer, GraphEdit, HScrollBar, HSlider, HSplitContainer, ItemList, Label, LineEdit, LinkButton, MenuBar, MenuButton, OptionButton, Panel, PopupMenu, PopupPanel, ProgressBar, RichTextLabel, SpinBox, TabBar, TabContainer, TextEdit, TooltipLabel, TooltipPanel, Tree, VScrollBar, VSlider, VSplitContainer, Window. **Count = 37 exact. NO executor discretion to add or drop. NO 'select 37 from 39'.** Bucket reconciliation: 24 themed-in-upstream + 1 Window-via-subclass + 2 bare-class-unthemed (MenuBar, Panel) + 2 container-chrome-constants-only (HSplitContainer, VSplitContainer) + 8 NeoCade-additive (CodeEdit, ColorPickerButton, ConfirmationDialog, FileDialog, FoldableContainer, LinkButton, SpinBox, TooltipLabel) = 37."
+    - "`TYPE_VARIATIONS` constant declares all **14** NeoCade type variations (Cross-AI Cycle 1 C4 fix: pick 14 with CodeLabel INCLUDED — the correct enumeration of TYPEVAR-01..04 + TYPEVAR-05): PrimaryButton, SecondaryButton, GhostButton, DangerButton, IconButton, FlatButton (6 Button) + HeaderLarge, HeaderMedium, HeaderSmall, Caption, CodeLabel (5 Label) + InfoText (1 RichTextLabel/Label) + CardPanel, HeroPanel (2 PanelContainer) = 14."
     - "`_regenerate_theme()` body now walks `BINDING_TABLE`: for each `(theme_type, data_type, slot_name)`, computes the recipe value from the derived locals (Plan 04-04) + the per-Control parameter context, and calls `set_stylebox(slot_name, theme_type, sb)` / `set_color(...)` / `set_constant(...)` / `set_font(...)` / `set_font_size(...)` / `set_icon(...)`."
     - "Iteration is ADDITIVE — entries not in BINDING_TABLE are LEFT UNTOUCHED (D-04 escape hatch). The walk uses `set_*(name, type, value)` directly and does NOT call `clear()` (D-01 invariant)."
-    - "`_regenerate_theme()` calls `set_type_variation(variation, base_type)` for all 13 variations registered in `TYPE_VARIATIONS`."
-    - "Each variation that needs a font has an explicit `set_font(\"font\", variation, ...)` call (PITFALLS 1.2 — variations don't inherit fonts from base type). HeaderLarge/HeaderMedium/HeaderSmall reference the matching FontVariation from Plan 04-02; Caption + InfoText reference Inter-Caption.tres; CodeLabel uses default font (consumer-overridable per FONT-04)."
+    - "`_regenerate_theme()` calls `set_type_variation(variation, base_type)` for all 14 variations registered in `TYPE_VARIATIONS`."
+    - "**Cross-AI Cycle 1 C3 fix:** `_regenerate_theme()` sets `default_font = preload(\"res://addons/neocade_theme/fonts/Inter-Body.tres\")` and `default_font_size = tokens.body` BEFORE the BINDING_TABLE walk, so any Control type that lacks an explicit per-type font entry still renders in Inter at the correct platform size (FONT-06 closure)."
+    - "Each variation that needs a font has an explicit `set_font(\"font\", variation, ...)` call (PITFALLS 1.2 — variations don't inherit fonts from base type). HeaderLarge/HeaderMedium/HeaderSmall reference the matching FontVariation from Plan 04-02; Caption + InfoText reference Inter-Caption.tres / Inter-Body.tres; CodeLabel uses Inter-Body.tres + a CHANGELOG note that consumers can override with their preferred mono per FONT-04 stricken (consumer override pattern documented in README, Plan 04-08)."
     - "Font sizes are read from `_platform_tokens(p)` per DESIGN_TOKENS §8.5 type scale; `Theme.set_font_size` sets per-type / per-variation sizes."
     - "Icon binding wires the 10 Button-family SVGs (Plan 04-03) to the appropriate Theme slots: CheckBox checked/unchecked, RadioButton checked/unchecked (CheckBox alternate slot), CheckButton on/off, OptionButton arrow, LineEdit clear, etc."
     - "PITFALLS-aligned slots present: `Tree` has all 16 styleboxes; `LineEdit` has normal/focus/read_only; `PopupMenu` has panel/hover/separator + labeled separators; `Window` has embedded_border/embedded_unfocused_border; HScrollBar/VScrollBar have scroll/grabber/grabber_highlight/grabber_pressed."
@@ -93,35 +94,45 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
 
     ```gdscript
     # ─── Type variation registry (DESIGN_TOKENS §8.5; PITFALLS 1.2 mandate explicit fonts) ──────
-    ## 13 NeoCade type variations registered via Theme.set_type_variation().
+    ## 14 NeoCade type variations registered via Theme.set_type_variation() (Cross-AI Cycle 1 C4
+    ## fix: PICK 14 with CodeLabel INCLUDED — the correct enumeration of TYPEVAR-01..04+05).
     ## Each entry: variation_name → base_type. Phases 5/6/7 author per-direction personality
     ## styleboxes per variation in `.tres` Theme Editor overrides; Phase 4 only registers + sets
     ## explicit fonts (Pitfall 1.2: variations don't inherit fonts from base type).
     const TYPE_VARIATIONS: Dictionary = {
-        # Button family (TYPEVAR-01)
+        # Button family (TYPEVAR-01) — 6
         "PrimaryButton":   "Button",
         "SecondaryButton": "Button",
         "GhostButton":     "Button",
         "DangerButton":    "Button",
         "IconButton":      "Button",
         "FlatButton":      "Button",
-        # Label / heading family (TYPEVAR-02 + TYPEVAR-03)
+        # Label / heading family (TYPEVAR-02 + TYPEVAR-03) — 5
         "HeaderLarge":  "Label",
         "HeaderMedium": "Label",
         "HeaderSmall":  "Label",
         "Caption":      "Label",
-        "InfoText":     "Label",
-        # Panel family (TYPEVAR-04)
+        "CodeLabel":    "Label",     # Cross-AI Cycle 1 C4 fix: INCLUDED (was previously dropped)
+        # InfoText (TYPEVAR-05; rich-text small body) — 1
+        "InfoText":     "RichTextLabel",
+        # Panel family (TYPEVAR-04) — 2
         "CardPanel": "PanelContainer",
         "HeroPanel": "PanelContainer",
     }
     ```
 
-    Rationale: 13 entries exact (6 Button-family + 5 Label-family + 2 Panel-family). If FEATURES.md / TYPEVAR-05 names a different 13th, the executor swaps `HeroPanel` for the canonical name; the COUNT is binding (13 variations exact).
+    Rationale: **14 entries exact** (6 Button + 5 Label + 1 RichTextLabel + 2 Panel = 14 — Cross-AI Cycle 1 C4 fix). The COUNT is binding: 14 variations.
 
-    Then in `_regenerate_theme()` body, AFTER the derivation block (Plan 04-04) and BEFORE the `_last_regeneration_usec` line, add the variation-registration block:
+    Then in `_regenerate_theme()` body, AFTER the derivation block (Plan 04-04) and BEFORE the `_last_regeneration_usec` line, add the default-font block + variation-registration block:
 
     ```gdscript
+        # ── Theme defaults (Cross-AI Cycle 1 C3 fix; FONT-06 closure) ──
+        # Set the theme-level default_font + default_font_size BEFORE the BINDING_TABLE walk
+        # so any Control type without an explicit per-type font entry still renders in Inter.
+        var body_font := preload("res://addons/neocade_theme/fonts/Inter-Body.tres") as FontVariation
+        default_font = body_font
+        default_font_size = tokens.body
+
         # ── Register type variations (DESIGN_TOKENS §8.5; PITFALLS 1.2) ──
         for variation_name in TYPE_VARIATIONS.keys():
             var base_type: String = TYPE_VARIATIONS[variation_name]
@@ -131,12 +142,13 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
         var header_large_font  := preload("res://addons/neocade_theme/fonts/Inter-HeaderLarge.tres") as FontVariation
         var header_medium_font := preload("res://addons/neocade_theme/fonts/Inter-HeaderMedium.tres") as FontVariation
         var header_small_font  := preload("res://addons/neocade_theme/fonts/Inter-HeaderSmall.tres") as FontVariation
-        var body_font          := preload("res://addons/neocade_theme/fonts/Inter-Body.tres") as FontVariation
         var caption_font       := preload("res://addons/neocade_theme/fonts/Inter-Caption.tres") as FontVariation
+        # 14 variations × set_font (Cross-AI Cycle 1 C4 fix: CodeLabel included)
         set_font("font", "HeaderLarge",  header_large_font)
         set_font("font", "HeaderMedium", header_medium_font)
         set_font("font", "HeaderSmall",  header_small_font)
         set_font("font", "Caption",      caption_font)
+        set_font("font", "CodeLabel",    body_font)   # consumer can override to a mono per FONT-04 stricken
         set_font("font", "InfoText",     body_font)
         set_font("font", "PrimaryButton",   body_font)
         set_font("font", "SecondaryButton", body_font)
@@ -152,6 +164,7 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
         set_font_size("font_size", "HeaderMedium", tokens.h2)
         set_font_size("font_size", "HeaderSmall",  tokens.h2)
         set_font_size("font_size", "Caption",      tokens.label_)
+        set_font_size("font_size", "CodeLabel",    tokens.label_)
         set_font_size("font_size", "InfoText",     tokens.body)
         set_font_size("font_size", "PrimaryButton",   tokens.body)
         set_font_size("font_size", "SecondaryButton", tokens.body)
@@ -165,28 +178,30 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
   </action>
   <acceptance_criteria>
     - File contains `const TYPE_VARIATIONS: Dictionary = {`.
-    - The TYPE_VARIATIONS dict contains all 13 entries: `"PrimaryButton"`, `"SecondaryButton"`, `"GhostButton"`, `"DangerButton"`, `"IconButton"`, `"FlatButton"`, `"HeaderLarge"`, `"HeaderMedium"`, `"HeaderSmall"`, `"Caption"`, `"InfoText"`, `"CardPanel"`, `"HeroPanel"`.
-    - The Button-family entries map to `"Button"`; the Label-family entries map to `"Label"`; the Panel-family entries map to `"PanelContainer"`.
+    - The TYPE_VARIATIONS dict contains all **14** entries (Cross-AI Cycle 1 C4 fix): `"PrimaryButton"`, `"SecondaryButton"`, `"GhostButton"`, `"DangerButton"`, `"IconButton"`, `"FlatButton"`, `"HeaderLarge"`, `"HeaderMedium"`, `"HeaderSmall"`, `"Caption"`, `"CodeLabel"`, `"InfoText"`, `"CardPanel"`, `"HeroPanel"`.
+    - The Button-family entries map to `"Button"`; the Label-family entries map to `"Label"`; the Panel-family entries map to `"PanelContainer"`; InfoText maps to `"RichTextLabel"`.
+    - `_regenerate_theme()` body contains `default_font = body_font` and `default_font_size = tokens.body` (Cross-AI Cycle 1 C3 fix; FONT-06 closure).
     - `_regenerate_theme()` body contains `for variation_name in TYPE_VARIATIONS.keys():`.
     - `_regenerate_theme()` body contains `set_type_variation(variation_name, base_type)` (or equivalent wrapped call).
-    - `_regenerate_theme()` body contains 13 `set_font("font", "<variation>", ...)` calls (13 explicit fonts on 13 variations).
+    - `_regenerate_theme()` body contains **14** `set_font("font", "<variation>", ...)` calls (14 explicit fonts on 14 variations).
+    - `_regenerate_theme()` body contains `set_font("font", "CodeLabel", body_font)` (Cross-AI Cycle 1 C4 fix: CodeLabel restored).
     - `_regenerate_theme()` body contains `preload("res://addons/neocade_theme/fonts/Inter-HeaderLarge.tres")`.
     - `_regenerate_theme()` body contains `preload("res://addons/neocade_theme/fonts/Inter-HeaderMedium.tres")`.
     - `_regenerate_theme()` body contains `preload("res://addons/neocade_theme/fonts/Inter-HeaderSmall.tres")`.
     - `_regenerate_theme()` body contains `preload("res://addons/neocade_theme/fonts/Inter-Body.tres")`.
     - `_regenerate_theme()` body contains `preload("res://addons/neocade_theme/fonts/Inter-Caption.tres")`.
-    - `_regenerate_theme()` body contains at least 8 `set_font_size("font_size", "<variation>", ...)` calls.
+    - `_regenerate_theme()` body contains at least 12 `set_font_size("font_size", "<variation>", ...)` calls.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; foreach($n in 'const TYPE_VARIATIONS: Dictionary = {','\"PrimaryButton\":   \"Button\"','\"SecondaryButton\": \"Button\"','\"GhostButton\":     \"Button\"','\"DangerButton\":    \"Button\"','\"IconButton\":      \"Button\"','\"FlatButton\":      \"Button\"','\"HeaderLarge\":  \"Label\"','\"HeaderMedium\": \"Label\"','\"HeaderSmall\":  \"Label\"','\"Caption\":      \"Label\"','\"InfoText\":     \"Label\"','\"CardPanel\": \"PanelContainer\"','\"HeroPanel\": \"PanelContainer\"','for variation_name in TYPE_VARIATIONS.keys():','set_type_variation(variation_name, base_type)','preload(\"res://addons/neocade_theme/fonts/Inter-HeaderLarge.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-HeaderMedium.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-HeaderSmall.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-Body.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-Caption.tres\")') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; $font_calls = ([regex]::Matches($g, 'set_font\\(\"font\", \"\\w+\"')).Count; if ($font_calls -lt 13) { throw \"expected at least 13 set_font calls; got $font_calls\" }; $size_calls = ([regex]::Matches($g, 'set_font_size\\(\"font_size\"')).Count; if ($size_calls -lt 8) { throw \"expected at least 8 set_font_size calls; got $size_calls\" }"
+      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; foreach($n in 'const TYPE_VARIATIONS: Dictionary = {','\"PrimaryButton\":   \"Button\"','\"SecondaryButton\": \"Button\"','\"GhostButton\":     \"Button\"','\"DangerButton\":    \"Button\"','\"IconButton\":      \"Button\"','\"FlatButton\":      \"Button\"','\"HeaderLarge\":  \"Label\"','\"HeaderMedium\": \"Label\"','\"HeaderSmall\":  \"Label\"','\"Caption\":      \"Label\"','\"CodeLabel\":    \"Label\"','\"InfoText\":     \"RichTextLabel\"','\"CardPanel\": \"PanelContainer\"','\"HeroPanel\": \"PanelContainer\"','for variation_name in TYPE_VARIATIONS.keys():','set_type_variation(variation_name, base_type)','default_font = body_font','default_font_size = tokens.body','set_font(\"font\", \"CodeLabel\"','preload(\"res://addons/neocade_theme/fonts/Inter-HeaderLarge.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-HeaderMedium.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-HeaderSmall.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-Body.tres\")','preload(\"res://addons/neocade_theme/fonts/Inter-Caption.tres\")') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; $font_calls = ([regex]::Matches($g, 'set_font\\(\"font\", \"\\w+\"')).Count; if ($font_calls -lt 14) { throw \"expected at least 14 set_font calls; got $font_calls\" }; $size_calls = ([regex]::Matches($g, 'set_font_size\\(\"font_size\"')).Count; if ($size_calls -lt 12) { throw \"expected at least 12 set_font_size calls; got $size_calls\" }"
     </automated>
   </verify>
-  <done>13 type variations are registered with explicit fonts + sizes; PITFALLS 1.2 satisfied; SC#7's variation requirement is met.</done>
+  <done>14 type variations registered with explicit fonts + sizes (CodeLabel included); theme `default_font` / `default_font_size` set; PITFALLS 1.2 + FONT-06 satisfied; SC#7's variation requirement met.</done>
 </task>
 
 <task type="auto">
-  <name>Task 2: Author BINDING_TABLE covering all 37 scorecard Controls</name>
+  <name>Task 2: Author BINDING_TABLE covering all 37 scorecard Controls (CANONICAL FREEZE — Cross-AI Cycle 1 C1 fix)</name>
   <read_first>
     - addons/neocade_theme/neocade_theme.gd
     - .planning/research/MINIMAL-THEME-COVERAGE-DELTA.md (37 scorecard rows)
@@ -197,17 +212,41 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
     - addons/neocade_theme/neocade_theme.gd (modify — author BINDING_TABLE constant)
   </files>
   <action>
+    **Cross-AI Cycle 1 C1 fix — CANONICAL 37-ROW FREEZE.** The binding table covers EXACTLY these 37 theme types (sourced verbatim from `MINIMAL-THEME-COVERAGE-DELTA.md §Coverage Scorecard`; no executor discretion to add/drop):
+
+    ```
+    1. AcceptDialog        14. HSplitContainer    27. SpinBox
+    2. Button              15. ItemList           28. TabBar
+    3. CheckBox            16. Label              29. TabContainer
+    4. CheckButton         17. LineEdit           30. TextEdit
+    5. CodeEdit            18. LinkButton         31. TooltipLabel
+    6. ColorPicker         19. MenuBar            32. TooltipPanel
+    7. ColorPickerButton   20. MenuButton         33. Tree
+    8. ConfirmationDialog  21. OptionButton       34. VScrollBar
+    9. FileDialog          22. Panel              35. VSlider
+    10. FoldableContainer  23. PopupMenu          36. VSplitContainer
+    11. GraphEdit          24. PopupPanel         37. Window
+    12. HScrollBar         25. ProgressBar
+    13. HSlider            26. RichTextLabel
+    ```
+
+    These 37 names are the EXACT keys the BINDING_TABLE Dictionary must declare at its top level. NO substitutions; NO executor "drop the unused one." If FEATURES.md or DISSECTION.md disagrees with a name, the scorecard is canonical (per CONTEXT.md D-09 + COVERAGE-DELTA.md §"Numeric Summary").
+
+    **Slot-name authority.** Per-Control slot lists are sourced from `MINIMAL-THEME-DISSECTION.md` (the verified-from-godot-minimal-theme dissection, which contains live-verified slot names). The executor cross-checks against Godot 4.6's Theme Editor at runtime when a slot name is ambiguous — but MINIMAL-THEME-DISSECTION.md is the canonical baseline. For NeoCade-additive Controls (CodeEdit, ColorPickerButton, ConfirmationDialog, FileDialog, FoldableContainer, LinkButton, SpinBox, TooltipLabel) — no upstream baseline exists; the executor uses the slot names produced by inspecting `Theme.get_stylebox_list("<TypeName>")` etc. via a one-shot `@tool` script BEFORE authoring the dictionary entries (or by referencing the Godot 4.6 source class definitions for those types).
+
+    **Recipe-to-role mapping discipline.** Every recipe's `role` MUST refer to one of the role-table keys produced by Plan 04-04's derivation block + role_table assembly: `surface_base`, `surface_low`, `surface_panel`, `surface_high`, `surface_overlay`, `outline_color`, `accent_offset`, `surface_high_offset`, `surface_panel_offset`, `surface_overlay_offset`, `surface_low_offset`, `text_strong`, `text_default`, `text_muted`, `state_hover`, `state_pressed`, `role_primary`, `accent_rim`, OR the special key `focus_ring` (constructed inline in `_resolve_recipe`).
+
     Author the `BINDING_TABLE` constant. The structure is a deeply-nested Dictionary with the following shape (excerpt for clarity; full version below):
 
     ```gdscript
     const BINDING_TABLE: Dictionary = {
         "Button": {
             "stylebox": {
-                "normal":         {"role": "surface_panel", "raised_intensity": 0},
-                "hover":          {"role": "state_hover",   "raised_intensity": 0},
-                "pressed":        {"role": "state_pressed", "raised_intensity": 0},
+                "normal":         {"role": "surface_panel", "raised_intensity": 1},  # raised-eligible: lifts when raised=true (Cross-AI Cycle 1 MEDIUM reconcile fix)
+                "hover":          {"role": "state_hover",   "raised_intensity": 1},
+                "pressed":        {"role": "state_pressed", "raised_intensity": 0},  # pressed sinks; never lifted
                 "focus":          {"role": "focus_ring"},
-                "disabled":       {"role": "surface_panel", "alpha": 0.38},
+                "disabled":       {"role": "surface_panel", "alpha": 0.38, "raised_intensity": 0},
                 "hover_pressed":  {"role": "state_pressed", "raised_intensity": 0},
             },
             "color": {
@@ -225,7 +264,9 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
     }
     ```
 
-    The full BINDING_TABLE is too long to inline verbatim here, but the executor authors it directly using the 37-row scorecard from `MINIMAL-THEME-COVERAGE-DELTA.md` and the per-Control state lists from `MINIMAL-THEME-DISSECTION.md`. The executor MUST cover ALL 37 rows. The structure for each Control:
+    **MEDIUM reconcile fix (Codex Cycle 1):** previously `Button.normal` had `raised_intensity = 0`, but Plan 04-06's verifier expects `shadow_size > 0` when `raised = true`. **The fix:** `Button.normal` (and `Button.hover`) get `raised_intensity = 1`. `Button.pressed`/`hover_pressed`/`disabled` keep `raised_intensity = 0` (pressed visually SINKS not lifts; disabled is flat). Plan 04-06's `_phase4_verify.gd` raised-toggle test explicitly asserts `Button.normal` has `shadow_size > 0` when `raised = true`, which now passes.
+
+    The full BINDING_TABLE is too long to inline verbatim here, but the executor authors it directly using the 37-row scorecard from `MINIMAL-THEME-COVERAGE-DELTA.md` and the per-Control state lists from `MINIMAL-THEME-DISSECTION.md`. The executor MUST cover ALL 37 rows EXACTLY (no add/drop). The structure for each Control:
 
     ```gdscript
     "<ThemeType>": {
@@ -300,7 +341,10 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
   </action>
   <acceptance_criteria>
     - File contains `const BINDING_TABLE: Dictionary = {`.
-    - BINDING_TABLE contains keys for all 37 scorecard Controls listed in must_haves[1]: `"AcceptDialog"`, `"Button"`, `"CheckBox"`, `"CheckButton"`, `"CodeEdit"`, `"ColorPicker"`, `"ColorPickerButton"`, `"ConfirmationDialog"`, `"FileDialog"`, `"GraphEdit"`, `"GraphFrame"`, `"GraphNode"`, `"HFlowContainer"`, `"HScrollBar"`, `"HSeparator"`, `"HSlider"`, `"ItemList"`, `"Label"`, `"LineEdit"`, `"LinkButton"`, `"MenuBar"`, `"MenuButton"`, `"OptionButton"`, `"PanelContainer"`, `"PopupMenu"`, `"PopupPanel"`, `"ProgressBar"`, `"RichTextLabel"`, `"SpinBox"`, `"SplitContainer"`, `"TabBar"`, `"TabContainer"`, `"TextEdit"`, `"TooltipPanel"`, `"Tree"`, `"VScrollBar"`, `"VSeparator"`, `"VSlider"`, `"Window"` (38 keys; the executor selects 37 — drops one of the Container types if FEATURES.md says it's layout-only-no-theme; or adds one if dissection says we missed; verify count via grep).
+    - BINDING_TABLE contains keys for the **CANONICAL 37 scorecard Controls** (Cross-AI Cycle 1 C1 fix; sourced verbatim from `MINIMAL-THEME-COVERAGE-DELTA.md §Coverage Scorecard`): `"AcceptDialog"`, `"Button"`, `"CheckBox"`, `"CheckButton"`, `"CodeEdit"`, `"ColorPicker"`, `"ColorPickerButton"`, `"ConfirmationDialog"`, `"FileDialog"`, `"FoldableContainer"`, `"GraphEdit"`, `"HScrollBar"`, `"HSlider"`, `"HSplitContainer"`, `"ItemList"`, `"Label"`, `"LineEdit"`, `"LinkButton"`, `"MenuBar"`, `"MenuButton"`, `"OptionButton"`, `"Panel"`, `"PopupMenu"`, `"PopupPanel"`, `"ProgressBar"`, `"RichTextLabel"`, `"SpinBox"`, `"TabBar"`, `"TabContainer"`, `"TextEdit"`, `"TooltipLabel"`, `"TooltipPanel"`, `"Tree"`, `"VScrollBar"`, `"VSlider"`, `"VSplitContainer"`, `"Window"` (**EXACTLY 37 keys, no more, no less, no executor discretion**).
+    - `BINDING_TABLE.size() == 37` is asserted by Plan 04-06's `_phase4_verify.gd`.
+    - `Button.normal` has `raised_intensity: 1` (Cross-AI Cycle 1 MEDIUM reconcile fix — was 0; now lifts when `raised=true` so Plan 04-06's shadow_size>0 assertion passes).
+    - `Button.pressed` has `raised_intensity: 0` (pressed sinks; never lifted).
     - Tree's stylebox subdict has at least 12 keys (per PITFALLS dissection — Tree has 16 styleboxes; minimum threshold 12 to pass).
     - LineEdit's stylebox subdict has at least 3 keys (`normal`, `focus`, `read_only`).
     - PopupMenu's stylebox subdict has at least 5 keys (`panel`, `hover`, `separator`, `labeled_separator_left`, `labeled_separator_right`).
@@ -312,7 +356,7 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; if ($g -notmatch 'const BINDING_TABLE: Dictionary = \\{') { throw 'BINDING_TABLE constant missing' }; foreach($t in 'AcceptDialog','Button','CheckBox','CheckButton','CodeEdit','ColorPicker','ColorPickerButton','ConfirmationDialog','FileDialog','GraphEdit','GraphFrame','GraphNode','HFlowContainer','HScrollBar','HSeparator','HSlider','ItemList','Label','LineEdit','LinkButton','MenuBar','MenuButton','OptionButton','PanelContainer','PopupMenu','PopupPanel','ProgressBar','RichTextLabel','SpinBox','SplitContainer','TabBar','TabContainer','TextEdit','TooltipPanel','Tree','VScrollBar','VSeparator','VSlider','Window') { if ($g -notmatch ('\"' + $t + '\":')) { throw \"BINDING_TABLE missing key: $t\" } }; $bt_refs = ([regex]::Matches($g, 'BINDING_TABLE')).Count; if ($bt_refs -lt 4) { throw \"BINDING_TABLE referenced only $bt_refs times; expected >=4\" }; $lines = (Get-Content $p | Measure-Object -Line).Lines; if ($lines -lt 800 -or $lines -gt 2500) { throw \"file line count $lines outside 800-2500 sanity bounds\" }"
+      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; if ($g -notmatch 'const BINDING_TABLE: Dictionary = \\{') { throw 'BINDING_TABLE constant missing' }; $canon=@('AcceptDialog','Button','CheckBox','CheckButton','CodeEdit','ColorPicker','ColorPickerButton','ConfirmationDialog','FileDialog','FoldableContainer','GraphEdit','HScrollBar','HSlider','HSplitContainer','ItemList','Label','LineEdit','LinkButton','MenuBar','MenuButton','OptionButton','Panel','PopupMenu','PopupPanel','ProgressBar','RichTextLabel','SpinBox','TabBar','TabContainer','TextEdit','TooltipLabel','TooltipPanel','Tree','VScrollBar','VSlider','VSplitContainer','Window'); if ($canon.Count -ne 37) { throw \"canon list count $($canon.Count) != 37\" }; foreach($t in $canon) { if ($g -notmatch ('\"' + $t + '\":')) { throw \"BINDING_TABLE missing canonical key: $t\" } }; $bt_refs = ([regex]::Matches($g, 'BINDING_TABLE')).Count; if ($bt_refs -lt 4) { throw \"BINDING_TABLE referenced only $bt_refs times; expected >=4\" }; $lines = (Get-Content $p | Measure-Object -Line).Lines; if ($lines -lt 800 -or $lines -gt 2500) { throw \"file line count $lines outside 800-2500 sanity bounds\" }"
     </automated>
   </verify>
   <done>BINDING_TABLE covers all 37 scorecard Controls with their PITFALLS-aligned slots; the file is the iteration engine's source of truth for additive theme population.</done>
@@ -485,27 +529,37 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
     Stage `addons/neocade_theme/neocade_theme.gd` and commit:
 
     ```
-    feat(04-05): BINDING_TABLE + iteration engine + 13 variations + icon binding
+    feat(04-05): BINDING_TABLE (37 canonical) + iteration engine + 14 variations + defaults
 
-    Plan 04-05 wave-2 engine (depends on Plans 04-01..04):
-    - TYPE_VARIATIONS const declares 13 NeoCade variations (PrimaryButton/
-      SecondaryButton/GhostButton/DangerButton/IconButton/FlatButton/HeaderLarge/
-      HeaderMedium/HeaderSmall/Caption/InfoText/CardPanel/HeroPanel)
-    - _regenerate_theme() registers all 13 via set_type_variation() with explicit
-      fonts (PITFALLS 1.2 mandate) + per-variation font_sizes from platform tokens
-    - BINDING_TABLE const covers all 37 scorecard Control rows from
-      MINIMAL-THEME-COVERAGE-DELTA.md with PITFALLS-aligned slot lists:
-      Tree (16 styleboxes), LineEdit (3), PopupMenu (5+), Window (2), HScrollBar (4)
+    Plan 04-05 wave-2 engine (depends on Plans 04-01..04; Cross-AI Cycle 1 fixes):
+    - C1 fix: BINDING_TABLE covers EXACTLY 37 canonical scorecard Controls per
+      MINIMAL-THEME-COVERAGE-DELTA.md (no executor discretion to add/drop):
+      AcceptDialog, Button, CheckBox, CheckButton, CodeEdit, ColorPicker,
+      ColorPickerButton, ConfirmationDialog, FileDialog, FoldableContainer,
+      GraphEdit, HScrollBar, HSlider, HSplitContainer, ItemList, Label, LineEdit,
+      LinkButton, MenuBar, MenuButton, OptionButton, Panel, PopupMenu, PopupPanel,
+      ProgressBar, RichTextLabel, SpinBox, TabBar, TabContainer, TextEdit,
+      TooltipLabel, TooltipPanel, Tree, VScrollBar, VSlider, VSplitContainer, Window
+    - C3 fix: theme.default_font = Inter-Body.tres + default_font_size = tokens.body
+      set BEFORE the BINDING_TABLE walk (FONT-06 closure)
+    - C4 fix: TYPE_VARIATIONS = 14 entries (PrimaryButton/SecondaryButton/
+      GhostButton/DangerButton/IconButton/FlatButton + HeaderLarge/HeaderMedium/
+      HeaderSmall/Caption/CodeLabel + InfoText + CardPanel/HeroPanel) — CodeLabel
+      INCLUDED (was previously dropped)
+    - MEDIUM reconcile fix: Button.normal raised_intensity = 1 (was 0), so Plan
+      04-06's "shadow_size > 0 when raised=true" assertion passes
+    - PITFALLS-aligned slot lists: Tree (16 styleboxes), LineEdit (3), PopupMenu
+      (5+), Window (2), HScrollBar (4)
     - _resolve_recipe() helper resolves recipes to concrete values; focus_ring slot
       receives a special stylebox (transparent bg + accent border + expand_margin
       = OUTSIDE corner radius per PITFALLS 1.1)
     - _regenerate_theme() walks BINDING_TABLE additively (D-01 invariant: no clear();
-      D-04 escape hatch: entries not in table are untouched, Theme Editor authored
-      content survives)
+      D-04 escape hatch: entries not in table are untouched)
     - Icon binding wires the 10 Button-family SVGs from Plan 04-03 to CheckBox /
       RadioButton / CheckButton / OptionButton / LineEdit clear / dialog close slots
 
-    Refs: FOUND-02 (full _regenerate_theme body), ICON-02 (wiring), TYPEVAR-01..05
+    Refs: FOUND-02 (full _regenerate_theme body), FONT-06 (default_font),
+      ICON-02 (wiring), TYPEVAR-01..05
     Plan: 04-05
     ```
 

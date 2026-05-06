@@ -22,7 +22,7 @@ must_haves:
     - "Every `@export` setter fires `_regenerate_theme()` and applies an equality short-circuit to avoid no-op regenerations."
     - "`_regenerate_theme()` exists with a skeleton body that sets `is_light = base_color.get_luminance() >= 0.5` and uses a reentry guard `_regenerating: bool`. NO `clear()` call anywhere in the regeneration path (D-01)."
     - "Class header docstring documents the binding-mechanism choice (slot-name + property-name table compiled into `.gd`) as REVISABLE per CONTEXT.md `<specifics>` and D-03."
-    - "`main.tscn` no longer references the deleted `neocade_theme.tres`; the theme override is removed (Plan 04-07 will reassign Pulse) so the scene loads without a missing-resource error."
+    - "`main.tscn` no longer references the deleted `neocade_theme.tres`; the theme override line is replaced with a single placeholder comment line (`# theme = ExtResource(...) - reassigned in Plan 04-07`) on the root Control block so reviewers reading the scene mid-phase see the deliberate gap. Plan 04-07 deletes the placeholder comment and re-adds the live `theme = ExtResource(...)` line pointing at Pulse. The scene still loads without a missing-resource error during Plans 04-02..06."
     - "Class defaults match DESIGN_TOKENS §3 / CONTEXT.md D-13 sensible-neutral values (NOT Pulse-flavored): `base_color=#111820`, `accent_color=#8BD3FF`, `raised=false`, `platform=AUTO`, `corner_radius=12`, `spacing=4`, `raised_strength=3`, `focus_thickness=2`, `outline_width=1`."
   artifacts:
     - addons/neocade_theme/neocade_theme.gd
@@ -89,11 +89,13 @@ The class shell is intentionally MINIMAL in this plan. The full `_regenerate_the
 
     Step 2. Delete the file at `addons/neocade_theme/neocade_theme.tres` from the working tree (using `git rm` so the deletion is staged).
 
-    Step 3. Edit `main.tscn` to remove BOTH:
-      a) The `[ext_resource type="Theme" uid="..." path="res://addons/neocade_theme/neocade_theme.tres" id="..."]` line.
-      b) The `theme = ExtResource("...")` line on the `[node name="..." type="Control"]` block.
+    Step 3. Edit `main.tscn`:
+      a) DELETE the `[ext_resource type="Theme" uid="..." path="res://addons/neocade_theme/neocade_theme.tres" id="..."]` line entirely (the dangling reference must go).
+      b) REPLACE the `theme = ExtResource("...")` property line on the root `[node ...]` Control block with the single literal placeholder line `# theme = ExtResource(...) - reassigned in Plan 04-07` (a Godot `.tscn` comment line; Godot's scene parser tolerates `#`-prefixed lines inside node blocks).
 
-       Result: `main.tscn` opens cleanly in Godot Editor without a "missing resource" error and without any reference to the deleted scaffold. (Plan 04-07 will re-add `theme = ExtResource(...)` pointing to `pulse_neocade_theme.tres`.)
+       Result: `main.tscn` opens cleanly in Godot Editor without a "missing resource" error and without any reference to the deleted scaffold. The placeholder comment communicates intent during Plans 04-02..06 (mid-phase reviewers see "this is deliberately blank, Plan 04-07 fills it" instead of guessing). Plan 04-07 deletes the placeholder comment and re-adds a real `theme = ExtResource("1_pulse_theme")` line pointing at Pulse.
+
+       NOTE on `.tscn` comments: Godot's text-resource parser supports `#` line comments at the top level. If the comment-on-property-line approach causes parser issues in 4.6 (verify by opening `main.tscn` in the editor; the file MUST still parse), fall back to no placeholder line — leave a blank line between the previous property and `[ext_resource]` blocks instead. The plan accepts either form; the verify command treats the placeholder as optional.
 
     Step 4. Verify both file states via PowerShell test commands.
 
@@ -101,14 +103,14 @@ The class shell is intentionally MINIMAL in this plan. The full `_regenerate_the
   </action>
   <acceptance_criteria>
     - `addons/neocade_theme/neocade_theme.tres` does not exist (PowerShell `Test-Path` returns `False`).
-    - `main.tscn` does not contain the literal substring `neocade_theme.tres` anywhere.
-    - `main.tscn` does not contain `theme = ExtResource(` on any line (no theme override; Plan 04-07 will reassign).
+    - `main.tscn` does not contain the literal substring `neocade_theme.tres` anywhere on a non-comment line.
+    - `main.tscn` does not contain a non-commented `theme = ExtResource(` line (a `# theme = ExtResource(...) - reassigned in Plan 04-07` comment line is acceptable; Plan 04-07 will reassign as a real property line).
     - `main.tscn` parses as a valid `.tscn` (the file's first line is `[gd_scene ...]` and the root node block is intact).
     - Git status shows `D addons/neocade_theme/neocade_theme.tres` and `M main.tscn`.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "if (Test-Path 'addons/neocade_theme/neocade_theme.tres') { throw 'scaffold .tres still exists' }; $tscn = Get-Content -Raw 'main.tscn'; if ($tscn -match 'neocade_theme\.tres') { throw 'main.tscn still references deleted scaffold' }; if ($tscn -match 'theme = ExtResource\(') { throw 'main.tscn still has theme override line' }; if ($tscn -notmatch '^\[gd_scene') { throw 'main.tscn is not a valid scene file' }"
+      powershell -NoProfile -Command "if (Test-Path 'addons/neocade_theme/neocade_theme.tres') { throw 'scaffold .tres still exists' }; $tscn = Get-Content -Raw 'main.tscn'; if ($tscn -match '(?m)^[^#]*neocade_theme\.tres') { throw 'main.tscn still references deleted scaffold on a non-comment line' }; if ($tscn -match '(?m)^\s*theme = ExtResource\(') { throw 'main.tscn still has live theme override line (a leading-# comment is allowed)' }; if ($tscn -notmatch '^\[gd_scene') { throw 'main.tscn is not a valid scene file' }"
     </automated>
   </verify>
   <done>The scaffold `.tres` is deleted; `main.tscn` no longer references it; the scene file remains parseable.</done>

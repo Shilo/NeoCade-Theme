@@ -34,7 +34,7 @@ requirements:
 must_haves:
   truths:
     - "10 bespoke monochrome SVG icons exist at `addons/neocade_theme/icons/{name}.svg`: `check`, `checkbox_checked`, `checkbox_unchecked`, `radio_checked`, `radio_unchecked`, `toggle_on`, `toggle_off`, `arrow_down`, `clear`, `close`."
-    - "Every SVG is authored at 32×32 reference (`viewBox=\"0 0 32 32\"`), monochrome (single fill color or `currentColor`), `modulate`-tintable (no baked color other than the strokes/fills that the icon's monochrome design needs)."
+    - "Every SVG is authored at 32×32 reference (`viewBox=\"0 0 32 32\"`), STRICTLY monochrome — every fill/stroke is `#FFFFFF` ONLY (no `#000000`, no other colors). Reason: Godot icon `modulate` multiplies — `Color.BLACK * accent = BLACK` (stays black under any tint). Cross-AI Cycle 1 MEDIUM fix (OpenCode + Codex agreed): all 10 icons are single-color so `modulate` produces predictable accent-tinted output."
     - "Every SVG has a corresponding `.import` sidecar that explicitly sets `svg/scale=2.0` and `mipmaps/generate=true` (Linear With Mipmaps filter) per ICON-01 + STACK + PITFALLS."
     - "No Material Symbols / Lucide / Phosphor / external icon library binaries are bundled (per ICON-04 + STACK Decision 5 + D-12)."
   artifacts:
@@ -107,6 +107,8 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
     </svg>
     ```
 
+    **STRICT MONOCHROME RULE (Cross-AI Cycle 1 MEDIUM fix):** every SVG uses ONLY `#FFFFFF` for fill/stroke. NO `#000000`. NO other colors. The two-tone visual contrast (e.g., toggle knob-on-track) is achieved by the StyleBoxFlat BACKING the icon (the toggle pill StyleBoxFlat under the icon provides the contrasting "track" — the icon itself only draws the knob + an outline ring). This ensures Godot's `icon_modulate = accent_color` produces predictable tinted output across every state.
+
     Per-icon path content (concrete; the executor authors these as-given so visual identity is consistent):
 
     1. **check.svg** — generic checkmark (used inside Buttons, in PopupMenu indicators, etc.):
@@ -114,20 +116,11 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
        <path d="M6 17 L13 24 L26 9" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
        ```
 
-    2. **checkbox_checked.svg** — square box with checkmark inside:
-       ```xml
-       <rect x="4" y="4" width="24" height="24" rx="3" stroke="#FFFFFF" stroke-width="2" fill="#FFFFFF" fill-opacity="0.0"/>
-       <rect x="4" y="4" width="24" height="24" rx="3" fill="#FFFFFF"/>
-       <path d="M9 16.5 L14 21.5 L23 11" stroke="#000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-       ```
-       (filled box, dark check inside — Godot's modulate will recolor; the modulate-tintable convention is that the box uses fill="#FFFFFF" and the check uses a contrasting color so consumers know which token to use; alternative: ship the box only and let StyleBoxFlat back the check fill — but bespoke convention is easier).
-
-       NOTE: if the dual-color approach above complicates `modulate` tinting, simplify to a single-color outlined-box-with-inset-check version and let consumers compose colors via the Theme's `font_color` slot. The simplest version that works:
+    2. **checkbox_checked.svg** — square box outline + check stroke (single-color per Cross-AI Cycle 1 fix):
        ```xml
        <rect x="4" y="4" width="24" height="24" rx="3" stroke="#FFFFFF" stroke-width="2" fill="none"/>
        <path d="M9 16.5 L14 21.5 L23 11" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
        ```
-       Use the simpler single-color version. Aesthetic + modulate-tintable + monochrome.
 
     3. **checkbox_unchecked.svg** — square box outline only:
        ```xml
@@ -145,17 +138,12 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
        <circle cx="16" cy="16" r="12" stroke="#FFFFFF" stroke-width="2" fill="none"/>
        ```
 
-    6. **toggle_on.svg** — rounded pill with knob to the right (CheckButton on-state):
+    6. **toggle_on.svg** — rounded pill outline + filled knob to the right (CheckButton on-state; single-color per Cross-AI Cycle 1 fix):
        ```xml
-       <rect x="2" y="8" width="28" height="16" rx="8" fill="#FFFFFF"/>
-       <circle cx="22" cy="16" r="6" fill="#000000"/>
+       <rect x="2" y="8" width="28" height="16" rx="8" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+       <circle cx="22" cy="16" r="5" fill="#FFFFFF"/>
        ```
-       Single-color version (knob carved out via Godot modulate tricks):
-       ```xml
-       <rect x="2" y="8" width="28" height="16" rx="8" fill="#FFFFFF"/>
-       <circle cx="22" cy="16" r="5" fill="#FFFFFF" fill-opacity="0"/>
-       ```
-       Use the simpler dual-color version as authored above (`fill="#FFFFFF"` track, `fill="#000000"` knob). Theme bindings supply both colors.
+       Rationale: the on-state visually reads as "track empty + knob on right side"; the BackgroundStyleBoxFlat behind CheckButton (set by the BINDING_TABLE in Plan 04-05 with bg=accent_color when on) provides the colored fill behind the icon. The icon ITSELF is single-color so `icon_modulate` tints it predictably; the contrasting "filled track" effect is composed via the StyleBoxFlat backing.
 
     7. **toggle_off.svg** — rounded pill with knob to the left (CheckButton off-state):
        ```xml
@@ -168,17 +156,11 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
        <path d="M8 12 L16 22 L24 12" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
        ```
 
-    9. **clear.svg** — X mark inside a circle (LineEdit clear button):
-       ```xml
-       <circle cx="16" cy="16" r="12" fill="#FFFFFF"/>
-       <path d="M11 11 L21 21 M21 11 L11 21" stroke="#000000" stroke-width="3" stroke-linecap="round"/>
-       ```
-       Or simpler single-color version:
+    9. **clear.svg** — X mark inside a circle outline (LineEdit clear button; single-color per Cross-AI Cycle 1 fix):
        ```xml
        <circle cx="16" cy="16" r="12" stroke="#FFFFFF" stroke-width="2" fill="none"/>
        <path d="M11 11 L21 21 M21 11 L11 21" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
        ```
-       Use single-color version (cleaner monochrome).
 
     10. **close.svg** — bare X mark (window/dialog close):
         ```xml
@@ -187,16 +169,16 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
 
     Implementation: write each file with PowerShell `Set-Content -Encoding UTF8` (no BOM). The exact path data above is the production icon set; do not deviate (the visual identity is locked at this baseline; per-direction icon variations are not in scope for v1).
 
-    For the dual-color icons (`checkbox_checked`, `toggle_on`, `clear`, optionally), the dual-color authoring is acceptable IF Godot's icon modulate is not used as a complete recolor (the bespoke pattern is that Godot icon `modulate` multiplies; multi-color icons preserve the design's relative contrast under tint). The simpler single-color versions are preferred where they read as cleanly. Use these single-color versions for `checkbox_checked` (just the check), `clear` (single-color X-in-circle outline). For `toggle_on`/`toggle_off`, the dual-color (filled track + contrasting knob) authoring is intentional — toggles need to read as "knob on track" and a single-color version doesn't communicate state.
+    Cross-AI Cycle 1 MEDIUM fix: ALL 10 icons are single-color (`#FFFFFF` only). Two-tone state communication is achieved via the StyleBoxFlat BACKING the icon (Plan 04-05 binds the toggle pill's background StyleBoxFlat with bg=accent_color in on-state, bg=surface_low in off-state — the icon overlays this with a knob position cue).
 
-    Final per-file authoring:
+    Final per-file authoring (single-color throughout):
     - `check.svg`: single path (the checkmark), `stroke="#FFFFFF"`, no fill.
     - `checkbox_checked.svg`: outlined box + inset check, both `stroke="#FFFFFF"`, no fill.
     - `checkbox_unchecked.svg`: outlined box only, `stroke="#FFFFFF"`, no fill.
     - `radio_checked.svg`: outlined circle + filled inner dot, `stroke="#FFFFFF"` outer, `fill="#FFFFFF"` inner.
     - `radio_unchecked.svg`: outlined circle, `stroke="#FFFFFF"`, no fill.
-    - `toggle_on.svg`: filled track + dark knob (dual-color, intentional).
-    - `toggle_off.svg`: outlined track + filled knob, `stroke="#FFFFFF"` track, `fill="#FFFFFF"` knob.
+    - `toggle_on.svg`: outlined track + filled knob on right side, all `#FFFFFF`. Backing StyleBoxFlat (Plan 04-05) provides accent fill.
+    - `toggle_off.svg`: outlined track + filled knob on left side, all `#FFFFFF`.
     - `arrow_down.svg`: chevron path, `stroke="#FFFFFF"`, no fill.
     - `clear.svg`: outlined circle + inset X, both `stroke="#FFFFFF"`, no fill.
     - `close.svg`: bare X, `stroke="#FFFFFF"`, no fill.
@@ -205,7 +187,7 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
     - All 10 SVG files exist at `addons/neocade_theme/icons/{name}.svg`.
     - Every file's first line begins with `<?xml version="1.0"`.
     - Every file's `<svg>` tag contains `width="32"`, `height="32"`, `viewBox="0 0 32 32"`.
-    - Every file is monochrome (uses only `#FFFFFF` and/or `#000000` fills/strokes — no other colors; the `toggle_on.svg` dual-color authoring uses `#FFFFFF` track + `#000000` knob and is the only file with `#000000`).
+    - Every file is STRICTLY single-color (uses ONLY `#FFFFFF` fills/strokes — NO `#000000`, no other colors). Cross-AI Cycle 1 MEDIUM fix.
     - Every file is under 2 KB (sanity check — these are simple geometric SVGs).
     - File `check.svg` contains a `<path` element with `M6 17 L13 24 L26 9` (or equivalent path data — the checkmark stroke).
     - File `arrow_down.svg` contains a `<path` element with `M8 12 L16 22 L24 12` (or equivalent — the chevron).
@@ -220,7 +202,7 @@ This plan is parallel-eligible with Plans 04-01 and 04-02 (Wave 1).
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$base='addons/neocade_theme/icons'; $names=@('check','checkbox_checked','checkbox_unchecked','radio_checked','radio_unchecked','toggle_on','toggle_off','arrow_down','clear','close'); foreach($n in $names) { $p=\"$base/$n.svg\"; if (-not (Test-Path $p)) { throw \"$n.svg missing\" }; $g=Get-Content -Raw $p; if ($g -notmatch '^<\\?xml version=\"1\\.0\"') { throw \"$n.svg missing XML decl\" }; if ($g -notmatch 'width=\"32\"') { throw \"$n.svg missing width=32\" }; if ($g -notmatch 'height=\"32\"') { throw \"$n.svg missing height=32\" }; if ($g -notmatch 'viewBox=\"0 0 32 32\"') { throw \"$n.svg missing viewBox\" }; if ((Get-Item $p).Length -gt 2048) { throw \"$n.svg too large (>2KB)\" } }; foreach($n in 'radio_checked','radio_unchecked','toggle_on','toggle_off','clear') { $g=Get-Content -Raw \"$base/$n.svg\"; if ($g -notmatch '<circle') { throw \"$n.svg missing <circle>\" } }; foreach($n in 'checkbox_checked','checkbox_unchecked','toggle_on','toggle_off') { $g=Get-Content -Raw \"$base/$n.svg\"; if ($g -notmatch '<rect') { throw \"$n.svg missing <rect>\" } }; foreach($n in 'check','arrow_down','close','checkbox_checked','clear') { $g=Get-Content -Raw \"$base/$n.svg\"; if ($g -notmatch '<path') { throw \"$n.svg missing <path>\" } }"
+      powershell -NoProfile -Command "$base='addons/neocade_theme/icons'; $names=@('check','checkbox_checked','checkbox_unchecked','radio_checked','radio_unchecked','toggle_on','toggle_off','arrow_down','clear','close'); foreach($n in $names) { $p=\"$base/$n.svg\"; if (-not (Test-Path $p)) { throw \"$n.svg missing\" }; $g=Get-Content -Raw $p; if ($g -notmatch '^<\\?xml version=\"1\\.0\"') { throw \"$n.svg missing XML decl\" }; if ($g -notmatch 'width=\"32\"') { throw \"$n.svg missing width=32\" }; if ($g -notmatch 'height=\"32\"') { throw \"$n.svg missing height=32\" }; if ($g -notmatch 'viewBox=\"0 0 32 32\"') { throw \"$n.svg missing viewBox\" }; if ($g -match '#000000|#000\"|black') { throw \"$n.svg contains a non-white color (Cross-AI Cycle 1 forbids dual-color icons)\" }; if ((Get-Item $p).Length -gt 2048) { throw \"$n.svg too large (>2KB)\" } }; foreach($n in 'radio_checked','radio_unchecked','toggle_on','toggle_off','clear') { $g=Get-Content -Raw \"$base/$n.svg\"; if ($g -notmatch '<circle') { throw \"$n.svg missing <circle>\" } }; foreach($n in 'checkbox_checked','checkbox_unchecked','toggle_on','toggle_off') { $g=Get-Content -Raw \"$base/$n.svg\"; if ($g -notmatch '<rect') { throw \"$n.svg missing <rect>\" } }; foreach($n in 'check','arrow_down','close','checkbox_checked','clear') { $g=Get-Content -Raw \"$base/$n.svg\"; if ($g -notmatch '<path') { throw \"$n.svg missing <path>\" } }"
     </automated>
   </verify>
   <done>10 monochrome Button-family SVG icons authored at 32×32 reference per the locked NeoCade icon contract.</done>

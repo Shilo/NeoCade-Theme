@@ -4,7 +4,7 @@ plan: 08
 type: execute
 wave: 4
 depends_on:
-  - "04-02"
+  - "04-07"  # Cross-AI Cycle 1 C7 fix: was [04-02]; Task 5 verifies files from 04-06 (Pulse) + 04-07 (peers + main.tscn). Depending only on 04-02 was wrong.
 files_modified:
   - addons/neocade_theme/LICENSE.md
   - addons/neocade_theme/CHANGELOG.md
@@ -57,7 +57,9 @@ Output: 4 new metadata files at `addons/neocade_theme/` root.
 @addons/neocade_theme/OFL.txt
 
 <interfaces>
-This plan is parallel-eligible with Plan 04-07 (peer themes + main.tscn). Both depend on Plan 04-02 (OFL.txt) only; neither depends on Plans 04-04/05/06.
+**Cross-AI Cycle 1 C7 fix:** this plan now depends on Plan 04-07 (was 04-02). Task 5 verifies the addon root layout — including files from Plan 04-06 (Pulse `.tres`) and Plan 04-07 (peer `.tres` + main.tscn restoration). Sequencing 04-08 after 04-07 makes the dependency explicit.
+
+Plan 04-08 still ships independently of the engine .gd file logic; only the structural verification in Task 5 needs the prior plans' outputs in place.
 
 Per FOUND-01, the addon's distribution layout is:
 - `addons/neocade_theme/`
@@ -173,7 +175,8 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
     - 5 data-only direction `.tres` files at addon root: `pulse_neocade_theme.tres`
       (recommended starter), `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`,
       `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`.
-    - Inter Variable Roman font bundled at `fonts/Inter-Variable.ttf` with
+    - Inter Variable Roman font (PINNED to Inter v4.0; SHA256: `<hash captured
+      in Plan 04-02 commit message>`) bundled at `fonts/Inter-Variable.ttf` with
       Grayscale AA + Light hinting + Auto subpixel + Mipmaps import settings
       (per GL Compatibility renderer constraints).
     - 5 FontVariation `.tres` resources covering the M3 type scale: HeaderLarge
@@ -193,9 +196,10 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
       GraphNode, HFlowContainer, SplitContainer, MenuBar, MenuButton,
       OptionButton, LinkButton, RichTextLabel, Label, SpinBox, CodeEdit,
       HSeparator, VSeparator).
-    - 13 type variations registered with explicit fonts (PITFALLS 1.2):
-      PrimaryButton / SecondaryButton / GhostButton / DangerButton / IconButton /
-      FlatButton / HeaderLarge / HeaderMedium / HeaderSmall / Caption /
+    - 14 type variations registered with explicit fonts (PITFALLS 1.2;
+      Cross-AI Cycle 1 C4 fix: CodeLabel included): PrimaryButton /
+      SecondaryButton / GhostButton / DangerButton / IconButton / FlatButton /
+      HeaderLarge / HeaderMedium / HeaderSmall / Caption / CodeLabel /
       InfoText / CardPanel / HeroPanel.
     - `is_light` flag derived from `base_color.get_luminance() >= 0.5`;
       surface ramp + state layers + text colors flip on `is_light` per
@@ -258,12 +262,13 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
     - File contains the names of all 5 directions: `pulse_neocade_theme`, `slate_neocade_theme`, `bubble_neocade_theme`, `daybreak_neocade_theme`, `burst_neocade_theme`.
     - File contains `Inter Variable Roman` and `OFL.txt` references.
     - File contains `BINDING_TABLE` reference.
-    - File contains the literal text `13 type variations`.
+    - File contains the literal text `14 type variations` (Cross-AI Cycle 1 C4 fix).
+    - File contains the literal text `SHA256:` (Inter version pin per Cross-AI Cycle 1 MEDIUM).
     - File is between 2 KB and 8 KB.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='addons/neocade_theme/CHANGELOG.md'; if (-not (Test-Path $p)) { throw 'CHANGELOG.md missing' }; $g=Get-Content -Raw $p; foreach($n in '# Changelog','## [Unreleased]','### Added (Phase 4 — Foundation)','### Notes (v1.0.0 limitations preserved)','Inter Italic Variable is deferred','No CJK font bundled','No `plugin.cfg`','is REVISABLE','pulse_neocade_theme','slate_neocade_theme','bubble_neocade_theme','daybreak_neocade_theme','burst_neocade_theme','Inter Variable Roman','OFL.txt','BINDING_TABLE','13 type variations') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; $size=(Get-Item $p).Length; if ($size -lt 2000 -or $size -gt 8000) { throw \"CHANGELOG.md size $size bytes outside 2-8 KB range\" }"
+      powershell -NoProfile -Command "$p='addons/neocade_theme/CHANGELOG.md'; if (-not (Test-Path $p)) { throw 'CHANGELOG.md missing' }; $g=Get-Content -Raw $p; foreach($n in '# Changelog','## [Unreleased]','### Added (Phase 4 — Foundation)','### Notes (v1.0.0 limitations preserved)','Inter Italic Variable is deferred','No CJK font bundled','No `plugin.cfg`','is REVISABLE','pulse_neocade_theme','slate_neocade_theme','bubble_neocade_theme','daybreak_neocade_theme','burst_neocade_theme','Inter Variable Roman','OFL.txt','BINDING_TABLE','14 type variations','SHA256:') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; $size=(Get-Item $p).Length; if ($size -lt 2000 -or $size -gt 8000) { throw \"CHANGELOG.md size $size bytes outside 2-8 KB range\" }"
     </automated>
   </verify>
   <done>CHANGELOG.md ships with [Unreleased] body documenting Phase 4 deliverables + v1 limitations.</done>
@@ -541,7 +546,9 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
     - `CHANGELOG.md` ✓ (this plan)
     - `VERSION` ✓ (this plan)
     - `README.md` ✓ (this plan)
-    - `_phase4_verify.gd` ✓ (Plan 04-06; deleted in Phase 11)
+    - `_phase4_import.gd` ✓ (Plan 04-02/06/07 build-time helper; DELETED IN PHASE 11)
+    - `_phase4_verify.gd` ✓ (Plan 04-06; DELETED IN PHASE 11)
+    - `_phase4_verify_headless.gd` ✓ (Plan 04-06 Cross-AI Cycle 1 MEDIUM fix; DELETED IN PHASE 11)
 
     Required subdirectories:
     - `fonts/` ✓ (Plan 04-02)
@@ -563,7 +570,7 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$base='addons/neocade_theme'; $required=@('neocade_theme.gd','pulse_neocade_theme.tres','slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres','OFL.txt','LICENSE.md','CHANGELOG.md','VERSION','README.md','_phase4_verify.gd'); foreach($f in $required) { if (-not (Test-Path \"$base/$f\")) { throw \"required file missing: $f\" } }; foreach($d in 'fonts','icons') { if (-not (Test-Path -PathType Container \"$base/$d\")) { throw \"required dir missing: $d\" } }; foreach($forbidden in 'plugin.cfg','neocade_theme.tres','_dev','themes','neocade_mobile_theme.tres') { if (Test-Path \"$base/$forbidden\") { throw \"forbidden path exists: $forbidden\" } }"
+      powershell -NoProfile -Command "$base='addons/neocade_theme'; $required=@('neocade_theme.gd','pulse_neocade_theme.tres','slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres','OFL.txt','LICENSE.md','CHANGELOG.md','VERSION','README.md','_phase4_import.gd','_phase4_verify.gd','_phase4_verify_headless.gd'); foreach($f in $required) { if (-not (Test-Path \"$base/$f\")) { throw \"required file missing: $f\" } }; foreach($d in 'fonts','icons') { if (-not (Test-Path -PathType Container \"$base/$d\")) { throw \"required dir missing: $d\" } }; foreach($forbidden in 'plugin.cfg','neocade_theme.tres','_dev','themes','neocade_mobile_theme.tres') { if (Test-Path \"$base/$forbidden\") { throw \"forbidden path exists: $forbidden\" } }"
     </automated>
   </verify>
   <done>Addon layout matches the FOUND-01 + STACK Decision 5 contract; no `plugin.cfg`; no scaffold residue; flat layout per CONTEXT.md "Track 4".</done>
@@ -584,7 +591,7 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
     ```
     feat(04-08): ship addon metadata + Phase 4 minimal README
 
-    Plan 04-08 wave-4 (depends on Plan 04-02 OFL.txt):
+    Plan 04-08 wave-4 (depends on Plan 04-07; Cross-AI Cycle 1 C7 fix — was 04-02):
     - addons/neocade_theme/LICENSE.md — MIT license body for the addon code +
       explicit note that the bundled Inter font is OFL 1.1 (separate license)
     - addons/neocade_theme/CHANGELOG.md — [Unreleased] section enumerating

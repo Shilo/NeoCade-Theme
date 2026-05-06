@@ -24,6 +24,8 @@ must_haves:
     - "`_regenerate_theme()` derives `text_strong`, `text_default`, `text_muted` with the `is_light` branch values per DESIGN_TOKENS §6.4 (`#1B2230` / `#5A6478` for light; `#F7F8FB` / `#B9C1D0` for dark)."
     - "`_regenerate_theme()` derives `state_hover` and `state_pressed` per DESIGN_TOKENS §6.5; `state_hover` flips target with `is_light`; `state_pressed` always mixes toward BLACK."
     - "Helper `_make_raised_stylebox(bg: Color, offset_color: Color, raised_intensity: int) -> StyleBoxFlat` exists; sets `shadow_color = offset_color`, `shadow_size = raised_intensity` (or `-1` when `raised=false`), `shadow_offset = Vector2(0, raised_intensity)` (or `Vector2.ZERO` when flat)."
+    - "Cross-AI Cycle 1 C2 fix: a private const `DIRECTION_PRESETS: Dictionary` keyed by base_color hex string (`'#151A2E'`, `'#111820'`, `'#241326'`, `'#0B2420'`, `'#20112E'`) maps to a sub-dictionary with `spread_factor: float`, `hover_pct: float`, `pressed_pct: float`, `disabled_opacity: float` per DESIGN_TOKENS §5/§6 + directions.json: Pulse=1.3/6/-10/0.42, Slate=0.7/8/-12/0.50, Bubble=1.0/10/-12/0.45, Daybreak=1.0/8/-12/0.50, Burst=1.3/10/-14/0.45. Helper `_resolve_direction_presets() -> Dictionary` returns the sub-dict for `base_color.to_html(false)` (uppercased hex without alpha) or a fallback default if no match."
+    - "`_regenerate_theme()` consumes `_resolve_direction_presets()` to source `spread_factor`, `hover_pct`, `pressed_pct`, `disabled_opacity` per direction (no longer hard-coded 1.0 / 8 / 12 / 0.38). Cross-AI Cycle 1 C2 fix: per-direction surface ramp + state-layer deltas now actually differentiate the 5 directions."
     - "Helper `_resolve_platform() -> Platform` resolves `Platform.AUTO` to MOBILE/DESKTOP via `OS.has_feature(\"mobile\")` per DESIGN_TOKENS §10.2."
     - "Helper `_platform_tokens(p: Platform) -> Dictionary` returns the 14 platform tokens (buttonMin, primaryButtonMin, inputMin, toggleMin, checkboxSize, body, label_, h1, h2, kicker, rowMin, tabMin, tapPadding, densityScale) per DESIGN_TOKENS §10.1 with the correct desktop/mobile values."
     - "Role token derivation populates `role.primary` from `accent_color`, plus `accent_rim = _mix(accent_color, Color.WHITE, 0.5)`."
@@ -260,7 +262,83 @@ Wave 2 — depends on Plan 04-01 only. Parallel-eligible with Plan 04-05 if 04-0
 </task>
 
 <task type="auto">
-  <name>Task 4: Wire derivation block into _regenerate_theme() body</name>
+  <name>Task 3.5: Author DIRECTION_PRESETS const + _resolve_direction_presets() helper (Cross-AI Cycle 1 C2 fix)</name>
+  <read_first>
+    - addons/neocade_theme/neocade_theme.gd
+    - .planning/DESIGN_TOKENS.md (§5.1-§5.5 — per-direction values; §6.2 spread_factor; §6.5 state-layer pcts)
+    - .planning/mockups/3.4/data/directions.json (axis_8_surface_spread, axis_9_disabled_opacity per direction)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-REVIEWS.md (Cycle 1 HIGH C2)
+  </read_first>
+  <files>
+    - addons/neocade_theme/neocade_theme.gd (modify — append const DIRECTION_PRESETS + helper)
+  </files>
+  <action>
+    Cross-AI Cycle 1 HIGH C2 fix: per-direction `spread_factor`, `hover_pct`, `pressed_pct`, `disabled_opacity` are NOT hard-coded — they're sourced from a private const lookup table keyed by `base_color` hex.
+
+    Append to `neocade_theme.gd`, BELOW `_make_raised_stylebox`:
+
+    ```gdscript
+
+    # ─── Direction presets (DESIGN_TOKENS §5/§6, directions.json axis_8/axis_9) ─────────────────
+    ## Per-direction non-exported parameters that don't belong on the public 9-export surface but
+    ## must differentiate Pulse (wide spread) from Slate (narrow spread) etc. Sourced from
+    ## directions.json axis_8_surface_spread + axis_9_disabled_opacity + DESIGN_TOKENS §6.5
+    ## state-layer pcts. Cross-AI Cycle 1 C2 fix.
+    ##
+    ## Lookup is by base_color hex (uppercased, no alpha — matches `Color.to_html(false)`).
+    ## Fallback default is medium-spread / M3-baseline if no match.
+    const DIRECTION_PRESETS: Dictionary = {
+        # Pulse — base=#151A2E, accent=#8BFF6A, spread=wide, hover=6 (subtle), pressed=-10, disabled=0.42
+        "151A2E": {"spread_factor": 1.3, "hover_pct": 6.0,  "pressed_pct": -10.0, "disabled_opacity": 0.42},
+        # Slate — base=#111820, accent=#8BD3FF, spread=narrow, hover=8 (M3 baseline), pressed=-12, disabled=0.50
+        "111820": {"spread_factor": 0.7, "hover_pct": 8.0,  "pressed_pct": -12.0, "disabled_opacity": 0.50},
+        # Bubble — base=#241326, accent=#FFB3E6, spread=medium, hover=10 (lifted), pressed=-12, disabled=0.45
+        "241326": {"spread_factor": 1.0, "hover_pct": 10.0, "pressed_pct": -12.0, "disabled_opacity": 0.45},
+        # Daybreak — base=#0B2420, accent=#76F2D1, spread=medium, hover=8, pressed=-12, disabled=0.50
+        "0B2420": {"spread_factor": 1.0, "hover_pct": 8.0,  "pressed_pct": -12.0, "disabled_opacity": 0.50},
+        # Burst — base=#20112E, accent=#FFD166, spread=wide, hover=10, pressed=-14 (deeper), disabled=0.45
+        "20112E": {"spread_factor": 1.3, "hover_pct": 10.0, "pressed_pct": -14.0, "disabled_opacity": 0.45},
+    }
+
+    ## Default (when base_color doesn't match any of the 5 approved directions — custom themes).
+    const DIRECTION_PRESET_DEFAULT: Dictionary = {
+        "spread_factor": 1.0, "hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.38,
+    }
+
+    ## Returns the per-direction sub-dict for `base_color`. Lookup is by uppercased hex without alpha.
+    func _resolve_direction_presets() -> Dictionary:
+        var key := base_color.to_html(false).to_upper()
+        return DIRECTION_PRESETS.get(key, DIRECTION_PRESET_DEFAULT)
+    ```
+
+    Notes:
+    - The hex key format `"151A2E"` is `Color("#151A2E").to_html(false).to_upper()` — uppercased, no `#` prefix, no alpha. Verify against Godot 4.6's `Color.to_html(false)` output (without alpha) at runtime.
+    - Custom themes (consumers using `NeoCadeTheme.new()` with their own base_color) fall through to `DIRECTION_PRESET_DEFAULT` — sensible M3-baseline behavior.
+    - The 9-export surface is intact: `DIRECTION_PRESETS` is a `const`, not an `@export`. The user's preference for a tight 9-export public surface is preserved.
+  </action>
+  <acceptance_criteria>
+    - File contains `const DIRECTION_PRESETS: Dictionary = {`.
+    - File contains the 5 hex keys: `"151A2E"`, `"111820"`, `"241326"`, `"0B2420"`, `"20112E"` (one per approved direction).
+    - File contains `"spread_factor": 1.3` (appears at least 2 times — Pulse + Burst).
+    - File contains `"spread_factor": 0.7` (Slate narrow).
+    - File contains `"spread_factor": 1.0` (appears at least 2 times — Bubble + Daybreak).
+    - File contains `"hover_pct":` (state-layer hover % per direction).
+    - File contains `"pressed_pct":` (state-layer pressed % per direction).
+    - File contains `"disabled_opacity":` (state-layer disabled alpha per direction).
+    - File contains `const DIRECTION_PRESET_DEFAULT: Dictionary = {`.
+    - File contains `func _resolve_direction_presets() -> Dictionary:`.
+    - The body of `_resolve_direction_presets` calls `base_color.to_html(false)` (or equivalent — `to_html()` then `.substr(0, 6)` etc.).
+  </acceptance_criteria>
+  <verify>
+    <automated>
+      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; foreach($n in 'const DIRECTION_PRESETS: Dictionary = {','\"151A2E\":','\"111820\":','\"241326\":','\"0B2420\":','\"20112E\":','\"spread_factor\": 1.3','\"spread_factor\": 0.7','\"spread_factor\": 1.0','\"hover_pct\":','\"pressed_pct\":','\"disabled_opacity\":','const DIRECTION_PRESET_DEFAULT: Dictionary = {','func _resolve_direction_presets() -> Dictionary:') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; if (-not (($g -match 'base_color\\.to_html\\(false\\)') -or ($g -match 'base_color\\.to_html\\(\\)'))) { throw '_resolve_direction_presets does not call to_html()' }"
+    </automated>
+  </verify>
+  <done>DIRECTION_PRESETS lookup table + _resolve_direction_presets() helper exist; per-direction differentiation is now sourceable, not hard-coded.</done>
+</task>
+
+<task type="auto">
+  <name>Task 4: Wire derivation block into _regenerate_theme() body (consumes DIRECTION_PRESETS — Cross-AI Cycle 1 C2 fix)</name>
   <read_first>
     - addons/neocade_theme/neocade_theme.gd
     - .planning/DESIGN_TOKENS.md (§6.2, §6.3, §6.4, §6.5, §7.1)
@@ -282,13 +360,13 @@ Wave 2 — depends on Plan 04-01 only. Parallel-eligible with Plan 04-05 if 04-0
         is_light = base_color.get_luminance() >= 0.5
         var p: Platform = _resolve_platform()
         var tokens: Dictionary = _platform_tokens(p)
+        var presets: Dictionary = _resolve_direction_presets()  # Cross-AI Cycle 1 C2 fix
 
         # ── Surface ramp (DESIGN_TOKENS §6.2) ──
-        # spread_factor is the per-direction surface-ramp width control. Plan 04-05 will source this
-        # per-direction (Pulse=1.3 wide, Slate=0.7 narrow, Bubble=1.0 medium, Daybreak=1.0 medium,
-        # Burst=1.3 wide). For now, derive a sensible default from `spacing` so the engine is
-        # functional without per-direction lookup; Plan 04-05 supersedes this.
-        var spread_factor: float = 1.0
+        # spread_factor is the per-direction surface-ramp width control. Sourced from
+        # DIRECTION_PRESETS (Cross-AI Cycle 1 C2 fix): Pulse=1.3 wide, Slate=0.7 narrow,
+        # Bubble=1.0 medium, Daybreak=1.0 medium, Burst=1.3 wide; custom themes default to 1.0.
+        var spread_factor: float = presets.spread_factor
         var elevate_target: Color = Color.BLACK if is_light else Color.WHITE
 
         var surface_base: Color    = base_color
@@ -319,11 +397,13 @@ Wave 2 — depends on Plan 04-01 only. Parallel-eligible with Plan 04-05 if 04-0
             text_muted   = Color("#B9C1D0")
 
         # ── State-layer overlays (DESIGN_TOKENS §6.5) ──
-        # Per-direction hover_pct / pressed_pct / disabled_opacity come from the .tres or BINDING_TABLE
-        # in Plan 04-05; for now, use M3 baseline 8% / 12% / 0.38 per TOKEN-09.
-        var hover_pct: float = 8.0
-        var pressed_pct: float = 12.0
-        var disabled_opacity: float = 0.38
+        # Per-direction hover_pct / pressed_pct / disabled_opacity sourced from
+        # DIRECTION_PRESETS (Cross-AI Cycle 1 C2 fix). pressed_pct stored as negative in the
+        # preset (per DESIGN_TOKENS §6.5 convention: hover lifts toward elevate_target,
+        # pressed sinks toward BLACK); the `abs()` extracts the magnitude.
+        var hover_pct: float = presets.hover_pct
+        var pressed_pct: float = abs(presets.pressed_pct)
+        var disabled_opacity: float = presets.disabled_opacity
         var state_hover_target: Color = Color.BLACK if is_light else Color.WHITE
         var state_hover: Color = _mix(base_color, state_hover_target, hover_pct / 100.0)
         var state_pressed: Color = _mix(base_color, Color.BLACK, pressed_pct / 100.0)
@@ -345,7 +425,11 @@ Wave 2 — depends on Plan 04-01 only. Parallel-eligible with Plan 04-05 if 04-0
     NOTE on `spread_factor`, `hover_pct`, `pressed_pct`, `disabled_opacity`: these are intentionally hard-coded to sensible defaults in this plan. Plan 04-05 supersedes them with per-direction values via the BINDING_TABLE or by reading direction metadata. The current values let the engine be functional + verifiable (a freshly-loaded `pulse_neocade_theme.tres` produces non-empty derived colors immediately) without coupling Plan 04-04 to Plan 04-05's BINDING_TABLE design.
   </action>
   <acceptance_criteria>
-    - `_regenerate_theme()` body contains `var spread_factor: float = 1.0`.
+    - `_regenerate_theme()` body contains `var presets: Dictionary = _resolve_direction_presets()` (Cross-AI Cycle 1 C2 fix).
+    - `_regenerate_theme()` body contains `var spread_factor: float = presets.spread_factor` (sourced per-direction; NO `= 1.0` literal hard-code).
+    - `_regenerate_theme()` body contains `var hover_pct: float = presets.hover_pct` (NO hard-coded `8.0`).
+    - `_regenerate_theme()` body contains `var pressed_pct: float = abs(presets.pressed_pct)` (NO hard-coded `12.0`).
+    - `_regenerate_theme()` body contains `var disabled_opacity: float = presets.disabled_opacity` (NO hard-coded `0.38`).
     - Body contains `var elevate_target: Color = Color.BLACK if is_light else Color.WHITE`.
     - Body contains `var surface_base: Color    = base_color` (literal — derivation start).
     - Body contains `var surface_low: Color     = _mix(base_color, Color.BLACK, 0.18 * spread_factor)`.
@@ -366,7 +450,7 @@ Wave 2 — depends on Plan 04-01 only. Parallel-eligible with Plan 04-05 if 04-0
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; foreach($n in 'var spread_factor: float = 1.0','var elevate_target: Color = Color.BLACK if is_light else Color.WHITE','var surface_base: Color','var surface_low: Color','_mix(base_color, Color.BLACK, 0.18 * spread_factor)','_mix(base_color, elevate_target, 0.06 * spread_factor)','_mix(base_color, elevate_target, 0.13 * spread_factor)','_mix(base_color, elevate_target, 0.20 * spread_factor)','_mix(base_color, elevate_target, 0.24 * spread_factor)','_tint_toward_base(accent_color, base_color)','_tint_toward_base(surface_panel, base_color)','if is_light:','Color(\"#1B2230\")','Color(\"#F7F8FB\")','var role_primary: Color = accent_color','_mix(accent_color, Color.WHITE, 0.5)','_mix(base_color, state_hover_target, hover_pct / 100.0)','_mix(base_color, Color.BLACK, pressed_pct / 100.0)','if _regenerating: return','_regenerating = true','_regenerating = false') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; if ($g -match '\\bclear\\(\\)') { throw 'clear() call found — D-01 forbids' }"
+      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; foreach($n in 'var presets: Dictionary = _resolve_direction_presets()','var spread_factor: float = presets.spread_factor','var elevate_target: Color = Color.BLACK if is_light else Color.WHITE','var surface_base: Color','var surface_low: Color','_mix(base_color, Color.BLACK, 0.18 * spread_factor)','_mix(base_color, elevate_target, 0.06 * spread_factor)','_mix(base_color, elevate_target, 0.13 * spread_factor)','_mix(base_color, elevate_target, 0.20 * spread_factor)','_mix(base_color, elevate_target, 0.24 * spread_factor)','_tint_toward_base(accent_color, base_color)','_tint_toward_base(surface_panel, base_color)','if is_light:','Color(\"#1B2230\")','Color(\"#F7F8FB\")','var role_primary: Color = accent_color','_mix(accent_color, Color.WHITE, 0.5)','var hover_pct: float = presets.hover_pct','var pressed_pct: float = abs(presets.pressed_pct)','var disabled_opacity: float = presets.disabled_opacity','_mix(base_color, state_hover_target, hover_pct / 100.0)','_mix(base_color, Color.BLACK, pressed_pct / 100.0)','if _regenerating: return','_regenerating = true','_regenerating = false') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; if ($g -match '\\bclear\\(\\)') { throw 'clear() call found — D-01 forbids' }"
     </automated>
   </verify>
   <done>The full derivation block lives in `_regenerate_theme()` body. Plan 04-05 walks the BINDING_TABLE consuming these locals; no Control-specific math is duplicated.</done>
@@ -382,21 +466,25 @@ Wave 2 — depends on Plan 04-01 only. Parallel-eligible with Plan 04-05 if 04-0
     Stage `addons/neocade_theme/neocade_theme.gd` and commit:
 
     ```
-    feat(04-04): port color formulas + role tokens + raised helper + platform branch
+    feat(04-04): color formulas + role tokens + DIRECTION_PRESETS + raised helper
 
     Plan 04-04 wave-2 formulas (depends on Plan 04-01 class shell):
     - Helpers: _mix, _tint_toward_base (DESIGN_TOKENS §6.1)
     - Helpers: _resolve_platform, _platform_tokens (DESIGN_TOKENS §10.1, §10.2)
     - Helper: _make_raised_stylebox (DESIGN_TOKENS §9)
-    - _regenerate_theme() body now derives: 5-stop surface ramp + 5 raised offsets +
-      text colors (is_light flip) + state layers + role tokens (accent_rim).
+    - DIRECTION_PRESETS const + _resolve_direction_presets() (Cross-AI Cycle 1 C2 fix):
+      per-direction spread_factor, hover_pct, pressed_pct, disabled_opacity sourced
+      by base_color hex lookup. Pulse=1.3/6/-10/0.42, Slate=0.7/8/-12/0.50,
+      Bubble=1.0/10/-12/0.45, Daybreak=1.0/8/-12/0.50, Burst=1.3/10/-14/0.45.
+      9-export surface intact (DIRECTION_PRESETS is a const, not @export).
+    - _regenerate_theme() body now derives: 5-stop surface ramp (per-direction
+      spread_factor) + 5 raised offsets + text colors (is_light flip) + state
+      layers (per-direction hover/pressed/disabled) + role tokens (accent_rim).
     - is_light = base_color.get_luminance() >= 0.5; surface_low always mixes toward
       BLACK; elevated tier flips target on is_light.
-    - Hard-coded spread_factor / hover_pct / pressed_pct / disabled_opacity defaults
-      will be superseded per-direction by Plan 04-05 BINDING_TABLE.
     - D-01 invariant preserved: no clear() anywhere in regeneration path.
 
-    Refs: TOKEN-01, TOKEN-02, TOKEN-03, TOKEN-08, TOKEN-09
+    Refs: TOKEN-01, TOKEN-02, TOKEN-03, TOKEN-06, TOKEN-08, TOKEN-09
     Plan: 04-04
     ```
 
