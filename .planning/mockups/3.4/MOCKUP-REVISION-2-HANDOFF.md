@@ -354,54 +354,96 @@ After re-rendering, run the greyscale sufficiency test again (`screenshots/greys
 
 The current `PLATFORM_TOKENS` and `.nc-artboard.mobile` CSS overrides are inverted relative to iOS HIG, Android Material 3, and desktop game-UI conventions. Result: at the rendered PNG resolution the viewer can't tell which artboard is which platform. The user wants this difference to be **obvious at a glance** — mobile mockups should look like a tappable iOS / Android app (big targets, larger body text, generous breathing room), and desktop mockups should look like a compact game launcher / Steam-style tool panel (denser chrome, more information per screen).
 
-### Reference standards
+### Reference standards (cited)
 
-| Platform | Min tap target | Body text | Notes |
+**Mobile — match Material Design 3 component specs.** Material Design is fundamentally a mobile-first design system; mobile mockups should embody MD3 component values directly. iOS HIG is the secondary reference for cross-platform parity (the floors are similar; we always pick whichever is larger so a single mobile artboard satisfies both OSes).
+
+Use WebFetch or context7 to verify current values before committing. Authoritative sources at the time this handoff was written:
+
+| Component | Material 3 spec (primary) | iOS HIG (secondary) | NeoCade mobile token |
 |---|---|---|---|
-| iOS HIG | **44 pt** (≈ 44px @1x; 88px @2x) | **17 pt body** (16-17 px on a typical iPhone) | Apple's Human Interface Guidelines spec since iOS 7. Primary buttons commonly 50-56pt for emphasis. |
-| Android Material 3 | **48 dp** | **14 sp body**, often raised to **16 sp** for accessibility | Material 3 + WCAG 2.5.5 (AAA target = 44×44 CSS px minimum). |
-| **NeoCade mobile floor** | **48 dp** (covers both, since 48 ≥ 44) | **16 px body** | Always meet the higher bar so the theme works on either platform without per-OS branching. |
-| Desktop game UI (Steam, launchers, in-game menus) | ~**32-36px** chrome controls | **14 px body** | Compact density; primary actions can be 36-44px for emphasis. |
+| Tap target floor | **48 dp** (Material density + WCAG 2.5.5 AAA) | **44 pt** (HIG since iOS 7) | **48 dp** (`buttonMin: 48`) — covers both |
+| Standard button height | **40 dp** visual + 4 dp top/bottom touch padding = 48 dp target | **44 pt** | **48 dp** as combined visual+target |
+| Emphasis / Extended FAB | **56 dp** (Extended FAB) | n/a — HIG just makes hero buttons taller | **56 dp** (`primaryButtonMin: 56`) |
+| Filled text field | **56 dp** (M3 default) | ~44-50 pt | **56 dp** (`inputMin: 56`) |
+| List item (one-line) | **56 dp** (M3 list-item-one-line) | 44 pt (UITableViewCell default) | **56 dp** (`rowMin: 56`) |
+| Switch | **32 dp** track height, ~52 dp track width (M3 Switch) | ~31×51 pt (UISwitch) | **32 dp** (`toggleMin: 32`) |
+| Checkbox | 18 dp box inside 48 dp target (M3) | 24×24 pt typical | **20 dp** visible box, 48 dp target via padding (`checkboxSize: 20`) |
+| Tab | **48 dp** (M3 Tabs) | 44 pt | **48 dp** (`tabMin: 48`) |
+| Body text | **16 sp** (M3 Body Large) | **17 pt body** (≈ 17px @1x) | **16 px** (`body: 16`) |
+| Label text | **14 sp** (M3 Label Medium) | 13 pt (HIG Caption 1 / Footnote) | **14 px** (`label_: 14`) |
+| Title heading | **22 sp** (M3 Title Large) | 17-22 pt typical | **22 px** (`h2: 22`) |
+| Display heading | **32 sp** (M3 Headline Large) | 28-34 pt | **32 px** (`h1: 32`) |
+| Inter-control gap on `space.4+` | M3 8/12/16 dp scale; "+50%" mobile guidance from PROJECT.md architecture revision 2026-05-04 | similar | **densityScale: 1.5** on mobile |
+
+Material 3 reference URLs to verify against:
+- https://m3.material.io/foundations/accessible-design/accessibility-basics (tap targets)
+- https://m3.material.io/components/buttons/specs (button heights)
+- https://m3.material.io/components/text-fields/specs (text field heights)
+- https://m3.material.io/components/lists/specs (list item heights)
+- https://m3.material.io/styles/typography/type-scale-tokens (type scale)
+
+iOS HIG references:
+- https://developer.apple.com/design/human-interface-guidelines/buttons
+- https://developer.apple.com/design/human-interface-guidelines/typography
+
+**Desktop — match standard desktop game UI conventions.** Reference points the user is comfortable with as "standard for a desktop game":
+
+| Reference | Button (chrome) | Primary / hero button | Body text | List row | Notes |
+|---|---|---|---|---|---|
+| Steam client (settings, library) | ~28-32 px | ~40 px (e.g. Install) | 14 px | ~36 px | Most influential desktop-game UI; sets community expectation |
+| Battle.net launcher | ~32-36 px | ~44-48 px (Play) | 14-15 px | ~40 px | Big-screen-friendly hero buttons |
+| Epic Games Launcher | ~36-40 px | ~44 px | 15-16 px | ~40 px | Slightly larger overall than Steam |
+| Discord | ~32 px | ~36-40 px | 14-15 px | ~36 px | Chat-app dense |
+| Godot editor | ~22-28 px | ~28 px | 13-14 px | ~26 px | Tooling — most compact end |
+| In-game menus (Civ, Stardew, Hades) | ~40-48 px | ~48-56 px | 16-18 px | ~44 px | Played at distance / with controllers; bigger than chrome |
+| **NeoCade desktop token** | **36 px** (`buttonMin: 36`) | **44 px** (`primaryButtonMin: 44`) | **14 px** (`body: 14`) | **36 px** (`rowMin: 36`) | Sits in the middle of the "professional desktop game UI" range — works for both editor tooling and game runtime contexts. |
+
+Desktop NeoCade rationale: the theme has to work both for game-dev editor tooling (Godot inspector panels, custom tools) AND game-runtime UI (settings screens, lobby UI, pause menus). Steam-comparable density (36 px standard, 44 px primary) hits the sweet spot — not as compact as a pure editor tool, not as oversized as a console-first in-game menu.
 
 ### Token values to commit
 
-In `src/neocade-mockups.js`, replace `PLATFORM_TOKENS`:
+In `src/neocade-mockups.js`, replace `PLATFORM_TOKENS`. Values below are pulled from the cited standards table — keep them aligned if you tweak.
 
 ```js
 const PLATFORM_TOKENS = {
   desktop: {
+    // Standard desktop game UI per Steam / Battle.net / Epic conventions.
+    // Sits in the middle of the "professional desktop game UI" range.
     label: "platform=DESKTOP",
-    buttonMin: 36,           // compact game-UI chrome
-    primaryButtonMin: 42,    // primary actions slightly larger for emphasis
-    inputMin: 34,
-    toggleMin: 24,
-    checkboxSize: 18,
-    body: 14,                // dense body type
-    label_: 12,              // smaller secondary labels
+    buttonMin: 36,           // Steam settings buttons + Battle.net default chrome
+    primaryButtonMin: 44,    // Battle.net Play / Steam Install hero button
+    inputMin: 34,            // Steam-style search/filter input
+    toggleMin: 22,           // Steam-comparable: small but visible
+    checkboxSize: 18,        // standard desktop checkbox
+    body: 14,                // Steam / Discord / Battle.net body
+    label_: 12,              // smaller secondary labels (kicker, helper text)
     h1: 36,
     h2: 22,
     kicker: 12,
-    rowMin: 36,              // list/tree row height
+    rowMin: 36,              // Steam list-row density
     tabMin: 32,
-    tapPadding: 8,           // around interactives
+    tapPadding: 8,
     densityScale: 1.0
   },
   mobile: {
+    // Material Design 3 component spec values; iOS HIG covered by always
+    // picking the larger of the two floors (Material wins on every axis here).
     label: "platform=MOBILE",
-    buttonMin: 48,           // Material 3 minimum (covers iOS HIG 44 too)
-    primaryButtonMin: 56,    // primary buttons more prominent on touch
-    inputMin: 48,            // tap-friendly input height
-    toggleMin: 32,           // chunky toggle for thumbs
-    checkboxSize: 24,        // larger checkbox for fingers
-    body: 16,                // larger body for held-at-arm's-length reading
-    label_: 14,
-    h1: 30,                  // proportionally smaller H1 vs desktop because viewport is narrower
-    h2: 20,
-    kicker: 13,              // larger than desktop kicker
-    rowMin: 56,              // bigger list row for tap targets + breathing
-    tabMin: 44,
-    tapPadding: 12,          // extra slop around interactives
-    densityScale: 1.5        // multiplier for inter-control gaps (per architecture revision 2026-05-04: "+50% spacing on space.4+")
+    buttonMin: 48,           // M3 tap-target floor + WCAG 2.5.5 (AAA) + iOS HIG 44pt
+    primaryButtonMin: 56,    // M3 Extended FAB height — primary-action emphasis
+    inputMin: 56,            // M3 filled text field default
+    toggleMin: 32,           // M3 Switch track height
+    checkboxSize: 20,        // M3 visible box; full 48dp target via tapPadding
+    body: 16,                // M3 Body Large (≈ iOS 17pt body @1x)
+    label_: 14,              // M3 Label Medium (≈ iOS Footnote)
+    h1: 32,                  // M3 Headline Large
+    h2: 22,                  // M3 Title Large
+    kicker: 13,              // M3 Label Small
+    rowMin: 56,              // M3 list-item-one-line
+    tabMin: 48,              // M3 Tabs default
+    tapPadding: 12,          // hit-area expansion around small interactives
+    densityScale: 1.5        // +50% inter-control gap on space.4+ (per architecture revision 2026-05-04)
   }
 };
 ```
