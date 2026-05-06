@@ -298,7 +298,7 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 | 3.2 Source-Dive: Godot Dynamic Theme Architecture | 6/6 | Complete | 2026-05-06 |
 | 3.3 Theme Direction Research (5 candidate directions) | 3/3 | Complete | 2026-05-06 |
 | 3.4 Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat) | 2/4 complete; Plan 03 paused at Task 4 | Awaiting user final approval | - |
-| 4. Foundation: Single `NeoCadeTheme` class + data `.tres` files + Fonts + Icons | 0/TBD | Not started | - |
+| 4. Foundation: Single `NeoCadeTheme` class + data `.tres` files + Fonts + Icons | 1/8 (Plan 04-01 done) | In progress | started 2026-05-06 |
 | 5. Core Controls (Buttons/Inputs/Labels/Panels) | 0/TBD | Not started | - |
 | 6. Lists/Layout/Range | 0/TBD | Not started | - |
 | 7. Dialogs/Popups/Advanced | 0/TBD | Not started | - |

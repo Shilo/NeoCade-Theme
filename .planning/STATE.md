@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 4 context gathered
-last_updated: "2026-05-06T20:20:16.191Z"
-last_activity: 2026-05-06 -- Phase 4 planning complete
+stopped_at: Phase 4 Plan 01 complete (class shell + scaffold deletion)
+last_updated: "2026-05-06T23:30:00.000Z"
+last_activity: 2026-05-06 -- Phase 04 Plan 01 complete (NeoCadeTheme class shell authored)
 progress:
   total_phases: 15
   completed_phases: 6
   total_plans: 42
-  completed_plans: 31
-  percent: 74
+  completed_plans: 32
+  percent: 76
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-06)
 
 **Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships **5 approved data-only direction `.tres` files** (Pulse, Slate, Bubble, Daybreak, Burst) of type `NeoCadeTheme`, plus one concrete `addons/neocade_theme/neocade_theme.gd` class. Consumer toggles `raised` / `platform` / `base_color` / `accent_color` exports for flat/raised × desktop/mobile/AUTO variations — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect). **Dynamic-theme architecture** feasibility-validated 2026-05-06 (Phase 3.2 strict gate 6/6 PASS in Godot 4.6.2), then simplified 2026-05-06e/f: single concrete `@tool class_name NeoCadeTheme extends Theme`, 9 exports, luminance-derived `is_light`, no subclasses, no `_dev/`, no `themes/`, no root `.tres`, no `neocade_mobile_theme.tres`.
-**Current focus:** Phase 03.4 — visual-direction-flat-extruded-flat-mockup-approval-gate
+**Current focus:** Phase 04 — foundation-neocadetheme-superclass-per-theme-subclasses-font
 
 ## Current Position
 
-Phase: 03.4 (visual-direction-flat-extruded-flat-mockup-approval-gate) — EXECUTING
-Plan: 3 of 4
-Next: user resolves `.planning/mockups/3.4/final-approval.md`; then `/gsd-execute-phase 3.4` resumes Plan 04
-Status: Ready to execute
-Last activity: 2026-05-06 -- Phase 4 planning complete
+Phase: 04 (foundation-neocadetheme-superclass-per-theme-subclasses-font) — EXECUTING
+Plan: 2 of 8 (Plan 04-01 complete; next is Plan 04-02 fonts + OFL OR Plan 04-03 button-family icons — both Wave 1, parallel-eligible)
+Next: `/gsd-execute-phase 04` continues with Plan 04-02 (fonts + OFL) — does not depend on the class shell beyond file presence
+Status: Executing Phase 04
+Last activity: 2026-05-06 -- Phase 04 Plan 01 complete (NeoCadeTheme class shell authored, scaffold .tres deleted, main.tscn cleared)
 
-Progress: [█████████░] 85%
+Progress: [█████████░] 76%
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ Progress: [█████████░] 85%
 | Phase 03.1 P06 | 18 min | 3 tasks | 4 files |
 | Phase 03.4 P01 | 17 min | 4 tasks | 8 files |
 | Phase 03.4 P02 | re-executed 2026-05-06 | 5 tasks | mockup gallery + 15 concept PNGs |
+| Phase 04 P01 | 25 min | 3 tasks | 3 files (1 D, 1 M, 1 A) |
 
 ## Accumulated Context
 
@@ -90,6 +91,7 @@ Recent decisions affecting current work:
 - **Phase 3 REDIRECTED (2026-05-04):** User rejected the painterly arcade-venue direction at Plan 03-03 finalist-selection checkpoint. **Boardwalk Sunset (the original recommended baseline) is rejected.** New direction: **flat MD3 / MD3 Expressive visual identity, no textures / no patterns / no embossing / no gradients on chrome.** Optional "extruded flat 3D" raised variation per the Flat-3D Game UI pattern (per user's itch.io references). Phase 3 outputs (mood-board, 5 concept images, direction boards) preserved as v0 historical reference. Replaced by Phase 3.1 (MD3 visual research) + Phase 3.2 (dynamic-theme architecture research) + Phase 3.3 (theme direction research) + Phase 3.4 (revised mockup gate).
 - **Architecture revision (2026-05-04, simplified 2026-05-06e/f):** Replaced "4 static `.tres` per theme generated from TokenSet matrix" with dynamic export-driven Theme regeneration. Phase 3.2 first validated the superclass/subclass hypothesis, but production is now **single concrete `NeoCadeTheme` class + data-only direction `.tres` files**. `NeoCadeTheme` is `@tool extends Theme` with 9 exports (`base_color`, `accent_color`, `raised`, `platform`, `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`). Setters dynamically regenerate theme entries via `_get_base_color`-style formulas ported from passivestar's editor theme (driven by exports, not `EditorSettings`). Per-direction personality lives in Theme Editor entry overrides per `.tres`, not per-direction `.gd` classes. `platform=AUTO` auto-detects via `OS.has_feature("mobile")` at runtime; `DESKTOP` and `MOBILE` are forced sizes. **NEW Phase 3.2 inserted** between Phase 3.1 and Phase 3.4 to validate this dynamic-theme feasibility.
 - **Theme-direction phase insertion (2026-05-04; completed 2026-05-06):** **NEW Phase 3.3 inserted** to address gap — original phases 3.1/3.2/3.3 covered design language + architecture + mockups, but NO phase explicitly researched/derived theme directions. Phase 3.3 (Theme Direction Research) derived 5 candidate directions using user's new goals/restrictions + per-v0-direction reactions as DNA + Phase 3.1 findings + commercial flat-MD3 example survey. Outputs `.planning/research/THEME-DIRECTIONS.md` with text-level user approval. **Phase 3.4 Plan 02 selected Pulse as the recommended starter / implementation priority; Slate, Bubble, Daybreak, and Burst remain v1 personality variations.** Recommended starter affects showcase default + README "try this first" only; it does NOT bake Pulse into class defaults.
+- Phase 4 Plan 01 (2026-05-06): NeoCadeTheme class shell authored at `addons/neocade_theme/neocade_theme.gd` — `@tool class_name NeoCadeTheme extends Theme` with 9 @exports (4 Core + 5 Shape under `@export_group("Shape")`), `enum Platform { DESKTOP, MOBILE, AUTO }`, `is_light` luminance-derivation, `_regenerating` reentry guard, `_regenerate_theme()` skeleton, no-`Theme.clear` invariant from day 1, D-03/D-31/D-04/REVISABLE/binding docstring anchors. Empty scaffold `addons/neocade_theme/neocade_theme.tres` deleted; `main.tscn` `theme = ExtResource(...)` line removed entirely (Cycle 6 F2 fix — no placeholder comment because Godot discards `.tscn` comments on save). Atomic commit `d1d596c`.
 
 ### Pending Todos
 
@@ -120,9 +122,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-06T15:16:51.238Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-CONTEXT.md
+Last session: 2026-05-06T23:30:00.000Z
+Stopped at: Phase 4 Plan 01 complete (class shell authored; atomic commit `d1d596c`)
+Resume file: .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-02-fonts-and-OFL-PLAN.md
 
 ## Phase 3.4 Plan 02 redirect (2026-05-06b)
 

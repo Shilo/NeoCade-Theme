@@ -281,8 +281,8 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | DESIGN-04 | Phase 3.4 Plan 03 (Pulse mobile 4-grid evidence) | — | In Progress |
 | DESIGN-05 | Phase 3.4 Plan 04 (`DESIGN_TOKENS.md` finalized pre-Phase-4) | — | Pending |
 | DESIGN-06 | Phase 3.4 (gate enforcement) | — | Active |
-| FOUND-01 | Phase 4 (addon directory layout) | — | Pending |
-| FOUND-02 | Phase 4 (single concrete `NeoCadeTheme` class + 9-property export surface) | — | Pending |
+| FOUND-01 | Phase 4 (addon directory layout) | — | In Progress (Plan 04-01 deleted scaffold root .tres; full layout closes via Plans 04-02/03/06/07/08) |
+| FOUND-02 | Phase 4 (single concrete `NeoCadeTheme` class + 9-property export surface) | — | In Progress (Plan 04-01 authored class shell with all 9 @exports + Platform enum + is_light + reentry guard; formula + binding-table body closes via Plans 04-04/05) |
 | FOUND-03 | Phase 4 (five data-only direction `.tres` resources) | — | Pending |
 | FONT-01 | Phase 4 | — | Pending |
 | FONT-02 | Phase 4 | — | Pending |
