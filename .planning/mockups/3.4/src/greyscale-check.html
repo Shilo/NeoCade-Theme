@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Greyscale sufficiency test (D-30)</title>
+  <style>
+    body { margin: 0; padding: 24px; background: #000; font-family: Inter, system-ui, sans-serif; color: #ddd; }
+    h1 { margin: 0 0 8px; font-size: 18px; }
+    p { margin: 0 0 16px; color: #aaa; font-size: 13px; }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+    figure { margin: 0; }
+    img {
+      display: block;
+      width: 100%;
+      filter: grayscale(1) contrast(1.05);
+      border: 1px solid #222;
+    }
+    figcaption {
+      margin-top: 6px;
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <h1>D-30 Greyscale sufficiency test</h1>
+  <p>All 5 directions desktop-flat rendered with CSS grayscale(1). Identifying each by shape language alone is the bar.</p>
+  <div class="row">
+    <figure><img src="../concepts/pulse-desktop-flat.png" alt="Pulse greyscale"><figcaption>Pulse</figcaption></figure>
+    <figure><img src="../concepts/slate-desktop-flat.png" alt="Slate greyscale"><figcaption>Slate</figcaption></figure>
+    <figure><img src="../concepts/bubble-desktop-flat.png" alt="Bubble greyscale"><figcaption>Bubble</figcaption></figure>
+    <figure><img src="../concepts/daybreak-desktop-flat.png" alt="Daybreak greyscale"><figcaption>Daybreak</figcaption></figure>
+    <figure><img src="../concepts/burst-desktop-flat.png" alt="Burst greyscale"><figcaption>Burst</figcaption></figure>
+  </div>
+</body>
+</html>

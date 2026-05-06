@@ -1,9 +1,19 @@
 "use strict";
 
+/* NeoCade Phase 3.4 mockup renderer — re-execution 2026-05-06b
+ *
+ * Loads each direction's `shape_language` block from data/directions.json
+ * (mirrored inline below for file:// runtime, kept in sync intentionally) and
+ * emits an artboard whose CSS variables and data-attributes drive per-direction
+ * shape language. The shared artboard CSS does NOT hard-code shape-language
+ * tokens — every value flows through this renderer.
+ *
+ * Authoritative spec: image-prompts/direction-shape-language-spec.md
+ */
+
 const NEOCADE_DIRECTIONS = [
   {
     name: "Pulse",
-    className: "PulseNeoCadeTheme",
     fileStem: "pulse_neocade_theme",
     conceptImages: {
       desktopFlat: "concepts/pulse-desktop-flat.png",
@@ -13,17 +23,32 @@ const NEOCADE_DIRECTIONS = [
     base_color: "#151A2E",
     accent_color: "#8BFF6A",
     contrast: "13.62:1",
-    radius: 12,
-    raisedOffset: 3,
-    summary: "Dark saturated arcade energy with lively green action and focus roles.",
-    target: "Multiplayer lobbies, action menus, active dark editor/runtime surfaces.",
-    flat: "Solid tonal surfaces, accent reserved for primary actions and selected states.",
-    raised: "Filled buttons and selected tabs gain small hard offsets; panels and inputs stay flat.",
-    mobile: "44pt / 48dp target language with restrained bright accent use."
+    summary: "Vibrant arcade hall by day — cabinet-bezel chrome, lit primary actions, packed control deck.",
+    target: "Multiplayer arcade lobbies, action menus, streamer-friendly tool surfaces.",
+    flat: "Solid tonal surfaces; bright green accent reserved for primary actions, selected tabs, focus.",
+    raised: "Filled buttons and selected tabs gain small extruded offsets; panels stay flat for density.",
+    mobile: "44pt / 48dp targets; bright accent restrained to action and focus roles.",
+    shape: {
+      r_base: 5, r_chip: 4, r_button: 5, r_button_primary: 5,
+      r_tab: 4, r_mark: 4,
+      btn_pad_h: 14, btn_pad_v: 10, btn_pad_h_primary: 14, btn_pad_v_primary: 10,
+      mark_size_desktop: 54, mark_size_mobile: 42,
+      density_padding: 18, density_gap: 10, card_gap: 14,
+      focus_thickness: 2, focus_offset: 0,
+      h1_weight: 800, h2_weight: 740, kicker: "uppercase-tracked-accent",
+      surface_stops: 4, surface_spread: "wide",
+      hover_pct: 6, pressed_pct: -10, disabled_opacity: 0.42,
+      raised_primary: 3, raised_tab: 2, raised_row: 0, raised_secondary: 0,
+      lift_tabs: true, lift_rows: false, lift_secondary: false,
+      tab_shape: "rectangular-strip",
+      mark_shape: "square-cabinet-bezel",
+      primary_strategy: "bold-accent-fill-dark-text",
+      ghost_strategy: "accent-outlined-accent-text",
+      focus_style: "tight-cabinet-ring"
+    }
   },
   {
     name: "Slate",
-    className: "SlateNeoCadeTheme",
     fileStem: "slate_neocade_theme",
     conceptImages: {
       desktopFlat: "concepts/slate-desktop-flat.png",
@@ -33,17 +58,32 @@ const NEOCADE_DIRECTIONS = [
     base_color: "#111820",
     accent_color: "#8BD3FF",
     contrast: "10.94:1",
-    radius: 10,
-    raisedOffset: 2,
-    summary: "Calm modern minimal dark with sparse blue emphasis and polished rounding.",
-    target: "Desktop tools, settings-heavy games, launchers, premium dark defaults.",
-    flat: "Subtle tonal separation with accent only for primary, selection, caret, and focus.",
-    raised: "Restrained 1-2px hard offset or stronger outline on primary button-like controls.",
-    mobile: "Quiet palette with expanded button constants and high-contrast focus rings."
+    summary: "Premium dark default — iOS-pill polish, restrained accent, quiet confident chrome.",
+    target: "Desktop tools, settings-heavy launchers, premium dark defaults.",
+    flat: "Subtle tonal separation; sky-blue accent only on primary, focus, selection, important toggles.",
+    raised: "Restrained 1-2px hard offset on primary buttons only; tabs and rows stay flat.",
+    mobile: "Quiet palette with expanded button targets and high-contrast focus rings.",
+    shape: {
+      r_base: 11, r_chip: 999, r_button: 11, r_button_primary: 11,
+      r_tab: 999, r_mark: 11,
+      btn_pad_h: 16, btn_pad_v: 11, btn_pad_h_primary: 18, btn_pad_v_primary: 12,
+      mark_size_desktop: 54, mark_size_mobile: 42,
+      density_padding: 22, density_gap: 14, card_gap: 18,
+      focus_thickness: 2, focus_offset: 2,
+      h1_weight: 720, h2_weight: 640, kicker: "small-caps-subtle",
+      surface_stops: 3, surface_spread: "narrow",
+      hover_pct: 4, pressed_pct: -6, disabled_opacity: 0.50,
+      raised_primary: 2, raised_tab: 0, raised_row: 0, raised_secondary: 0,
+      lift_tabs: false, lift_rows: false, lift_secondary: false,
+      tab_shape: "rounded-pill",
+      mark_shape: "rounded-square",
+      primary_strategy: "quiet-pill-primary",
+      ghost_strategy: "thin-accent-outline",
+      focus_style: "ios-style-offset"
+    }
   },
   {
     name: "Bubble",
-    className: "BubbleNeoCadeTheme",
     fileStem: "bubble_neocade_theme",
     conceptImages: {
       desktopFlat: "concepts/bubble-desktop-flat.png",
@@ -53,17 +93,32 @@ const NEOCADE_DIRECTIONS = [
     base_color: "#241326",
     accent_color: "#FFB3E6",
     contrast: "10.74:1",
-    radius: 16,
-    raisedOffset: 5,
-    summary: "Friendly mobile-game brightness on a dark berry arcade base with light pink actions.",
-    target: "Casual games, cozy menus, tutorials, family-friendly mobile-first UI.",
-    flat: "Rounded dark berry solid fills, generous state contrast, cheerful but sparse pink accent placement.",
-    raised: "Buttons and selected playful affordances get 3-5px hard offsets; fields stay flat.",
-    mobile: "Larger buttons and toggles with 44pt / 48dp minimum target thinking."
+    summary: "Playful candy-counter at night — pillowy chrome, fully-rounded chips, tactile cheerful warmth.",
+    target: "Casual games, cozy menus, family-friendly mobile-first UI, tutorial-heavy flows.",
+    flat: "Rounded dark berry surfaces; cheerful pink accent placement is sparse and meaningful.",
+    raised: "Buttons, selected tabs, selected rows and chips get 3-5px extruded offsets — pokes-out.",
+    mobile: "Larger button targets, thicker focus rings, bouncy hover feel.",
+    shape: {
+      r_base: 18, r_chip: 999, r_button: 20, r_button_primary: 999,
+      r_tab: 999, r_mark: 22,
+      btn_pad_h: 20, btn_pad_v: 14, btn_pad_h_primary: 22, btn_pad_v_primary: 15,
+      mark_size_desktop: 54, mark_size_mobile: 42,
+      density_padding: 22, density_gap: 14, card_gap: 18,
+      focus_thickness: 3, focus_offset: 2,
+      h1_weight: 800, h2_weight: 760, kicker: "uppercase-tracked-accent",
+      surface_stops: 3, surface_spread: "medium",
+      hover_pct: 8, pressed_pct: -10, disabled_opacity: 0.45,
+      raised_primary: 5, raised_tab: 3, raised_row: 2, raised_secondary: 2,
+      lift_tabs: true, lift_rows: true, lift_secondary: true,
+      tab_shape: "fully-rounded-pill-large",
+      mark_shape: "circle-or-squircle",
+      primary_strategy: "pillowy-fully-rounded-primary",
+      ghost_strategy: "rounded-ghost-thicker-outline",
+      focus_style: "cheerful-chunky-ring"
+    }
   },
   {
     name: "Daybreak",
-    className: "DaybreakNeoCadeTheme",
     fileStem: "daybreak_neocade_theme",
     conceptImages: {
       desktopFlat: "concepts/daybreak-desktop-flat.png",
@@ -73,17 +128,32 @@ const NEOCADE_DIRECTIONS = [
     base_color: "#0B2420",
     accent_color: "#76F2D1",
     contrast: "11.96:1",
-    radius: 12,
-    raisedOffset: 3,
-    summary: "Welcoming daylight arcade mood reworked as dark teal surfaces with mint wayfinding.",
-    target: "Community hubs, onboarding flows, cozy game menus, bright mobile experiences.",
-    flat: "Dark teal tonal surfaces with high-contrast mint for primary/focus/selection.",
-    raised: "Primary actions and cards-as-actions lift; ordinary panels, lists, and fields stay flat.",
-    mobile: "44pt / 48dp floors with extra breathing room around touch clusters."
+    summary: "Fresh evening lobby — dark teal surfaces with bright mint wayfinding and airy spacing.",
+    target: "Community hubs, onboarding flows, family-friendly settings, bright mobile experiences.",
+    flat: "Dark teal tonal surfaces; high-contrast mint accent for primary, focus, selection.",
+    raised: "Primary actions and selected tabs lift; ordinary panels and lists stay flat for readability.",
+    mobile: "Generous breathing room around touch clusters, mint glow on focus.",
+    shape: {
+      r_base: 13, r_chip: 12, r_button: 13, r_button_primary: 13,
+      r_tab: 12, r_mark: 13,
+      btn_pad_h: 18, btn_pad_v: 12, btn_pad_h_primary: 20, btn_pad_v_primary: 13,
+      mark_size_desktop: 54, mark_size_mobile: 42,
+      density_padding: 24, density_gap: 16, card_gap: 20,
+      focus_thickness: 2, focus_offset: 2,
+      h1_weight: 720, h2_weight: 660, kicker: "sentence-case-accent",
+      surface_stops: 4, surface_spread: "medium",
+      hover_pct: 6, pressed_pct: -6, disabled_opacity: 0.50,
+      raised_primary: 3, raised_tab: 2, raised_row: 0, raised_secondary: 0,
+      lift_tabs: true, lift_rows: false, lift_secondary: false,
+      tab_shape: "rounded-rect",
+      mark_shape: "rounded-square-with-halo",
+      primary_strategy: "friendly-primary-generous-breathing",
+      ghost_strategy: "soft-outline-ghost",
+      focus_style: "airy-fresh-ring-with-mint-halo"
+    }
   },
   {
     name: "Burst",
-    className: "BurstNeoCadeTheme",
     fileStem: "burst_neocade_theme",
     conceptImages: {
       desktopFlat: "concepts/burst-desktop-flat.png",
@@ -93,63 +163,57 @@ const NEOCADE_DIRECTIONS = [
     base_color: "#20112E",
     accent_color: "#FFD166",
     contrast: "12.33:1",
-    radius: 14,
-    raisedOffset: 4,
-    summary: "Bold celebratory MD3 Expressive statement with deep plum and warm gold.",
-    target: "Mini-game launchers, achievements, party-game menus, showcase scenes.",
-    flat: "Disciplined dark surface ladder with accent for critical action, focus, and progress.",
-    raised: "Stronger offsets on key buttons; dense rows, inputs, and range tracks stay stable.",
-    mobile: "Large touch affordances with gold kept to high-value action and focus roles."
+    summary: "Celebratory MD3 Expressive max — oversized statement primary, asymmetric brand mark, bold gold.",
+    target: "Mini-game launchers, achievement screens, party-game menus, brand-forward showcases.",
+    flat: "Disciplined dark surface ladder; gold accent for critical action, focus, progress.",
+    raised: "Stronger 4-6px offsets on primary; smaller offsets on secondary; rows lift on selected.",
+    mobile: "Large touch affordances; gold confined to high-value action and focus roles.",
+    shape: {
+      r_base: 16, r_chip: 14, r_button: 16, r_button_primary: 22,
+      r_tab: 14, r_mark: 16,
+      btn_pad_h: 20, btn_pad_v: 14, btn_pad_h_primary: 24, btn_pad_v_primary: 16,
+      mark_size_desktop: 60, mark_size_mobile: 48,
+      density_padding: 22, density_gap: 14, card_gap: 20,
+      focus_thickness: 3, focus_offset: 1,
+      h1_weight: 820, h2_weight: 780, kicker: "uppercase-bold-larger-scale",
+      surface_stops: 4, surface_spread: "wide",
+      hover_pct: 8, pressed_pct: -12, disabled_opacity: 0.45,
+      raised_primary: 5, raised_tab: 3, raised_row: 2, raised_secondary: 2,
+      lift_tabs: true, lift_rows: true, lift_secondary: true,
+      tab_shape: "rounded-rect-asymmetric-on-selected",
+      mark_shape: "chunky-asymmetric-badge",
+      primary_strategy: "oversized-statement-primary",
+      ghost_strategy: "normal-accent-ghost",
+      focus_style: "dramatic-event-ring"
+    }
   }
 ];
 
 const PLATFORM_TOKENS = {
-  desktop: {
-    label: "platform=DESKTOP",
-    buttonMin: 40,
-    body: 14,
-    density: "dense desktop"
-  },
-  mobile: {
-    label: "platform=MOBILE",
-    buttonMin: 48,
-    body: 16,
-    density: "44pt / 48dp mobile"
-  }
+  desktop: { label: "platform=DESKTOP", buttonMin: 44, body: 14 },
+  mobile: { label: "platform=MOBILE", buttonMin: 48, body: 13 }
 };
 
 const CONCEPT_VARIANTS = [
-  {
-    key: "desktopFlat",
-    label: "Desktop flat",
-    platform: "desktop",
-    raised: false
-  },
-  {
-    key: "mobileFlat",
-    label: "Mobile flat",
-    platform: "mobile",
-    raised: false
-  },
-  {
-    key: "mobileRaised",
-    label: "Mobile raised",
-    platform: "mobile",
-    raised: true
-  }
+  { key: "desktopFlat", label: "Desktop flat", platform: "desktop", raised: false },
+  { key: "mobileFlat", label: "Mobile flat", platform: "mobile", raised: false },
+  { key: "mobileRaised", label: "Mobile raised", platform: "mobile", raised: true }
 ];
 
+/* --- color utilities ------------------------------------------------------- */
+
 function hexToRgb(hex) {
-  const clean = hex.replace("#", "");
+  const c = hex.replace("#", "");
   return {
-    r: parseInt(clean.slice(0, 2), 16),
-    g: parseInt(clean.slice(2, 4), 16),
-    b: parseInt(clean.slice(4, 6), 16)
+    r: parseInt(c.slice(0, 2), 16),
+    g: parseInt(c.slice(2, 4), 16),
+    b: parseInt(c.slice(4, 6), 16)
   };
 }
 
 function rgbToHex({ r, g, b }) {
-  return `#${[r, g, b].map((v) => Math.round(v).toString(16).padStart(2, "0")).join("")}`;
+  const clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
+  return `#${[r, g, b].map((v) => clamp(v).toString(16).padStart(2, "0")).join("")}`;
 }
 
 function mix(a, b, amount) {
@@ -164,229 +228,142 @@ function mix(a, b, amount) {
 
 function luminance(hex) {
   const { r, g, b } = hexToRgb(hex);
-  const channel = (value) => {
-    const normalized = value / 255;
-    return normalized <= 0.04045
-      ? normalized / 12.92
-      : Math.pow((normalized + 0.055) / 1.055, 2.4);
+  const ch = (v) => {
+    const n = v / 255;
+    return n <= 0.04045 ? n / 12.92 : Math.pow((n + 0.055) / 1.055, 2.4);
   };
-  return channel(r) * 0.2126 + channel(g) * 0.7152 + channel(b) * 0.0722;
+  return ch(r) * 0.2126 + ch(g) * 0.7152 + ch(b) * 0.0722;
 }
 
-function deriveTokens(direction, platformName = "desktop") {
+/* --- token derivation per direction + platform ----------------------------- */
+
+function spreadFactor(spread) {
+  if (spread === "narrow") return 0.7;
+  if (spread === "medium") return 1.0;
+  if (spread === "wide") return 1.3;
+  return 1.0;
+}
+
+function deriveSurfaceRamp(direction) {
+  const base = direction.base_color;
+  const f = spreadFactor(direction.shape.surface_spread);
+  return {
+    surface_base: base,
+    surface_low: mix(base, "#000000", 0.18 * f),
+    surface_panel: mix(base, "#ffffff", 0.06 * f),
+    surface_high: mix(base, "#ffffff", 0.13 * f),
+    surface_overlay: mix(base, "#ffffff", 0.20 * f),
+    outline: mix(base, "#ffffff", 0.24 * f),
+    offset: mix(base, "#000000", 0.55)
+  };
+}
+
+function deriveTokens(direction, platformName, raisedFlag) {
   const base = direction.base_color;
   const accent = direction.accent_color;
-  const lightBase = luminance(base) > 0.56;
-  const towardA = lightBase ? "#000000" : "#ffffff";
-  const towardB = lightBase ? "#ffffff" : "#000000";
-  const ink = lightBase ? "#17201C" : "#F7F8FB";
-  const muted = lightBase ? "#52625B" : "#B9C1D0";
-  const platform = PLATFORM_TOKENS[platformName] || PLATFORM_TOKENS.desktop;
+  const ink = "#F7F8FB";
+  const muted = "#B9C1D0";
+  const ramp = deriveSurfaceRamp(direction);
+  const s = direction.shape;
+  const platform = PLATFORM_TOKENS[platformName];
+  const markSize = platformName === "mobile" ? s.mark_size_mobile : s.mark_size_desktop;
 
   return {
-    "--base_color": base,
-    "--accent_color": accent,
-    "--surface-base": base,
-    "--surface-low": mix(base, towardB, lightBase ? 0.04 : 0.20),
-    "--surface-panel": mix(base, towardA, lightBase ? 0.05 : 0.08),
-    "--surface-high": mix(base, towardA, lightBase ? 0.12 : 0.16),
-    "--surface-overlay": mix(base, towardA, lightBase ? 0.18 : 0.24),
-    "--ink-local": ink,
-    "--muted-local": muted,
-    "--outline-local": mix(base, towardA, lightBase ? 0.28 : 0.30),
-    "--offset-local": mix(base, "#000000", lightBase ? 0.18 : 0.42),
-    "--state-hover": mix(base, accent, 0.16),
-    "--state-pressed": mix(base, accent, 0.24),
-    "--radius": `${direction.radius}px`,
-    "--raised-offset": `${direction.raisedOffset}px`,
+    "--base": base,
+    "--accent": accent,
+    "--ink": ink,
+    "--muted": muted,
+    "--surface-base": ramp.surface_base,
+    "--surface-low": ramp.surface_low,
+    "--surface-panel": ramp.surface_panel,
+    "--surface-high": ramp.surface_high,
+    "--surface-overlay": ramp.surface_overlay,
+    "--outline": ramp.outline,
+    "--offset": ramp.offset,
+    "--state-hover": mix(base, "#ffffff", Math.abs(s.hover_pct) / 100),
+    "--state-pressed": mix(base, "#000000", Math.abs(s.pressed_pct) / 100),
+    "--disabled-opacity": String(s.disabled_opacity),
+
+    "--radius-base": `${s.r_base}px`,
+    "--radius-chip": s.r_chip >= 999 ? "999px" : `${s.r_chip}px`,
+    "--radius-button": s.r_button >= 999 ? "999px" : `${s.r_button}px`,
+    "--radius-button-primary": s.r_button_primary >= 999 ? "999px" : `${s.r_button_primary}px`,
+    "--radius-tab": s.r_tab >= 999 ? "999px" : `${s.r_tab}px`,
+    "--radius-mark": `${s.r_mark}px`,
+
+    "--button-pad-h": `${s.btn_pad_h}px`,
+    "--button-pad-v": `${s.btn_pad_v}px`,
+    "--button-pad-h-primary": `${s.btn_pad_h_primary}px`,
+    "--button-pad-v-primary": `${s.btn_pad_v_primary}px`,
+
+    "--mark-size": `${markSize}px`,
+
+    "--density-padding": `${s.density_padding}px`,
+    "--density-gap": `${s.density_gap}px`,
+    "--card-gap": `${s.card_gap}px`,
+
+    "--focus-thickness": `${s.focus_thickness}px`,
+    "--focus-offset": `${s.focus_offset}px`,
+    "--focus-color": accent,
+
+    "--h1-weight": String(s.h1_weight),
+    "--h2-weight": String(s.h2_weight),
+
+    "--raised-primary-offset": `${s.raised_primary}px`,
+    "--raised-tab-offset": `${s.raised_tab}px`,
+    "--raised-row-offset": `${s.raised_row}px`,
+    "--raised-secondary-offset": `${s.raised_secondary}px`,
+
     "--body-size": `${platform.body}px`,
     "--button-min": `${platform.buttonMin}px`
   };
 }
 
 function styleVars(tokens) {
-  return Object.entries(tokens).map(([key, value]) => `${key}: ${value}`).join("; ");
+  return Object.entries(tokens).map(([k, v]) => `${k}: ${v}`).join("; ");
 }
 
-function controlPanel(direction, mode, platformName = "desktop", compact = false) {
-  const platform = PLATFORM_TOKENS[platformName] || PLATFORM_TOKENS.desktop;
-  const raisedFlag = mode === "raised";
-  return `
-    <article class="nc-board mode-${mode}${compact ? " compact" : ""}" style="${styleVars(deriveTokens(direction, platformName))}" data-direction="${direction.name}" data-raised="${raisedFlag}" data-platform="${platformName}">
-      <div class="nc-board-head">
-        <div>
-          <div class="nc-title-row">
-            <h2>${direction.name}</h2>
-            <span class="nc-chip">${raisedFlag ? "raised=true" : "raised=false"}</span>
-            <span class="nc-chip">${platform.label}</span>
-          </div>
-          <p class="nc-board-copy">${direction.summary}</p>
-        </div>
-        <div class="nc-specs">
-          <div><b>base_color</b><span>${direction.base_color}</span></div>
-          <div><b>accent_color</b><span>${direction.accent_color}</span></div>
-          <div><b>Future class</b><span>${direction.className}</span></div>
-          <div><b>Target</b><span>${direction.target}</span></div>
-        </div>
-      </div>
-      <div class="nc-samples">
-        <section class="nc-panel">
-          <h3>Action hierarchy</h3>
-          <div class="nc-actions">
-            <span class="nc-button primary">Start</span>
-            <span class="nc-button">Options</span>
-            <span class="nc-button ghost">Cancel</span>
-          </div>
-          <div class="nc-control-stack">
-            <div class="nc-field">
-              <label>Input focus</label>
-              <div class="nc-input focused">Player alias</div>
-            </div>
-            <div class="nc-toggle-row">
-              <span class="nc-check"><span class="nc-box"></span>Checked</span>
-              <span class="nc-toggle"><span class="nc-track"><span class="nc-thumb"></span></span>Voice</span>
-            </div>
-          </div>
-        </section>
-        <section class="nc-panel">
-          <h3>Selection and dialog</h3>
-          <div class="nc-tabs">
-            <span class="nc-tab selected">Lobby</span>
-            <span class="nc-tab">Cabinets</span>
-            <span class="nc-tab">Profile</span>
-          </div>
-          <div class="nc-list">
-            <div class="nc-list-row selected"><span class="nc-dot"></span><b>Cabinet A</b><small>ready</small></div>
-            <div class="nc-list-row"><span class="nc-dot"></span><b>Mini-game list</b><small>3 new</small></div>
-            <div class="nc-list-row"><span class="nc-dot"></span><b>Settings row</b><small>stable</small></div>
-          </div>
-          <div class="nc-dialog">
-            <h3>Popup / dialog sample</h3>
-            <p>Solid surface, readable state roles, action emphasis, no production implementation.</p>
-            <div class="nc-actions">
-              <span class="nc-button primary selected">Confirm</span>
-              <span class="nc-button ghost">Back</span>
-            </div>
-          </div>
-        </section>
-        <section class="nc-panel">
-          <h3>State samples</h3>
-          <div class="nc-state-strip">
-            <span class="nc-state">normal</span>
-            <span class="nc-state hover">hover</span>
-            <span class="nc-state focus">focus</span>
-            <span class="nc-state pressed">pressed</span>
-            <span class="nc-state disabled">disabled</span>
-          </div>
-          <div class="nc-swatch-grid">
-            <div class="nc-swatch" style="background: var(--surface-low)"><b>surface low</b><span>${direction.fileStem}</span></div>
-            <div class="nc-swatch" style="background: var(--surface-panel)"><b>surface panel</b><span>panel role</span></div>
-            <div class="nc-swatch" style="background: var(--surface-high)"><b>surface high</b><span>raised role</span></div>
-            <div class="nc-swatch" style="background: var(--accent_color); color: var(--surface-base)"><b>accent</b><span>focus/action</span></div>
-          </div>
-          <div class="nc-type"><b>Type and mobile</b><span>Inter roles, ${platform.density}, body ${platform.body}px, min target ${platform.buttonMin}px</span></div>
-          <div class="nc-radius-row">
-            <span class="nc-radius" style="border-radius: 4px"></span>
-            <span class="nc-radius" style="border-radius: ${direction.radius}px"></span>
-            <span class="nc-radius" style="border-radius: 999px"></span>
-          </div>
-        </section>
-      </div>
-    </article>
-  `;
-}
+/* --- artboard markup ------------------------------------------------------- */
 
 function findDirection(name) {
-  return NEOCADE_DIRECTIONS.find((direction) => direction.name.toLowerCase() === String(name).toLowerCase());
+  return NEOCADE_DIRECTIONS.find((d) => d.name.toLowerCase() === String(name).toLowerCase());
 }
 
-function conceptBrief(direction) {
-  return `
-    <div class="nc-title-row">
-      <h2>${direction.name}</h2>
-      <span class="nc-chip">base ${direction.base_color}</span>
-      <span class="nc-chip">accent ${direction.accent_color}</span>
-      <span class="nc-chip">WCAG ${direction.contrast}</span>
-    </div>
-    <p class="nc-board-copy">${direction.summary}</p>
-    <div class="nc-specs">
-      <div><b>Future class</b><span>${direction.className}</span></div>
-      <div><b>Target</b><span>${direction.target}</span></div>
-      <div><b>Flat behavior</b><span>${direction.flat}</span></div>
-      <div><b>Raised behavior</b><span>${direction.raised}</span></div>
-    </div>
-  `;
-}
-
-function fillDirectionSection(section, direction) {
-  section.setAttribute("style", styleVars(deriveTokens(direction, "desktop")));
-  const conceptImages = section.querySelector("[data-concept-images]");
-  const brief = section.querySelector("[data-concept-brief]");
-  const variants = section.querySelector("[data-variant-pair]");
-  if (conceptImages && conceptImages.children.length === 0) {
-    conceptImages.innerHTML = CONCEPT_VARIANTS.map((variant) => conceptFigure(direction, variant)).join("");
-  }
-  if (brief) {
-    brief.innerHTML = conceptBrief(direction);
-  }
-  if (variants) {
-    variants.innerHTML = `
-      ${controlPanel(direction, "flat", "desktop", true)}
-      ${controlPanel(direction, "raised", "desktop", true)}
-    `;
-  }
-}
-
-function conceptFigure(direction, variant) {
-  const src = direction.conceptImages[variant.key];
-  const raisedLabel = variant.raised ? "raised=true" : "raised=false";
-  return `
-    <figure class="nc-concept-card" data-concept-variant="${variant.key}">
-      <img src="${src}" alt="${direction.name} ${variant.label} fixed-layout dark UI mockup">
-      <figcaption>${variant.label} / ${raisedLabel}</figcaption>
-    </figure>
-  `;
-}
-
-function directionConcept(direction) {
-  const tokens = deriveTokens(direction, "desktop");
-  return `
-    <section class="nc-direction-section" style="${styleVars(tokens)}" data-direction="${direction.name}">
-      <div class="nc-concept-layout">
-        <div class="nc-concept-image-grid" data-concept-images>
-          ${CONCEPT_VARIANTS.map((variant) => conceptFigure(direction, variant)).join("")}
-        </div>
-        <div class="nc-concept-brief">
-          ${conceptBrief(direction)}
-        </div>
-      </div>
-      <div class="nc-variant-pair">
-        ${controlPanel(direction, "flat", "desktop", true)}
-        ${controlPanel(direction, "raised", "desktop", true)}
-      </div>
-    </section>
-  `;
-}
-
-function conceptArtboard(direction, platformName = "desktop", raisedFlag = false) {
-  const tokens = deriveTokens(direction, platformName);
-  const platform = PLATFORM_TOKENS[platformName] || PLATFORM_TOKENS.desktop;
+function conceptArtboard(direction, platformName, raisedFlag) {
+  const tokens = deriveTokens(direction, platformName, raisedFlag);
+  const platform = PLATFORM_TOKENS[platformName];
   const variantLabel = `${platformName === "mobile" ? "Mobile" : "Desktop"} ${raisedFlag ? "raised" : "flat"}`;
+  const s = direction.shape;
+  const dataAttrs = [
+    `data-direction="${direction.name}"`,
+    `data-platform="${platformName}"`,
+    `data-raised="${raisedFlag}"`,
+    `data-tab-shape="${s.tab_shape}"`,
+    `data-mark-shape="${s.mark_shape}"`,
+    `data-primary-strategy="${s.primary_strategy}"`,
+    `data-ghost-strategy="${s.ghost_strategy}"`,
+    `data-focus-style="${s.focus_style}"`,
+    `data-kicker-style="${s.kicker}"`,
+    `data-lift-tabs="${s.lift_tabs}"`,
+    `data-lift-rows="${s.lift_rows}"`,
+    `data-lift-secondary="${s.lift_secondary}"`
+  ].join(" ");
+
   return `
-    <article class="nc-artboard ${platformName} ${raisedFlag ? "mode-raised" : "mode-flat"}" style="${styleVars(tokens)}" data-direction="${direction.name}" data-platform="${platformName}" data-raised="${raisedFlag}" data-fixed-control-order="header-tabs action-panel input-toggle dialog-stack list-tree states-palette">
+    <article class="nc-artboard ${platformName} ${raisedFlag ? "mode-raised" : "mode-flat"}" ${dataAttrs} style="${styleVars(tokens)}">
       <header class="nc-art-top">
         <div class="nc-art-brand">
           <span class="nc-art-mark"></span>
-          <div>
+          <div class="nc-art-brand-text">
             <b>${direction.name}</b>
             <small>${variantLabel} / ${platform.label} / ${direction.contrast}</small>
           </div>
         </div>
-        <nav class="nc-art-tabs" aria-label="Fixed tabs">
-          <span class="selected">Lobby</span>
-          <span>Cabinets</span>
-          <span>Profile</span>
-          <span>Settings</span>
+        <nav class="nc-art-tabs" aria-label="Top nav">
+          <span class="nc-tab selected">Lobby</span>
+          <span class="nc-tab">Cabinets</span>
+          <span class="nc-tab">Profile</span>
+          <span class="nc-tab">Settings</span>
         </nav>
       </header>
 
@@ -411,9 +388,9 @@ function conceptArtboard(direction, platformName = "desktop", raisedFlag = false
         <section class="nc-art-card nc-art-dialog-stack">
           <h2>02 Dialog stack</h2>
           <div class="nc-art-segments">
-            <span class="selected">Lobby</span>
-            <span>Match</span>
-            <span>Audio</span>
+            <span class="nc-tab selected">Lobby</span>
+            <span class="nc-tab">Match</span>
+            <span class="nc-tab">Audio</span>
           </div>
           <div class="nc-art-dialog">
             <b>Popup surface</b>
@@ -428,9 +405,11 @@ function conceptArtboard(direction, platformName = "desktop", raisedFlag = false
 
         <section class="nc-art-card nc-art-list-tree">
           <h2>03 List / tree</h2>
-          <div class="nc-art-list-row selected"><span></span><b>Cabinet A</b><small>ready</small></div>
-          <div class="nc-art-list-row"><span></span><b>Mini-game list</b><small>3 new</small></div>
-          <div class="nc-art-list-row"><span></span><b>Settings row</b><small>stable</small></div>
+          <div class="nc-art-list">
+            <div class="nc-art-list-row selected"><span class="nc-dot"></span><b>Cabinet A</b><small>ready</small></div>
+            <div class="nc-art-list-row"><span class="nc-dot"></span><b>Mini-game list</b><small>3 new</small></div>
+            <div class="nc-art-list-row"><span class="nc-dot"></span><b>Settings row</b><small>stable</small></div>
+          </div>
           <div class="nc-art-scrollbar"><i></i></div>
         </section>
       </div>
@@ -447,10 +426,67 @@ function conceptArtboard(direction, platformName = "desktop", raisedFlag = false
           <span style="background: var(--surface-low)"></span>
           <span style="background: var(--surface-panel)"></span>
           <span style="background: var(--surface-high)"></span>
-          <span style="background: var(--accent_color)"></span>
+          <span style="background: var(--accent)"></span>
         </div>
       </footer>
     </article>
+  `;
+}
+
+/* --- gallery (concept page) ------------------------------------------------ */
+
+function conceptFigure(direction, variant) {
+  const src = direction.conceptImages[variant.key];
+  const raisedLabel = variant.raised ? "raised=true" : "raised=false";
+  return `
+    <figure class="nc-concept-card" data-concept-variant="${variant.key}">
+      <img src="${src}" alt="${direction.name} ${variant.label} fixed-layout dark UI mockup">
+      <figcaption>${variant.label} / ${raisedLabel}</figcaption>
+    </figure>
+  `;
+}
+
+function conceptBrief(direction) {
+  return `
+    <div class="nc-title-row">
+      <h2>${direction.name}</h2>
+      <span class="nc-chip">base ${direction.base_color}</span>
+      <span class="nc-chip">accent ${direction.accent_color}</span>
+      <span class="nc-chip">WCAG ${direction.contrast}</span>
+    </div>
+    <p class="nc-board-copy">${direction.summary}</p>
+    <div class="nc-specs">
+      <div><b>Target use</b><span>${direction.target}</span></div>
+      <div><b>Flat behavior</b><span>${direction.flat}</span></div>
+      <div><b>Raised behavior</b><span>${direction.raised}</span></div>
+      <div><b>Mobile note</b><span>${direction.mobile}</span></div>
+    </div>
+  `;
+}
+
+function fillDirectionSection(section, direction) {
+  const conceptImages = section.querySelector("[data-concept-images]");
+  const brief = section.querySelector("[data-concept-brief]");
+  if (conceptImages && conceptImages.children.length === 0) {
+    conceptImages.innerHTML = CONCEPT_VARIANTS.map((v) => conceptFigure(direction, v)).join("");
+  }
+  if (brief) {
+    brief.innerHTML = conceptBrief(direction);
+  }
+}
+
+function directionConcept(direction) {
+  return `
+    <section class="nc-direction-section" data-direction="${direction.name}">
+      <div class="nc-concept-layout">
+        <div class="nc-concept-image-grid" data-concept-images>
+          ${CONCEPT_VARIANTS.map((v) => conceptFigure(direction, v)).join("")}
+        </div>
+        <div class="nc-concept-brief">
+          ${conceptBrief(direction)}
+        </div>
+      </div>
+    </section>
   `;
 }
 
@@ -461,9 +497,7 @@ function renderConceptGallery() {
   if (staticSections.length > 0) {
     staticSections.forEach((section) => {
       const direction = findDirection(section.dataset.direction);
-      if (direction) {
-        fillDirectionSection(section, direction);
-      }
+      if (direction) fillDirectionSection(section, direction);
     });
     return;
   }
@@ -487,10 +521,6 @@ function renderFinalistPlaceholder() {
     <section class="nc-empty">
       <h2>Plan 03 waits for finalist-selection.md</h2>
       <p>Once the user gate selects 1-3 finalists, this page will render each finalist in the full 4-grid: raised=false desktop, raised=false mobile, raised=true desktop, raised=true mobile, plus base_color and accent_color override previews.</p>
-      <div class="nc-actions">
-        <span class="nc-button primary mobile-preview">platform=MOBILE preview target</span>
-        <span class="nc-button ghost">raised=true support ready</span>
-      </div>
     </section>
   `;
 }
@@ -498,15 +528,9 @@ function renderFinalistPlaceholder() {
 function boot() {
   const page = document.querySelector("[data-gallery]");
   if (!page) return;
-  if (page.dataset.gallery === "concept") {
-    renderConceptGallery();
-  }
-  if (page.dataset.gallery === "concept-image") {
-    renderConceptImage();
-  }
-  if (page.dataset.gallery === "finalist") {
-    renderFinalistPlaceholder();
-  }
+  if (page.dataset.gallery === "concept") renderConceptGallery();
+  if (page.dataset.gallery === "concept-image") renderConceptImage();
+  if (page.dataset.gallery === "finalist") renderFinalistPlaceholder();
 }
 
-boot();
+if (typeof window !== "undefined") boot();
