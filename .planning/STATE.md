@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-05-06)
 
 Phase: 03.3
 Plan: Not started
-Next: /gsd-plan-review-convergence 3.3 --opencode
+Next: /gsd-plan-review-convergence 3.3 --opencode --claude
 Status: Ready to plan
 Last activity: 2026-05-06
 
@@ -144,7 +144,7 @@ Recommended sequence (sequential, simpler):
 
 1. `/gsd-discuss-phase 3.1` → `/gsd-plan-review-convergence 3.1 --opencode` → `/gsd-execute-phase 3.1` → `/gsd-verify-work 3.1`
 2. `/clear` → `/gsd-discuss-phase 3.2` → `/gsd-plan-review-convergence 3.2 --opencode` → `/gsd-execute-phase 3.2` → `/gsd-verify-work 3.2`
-3. `/clear` → `/gsd-discuss-phase 3.3` → `/gsd-plan-review-convergence 3.3 --opencode` → `/gsd-execute-phase 3.3` → text-level user-approval of 5 candidate directions → `/gsd-verify-work 3.3`
+3. `/clear` → `/gsd-discuss-phase 3.3` → `/gsd-plan-review-convergence 3.3 --opencode --claude` → `/gsd-execute-phase 3.3` → text-level user-approval of 5 candidate directions → `/gsd-verify-work 3.3`
 4. `/clear` → `/gsd-discuss-phase 3.4` → `/gsd-plan-review-convergence 3.4 --opencode` → `/gsd-execute-phase 3.4` → user-approval of N final mockups → `/gsd-verify-work 3.4`
 5. Phase 3.4 mockup gate replaces the redirected Phase 3 gate; Phase 4 starts after approval
 
