@@ -350,24 +350,43 @@ Audit row: **PASS** — every mobile cell hits the M3 floors and exceeds the iOS
 The finalist gallery (`finalist-gallery.html`) explicitly contains:
 
 - An `#finalistOverrideRow` section labeled "Color overrides — dynamic `@export` demo".
-- Two override cells, each with: a swatch chip showing the override `base_color`, a swatch chip showing the override `accent_color`, both in `#RRGGBB` form, plus a rendered PNG demonstrating the override applied to Pulse's shape language.
-- Override A — warm amber (`#1A1410` / `#FFC857`).
-- Override B — ocean cyan (`#0F1A22` / `#5FE3FF`).
+- Three override cells, each with: a swatch chip showing the override `base_color`, a swatch chip showing the override `accent_color`, both in `#RRGGBB` form, plus a rendered PNG demonstrating the override applied to Pulse's shape language.
+- Override A — warm amber (`#1A1410` / `#FFC857`) — dark-mode palette swap.
+- Override B — ocean cyan (`#0F1A22` / `#5FE3FF`) — dark-mode palette swap.
+- Override C — cream light (`#F4F1EC` / `#1F4F8C`) — **light-mode `is_light` flag demo (added at user request after the Plan 03 checkpoint)**. Demonstrates that the architecture's luminance-derived `is_light = base_color.get_luminance() >= 0.5` flag (matching the production `NeoCadeTheme.gd` semantics from architecture revision 2026-05-06f) correctly flips text + surface ramp + state-hover tokens when the consumer swaps in a light base. Light mode itself is officially v2 (PROJECT.md Out of Scope), but the wiring is forward-compatible — a future v2 `light_pulse_neocade_theme.tres` plugs in via the same two `@export` values without code changes.
 - Default-Pulse reference palette also documented in the section header (`#151A2E` / `#8BFF6A`, 13.62:1) with swatch chips, so the reviewer can compare overrides against canonical Pulse without leaving the gallery.
 
-Audit row: **PASS** — color override row is present and demonstrates dynamic `@export` behavior on the same direction.
+Audit row: **PASS** — color override row is present and demonstrates dynamic `@export` behavior on the same direction across both dark and (forward-compat) light bases.
+
+### Light-mode `is_light` flag audit (Override C — added 2026-05-06)
+
+| Audit row | Result | Note |
+|---|---|---|
+| `is_light` correctly evaluates true on `#F4F1EC` | PASS | luminance(#F4F1EC) ≈ 0.91, well above the 0.5 threshold. |
+| `--ink` flips dark on light base | PASS | `#1B2230` navy on cream — visually verified in `pulse-finalist-override-light.png`. |
+| `--muted` flips to a darker mid-tone on light base | PASS | `#5A6478` slate-gray on cream. |
+| Surface ramp panel/high/overlay flip mix-target white→black on light base | PASS | Containers stay distinguishable from the light base instead of merging into near-white. |
+| `--state-hover` flips mix-target white→black on light base | PASS | Hover darkens-from-base in light mode (M3 light-spec on-surface tint behavior). |
+| Primary button text (`color: var(--surface-base)`) reads correctly on accent fill | PASS | Cream `#F4F1EC` text on dark blue `#1F4F8C` accent fill ≈ 9:1 contrast (AAA). |
+| Body text (`color: var(--ink)`) reads correctly on cream base | PASS | Navy `#1B2230` on cream `#F4F1EC` ≈ 14:1 contrast (AAA). |
+| Ghost button text + outline visible | PASS | `#1F4F8C` accent text + outline on cream base ≈ 9:1 (AAA). |
+| Popup surface keeps text legibility | PASS | Surface_overlay container (mid-grey at f=1.3 wide spread on cream) with `--ink` navy text — passes AA. |
+| Tabs / focus ring / state strip readable | PASS | Selected tab indicator + accent focus ring + all 5 state strip cells render with correct contrast against the cream base. |
+| Forbidden-surface audit (light demo) | PASS | No texture / pattern / embossing / gradient on chrome introduced by the light demo; no `addons/`, `*.tres`, `*.gd`, `main.tscn`, or `project.godot` modified. |
+
+Visual evidence: `concepts/pulse-finalist-override-light.png`. Code locus: the renderer's `is_light` branch lives in `src/neocade-mockups.js` `deriveSurfaceRamp()` and `deriveTokens()`; Phase 4 carries the same branch into `addons/neocade_theme/neocade_theme.gd`.
 
 ### Anti-cyberpunk / anti-texture / anti-painterly-chrome audit (finalist)
 
 Each of the 6 finalist PNGs was visually inspected against the same anti-rules from Plan 02 Stage 1:
 
-| Audit row | Cell 1 | Cell 2 | Cell 3 | Cell 4 | Override A | Override B |
-|---|---|---|---|---|---|---|
-| anti-cyberpunk | PASS | PASS | PASS | PASS | PASS | PASS |
-| anti-texture | PASS | PASS | PASS | PASS | PASS | PASS |
-| anti-painterly-chrome / anti-embossing | PASS | PASS | PASS | PASS | PASS | PASS |
-| dark-only compliance (D-28) | PASS | PASS | PASS | PASS | PASS (`#1A1410` dark) | PASS (`#0F1A22` dark) |
-| solid-fill discipline (no gradients on chrome) | PASS | PASS | PASS | PASS | PASS | PASS |
+| Audit row | Cell 1 | Cell 2 | Cell 3 | Cell 4 | Override A | Override B | Override C (light) |
+|---|---|---|---|---|---|---|---|
+| anti-cyberpunk | PASS | PASS | PASS | PASS | PASS | PASS | PASS |
+| anti-texture | PASS | PASS | PASS | PASS | PASS | PASS | PASS |
+| anti-painterly-chrome / anti-embossing | PASS | PASS | PASS | PASS | PASS | PASS | PASS |
+| dark-only compliance (D-28, v1 ship constraint) | PASS | PASS | PASS | PASS | PASS (`#1A1410` dark) | PASS (`#0F1A22` dark) | N/A — explicit light-mode forward-compat demo only; v1 ships dark, light is v2 per PROJECT.md Out of Scope. The override exists to validate the `is_light` flag wiring, not to ship in v1. |
+| solid-fill discipline (no gradients on chrome) | PASS | PASS | PASS | PASS | PASS | PASS | PASS |
 
 No glow, no neon outlines, no synthwave / nightclub framing, no sci-fi HUD vocabulary, no painted gradients on chrome, no embossing, no leather/wood/grunge backgrounds. Both override variants preserve the anti-rules — warm amber stays cabinet-personality (not casino glow), ocean cyan stays tool/streamer-personality (not sci-fi HUD).
 

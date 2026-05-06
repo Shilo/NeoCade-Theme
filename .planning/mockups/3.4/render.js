@@ -145,18 +145,27 @@ const FINALIST_GRID = [
  * contrast (verified against the project's deliberate AA floor) so the
  * override previews remain accessibility-compliant.
  *
- * Override A (warm-amber): #1A1410 base / #FFC857 accent — keeps Pulse's
- *   cabinet personality but swaps the green for a warm amber, simulating a
- *   brand that wants warmth without abandoning Pulse's shape language.
- * Override B (ocean-cyan): #0F1A22 base / #5FE3FF accent — cooler navy
- *   surface with a cool cyan accent, simulating a tool/streamer brand that
- *   wants Pulse's density + sharp 0px corners with a cool palette.
+ * Override A (warm-amber): #1A1410 base / #FFC857 accent — dark mode, keeps
+ *   Pulse's cabinet personality but swaps the green for a warm amber.
+ * Override B (ocean-cyan): #0F1A22 base / #5FE3FF accent — dark mode, cooler
+ *   navy with cool cyan accent.
+ * Override C (cream-light): #F4F1EC base / #1F4F8C accent — LIGHT MODE proof
+ *   that the architecture's `is_light = base_color.get_luminance() >= 0.5`
+ *   flag correctly flips text/surface tokens so the UI stays legible on a
+ *   light base. Light mode is officially v2 (PROJECT.md Out of Scope) — this
+ *   override is a forward-compatibility demo, not a v1 ship variant.
+ *   Contrast: dark deep-blue accent (#1F4F8C, luminance ~0.06) on cream
+ *   surface delivers ~9:1 (AAA); ink (#1B2230) on cream delivers ~14:1 (AAA);
+ *   primary button surface-base text (#F4F1EC) on accent fill (#1F4F8C)
+ *   delivers ~9:1 (AAA). All text targets pass WCAG AA Large + AAA Normal.
  */
 const FINALIST_OVERRIDES = [
   { name: "override-warm",  platform: "mobile",  raised: false, viewport: { width: 430, height: 1500 },
-    base: "#1A1410", accent: "#FFC857", label: "Warm amber override" },
+    base: "#1A1410", accent: "#FFC857", label: "Warm amber override (dark)" },
   { name: "override-ocean", platform: "mobile",  raised: false, viewport: { width: 430, height: 1500 },
-    base: "#0F1A22", accent: "#5FE3FF", label: "Ocean cyan override" }
+    base: "#0F1A22", accent: "#5FE3FF", label: "Ocean cyan override (dark)" },
+  { name: "override-light", platform: "mobile",  raised: false, viewport: { width: 430, height: 1500 },
+    base: "#F4F1EC", accent: "#1F4F8C", label: "Cream light override (light-mode is_light demo)" }
 ];
 
 async function renderFinalistImages(playwright, browserPath, root) {

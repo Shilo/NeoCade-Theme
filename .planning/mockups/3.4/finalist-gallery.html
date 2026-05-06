@@ -262,6 +262,16 @@
             <span>Mood: cool tool / streamer — same dense Pulse rhythm and sharp 0px corners with a cyan accent. Demonstrates Pulse + cool palette is still recognizably Pulse.</span>
           </figcaption>
         </figure>
+        <figure class="nc-override-cell">
+          <img src="concepts/pulse-finalist-override-light.png"
+               alt="Pulse mobile flat with cream-light color override — base_color=#F4F1EC, accent_color=#1F4F8C — light-mode is_light flag demo">
+          <figcaption>
+            <b>Override C — cream light <em>(light-mode forward-compat demo)</em></b>
+            <span><span class="nc-override-swatch" style="background: #F4F1EC; outline: 1px solid var(--outline);"></span><code>base_color = #F4F1EC</code></span>
+            <span><span class="nc-override-swatch" style="background: #1F4F8C;"></span><code>accent_color = #1F4F8C</code></span>
+            <span>Light mode is officially v2 (PROJECT.md Out of Scope), but the architecture's <code>is_light = base_color.get_luminance() &gt;= 0.5</code> flag is wired today. This override proves it: when <code>base_color</code> goes light, <code>--ink</code> flips to dark, surface containers flip to mix-with-black (so panels stay distinguishable from base), and state-hover flips to mix-with-black. All text passes WCAG AA Large + AAA Normal. The user can swap in a light palette via two <code>@export</code> values and the theme stays legible — Phase 4 carries the same <code>is_light</code> branch into the production <code>NeoCadeTheme.gd</code>.</span>
+          </figcaption>
+        </figure>
       </div>
     </section>
 

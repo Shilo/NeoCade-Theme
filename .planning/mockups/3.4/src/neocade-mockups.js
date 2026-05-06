@@ -430,12 +430,22 @@ function deriveSurfaceRamp(direction) {
   const base = direction.base_color;
   const accent = direction.accent_color;
   const f = spreadFactor(direction.shape.surface_spread);
+  /* Luminance-derived light-mode flag — mirrors the production NeoCadeTheme
+   * `var is_light: bool = base_color.get_luminance() >= 0.5` semantics from the
+   * 2026-05-06f architecture revision. When base_color is light, the surface
+   * ramp's "elevated container" tints flip from mix-with-white (lifts above
+   * dark base) to mix-with-black (sinks below light base) so containers stay
+   * distinguishable from the page color. surface_low remains mix-with-black in
+   * both modes — it's the recessed shadow color and reads as "below" regardless
+   * of mode. Outline flips with the elevated tier. */
+  const isLight = luminance(base) >= 0.5;
+  const elevateTarget = isLight ? "#000000" : "#ffffff";
   const surface_base = base;
   const surface_low = mix(base, "#000000", 0.18 * f);
-  const surface_panel = mix(base, "#ffffff", 0.06 * f);
-  const surface_high = mix(base, "#ffffff", 0.13 * f);
-  const surface_overlay = mix(base, "#ffffff", 0.20 * f);
-  const outline = mix(base, "#ffffff", 0.24 * f);
+  const surface_panel = mix(base, elevateTarget, 0.06 * f);
+  const surface_high = mix(base, elevateTarget, 0.13 * f);
+  const surface_overlay = mix(base, elevateTarget, 0.20 * f);
+  const outline = mix(base, elevateTarget, 0.24 * f);
   return {
     surface_base,
     surface_low,
@@ -467,8 +477,14 @@ function deriveSurfaceRamp(direction) {
 function deriveTokens(direction, platformName, raisedFlag) {
   const base = direction.base_color;
   const accent = direction.accent_color;
-  const ink = "#F7F8FB";
-  const muted = "#B9C1D0";
+  /* Luminance-derived light-mode flag (matches production
+   * `is_light: bool = base_color.get_luminance() >= 0.5`). v1 directions are
+   * all dark; this branch only fires for color overrides that swap to a light
+   * base. Ink and muted flip to dark so text remains legible on light bases.
+   * Production NeoCadeTheme's text-color generator follows the same rule. */
+  const isLight = luminance(base) >= 0.5;
+  const ink = isLight ? "#1B2230" : "#F7F8FB";
+  const muted = isLight ? "#5A6478" : "#B9C1D0";
   const ramp = deriveSurfaceRamp(direction);
   const s = direction.shape;
   const platform = PLATFORM_TOKENS[platformName];
@@ -516,7 +532,12 @@ function deriveTokens(direction, platformName, raisedFlag) {
     "--surface-overlay-offset": ramp.surface_overlay_offset,
     "--surface-low-offset": ramp.surface_low_offset,
     "--offset": ramp.base_offset,
-    "--state-hover": mix(base, "#ffffff", Math.abs(s.hover_pct) / 100),
+    /* State-layer mix targets flip on is_light. Dark mode: hover lightens
+     * (toward white = "lift"), pressed darkens. Light mode: hover darkens
+     * (toward black = "press"-style emphasis cue, matching M3 light spec where
+     * state layers are on-surface tint = dark on light), pressed darkens
+     * further. */
+    "--state-hover": mix(base, isLight ? "#000000" : "#ffffff", Math.abs(s.hover_pct) / 100),
     "--state-pressed": mix(base, "#000000", Math.abs(s.pressed_pct) / 100),
     "--disabled-opacity": String(s.disabled_opacity),
 
