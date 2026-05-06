@@ -111,14 +111,20 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Depends on**: Nothing (parallel-eligible with Phase 3.1)
 **Requirements**: RES-NEW-03 (Godot editor theme dynamic-color flow research), RES-NEW-04 (`@tool extends Theme` superclass + subclass feasibility validation), RES-NEW-05 (passivestar `_get_base_color` formula port), DOCS-05 (continuous SOURCES.md update)
 **Success Criteria** (what must be TRUE):
-  1. **Feasibility validated FIRST.** Working code spike at `.planning/spikes/dynamic-theme/` proves: (a) `@tool extends Theme` with `@export` props that regenerate entries on change, (b) subclass extends superclass with personality overrides, (c) saved subclass `.tres` applies regenerated entries to Controls at runtime, (d) `OS.has_feature("mobile")` runtime detection for `platform=AUTO`, (e) `.tres` serialization saves exports only (small file), not regenerated entries. ≥4 of 5 must succeed.
+  1. **Feasibility validated FIRST.** Working code spike at `.planning/spikes/dynamic-theme/` proves: (a) `@tool extends Theme` with `@export` props that regenerate entries on change, (b) subclass extends superclass with personality overrides, including the mandatory super-first regeneration rule, (c) saved subclass `.tres` applies regenerated entries to Controls at runtime, (d) layered Godot-only runtime detection for `platform=AUTO` using `OS.has_feature("mobile")`, Web feature tags / `OS.get_name()` where available, and mobile-preferred fallback when ambiguous, (e) `.tres` serialization behavior is inspected and understood. **All strict checks must pass** before the dynamic architecture is locked for Phase 4; any failed or blocked check triggers escalation and fallback recommendation rather than silent downgrade.
   2. **`.planning/research/GODOT-DYNAMIC-THEME-RESEARCH.md` produced.** Documents: editor theme generation flow (from `editor/themes/editor_theme_manager.cpp`), passivestar's `_get_base_color(brightness_offset, saturation_multiplier)` formula re-ported as a runtime-safe `NeoCadeTheme` method, `@tool extends Theme` + `@export` setter recipe for subclassing, runtime API surface (`Theme.set_stylebox/set_color/set_font/set_constant`), `OS.has_feature("mobile")` runtime-detection contract, pitfall catalogue (infinite-loop setter traps, resource serialization, `@tool` editor vs runtime divergence, GL Compatibility compatibility).
   3. **Editor theme reverse-engineering.** `editor/themes/editor_theme_manager.cpp`/`editor_color_map.cpp`/`scene/theme/theme.cpp`/`theme_db.cpp`/`scene/resources/style_box.cpp` enumerated for the patterns that drive dynamic theme entries from base/accent/contrast inputs.
   4. **Anti-pattern audit.** Confirms zero `EditorInterface` / `EditorSettings` / `EDSCALE` references in the proposed runtime-safe architecture (Phase 1 D-05 discipline re-applied).
   5. **SOURCES.md Section 13 added** with adopt/reject/open synthesis. Confidence raised to HIGH if feasibility passes; otherwise LOW with blockers documented.
-  6. **Fallback path documented.** If feasibility fails (≤3 of 5 spike validations succeed), documents a hybrid architecture (e.g., `@tool` generator script produces static `.tres` per variation per the Phase 3 redirect's original plan, but using the formula approach). User is informed; Phase 3.3 + Phase 4 are revised.
+  6. **Fallback path documented.** If any strict feasibility check fails or is blocked, documents fallback options and recommends one strongest fallback for user approval (e.g., a hybrid `@tool` generator script that produces static `.tres` resources from the formula model). User is informed before Phase 3.3 + Phase 4 assume the fallback.
   7. **No `.tres` styling commits** under `addons/neocade_theme/`. Spike `.tres` files live under `.planning/spikes/dynamic-theme/` (research-only, not v1 implementation).
-**Plans**: TBD
+**Plans**:
+- **Wave 0:** `03.2-01-provenance-and-source-map-PLAN.md` — Create the Godot dynamic-theme research artifact skeleton, source map, strict-gate placeholders, and spike evidence table.
+- **Wave 1:** `03.2-02-engine-theme-flow-and-formula-port-PLAN.md` — Reverse-engineer Godot editor theme flow, inventory runtime Theme APIs, and document the passivestar formula port.
+- **Wave 1:** `03.2-03-spike-template-and-visual-scene-PLAN.md` — Build the research-only prototype-template spike under `.planning/spikes/dynamic-theme/`.
+- **Wave 2:** `03.2-04-strict-feasibility-verifier-PLAN.md` — Run strict feasibility validation, serialization inspection, negative-control subclass checks, and AUTO platform validation.
+- **Wave 3:** `03.2-05-architecture-recipe-fallback-and-contract-PLAN.md` — Write the Phase 4 architecture recipe, subclass contract table, AUTO recipe, and fallback recommendation.
+- **Wave 4:** `03.2-06-sources-and-closeout-audit-PLAN.md` — Add SOURCES.md Section 13 and run the final cross-document/no-addon-change audit.
 **UI hint**: no
 **Parallel-eligible with**: Phase 3.1
 
@@ -279,7 +285,7 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 | 2. Source-Dive: LDtk source | 5/5 | Complete | 2026-05-04 |
 | 3. Visual Direction (v0) | n/a | REDIRECTED 2026-05-04 | preserved as historical reference |
 | 3.1 Source-Dive: MD3 + MD3 Expressive + Flat-3D Game UI | 6/6 | Complete    | 2026-05-06 |
-| 3.2 Source-Dive: Godot Dynamic Theme Architecture | 0/TBD | Not started (parallel-eligible with 3.1) | - |
+| 3.2 Source-Dive: Godot Dynamic Theme Architecture | 0/6 | Planned | - |
 | 3.3 Theme Direction Research (5 candidate directions) | 0/TBD | Not started | - |
 | 3.4 Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat) | 0/TBD | Not started | - |
 | 4. Foundation: `NeoCadeTheme` Superclass + Subclasses + Fonts + Icons | 0/TBD | Not started | - |
