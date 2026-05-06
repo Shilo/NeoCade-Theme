@@ -2,7 +2,7 @@
 
 **Phase:** 03.3-theme-direction-research  
 **Created:** 2026-05-06  
-**Status:** In progress; Plan 01 survey complete; Plan 02 synthesis pending.
+**Status:** In progress; Plan 01 and Plan 02 complete; Plan 03 closeout and approval checkpoint pending.
 
 ## Provenance and Scope
 
@@ -94,15 +94,123 @@ Coverage notes:
 
 ## v0 Feedback DNA Mapping
 
-Pending Plan 02.
+Per D-01, D-01b, D-01c, D-04, and D-05, v0 directions are DNA inputs, not automatic carryovers. Boardwalk Sunset is hard-rejected and contributes no direction identity; the only usable lesson is "flat/simple felt closer", which is already absorbed by the universal flat-MD3 mandate.
+
+| v0 direction | Liked DNA to extract | Rejected traits to drop | Eligible downstream use | Candidate direction(s) informed |
+|---|---|---|---|---|
+| Midnight Marquee | Dark surface, saturated accent energy, LDtk-like arcade/control-panel color confidence. | 3D elements, textured background panels, painterly venue mood. | Color and energy DNA only, flattened through MD3 roles. | ArcadePulse |
+| Boardwalk Sunset | Only the flat/simple lesson, already covered by D-01c. | Hard-rejected; warm leather/old-fashioned mood, textured/painterly background, baseline recommendation status. | No downstream direction identity; no name carryover. | None |
+| Cabinet Chrome | Dark/clean palette similar to Midnight Marquee, professional arcade/editor confidence. | 3D cabinet framing, chrome/material cue, texture. | Color restraint and neutral-ramp DNA only. | ArcadePulse; OrbitalSlate |
+| Prize Pop Plaza | Childish, friendly, mobile-game vibe; simple raised interactables can work when built from flat fills. | Texture, embossing, jelly/painterly material, asset-art dependency. | Personality lineage may survive because the user loved the concept after flat/extruded-flat filtering. | PrizePopPlaza |
+| Orbital Playdeck | Modern/safest dark theme, big buttons, color only where it matters, nice iOS-like rounding. | Textured backgrounds and any space/sci-fi HUD drift. | Modern minimal dark and restrained accent DNA. | OrbitalSlate |
 
 ## Candidate Directions
 
-Pending Plan 02.
+Shared direction constraints: All five are peer candidates per D-03 and D-03b. No base direction is selected here; base direction deferred to Phase 3.4. Each direction must work through the same dynamic `NeoCadeTheme` export model: `raised`, `platform`, `base_color`, and `accent_color`. D-06 seeded archetypes were retained because the survey provided evidence for all five anchors. D-14 and D-15 naming rules are applied through PascalCase future subclass names ending in `NeoCadeTheme`, with no cyber/synth/noir-coded names. D-16 carries Inter Variable Roman, dynamic superclass compatibility, and coverage discipline into every direction.
+
+### ArcadePulseNeoCadeTheme
+
+- Direction display name: Arcade Pulse
+- Future subclass form: ArcadePulseNeoCadeTheme
+- Suggested future `.tres` filename stem: `arcade_pulse_neocade_theme`
+- Base color: #151A2E
+- Accent color: #8BFF6A
+- Contrast ratio: 13.62:1 - WCAG AA PASS
+- Personality / palette / mood summary: Dark saturated arcade energy with a near-navy control-panel base and a lively green accent that reads like active cabinet buttons, not nightclub glow. The mood is social, fast, and clear: a vibrant arcade hall by day with the lights on and the UI doing the work. It takes the Midnight Marquee and Cabinet Chrome color DNA but removes all 3D, texture, chrome, and mood-board haze.
+- Target use case: Multiplayer arcade lobbies, action-game menus, streamer-friendly tool surfaces, and dark runtime/editor UI where strong active states matter.
+- Flat-mode behavior: Solid tonal surfaces use the base as the root/panel family, with the accent reserved for primary actions, selected tabs, focus rings, and high-value toggles.
+- Raised-mode behavior: Filled buttons and selected chip/tab surfaces gain small extruded-flat offset duplicates in darker tonal variants; panels, inputs, lists, and passive labels stay flat for density.
+- Mobile-sizing notes: Mobile keeps the same personality but increases button/toggle targets toward iOS 44pt and Android 48dp floors; the bright accent is limited to action/focus roles so small screens do not become noisy.
+- DNA inputs used: Midnight Marquee palette love; Cabinet Chrome dark-clean palette; Boardwalk Sunset rejection as a no-texture reminder only.
+- Commercial examples used: Brawl Stars screenshot collection for strong action hierarchy; SunGraphica for dark flat game UI breadth; Material Web for role-token discipline.
+- Rationale: Phase 3.1 supports saturated but controlled color, state layers, and MD3 surface roles; Phase 3.2 supports export-driven base/accent regeneration through one subclass. This direction satisfies D-03 by taking the dark saturated arcade anchor, D-03b by supporting both flat/raised and desktop/mobile, and D-16 by staying Inter-only and Theme-compatible.
+- Filter audit status: PASS; see Filter Audit Summary.
+
+### OrbitalSlateNeoCadeTheme
+
+- Direction display name: Orbital Slate
+- Future subclass form: OrbitalSlateNeoCadeTheme
+- Suggested future `.tres` filename stem: `orbital_slate_neocade_theme`
+- Base color: #111820
+- Accent color: #8BD3FF
+- Contrast ratio: 10.94:1 - WCAG AA PASS
+- Personality / palette / mood summary: Calm modern minimal dark with cool slate surfaces, restrained blue accenting, and iOS-like rounding. The personality is the "safest modern" candidate: polished, readable, and quiet without becoming corporate-flat or sci-fi. It preserves Orbital Playdeck's safety and big-button clarity while dropping textured/space-ui baggage.
+- Target use case: Desktop tools, editor-style runtime UIs, settings-heavy games, launchers, and projects that want a premium dark default.
+- Flat-mode behavior: Most controls use subtle tonal separation and clear focus rings; the accent appears only in primary actions, selection, caret/focus, and important active states.
+- Raised-mode behavior: Raised mode is restrained: 1-2px hard offset or stronger outline on primary/button-like controls only, with no lifted shells or decorative depth.
+- Mobile-sizing notes: Mobile mode keeps the quiet palette but expands spacing and button-like constants toward 44pt/48dp floors; focus rings stay high-contrast because the accent is sparse.
+- DNA inputs used: Orbital Playdeck modern/dark/big-button DNA; Cabinet Chrome clean dark palette; rejected Orbital texture as a hard boundary.
+- Commercial examples used: Material Web theming for token hierarchy; Android Developers Material 3 guidance for role pairing; Kenney UI Pack for restrained reusable shapes.
+- Rationale: Phase 3.1's MD3 role system and state-layer discipline are strongest here; Phase 3.2's dynamic subclass contract lets this direction tune profile values without losing full base coverage. This direction covers the modern minimal dark D-06 anchor while still satisfying D-03b universal axes and D-14/D-15 naming.
+- Filter audit status: PASS; see Filter Audit Summary.
+
+### PrizePopPlazaNeoCadeTheme
+
+- Direction display name: Prize Pop Plaza
+- Future subclass form: PrizePopPlazaNeoCadeTheme
+- Suggested future `.tres` filename stem: `prize_pop_plaza_neocade_theme`
+- Base color: #FFF4FA
+- Accent color: #7B1B55
+- Contrast ratio: 9.19:1 - WCAG AA PASS
+- Personality / palette / mood summary: Friendly, childlike, and mobile-game-bright with a soft candy-counter base and deep berry accent. This is the playful bubbly option, but "bubbly" is personality, not material: it remains flat, solid, and clean in normal mode. The name survives because the user explicitly loved the concept, while the old textured/embossed treatment does not.
+- Target use case: Casual games, cozy menus, tutorial-heavy experiences, family-friendly apps, and mobile-first game UIs that need warmth without asset-art dependency.
+- Flat-mode behavior: Controls use rounded solid fills, generous state-layer contrast, and cheerful but sparse accent placement; backgrounds stay simple and unillustrated.
+- Raised-mode behavior: Buttons, stepper-like controls, and selected playful affordances can use 3-5px extruded-flat offsets; large panels and text inputs remain flat so the theme does not become toy-like chrome.
+- Mobile-sizing notes: Mobile mode leans into larger buttons and toggles with 44pt/48dp minimum targets, while desktop mode tempers spacing to remain usable for editor/runtime panels.
+- DNA inputs used: Prize Pop Plaza loved personality; user exemplar flat/raised button grammar; Boardwalk Sunset rejection prevents warm textured drift.
+- Commercial examples used: HCGames Flat GUI, fajrulaslim UI Button Flat Design, GameArt2D, MODI, Pinky UI, and Royal Match.
+- Rationale: Phase 3.1 validates extruded-flat as a solid top shape plus offset darker duplicate; MD3 Expressive supports stronger static personality through color, shape, and hierarchy. Phase 3.2 lets the same subclass support flat/raised and desktop/mobile from exports, satisfying D-03b and D-16.
+- Filter audit status: PASS; see Filter Audit Summary.
+
+### DaybreakLobbyNeoCadeTheme
+
+- Direction display name: Daybreak Lobby
+- Future subclass form: DaybreakLobbyNeoCadeTheme
+- Suggested future `.tres` filename stem: `daybreak_lobby_neocade_theme`
+- Base color: #EAF7F1
+- Accent color: #006A68
+- Contrast ratio: 5.85:1 - WCAG AA PASS
+- Personality / palette / mood summary: Welcoming daylight arcade by day: mint-clean surfaces, teal wayfinding, and a lighter social-lobby mood. This direction exists to keep the five-theme spread honest; it is not a global light-mode system and does not create a new export axis. It should feel approachable and fresh while staying reusable for serious controls.
+- Target use case: Community hubs, onboarding flows, cozy game menus, family-friendly settings screens, and bright mobile experiences.
+- Flat-mode behavior: Flat mode uses clear high-contrast teal for primary/focus/selection and keeps secondary surfaces quiet through MD3 tonal roles rather than illustration.
+- Raised-mode behavior: Raised mode adds tactile depth mainly to primary actions and cards-as-actions; ordinary panels, lists, and text fields remain flat for readability.
+- Mobile-sizing notes: Mobile mode uses the same 44pt iOS and 48dp Android floor language as the other directions, with slightly more breathing room around touch clusters to preserve the daylight calm.
+- DNA inputs used: Phase 3.1 daylight-friendly gap; HCGames/GameArt2D/Kenney friendliness; the "vibrant arcade hall by day" project identity.
+- Commercial examples used: HCGames, GameArt2D, Kenney, Pinky UI, Royal Match, and Android Developers Expressive Wear guidance.
+- Rationale: MD3/MD3 Expressive supports brighter tonal seeds and accessible role pairing, while NeoCade's dynamic base/accent exports let a bright default remain user-adjustable. This direction satisfies D-03 by widening personality spread and D-03b by treating desktop/mobile and flat/raised as universal, not identity.
+- Filter audit status: PASS; see Filter Audit Summary.
+
+### FestivalBurstNeoCadeTheme
+
+- Direction display name: Festival Burst
+- Future subclass form: FestivalBurstNeoCadeTheme
+- Suggested future `.tres` filename stem: `festival_burst_neocade_theme`
+- Base color: #20112E
+- Accent color: #FFD166
+- Contrast ratio: 12.33:1 - WCAG AA PASS
+- Personality / palette / mood summary: The maximum MD3 Expressive statement: bold, celebratory, high-contrast, and saturated without using glow or nightclub cues. A deep plum base keeps the UI grounded while the warm gold accent makes primary action and focus feel event-like. It is the loudest candidate, intended to test how expressive NeoCade can be while staying professional.
+- Target use case: Mini-game launchers, achievement/reward surfaces, party-game menus, showcase scenes, and brand-forward projects that still need all controls to be readable.
+- Flat-mode behavior: Flat mode uses a disciplined dark surface ladder with the accent for critical actions, focus, selected states, progress, and reward-like callouts.
+- Raised-mode behavior: Raised mode can use stronger extruded-flat button offsets and bolder corner radii on button-like controls, but range controls, inputs, tree/list rows, and panels stay stable and flat.
+- Mobile-sizing notes: Mobile mode preserves the celebratory accent but enlarges touch affordances to 44pt/48dp targets and avoids filling every row with gold, which would reduce scan speed.
+- DNA inputs used: Phase 3.1 MD3 Expressive findings; Prize Pop Plaza friendliness at a more polished intensity; Midnight/Cabinet dark arcade grounding.
+- Commercial examples used: Google Expressive research, Material 3 Expressive official blog, Android Developers Blog for M3 Expressive, fajrulaslim, MODI, SunGraphica, and Brawl Stars.
+- Rationale: This direction is the D-06 expressive statement anchor. It uses MD3 Expressive's static levers - color confidence, shape, containment, and emphasis - while Phase 3.2's superclass/subclass model keeps the implementation deterministic and complete.
+- Filter audit status: PASS; see Filter Audit Summary.
 
 ## Filter Audit Summary
 
-Pending Plan 02.
+DESIGN-NEW-DIR-02 and D-07 audit result: all five directions pass after applying universal flat-MD3, anti-texture, anti-cyberpunk, and dynamic-export constraints.
+
+| Direction | anti-cyberpunk | anti-texture | universal-axes-still-work | no base-direction preselection | no mockup or `.tres` output |
+|---|---|---|---|---|---|
+| ArcadePulse | PASS: Arcade energy is role/color hierarchy, not synth/noir framing. | PASS: Solid dark surfaces, no patterns, no embossing, no chrome material. | PASS: flat-mode surface uses #151A2E tonal ladder with #8BFF6A as action/focus; raised-mode depth uses small darker offset on pressable controls; mobile sizing explicitly respects 44pt iOS and 48dp Android floors. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
+| OrbitalSlate | PASS: "Orbital" is retained as modern calm, not space HUD vocabulary. | PASS: Minimal dark surfaces and outlines only. | PASS: flat-mode surface stays quiet and role-driven; raised-mode depth is restrained 1-2px offset/outline for primary actions; mobile sizing expands touch controls to 44pt/48dp while preserving sparse accent. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
+| PrizePopPlaza | PASS: Playful mobile-game tone has no dystopian or scanline framing. | PASS: Candy-like mood is expressed through solid color and shape, not texture, emboss, or glossy material. | PASS: flat-mode surface uses cheerful solids; raised-mode depth uses 3-5px extruded-flat offsets on button-like controls; mobile sizing uses 44pt/48dp targets and denser desktop restraint. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
+| DaybreakLobby | PASS: Daylight social-lobby mood is explicitly non-noir. | PASS: Clean mint/teal solids, no leather/wood/grunge/painterly treatment. | PASS: flat-mode surface uses bright tonal roles and teal focus/action; raised-mode depth lifts only actions/cards-as-actions; mobile sizing adds touch breathing room while meeting 44pt/48dp floors. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
+| FestivalBurst | PASS: Expressive does not mean synth/nightclub; no glow or sci-fi HUD dependency. | PASS: Event-like emphasis comes from color contrast, not decorative materials. | PASS: flat-mode surface uses deep plum role ladder with warm accent; raised-mode depth allows stronger offsets on key buttons only; mobile sizing keeps 44pt/48dp controls and limits accent saturation in dense rows. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
+
+No direction is differentiated by being flat, raised, desktop, mobile, or base. All five are personality directions that support the same export axes.
 
 ## User Approval Checkpoint
 
@@ -119,3 +227,15 @@ Pending Plan 03. Approval is text-level only per D-12 and D-13. No mockups, desi
 | inspiration-only language | PASS: every external row uses adopt/reject/open notes and states inspiration-only adoption boundaries. |
 | no mockup/image/addon/theme `.tres`/font/icon/scene/project file intentionally changed | PASS: Plan 01 edits are limited to this research document and `.planning/STATE.md` workflow metadata. |
 | phase boundary | PASS: document states no mockups, no concept images, no production theme resources, no addon files, and no `.tres` styling commits. |
+
+### 2026-05-06 - Plan 02 direction synthesis and filter audit
+
+| Check | Result |
+|---|---|
+| v0 DNA mapping | PASS: Midnight Marquee, Boardwalk Sunset, Cabinet Chrome, Prize Pop Plaza, and Orbital Playdeck are mapped with liked DNA, rejected traits, and downstream use. |
+| Boardwalk Sunset handling | PASS: hard-rejected and not carried forward as a candidate direction. |
+| candidate count | PASS: exactly five peer candidate directions were documented: ArcadePulse, OrbitalSlate, PrizePopPlaza, DaybreakLobby, and FestivalBurst. |
+| D-06 archetype validation | PASS: all five seeded anchors had commercial survey support, so no replacement archetype was needed. |
+| contrast verification | PASS: all base/accent pairs exceed the deliberate 4.5:1 WCAG AA floor for normal text/icons/focus usage. |
+| universal axes | PASS: every direction documents flat-mode behavior, raised-mode behavior, and mobile-sizing notes; none is the flat, raised, desktop, mobile, or base theme. |
+| filter audit | PASS: every direction passes anti-cyberpunk, anti-texture, universal-axes-still-work, no-base-preselection, and no-mockup/no-.tres checks. |
