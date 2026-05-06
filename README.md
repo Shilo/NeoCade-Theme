@@ -405,3 +405,9 @@ The task still runs Git under the hood, but you can trigger it from VS Code with
 ## 📦 Dependencies
 
 None.
+
+## 🔁 Used By
+
+- [Tyle Map Editor](https://github.com/Shilo/tyle-map-editor) - uses NeoCade Theme as a child subtree at `addons/tyle_map_editor/neocade_theme`.
+- [PentaTile](https://github.com/Shilo/PentaTile) - receives NeoCade Theme recursively through Tyle Map Editor at `addons/penta_tile/tyle_map_editor/neocade_theme`.
+- [VirtuMap](https://github.com/Shilo/VirtuMap) - receives NeoCade Theme recursively through PentaTile and Tyle Map Editor at `addons/virtumap/penta_tile/tyle_map_editor/neocade_theme`.
