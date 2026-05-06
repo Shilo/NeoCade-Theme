@@ -124,19 +124,23 @@ h3 {
 
 .nc-concept-layout {
   display: grid;
-  grid-template-columns: minmax(640px, 1.3fr) minmax(320px, 0.7fr);
-  gap: 18px;
-  align-items: stretch;
-  padding: 18px;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  padding: 24px;
   background: var(--panel);
   border-bottom: 1px solid var(--line);
 }
 
 .nc-concept-image-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) repeat(2, minmax(160px, 0.42fr));
-  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
   align-items: start;
+}
+
+/* Desktop variant spans the full width row above the two mobile columns. */
+.nc-concept-card[data-concept-variant="desktopFlat"] {
+  grid-column: 1 / -1;
 }
 
 .nc-concept-card { display: grid; gap: 8px; margin: 0; }
@@ -150,7 +154,11 @@ h3 {
   background: var(--panel-high);
 }
 
-.nc-concept-card[data-concept-variant="desktopFlat"] img { aspect-ratio: 16 / 9; }
+.nc-concept-card[data-concept-variant="desktopFlat"] img {
+  aspect-ratio: 16 / 9;
+  max-width: 1280px;
+  margin-inline: auto;
+}
 .nc-concept-card[data-concept-variant="mobileFlat"] img,
 .nc-concept-card[data-concept-variant="mobileRaised"] img {
   aspect-ratio: 430 / 932;
@@ -159,7 +167,13 @@ h3 {
 
 .nc-concept-card figcaption { color: var(--muted); font-size: 0.84rem; font-weight: 700; }
 
-.nc-concept-brief { display: grid; align-content: start; gap: 14px; min-width: 0; }
+.nc-concept-brief {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+  max-width: 880px;
+}
 
 .nc-concept-brief .nc-title-row {
   display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
@@ -207,7 +221,6 @@ h3 {
 
 @media (max-width: 1100px) {
   .nc-header,
-  .nc-concept-layout,
   .nc-concept-image-grid { grid-template-columns: 1fr; }
 }
 
