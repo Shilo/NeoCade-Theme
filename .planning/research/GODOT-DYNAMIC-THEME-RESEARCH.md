@@ -132,15 +132,28 @@ Plan 03 is unblocked: this formula port is now populated and avoids editor-only 
 
 ## Dynamic Theme Spike Evidence
 
+Spike artifacts live under `.planning/spikes/dynamic-theme/` only (`SPIKE-03.2`). They are research evidence, not addon implementation.
+
+| Artifact | Role |
+|----------|------|
+| `README.md` | Research-only boundary, run commands, limitations, and representative subset declaration. |
+| `SpikeNeoCadeTheme.gd` | Dynamic superclass prototype with exported knobs, formula-derived surfaces, platform resolution, and required subset generation. |
+| `PrizePopSpikeNeoCadeTheme.gd` | Positive subclass: calls `super._regenerate()` first and adds a documented direct Button override marker. |
+| `BrokenNoSuperSpikeTheme.gd` | Negative subclass: skips `super._regenerate()` so missing entries can be detected. |
+| `prize_pop_spike_neocade_theme.tres` | Saved positive Theme resource. |
+| `broken_no_super_spike_theme.tres` | Saved negative Theme resource. |
+| `dynamic_theme_spike.tscn` | Visual scene using Button, OptionButton, CheckBox, LineEdit, Tree, PopupMenu, Window, and HScrollBar. |
+| `verify_dynamic_theme_spike.gd` | Headless verifier script for strict checks. |
+
 | Evidence item | What must be shown | Evidence mode | Status | Notes |
 |---------------|--------------------|---------------|--------|-------|
-| Export-driven regeneration | Required representative controls change when exports change | Pending | PENDING | Required controls: Button, OptionButton, CheckBox, LineEdit, Tree, PopupMenu, Window, ScrollBar |
-| Correct subclass | Good subclass retains superclass entries and adds personality overrides | Pending | PENDING | Must include at least one direct documented override |
-| Negative subclass | Bad subclass omits `super._regenerate()` and verifier catches missing entries | Pending | PENDING | Prevents false confidence in resource-level inheritance |
-| Runtime saved `.tres` | Saved resource loads and can be applied to a scene/control tree | Pending | PENDING | Production addon untouched |
-| Serialization | Saved resource records script refs and exported values | Pending | PENDING | Generated entries may be runtime/editor-time output depending on Godot behavior |
-| AUTO local/simulated | Desktop, mobile, Web desktop, Web mobile, ambiguous Web, and forced modes are covered | Pending | PENDING | Godot-only fallback; no JS bridge in v1 research |
-| Anti-pattern audit | Spike avoids editor-only APIs and addon implementation edits | Pending | PENDING | See Anti-Pattern Audit |
+| Export-driven regeneration | Required representative controls change when exports change | EXECUTED | READY FOR PLAN 04 GATE | Verified once during Plan 03 smoke run; Plan 04 records formal results. |
+| Correct subclass | Good subclass retains superclass entries and adds personality overrides | EXECUTED | READY FOR PLAN 04 GATE | `PrizePopSpikeNeoCadeTheme` sets `Button.prize_pop_direct_override_marker`. |
+| Negative subclass | Bad subclass omits `super._regenerate()` and verifier catches missing entries | EXECUTED | READY FOR PLAN 04 GATE | `BrokenNoSuperSpikeTheme` only sets Button entries. |
+| Runtime saved `.tres` | Saved resource loads and can be applied to a scene/control tree | EXECUTED | READY FOR PLAN 04 GATE | Production addon untouched. |
+| Serialization | Saved resource records script refs and exported values | EXECUTED | READY FOR PLAN 04 GATE | Verifier saves/loads a `user://` roundtrip copy. |
+| AUTO local/simulated | Desktop, mobile, Web desktop, Web mobile, ambiguous Web, and forced modes are covered | EXECUTED | READY FOR PLAN 04 GATE | Godot-only fallback; no JS bridge in v1 research. |
+| Anti-pattern audit | Spike avoids editor-only APIs and addon implementation edits | STATIC-FALLBACK | READY FOR PLAN 04 GATE | Formal file-scope audit occurs in Plan 06. |
 
 ## Subclass Contract
 
@@ -195,3 +208,4 @@ Pending Plan 05. This recipe must be marked LOCKED only if the strict feasibilit
 |------|------|--------------|--------|
 | 2026-05-06 | 01 | Research artifact created with required sections, source labels, strict gate rows, spike evidence matrix, no-addon boundary, and anti-pattern audit skeleton | PASS |
 | 2026-05-06 | 02 | Godot source inspection populated editor generation flow, runtime Theme APIs, StyleBoxFlat constraints, formula port, and anti-pattern decisions | PASS |
+| 2026-05-06 | 03 | Research-only dynamic Theme spike artifacts created under `.planning/spikes/dynamic-theme/`; smoke verifier passed on Godot 4.6.2 | PASS |

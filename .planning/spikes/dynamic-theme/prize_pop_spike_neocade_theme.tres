@@ -1,0 +1,10 @@
+[gd_resource type="Theme" script_class="PrizePopSpikeNeoCadeTheme" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://.planning/spikes/dynamic-theme/PrizePopSpikeNeoCadeTheme.gd" id="1_theme_script"]
+
+[resource]
+script = ExtResource("1_theme_script")
+base_color = Color(0.145098, 0.156863, 0.215686, 1)
+accent_color = Color(0.207843, 0.823529, 1, 1)
+raised = true
+platform = 2

@@ -1,0 +1,10 @@
+[gd_resource type="Theme" script_class="BrokenNoSuperSpikeTheme" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://.planning/spikes/dynamic-theme/BrokenNoSuperSpikeTheme.gd" id="1_theme_script"]
+
+[resource]
+script = ExtResource("1_theme_script")
+base_color = Color(0.145098, 0.156863, 0.215686, 1)
+accent_color = Color(1, 0.309804, 0.721569, 1)
+raised = false
+platform = 2

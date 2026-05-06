@@ -1,0 +1,51 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Theme" path="res://.planning/spikes/dynamic-theme/prize_pop_spike_neocade_theme.tres" id="1_theme"]
+
+[node name="DynamicThemeSpike" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("1_theme")
+
+[node name="Layout" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+
+[node name="Button" type="Button" parent="Layout"]
+layout_mode = 2
+text = "Prize Pop Button"
+
+[node name="OptionButton" type="OptionButton" parent="Layout"]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Layout"]
+layout_mode = 2
+text = "Cabinet is live"
+
+[node name="LineEdit" type="LineEdit" parent="Layout"]
+layout_mode = 2
+text = "Player handle"
+
+[node name="Tree" type="Tree" parent="Layout"]
+custom_minimum_size = Vector2(360, 120)
+layout_mode = 2
+
+[node name="HScrollBar" type="HScrollBar" parent="Layout"]
+layout_mode = 2
+max_value = 100.0
+value = 42.0
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+
+[node name="Window" type="Window" parent="."]
+title = "Spike Window"
+initial_position = 1
+size = Vector2i(320, 160)
