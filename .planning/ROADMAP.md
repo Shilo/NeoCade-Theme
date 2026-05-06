@@ -121,10 +121,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**:
 - **Wave 0:** `03.2-01-provenance-and-source-map-PLAN.md` — Create the Godot dynamic-theme research artifact skeleton, source map, strict-gate placeholders, and spike evidence table.
 - **Wave 1:** `03.2-02-engine-theme-flow-and-formula-port-PLAN.md` — Reverse-engineer Godot editor theme flow, inventory runtime Theme APIs, and document the passivestar formula port.
-- **Wave 1:** `03.2-03-spike-template-and-visual-scene-PLAN.md` — Build the research-only prototype-template spike under `.planning/spikes/dynamic-theme/`.
-- **Wave 2:** `03.2-04-strict-feasibility-verifier-PLAN.md` — Run strict feasibility validation, serialization inspection, negative-control subclass checks, and AUTO platform validation.
-- **Wave 3:** `03.2-05-architecture-recipe-fallback-and-contract-PLAN.md` — Write the Phase 4 architecture recipe, subclass contract table, AUTO recipe, and fallback recommendation.
-- **Wave 4:** `03.2-06-sources-and-closeout-audit-PLAN.md` — Add SOURCES.md Section 13 and run the final cross-document/no-addon-change audit.
+- **Wave 2 *(blocked on Wave 1 completion)*:** `03.2-03-spike-template-and-visual-scene-PLAN.md` — Build the research-only prototype-template spike under `.planning/spikes/dynamic-theme/`, consuming Plan 02's formula-port recipe before finalizing `_regenerate()` logic.
+- **Wave 3 *(blocked on Wave 2 completion)*:** `03.2-04-strict-feasibility-verifier-PLAN.md` — Run strict feasibility validation, serialization inspection, negative-control subclass checks, AUTO platform validation, and Godot-unavailable fallback evidence protocol.
+- **Wave 4 *(blocked on Wave 3 completion)*:** `03.2-05-architecture-recipe-fallback-and-contract-PLAN.md` — Write the Phase 4 architecture recipe, subclass contract table, AUTO recipe, regeneration performance note, and fallback recommendation.
+- **Wave 5 *(blocked on Wave 4 completion)*:** `03.2-06-sources-and-closeout-audit-PLAN.md` — Add SOURCES.md Section 13 and run the final cross-document/no-addon-change audit.
 **UI hint**: no
 **Parallel-eligible with**: Phase 3.1
 
