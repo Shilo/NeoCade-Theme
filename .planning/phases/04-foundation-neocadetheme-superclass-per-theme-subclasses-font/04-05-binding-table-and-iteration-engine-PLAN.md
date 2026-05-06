@@ -19,11 +19,14 @@ must_haves:
     - "**D-06** Phase 4 baseline coverage achieved here: this plan ships the BINDING_TABLE + iteration engine that produces the 37/37 baseline pass — the binding table covers every one of the 37 scorecard Controls (CANONICAL list frozen below; Cross-AI Cycle 1 C1 fix) so SC#7 closes by Phase 4 end."
     - "**D-07** Baseline depth is full formula state coverage: the BINDING_TABLE entries authored by this plan populate Button's normal/hover/pressed/focus/disabled/hover_pressed; Tree's 16 styleboxes; LineEdit's normal/focus/read_only; PopupMenu's panel/hover/separator + labeled separators; Window's embedded_border/embedded_unfocused_border; HScrollBar's scroll/grabber/grabber_highlight/grabber_pressed. Phases 5/6/7 are POLISH passes only."
     - "**D-09** SC#7 is read STRICTLY here: every Control type has every required slot present (formula-derived) + every variation type registered with its required fonts; verified via Plan 04-06's `_phase4_verify.gd` helper. Final COV-10 check happens in Phase 10."
-    - "`addons/neocade_theme/neocade_theme.gd` declares a constant `BINDING_TABLE` (a `Dictionary` compiled into the file) keyed by `theme_type` → `data_type` (`stylebox`/`color`/`constant`/`font`/`font_size`/`icon`) → `slot_name` → recipe metadata."
+    - "`addons/neocade_theme/neocade_theme.gd` declares a constant `BINDING_TABLE` (a `Dictionary` compiled into the file) keyed by `theme_type` → `data_type` (`stylebox`/`color`/`constant`/`font_size`/`icon`) → `slot_name` → recipe metadata. **Cross-AI Cycle 2 N1 fix:** the `font` data type is REMOVED from the schema — per-Control fonts go through `theme.default_font` (set by Plan 04-04 derivation block) and explicit `set_font()` calls on the 14 type variations (PITFALLS 1.2). No base Control needs a per-slot font binding (verified against MINIMAL-THEME-DISSECTION.md: zero base Controls set `font` slots in upstream)."
     - "**CANONICAL 37 ROW FREEZE (Cross-AI Cycle 1 C1 fix; sourced verbatim from MINIMAL-THEME-COVERAGE-DELTA.md §Coverage Scorecard):** AcceptDialog, Button, CheckBox, CheckButton, CodeEdit, ColorPicker, ColorPickerButton, ConfirmationDialog, FileDialog, FoldableContainer, GraphEdit, HScrollBar, HSlider, HSplitContainer, ItemList, Label, LineEdit, LinkButton, MenuBar, MenuButton, OptionButton, Panel, PopupMenu, PopupPanel, ProgressBar, RichTextLabel, SpinBox, TabBar, TabContainer, TextEdit, TooltipLabel, TooltipPanel, Tree, VScrollBar, VSlider, VSplitContainer, Window. **Count = 37 exact. NO executor discretion to add or drop. NO 'select 37 from 39'.** Bucket reconciliation: 24 themed-in-upstream + 1 Window-via-subclass + 2 bare-class-unthemed (MenuBar, Panel) + 2 container-chrome-constants-only (HSplitContainer, VSplitContainer) + 8 NeoCade-additive (CodeEdit, ColorPickerButton, ConfirmationDialog, FileDialog, FoldableContainer, LinkButton, SpinBox, TooltipLabel) = 37."
     - "`TYPE_VARIATIONS` constant declares all **14** NeoCade type variations (Cross-AI Cycle 1 C4 fix: pick 14 with CodeLabel INCLUDED — the correct enumeration of TYPEVAR-01..04 + TYPEVAR-05): PrimaryButton, SecondaryButton, GhostButton, DangerButton, IconButton, FlatButton (6 Button) + HeaderLarge, HeaderMedium, HeaderSmall, Caption, CodeLabel (5 Label) + InfoText (1 RichTextLabel/Label) + CardPanel, HeroPanel (2 PanelContainer) = 14."
-    - "`_regenerate_theme()` body now walks `BINDING_TABLE`: for each `(theme_type, data_type, slot_name)`, computes the recipe value from the derived locals (Plan 04-04) + the per-Control parameter context, and calls `set_stylebox(slot_name, theme_type, sb)` / `set_color(...)` / `set_constant(...)` / `set_font(...)` / `set_font_size(...)` / `set_icon(...)`."
+    - "`_regenerate_theme()` body now walks `BINDING_TABLE`: for each `(theme_type, data_type, slot_name)`, computes the recipe value from the derived locals (Plan 04-04) + the per-Control parameter context, and calls `set_stylebox(slot_name, theme_type, sb)` / `set_color(...)` / `set_constant(...)` / `set_font_size(...)` / `set_icon(...)`. (Cross-AI Cycle 2 N1 fix: NO `set_font` branch — per-Control fonts are NOT a BINDING_TABLE concept; the only font bindings come from `default_font` + the 14 explicit type-variation `set_font` calls in Task 1.)"
     - "Iteration is ADDITIVE — entries not in BINDING_TABLE are LEFT UNTOUCHED (D-04 escape hatch). The walk uses `set_*(name, type, value)` directly and does NOT call `clear()` (D-01 invariant)."
+    - "**Cross-AI Cycle 2 C1 fix — CANONICAL_SLOT_NAMES freeze.** A sibling const `CANONICAL_SLOT_NAMES: Dictionary` declares the EXACT slot-name list per Control type for the most-complex Controls (Tree 16 styleboxes; Button 6 styleboxes + 5 colors; LineEdit 3 styleboxes; PopupMenu 5 styleboxes + 3 constants; Window 2 styleboxes; HScrollBar 4 styleboxes; VScrollBar 4 styleboxes; OptionButton 6 styleboxes + 1 constant + arrow icon; CheckBox 4 icons; CheckButton 2 icons; ItemList 6+ styleboxes; TabBar 5 styleboxes + 8 colors). Slot names are sourced VERBATIM from `MINIMAL-THEME-DISSECTION.md` (the live-verified-from-godot-minimal-theme dissection). Plan 04-06's verifier iterates `CANONICAL_SLOT_NAMES` and asserts each declared slot exists on the loaded theme via `theme.has_stylebox/color/constant/font_size/icon(slot_name, theme_type)` — this guarantees correct slot-name strings, not just row counts."
+    - "**Cross-AI Cycle 2 C2 fix — disabled alpha sourced from presets.** `_resolve_recipe()` reads `disabled_opacity` from the per-direction `presets` dictionary (Plan 04-04 DIRECTION_PRESETS). The Button.disabled / Button.font_disabled_color / etc. recipes use `disabled_opacity` (a float passed in) instead of hard-coded `0.38`. Recipes carry a `\"disabled\": true` flag (or equivalent) to opt into the per-direction alpha, replacing the previous `\"alpha\": 0.38` literal."
+    - "**Cross-AI Cycle 2 M2 fix — platform-aware stylebox margins.** `_resolve_recipe()`'s stylebox branch multiplies content_margin by `tokens.densityScale` and adds `tokens.tapPadding` so MOBILE platform produces visibly larger Button.normal margins than DESKTOP (Plan 04-06's MOBILE-toggle assertion can now observe the change)."
     - "`_regenerate_theme()` calls `set_type_variation(variation, base_type)` for all 14 variations registered in `TYPE_VARIATIONS`."
     - "**Cross-AI Cycle 1 C3 fix:** `_regenerate_theme()` sets `default_font = preload(\"res://addons/neocade_theme/fonts/Inter-Body.tres\")` and `default_font_size = tokens.body` BEFORE the BINDING_TABLE walk, so any Control type that lacks an explicit per-type font entry still renders in Inter at the correct platform size (FONT-06 closure)."
     - "Each variation that needs a font has an explicit `set_font(\"font\", variation, ...)` call (PITFALLS 1.2 — variations don't inherit fonts from base type). HeaderLarge/HeaderMedium/HeaderSmall reference the matching FontVariation from Plan 04-02; Caption + InfoText reference Inter-Caption.tres / Inter-Body.tres; CodeLabel uses Inter-Body.tres + a CHANGELOG note that consumers can override with their preferred mono per FONT-04 stricken (consumer override pattern documented in README, Plan 04-08)."
@@ -44,9 +47,9 @@ must_haves:
 ---
 
 <objective>
-Author the `BINDING_TABLE` (the data structure that maps every Control's theme entries to derivation-block-driven recipes) and the `TYPE_VARIATIONS` table; rewrite `_regenerate_theme()` to walk both tables and populate Theme entries via `set_stylebox` / `set_color` / `set_constant` / `set_font` / `set_font_size` / `set_icon` (additive only); register all 13 NeoCade type variations with explicit fonts per PITFALLS 1.2; wire the 10 Button-family icons (Plan 04-03) to their Theme slots.
+Author the `BINDING_TABLE` (the data structure that maps every Control's theme entries to derivation-block-driven recipes), the sibling `CANONICAL_SLOT_NAMES` slot-name freeze, and the `TYPE_VARIATIONS` table; rewrite `_regenerate_theme()` to walk both tables and populate Theme entries via `set_stylebox` / `set_color` / `set_constant` / `set_font_size` / `set_icon` (additive only; per-Control fonts NOT included — Cross-AI Cycle 2 N1 fix); register all 14 NeoCade type variations with explicit fonts per PITFALLS 1.2; wire the 10 Button-family icons (Plan 04-03) to their Theme slots.
 
-Purpose: produce the additive iteration engine that turns the `@export` properties + derived locals (Plan 04-04) into a fully-populated Theme covering all 37 scorecard Control rows + 13 type variations — the SC#7 hard requirement for Phase 4 close.
+Purpose: produce the additive iteration engine that turns the `@export` properties + derived locals (Plan 04-04) into a fully-populated Theme covering all 37 scorecard Control rows + 14 type variations — the SC#7 hard requirement for Phase 4 close.
 Output: `addons/neocade_theme/neocade_theme.gd` extended by ~600-1000 lines of `BINDING_TABLE` data + the iteration walk in `_regenerate_theme()`.
 </objective>
 
@@ -72,7 +75,7 @@ This plan is the heaviest plan in Phase 4 by line count. It depends on:
 - Plan 04-03 (10 SVG icons referenceable by `preload`).
 - Plan 04-04 (color helpers + platform helpers + raised helper + derivation block locals).
 
-After this plan, `_regenerate_theme()` is feature-complete: loading any direction `.tres` yields a Theme with entries for all 37 scorecard Controls + 13 variations populated. Plans 04-06 (Pulse `.tres`) and 04-07 (Slate/Bubble/Daybreak/Burst `.tres`) only set `@export` values; the engine does the rest.
+After this plan, `_regenerate_theme()` is feature-complete: loading any direction `.tres` yields a Theme with entries for all 37 scorecard Controls + 14 variations populated. Plans 04-06 (Pulse `.tres`) and 04-07 (Slate/Bubble/Daybreak/Burst `.tres`) only set `@export` values; the engine does the rest.
 </interfaces>
 </context>
 
@@ -82,7 +85,7 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
   <name>Task 1: Author the TYPE_VARIATIONS constant + register variations in _regenerate_theme()</name>
   <read_first>
     - addons/neocade_theme/neocade_theme.gd
-    - .planning/research/FEATURES.md (13 type variations)
+    - .planning/research/FEATURES.md (type variations table; 14 variations per Cross-AI Cycle 1 C4)
     - .planning/DESIGN_TOKENS.md (§8.5 type scale, §8.6 kicker)
     - .planning/research/PITFALLS.md (1.2 — variations don't inherit fonts)
   </read_first>
@@ -246,7 +249,7 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
                 "hover":          {"role": "state_hover",   "raised_intensity": 1},
                 "pressed":        {"role": "state_pressed", "raised_intensity": 0},  # pressed sinks; never lifted
                 "focus":          {"role": "focus_ring"},
-                "disabled":       {"role": "surface_panel", "alpha": 0.38, "raised_intensity": 0},
+                "disabled":       {"role": "surface_panel", "disabled": true, "raised_intensity": 0},  # Cross-AI Cycle 2 C2 fix: NO hard-coded 0.38; "disabled":true triggers presets.disabled_opacity
                 "hover_pressed":  {"role": "state_pressed", "raised_intensity": 0},
             },
             "color": {
@@ -254,7 +257,7 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
                 "font_hover_color":    {"role": "text_strong"},
                 "font_pressed_color":  {"role": "text_strong"},
                 "font_focus_color":    {"role": "text_strong"},
-                "font_disabled_color": {"role": "text_strong", "alpha": 0.38},
+                "font_disabled_color": {"role": "text_strong", "disabled": true},  # Cross-AI Cycle 2 C2 fix: was "alpha": 0.38; now sources presets.disabled_opacity
             },
             "constant": {
                 "h_separation": {"value": "tokens.tapPadding"},
@@ -263,6 +266,8 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
         # ... etc for every Control ...
     }
     ```
+
+    **Cross-AI Cycle 2 C2 fix — `"disabled": true` instead of `"alpha": 0.38`:** every Button-family / disabled-state recipe MUST use the new `"disabled": true` flag (which the iteration engine resolves by reading `presets.disabled_opacity` from Plan 04-04 DIRECTION_PRESETS). The literal `0.38` MUST NOT appear as a hard-coded `alpha` value anywhere in BINDING_TABLE recipes. Per-direction Pulse=0.42, Slate=0.50, Bubble=0.45, Daybreak=0.50, Burst=0.45 — visible per-direction differentiation on disabled state. (Custom themes fall through to `DIRECTION_PRESET_DEFAULT.disabled_opacity = 0.38` as the legacy default — only the fallback path sees 0.38.)
 
     **MEDIUM reconcile fix (Codex Cycle 1):** previously `Button.normal` had `raised_intensity = 0`, but Plan 04-06's verifier expects `shadow_size > 0` when `raised = true`. **The fix:** `Button.normal` (and `Button.hover`) get `raised_intensity = 1`. `Button.pressed`/`hover_pressed`/`disabled` keep `raised_intensity = 0` (pressed visually SINKS not lifts; disabled is flat). Plan 04-06's `_phase4_verify.gd` raised-toggle test explicitly asserts `Button.normal` has `shadow_size > 0` when `raised = true`, which now passes.
 
@@ -277,6 +282,8 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
         "icon":     { "<slot_name>": <recipe>, ... },  # if needed (Button family + CheckBox + LineEdit + OptionButton + dialog close)
     }
     ```
+
+    **Cross-AI Cycle 2 N1 fix:** the `font` data type is NOT supported in BINDING_TABLE. Per-Control fonts go through `theme.default_font` (set in Plan 04-04 derivation block — Cross-AI Cycle 1 C3) and explicit `set_font("font", "<variation>", ...)` calls on the 14 type variations (Task 1). NO base Control in MINIMAL-THEME-DISSECTION.md declares a per-slot `font` binding for v1; the schema simplification reflects this.
 
     A `<recipe>` is a sub-dictionary that the iteration engine in Task 3 reads to compute the actual value:
     - `{"role": "<role-name>"}` — uses one of the derivation-block locals: `surface_base`, `surface_low`, `surface_panel`, `surface_high`, `surface_overlay`, `outline_color`, `accent_offset`, `surface_panel_offset`, `text_strong`, `text_default`, `text_muted`, `state_hover`, `state_pressed`, `role_primary`, `accent_rim`, `focus_ring` (special — constructed inline in iteration with the focus_thickness + outline expand semantics).
@@ -363,6 +370,182 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
 </task>
 
 <task type="auto">
+  <name>Task 2.5: Author CANONICAL_SLOT_NAMES slot-name freeze (Cross-AI Cycle 2 C1 fix)</name>
+  <read_first>
+    - addons/neocade_theme/neocade_theme.gd (after Task 2 — BINDING_TABLE is in place)
+    - .planning/research/MINIMAL-THEME-DISSECTION.md (per-Control slot lists — slot names verbatim from godot-minimal-theme dissection)
+    - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-REVIEWS.md (Cycle 2 C1 partial-resolution)
+  </read_first>
+  <files>
+    - addons/neocade_theme/neocade_theme.gd (modify — append CANONICAL_SLOT_NAMES constant)
+  </files>
+  <action>
+    **Cross-AI Cycle 2 C1 fix (slot-name freeze).** Cycle 1 froze the canonical 37-Control row list. Cycle 2 found exact slot names per Control were still delegated to executor discretion. This task FREEZES the slot names verbatim from `MINIMAL-THEME-DISSECTION.md` so Plan 04-06's verifier can iterate them and assert each exists, eliminating wrong-slot-name false-positives that pass row-count checks.
+
+    Append `CANONICAL_SLOT_NAMES: Dictionary` to `neocade_theme.gd` AFTER the `BINDING_TABLE` constant. The dictionary is keyed by `theme_type` → `data_type` → array of slot-name strings. It is the SLOT-NAME ENUMERATION SOURCE OF TRUTH; verifiers (Plan 04-06) read it. BINDING_TABLE recipes for each slot must match the slot-name lists here.
+
+    **Cross-Control coverage scope (Cycle 2 freeze):** the most-complex Controls have full slot enumerations frozen here; simpler Controls (Label, RichTextLabel, ProgressBar, etc.) are covered by their BINDING_TABLE row's slot-name keys (the `BINDING_TABLE[type][data_type].keys()` IS the slot-name list, just not duplicated here). The freeze table is for the Controls where MINIMAL-THEME-DISSECTION.md proves slot names matter most.
+
+    ```gdscript
+
+    # ─── Canonical slot-name freeze (Cross-AI Cycle 2 C1 fix) ───────────────────────────────────
+    ## Per-Control slot-name enumeration sourced VERBATIM from MINIMAL-THEME-DISSECTION.md.
+    ## Plan 04-06's verifier iterates these arrays and asserts each slot exists on the loaded
+    ## theme, replacing the previous "broad row-count check" that could pass with wrong slot names.
+    ## BINDING_TABLE recipe slot-keys MUST match these arrays exactly.
+    const CANONICAL_SLOT_NAMES: Dictionary = {
+        # Tree — 16 stylebox slots (per MINIMAL-THEME-DISSECTION.md §Tree, lines 689-720)
+        # NOTE: upstream collapses many to one stylebox; NeoCade preserves the slot-name set.
+        "Tree": {
+            "stylebox": ["panel", "focus", "title_button_normal", "title_button_pressed", "title_button_hover",
+                         "button_hover", "button_pressed", "hover", "selected", "selected_focus",
+                         "hovered_selected", "hovered_selected_focus", "custom_button_hover", "custom_button_pressed",
+                         "cursor", "cursor_unfocused"],
+            "color": ["font_color", "guide_color", "drop_position_color", "parent_hl_line_color"],
+            "constant": ["v_separation", "inner_item_margin_left", "inner_item_margin_right"],
+        },
+        # Button — 6 stylebox + 5+ font colors (per MINIMAL-THEME-DISSECTION.md §Button)
+        # NOTE: upstream sets 12 styleboxes (incl. _mirrored variants); v1 ships 6 base + Godot
+        # mirrors via type chain. _mirrored slots are added in Phase 5/6 polish.
+        "Button": {
+            "stylebox": ["normal", "hover", "pressed", "focus", "disabled", "hover_pressed"],
+            "color": ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color",
+                      "font_disabled_color", "font_hover_pressed_color",
+                      "icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color",
+                      "icon_disabled_color", "icon_hover_pressed_color"],
+            "constant": ["h_separation"],
+        },
+        # CheckBox — 4 icon slots (per MINIMAL-THEME-DISSECTION.md §CheckBox)
+        "CheckBox": {
+            "icon": ["checked", "unchecked", "radio_checked", "radio_unchecked"],
+            "color": ["font_pressed_color", "font_hover_pressed_color"],
+            "stylebox": ["normal"],
+        },
+        # CheckButton — 2 icon slots (per MINIMAL-THEME-DISSECTION.md §CheckButton)
+        "CheckButton": {
+            "icon": ["on", "off"],
+            "color": ["font_focus_color", "font_hover_pressed_color", "font_pressed_color"],
+        },
+        # OptionButton — 6 stylebox + 1 constant + 1 icon
+        "OptionButton": {
+            "stylebox": ["normal", "hover", "pressed", "focus", "disabled", "hover_pressed"],
+            "constant": ["arrow_margin"],
+            "icon": ["arrow"],
+            "color": ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color",
+                      "font_disabled_color"],
+        },
+        # LineEdit — 3 stylebox + caret + selection + clear icon (per MINIMAL-THEME-DISSECTION.md §LineEdit)
+        "LineEdit": {
+            "stylebox": ["normal", "focus", "read_only"],
+            "color": ["font_placeholder_color"],
+            "icon": ["clear"],
+        },
+        # TextEdit — same 3-stylebox set as LineEdit
+        "TextEdit": {
+            "stylebox": ["normal", "focus", "read_only"],
+        },
+        # PopupMenu — 5 stylebox + 3 constants (per MINIMAL-THEME-DISSECTION.md §PopupMenu)
+        "PopupMenu": {
+            "stylebox": ["panel", "hover", "separator", "labeled_separator_left", "labeled_separator_right"],
+            "constant": ["item_start_padding", "v_separation", "h_separation"],
+        },
+        # PopupPanel — 1 stylebox
+        "PopupPanel": {
+            "stylebox": ["panel"],
+        },
+        # TooltipPanel — 1 stylebox
+        "TooltipPanel": {
+            "stylebox": ["panel"],
+        },
+        # Window — 2 stylebox slots (per MINIMAL-THEME-DISSECTION.md §Window — NeoCade-additive)
+        "Window": {
+            "stylebox": ["embedded_border", "embedded_unfocused_border"],
+        },
+        # HScrollBar — 5 stylebox slots (per MINIMAL-THEME-DISSECTION.md §HScrollBar)
+        "HScrollBar": {
+            "stylebox": ["scroll", "scroll_focus", "grabber", "grabber_highlight", "grabber_pressed"],
+        },
+        # VScrollBar — 5 stylebox slots (mirror of HScrollBar)
+        "VScrollBar": {
+            "stylebox": ["scroll", "scroll_focus", "grabber", "grabber_highlight", "grabber_pressed"],
+        },
+        # ItemList — 6 styleboxes + colors + 1 constant (per MINIMAL-THEME-DISSECTION.md §ItemList)
+        "ItemList": {
+            "stylebox": ["panel", "focus", "cursor", "cursor_unfocused", "hovered", "selected", "selected_focus",
+                         "hovered_selected", "hovered_selected_focus"],
+            "color": ["guide_color"],
+            "constant": ["v_separation"],
+        },
+        # TabBar — 5 stylebox + 8 colors (per MINIMAL-THEME-DISSECTION.md §TabBar)
+        "TabBar": {
+            "stylebox": ["tab_selected", "tab_unselected", "tab_hovered", "tab_disabled", "tab_focus"],
+            "color": ["font_selected_color", "font_unselected_color", "font_hovered_color", "font_disabled_color",
+                      "icon_selected_color", "icon_unselected_color", "icon_hovered_color", "icon_disabled_color"],
+        },
+        # TabContainer — same TabBar set + panel + tabbar_background
+        "TabContainer": {
+            "stylebox": ["tab_selected", "tab_unselected", "tab_hovered", "tab_disabled", "tab_focus",
+                         "panel", "tabbar_background"],
+        },
+        # HSlider / VSlider — slider stylebox per MINIMAL-THEME-DISSECTION.md
+        "HSlider": {
+            "stylebox": ["slider", "grabber_area", "grabber_area_highlight"],
+        },
+        "VSlider": {
+            "stylebox": ["slider", "grabber_area", "grabber_area_highlight"],
+        },
+        # ProgressBar — 2 styleboxes
+        "ProgressBar": {
+            "stylebox": ["background", "fill"],
+        },
+        # Label — 1 stylebox + 1 color
+        "Label": {
+            "stylebox": ["normal"],
+            "color": ["font_color"],
+        },
+        # RichTextLabel — 1 stylebox
+        "RichTextLabel": {
+            "stylebox": ["normal"],
+        },
+        # PanelContainer-like (Panel) — 1 stylebox
+        "Panel": {
+            "stylebox": ["panel"],
+        },
+        # Per-direction polish (Phase 5/6/7) extends these. The Controls below have their slot
+        # name lists equal to BINDING_TABLE[type][data_type].keys() at runtime; freezing them
+        # in this dict is optional for v1 verification (Plan 04-06 derives slot lists from
+        # BINDING_TABLE.keys() for any Control NOT in CANONICAL_SLOT_NAMES).
+    }
+    ```
+
+    **Verification handshake with Plan 04-06:** Plan 04-06's verifier (`_phase4_verify.gd` + `_phase4_verify_headless.gd`) iterates `CANONICAL_SLOT_NAMES` keys and for each `(theme_type, data_type, slot_name)` triple, calls the matching `theme.has_*` method (`has_stylebox` / `has_color` / `has_constant` / `has_icon`). If ANY frozen slot is missing, the verifier fails. This catches wrong slot names that would otherwise pass row-count checks.
+
+    The freeze covers the 22 most-complex Controls (Tree's 16, Button's 6+12, CheckBox/CheckButton/OptionButton, LineEdit/TextEdit, all Popups, Window, both ScrollBars, ItemList, both TabBar variants, both Sliders, ProgressBar, Label, RichTextLabel, Panel). The remaining 15 simpler Controls (AcceptDialog, ConfirmationDialog, FileDialog, FoldableContainer, GraphEdit, HSplitContainer, ColorPicker, ColorPickerButton, CodeEdit, LinkButton, MenuBar, MenuButton, SpinBox, TooltipLabel, VSplitContainer) verify via "BINDING_TABLE has at least one entry for this type" — they're either inherits-from-Button (LinkButton/MenuButton/MenuBar/etc.) or minimal-baseline (FoldableContainer/GraphEdit/etc. add coverage in Phases 6/7).
+  </action>
+  <acceptance_criteria>
+    - File contains `const CANONICAL_SLOT_NAMES: Dictionary = {`.
+    - File contains `"Tree":` key under CANONICAL_SLOT_NAMES with a `"stylebox":` array of 16 strings (the 16 Tree stylebox slots).
+    - The Tree stylebox array contains the literal strings: `"panel"`, `"focus"`, `"title_button_normal"`, `"title_button_pressed"`, `"title_button_hover"`, `"button_hover"`, `"button_pressed"`, `"hover"`, `"selected"`, `"selected_focus"`, `"hovered_selected"`, `"hovered_selected_focus"`, `"custom_button_hover"`, `"custom_button_pressed"`, `"cursor"`, `"cursor_unfocused"`.
+    - File contains `"Button":` key with stylebox array including `"normal"`, `"hover"`, `"pressed"`, `"focus"`, `"disabled"`, `"hover_pressed"`.
+    - File contains `"LineEdit":` with stylebox array `["normal", "focus", "read_only"]`.
+    - File contains `"PopupMenu":` with stylebox array including `"panel"`, `"hover"`, `"separator"`, `"labeled_separator_left"`, `"labeled_separator_right"`.
+    - File contains `"Window":` with stylebox array including `"embedded_border"`, `"embedded_unfocused_border"`.
+    - File contains `"HScrollBar":` with stylebox array including `"scroll"`, `"scroll_focus"`, `"grabber"`, `"grabber_highlight"`, `"grabber_pressed"`.
+    - File contains `"VScrollBar":` with the same 5 slot names as HScrollBar.
+    - File contains `"CheckBox":` with `"icon":` array including `"checked"`, `"unchecked"`.
+    - File contains `"CheckButton":` with `"icon":` array including `"on"`, `"off"`.
+    - File contains `"OptionButton":` with `"icon":` array including `"arrow"`.
+    - The CANONICAL_SLOT_NAMES dict declares at least 22 Control type keys (the freeze coverage scope).
+  </acceptance_criteria>
+  <verify>
+    <automated>
+      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; if ($g -notmatch 'const CANONICAL_SLOT_NAMES: Dictionary = \\{') { throw 'CANONICAL_SLOT_NAMES constant missing' }; $tree_slots=@('panel','focus','title_button_normal','title_button_pressed','title_button_hover','button_hover','button_pressed','hover','selected','selected_focus','hovered_selected','hovered_selected_focus','custom_button_hover','custom_button_pressed','cursor','cursor_unfocused'); foreach($s in $tree_slots) { if ($g -notmatch ('\"' + [regex]::Escape($s) + '\"')) { throw \"CANONICAL_SLOT_NAMES.Tree missing slot: $s\" } }; foreach($n in '\"Button\":','\"CheckBox\":','\"CheckButton\":','\"OptionButton\":','\"LineEdit\":','\"TextEdit\":','\"PopupMenu\":','\"PopupPanel\":','\"TooltipPanel\":','\"Window\":','\"HScrollBar\":','\"VScrollBar\":','\"ItemList\":','\"TabBar\":','\"TabContainer\":','\"HSlider\":','\"VSlider\":','\"ProgressBar\":','\"Label\":','\"RichTextLabel\":','\"Panel\":','\"embedded_border\"','\"embedded_unfocused_border\"','\"labeled_separator_left\"','\"labeled_separator_right\"','\"grabber_highlight\"','\"grabber_pressed\"') { if ($g -notmatch [regex]::Escape($n)) { throw \"CANONICAL_SLOT_NAMES missing: $n\" } }"
+    </automated>
+  </verify>
+  <done>CANONICAL_SLOT_NAMES freeze table is in place; Plan 04-06's verifier can now iterate frozen slots per Control type and catch wrong slot names that would have passed row-count checks.</done>
+</task>
+
+<task type="auto">
   <name>Task 3: Implement the BINDING_TABLE iteration walk in _regenerate_theme()</name>
   <read_first>
     - addons/neocade_theme/neocade_theme.gd
@@ -373,7 +556,7 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
     - addons/neocade_theme/neocade_theme.gd (modify — extend _regenerate_theme body with iteration walk + recipe-resolution helper)
   </files>
   <action>
-    Add a helper method that resolves a recipe to a concrete value, given the derivation-block locals. The helper signature:
+    Add a helper method that resolves a recipe to a concrete value, given the derivation-block locals. The helper signature now takes `presets` (the per-direction DIRECTION_PRESETS sub-dict from Plan 04-04) so disabled-opacity is sourced per-direction (Cross-AI Cycle 2 C2 fix). The stylebox branch multiplies content_margin by `tokens.densityScale` and adds `tokens.tapPadding` so MOBILE platform produces visibly larger margins (Cross-AI Cycle 2 M2 fix).
 
     ```gdscript
 
@@ -381,12 +564,20 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
 
     ## Resolves a BINDING_TABLE recipe to a concrete value, given the precomputed derivation block.
     ## `data_type` is "stylebox", "color", "constant", "font_size", or "icon".
+    ##   (Cross-AI Cycle 2 N1 fix: NO "font" branch — per-Control fonts are handled by
+    ##   theme.default_font + the 14 explicit set_font calls on type variations in Task 1.)
     ## Returns null if the recipe references an unknown role or icon (caller skips silently — D-04).
-    func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictionary, tokens: Dictionary) -> Variant:
+    func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictionary,
+                          tokens: Dictionary, presets: Dictionary) -> Variant:
         if data_type == "stylebox":
             var role: String = recipe.get("role", "surface_panel")
             var raised_intensity: int = recipe.get("raised_intensity", 0)
+            # Cross-AI Cycle 2 C2 fix: disabled flag pulls per-direction alpha from presets,
+            # NOT a hard-coded 0.38. Recipes carrying "disabled": true get presets.disabled_opacity.
+            var is_disabled: bool = recipe.get("disabled", false)
             var alpha: float = recipe.get("alpha", 1.0)
+            if is_disabled:
+                alpha = presets.disabled_opacity
             if role == "focus_ring":
                 # Focus ring is a special stylebox: transparent bg, accent border, expand outside corner.
                 var sb := StyleBoxFlat.new()
@@ -422,14 +613,26 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
             sb.border_width_top = outline_width
             sb.border_width_right = outline_width
             sb.border_width_bottom = outline_width
-            sb.content_margin_left = spacing
-            sb.content_margin_top = int(spacing * 0.6)
-            sb.content_margin_right = spacing
-            sb.content_margin_bottom = int(spacing * 0.6)
+            # Cross-AI Cycle 2 M2 fix: platform-aware margins. DESKTOP (densityScale=1.0,
+            # tapPadding=8) yields the base spacing; MOBILE (densityScale=1.5, tapPadding=12)
+            # produces a visibly larger Button.normal content_margin_*. Plan 04-06's MOBILE
+            # toggle assertion observes this difference.
+            var density: float = tokens.get("densityScale", 1.0)
+            var tap_pad: int = tokens.get("tapPadding", 0)
+            var h_margin: int = int(spacing * density) + tap_pad
+            var v_margin: int = int(spacing * 0.6 * density) + tap_pad
+            sb.content_margin_left = h_margin
+            sb.content_margin_top = v_margin
+            sb.content_margin_right = h_margin
+            sb.content_margin_bottom = v_margin
             return sb
         elif data_type == "color":
             var role: String = recipe.get("role", "text_strong")
+            # Cross-AI Cycle 2 C2 fix: disabled flag pulls per-direction alpha from presets.
+            var is_disabled: bool = recipe.get("disabled", false)
             var alpha: float = recipe.get("alpha", 1.0)
+            if is_disabled:
+                alpha = presets.disabled_opacity
             var c: Color = role_table.get(role, role_table.text_strong)
             if alpha < 1.0:
                 c = Color(c.r, c.g, c.b, alpha)
@@ -446,6 +649,8 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
             var path: String = "res://addons/neocade_theme/icons/" + icon_name + ".svg"
             var icon: Texture2D = load(path) as Texture2D
             return icon
+        # Cross-AI Cycle 2 N1 fix: any unrecognized data_type (including the now-removed "font")
+        # falls through to null — caller skips silently per D-04 escape hatch.
         return null
     ```
 
@@ -475,13 +680,17 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
         }
 
         # ── Walk BINDING_TABLE — additive iteration; entries not in table are LEFT UNTOUCHED (D-04) ──
+        # Cross-AI Cycle 2 N1 fix: only 5 setter branches — NO set_font branch. Per-Control
+        # fonts are handled by default_font + explicit set_font on the 14 type variations.
+        # Cross-AI Cycle 2 C2 fix: presets passed to _resolve_recipe so disabled alpha is
+        # sourced per-direction from DIRECTION_PRESETS.disabled_opacity.
         for theme_type in BINDING_TABLE.keys():
             var type_block: Dictionary = BINDING_TABLE[theme_type]
             for data_type in type_block.keys():
                 var slots: Dictionary = type_block[data_type]
                 for slot_name in slots.keys():
                     var recipe: Dictionary = slots[slot_name]
-                    var value = _resolve_recipe(recipe, data_type, role_table, tokens)
+                    var value = _resolve_recipe(recipe, data_type, role_table, tokens, presets)
                     if value == null: continue  # D-04 escape hatch — recipe failed; leave slot alone
                     if data_type == "stylebox":
                         set_stylebox(slot_name, theme_type, value)
@@ -493,6 +702,10 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
                         set_font_size(slot_name, theme_type, int(value))
                     elif data_type == "icon":
                         set_icon(slot_name, theme_type, value)
+                    # NOTE: data_type == "font" is intentionally NOT handled (Cross-AI Cycle 2
+                    # N1 fix). Such entries will not appear in BINDING_TABLE since the schema
+                    # explicitly excludes "font". If they did, _resolve_recipe returns null
+                    # (its switch has no font branch), and the value==null check above skips.
     ```
 
     This walk is the additive iteration engine. It uses Godot's standard `set_*(slot, type, value)` methods on the Theme. There is NO `clear()` call — entries not in BINDING_TABLE are untouched (the D-04 escape hatch lets Theme Editor authored content survive).
@@ -500,20 +713,28 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
     Note on iteration order: Godot's Dictionary iteration in Godot 4.6 is insertion-ordered, so the BINDING_TABLE keys iterate in declaration order. This is sufficient for additive iteration; entries within a Control type don't depend on each other.
   </action>
   <acceptance_criteria>
-    - File contains `func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictionary, tokens: Dictionary) -> Variant:`.
-    - `_resolve_recipe` body branches on `data_type` for `"stylebox"`, `"color"`, `"constant"`, `"font_size"`, `"icon"`.
+    - File contains `func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictionary,` (multi-line signature; the `presets: Dictionary` param appears on the continuation line — Cross-AI Cycle 2 C2 fix).
+    - File contains `presets: Dictionary` as a parameter to `_resolve_recipe` (Cross-AI Cycle 2 C2 fix).
+    - `_resolve_recipe` body branches on `data_type` for `"stylebox"`, `"color"`, `"constant"`, `"font_size"`, `"icon"` — exactly 5 branches (Cross-AI Cycle 2 N1 fix: NO `"font"` branch).
     - `_resolve_recipe` calls `_make_raised_stylebox(bg_color, offset_color, sb_intensity)` for the stylebox branch.
     - `_resolve_recipe` handles the special role `"focus_ring"` by constructing a focus-styled StyleBoxFlat with `border_width_*` = `focus_thickness`.
+    - **Cross-AI Cycle 2 C2 fix:** `_resolve_recipe`'s stylebox branch contains `var is_disabled: bool = recipe.get("disabled", false)` and the literal `alpha = presets.disabled_opacity` (NOT a hard-coded `0.38`).
+    - **Cross-AI Cycle 2 C2 fix:** `_resolve_recipe`'s color branch ALSO contains the same `presets.disabled_opacity` source (not a hard-coded `0.38`).
+    - **Cross-AI Cycle 2 C2 fix:** the literal `0.38` does NOT appear ANYWHERE inside the body of `_resolve_recipe()` or in any BINDING_TABLE recipe `alpha` value — verified via grep: `0.38` only appears in `DIRECTION_PRESET_DEFAULT` (Plan 04-04) as the legacy custom-theme fallback.
+    - **Cross-AI Cycle 2 M2 fix:** `_resolve_recipe`'s stylebox branch contains `tokens.get("densityScale", 1.0)` and `tokens.get("tapPadding", 0)`.
+    - **Cross-AI Cycle 2 M2 fix:** the stylebox branch computes `h_margin` and `v_margin` using both `density` and `tap_pad` so MOBILE platform tokens (`densityScale=1.5, tapPadding=12`) produce numerically larger content_margin_* than DESKTOP (`densityScale=1.0, tapPadding=8`).
     - `_regenerate_theme()` body contains a `var role_table: Dictionary = {` declaration with at least 16 entries.
     - `_regenerate_theme()` body contains `for theme_type in BINDING_TABLE.keys():`.
     - The walk contains nested `for data_type in type_block.keys():` and `for slot_name in slots.keys():`.
     - The walk contains all 5 set methods: `set_stylebox(slot_name, theme_type, value)`, `set_color(slot_name, theme_type, value)`, `set_constant(slot_name, theme_type, int(value))`, `set_font_size(slot_name, theme_type, int(value))`, `set_icon(slot_name, theme_type, value)`.
+    - **Cross-AI Cycle 2 N1 fix:** the walk does NOT contain `set_font(slot_name, theme_type,` — there are exactly 5 setter calls in the walk, not 6. (The `set_font` calls in Task 1's variation-registration block are explicit per-variation calls and do NOT live inside the BINDING_TABLE walk.)
+    - The walk contains the call `_resolve_recipe(recipe, data_type, role_table, tokens, presets)` — 5 arguments (Cross-AI Cycle 2 C2 fix added `presets`).
     - The walk contains a null-check (`if value == null: continue`) implementing the D-04 escape hatch.
     - The string `clear()` does NOT appear in `_regenerate_theme()` or any helper it calls (D-01 invariant; check entire file).
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; foreach($n in 'func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictionary, tokens: Dictionary) -> Variant:','if data_type == \"stylebox\":','if data_type == \"color\":','elif data_type == \"constant\"','elif data_type == \"font_size\":','elif data_type == \"icon\":','_make_raised_stylebox(bg_color, offset_color, sb_intensity)','if role == \"focus_ring\":','var role_table: Dictionary = {','for theme_type in BINDING_TABLE.keys():','for data_type in type_block.keys():','for slot_name in slots.keys():','set_stylebox(slot_name, theme_type, value)','set_color(slot_name, theme_type, value)','set_constant(slot_name, theme_type, int(value))','set_font_size(slot_name, theme_type, int(value))','set_icon(slot_name, theme_type, value)','if value == null: continue') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; if ($g -match '\\bclear\\(\\)') { throw 'clear() call found — D-01 forbids' }; $rt_lines = ([regex]::Matches($g, '\":\\s+(surface|outline_color|accent|text|state|role|accent_rim)')).Count; if ($rt_lines -lt 14) { throw \"role_table has $rt_lines entries; expected >=14\" }"
+      powershell -NoProfile -Command "$p='addons/neocade_theme/neocade_theme.gd'; $g=Get-Content -Raw $p; foreach($n in 'func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictionary,','presets: Dictionary','if data_type == \"stylebox\":','if data_type == \"color\":','elif data_type == \"constant\"','elif data_type == \"font_size\":','elif data_type == \"icon\":','_make_raised_stylebox(bg_color, offset_color, sb_intensity)','if role == \"focus_ring\":','var role_table: Dictionary = {','for theme_type in BINDING_TABLE.keys():','for data_type in type_block.keys():','for slot_name in slots.keys():','set_stylebox(slot_name, theme_type, value)','set_color(slot_name, theme_type, value)','set_constant(slot_name, theme_type, int(value))','set_font_size(slot_name, theme_type, int(value))','set_icon(slot_name, theme_type, value)','if value == null: continue','_resolve_recipe(recipe, data_type, role_table, tokens, presets)','presets.disabled_opacity','tokens.get(\"densityScale\"','tokens.get(\"tapPadding\"','recipe.get(\"disabled\", false)') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; if ($g -match '\\bclear\\(\\)') { throw 'clear() call found — D-01 forbids' }; $rt_lines = ([regex]::Matches($g, '\":\\s+(surface|outline_color|accent|text|state|role|accent_rim)')).Count; if ($rt_lines -lt 14) { throw \"role_table has $rt_lines entries; expected >=14\" }; $resolve_body_match = [regex]::Match($g, '(?s)func _resolve_recipe.*?(?=^func |\\Z)'); if ($resolve_body_match.Success) { $resolve_body = $resolve_body_match.Value; if ($resolve_body -match '\\b0\\.38\\b') { throw 'C2 fix incomplete: 0.38 hard-coded inside _resolve_recipe body' } }; $btn_recipe_section = [regex]::Match($g, '(?s)\"Button\":\\s*\\{.*?\\\\}\\s*,'); if ($btn_recipe_section.Success -and $btn_recipe_section.Value -match '\\\"alpha\\\":\\s*0\\.38') { throw 'C2 fix incomplete: \"alpha\": 0.38 still in Button BINDING_TABLE recipe' }; if ($g -match '(?s)func _resolve_recipe.*?elif data_type == \"font\"') { throw 'N1 fix incomplete: font branch still in _resolve_recipe' }; $walk_section_match = [regex]::Match($g, '(?s)for theme_type in BINDING_TABLE\\.keys.*?(?=^\\s*_last_regeneration_usec|\\Z)'); if ($walk_section_match.Success -and $walk_section_match.Value -match 'set_font\\(slot_name, theme_type,') { throw 'N1 fix incomplete: BINDING_TABLE walk contains set_font(slot_name, theme_type, ...)' }"
     </automated>
   </verify>
   <done>The additive iteration walk populates every BINDING_TABLE entry; entries not in the table survive (D-04); clear() is forbidden (D-01); SC#7 is achievable on a feature-complete Pulse load.</done>
@@ -529,9 +750,10 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
     Stage `addons/neocade_theme/neocade_theme.gd` and commit:
 
     ```
-    feat(04-05): BINDING_TABLE (37 canonical) + iteration engine + 14 variations + defaults
+    feat(04-05): BINDING_TABLE (37 canonical) + slot-name freeze + iteration engine
 
-    Plan 04-05 wave-2 engine (depends on Plans 04-01..04; Cross-AI Cycle 1 fixes):
+    Plan 04-05 wave-2 engine (depends on Plans 04-01..04; Cross-AI Cycle 1 +
+    Cycle 2 fixes):
     - C1 fix: BINDING_TABLE covers EXACTLY 37 canonical scorecard Controls per
       MINIMAL-THEME-COVERAGE-DELTA.md (no executor discretion to add/drop):
       AcceptDialog, Button, CheckBox, CheckButton, CodeEdit, ColorPicker,
@@ -540,6 +762,25 @@ After this plan, `_regenerate_theme()` is feature-complete: loading any directio
       LinkButton, MenuBar, MenuButton, OptionButton, Panel, PopupMenu, PopupPanel,
       ProgressBar, RichTextLabel, SpinBox, TabBar, TabContainer, TextEdit,
       TooltipLabel, TooltipPanel, Tree, VScrollBar, VSlider, VSplitContainer, Window
+    - Cycle 2 C1 fix: NEW const CANONICAL_SLOT_NAMES freezes per-Control slot
+      names verbatim from MINIMAL-THEME-DISSECTION.md (Tree's 16 styleboxes,
+      Button's 6+12, LineEdit's 3, PopupMenu's 5, Window's 2, both ScrollBars'
+      5, etc.). Plan 04-06's verifier iterates the freeze table and asserts
+      every declared slot exists — catches wrong slot names that pass row-counts.
+    - Cycle 2 C2 fix: BINDING_TABLE recipes use "disabled": true flag (NOT
+      hard-coded "alpha": 0.38). _resolve_recipe sources alpha from
+      presets.disabled_opacity per direction (Pulse=0.42 / Slate=0.50 /
+      Bubble=0.45 / Daybreak=0.50 / Burst=0.45). 0.38 only appears in the
+      DIRECTION_PRESET_DEFAULT fallback in Plan 04-04 for custom themes.
+    - Cycle 2 N1 fix: schema EXCLUDES "font" data type (per-Control fonts are
+      not a BINDING_TABLE concept). Per-Control fonts come from theme.default_font
+      + the 14 explicit set_font calls on type variations (Task 1). Iteration
+      walk has 5 setters, NOT 6: stylebox/color/constant/font_size/icon.
+    - Cycle 2 M2 fix: _resolve_recipe stylebox branch wires tokens.densityScale
+      and tokens.tapPadding into content_margin computation. MOBILE platform
+      (densityScale=1.5, tapPadding=12) yields larger Button.normal margins
+      than DESKTOP (densityScale=1.0, tapPadding=8). Plan 04-06 verifier
+      observes the MOBILE>DESKTOP difference.
     - C3 fix: theme.default_font = Inter-Body.tres + default_font_size = tokens.body
       set BEFORE the BINDING_TABLE walk (FONT-06 closure)
     - C4 fix: TYPE_VARIATIONS = 14 entries (PrimaryButton/SecondaryButton/

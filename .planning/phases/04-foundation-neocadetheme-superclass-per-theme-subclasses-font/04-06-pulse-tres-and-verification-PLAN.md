@@ -18,7 +18,7 @@ must_haves:
   truths:
     - "`addons/neocade_theme/pulse_neocade_theme.tres` exists and is GENERATED PROGRAMMATICALLY (Cross-AI Cycle 1 C6 fix): the file is produced by an `@tool` script that does `var t := NeoCadeTheme.new(); t.base_color = Color(\"#151A2E\"); ...; ResourceSaver.save(t, \"...pulse_neocade_theme.tres\")`. The actual on-disk header (`[gd_resource type=\"NeoCadeTheme\" ...]` vs `[gd_resource type=\"Resource\" script_class=\"NeoCadeTheme\" ...]` etc.) is whatever Godot 4.6 emits — NOT hand-authored — and that emitted form is the canonical template Plan 04-07 will copy for the peer .tres files."
     - "The `.tres` saves the 9 `@export` values per DESIGN_TOKENS §5.1: `base_color = Color(\"#151A2E\")`, `accent_color = Color(\"#8BFF6A\")`, `raised = false`, `platform = 2` (Platform.AUTO), `corner_radius = 0`, `spacing = 18`, `raised_strength = 3`, `focus_thickness = 2`, `outline_width = 1`."
-    - "Loading `pulse_neocade_theme.tres` in Godot Editor opens it as a `NeoCadeTheme` instance with the values above; `_regenerate_theme()` runs at load time (per `_init()` in Plan 04-01) populating all 37 BINDING_TABLE Control entries + 13 type variations."
+    - "Loading `pulse_neocade_theme.tres` in Godot Editor opens it as a `NeoCadeTheme` instance with the values above; `_regenerate_theme()` runs at load time (per `_init()` in Plan 04-01) populating all 37 BINDING_TABLE Control entries + 14 type variations (Cross-AI Cycle 1 C4: count fixed to 14 with CodeLabel included)."
     - "Verification (manual or scripted): after load, `theme.has_stylebox(\"normal\", \"Button\")` returns `true`; `theme.has_stylebox(\"panel\", \"Tree\")` returns `true`; `theme.has_color(\"font_color\", \"Button\")` returns `true`; `theme.get_type_variation_base(\"PrimaryButton\")` returns `\"Button\"`; `theme.has_font(\"font\", \"HeaderLarge\")` returns `true`."
     - "Toggling `raised = true` then `raised = false` on the loaded `.tres` (in Godot Editor's Inspector) triggers `_regenerate_theme()` and produces correct shadow_size values on raised-eligible Controls (verified visually or via spot-check on 1-2 stylebox slots)."
     - "Toggling `platform = MOBILE` on the loaded `.tres` triggers regeneration and produces `Button.normal.content_margin_*` values consistent with mobile platform tokens (the spacing scaling is observable)."
@@ -55,7 +55,7 @@ Output: 1 new `.tres` file at `addons/neocade_theme/pulse_neocade_theme.tres` + 
 @addons/neocade_theme/neocade_theme.gd
 
 <interfaces>
-After Plan 04-05 closes, `NeoCadeTheme` (`addons/neocade_theme/neocade_theme.gd`) is feature-complete: loading any `[gd_resource type="NeoCadeTheme"]` `.tres` with the 9 `@export` values populated triggers `_regenerate_theme()` which populates 37 Controls + 13 variations.
+After Plan 04-05 closes, `NeoCadeTheme` (`addons/neocade_theme/neocade_theme.gd`) is feature-complete: loading any `[gd_resource type="NeoCadeTheme"]` `.tres` with the 9 `@export` values populated triggers `_regenerate_theme()` which populates 37 Controls + 14 variations (Cross-AI Cycle 1 C4 fix).
 
 This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-07 ships the remaining 4 directions; Plan 04-08 ships metadata.
 </interfaces>
@@ -172,11 +172,15 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
     3. Theme `default_font` is set to Inter-Body.tres (Cross-AI Cycle 1 C3 fix; FONT-06).
     4. After `_regenerate_theme()` (which `_init()` triggers): every BINDING_TABLE root key has `has_stylebox` / `has_color` / `has_constant` / `has_font` / `has_icon` returning true for at least one slot.
     5. `BINDING_TABLE.size() == 37` exactly (Cross-AI Cycle 1 C1 fix).
-    6. `TYPE_VARIATIONS.size() == 14` exactly (Cross-AI Cycle 1 C4 fix — was previously 13; CodeLabel restored).
-    7. Every TYPE_VARIATIONS key returns `get_type_variation_base()` == its base type.
-    8. `is_light` is `false` (Pulse base `#151A2E` luminance < 0.5).
-    9. Spot-check derived values: `theme.get_stylebox("normal", "Button")` returns a non-null StyleBoxFlat; `theme.get_color("font_color", "Label")` is a non-default Color; `theme.has_font("font", "HeaderLarge")` is true; `theme.has_font("font", "CodeLabel")` is true.
-    10. Toggling `raised = true` produces `Button.normal.shadow_size > 0` (per Plan 04-05 BINDING_TABLE `raised_intensity = 1` for Button.normal — Cross-AI Cycle 1 MEDIUM reconcile fix).
+    6. **Cross-AI Cycle 2 C1 fix — CANONICAL_SLOT_NAMES iteration.** For every `(theme_type, data_type, slot_name)` tuple frozen in `CANONICAL_SLOT_NAMES` (Plan 04-05 Task 2.5), assert the matching `theme.has_stylebox/color/constant/font_size/icon(slot_name, theme_type)` returns true. This catches wrong slot names that would otherwise pass row-count checks.
+    7. `TYPE_VARIATIONS.size() == 14` exactly (Cross-AI Cycle 1 C4 fix — was previously 13; CodeLabel restored).
+    8. Every TYPE_VARIATIONS key returns `get_type_variation_base()` == its base type.
+    9. `is_light` is `false` (Pulse base `#151A2E` luminance < 0.5).
+    10. Spot-check derived values: `theme.get_stylebox("normal", "Button")` returns a non-null StyleBoxFlat; `theme.get_color("font_color", "Label")` is a non-default Color; `theme.has_font("font", "HeaderLarge")` is true; `theme.has_font("font", "CodeLabel")` is true.
+    11. Toggling `raised = true` produces `Button.normal.shadow_size > 0` (per Plan 04-05 BINDING_TABLE `raised_intensity = 1` for Button.normal — Cross-AI Cycle 1 MEDIUM reconcile fix).
+    12. **Cross-AI Cycle 2 M2 fix — platform margin observable change.** Toggling `platform = MOBILE` then `platform = DESKTOP` on the loaded `.tres` produces measurably different `Button.normal` `content_margin_left` values (MOBILE > DESKTOP), proving `tokens.densityScale` + `tokens.tapPadding` reach the stylebox layer.
+    13. **Cross-AI Cycle 2 L2 fix — cross-direction differentiation smoke test.** Load `slate_neocade_theme.tres` (when Plan 04-07 has shipped it; OR construct a transient in-memory NeoCadeTheme with `base_color = Color("#111820")`) and assert its `_resolve_direction_presets().spread_factor` differs from Pulse's 1.3 (Slate's 0.7). This catches hex-key float round-trip silent-fallback regressions where all directions collapse to DEFAULT (1.0).
+    14. **Cross-AI Cycle 2 C2 fix — disabled alpha sourced from presets.** Assert that `theme.get_color("font_disabled_color", "Button").a` equals Pulse's `disabled_opacity` (0.42), NOT 0.38. Catches regressions where the recipe still hard-codes 0.38.
 
     **Cross-AI Cycle 1 MEDIUM fix (headless verification):** the helper is split into TWO files for autonomous-executor friendliness:
     - `addons/neocade_theme/_phase4_verify.gd` — `extends EditorScript` (run via Godot Editor; the original).
@@ -228,6 +232,26 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
         for t in sampled_types:
             assert(theme.has_stylebox("normal", t) or theme.has_stylebox("panel", t) or theme.has_stylebox("scroll", t) or theme.has_stylebox("embedded_border", t), "%s has no stylebox after regenerate" % t)
 
+        # 2b. Cross-AI Cycle 2 C1 fix — CANONICAL_SLOT_NAMES iteration.
+        # Iterate the frozen slot-name table from Plan 04-05 Task 2.5 and assert each declared
+        # slot exists on the loaded theme. Catches wrong slot names that pass row-count checks.
+        var canonical_slots = theme.get_script().get_script_constant_map().get("CANONICAL_SLOT_NAMES", {})
+        assert(canonical_slots.size() >= 22, "CANONICAL_SLOT_NAMES freeze coverage too small: %d (expected >= 22)" % canonical_slots.size())
+        for theme_type in canonical_slots.keys():
+            var by_data_type: Dictionary = canonical_slots[theme_type]
+            for dt in by_data_type.keys():
+                var slot_list: Array = by_data_type[dt]
+                for slot_name in slot_list:
+                    var present := false
+                    match dt:
+                        "stylebox":  present = theme.has_stylebox(slot_name, theme_type)
+                        "color":     present = theme.has_color(slot_name, theme_type)
+                        "constant":  present = theme.has_constant(slot_name, theme_type)
+                        "font_size": present = theme.has_font_size(slot_name, theme_type)
+                        "icon":      present = theme.has_icon(slot_name, theme_type)
+                        _: present = true  # unknown data_type — skip
+                    assert(present, "CANONICAL_SLOT_NAMES freeze fail: %s.%s.%s missing" % [theme_type, dt, slot_name])
+
         # 3. Verify TYPE_VARIATIONS registration — EXACT 14 (Cross-AI Cycle 1 C4 fix; CodeLabel included)
         var type_variations = theme.get_script().get_script_constant_map().get("TYPE_VARIATIONS", {})
         assert(type_variations.size() == 14, "TYPE_VARIATIONS size %d != 14" % type_variations.size())
@@ -268,6 +292,41 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
         assert(light_label_color.r < 0.5, "is_light=true should produce dark text (#1B2230 family)")
         # Revert
         theme.base_color = Color("#151A2E")
+
+        # 8. Cross-AI Cycle 2 C2 fix — disabled alpha sourced from DIRECTION_PRESETS, not 0.38.
+        # Pulse's DIRECTION_PRESETS sub-dict has disabled_opacity = 0.42; Button's
+        # font_disabled_color recipe carries "disabled": true so its alpha equals 0.42.
+        var btn_disabled: Color = theme.get_color("font_disabled_color", "Button")
+        assert(abs(btn_disabled.a - 0.42) < 0.001,
+            "C2 fix regression: Button.font_disabled_color.a = %f; expected Pulse's 0.42" % btn_disabled.a)
+
+        # 9. Cross-AI Cycle 2 M2 fix — platform tokens reach stylebox margins.
+        # Toggling MOBILE produces visibly larger Button.normal content_margin than DESKTOP.
+        theme.platform = NeoCadeTheme.Platform.DESKTOP
+        var btn_desktop: StyleBoxFlat = theme.get_stylebox("normal", "Button") as StyleBoxFlat
+        var desktop_margin: int = btn_desktop.content_margin_left if btn_desktop else -1
+        theme.platform = NeoCadeTheme.Platform.MOBILE
+        var btn_mobile: StyleBoxFlat = theme.get_stylebox("normal", "Button") as StyleBoxFlat
+        var mobile_margin: int = btn_mobile.content_margin_left if btn_mobile else -1
+        assert(mobile_margin > desktop_margin,
+            "M2 fix regression: MOBILE margin %d not > DESKTOP %d (densityScale/tapPadding not wired)" % [mobile_margin, desktop_margin])
+        # Revert
+        theme.platform = NeoCadeTheme.Platform.AUTO
+
+        # 10. Cross-AI Cycle 2 L2 fix — cross-direction smoke test (Pulse spread != Slate spread).
+        # Construct a transient Slate to verify hex-key lookup works under .tres reload.
+        # If both directions resolve to DIRECTION_PRESET_DEFAULT (1.0) due to float round-trip,
+        # this assertion fails — surfacing the silent-fallback regression.
+        var pulse_presets: Dictionary = theme._resolve_direction_presets()
+        assert(abs(pulse_presets.spread_factor - 1.3) < 0.001,
+            "L2 fix: Pulse spread_factor %f != 1.3 (hex-key lookup may be falling through to DEFAULT)" % pulse_presets.spread_factor)
+        var slate_test: NeoCadeTheme = NeoCadeTheme.new()
+        slate_test.base_color = Color("#111820")
+        var slate_presets: Dictionary = slate_test._resolve_direction_presets()
+        assert(abs(slate_presets.spread_factor - 0.7) < 0.001,
+            "L2 fix: Slate spread_factor %f != 0.7 (hex-key lookup may be falling through to DEFAULT)" % slate_presets.spread_factor)
+        assert(abs(pulse_presets.spread_factor - slate_presets.spread_factor) > 0.5,
+            "L2 fix: Pulse and Slate spread_factor too close (%f vs %f) — directions not differentiated" % [pulse_presets.spread_factor, slate_presets.spread_factor])
 
         print("✓ Phase 4 verification: pulse_neocade_theme.tres passes all gates.")
     ```
@@ -323,12 +382,61 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
         if not theme.has_font("font", "HeaderLarge"): failures.append("HeaderLarge font missing")
         if not theme.has_font("font", "CodeLabel"): failures.append("CodeLabel font missing")
 
+        # Cross-AI Cycle 2 C1 fix — CANONICAL_SLOT_NAMES iteration. Iterate the frozen
+        # slot-name table and assert each declared slot exists on the loaded theme.
+        var canonical_slots = theme.get_script().get_script_constant_map().get("CANONICAL_SLOT_NAMES", {})
+        if canonical_slots.size() < 22:
+            failures.append("CANONICAL_SLOT_NAMES freeze coverage too small: %d (expected >= 22)" % canonical_slots.size())
+        for theme_type in canonical_slots.keys():
+            var by_data_type: Dictionary = canonical_slots[theme_type]
+            for dt in by_data_type.keys():
+                var slot_list: Array = by_data_type[dt]
+                for slot_name in slot_list:
+                    var present := false
+                    match dt:
+                        "stylebox":  present = theme.has_stylebox(slot_name, theme_type)
+                        "color":     present = theme.has_color(slot_name, theme_type)
+                        "constant":  present = theme.has_constant(slot_name, theme_type)
+                        "font_size": present = theme.has_font_size(slot_name, theme_type)
+                        "icon":      present = theme.has_icon(slot_name, theme_type)
+                        _: present = true
+                    if not present:
+                        failures.append("CANONICAL_SLOT_NAMES freeze fail: %s.%s.%s missing" % [theme_type, dt, slot_name])
+
         # Raised toggle test (Cross-AI Cycle 1 MEDIUM reconcile)
         theme.raised = true
         var raised_btn: StyleBoxFlat = theme.get_stylebox("normal", "Button") as StyleBoxFlat
         if raised_btn != null and raised_btn.shadow_size <= 0:
             failures.append("raised=true: Button.normal shadow_size %d not > 0" % raised_btn.shadow_size)
         theme.raised = false
+
+        # Cross-AI Cycle 2 C2 fix — disabled alpha sourced from presets, not 0.38.
+        var btn_disabled: Color = theme.get_color("font_disabled_color", "Button")
+        if abs(btn_disabled.a - 0.42) > 0.001:
+            failures.append("C2 fix regression: Button.font_disabled_color.a = %f; expected Pulse 0.42" % btn_disabled.a)
+
+        # Cross-AI Cycle 2 M2 fix — platform tokens reach stylebox margins.
+        theme.platform = NeoCadeTheme.Platform.DESKTOP
+        var btn_desktop: StyleBoxFlat = theme.get_stylebox("normal", "Button") as StyleBoxFlat
+        var desktop_margin: int = btn_desktop.content_margin_left if btn_desktop else -1
+        theme.platform = NeoCadeTheme.Platform.MOBILE
+        var btn_mobile: StyleBoxFlat = theme.get_stylebox("normal", "Button") as StyleBoxFlat
+        var mobile_margin: int = btn_mobile.content_margin_left if btn_mobile else -1
+        if mobile_margin <= desktop_margin:
+            failures.append("M2 fix regression: MOBILE margin %d not > DESKTOP %d" % [mobile_margin, desktop_margin])
+        theme.platform = NeoCadeTheme.Platform.AUTO
+
+        # Cross-AI Cycle 2 L2 fix — Pulse vs Slate cross-direction smoke test.
+        var pulse_presets: Dictionary = theme._resolve_direction_presets()
+        if abs(pulse_presets.spread_factor - 1.3) > 0.001:
+            failures.append("L2 fix: Pulse spread_factor %f != 1.3 (hex-key lookup falling to DEFAULT?)" % pulse_presets.spread_factor)
+        var slate_test: NeoCadeTheme = NeoCadeTheme.new()
+        slate_test.base_color = Color("#111820")
+        var slate_presets: Dictionary = slate_test._resolve_direction_presets()
+        if abs(slate_presets.spread_factor - 0.7) > 0.001:
+            failures.append("L2 fix: Slate spread_factor %f != 0.7 (hex-key lookup falling to DEFAULT?)" % slate_presets.spread_factor)
+        if abs(pulse_presets.spread_factor - slate_presets.spread_factor) <= 0.5:
+            failures.append("L2 fix: Pulse and Slate spread_factor not differentiated (%f vs %f)" % [pulse_presets.spread_factor, slate_presets.spread_factor])
 
         if failures.size() > 0:
             print("FAIL — Phase 4 headless verify failures:")
@@ -364,16 +472,22 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
     - File contains assertion that all 37 canonical types are present in BINDING_TABLE.
     - File contains the raised toggle test asserting `shadow_size > 0` after `theme.raised = true`.
     - File contains the `is_light` flip test (`theme.base_color = Color("#F0F0F0")`).
+    - **Cross-AI Cycle 2 C1 fix:** File contains `CANONICAL_SLOT_NAMES` reference and `for theme_type in canonical_slots.keys():` loop with nested `match dt:` branches for `"stylebox"`, `"color"`, `"constant"`, `"font_size"`, `"icon"` data types.
+    - **Cross-AI Cycle 2 C1 fix:** File contains the failure-message format `"CANONICAL_SLOT_NAMES freeze fail: %s.%s.%s missing"` (or close equivalent).
+    - **Cross-AI Cycle 2 C2 fix:** File contains assertion that `Button.font_disabled_color.a` equals Pulse's `0.42` (literal `0.42`), NOT `0.38`.
+    - **Cross-AI Cycle 2 M2 fix:** File contains `theme.platform = NeoCadeTheme.Platform.DESKTOP` AND `theme.platform = NeoCadeTheme.Platform.MOBILE` toggles + a `mobile_margin > desktop_margin` assertion.
+    - **Cross-AI Cycle 2 L2 fix:** File contains the cross-direction smoke test — constructs a `slate_test: NeoCadeTheme` with `base_color = Color("#111820")` and asserts its `_resolve_direction_presets().spread_factor` differs from Pulse's by > 0.5.
     - File `addons/neocade_theme/_phase4_verify_headless.gd` exists (Cross-AI Cycle 1 MEDIUM headless fix).
     - Headless file contains `extends SceneTree` (NOT EditorScript).
     - Headless file contains `func _init() -> void:` and `quit(0)` / `quit(1)` exit paths.
     - Headless file contains `BINDING_TABLE.size() != 37` failure check and `TYPE_VARIATIONS.size() != 14` failure check.
+    - **Headless file ALSO contains the same Cross-AI Cycle 2 C1/C2/M2/L2 assertions** as the EditorScript variant (CANONICAL_SLOT_NAMES iteration, 0.42 disabled-alpha check, MOBILE>DESKTOP margin check, Pulse vs Slate spread differentiation check).
     - When the headless variant is run via `godot --headless --quit --script ...`, it prints the PASS line on success and exits with status 0.
     - When the EditorScript variant is run via Godot Editor's File → Run, it completes without assertion failures.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='addons/neocade_theme/_phase4_verify.gd'; if (-not (Test-Path $p)) { throw '_phase4_verify.gd missing' }; $g=Get-Content -Raw $p; foreach($n in '@tool','extends EditorScript','func _run() -> void:','func _verify_pulse() -> void:','DELETE BEFORE','ResourceLoader.load(path)','loaded is NeoCadeTheme','theme.default_font != null','base_color == Color(\"#151A2E\")','accent_color == Color(\"#8BFF6A\")','raised == false','corner_radius == 0','spacing == 18','raised_strength == 3','focus_thickness == 2','outline_width == 1','is_light == false','binding_table.size() == 37','type_variations.size() == 14','type_variations.has(\"CodeLabel\")','theme.raised = true','theme.raised = false','theme.base_color = Color(\"#F0F0F0\")','theme.is_light == true') { if ($g -notmatch [regex]::Escape($n)) { throw \"_phase4_verify.gd missing: $n\" } }; $h='addons/neocade_theme/_phase4_verify_headless.gd'; if (-not (Test-Path $h)) { throw '_phase4_verify_headless.gd missing (Cross-AI Cycle 1 MEDIUM)' }; $hg=Get-Content -Raw $h; foreach($n in 'extends SceneTree','func _init() -> void:','ResourceLoader.load(path)','loaded is NeoCadeTheme','binding_table.size() != 37','type_variations.size() != 14','type_variations.has(\"CodeLabel\")','quit(0)','quit(1)','DELETE BEFORE') { if ($hg -notmatch [regex]::Escape($n)) { throw \"_phase4_verify_headless.gd missing: $n\" } }"
+      powershell -NoProfile -Command "$p='addons/neocade_theme/_phase4_verify.gd'; if (-not (Test-Path $p)) { throw '_phase4_verify.gd missing' }; $g=Get-Content -Raw $p; foreach($n in '@tool','extends EditorScript','func _run() -> void:','func _verify_pulse() -> void:','DELETE BEFORE','ResourceLoader.load(path)','loaded is NeoCadeTheme','theme.default_font != null','base_color == Color(\"#151A2E\")','accent_color == Color(\"#8BFF6A\")','raised == false','corner_radius == 0','spacing == 18','raised_strength == 3','focus_thickness == 2','outline_width == 1','is_light == false','binding_table.size() == 37','type_variations.size() == 14','type_variations.has(\"CodeLabel\")','theme.raised = true','theme.raised = false','theme.base_color = Color(\"#F0F0F0\")','theme.is_light == true','CANONICAL_SLOT_NAMES','for theme_type in canonical_slots.keys():','match dt:','\"stylebox\":  present = theme.has_stylebox','\"color\":     present = theme.has_color','\"constant\":  present = theme.has_constant','\"font_size\": present = theme.has_font_size','\"icon\":      present = theme.has_icon','CANONICAL_SLOT_NAMES freeze fail','0.42','NeoCadeTheme.Platform.DESKTOP','NeoCadeTheme.Platform.MOBILE','mobile_margin > desktop_margin','slate_test: NeoCadeTheme','Color(\"#111820\")','spread_factor') { if ($g -notmatch [regex]::Escape($n)) { throw \"_phase4_verify.gd missing: $n\" } }; $h='addons/neocade_theme/_phase4_verify_headless.gd'; if (-not (Test-Path $h)) { throw '_phase4_verify_headless.gd missing (Cross-AI Cycle 1 MEDIUM)' }; $hg=Get-Content -Raw $h; foreach($n in 'extends SceneTree','func _init() -> void:','ResourceLoader.load(path)','loaded is NeoCadeTheme','binding_table.size() != 37','type_variations.size() != 14','type_variations.has(\"CodeLabel\")','quit(0)','quit(1)','DELETE BEFORE','CANONICAL_SLOT_NAMES','for theme_type in canonical_slots.keys():','CANONICAL_SLOT_NAMES freeze fail','0.42','NeoCadeTheme.Platform.DESKTOP','NeoCadeTheme.Platform.MOBILE','mobile_margin <= desktop_margin','slate_test: NeoCadeTheme','Color(\"#111820\")','spread_factor') { if ($hg -notmatch [regex]::Escape($n)) { throw \"_phase4_verify_headless.gd missing: $n\" } }"
     </automated>
   </verify>
   <done>BOTH the EditorScript and headless verification variants exist; Pulse loads, regenerates, populates 37 Controls + 14 variations, raised + is_light toggles work; canonical 37 + 14 counts asserted exactly. Cross-AI Cycle 1 C4/C6/MEDIUM/LOW addressed.</done>
@@ -392,7 +506,7 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
     ```
     feat(04-06): ship Pulse .tres (Godot-serialized) + dual verification helpers
 
-    Plan 04-06 wave-3 (depends on Plans 04-04, 04-05; Cross-AI Cycle 1 fixes):
+    Plan 04-06 wave-3 (depends on Plans 04-04, 04-05; Cross-AI Cycle 1 + Cycle 2 fixes):
     - C6 fix: addons/neocade_theme/pulse_neocade_theme.tres — generated via
       _phase4_import.gd ResourceSaver.save() pass; header is whatever Godot
       4.6 emits for NeoCadeTheme (canonical for Plan 04-07 peer .tres files)
@@ -404,6 +518,17 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
     - addons/neocade_theme/_phase4_verify_headless.gd — SceneTree-based variant
       runs via `godot --headless --quit --script ...` for autonomous CI
       verification (Cross-AI Cycle 1 MEDIUM); DELETED IN PHASE 11.
+    - Cycle 2 C1 fix: BOTH verifiers now iterate CANONICAL_SLOT_NAMES (Plan
+      04-05 Task 2.5) and assert each frozen slot exists per Control type —
+      catches wrong slot names that would pass row-count checks alone.
+    - Cycle 2 C2 fix: BOTH verifiers assert Button.font_disabled_color.a ==
+      0.42 (Pulse's DIRECTION_PRESETS.disabled_opacity), NOT 0.38.
+    - Cycle 2 M2 fix: BOTH verifiers toggle MOBILE/DESKTOP and assert
+      Button.normal content_margin_left differs (densityScale + tapPadding
+      reach the stylebox layer in Plan 04-05 _resolve_recipe).
+    - Cycle 2 L2 fix: BOTH verifiers construct an in-memory Slate (#111820)
+      and assert its spread_factor (0.7) differs from Pulse's (1.3) by > 0.5
+      — catches hex-key float round-trip silent-fallback regressions.
 
     Pulse @export values per DESIGN_TOKENS §5.1: base=#151A2E, accent=#8BFF6A,
     raised=false, platform=AUTO, corner_radius=0, spacing=18, raised_strength=3,

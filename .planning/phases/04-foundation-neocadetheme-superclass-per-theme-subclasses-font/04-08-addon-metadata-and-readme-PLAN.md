@@ -188,14 +188,17 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
       Scale=2.0 + Linear With Mipmaps import.
     - SIL OFL 1.1 license text + Inter Reserved Font Name notice in `OFL.txt`.
     - Dynamic `_regenerate_theme()` engine that walks BINDING_TABLE covering
-      all 37 scorecard Godot 4.6 Control types (Button, CheckBox, CheckButton,
-      LineEdit, TextEdit, Tree, ItemList, TabBar, TabContainer, ProgressBar,
-      HSlider, VSlider, HScrollBar, VScrollBar, PanelContainer, PopupPanel,
-      PopupMenu, TooltipPanel, Window, AcceptDialog, ConfirmationDialog,
-      FileDialog, ColorPicker, ColorPickerButton, GraphEdit, GraphFrame,
-      GraphNode, HFlowContainer, SplitContainer, MenuBar, MenuButton,
-      OptionButton, LinkButton, RichTextLabel, Label, SpinBox, CodeEdit,
-      HSeparator, VSeparator).
+      all 37 canonical scorecard Godot 4.6 Control types (Cross-AI Cycle 2 L3
+      fix: list trimmed to the canonical 37 from MINIMAL-THEME-COVERAGE-DELTA.md;
+      previously included non-canonical entries like GraphFrame / GraphNode /
+      HFlowContainer / HSeparator / VSeparator that are container-chrome or
+      Phase 6/7 polish, not Phase 4 baseline): AcceptDialog, Button, CheckBox,
+      CheckButton, CodeEdit, ColorPicker, ColorPickerButton, ConfirmationDialog,
+      FileDialog, FoldableContainer, GraphEdit, HScrollBar, HSlider,
+      HSplitContainer, ItemList, Label, LineEdit, LinkButton, MenuBar,
+      MenuButton, OptionButton, Panel, PopupMenu, PopupPanel, ProgressBar,
+      RichTextLabel, SpinBox, TabBar, TabContainer, TextEdit, TooltipLabel,
+      TooltipPanel, Tree, VScrollBar, VSlider, VSplitContainer, Window.
     - 14 type variations registered with explicit fonts (PITFALLS 1.2;
       Cross-AI Cycle 1 C4 fix: CodeLabel included): PrimaryButton /
       SecondaryButton / GhostButton / DangerButton / IconButton / FlatButton /
@@ -264,11 +267,13 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
     - File contains `BINDING_TABLE` reference.
     - File contains the literal text `14 type variations` (Cross-AI Cycle 1 C4 fix).
     - File contains the literal text `SHA256:` (Inter version pin per Cross-AI Cycle 1 MEDIUM).
+    - **Cross-AI Cycle 2 L3 fix:** File contains all 37 canonical scorecard names: `AcceptDialog`, `Button`, `CheckBox`, `CheckButton`, `CodeEdit`, `ColorPicker`, `ColorPickerButton`, `ConfirmationDialog`, `FileDialog`, `FoldableContainer`, `GraphEdit`, `HScrollBar`, `HSlider`, `HSplitContainer`, `ItemList`, `Label`, `LineEdit`, `LinkButton`, `MenuBar`, `MenuButton`, `OptionButton`, `Panel`, `PopupMenu`, `PopupPanel`, `ProgressBar`, `RichTextLabel`, `SpinBox`, `TabBar`, `TabContainer`, `TextEdit`, `TooltipLabel`, `TooltipPanel`, `Tree`, `VScrollBar`, `VSlider`, `VSplitContainer`, `Window`.
+    - **Cross-AI Cycle 2 L3 fix:** File does NOT contain non-canonical names `GraphFrame`, `GraphNode`, `HFlowContainer`, `HSeparator`, `VSeparator` in the Phase 4 coverage prose (they are valid Godot Controls but Phase 4 baseline does not cover them; Phase 6/7 polish does).
     - File is between 2 KB and 8 KB.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='addons/neocade_theme/CHANGELOG.md'; if (-not (Test-Path $p)) { throw 'CHANGELOG.md missing' }; $g=Get-Content -Raw $p; foreach($n in '# Changelog','## [Unreleased]','### Added (Phase 4 — Foundation)','### Notes (v1.0.0 limitations preserved)','Inter Italic Variable is deferred','No CJK font bundled','No `plugin.cfg`','is REVISABLE','pulse_neocade_theme','slate_neocade_theme','bubble_neocade_theme','daybreak_neocade_theme','burst_neocade_theme','Inter Variable Roman','OFL.txt','BINDING_TABLE','14 type variations','SHA256:') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; $size=(Get-Item $p).Length; if ($size -lt 2000 -or $size -gt 8000) { throw \"CHANGELOG.md size $size bytes outside 2-8 KB range\" }"
+      powershell -NoProfile -Command "$p='addons/neocade_theme/CHANGELOG.md'; if (-not (Test-Path $p)) { throw 'CHANGELOG.md missing' }; $g=Get-Content -Raw $p; foreach($n in '# Changelog','## [Unreleased]','### Added (Phase 4 — Foundation)','### Notes (v1.0.0 limitations preserved)','Inter Italic Variable is deferred','No CJK font bundled','No `plugin.cfg`','is REVISABLE','pulse_neocade_theme','slate_neocade_theme','bubble_neocade_theme','daybreak_neocade_theme','burst_neocade_theme','Inter Variable Roman','OFL.txt','BINDING_TABLE','14 type variations','SHA256:') { if ($g -notmatch [regex]::Escape($n)) { throw \"missing: $n\" } }; $canon37=@('AcceptDialog','Button','CheckBox','CheckButton','CodeEdit','ColorPicker','ColorPickerButton','ConfirmationDialog','FileDialog','FoldableContainer','GraphEdit','HScrollBar','HSlider','HSplitContainer','ItemList','Label','LineEdit','LinkButton','MenuBar','MenuButton','OptionButton','Panel','PopupMenu','PopupPanel','ProgressBar','RichTextLabel','SpinBox','TabBar','TabContainer','TextEdit','TooltipLabel','TooltipPanel','Tree','VScrollBar','VSlider','VSplitContainer','Window'); foreach($c in $canon37) { if ($g -notmatch ('\\b' + [regex]::Escape($c) + '\\b')) { throw \"L3 fix: CHANGELOG missing canonical scorecard name: $c\" } }; foreach($noncanon in 'GraphFrame','GraphNode','HFlowContainer','HSeparator','VSeparator') { if ($g -match ('\\b' + [regex]::Escape($noncanon) + '\\b')) { throw \"L3 fix: CHANGELOG still mentions non-canonical Control: $noncanon (Phase 6/7 polish, not Phase 4 baseline)\" } }; $size=(Get-Item $p).Length; if ($size -lt 2000 -or $size -gt 8000) { throw \"CHANGELOG.md size $size bytes outside 2-8 KB range\" }"
     </automated>
   </verify>
   <done>CHANGELOG.md ships with [Unreleased] body documenting Phase 4 deliverables + v1 limitations.</done>

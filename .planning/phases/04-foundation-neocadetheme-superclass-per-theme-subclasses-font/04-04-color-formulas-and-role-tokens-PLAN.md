@@ -422,7 +422,7 @@ Wave 2 — depends on Plan 04-01 only. Parallel-eligible with Plan 04-05 if 04-0
 
     Important: the existing skeleton from Plan 04-01 already has the reentry guard + `is_light` derivation. This task REPLACES the body between `is_light = base_color.get_luminance() >= 0.5` and `_last_regeneration_usec = Time.get_ticks_usec() - t0` with the full derivation block. The `_regenerating = false` and `_last_regeneration_usec` lines stay at the end.
 
-    NOTE on `spread_factor`, `hover_pct`, `pressed_pct`, `disabled_opacity`: these are intentionally hard-coded to sensible defaults in this plan. Plan 04-05 supersedes them with per-direction values via the BINDING_TABLE or by reading direction metadata. The current values let the engine be functional + verifiable (a freshly-loaded `pulse_neocade_theme.tres` produces non-empty derived colors immediately) without coupling Plan 04-04 to Plan 04-05's BINDING_TABLE design.
+    **Cross-AI Cycle 1 C2 + Cycle 2 cleanup:** `spread_factor`, `hover_pct`, `pressed_pct`, `disabled_opacity` are sourced per-direction from `presets` (the DIRECTION_PRESETS lookup added in Task 3.5). The previous "intentionally hard-coded" NOTE was a pre-replan remnant from Cycle 0; per Cycle 2 L1 cleanup it is REMOVED. The acceptance criteria below verify the per-direction sourcing is now canonical (NO hard-coded `1.0` / `8.0` / `12.0` / `0.38` literals on those lines).
   </action>
   <acceptance_criteria>
     - `_regenerate_theme()` body contains `var presets: Dictionary = _resolve_direction_presets()` (Cross-AI Cycle 1 C2 fix).
