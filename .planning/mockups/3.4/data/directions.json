@@ -1,6 +1,6 @@
 {
   "source": ".planning/research/THEME-DIRECTIONS.md",
-  "revision": "Mockup revision 2 (2026-05-07) — wider corner-radius spread (0/14/26/8/18), broader raised matrix, per-color offset tokens (no near-black bottom edges), and platform-correct sizing (Material 3 mobile floors, Steam-style desktop density). Builds on Round 2/2 (2026-05-06b) which migrated Bubble + Daybreak to dark per the project-wide dark-only constraint. See MOCKUP-REVISION-2-HANDOFF.md (Issues 1-6), .planning/research/THEME-DIRECTIONS.md verification log entry 2026-05-06b, and .planning/phases/03.4-visual-direction-flat-extruded-flat-mockup-approval-gate/03.4-CORRECTIVE-ADDENDUM.md (D-28).",
+  "revision": "Mockup revision 4 (2026-05-06) — selective surface alpha (`axis_11_surface_alpha`) for mood tuning per MOCKUP-REVISION-4-HANDOFF.md: Slate popup_surface 92%, Daybreak popup_surface 90% + panels 96%, Pulse/Bubble/Burst 100% solid (cabinet/candy/poster metaphors favor opacity). Universal modal scrim behind dialogs in all 5 directions. Builds on rev 3 (2026-05-06) which replaced rev-2's `darken(color, 22%)` HSL offsets with `tintTowardBase(color, base, 0.40)` (= mix(element_color, page_base, 40%)) to eliminate near-black bottom edges on already-dark surface elements (panels, popups, brand mark, state-strip cells, unselected tabs, selected list rows). Rev 2 (2026-05-07) introduced wider corner-radius spread (0/14/26/8/18), broader raised matrix, per-color offset tokens, and platform-correct sizing (Material 3 mobile floors, Steam-style desktop density). Round 2/2 (2026-05-06b) migrated Bubble + Daybreak to dark per the project-wide dark-only constraint. See MOCKUP-REVISION-{2,3,4}-HANDOFF.md, .planning/research/THEME-DIRECTIONS.md verification log entry 2026-05-06b, and .planning/phases/03.4-visual-direction-flat-extruded-flat-mockup-approval-gate/03.4-CORRECTIVE-ADDENDUM.md (D-28).",
   "shape_language_spec": ".planning/mockups/3.4/image-prompts/direction-shape-language-spec.md",
   "base_direction_selected": false,
   "directions": [
@@ -51,7 +51,14 @@
         "axis_9_disabled_opacity": 0.42,
         "axis_10_raised_primary_offset_px": 3,
         "axis_10_raised_secondary_offset_px": 1,
-        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "chips"]
+        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "chips"],
+        "axis_11_surface_alpha": {
+          "popup_surface": 1.00,
+          "panels": 1.00,
+          "buttons": 1.00,
+          "chrome": 1.00,
+          "rationale": "Cabinet hardware is solid. Translucent cabinet surfaces would read as futuristic glass UI, not arcade machine — wrong personality."
+        }
       }
     },
     {
@@ -101,7 +108,14 @@
         "axis_9_disabled_opacity": 0.50,
         "axis_10_raised_primary_offset_px": 2,
         "axis_10_raised_secondary_offset_px": 1,
-        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "selected-rows", "chips"]
+        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "selected-rows", "chips"],
+        "axis_11_surface_alpha": {
+          "popup_surface": 0.92,
+          "panels": 1.00,
+          "buttons": 1.00,
+          "chrome": 1.00,
+          "rationale": "iOS-premium mood matches iOS NavigationBar/Sheet/modal-backdrop translucency. 8% bleed-through on popup overlay is the canonical premium-tool look without sliding into glassmorphism (which Godot StyleBoxFlat does not support and would require shaders/textures, both anti-features in this addon)."
+        }
       }
     },
     {
@@ -151,7 +165,14 @@
         "axis_9_disabled_opacity": 0.45,
         "axis_10_raised_primary_offset_px": 6,
         "axis_10_raised_secondary_offset_px": 3,
-        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "selected-rows", "chips"]
+        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "selected-rows", "chips"],
+        "axis_11_surface_alpha": {
+          "popup_surface": 1.00,
+          "panels": 1.00,
+          "buttons": 1.00,
+          "chrome": 1.00,
+          "rationale": "Candy is opaque. Translucent candy reads as ice or gelatin, which shifts the mood toward sci-fi/glassmorphism — wrong personality. Solid berry surfaces preserve the playful candy-counter feel."
+        }
       }
     },
     {
@@ -201,7 +222,14 @@
         "axis_9_disabled_opacity": 0.50,
         "axis_10_raised_primary_offset_px": 3,
         "axis_10_raised_secondary_offset_px": 1,
-        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "selected-rows", "chips"]
+        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "selected-rows", "chips"],
+        "axis_11_surface_alpha": {
+          "popup_surface": 0.90,
+          "panels": 0.96,
+          "buttons": 1.00,
+          "chrome": 1.00,
+          "rationale": "Airy welcoming-lobby mood benefits from light translucency throughout. 4% bleed-through on container panels and 10% on popup overlay reads as airy lift without becoming visually weak. Buttons stay solid so interactive elements remain defined and tappable."
+        }
       }
     },
     {
@@ -252,7 +280,14 @@
         "axis_9_disabled_opacity": 0.45,
         "axis_10_raised_primary_offset_px": 5,
         "axis_10_raised_secondary_offset_px": 2,
-        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "selected-rows", "chips"]
+        "axis_10_raised_lifts": ["primary-buttons", "secondary-buttons", "ghost-buttons", "selected-tabs", "unselected-tabs", "panels", "dialogs", "lists", "brand-mark", "selected-rows", "chips"],
+        "axis_11_surface_alpha": {
+          "popup_surface": 1.00,
+          "panels": 1.00,
+          "buttons": 1.00,
+          "chrome": 1.00,
+          "rationale": "Celebration posters are solid. Translucent achievement surfaces feel weak, not bold — the personality demands poster-grade opacity. Solid surfaces keep the celebratory MD3 Expressive max statement intact."
+        }
       }
     }
   ]

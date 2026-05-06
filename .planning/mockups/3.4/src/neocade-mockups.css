@@ -384,6 +384,13 @@ h3 {
   --surface-panel-offset: #07090e;
   --surface-overlay-offset: #141a23;
   --surface-low-offset: #02030a;
+  /* Rev-4 axis 11 fallbacks (alpha-aware bg tokens). JS overrides per
+   * direction. Defaults are fully-opaque so the artboard renders solid if a
+   * direction predates the axis. */
+  --popup-surface-bg: var(--surface-overlay);
+  --panel-surface-bg: var(--surface-panel);
+  --popup-surface-alpha: 1;
+  --panel-surface-alpha: 1;
   --state-hover: #1c2436;
   --state-pressed: #14202c;
   --disabled-opacity: 0.5;
@@ -685,7 +692,10 @@ h3 {
   min-width: 0;
   border: 1px solid var(--outline);
   border-radius: var(--radius-base);
-  background: var(--surface-panel);
+  /* Rev-4 axis 11: alpha-aware bg. Solid for Pulse/Bubble/Burst (1.00); 96% on
+   * Daybreak (airy lobby bleed); 100% on Slate (panels stay solid, only the
+   * popup overlay translucent). */
+  background: var(--panel-surface-bg);
   padding: var(--density-padding);
 }
 
@@ -944,12 +954,44 @@ h3 {
 }
 
 .nc-art-dialog {
+  /* Rev-4 Tier 1 — universal modal scrim. position: relative + isolation:
+   * isolate establishes a stacking context so the ::before scrim's
+   * z-index: -1 stays contained inside the dialog (does not escape to the
+   * parent panel). */
+  position: relative;
+  isolation: isolate;
   display: grid;
   gap: calc(12px * var(--density-scale));
   border: 1px solid var(--outline);
   border-radius: calc(var(--radius-base) + 2px);
-  background: var(--surface-overlay);
+  /* Rev-4 axis 11: alpha-aware bg. 92% on Slate (iOS-style overlay
+   * translucency), 90% on Daybreak (airy lobby), 100% solid on
+   * Pulse/Bubble/Burst (cabinet/candy/poster metaphors favor opacity). */
+  background: var(--popup-surface-bg);
   padding: calc(var(--density-padding) * 0.85);
+}
+
+/* Universal modal scrim (Rev-4 Tier 1) — applies to ALL 5 directions. Renders
+ * a subtle dark halo behind the dialog at 30% opacity, extending 8px past the
+ * dialog edge into the parent panel padding area. Reads as a "lifted" feel
+ * even in flat mode. The literal full-page scrim is not visually appropriate
+ * here because the dialog lives inside the dialog-stack panel, not as a true
+ * modal overlay; the inset version is the pragmatic mockup-level analogue.
+ *
+ * In raised mode this stacks with the dialog's bottom-edge offset shadow.
+ * The 8px-extending scrim covers the area just past the offset, which reads
+ * as a cohesive "modal lift" rather than two separate shadows.
+ *
+ * NOT direction-specific (handoff: "the scrim is a UNIVERSAL behavior. Don't
+ * add per-direction variation here"). */
+.nc-art-dialog::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  background: rgba(0, 0, 0, 0.30);
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* Raised: dialog overlay sits highest in the depth hierarchy. Use a stronger

@@ -1,5 +1,11 @@
 # Phase 3.4 Render Check
 
+**Status (revision 4, 2026-05-06):** Mockup revision 4 complete per `MOCKUP-REVISION-4-HANDOFF.md` — selective surface alpha for mood tuning (`axis_11_surface_alpha`). Adds a universal modal scrim behind dialogs in all 5 directions (Tier 1) plus per-direction surface alpha for Slate (popup overlay 92%) and Daybreak (popup 90% + panels 96%) — Tier 2. Pulse, Bubble, and Burst stay 100% solid (cabinet/candy/poster metaphors favor opacity). 15 concept PNGs + 2 audit composites re-rendered. All rev-3 + rev-2 decisions stand unchanged.
+
+**Rev-4 scope:**
+- Tier 1 — universal modal scrim. `.nc-art-dialog::before` pseudo-element with `inset: -8px` + `rgba(0, 0, 0, 0.30)` extends a subtle dark halo 8px past the dialog edge into the parent panel padding. `position: relative; isolation: isolate;` on `.nc-art-dialog` establishes the stacking context so `z-index: -1` stays contained. Renders in flat AND raised modes — the scrim represents modal layering, not raised lift. The literal full-page scrim (50% black) is not appropriate at this mockup level because the dialog lives inside the dialog-stack panel; the inset variant is the pragmatic mockup-level analogue.
+- Tier 2 — per-direction surface alpha. New `axis_11_surface_alpha: { popup_surface, panels, buttons, chrome }` block in each direction's `shape_language`. JS emits `--popup-surface-bg: rgba(surface_overlay, popup_alpha)` and `--panel-surface-bg: rgba(surface_panel, panels_alpha)`; CSS rules on `.nc-art-dialog` and `.nc-art-card` consume them. Buttons and chrome are fixed at alpha 1.0 (translucent buttons read as outlined-ghost variants and conflict with all 5 v1 personalities; the state-layer alpha system stays as-is).
+
 **Status (revision 3, 2026-05-06):** Mockup revision 3 complete per `MOCKUP-REVISION-3-HANDOFF.md` — surgical fix for the dark-surface near-black bottom-edge bug introduced by rev-2's `darken()` HSL helper. Surface-colored elements (panels, dialogs, popup overlays, brand-mark badge, state-strip cells, unselected tabs, selected list rows) now correctly land color-tinted offsets in their own hue family. 15 concept PNGs + 2 audit composites re-rendered. All other rev-2 decisions (wider radius spread, broader raised matrix, slideshow, platform sizing, mood differentiation) stand unchanged.
 
 **Rev-3 fix:** Replaced `darken(color, 22%)` with `tintTowardBase(color, base, 0.40)` (= `mix(element_color, page_base, 40%)`) for `--accent-offset`, `--surface-panel-offset`, `--surface-high-offset`, `--surface-overlay-offset`, `--surface-low-offset`. The previous formula floored at HSL lightness 0 on already-dark surfaces (e.g., Bubble's `surface_panel` ≈ L=10%; minus 22 clamps to L=0 → near-black), reading as Neobrutalism — the look the user explicitly rejected. The new formula shifts each element 40% toward the page background, preserving hue at every brightness and never crossing past the base. The legacy `--offset` alias still uses `darken()` for a distinct-from-base sentinel (no CSS rule consumes `var(--offset)` today).
@@ -28,6 +34,8 @@
 | Artboard CSS does NOT hard-code shape tokens | PASS | `.nc-artboard` reads `var(--radius-base)`, `var(--button-pad-h)`, etc.; no `--radius: 12px` literal anywhere on the artboard or board path. |
 | Artboard CSS does NOT hard-code platform sizes | PASS | `.nc-art-button` reads `var(--button-min)`; `.nc-art-input` reads `var(--input-min)`; `.nc-art-list-row` reads `var(--row-min)`; etc. `.nc-artboard.mobile` only overrides physical width/height, not control sizes. |
 | Per-color offset tokens emitted | PASS | `deriveSurfaceRamp()` emits `accent_offset`, `surface_high_offset`, `surface_panel_offset`, `surface_overlay_offset`, `surface_low_offset` via `tintTowardBase(hex, base, 0.40)` (rev-3 — replaces rev-2's `darken()` which clamped to near-black on already-dark surfaces). Each offset is `mix(element_color, page_base, 40%)`, preserving hue at every brightness. |
+| Axis 11 surface alpha emitted (rev-4) | PASS | Every direction declares `axis_11_surface_alpha: { popup_surface, panels, buttons, chrome }` in `data/directions.json` shape_language and the JS shape mirror. `deriveTokens()` emits `--popup-surface-bg: rgba(surface_overlay, popup_alpha)` and `--panel-surface-bg: rgba(surface_panel, panels_alpha)` as inline CSS variables; `.nc-art-card` and `.nc-art-dialog` consume the new bg tokens. Buttons + chrome are fixed at alpha 1.0 per handoff (translucent buttons would conflict with the v1 personalities). |
+| Universal modal scrim emitted (rev-4) | PASS | `.nc-art-dialog::before` pseudo-element with `position: absolute; inset: -8px; background: rgba(0,0,0,0.30); z-index: -1; border-radius: inherit; pointer-events: none;`. `.nc-art-dialog` gets `position: relative; isolation: isolate;` to establish a stacking context so the negative z-index stays contained inside the dialog. Renders in flat AND raised modes (modal layering, not raised lift). |
 | Slideshow component bound | PASS | `concept-gallery.html` includes `<section class="nc-slideshow">`; `bindSlideshow()` wires arrows + keyboard + tabs; image transition is `none !important`. |
 | Flat concept output path | PASS | `concept-image.html?raised=false` renders the flat artboard. |
 | Raised concept output path | PASS | `concept-image.html?raised=true` renders the raised artboard with broad raise matrix and per-color offsets. |
@@ -55,6 +63,7 @@
 | 8 surface ramp | 4 stops, wide spread | strong tonal hierarchy visible |
 | 9 state behavior | hover +6%, pressed -10%, disabled 0.42 | tactile, mechanical |
 | 10 raised offset | primary 3 / tab 2 / row 0 / secondary 1; broad matrix lifts buttons + panels + dialogs + brand mark + tabs + chips + thumb + check + progress | flat-3D depth on every interactable; passive elements stay flat |
+| 11 surface alpha (rev-4) | popup 100% / panels 100% / buttons 100% / chrome 100% — solid | Cabinet hardware is opaque; translucent cabinets would read as futuristic glass UI, not arcade machine |
 
 | Audit row | Result | Note |
 |---|---|---|
@@ -82,6 +91,7 @@
 | 8 surface ramp | 3 stops, narrow spread | calm continuous tonal feel |
 | 9 state behavior | hover +4%, pressed -6%, disabled 0.50 | quiet, not aggressive |
 | 10 raised offset | primary 2 / tab 1 / row 1 / secondary 1; restrained but broad matrix | tool-friendly subtle depth on every interactable |
+| 11 surface alpha (rev-4) | popup 92% / panels 100% / buttons 100% / chrome 100% — iOS-style overlay translucency | Subtle 8% bleed-through visible behind the popup surface only; mirrors iOS NavigationBar/Sheet/modal-backdrop translucency. The premium-tool restraint stays intact because container panels remain solid |
 
 | Audit row | Result | Note |
 |---|---|---|
@@ -109,6 +119,7 @@
 | 8 surface ramp | 3 stops, medium spread | playful soft layers |
 | 9 state behavior | hover +8% (bouncy), pressed -10%, disabled 0.45 | feels alive |
 | 10 raised offset | primary 6 / tab 4 / row 3 / secondary 3 (was 5/3/2/2 in rev 1); broad matrix | "poked-out" tactile depth on every interactive element — the user's PLAY-button reference vibe |
+| 11 surface alpha (rev-4) | popup 100% / panels 100% / buttons 100% / chrome 100% — solid | Candy is opaque; translucent candy reads as ice/gelatin and shifts the mood toward sci-fi/glassmorphism |
 
 | Audit row | Result | Note |
 |---|---|---|
@@ -136,6 +147,7 @@
 | 8 surface ramp | 4 stops, medium spread | airy fresh layers |
 | 9 state behavior | hover +6%, pressed -6%, disabled 0.50 | soft, friendly response |
 | 10 raised offset | primary 3 / tab 2 / row 1 / secondary 1 (was 3/2/0/0 in rev 1); broad matrix | tactile but spare; broader than rev 1 |
+| 11 surface alpha (rev-4) | popup 90% / panels 96% / buttons 100% / chrome 100% — airy lobby | Subtle 4% translucency through the action-panel + dialog-stack + list/tree containers (the dark teal page bleeds through gently); stronger 10% on the popup overlay; buttons stay solid for tappability |
 
 | Audit row | Result | Note |
 |---|---|---|
@@ -163,6 +175,7 @@
 | 8 surface ramp | 4 stops, wide spread | dramatic layered emphasis |
 | 9 state behavior | hover +8%, pressed -12% (bold), disabled 0.45 | strong press feedback |
 | 10 raised offset | primary 5 / tab 3 / row 2 / secondary 2; broad matrix | clear depth hierarchy |
+| 11 surface alpha (rev-4) | popup 100% / panels 100% / buttons 100% / chrome 100% — solid | Celebration posters are solid; translucent achievement surfaces feel weak, not bold — the personality demands poster-grade opacity |
 
 | Audit row | Result | Note |
 |---|---|---|
@@ -224,6 +237,24 @@ Each direction now visibly differentiates desktop and mobile, per Issue 6. The c
 | Bubble | Desktop: 36-44px 26px-rounded chrome with 999px primary pill. Mobile: 48-56px chrome with bigger pill primary at 56px (M3 Extended FAB), chunkier toggles, generous spacing. Mobile-raised primary button pink with darker-pink offset reads decisively as "candy machine" not "Neobrutalism". | PASS |
 | Daybreak | Desktop: 36-44px 8px-rounded chrome with sentence-case kickers. Mobile: 48-56px chrome, brighter mint halos preserved, 56px list rows. Airy density rule (+50% gap) most visible here because of the already-airy base spacing. | PASS |
 | Burst | Desktop: 36-44px chrome with oversized 28px primary radius. Mobile: 48-56px chrome, asymmetric selected tab visibly bigger on mobile due to the size scaling, chunky tilted brand mark unchanged across platforms. Most expressive shape language stays expressive at both sizes. | PASS |
+
+## Surface-Alpha Policy Audit (revision 4)
+
+Per `MOCKUP-REVISION-4-HANDOFF.md`. Each direction declares an `axis_11_surface_alpha` block in `data/directions.json`/`shape_language` with four entries: `popup_surface`, `panels`, `buttons`, `chrome`. The first two are consumed by `.nc-art-dialog` and `.nc-art-card` via `--popup-surface-bg` and `--panel-surface-bg` (rgba tokens emitted by `deriveTokens()`). Buttons and chrome remain fixed at alpha 1.0 — the handoff explicitly forbids translucent buttons (would read as outlined-ghost variants and conflict with every v1 personality) and translucent state-layer overlays (the existing `--state-hover` / `--state-pressed` mix system is correct as-is).
+
+| Direction | Surface alpha policy | Visible in renders |
+|---|---|---|
+| Pulse | popup 100%, panels 100%, buttons 100%, chrome 100% — solid (cabinet hardware) | All container panels and the popup surface render fully opaque. Translucent cabinets would read as futuristic glass UI, not arcade machine — wrong personality. |
+| Slate | popup 92%, panels 100%, buttons 100%, chrome 100% — iOS-style overlay translucency | Subtle 8% bleed-through visible behind the popup surface only. Container panels stay solid. Mirrors iOS NavigationBar/Sheet/modal-backdrop translucency without crossing into glassmorphism (Godot StyleBoxFlat does not support backdrop blur, and shaders/textures are anti-features). |
+| Bubble | popup 100%, panels 100%, buttons 100%, chrome 100% — solid (candy is opaque) | All container panels and the popup surface render fully opaque. Translucent candy reads as ice/gelatin and shifts the mood toward sci-fi — wrong personality for the playful candy-counter feel. |
+| Daybreak | popup 90%, panels 96%, buttons 100%, chrome 100% — airy lobby | Subtle 4% translucency visible through the action-panel + dialog-stack + list/tree containers (the dark teal page bleeds gently through). Stronger 10% translucency on the popup overlay. Buttons stay solid so interactive elements remain defined and tappable. |
+| Burst | popup 100%, panels 100%, buttons 100%, chrome 100% — solid (poster-bold) | All container panels and the popup surface render fully opaque. Celebration posters are solid; translucent achievement surfaces feel weak, not bold — the personality demands poster-grade opacity. |
+| Universal modal scrim | All 5 directions get `.nc-art-dialog::before` with `inset: -8px`, `rgba(0, 0, 0, 0.30)`, `z-index: -1`, `border-radius: inherit` | A subtle dark halo extends 8px past the dialog edge into the parent panel padding area. In flat mode this reads as a "lifted modal" rim; in raised mode it stacks with the bottom-edge offset shadow (rev-3 `--surface-overlay-offset`) for compounded modal depth. Rendered in all 5 directions identically — Tier 1 is universal, no per-direction variation. |
+
+What stays out of scope (per handoff "Don't" list):
+- No alpha on button surfaces in any direction — the MD3 outlined-button variant is a separate conceptual style that conflicts with all 5 v1 personalities.
+- No alpha on hover/pressed state layers — the existing `--state-hover` / `--state-pressed` mix is correct.
+- No 6th wireframe/HUD direction — Phase 3.3 approval is locked. A wireframe direction is queued for v1.x (transparent fills + strong colored borders, "futuristic UI / AR overlay / schematic" mood); architecture supports adding it as a new `.tres` without code changes. Defer.
 
 ## Concept Render Evidence
 

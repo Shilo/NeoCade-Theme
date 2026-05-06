@@ -47,7 +47,10 @@ const NEOCADE_DIRECTIONS = [
       mark_shape: "square-cabinet-bezel",
       primary_strategy: "bold-accent-fill-dark-text",
       ghost_strategy: "accent-outlined-accent-text",
-      focus_style: "tight-cabinet-ring"
+      focus_style: "tight-cabinet-ring",
+      // Rev-4 axis 11: surface alpha policy. Pulse stays 100% solid —
+      // cabinet hardware, not glass UI.
+      surface_alpha: { popup_surface: 1.00, panels: 1.00, buttons: 1.00, chrome: 1.00 }
     }
   },
   {
@@ -85,7 +88,11 @@ const NEOCADE_DIRECTIONS = [
       mark_shape: "rounded-square",
       primary_strategy: "quiet-pill-primary",
       ghost_strategy: "thin-accent-outline",
-      focus_style: "ios-style-offset"
+      focus_style: "ios-style-offset",
+      // Rev-4 axis 11: 8% bleed-through on popup overlay only — iOS-premium
+      // mood mirrors iOS NavigationBar/Sheet/modal-backdrop translucency
+      // without sliding into glassmorphism (no backdrop blur in StyleBoxFlat).
+      surface_alpha: { popup_surface: 0.92, panels: 1.00, buttons: 1.00, chrome: 1.00 }
     }
   },
   {
@@ -123,7 +130,9 @@ const NEOCADE_DIRECTIONS = [
       mark_shape: "circle-or-squircle",
       primary_strategy: "pillowy-fully-rounded-primary",
       ghost_strategy: "rounded-ghost-thicker-outline",
-      focus_style: "cheerful-chunky-ring"
+      focus_style: "cheerful-chunky-ring",
+      // Rev-4 axis 11: candy is opaque. Translucent candy reads as ice/gelatin.
+      surface_alpha: { popup_surface: 1.00, panels: 1.00, buttons: 1.00, chrome: 1.00 }
     }
   },
   {
@@ -160,7 +169,10 @@ const NEOCADE_DIRECTIONS = [
       mark_shape: "rounded-square-with-halo",
       primary_strategy: "friendly-primary-generous-breathing",
       ghost_strategy: "soft-outline-ghost",
-      focus_style: "airy-fresh-ring-with-mint-halo"
+      focus_style: "airy-fresh-ring-with-mint-halo",
+      // Rev-4 axis 11: airy welcoming-lobby mood. 4% bleed on panels + 10% on
+      // popup overlay reads as airy lift; buttons stay solid for tappability.
+      surface_alpha: { popup_surface: 0.90, panels: 0.96, buttons: 1.00, chrome: 1.00 }
     }
   },
   {
@@ -198,7 +210,10 @@ const NEOCADE_DIRECTIONS = [
       mark_shape: "chunky-asymmetric-badge",
       primary_strategy: "oversized-statement-primary",
       ghost_strategy: "normal-accent-ghost",
-      focus_style: "dramatic-event-ring"
+      focus_style: "dramatic-event-ring",
+      // Rev-4 axis 11: celebration posters are solid. Translucent achievement
+      // surfaces feel weak — personality demands poster-grade opacity.
+      surface_alpha: { popup_surface: 1.00, panels: 1.00, buttons: 1.00, chrome: 1.00 }
     }
   }
 ];
@@ -287,6 +302,19 @@ function mix(a, b, amount) {
     g: ca.g + (cb.g - ca.g) * amount,
     b: ca.b + (cb.b - ca.b) * amount
   });
+}
+
+/**
+ * Returns a CSS rgba() string for `hex` at the given alpha (0..1). Used for
+ * rev-4 axis 11 selective-alpha tokens — Slate's popup overlay 92%, Daybreak's
+ * popup 90% + panels 96%, others 100%. Anything at alpha=1.0 is visually
+ * indistinguishable from the source hex; we still emit rgba() so downstream
+ * CSS uses a single bg-token shape (no branching). See
+ * MOCKUP-REVISION-4-HANDOFF.md "Tier 2 — per-direction subtle alpha".
+ */
+function rgba(hex, alpha) {
+  const { r, g, b } = hexToRgb(hex);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 function luminance(hex) {
@@ -449,6 +477,12 @@ function deriveTokens(direction, platformName, raisedFlag) {
    * recommendation in the handoff). Half-mix with white reads as a 1px lighter
    * top edge — the "inner highlight" you see on the user's PLAY-button reference. */
   const accent_rim = mix(accent, "#ffffff", 0.5);
+  /* Rev-4 axis 11: surface alpha policy. Default to fully solid if a direction
+   * predates the axis (defensive — every direction in v1 declares it). Only
+   * popup_surface and panels currently consume alpha; buttons + chrome are
+   * fixed at 1.0 per handoff (Don't-do list — translucent buttons read as
+   * outlined-ghost variants and conflict with all 5 v1 personalities). */
+  const sa = s.surface_alpha || { popup_surface: 1.0, panels: 1.0, buttons: 1.0, chrome: 1.0 };
 
   return {
     "--base": base,
@@ -462,6 +496,16 @@ function deriveTokens(direction, platformName, raisedFlag) {
     "--surface-high": ramp.surface_high,
     "--surface-overlay": ramp.surface_overlay,
     "--outline": ramp.outline,
+    /* Alpha-aware bg tokens (rev-4 axis 11). Consumed by `.nc-art-card` and
+     * `.nc-art-dialog` to render at the per-direction surface_alpha policy.
+     * The base hex tokens (--surface-panel, --surface-overlay) above remain
+     * available for any rule that needs the SOLID color (e.g., the footer
+     * palette swatches in the artboard, where the swatch shows the color
+     * itself, not the rendered alpha). */
+    "--popup-surface-bg": rgba(ramp.surface_overlay, sa.popup_surface),
+    "--panel-surface-bg": rgba(ramp.surface_panel, sa.panels),
+    "--popup-surface-alpha": String(sa.popup_surface),
+    "--panel-surface-alpha": String(sa.panels),
     /* Per-color offset tokens — each raised element's bottom edge is a darker
      * variant of its own bg color (Issue 2). The legacy --offset alias is
      * retained at the base-darker variant for any rule that has not yet been
