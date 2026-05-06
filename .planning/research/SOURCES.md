@@ -575,6 +575,11 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 - Disabled 38% content and 12% container/outline values are corroborated by Material Web filled/outlined button token sources.
 - Official `m3.material.io` JavaScript extraction gaps are non-blocking because every numeric fact used downstream has an accessible fallback source.
 
+**Rerun execution pass (2026-05-05):**
+- Live spot-checks reconfirmed access to Android Developers Material 3, Material Web token sources, and Godot StyleBoxFlat/Theme/type-variation documentation.
+- Local hard-fail audit rechecked MD3 numeric state values, source-access/source-agreement labels, Godot mapping terms, Flat-vs-Raised guidance, and forbidden implementation surfaces.
+- No adoption/rejection/open-decision changes were required.
+
 **Confidence:** HIGH for numeric MD3 token values and Godot API facts; MEDIUM-HIGH for MD3 Expressive synthesis because platform behavior must be filtered carefully for static Godot Theme scope.
 
 ---
@@ -621,6 +626,11 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 - Accepted survey rows include source URL, evidence role, source-access status, screenshot/image URL or visual-capture note, hard-filter audit, and adopt/reject/open decision.
 - Rejected rows are intentionally retained to keep the future design out of gradient, texture, seasonal illustration, candy-gloss, and low-context board territory.
 - Asset packs are inspiration and construction evidence only, not artwork to copy.
+
+**Rerun execution pass (2026-05-05):**
+- Live spot-checks reconfirmed access to both user exemplar pages and Godot StyleBoxFlat/Theme documentation relevant to raised recipe feasibility.
+- Local hard-fail audit rechecked construction evidence, visual-capture fields, hard-filter audit language, Control-family matrix coverage, escape-hatch notes, and forbidden implementation surfaces.
+- No adoption/rejection/open-decision changes were required.
 
 **Confidence:** HIGH that the valid raised grammar is narrow and well-scoped; MEDIUM that the final raised intensity should be chosen before mockups, so Phase 3.4 must show both flat and raised variants.
 

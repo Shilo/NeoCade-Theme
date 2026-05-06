@@ -371,3 +371,4 @@ Baseline principle: MD3 flat treatment is the default; raised treatment is optio
 | 2026-05-05 | 03.1-02 | MD3 foundations/mapping/recipes verified with URL count, numeric state-layer values, source-access labels, source agreement, mapping terms, and StyleBoxFlat recipe checks. | PASS |
 | 2026-05-05 | 03.1-03 | MD3 Expressive source facts, adopt/reject/open synthesis, post-launch check, and drift audit verified. | PASS |
 | 2026-05-05 | 03.1-06 | Final cross-document audit checked Flat vs Raised matrix, numeric state values, source agreement, source-access status, and populated anti-filter audit. | PASS |
+| 2026-05-05 | 03.1-rerun | Re-executed the Phase 3.1 MD3 audit after user correction; spot-checked live Android Developers, Material Web token, and Godot documentation access, then reran hard-fail checks for numeric state values, source agreement/source-access labels, Godot mappings, Flat vs Raised guidance, and forbidden implementation surfaces. | PASS |

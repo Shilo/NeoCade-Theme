@@ -240,3 +240,4 @@ Final handoff: Phase 3.4 mockups must show both flat and raised versions for eac
 | 2026-05-05 | 03.1-04 | User exemplars, broad survey rows, visual-capture notes, rejection rows, and pattern catalogue verified. | PASS |
 | 2026-05-05 | 03.1-05 | Recipe A/B decision, wrapper/two-layer recommendation, Control-family matrix, and escape-hatch notes verified. | PASS |
 | 2026-05-05 | 03.1-06 | Final cross-document audit checked Flat vs Raised matrix, visual-capture fields, hard-filter audit, adopt/reject/open decisions, and forbidden implementation surface status. | PASS |
+| 2026-05-05 | 03.1-rerun | Re-executed the Phase 3.1 Flat-3D audit after user correction; spot-checked live itch.io exemplar access and Godot StyleBoxFlat/Theme docs, then reran hard-fail checks for construction evidence, visual-capture fields, hard-filter terms, Control-family matrix coverage, escape hatches, and forbidden implementation surfaces. | PASS |
