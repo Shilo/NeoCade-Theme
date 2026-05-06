@@ -698,6 +698,68 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 
 ---
 
+## 14. Theme Direction Research sources (added 2026-05-06 by Phase 3.3)
+
+**Source name + location:**
+- Final artifact: `.planning/research/THEME-DIRECTIONS.md`
+- Phase context and decisions: `.planning/phases/03.3-theme-direction-research/03.3-CONTEXT.md`
+- Redirect feedback: `.planning/phases/03-visual-direction-mockup-approval-gate/REDIRECTED.md`
+- Local inputs: `.planning/research/MD3-RESEARCH.md`, `.planning/research/FLAT-3D-UI-RESEARCH.md`, `.planning/research/GODOT-DYNAMIC-THEME-RESEARCH.md`, `.planning/spikes/dynamic-theme/VERIFY-RESULTS.md`
+- User exemplars: https://hcgamestudios.itch.io/flat-game-ui-for-mobile-games, https://fajrulaslim.itch.io/ui-button-flat-design/devlog/157464/ui-button-flat-design
+- Official MD3/Expressive references: https://m3.material.io/blog/building-with-m3-expressive, https://design.google/library/expressive-material-design-google-research, https://material-web.dev/theming/material-theming/, https://developer.android.com/design/ui/wear/guides/get-started/design-language, https://android-developers.googleblog.com/2025/08/introducing-material-3-expressive-for-wear-os.html
+- Commercial / asset-pack survey references: https://kenney.nl/assets/ui-pack, https://www.gameart2d.com/minimalist-game-gui.html, https://modi-assets.itch.io/, https://gamecontentdeals.com/assets/2d/pinky-ui/, https://sungraphica.itch.io/flat-game-user-interface-asset-pack/purchase, https://interfaceingame.com/games/brawl-stars/, https://www.mobygames.com/game/204301/royal-match/screenshots/
+
+**What was read (Phase 3.3, 2026-05-06):**
+- THEME-DIRECTIONS.md was created and populated with provenance, filter contract, 14-source commercial survey, v0 feedback DNA mapping, five candidate directions, WCAG AA base/accent checks, per-direction filter audit, final verification log, and text-level approval checkpoint stub.
+- 03.3-CONTEXT.md decisions D-01 through D-16 were used as the controlling requirements, especially D-03 broad personality spread, D-03b universal export axes, D-07 filters, D-11 SOURCES update, and D-12/D-13 approval gate.
+- REDIRECTED.md was read for exact v0 user reactions and the hard Boardwalk Sunset rejection.
+- Phase 3.1 MD3/Flat-3D research and Phase 3.2 dynamic theme architecture research were read as upstream constraints.
+- External survey pages were inspected or retained with honest access-status labels in THEME-DIRECTIONS.md.
+
+**Source-access status:**
+- THEME-DIRECTIONS.md and local research: `local artifact inspected`.
+- User exemplars and many asset-pack sources: `directly extracted` and/or `browser/manual verified`.
+- `m3.material.io` Expressive page: `fallback source used`; canonical URL retained because direct extraction is JavaScript-gated in this runtime.
+- Brawl Stars interface page: `blocked in direct open`; search-result summary plus Phase 3.1 visual-capture note used, with Royal Match and asset-pack rows covering the same evidence role.
+- External survey rows in THEME-DIRECTIONS.md record retrieved dates individually; all Phase 3.3 survey rows were retrieved 2026-05-06 unless marked as local artifact evidence.
+
+**What NeoCade adopts:**
+- Five peer candidate directions for user review: ArcadePulse, OrbitalSlate, PrizePopPlaza, DaybreakLobby, and FestivalBurst.
+- Broad-spread personality model: dark saturated arcade, modern minimal dark, playful bubbly, friendly daylight, and expressive statement.
+- Inspiration-only survey discipline: commercial and asset-pack examples validate hierarchy, construction, and personality, but not artwork, exact values, names, or layouts.
+- Per-direction base/accent defaults with arithmetic WCAG AA checks at a stricter 4.5:1 floor for normal text/icons/focus affordances.
+- Universal export-axis language: every direction supports flat/raised and desktop/mobile through the dynamic `NeoCadeTheme` superclass.
+
+**What NeoCade rejects:**
+- Boardwalk Sunset as a direction identity; its only retained lesson is the already-universal flat/simple mandate.
+- Any direction differentiated by being the base, flat, raised, desktop, or mobile theme.
+- Texture, patterns, embossing, painterly/leather/wood/grunge surfaces, gradients on chrome, glow-first focus, scanlines, synth/noir/dystopian framing, copied marketplace assets, exact commercial palettes, or app-specific UI layouts.
+- Mockup, image, addon, theme resource, font, icon, scene, project, or `.tres` edits during Phase 3.3.
+
+**What remains open:**
+- User approval, focused revisions, or rejection of the five text-level directions at the Phase 3.3 checkpoint.
+- Phase 3.4 mockups must visualize the approved directions in both flat and raised modes before selecting finalists.
+- The Phase 3.4 gate still chooses which approved direction becomes the base `NeoCadeTheme` default.
+- Phase 4 converts approved direction recipes into subclass profiles only after Phase 3.4 approval.
+
+**source agreement or conflict notes:**
+- User exemplars, asset-pack sources, and Flat-3D research agree on solid flat construction plus optional offset duplicate for tactile raised controls.
+- MD3/MD3 Expressive sources agree with using role colors, shape, hierarchy, and accessible pairing as the static design grammar.
+- Commercial examples validate energy and hierarchy but often include artwork/gradient/gloss effects that NeoCade explicitly rejects.
+- Phase 3.2 architecture confirms directions must be personality subclasses over a common dynamic superclass, not a matrix of static flat/raised/mobile files.
+
+**requirements / decision coverage:**
+- RES-NEW-06: covered by five documented candidate directions.
+- DESIGN-NEW-DIR-01: covered by the 14-source commercial example survey.
+- DESIGN-NEW-DIR-02: covered by the per-direction filter audit.
+- DOCS-05: this Section 14 update keeps SOURCES.md current for Phase 3 source-dive outputs.
+- D-11: implemented by this Section 14.
+- D-12/D-13: approval remains text-level and is recorded in THEME-DIRECTIONS.md; no mockups are created here.
+
+**Confidence:** HIGH for text-level direction research readiness; MEDIUM until the user approves or revises the five directions at the checkpoint.
+
+---
+
 ## Summary of Source-Dive Spike Recommendations
 
 Of the nine sources catalogued above, four have HIGH or HIGH-MEDIUM coverage from the initial parallel research pass; the other five have explicit gaps that the roadmap-level spike phases must close:

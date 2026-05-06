@@ -2,7 +2,7 @@
 
 **Phase:** 03.3-theme-direction-research  
 **Created:** 2026-05-06  
-**Status:** In progress; Plan 01 and Plan 02 complete; Plan 03 closeout and approval checkpoint pending.
+**Status:** Awaiting user text-level approval checkpoint.
 
 ## Provenance and Scope
 
@@ -214,7 +214,27 @@ No direction is differentiated by being flat, raised, desktop, mobile, or base. 
 
 ## User Approval Checkpoint
 
-Pending Plan 03. Approval is text-level only per D-12 and D-13. No mockups, design tokens, subclass code, or `.tres` resources are created in this phase.
+CHECKPOINT REACHED: Phase 3.3 text-level direction approval is pending.
+
+D-12 and D-13 checkpoint scope: approval is text-level only. No mockups, design tokens, subclass code, production addon files, or `.tres` resources are created in Phase 3.3. Phase 3.4 may mock up the approved directions only after this checkpoint is resolved.
+
+Revision round: 0/2
+
+| Option | Meaning | Result |
+|---|---|---|
+| approve | Approve these five directions for Phase 3.4 mockups. | Phase 3.3 can close after verification; Phase 3.4 may mock up the approved set. |
+| revise | Revise specific directions by name, up to two focused revision rounds. | The named directions are updated, checks rerun, and this checkpoint returns. |
+| reject all | Reject all five directions. | Stop before mockup effort and open escalation discussion for a new direction strategy. |
+
+Five directions awaiting decision:
+
+| Direction | Future subclass | Base color | Accent color | One-sentence personality summary |
+|---|---|---|---|---|
+| Arcade Pulse | ArcadePulseNeoCadeTheme | #151A2E | #8BFF6A | Dark saturated arcade energy with a near-navy control-panel base and lively green action/focus accent. |
+| Orbital Slate | OrbitalSlateNeoCadeTheme | #111820 | #8BD3FF | Calm modern minimal dark with restrained blue accenting and iOS-like clarity. |
+| Prize Pop Plaza | PrizePopPlazaNeoCadeTheme | #FFF4FA | #7B1B55 | Friendly, childlike, mobile-game-bright, and tactile without texture or embossing. |
+| Daybreak Lobby | DaybreakLobbyNeoCadeTheme | #EAF7F1 | #006A68 | Welcoming daylight arcade by day with mint-clean surfaces and teal wayfinding. |
+| Festival Burst | FestivalBurstNeoCadeTheme | #20112E | #FFD166 | Bold MD3 Expressive statement with deep plum grounding and warm event-like emphasis. |
 
 ## Phase 3.3 Verification Log
 
@@ -239,3 +259,57 @@ Pending Plan 03. Approval is text-level only per D-12 and D-13. No mockups, desi
 | contrast verification | PASS: all base/accent pairs exceed the deliberate 4.5:1 WCAG AA floor for normal text/icons/focus usage. |
 | universal axes | PASS: every direction documents flat-mode behavior, raised-mode behavior, and mobile-sizing notes; none is the flat, raised, desktop, mobile, or base theme. |
 | filter audit | PASS: every direction passes anti-cyberpunk, anti-texture, universal-axes-still-work, no-base-preselection, and no-mockup/no-.tres checks. |
+
+### 2026-05-06 - Plan 03 final coverage audit and checkpoint
+
+ROADMAP success criteria audit:
+
+| SC | Roadmap success criterion | Evidence | Status |
+|---|---|---|---|
+| SC-01 | THEME-DIRECTIONS.md produced with 5 candidate directions, subclass-form names, base/accent hex values, WCAG AA contrast, personality summaries, target use cases, filter audit, and rationale. | Candidate Directions section and Filter Audit Summary. | PASS |
+| SC-02 | Names may keep, revise, or replace per fit; Boardwalk Sunset is hard-rejected. | v0 Feedback DNA Mapping and direction naming decisions. | PASS |
+| SC-03 | Five directions span personality space, not five similar themes. | ArcadePulse, OrbitalSlate, PrizePopPlaza, DaybreakLobby, FestivalBurst cover the five D-06 anchors. | PASS |
+| SC-04 | Per-v0-direction reaction to DNA mapping table exists. | v0 Feedback DNA Mapping table names liked DNA, rejected traits, eligible use, and informed directions. | PASS |
+| SC-05 | Commercial example survey documents 10-15 references and each direction cites surveyed examples. | 14-source Commercial Example Survey; each candidate lists commercial examples used. | PASS |
+| SC-06 | Anti-cyberpunk and anti-texture filter pass per direction. | Filter Audit Summary rows for all five directions. | PASS |
+| SC-07 | Universal flat-MD3 revisions apply across all directions. | Candidate shared constraints plus per-direction flat/raised behavior. | PASS |
+| SC-08 | Base-direction selection is not pre-decided. | Shared constraints and audit state base direction deferred / no base preselection. | PASS |
+| SC-09 | User-approval checkpoint is presented at text level. | User Approval Checkpoint section with approve/revise/reject all choices and Revision round: 0/2. | PENDING USER |
+| SC-10 | SOURCES.md Section 14 added with adopt/reject/open synthesis. | `.planning/research/SOURCES.md` Section 14. | PASS |
+| SC-11 | No mockup commits and no `.tres` commits. | Changed-file audit limited to `.planning/` markdown workflow artifacts. | PASS |
+
+Requirement coverage audit:
+
+| Requirement | Evidence | Status |
+|---|---|---|
+| RES-NEW-06 | Five candidate theme directions derived from user goals, restrictions, v0 DNA, survey, Phase 3.1, and Phase 3.2. | PASS |
+| DESIGN-NEW-DIR-01 | Commercial Example Survey contains 14 baseline sources with access status, retrieved date, role, anchor, adopt/reject/open notes. | PASS |
+| DESIGN-NEW-DIR-02 | Filter Audit Summary covers each direction against anti-cyberpunk, anti-texture, universal axes, no base preselection, and no mockup/.tres output. | PASS |
+| DOCS-05 | SOURCES.md Section 14 updated for Phase 3.3. | PASS |
+
+Context decision audit:
+
+| Decision | Coverage | Status |
+|---|---|---|
+| D-01 | Names kept/revised/replaced by fit: Prize Pop Plaza retained; other direction names revised/replaced; Boardwalk Sunset dropped. | PASS |
+| D-01b | base direction deferred to Phase 3.4; no base preselection in Phase 3.3. | PASS |
+| D-01c | Universal no-texture/no-pattern/no-embossing/flat-MD3/dynamic-export constraints apply to all directions. | PASS |
+| D-02 | Input priority is encoded in Provenance and Scope and applied to synthesis. | PASS |
+| D-03 | Broad spread covered by five distinct personality anchors. | PASS |
+| D-03b | Universal flat/raised and desktop/mobile axes documented for every direction. | PASS |
+| D-03c | Expansion not needed; 14 baseline sources cover all seeded anchors. | PASS |
+| D-04 | v0 feedback DNA table maps liked and rejected traits. | PASS |
+| D-05 | Boardwalk Sunset contributes no direction identity. | PASS |
+| D-06 | Seed archetypes validated by commercial survey rows. | PASS |
+| D-07 | Per-direction filter audit complete. | PASS |
+| D-08 | Commercial survey includes 10-15 baseline sources with anchor coverage. | PASS |
+| D-09 | Inspiration-only discipline stated in source contract and every external survey row. | PASS |
+| D-10 | Required output structure exists. | PASS |
+| D-11 | SOURCES.md Section 14 added. | PASS |
+| D-12 | Approval gate options are approve, revise, reject all. | PENDING USER |
+| D-13 | Approval is text-level only before mockups. | PASS |
+| D-14 | Candidate future subclass forms are PascalCase and end in NeoCadeTheme. | PASS |
+| D-15 | Names avoid forbidden cyber/synth/noir coding; Boardwalk Sunset absent as candidate. | PASS |
+| D-16 | Inter Variable Roman and dynamic `NeoCadeTheme` superclass compatibility are preserved. | PASS |
+
+Final no-forbidden-file audit: PASS. No mockup, image, addon, theme resource, font, icon, scene, project, production `.gd`, or `.tres` file was intentionally changed during Phase 3.3 execution.
