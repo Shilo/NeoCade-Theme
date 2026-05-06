@@ -1,0 +1,71 @@
+{
+  "source": ".planning/research/THEME-DIRECTIONS.md",
+  "base_direction_selected": false,
+  "directions": [
+    {
+      "display_name": "Pulse",
+      "class_name": "PulseNeoCadeTheme",
+      "tres_filename_stem": "pulse_neocade_theme",
+      "base_color": "#151A2E",
+      "accent_color": "#8BFF6A",
+      "contrast_ratio": "13.62:1",
+      "personality_summary": "Dark saturated arcade energy with a near-navy control-panel base and a lively green accent that reads like active cabinet buttons. The mood is social, fast, clear, and active.",
+      "target_use_case": "Multiplayer arcade lobbies, action-game menus, streamer-friendly tool surfaces, and dark runtime/editor UI where strong active states matter.",
+      "flat_behavior_note": "Solid tonal surfaces use the base as the root/panel family, with the accent reserved for primary actions, selected tabs, focus rings, and high-value toggles.",
+      "raised_behavior_note": "Filled buttons and selected chip/tab surfaces gain small extruded-flat offset duplicates in darker tonal variants; panels, inputs, lists, and passive labels stay flat for density.",
+      "mobile_sizing_note": "Mobile keeps the same personality but increases button/toggle targets toward iOS 44pt and Android 48dp floors; bright accent use is limited to action/focus roles."
+    },
+    {
+      "display_name": "Slate",
+      "class_name": "SlateNeoCadeTheme",
+      "tres_filename_stem": "slate_neocade_theme",
+      "base_color": "#111820",
+      "accent_color": "#8BD3FF",
+      "contrast_ratio": "10.94:1",
+      "personality_summary": "Calm modern minimal dark with cool slate surfaces, restrained blue accenting, and polished rounded controls. It is the safest modern candidate without becoming corporate-flat.",
+      "target_use_case": "Desktop tools, editor-style runtime UIs, settings-heavy games, launchers, and projects that want a premium dark default.",
+      "flat_behavior_note": "Most controls use subtle tonal separation and clear focus rings; the accent appears only in primary actions, selection, caret/focus, and important active states.",
+      "raised_behavior_note": "Raised mode is restrained: 1-2px hard offset or stronger outline on primary/button-like controls only, with no lifted shells or decorative depth.",
+      "mobile_sizing_note": "Mobile mode keeps the quiet palette but expands spacing and button-like constants toward 44pt/48dp floors; focus rings stay high-contrast because the accent is sparse."
+    },
+    {
+      "display_name": "Bubble",
+      "class_name": "BubbleNeoCadeTheme",
+      "tres_filename_stem": "bubble_neocade_theme",
+      "base_color": "#FFF4FA",
+      "accent_color": "#7B1B55",
+      "contrast_ratio": "9.19:1",
+      "personality_summary": "Friendly, childlike, and mobile-game-bright with a soft candy-counter base and deep berry accent. It remains flat, solid, and clean in normal mode.",
+      "target_use_case": "Casual games, cozy menus, tutorial-heavy experiences, family-friendly apps, and mobile-first game UIs that need warmth without asset-art dependency.",
+      "flat_behavior_note": "Controls use rounded solid fills, generous state-layer contrast, and cheerful but sparse accent placement; backgrounds stay simple and unillustrated.",
+      "raised_behavior_note": "Buttons, stepper-like controls, and selected playful affordances can use 3-5px extruded-flat offsets; large panels and text inputs remain flat.",
+      "mobile_sizing_note": "Mobile mode leans into larger buttons and toggles with 44pt/48dp minimum targets, while desktop mode tempers spacing for editor/runtime panels."
+    },
+    {
+      "display_name": "Daybreak",
+      "class_name": "DaybreakNeoCadeTheme",
+      "tres_filename_stem": "daybreak_neocade_theme",
+      "base_color": "#EAF7F1",
+      "accent_color": "#006A68",
+      "contrast_ratio": "5.85:1",
+      "personality_summary": "Welcoming daylight arcade by day: mint-clean surfaces, teal wayfinding, and a lighter social-lobby mood. It is approachable and fresh while staying reusable for serious controls.",
+      "target_use_case": "Community hubs, onboarding flows, cozy game menus, family-friendly settings screens, and bright mobile experiences.",
+      "flat_behavior_note": "Flat mode uses clear high-contrast teal for primary/focus/selection and keeps secondary surfaces quiet through MD3 tonal roles rather than illustration.",
+      "raised_behavior_note": "Raised mode adds tactile depth mainly to primary actions and cards-as-actions; ordinary panels, lists, and text fields remain flat for readability.",
+      "mobile_sizing_note": "Mobile mode uses 44pt iOS and 48dp Android floor language with slightly more breathing room around touch clusters to preserve the daylight calm."
+    },
+    {
+      "display_name": "Burst",
+      "class_name": "BurstNeoCadeTheme",
+      "tres_filename_stem": "burst_neocade_theme",
+      "base_color": "#20112E",
+      "accent_color": "#FFD166",
+      "contrast_ratio": "12.33:1",
+      "personality_summary": "The maximum MD3 Expressive statement: bold, celebratory, high-contrast, and saturated without glow or nightclub cues. It tests how expressive NeoCade can be while staying professional.",
+      "target_use_case": "Mini-game launchers, achievement/reward surfaces, party-game menus, showcase scenes, and brand-forward projects that still need all controls to be readable.",
+      "flat_behavior_note": "Flat mode uses a disciplined dark surface ladder with the accent for critical actions, focus, selected states, progress, and reward-like callouts.",
+      "raised_behavior_note": "Raised mode can use stronger extruded-flat button offsets and bolder corner radii on button-like controls, but range controls, inputs, tree/list rows, and panels stay stable and flat.",
+      "mobile_sizing_note": "Mobile mode preserves the celebratory accent but enlarges touch affordances to 44pt/48dp targets and avoids filling every row with gold."
+    }
+  ]
+}
