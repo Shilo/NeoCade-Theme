@@ -10,7 +10,7 @@
 - The user's reference for raised buttons: the [hcgamestudios.itch.io flat-game-ui-for-mobile-games](https://hcgamestudios.itch.io/flat-game-ui-for-mobile-games) and [fajrulaslim.itch.io UI Button Flat Design](https://fajrulaslim.itch.io/ui-button-flat-design/devlog/157464/ui-button-flat-design) pages. Use WebFetch to view the pages and inspect the example images. **Look specifically at how the bottom edge of raised buttons is colored — it is a darker variant of the button's own color, never black.**
 - The user's original v0 feedback (paraphrased): liked the colors of Midnight Marquee, Cabinet Chrome, Orbital Playdeck; loved Prize Pop Plaza's childish/friendly mobile-game vibe and especially its raised tactility ("simple 3D interactables with the colorful fill"); thought Orbital Playdeck was the safest with iOS-like rounding. Wants ALL of that personality range preserved, just rendered flat-without-textures.
 
-## TL;DR — five issues
+## TL;DR — six issues
 
 | # | Issue | Root cause |
 |---|---|---|
@@ -19,6 +19,7 @@
 | 3 | Corner radii too clustered (5/11/13/16/18) | The 5 directions are within a 13px range, which the user finds insufficiently varied. They want at least one direction with **0px corners** (truly sharp/arcade) and a much wider spread, plus more categorical shape variety (e.g., one direction's primary button is fully-pill, another is rectangular with sharp corners). |
 | 4 | `concept-gallery.html` is hard to A/B compare | No way to flip directly between two directions for instant comparison. The user wants a **slideshow** at the top of the gallery: a big desktop image, left/right arrow keys cycle through the 5 directions, **no transition** (instant swap so visual differences are obvious). |
 | 5 | Mood variety hasn't matched the v0 categorical distinction | Even with shape-language differentiation, the directions still feel like "the same UI in different colors with slightly different radii." The user wants every direction to feel like a **different room in the arcade**, comparable to the v0 atmospheric concepts but flat. |
+| 6 | Desktop and mobile mockups look the same size — platform sizing is actually inverted | `PLATFORM_TOKENS` in `src/neocade-mockups.js` has `desktop: {buttonMin:44, body:14}` and `mobile: {buttonMin:48, body:13}` — mobile body text is SMALLER than desktop (backwards from iOS HIG / Material 3 guidance). The CSS at `.nc-artboard.mobile` actually SHRINKS mobile controls (button 46→42px, input 44→40px, toggle 24→20px). Result: a viewer can't tell which mockup is mobile and which is desktop. The user wants the difference to be **immediately visible**: mobile = iOS/Android tap-target floors with larger body text; desktop = compact game-UI density. |
 
 ## Issue 1 — Broad raised semantics with explicit do-not-raise matrix
 
@@ -349,12 +350,145 @@ The current v1 mockups capture some of that personality through type weight, bra
 
 After re-rendering, run the greyscale sufficiency test again (`screenshots/greyscale-sufficiency-test.png`) and verify that each direction reads as the right MOOD, not just "the small-radius one" / "the round one." If two directions start to read as the same mood in greyscale, push their categorical differentiation harder.
 
+## Issue 6 — Desktop and mobile must visibly follow their platform's sizing guidelines
+
+The current `PLATFORM_TOKENS` and `.nc-artboard.mobile` CSS overrides are inverted relative to iOS HIG, Android Material 3, and desktop game-UI conventions. Result: at the rendered PNG resolution the viewer can't tell which artboard is which platform. The user wants this difference to be **obvious at a glance** — mobile mockups should look like a tappable iOS / Android app (big targets, larger body text, generous breathing room), and desktop mockups should look like a compact game launcher / Steam-style tool panel (denser chrome, more information per screen).
+
+### Reference standards
+
+| Platform | Min tap target | Body text | Notes |
+|---|---|---|---|
+| iOS HIG | **44 pt** (≈ 44px @1x; 88px @2x) | **17 pt body** (16-17 px on a typical iPhone) | Apple's Human Interface Guidelines spec since iOS 7. Primary buttons commonly 50-56pt for emphasis. |
+| Android Material 3 | **48 dp** | **14 sp body**, often raised to **16 sp** for accessibility | Material 3 + WCAG 2.5.5 (AAA target = 44×44 CSS px minimum). |
+| **NeoCade mobile floor** | **48 dp** (covers both, since 48 ≥ 44) | **16 px body** | Always meet the higher bar so the theme works on either platform without per-OS branching. |
+| Desktop game UI (Steam, launchers, in-game menus) | ~**32-36px** chrome controls | **14 px body** | Compact density; primary actions can be 36-44px for emphasis. |
+
+### Token values to commit
+
+In `src/neocade-mockups.js`, replace `PLATFORM_TOKENS`:
+
+```js
+const PLATFORM_TOKENS = {
+  desktop: {
+    label: "platform=DESKTOP",
+    buttonMin: 36,           // compact game-UI chrome
+    primaryButtonMin: 42,    // primary actions slightly larger for emphasis
+    inputMin: 34,
+    toggleMin: 24,
+    checkboxSize: 18,
+    body: 14,                // dense body type
+    label_: 12,              // smaller secondary labels
+    h1: 36,
+    h2: 22,
+    kicker: 12,
+    rowMin: 36,              // list/tree row height
+    tabMin: 32,
+    tapPadding: 8,           // around interactives
+    densityScale: 1.0
+  },
+  mobile: {
+    label: "platform=MOBILE",
+    buttonMin: 48,           // Material 3 minimum (covers iOS HIG 44 too)
+    primaryButtonMin: 56,    // primary buttons more prominent on touch
+    inputMin: 48,            // tap-friendly input height
+    toggleMin: 32,           // chunky toggle for thumbs
+    checkboxSize: 24,        // larger checkbox for fingers
+    body: 16,                // larger body for held-at-arm's-length reading
+    label_: 14,
+    h1: 30,                  // proportionally smaller H1 vs desktop because viewport is narrower
+    h2: 20,
+    kicker: 13,              // larger than desktop kicker
+    rowMin: 56,              // bigger list row for tap targets + breathing
+    tabMin: 44,
+    tapPadding: 12,          // extra slop around interactives
+    densityScale: 1.5        // multiplier for inter-control gaps (per architecture revision 2026-05-04: "+50% spacing on space.4+")
+  }
+};
+```
+
+Also expose these to CSS as variables in `deriveTokens()`:
+
+```js
+"--button-min": `${platform.buttonMin}px`,
+"--button-min-primary": `${platform.primaryButtonMin}px`,
+"--input-min": `${platform.inputMin}px`,
+"--toggle-min": `${platform.toggleMin}px`,
+"--checkbox-size": `${platform.checkboxSize}px`,
+"--body-size": `${platform.body}px`,
+"--label-size": `${platform.label_}px`,
+"--h1-size": `${platform.h1}px`,
+"--h2-size": `${platform.h2}px`,
+"--kicker-size": `${platform.kicker}px`,
+"--row-min": `${platform.rowMin}px`,
+"--tab-min": `${platform.tabMin}px`,
+"--tap-padding": `${platform.tapPadding}px`,
+"--density-scale": String(platform.densityScale),
+```
+
+### CSS overhaul
+
+The `.nc-artboard.mobile` block in `src/neocade-mockups.css` currently overrides the desktop defaults DOWNWARD (mobile button 42, input 40, toggle 20). **Reverse this.** The base rules should target the COMMON artboard (using the new CSS variables for sizing), and `.nc-artboard.mobile` overrides where needed should bump values UP, not down.
+
+Suggested approach:
+
+```css
+/* Base — desktop sizing assumed as default; consumed by both desktop and mobile artboards. */
+.nc-art-button {
+  min-height: var(--button-min);
+  font-size: var(--body-size);
+  padding-inline: calc(var(--button-pad-h) * 1px);
+  padding-block: calc(var(--button-pad-v) * 1px);
+}
+.nc-art-button.primary {
+  min-height: var(--button-min-primary);
+}
+.nc-art-input {
+  min-height: var(--input-min);
+  font-size: var(--body-size);
+}
+.nc-art-toggle .nc-track {
+  min-width: calc(var(--toggle-min) * 1.6);
+  min-height: var(--toggle-min);
+}
+.nc-art-checkbox {
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+}
+.nc-art-list-row {
+  min-height: var(--row-min);
+}
+.nc-art-tab {
+  min-height: var(--tab-min);
+}
+/* …kicker uses --kicker-size, h1 uses --h1-size, etc. */
+
+/* Mobile-specific tweaks — only what truly differs beyond the variable values
+   (e.g. nav tab layout becomes a single-row scroll on mobile, scrollbar hides). */
+.nc-artboard.mobile .nc-art-grid { grid-template-columns: 1fr; }
+.nc-artboard.mobile .nc-art-scrollbar { display: none; }
+.nc-artboard.mobile .nc-art-tabs { overflow-x: auto; }
+```
+
+The point: **size differences flow from CSS variables, not from explicit DOWNWARD `.mobile` overrides**. Desktop gets compact tokens; mobile gets the larger tokens; the same CSS rule produces visibly different output.
+
+### What the user should be able to see
+
+After re-rendering:
+
+- Open `pulse-desktop-flat.png` and `pulse-mobile-flat.png` side by side. The mobile button heights should be **noticeably larger** (~48-56px) than desktop's (~36-42px). Mobile body text should be **noticeably larger** (~16px) than desktop's (~14px). Mobile list rows should be **noticeably taller** (~56px) than desktop's (~36px). Mobile toggles and checkboxes should be **chunkier** for thumb access.
+- The same comparison should hold for every direction — Bubble's mobile primary button at 56px tall is unambiguously a mobile button; Slate's desktop primary button at 42px tall is unambiguously a desktop control.
+- Inter-control gap on mobile is +50% over desktop on `space.4+` per the original 2026-05-04 architecture revision; this is what `--density-scale` is for.
+
+### Why this matters
+
+The `@export var platform: Platform` toggle on `NeoCadeTheme` (locked architecture) is supposed to swap the theme between three real-world targets: forced DESKTOP for desktop builds, forced MOBILE for mobile builds, AUTO for runtime detection via `OS.has_feature("mobile")`. If the mockups don't visibly differentiate desktop and mobile, the whole point of having a `platform` `@export` is unclear. After this fix, a consumer instantiating `SlateNeoCadeTheme` and flipping `platform=MOBILE` should see controls grow to tap-target size; flipping back to `DESKTOP` should see them tighten to game-launcher density.
+
 ## Files to change
 
 | Path | Change |
 |---|---|
-| `src/neocade-mockups.css` | (a) Apply the vertical layout reflow from `GALLERY-LAYOUT-HANDOFF.md` if not already done. (b) Replace narrow raised selectors with broad raised matrix from Issue 1. (c) Replace single `--offset` references with per-color offset tokens from Issue 2. (d) Add slideshow CSS from Issue 4. |
-| `src/neocade-mockups.js` | (a) Replace `offset: mix(base, "#000000", 0.55)` in `deriveSurfaceRamp()` with per-color offsets. (b) Add `darken(hex, pct)` helper. (c) Add new offset tokens to `deriveTokens()` return object. (d) Add `bindSlideshow()` and call from `boot()` for the concept gallery. |
+| `src/neocade-mockups.css` | (a) Apply the vertical layout reflow from `GALLERY-LAYOUT-HANDOFF.md` if not already done. (b) Replace narrow raised selectors with broad raised matrix from Issue 1. (c) Replace single `--offset` references with per-color offset tokens from Issue 2. (d) Add slideshow CSS from Issue 4. (e) Replace `.nc-artboard.mobile` downward overrides with platform-variable-driven sizing per Issue 6 — base rules consume the new sizing variables; the mobile artboard simply gets bigger values via its `--button-min`/`--input-min`/etc. tokens. |
+| `src/neocade-mockups.js` | (a) Replace `offset: mix(base, "#000000", 0.55)` in `deriveSurfaceRamp()` with per-color offsets. (b) Add `darken(hex, pct)` helper. (c) Add new offset tokens to `deriveTokens()` return object. (d) Add `bindSlideshow()` and call from `boot()` for the concept gallery. (e) Replace `PLATFORM_TOKENS` with the expanded desktop/mobile sizing tables from Issue 6 (correct iOS HIG / Material 3 floors on mobile, compact game-UI density on desktop) and emit all the new sizing tokens from `deriveTokens()`. |
 | `data/directions.json` | Update each direction's `shape_language` block: new `corner_radius` values from Issue 3 (Pulse 0, Slate 14, Bubble 26, Daybreak 8, Burst 18), plus categorical shape-axis updates. |
 | `concept-gallery.html` | Insert the `<section class="nc-slideshow">` block from Issue 4 between header and legend. No other structural changes. |
 | `concepts/*.png` | RE-RENDER all 15 PNGs after CSS/JS changes via `node render.js concept-images`. The shape and raised changes WILL change the rendered output. |
@@ -389,9 +523,17 @@ After all changes are applied:
 
 3. **Inspect raised mode (mobile-raised PNGs)** at full resolution. For every raised element, the bottom edge color must be a darker variant of the element's own background color. Specifically zoom into Bubble's `Start` button — bottom should be a darker pink, not a near-black slab. Same check for Pulse's green primary, Slate's blue primary, Daybreak's mint primary, Burst's gold primary.
 
-4. **Run the greyscale sufficiency test** (`node render.js` greyscale mode, or open `src/greyscale-check.html`). Confirm each direction is identifiable by SHAPE LANGUAGE alone (the test still passes), AND that each reads as the right mood (the test now passes more decisively — Pulse's 0px corners are unmistakable in greyscale; Bubble's circle and full-pill chips ditto; Burst's tilted badge ditto).
+4. **Compare desktop vs mobile mockups directly** for any one direction (e.g., open `slate-desktop-flat.png` and `slate-mobile-flat.png` side by side). Confirm:
+   - Mobile primary button is visibly **larger** than desktop primary (mobile ~56px tall vs desktop ~42px).
+   - Mobile body text is visibly **larger** than desktop body (mobile ~16px vs desktop ~14px).
+   - Mobile list rows are visibly **taller** than desktop rows (mobile ~56px vs desktop ~36px).
+   - Mobile checkboxes and toggle thumbs are **chunkier** than desktop equivalents.
+   - Mobile inter-control gaps are noticeably more generous than desktop (per the +50% mobile spacing rule).
+   - If you can't tell which is which without reading the filename, the platform-sizing fix didn't take.
 
-5. **Update `render-check.md`** with the revision-2 audit results — per-direction tables, mood-target reads, D-30 result. The doc currently records revision 1's outputs; supersede those with revision 2's.
+5. **Run the greyscale sufficiency test** (`node render.js` greyscale mode, or open `src/greyscale-check.html`). Confirm each direction is identifiable by SHAPE LANGUAGE alone (the test still passes), AND that each reads as the right mood (the test now passes more decisively — Pulse's 0px corners are unmistakable in greyscale; Bubble's circle and full-pill chips ditto; Burst's tilted badge ditto).
+
+6. **Update `render-check.md`** with the revision-2 audit results — per-direction tables, mood-target reads, D-30 result, plus a new **platform-sizing audit row per direction** confirming desktop and mobile differ visibly on button/input/row/text sizes. The doc currently records revision 1's outputs; supersede those with revision 2's.
 
 ## Hard rules
 
@@ -406,7 +548,7 @@ After all changes are applied:
 When done:
 
 ```
-feat(03.4-02): mockup revision 2 — broad raised, color-tinted offsets, wider radius spread, slideshow comparison
+feat(03.4-02): mockup revision 2 — broad raised, color-tinted offsets, wider radius spread, slideshow, platform sizing
 ```
 
 Body should note:
@@ -415,8 +557,9 @@ Body should note:
 - Issue 3 fix: new corner_radius spread (0/14/26/8/18) plus categorical shape-axis updates.
 - Issue 4 fix: instant slideshow at top of concept-gallery.html.
 - Issue 5 verification: D-30 greyscale test re-run + per-direction mood read.
+- Issue 6 fix: corrected `PLATFORM_TOKENS` (mobile 48dp/16px floors per Material 3 + iOS HIG; desktop 36px/14px compact game-UI density); replaced `.nc-artboard.mobile` downward overrides with variable-driven sizing so mobile artboards visibly differ from desktop in button height, input height, body text, list-row height, and inter-control gap.
 - Re-rendered: 15 concept PNGs + 2 audit composites.
-- Updated: render-check.md per-direction tables.
+- Updated: render-check.md per-direction tables + new platform-sizing audit row per direction.
 
 End with the standard `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` line.
 
