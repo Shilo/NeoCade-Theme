@@ -567,18 +567,21 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
     - `addons/neocade_theme/neocade_mobile_theme.tres` (per architecture revision; mobile is `@export`)
 
     The verify command checks the presence of required files + absence of forbidden files. This task does NOT modify any files; it is a structural assertion that all prior plans landed correctly.
+
+    **Cross-AI Cycle 3 N4 fix:** the verify command ALSO asserts that each of the 5 direction `.tres` files (Pulse + 4 peers) is < 2048 bytes (2 KiB) on disk. This is the layout-time double-check on SC#6 ("saved `.tres` files stay data-oriented") complementing Plan 04-06 Task 1 + Plan 04-07 Task 1's per-save assertions. Catches regressions where a future edit re-introduces serialized theme entries into a peer file.
   </action>
   <acceptance_criteria>
     - All 12 required files exist at the listed paths.
     - Both required subdirectories exist (`fonts/`, `icons/`).
     - The 5 forbidden paths do NOT exist.
+    - **Cross-AI Cycle 3 N4 fix:** Each of the 5 direction `.tres` files (`pulse_neocade_theme.tres`, `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`, `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`) is < 2048 bytes (2 KiB) — data-only per SC#6.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$base='addons/neocade_theme'; $required=@('neocade_theme.gd','pulse_neocade_theme.tres','slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres','OFL.txt','LICENSE.md','CHANGELOG.md','VERSION','README.md','_phase4_import.gd','_phase4_verify.gd','_phase4_verify_headless.gd'); foreach($f in $required) { if (-not (Test-Path \"$base/$f\")) { throw \"required file missing: $f\" } }; foreach($d in 'fonts','icons') { if (-not (Test-Path -PathType Container \"$base/$d\")) { throw \"required dir missing: $d\" } }; foreach($forbidden in 'plugin.cfg','neocade_theme.tres','_dev','themes','neocade_mobile_theme.tres') { if (Test-Path \"$base/$forbidden\") { throw \"forbidden path exists: $forbidden\" } }"
+      powershell -NoProfile -Command "$base='addons/neocade_theme'; $required=@('neocade_theme.gd','pulse_neocade_theme.tres','slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres','OFL.txt','LICENSE.md','CHANGELOG.md','VERSION','README.md','_phase4_import.gd','_phase4_verify.gd','_phase4_verify_headless.gd'); foreach($f in $required) { if (-not (Test-Path \"$base/$f\")) { throw \"required file missing: $f\" } }; foreach($d in 'fonts','icons') { if (-not (Test-Path -PathType Container \"$base/$d\")) { throw \"required dir missing: $d\" } }; foreach($forbidden in 'plugin.cfg','neocade_theme.tres','_dev','themes','neocade_mobile_theme.tres') { if (Test-Path \"$base/$forbidden\") { throw \"forbidden path exists: $forbidden\" } }; foreach($tres in 'pulse_neocade_theme.tres','slate_neocade_theme.tres','bubble_neocade_theme.tres','daybreak_neocade_theme.tres','burst_neocade_theme.tres') { $sz=(Get-Item \"$base/$tres\").Length; if ($sz -ge 2048) { throw \"N4 fix layout-time check: $tres size $sz bytes >= 2048 (SC#6 < 2 KiB violated)\" } }"
     </automated>
   </verify>
-  <done>Addon layout matches the FOUND-01 + STACK Decision 5 contract; no `plugin.cfg`; no scaffold residue; flat layout per CONTEXT.md "Track 4".</done>
+  <done>Addon layout matches the FOUND-01 + STACK Decision 5 contract; no `plugin.cfg`; no scaffold residue; flat layout per CONTEXT.md "Track 4". Each direction `.tres` is data-only (< 2 KiB; SC#6 satisfied at layout time).</done>
 </task>
 
 <task type="auto">

@@ -17,6 +17,7 @@ requirements:
 must_haves:
   truths:
     - "`addons/neocade_theme/pulse_neocade_theme.tres` exists and is GENERATED PROGRAMMATICALLY (Cross-AI Cycle 1 C6 fix): the file is produced by an `@tool` script that does `var t := NeoCadeTheme.new(); t.base_color = Color(\"#151A2E\"); ...; ResourceSaver.save(t, \"...pulse_neocade_theme.tres\")`. The actual on-disk header (`[gd_resource type=\"NeoCadeTheme\" ...]` vs `[gd_resource type=\"Resource\" script_class=\"NeoCadeTheme\" ...]` etc.) is whatever Godot 4.6 emits — NOT hand-authored — and that emitted form is the canonical template Plan 04-07 will copy for the peer .tres files."
+    - "**Cross-AI Cycle 3 N4 fix (Fix A — textual post-process):** AFTER `ResourceSaver.save()`, the helper invokes `_strip_theme_entries(path)` which (a) reads the freshly-saved `.tres` back as text, (b) strips ALL `[sub_resource ...]` blocks and their bodies, (c) strips ALL `theme_data/` lines AND all per-Control / per-variation entry sections from the `[resource]` block, (d) keeps ONLY the `[gd_resource ...]` header (Godot-emitted; preserves Cycle 1 C6 fix) PLUS the 9 `@export` property lines on the `[resource]` block, (e) writes the trimmed file back. SC#6 (`saved .tres files stay data-oriented`) is satisfied by construction; regenerated baseline entries are recomputed at load time when `_init()` runs. Final on-disk size MUST be < 2048 bytes (2 KiB)."
     - "The `.tres` saves the 9 `@export` values per DESIGN_TOKENS §5.1: `base_color = Color(\"#151A2E\")`, `accent_color = Color(\"#8BFF6A\")`, `raised = false`, `platform = 2` (Platform.AUTO), `corner_radius = 0`, `spacing = 18`, `raised_strength = 3`, `focus_thickness = 2`, `outline_width = 1`."
     - "Loading `pulse_neocade_theme.tres` in Godot Editor opens it as a `NeoCadeTheme` instance with the values above; `_regenerate_theme()` runs at load time (per `_init()` in Plan 04-01) populating all 37 BINDING_TABLE Control entries + 14 type variations (Cross-AI Cycle 1 C4: count fixed to 14 with CodeLabel included)."
     - "Verification (manual or scripted): after load, `theme.has_stylebox(\"normal\", \"Button\")` returns `true`; `theme.has_stylebox(\"panel\", \"Tree\")` returns `true`; `theme.has_color(\"font_color\", \"Button\")` returns `true`; `theme.get_type_variation_base(\"PrimaryButton\")` returns `\"Button\"`; `theme.has_font(\"font\", \"HeaderLarge\")` returns `true`."
@@ -85,9 +86,15 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
 
     ```gdscript
 
-    ## Plan 04-06 add-on: generate pulse_neocade_theme.tres via ResourceSaver.save().
-    ## NeoCadeTheme.new() triggers _init() which triggers _regenerate_theme(); the saved
-    ## .tres carries the 9 @export values. Loading the saved .tres re-triggers regeneration.
+    ## Plan 04-06 add-on: generate pulse_neocade_theme.tres via ResourceSaver.save(),
+    ## then post-process the file to strip serialized theme entries (Cross-AI Cycle 3 N4
+    ## Fix A — keeps SC#6 "saved .tres files stay data-oriented"). NeoCadeTheme.new()
+    ## triggers _init() which triggers _regenerate_theme() (populates hundreds of stylebox/
+    ## color/constant/font/icon entries); ResourceSaver.save() serializes EVERYTHING
+    ## (header + 9 @exports + sub_resources + theme_data/* entries). The strip pass
+    ## removes the regenerated entry bloat and keeps only the Godot-emitted [gd_resource
+    ## ...] header (preserves Cycle 1 C6 fix) + the 9 @export property lines. Loading
+    ## the trimmed .tres re-triggers _init() → _regenerate_theme() → entries repopulate.
     func _save_pulse_tres() -> void:
         var pulse: NeoCadeTheme = NeoCadeTheme.new()
         pulse.base_color = Color("#151A2E")
@@ -110,6 +117,88 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
         fa.close()
         print("✓ Pulse .tres saved. Godot header (canonical for Plan 04-07): ", first_line)
 
+        # Cross-AI Cycle 3 N4 Fix A — strip serialized theme entries. ResourceSaver.save()
+        # serializes _regenerate_theme()'s output into the .tres; the entry bloat
+        # contradicts SC#6 ("saved .tres files stay data-oriented") and Plan 04-06's
+        # < 2KiB sanity bound. Strip everything except the [gd_resource ...] header +
+        # the 9 @export lines on the [resource] block. Re-loading the stripped file
+        # produces the same NeoCadeTheme instance (regeneration runs at load time).
+        _strip_theme_entries(path)
+
+    ## Cross-AI Cycle 3 N4 Fix A — textual post-process to data-only the saved .tres.
+    ## Reads `path`, keeps the [gd_resource ...] header (whatever Godot emitted), drops
+    ## all [sub_resource ...] blocks (font/stylebox/etc. payloads regenerated at load),
+    ## drops the [resource] body's `theme_data/...` lines and any per-Control entry
+    ## sections, and keeps only the 9 @export property lines (base_color, accent_color,
+    ## raised, platform, corner_radius, spacing, raised_strength, focus_thickness,
+    ## outline_width). Asserts post-strip size < 2048 bytes (SC#6 + size sanity).
+    static func _strip_theme_entries(path: String) -> void:
+        var src := FileAccess.open(path, FileAccess.READ)
+        assert(src != null, "strip: cannot open %s for read" % path)
+        var text := src.get_as_text()
+        src.close()
+
+        # Whitelist of @export property names; ONLY lines whose left-hand side is one
+        # of these survive in the [resource] block. Anything else (theme_data/...,
+        # SubResource references, per-Control state entries) is dropped.
+        var EXPORT_KEYS := [
+            "base_color", "accent_color", "raised", "platform",
+            "corner_radius", "spacing", "raised_strength",
+            "focus_thickness", "outline_width",
+        ]
+
+        var lines := text.split("\n")
+        var out: PackedStringArray = []
+        var section: String = ""        # tracks current [section] block
+        var skip_section: bool = false  # true while inside [sub_resource ...] blocks
+        for raw_line in lines:
+            var line: String = raw_line
+            var stripped := line.strip_edges()
+            if stripped.begins_with("[") and stripped.ends_with("]"):
+                # Section header transition — strip [sub_resource ...] blocks entirely.
+                if stripped.begins_with("[sub_resource"):
+                    skip_section = true
+                    section = "sub_resource"
+                    continue
+                skip_section = false
+                section = stripped
+                # Keep [gd_resource ...] header and [resource] header; everything else
+                # (e.g., per-Control entry sections Godot may emit) is dropped.
+                if stripped.begins_with("[gd_resource") or stripped == "[resource]":
+                    out.append(line)
+                continue
+            if skip_section:
+                continue
+            if section == "[resource]":
+                if stripped == "":
+                    # collapse blank lines inside [resource] — final assembly re-adds spacing
+                    continue
+                # Keep ONLY whitelisted @export property assignments.
+                var key := stripped.split("=", true, 1)[0].strip_edges()
+                if EXPORT_KEYS.has(key):
+                    out.append(line)
+                # Otherwise (theme_data/..., SubResource(...) refs, etc.) drop.
+                continue
+            # Pre-[gd_resource] preamble: Godot rarely emits content here; pass-through.
+            if section == "":
+                out.append(line)
+
+        var final_text := "\n".join(out)
+        # Ensure trailing newline.
+        if not final_text.ends_with("\n"):
+            final_text += "\n"
+
+        var dst := FileAccess.open(path, FileAccess.WRITE)
+        assert(dst != null, "strip: cannot open %s for write" % path)
+        dst.store_string(final_text)
+        dst.close()
+
+        var size := FileAccess.get_file_as_bytes(path).size()
+        assert(size < 2048,
+            "N4 strip regression: %s post-strip size %d bytes >= 2048 (SC#6 < 2 KiB violated)"
+                % [path, size])
+        print("✓ Stripped theme entries from %s — %d bytes (data-only)." % [path, size])
+
     func _run() -> void:
         # ... existing font materialization ...
         _save_pulse_tres()
@@ -130,6 +219,9 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
   <acceptance_criteria>
     - `addons/neocade_theme/_phase4_import.gd` contains a `func _save_pulse_tres() -> void:` declaration.
     - `_phase4_import.gd` `_save_pulse_tres` body contains `NeoCadeTheme.new()`, sets all 9 @export values, and calls `ResourceSaver.save(pulse, "res://addons/neocade_theme/pulse_neocade_theme.tres")`.
+    - **Cross-AI Cycle 3 N4 Fix A:** `_phase4_import.gd` contains a `static func _strip_theme_entries(path: String) -> void:` declaration.
+    - **Cross-AI Cycle 3 N4 Fix A:** `_save_pulse_tres()` body invokes `_strip_theme_entries(path)` AFTER `ResourceSaver.save(...)` and AFTER the C6 first-line capture.
+    - **Cross-AI Cycle 3 N4 Fix A:** `_strip_theme_entries()` body contains a `EXPORT_KEYS` array with all 9 export property names AND a `[sub_resource` skip branch AND a `< 2048` post-strip size assertion.
     - `_phase4_import.gd` `_run()` calls `_save_pulse_tres()`.
     - `addons/neocade_theme/pulse_neocade_theme.tres` exists (generated by running the helper).
     - File first line begins with `[gd_resource` and includes `format=3`.
@@ -145,11 +237,12 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
     - File contains `outline_width = 1`.
     - File contains `NeoCadeTheme` somewhere in the header line (whatever exact form Godot uses — `script_class="NeoCadeTheme"` OR `type="NeoCadeTheme"` OR a `script = ExtResource(...)` line referencing `neocade_theme.gd`; the canonical-header verification is performed at runtime via `ResourceLoader.load("res://addons/neocade_theme/pulse_neocade_theme.tres") is NeoCadeTheme`).
     - LOW concern fix: the file PASSES `ResourceLoader.load()` + `is NeoCadeTheme` + `has_stylebox("normal", "Button")` assertions at runtime (verified by `_phase4_verify.gd` in Task 2).
-    - File is between 200 and 1500 bytes (Godot may serialize slightly larger than hand-authored; sanity-bound widened).
+    - **Cross-AI Cycle 3 N4 fix:** File contains NO `[sub_resource` blocks (stripped post-save) AND no `theme_data/` lines (the strip pass drops all regenerated entries).
+    - **Cross-AI Cycle 3 N4 fix:** File post-strip size is < 2048 bytes (data-only; SC#6 satisfied).
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$h='addons/neocade_theme/_phase4_import.gd'; if (-not (Test-Path $h)) { throw '_phase4_import.gd missing — Plan 04-02 must run first' }; $hg=Get-Content -Raw $h; foreach($n in 'func _save_pulse_tres() -> void:','NeoCadeTheme.new()','base_color = Color(\"#151A2E\")','accent_color = Color(\"#8BFF6A\")','ResourceSaver.save(pulse, \"res://addons/neocade_theme/pulse_neocade_theme.tres\")','_save_pulse_tres()') { if ($hg -notmatch [regex]::Escape($n)) { throw \"_phase4_import.gd missing: $n\" } }; $p='addons/neocade_theme/pulse_neocade_theme.tres'; if (-not (Test-Path $p)) { throw 'pulse_neocade_theme.tres missing — run _phase4_import.gd' }; $g=Get-Content -Raw $p; foreach($n in '[gd_resource','format=3','[resource]','base_color = Color(0.0823529, 0.101961, 0.180392, 1)','accent_color = Color(0.545098, 1, 0.415686, 1)','raised = false','platform = 2','corner_radius = 0','spacing = 18','raised_strength = 3','focus_thickness = 2','outline_width = 1') { if ($g -notmatch [regex]::Escape($n)) { throw \"pulse .tres missing: $n\" } }; if ($g -notmatch 'NeoCadeTheme') { throw 'NeoCadeTheme reference missing in pulse .tres header' }; $size=(Get-Item $p).Length; if ($size -lt 200 -or $size -gt 1500) { throw \"file size $size bytes outside 200-1500 range\" }"
+      powershell -NoProfile -Command "$h='addons/neocade_theme/_phase4_import.gd'; if (-not (Test-Path $h)) { throw '_phase4_import.gd missing — Plan 04-02 must run first' }; $hg=Get-Content -Raw $h; foreach($n in 'func _save_pulse_tres() -> void:','NeoCadeTheme.new()','base_color = Color(\"#151A2E\")','accent_color = Color(\"#8BFF6A\")','ResourceSaver.save(pulse, \"res://addons/neocade_theme/pulse_neocade_theme.tres\")','_save_pulse_tres()','static func _strip_theme_entries(path: String) -> void:','_strip_theme_entries(path)','EXPORT_KEYS','[sub_resource','< 2048') { if ($hg -notmatch [regex]::Escape($n)) { throw \"_phase4_import.gd missing: $n\" } }; $p='addons/neocade_theme/pulse_neocade_theme.tres'; if (-not (Test-Path $p)) { throw 'pulse_neocade_theme.tres missing — run _phase4_import.gd' }; $g=Get-Content -Raw $p; foreach($n in '[gd_resource','format=3','[resource]','base_color = Color(0.0823529, 0.101961, 0.180392, 1)','accent_color = Color(0.545098, 1, 0.415686, 1)','raised = false','platform = 2','corner_radius = 0','spacing = 18','raised_strength = 3','focus_thickness = 2','outline_width = 1') { if ($g -notmatch [regex]::Escape($n)) { throw \"pulse .tres missing: $n\" } }; if ($g -notmatch 'NeoCadeTheme') { throw 'NeoCadeTheme reference missing in pulse .tres header' }; if ($g -match '\\[sub_resource') { throw 'N4 fix regression: pulse .tres contains [sub_resource ...] blocks (strip pass did not run)' }; if ($g -match 'theme_data/') { throw 'N4 fix regression: pulse .tres contains theme_data/ lines (strip pass did not run)' }; $size=(Get-Item $p).Length; if ($size -ge 2048) { throw \"N4 fix regression: file size $size bytes >= 2048 (SC#6 < 2 KiB violated)\" }"
     </automated>
   </verify>
   <done>Pulse `.tres` ships the recommended-starter direction's `@export` values; the engine produces a renderable theme on load.</done>
@@ -504,13 +597,21 @@ This plan ships only the Pulse direction's `.tres` data + verification. Plan 04-
     Stage the 3 modified/new files (Pulse .tres + 2 verify helpers + extended _phase4_import.gd) and commit:
 
     ```
-    feat(04-06): ship Pulse .tres (Godot-serialized) + dual verification helpers
+    feat(04-06): ship Pulse .tres (Godot-serialized + stripped) + dual verification helpers
 
-    Plan 04-06 wave-3 (depends on Plans 04-04, 04-05; Cross-AI Cycle 1 + Cycle 2 fixes):
+    Plan 04-06 wave-3 (depends on Plans 04-04, 04-05; Cross-AI Cycle 1, Cycle 2,
+    Cycle 3 fixes):
     - C6 fix: addons/neocade_theme/pulse_neocade_theme.tres — generated via
       _phase4_import.gd ResourceSaver.save() pass; header is whatever Godot
       4.6 emits for NeoCadeTheme (canonical for Plan 04-07 peer .tres files)
+    - N4 fix (Cycle 3): _save_pulse_tres() now invokes _strip_theme_entries(path)
+      AFTER ResourceSaver.save() — strips [sub_resource] blocks + theme_data/
+      entries, keeps only the [gd_resource ...] header (C6) + the 9 @export
+      property lines on [resource]. Saved .tres stays data-oriented per SC#6;
+      regenerated baseline entries recomputed at load time. Post-strip size
+      asserted < 2048 bytes (2 KiB).
     - addons/neocade_theme/_phase4_import.gd — extended with _save_pulse_tres()
+      AND with the static _strip_theme_entries(path) helper (N4 Fix A)
     - addons/neocade_theme/_phase4_verify.gd — EditorScript helper; asserts
       BINDING_TABLE.size() == 37 (C1), TYPE_VARIATIONS.size() == 14 (C4),
       CodeLabel present, theme.default_font set (C3), explicit header fonts,
