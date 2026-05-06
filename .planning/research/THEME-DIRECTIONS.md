@@ -128,6 +128,7 @@ Naming revision note: Per user feedback on 2026-05-06, final direction names are
 - DNA inputs used: Midnight Marquee palette love; Cabinet Chrome dark-clean palette; Boardwalk Sunset rejection as a no-texture reminder only.
 - Commercial examples used: Brawl Stars screenshot collection for strong action hierarchy; SunGraphica for dark flat game UI breadth; Material Web for role-token discipline.
 - Rationale: Phase 3.1 supports saturated but controlled color, state layers, and MD3 surface roles; Phase 3.2 supports export-driven base/accent regeneration through one subclass. This direction satisfies D-03 by taking the dark saturated arcade anchor, D-03b by supporting both flat/raised and desktop/mobile, and D-16 by staying Inter-only and Theme-compatible.
+- Surface alpha policy: 100% solid on every surface (popup, panels, buttons, chrome). Cabinets are physical hardware; translucent cabinets read as sci-fi-HUD, not arcade. Modal scrim ~50% black behind popups (Godot's built-in `Window`/`Popup` modal-darkening). Authored in the `.tres` via Theme Editor — not an `@export`.
 - Filter audit status: PASS; see Filter Audit Summary.
 
 ### SlateNeoCadeTheme
@@ -146,6 +147,7 @@ Naming revision note: Per user feedback on 2026-05-06, final direction names are
 - DNA inputs used: Orbital Playdeck modern/dark/big-button DNA; Cabinet Chrome clean dark palette; rejected Orbital texture as a hard boundary.
 - Commercial examples used: Material Web theming for token hierarchy; Android Developers Material 3 guidance for role pairing; Kenney UI Pack for restrained reusable shapes.
 - Rationale: Phase 3.1's MD3 role system and state-layer discipline are strongest here; Phase 3.2's dynamic subclass contract lets this direction tune profile values without losing full base coverage. This direction covers the modern minimal dark D-06 anchor while still satisfying D-03b universal axes and D-14/D-15 naming.
+- Surface alpha policy: popup chrome at **92%** alpha (`PopupPanel`, `AcceptDialog`, `ConfirmationDialog`, `Window` chrome `bg_color.a = 0.92`); all other surfaces 100% solid. Matches actual iOS NavigationBar / Sheet / modal-backdrop translucency for an iOS-premium feel. Modal scrim ~50% black behind popups (Godot's built-in modal-darkening). Authored in the `.tres` via Theme Editor — not an `@export`.
 - Filter audit status: PASS; see Filter Audit Summary.
 
 ### BubbleNeoCadeTheme
@@ -165,6 +167,7 @@ Naming revision note: Per user feedback on 2026-05-06, final direction names are
 - DNA inputs used: Prize Pop Plaza loved personality; user exemplar flat/raised button grammar; Boardwalk Sunset rejection prevents warm textured drift.
 - Commercial examples used: HCGames Flat GUI, fajrulaslim UI Button Flat Design, GameArt2D, MODI, Pinky UI, and Royal Match.
 - Rationale: Phase 3.1 validates extruded-flat as a solid top shape plus offset darker duplicate; MD3 Expressive supports stronger static personality through color, shape, and hierarchy. Phase 3.2 lets the same subclass support flat/raised and desktop/mobile from exports, satisfying D-03b and D-16.
+- Surface alpha policy: 100% solid on every surface (popup, panels, buttons, chrome). Candy is opaque material; translucent candy reads as ice or jelly, which would shift the mood toward sci-fi. Modal scrim ~50% black behind popups (Godot's built-in modal-darkening). Authored in the `.tres` via Theme Editor — not an `@export`.
 - Filter audit status: PASS; see Filter Audit Summary.
 
 ### DaybreakNeoCadeTheme
@@ -184,6 +187,7 @@ Naming revision note: Per user feedback on 2026-05-06, final direction names are
 - DNA inputs used: Phase 3.1 daylight-friendly gap; HCGames/GameArt2D/Kenney friendliness; the "vibrant arcade hall by day" project identity reinterpreted dark.
 - Commercial examples used: HCGames, GameArt2D, Kenney, Pinky UI, Royal Match, and Android Developers Expressive Wear guidance.
 - Rationale: MD3/MD3 Expressive supports bright accents on dark surfaces and accessible role pairing, while NeoCade's dynamic base/accent exports let consumers adjust palettes without losing direction identity. This direction satisfies D-03 by widening personality spread (the friendliest dark direction) and D-03b by treating desktop/mobile and flat/raised as universal, not identity.
+- Surface alpha policy: container panels at **96%** alpha (`Panel`, `PanelContainer`, `ScrollContainer` chrome, `MarginContainer` with panel stylebox `bg_color.a = 0.96`) AND popup chrome at **90%** alpha (`PopupPanel`, `AcceptDialog`, `ConfirmationDialog`, `Window` chrome `bg_color.a = 0.90`); buttons, inputs, tabs, list rows, range controls, brand mark all 100% solid. Subtle translucency reinforces the airy welcoming-lobby mood — daylight feel through windows. Modal scrim ~50% black behind popups (Godot's built-in modal-darkening). Authored in the `.tres` via Theme Editor — not an `@export`.
 - Filter audit status: PASS; see Filter Audit Summary.
 
 ### BurstNeoCadeTheme
@@ -202,6 +206,7 @@ Naming revision note: Per user feedback on 2026-05-06, final direction names are
 - DNA inputs used: Phase 3.1 MD3 Expressive findings; Prize Pop Plaza friendliness at a more polished intensity; Midnight/Cabinet dark arcade grounding.
 - Commercial examples used: Google Expressive research, Material 3 Expressive official blog, Android Developers Blog for M3 Expressive, fajrulaslim, MODI, SunGraphica, and Brawl Stars.
 - Rationale: This direction is the D-06 expressive statement anchor. It uses MD3 Expressive's static levers - color confidence, shape, containment, and emphasis - while Phase 3.2's superclass/subclass model keeps the implementation deterministic and complete.
+- Surface alpha policy: 100% solid on every surface (popup, panels, buttons, chrome). Award/poster surfaces are solid; translucent achievement screens feel weak rather than bold. Modal scrim ~50% black behind popups (Godot's built-in modal-darkening). Authored in the `.tres` via Theme Editor — not an `@export`.
 - Filter audit status: PASS; see Filter Audit Summary.
 
 ## Filter Audit Summary

@@ -66,7 +66,7 @@ The 10-board matrix in CONTEXT.md D-04 (5 directions × flat + raised) is satisf
 
 ## Required-to-vary per direction (the personality channel)
 
-For each axis below, every direction MUST commit to a distinct value, and the values together must produce visually different mockups even with the constants above held identical. **Color tokens (`base_color`, `accent_color`, surface ramp, state colors) are necessary but NOT sufficient differentiation.** All ten axes below must vary.
+For each of axes 1-10 below, every direction MUST commit to a distinct value, and the values together must produce visually different mockups even with the constants above held identical. **Color tokens (`base_color`, `accent_color`, surface ramp, state colors) are necessary but NOT sufficient differentiation.** All ten of axes 1-10 must vary; axis 11 (surface alpha) is mood-conditional and can stay at 1.00 for directions where solid surfaces fit the personality (Pulse / Bubble / Burst), only varying for directions where translucency reinforces the mood (Slate, Daybreak).
 
 ### Axis 1 — Corner radius scale
 
@@ -173,6 +173,37 @@ Per Phase 3.1 + 3.2 contract, raised mode adds a darker offset duplicate behind 
 | Bubble | 4-5px | 3px | 2px | primary buttons + selected tabs + selected rows + chips |
 | Daybreak | 2-3px | 2px | none | primary buttons + selected tabs |
 | Burst | 4-6px (primary), 2px (secondary) | 3px | 2px | primary buttons + selected tabs + selected rows |
+
+### Axis 11 — Surface alpha policy (translucency)
+
+Per-direction translucency on container/overlay chrome. Authored as `bg_color` alpha on the relevant `StyleBoxFlat` entries in each direction's `.tres` via Godot's Theme Editor — **not** an `@export` property (per the locked principle: exports for global consistency, Theme Editor primary for personality; alpha is mood-tuning that fits the Theme Editor side).
+
+Mapping:
+- `popup_surface` = `PopupPanel`, `AcceptDialog`, `ConfirmationDialog`, `Window` chrome `bg_color.a`
+- `panels` = `Panel`, `PanelContainer`, `ScrollContainer` chrome, `MarginContainer` (when given a panel stylebox) `bg_color.a`
+- `buttons` = ALL button-family Controls (`Button`, `OptionButton`, `MenuButton`, `LinkButton`, `CheckBox`, `CheckButton`, `ColorPickerButton`) `bg_color.a` — always 1.0 for v1 (interactive affordances must read as solid)
+- `chrome` = inputs, tab chips, list rows, range controls, brand mark — always 1.0 for v1 (affordance / accessibility reasons)
+
+| Direction | popup_surface | panels | buttons | chrome | Justification |
+|---|---|---|---|---|---|
+| Pulse | 1.00 | 1.00 | 1.00 | 1.00 | Cabinets are physical hardware; translucent cabinets read sci-fi-HUD not arcade |
+| Slate | **0.92** | 1.00 | 1.00 | 1.00 | Subtle iOS-NavigationBar / Sheet translucency on modal chrome only |
+| Bubble | 1.00 | 1.00 | 1.00 | 1.00 | Candy is opaque material; translucent candy reads as ice/jelly |
+| Daybreak | **0.90** | **0.96** | 1.00 | 1.00 | Airy welcoming-lobby; subtle translucency on panels and stronger through popup |
+| Burst | 1.00 | 1.00 | 1.00 | 1.00 | Award/poster surfaces are solid; translucent achievement screens feel weak |
+
+**Universal across all 5 directions:** modal scrim ~50% black behind `Window`/`Popup` modal-darkening (Godot built-in via `Window.transient` modal mode). Standard MD3 + iOS HIG practice. Not direction-specific.
+
+**Why these stay solid in EVERY direction (no exceptions):**
+
+- **Buttons**: an interactive affordance must read as visually solid; translucent buttons read as ghost/preview, not "action available."
+- **Inputs (`LineEdit`/`TextEdit`/`CodeEdit`)**: translucent inputs read as disabled or read-only.
+- **Tabs / chips**: interactive affordances; same reasoning as buttons.
+- **List rows**: each row is an interactive surface; container around them can be translucent (Daybreak), but each row stays solid for readability.
+- **Range controls (`HSlider`/`VSlider`/`HScrollBar`/`VScrollBar`/`SpinBox`/`ProgressBar`)**: alpha on a slider track or scrollbar makes the position/value harder to read. Accessibility regression.
+- **Brand mark badge**: identity affordance; should always read as definitively present.
+
+Future v1.x note: a `panel_alpha` + `popup_alpha` `@export` pair could be added if consumer demand surfaces. Architecture supports adding exports without breaking changes; v1 ships with these baked into the `.tres` per the values above.
 
 ## Per-direction commit checklist
 
