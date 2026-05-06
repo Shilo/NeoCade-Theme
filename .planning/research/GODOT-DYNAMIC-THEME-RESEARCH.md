@@ -47,12 +47,12 @@ Phase 4 may treat the dynamic architecture as locked only if every strict check 
 
 | Check | Required evidence | Current status | Result |
 |-------|-------------------|----------------|--------|
-| Export-driven regeneration | Changing exported `base_color`, `accent_color`, `raised`, or `platform` causes required subset entries to regenerate | Spike pending | PENDING |
-| Subclass super-first overrides | Good subclass calls `super._regenerate()` and keeps base entries while overriding personality entries | Spike pending | PENDING |
-| Negative subclass failure | Bad subclass skipping `super._regenerate()` leaves detectable coverage gaps | Spike pending | PENDING |
-| Runtime application | Saved dynamic `.tres` can be loaded and assigned to a Control tree | Spike pending | PENDING |
-| Serialization behavior | Export values and script references survive saved `.tres` round trip, with generated entries understood as runtime/editor-time output | Spike pending | PENDING |
-| Platform detection | `DESKTOP`, `MOBILE`, and `AUTO` paths resolve with local, simulated, and Web-ambiguous cases documented | Spike pending | PENDING |
+| Export-driven regeneration | Changing exported `base_color`, `accent_color`, `raised`, or `platform` causes required subset entries to regenerate | Executed in Godot 4.6.2; see `SPIKE-03.2/VERIFY-RESULTS.md` | PASS |
+| Subclass super-first overrides | Good subclass calls `super._regenerate()` and keeps base entries while overriding personality entries | Executed; good subclass kept required entries and added direct override marker | PASS |
+| Negative subclass failure | Bad subclass skipping `super._regenerate()` leaves detectable coverage gaps | Executed; verifier caught LineEdit/Tree/Window gaps | PASS |
+| Runtime application | Saved dynamic `.tres` can be loaded and assigned to a Control tree | Executed; Button resolved stylebox through Control tree | PASS |
+| Serialization behavior | Export values and script references survive saved `.tres` round trip, with generated entries understood as runtime/editor-time output | Executed; saved resources inspected and `user://` roundtrip passed | PASS |
+| Platform detection | `DESKTOP`, `MOBILE`, and `AUTO` paths resolve with local, simulated, and Web-ambiguous cases documented | Executed; simulated Web desktop/mobile/ambiguous and local fallback covered | PASS |
 
 ## Editor Theme Generation Flow
 
@@ -165,11 +165,27 @@ Pending Plan 05. Discussion decision favors Godot-only layered detection: explic
 
 ## Serialization Findings
 
-Pending Plan 04.
+Saved dynamic `.tres` fixtures serialize script references and exported values:
+
+- `prize_pop_spike_neocade_theme.tres` references `PrizePopSpikeNeoCadeTheme.gd` and stores `base_color`, `accent_color`, `raised=true`, `platform=AUTO`.
+- `broken_no_super_spike_theme.tres` references `BrokenNoSuperSpikeTheme.gd` and stores `base_color`, `accent_color`, `raised=false`, `platform=AUTO`.
+- Generated theme entries are not relied on as hand-authored table data; the verifier proves they regenerate after load and after a `ResourceSaver.save()` / load roundtrip (`SPIKE-03.2`, EXECUTED).
+
+Conclusion: dynamic scripted Theme resources are feasible as saved `.tres` instances, provided Phase 4 keeps regeneration deterministic and verifier coverage rejects missing generated entries.
 
 ## Runtime and Editor-Time Findings
 
-Pending Plan 04.
+Runtime findings:
+
+- A saved scripted `Theme` resource can be loaded in headless Godot 4.6.2 and assigned to a Control tree.
+- `Theme.has_*` checks correctly expose generated entries and missing entries; this is the correct gate because engine fallback can mask visual gaps.
+- Representative subset regeneration reported `187 usec`. This is a subset smoke metric, not a full 35-Control timing guarantee.
+
+Editor-time findings:
+
+- `@tool` scripts parse and execute under Godot 4.6.2 when loaded from `.planning/spikes/dynamic-theme/`.
+- The spike does not prove Inspector editing UX for exported properties; Phase 4 should verify that exported knobs regenerate live in the editor when the production script exists.
+- The research confirms editor-specific APIs are unnecessary for runtime generation.
 
 ## Pitfall Catalogue
 
@@ -209,3 +225,4 @@ Pending Plan 05. This recipe must be marked LOCKED only if the strict feasibilit
 | 2026-05-06 | 01 | Research artifact created with required sections, source labels, strict gate rows, spike evidence matrix, no-addon boundary, and anti-pattern audit skeleton | PASS |
 | 2026-05-06 | 02 | Godot source inspection populated editor generation flow, runtime Theme APIs, StyleBoxFlat constraints, formula port, and anti-pattern decisions | PASS |
 | 2026-05-06 | 03 | Research-only dynamic Theme spike artifacts created under `.planning/spikes/dynamic-theme/`; smoke verifier passed on Godot 4.6.2 | PASS |
+| 2026-05-06 | 04 | Formal strict feasibility verifier passed in Godot 4.6.2; `VERIFY-RESULTS.md` records checks, raw output, serialization inspection, AUTO matrix, and performance note | PASS |

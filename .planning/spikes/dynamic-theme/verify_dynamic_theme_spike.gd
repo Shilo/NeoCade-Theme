@@ -34,6 +34,8 @@ func _run() -> void:
 	_verify_runtime_application(good)
 	_verify_platform_resolution(good)
 	_verify_serialization(good)
+	_expect(good.get_last_regeneration_usec() > 0, "regeneration duration hook reports non-zero usec")
+	print("VERIFY: good_regeneration_usec=%d" % good.get_last_regeneration_usec())
 	print("VERIFY: checks=%s" % [", ".join(checks)])
 
 func _verify_required_subset(theme: Theme) -> void:
