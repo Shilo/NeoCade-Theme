@@ -157,11 +157,44 @@ Spike artifacts live under `.planning/spikes/dynamic-theme/` only (`SPIKE-03.2`)
 
 ## Subclass Contract
 
-Pending Plan 05. Contract must define superclass hooks, allowed direct overrides, verifier obligations, mobile/a11y guardrails, and forbidden APIs.
+Phase 4 should implement a production version of this contract.
+
+| Hook/category | Purpose | Allowed subclass freedom | Direct override allowed? | Required verifier coverage | Mobile/a11y guardrail | Forbidden APIs |
+|---------------|---------|--------------------------|--------------------------|----------------------------|----------------------|----------------|
+| `NeoCadeTheme._regenerate()` | Clear and rebuild full 35-Control matrix from exported values | Superclass-owned only | No | Every required Control/type slot exists after regeneration | Desktop/mobile sizing both covered | `EditorSettings`, `EditorInterface`, `EDSCALE` |
+| `super._regenerate()` in subclasses | Populate base entries before personality deltas | Mandatory first line of subclass regeneration when overriding | N/A | Negative fixture must prove no-super gaps are detected | Missing base entries fail mobile and desktop variants | Resource-level inheritance assumptions |
+| `_theme_profile()` | Return personality constants: radius, border width, accent mix, contrast, density | Yes; subclasses may tune scalar values | Yes, via returned dictionary only | Snapshot profile values in verifier | Must not reduce touch targets below mobile spec | Editor-only scale/system theme reads |
+| `_derive_surface()` | Formula-driven tonal ramp from `base_color` | Limited; subclass may tune contrast through profile | Avoid direct replacement unless tested | Color output changes when exports change | Maintain WCAG targets in later token phases | Texture/pattern/painterly effects |
+| `_build_*` control groups | Generate theme entries per Control family | Superclass-owned by default | Only for documented exceptions | Full 35-Control coverage verifier | Mobile constants/font sizes must remain paired | Partial visual-only acceptance |
+| `_after_base_regenerate(context)` | Add personality after base coverage exists | Preferred subclass extension point | Yes, for narrow direct overrides | Direct override marker + affected slots tested | Overrides must include desktop/mobile expectations | Clearing the theme after superclass run |
+| Direct `set_*` override in subclass | Exceptional one-off personality slot | Allowed only after `super._regenerate()` | Yes, documented exception | Required per-slot verifier assertion | Must not remove focus/pressed/disabled states | Unverified override drift |
+| Platform resolver | Resolve forced desktop/mobile or AUTO | Superclass-owned | No | Forced, local, Web desktop/mobile/ambiguous cases | Ambiguous Web is mobile-preferred | JavaScript bridge in v1 architecture |
+
+Contract rule: a subclass may be visually opinionated, but coverage remains a superclass obligation. Every subclass that overrides generation must either call `super._regenerate()` first or fail verification by design.
 
 ## AUTO Platform Strategy
 
-Pending Plan 05. Discussion decision favors Godot-only layered detection: explicit forced enum first, `OS.has_feature("mobile")`, named Web/mobile feature tags where available, `OS.get_name()` fallback, and mobile-preferred handling for ambiguous Web.
+Recommended resolver order:
+
+1. If `platform == DESKTOP` or `platform == MOBILE`, use the forced value.
+2. For `AUTO`, prefer Godot feature tags: `mobile`, `android`, `ios`, `web_android`, `web_ios` all resolve mobile.
+3. `web_windows`, `web_macos`, and `web_linuxbsd` resolve desktop.
+4. Ambiguous `web` with no platform-specific tag resolves mobile-preferred.
+5. Fallback to `OS.get_name()`: `Android`/`iOS` mobile; `Windows`/`macOS`/`Linux`/BSD desktop; unknown mobile-preferred.
+
+Validation status:
+
+| Case | Status |
+|------|--------|
+| Forced DESKTOP | Verified in Godot 4.6.2 |
+| Forced MOBILE | Resolver path covered; future mobile visual check needed |
+| Native desktop local | Verified as known enum on Windows host |
+| Native Android/iOS | Simulated by resolver logic; real-device confirmation deferred to UD-5 / Phase 10 |
+| Web desktop tags | Verified by simulated `web_windows` |
+| Web mobile tags | Verified by simulated `web_android` and `web_ios` |
+| Ambiguous Web | Verified mobile-preferred |
+
+No JavaScript bridge is needed for v1 architecture. If Web ambiguity becomes unacceptable during export QA, research it then as a targeted fallback, not as a Phase 4 dependency.
 
 ## Serialization Findings
 
@@ -189,7 +222,18 @@ Editor-time findings:
 
 ## Pitfall Catalogue
 
-Pending Plan 05.
+| Pitfall | Risk | Phase 4 prevention |
+|---------|------|--------------------|
+| Fallback masks missing entries | Theme visually appears okay because Godot default theme fills gaps | Use `Theme.has_*` coverage verifier, not screenshots alone. |
+| Subclass skips `super._regenerate()` | Non-overridden Controls render default/unbranded | Keep bad no-super fixture and require a failing-gap assertion. |
+| Generated entries become stale | Export changes leave old entries in resource | Start regeneration with `clear()` and verify changed outputs. |
+| Editor-only dependencies leak in | Theme breaks in exports/runtime | Static audit for `EditorSettings`, `EditorInterface`, `EDSCALE`, editor-only classes. |
+| Web platform ambiguity | Desktop browser may get mobile sizing or vice versa | Forced platform escape hatch plus documented mobile-preferred AUTO. |
+| Shadow chrome sneaks back | GL Compatibility shadow over-render risk | `StyleBoxFlat.shadow_size = 0` in helpers and audit for shadows. |
+| Partial subset confidence | Spike passes but full 35-Control matrix fails | Treat Phase 03.2 as architecture feasibility only; Phase 4+ must run full coverage verifier. |
+| Direct subclass overrides drift | Personality override deletes accessibility/focus states | Require direct override table and per-slot verifier rows. |
+| Serialization misunderstanding | Generated entries expected to be hand-authored in `.tres` | Accept saved scripts/exports plus deterministic regeneration; document this in README. |
+| Mobile density regressions | Desktop values accidentally ship to mobile | Pair font-size/constants by platform in verifier. |
 
 ## Anti-Pattern Audit
 
@@ -212,11 +256,36 @@ Pending Plan 05.
 
 ## Fallback Options and Recommendation
 
-Pending Plan 05. The fallback recommendation may not be auto-adopted; the user requested one strongest fallback if the strict gate fails or is blocked.
+| Option | Description | Pros | Cons | Recommendation |
+|--------|-------------|------|------|----------------|
+| Dynamic scripted `Theme` superclass | `@tool extends Theme` with exported values and per-theme subclasses | One `.tres` per direction, user-editable exports, verified representative feasibility | Requires strong verifier discipline and full-matrix generator work | **Recommended** because strict gate passed |
+| Hybrid `@tool` static `.tres` generator | Editor/tool script writes static desktop/mobile `.tres` resources from the same formulas | Most robust fallback for Asset Library consumers if dynamic scripting breaks later | More files, less elegant user editing, generation workflow returns | **Chosen fallback** if full-matrix dynamic fails |
+| Older 4N static matrix | Flat/raised x desktop/mobile per theme direction | Simple runtime story | Explodes file count and contradicts architecture revision | Reject unless emergency |
+| Reduced dynamic model | Dynamic only for colors; static sizing/resources | Reduces moving parts | Less coherent, still needs fallback files | Reject unless a narrow Godot serialization issue appears |
+
+Recommendation: proceed with dynamic scripted `Theme` architecture. Keep the hybrid static generator as the one fallback to revisit only if Phase 4 full-matrix implementation exposes a blocker that the representative spike did not cover.
 
 ## Architecture Recipe for Phase 4
 
-Pending Plan 05. This recipe must be marked LOCKED only if the strict feasibility gate passes.
+**Status: LOCKED for Phase 4 planning, subject to full-matrix verification.**
+
+1. Create production `NeoCadeTheme.gd` as `@tool extends Theme` in the addon.
+2. Export `base_color`, `accent_color`, `raised`, and `platform: { DESKTOP, MOBILE, AUTO }`.
+3. Store all default base-direction values in the superclass; Phase 3.4 mockup approval chooses those defaults.
+4. Implement `_regenerate()` as superclass-owned full-matrix generation:
+   - `clear()` first.
+   - Resolve platform.
+   - Derive color ramp from exported values.
+   - Set styleboxes, colors, fonts, font sizes, icons, and constants for every required Control and state.
+   - Call `_after_base_regenerate(context)` last.
+5. Per-theme direction subclasses may override `_theme_profile()` and `_after_base_regenerate(context)`. If a subclass overrides `_regenerate()`, verifier requires `super._regenerate()` first.
+6. Use `StyleBoxFlat` helpers for flat MD3/MD3 Expressive chrome; set `shadow_size = 0`.
+7. Implement platform sizing through constants/font sizes, not separate desktop/mobile `.tres` files.
+8. Keep forced `DESKTOP`/`MOBILE` modes for deterministic QA and user escape hatches.
+9. Build a coverage verifier that checks `Theme.has_*` for all 35 user-facing Controls and required type variations.
+10. Add tests/fixtures for a good subclass and no-super bad subclass before adding visual polish.
+
+Phase 4 must not treat the 187 usec subset timing as a final performance result. Retain the timing hook and measure the full generated matrix.
 
 ## Phase 3.2 Verification Log
 
