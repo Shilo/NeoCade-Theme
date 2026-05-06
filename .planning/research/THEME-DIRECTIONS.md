@@ -1,8 +1,10 @@
 # NeoCade Theme Direction Research
 
-**Phase:** 03.3-theme-direction-research  
-**Created:** 2026-05-06  
-**Status:** Text-level directions approved after one naming revision.
+**Phase:** 03.3-theme-direction-research
+**Created:** 2026-05-06
+**Status:** Text-level directions approved after two revision rounds. **Revision 2/2 (2026-05-06b) migrated Bubble and Daybreak from light-mode to designed dark-mode palettes** to comply with the project-wide "all v1 themes are dark" constraint (PROJECT.md "Out of Scope: Light color mode"). Direction names, identities, personality intent, and use cases preserved.
+
+**Architecture amendment 2026-05-06e:** The "Future subclass form: `{Name}NeoCadeTheme`" lines below in each direction's section reflect the architecture as it stood when Phase 3.3 closed. PROJECT.md was subsequently simplified (2026-05-06e) to **single concrete class + data-driven `.tres` per direction** (godot-minimal-theme pattern). Under the simplified architecture there are NO per-direction subclass classes — every direction is a `.tres` of type `NeoCadeTheme` (the single concrete class) with different `@export` values. The `.tres` filename stems below remain authoritative; the "Future subclass form" lines are historical context only. See PROJECT.md Key Decisions row "Architecture simplified to single concrete class + data-driven `.tres` per direction (2026-05-06e)" for the locked architecture, and `.planning/phases/03.4-visual-direction-flat-extruded-flat-mockup-approval-gate/03.4-CORRECTIVE-ADDENDUM.md` D-31 for the full contract.
 
 ## Provenance and Scope
 
@@ -151,12 +153,13 @@ Naming revision note: Per user feedback on 2026-05-06, final direction names are
 - Direction display name: Bubble
 - Future subclass form: BubbleNeoCadeTheme
 - Suggested future `.tres` filename stem: `bubble_neocade_theme`
-- Base color: #FFF4FA
-- Accent color: #7B1B55
-- Contrast ratio: 9.19:1 - WCAG AA PASS
-- Personality / palette / mood summary: Friendly, childlike, and mobile-game-bright with a soft candy-counter base and deep berry accent. This is the playful bubbly option, but "bubbly" is personality, not material: it remains flat, solid, and clean in normal mode. The generic one-word name keeps the playful intent while avoiding v0 multiword or product-like naming.
+- Base color: #241326 *(dark berry-aubergine; Revision 2/2)*
+- Accent color: #FFB3E6 *(light bubblegum pink; Revision 2/2)*
+- Contrast ratio: 10.74:1 - WCAG AAA PASS *(re-verified 2026-05-06b in `.planning/mockups/3.4/wcag-palette-audit.md`)*
+- Revision 2/2 note: Original light palette (`#FFF4FA` + `#7B1B55`, 9.19:1) was migrated to a designed dark palette to comply with the project-wide "v1 is dark only" constraint. Personality intent, use case, and DNA inputs are preserved; the candy-counter mood is now expressed through dark berry surfaces with cheerful pink accent rather than light mint surfaces.
+- Personality / palette / mood summary: Friendly, childlike, and mobile-game-bright translated onto a dark berry-aubergine base with light bubblegum-pink action/focus accent. The mood is "playful candy-counter at night" — tactile, social, and cheerful without becoming toy-store. It remains flat, solid, and clean in normal mode; bubbliness comes from shape language (generous corner radius, pillowy buttons, fully-rounded chips) rather than material treatment.
 - Target use case: Casual games, cozy menus, tutorial-heavy experiences, family-friendly apps, and mobile-first game UIs that need warmth without asset-art dependency.
-- Flat-mode behavior: Controls use rounded solid fills, generous state-layer contrast, and cheerful but sparse accent placement; backgrounds stay simple and unillustrated.
+- Flat-mode behavior: Controls use rounded solid fills on dark berry surfaces, generous state-layer contrast, and cheerful but sparse pink accent placement; backgrounds stay simple and unillustrated.
 - Raised-mode behavior: Buttons, stepper-like controls, and selected playful affordances can use 3-5px extruded-flat offsets; large panels and text inputs remain flat so the theme does not become toy-like chrome.
 - Mobile-sizing notes: Mobile mode leans into larger buttons and toggles with 44pt/48dp minimum targets, while desktop mode tempers spacing to remain usable for editor/runtime panels.
 - DNA inputs used: Prize Pop Plaza loved personality; user exemplar flat/raised button grammar; Boardwalk Sunset rejection prevents warm textured drift.
@@ -169,17 +172,18 @@ Naming revision note: Per user feedback on 2026-05-06, final direction names are
 - Direction display name: Daybreak
 - Future subclass form: DaybreakNeoCadeTheme
 - Suggested future `.tres` filename stem: `daybreak_neocade_theme`
-- Base color: #EAF7F1
-- Accent color: #006A68
-- Contrast ratio: 5.85:1 - WCAG AA PASS
-- Personality / palette / mood summary: Welcoming daylight arcade by day: mint-clean surfaces, teal wayfinding, and a lighter social-lobby mood. This direction exists to keep the five-theme spread honest; it is not a global light-mode system and does not create a new export axis. It should feel approachable and fresh while staying reusable for serious controls.
+- Base color: #0B2420 *(dark forest teal; Revision 2/2)*
+- Accent color: #76F2D1 *(fresh mint; Revision 2/2)*
+- Contrast ratio: 11.96:1 - WCAG AAA PASS *(re-verified 2026-05-06b in `.planning/mockups/3.4/wcag-palette-audit.md`)*
+- Revision 2/2 note: Original light palette (`#EAF7F1` + `#006A68`, 5.85:1) was migrated to a designed dark palette to comply with the project-wide "v1 is dark only" constraint. The "welcoming daylight" personality is preserved through bright fresh-mint accent on a dark forest-teal base; the daylight feel now reads as airy spacing + bright accent rather than light surface.
+- Personality / palette / mood summary: Welcoming-daylight mood translated to dark mode: deep forest-teal surfaces with bright fresh-mint wayfinding, airy spacing, and a friendly social-lobby feel. The personality is "fresh evening lobby" — approachable and bright without ever using a light surface. It should feel reusable for serious controls while staying the friendliest of the five directions.
 - Target use case: Community hubs, onboarding flows, cozy game menus, family-friendly settings screens, and bright mobile experiences.
-- Flat-mode behavior: Flat mode uses clear high-contrast teal for primary/focus/selection and keeps secondary surfaces quiet through MD3 tonal roles rather than illustration.
+- Flat-mode behavior: Flat mode uses dark teal tonal surfaces with clear high-contrast mint for primary/focus/selection; secondary surfaces stay quiet through MD3 tonal roles rather than illustration. Airy spacing carries the daylight feel.
 - Raised-mode behavior: Raised mode adds tactile depth mainly to primary actions and cards-as-actions; ordinary panels, lists, and text fields remain flat for readability.
 - Mobile-sizing notes: Mobile mode uses the same 44pt iOS and 48dp Android floor language as the other directions, with slightly more breathing room around touch clusters to preserve the daylight calm.
-- DNA inputs used: Phase 3.1 daylight-friendly gap; HCGames/GameArt2D/Kenney friendliness; the "vibrant arcade hall by day" project identity.
+- DNA inputs used: Phase 3.1 daylight-friendly gap; HCGames/GameArt2D/Kenney friendliness; the "vibrant arcade hall by day" project identity reinterpreted dark.
 - Commercial examples used: HCGames, GameArt2D, Kenney, Pinky UI, Royal Match, and Android Developers Expressive Wear guidance.
-- Rationale: MD3/MD3 Expressive supports brighter tonal seeds and accessible role pairing, while NeoCade's dynamic base/accent exports let a bright default remain user-adjustable. This direction satisfies D-03 by widening personality spread and D-03b by treating desktop/mobile and flat/raised as universal, not identity.
+- Rationale: MD3/MD3 Expressive supports bright accents on dark surfaces and accessible role pairing, while NeoCade's dynamic base/accent exports let consumers adjust palettes without losing direction identity. This direction satisfies D-03 by widening personality spread (the friendliest dark direction) and D-03b by treating desktop/mobile and flat/raised as universal, not identity.
 - Filter audit status: PASS; see Filter Audit Summary.
 
 ### BurstNeoCadeTheme
@@ -232,13 +236,13 @@ User decision, 2026-05-06: revise names to generic one-word names and approve th
 
 Five directions awaiting decision:
 
-| Direction | Future subclass | Base color | Accent color | One-sentence personality summary |
-|---|---|---|---|---|
-| Pulse | PulseNeoCadeTheme | #151A2E | #8BFF6A | Dark saturated arcade energy with a near-navy control-panel base and lively green action/focus accent. |
-| Slate | SlateNeoCadeTheme | #111820 | #8BD3FF | Calm modern minimal dark with restrained blue accenting and iOS-like clarity. |
-| Bubble | BubbleNeoCadeTheme | #FFF4FA | #7B1B55 | Friendly, childlike, mobile-game-bright, and tactile without texture or embossing. |
-| Daybreak | DaybreakNeoCadeTheme | #EAF7F1 | #006A68 | Welcoming daylight arcade by day with mint-clean surfaces and teal wayfinding. |
-| Burst | BurstNeoCadeTheme | #20112E | #FFD166 | Bold MD3 Expressive statement with deep plum grounding and warm event-like emphasis. |
+| Direction | Future subclass | Base color | Accent color | Contrast | One-sentence personality summary |
+|---|---|---|---|---|---|
+| Pulse | PulseNeoCadeTheme | #151A2E | #8BFF6A | 13.62:1 | Dark saturated arcade energy with a near-navy control-panel base and lively green action/focus accent. |
+| Slate | SlateNeoCadeTheme | #111820 | #8BD3FF | 10.94:1 | Calm modern minimal dark with restrained blue accenting and iOS-like clarity. |
+| Bubble | BubbleNeoCadeTheme | #241326 | #FFB3E6 | 10.74:1 | Friendly, childlike, mobile-game-bright translated dark — playful candy-counter at night. *(Revised 2/2 to dark.)* |
+| Daybreak | DaybreakNeoCadeTheme | #0B2420 | #76F2D1 | 11.96:1 | Welcoming-daylight mood translated dark — fresh evening lobby with bright mint wayfinding. *(Revised 2/2 to dark.)* |
+| Burst | BurstNeoCadeTheme | #20112E | #FFD166 | 12.33:1 | Bold MD3 Expressive statement with deep plum grounding and warm event-like emphasis. |
 
 ## Phase 3.3 Verification Log
 
@@ -327,3 +331,25 @@ Final no-forbidden-file audit: PASS. No mockup, image, addon, theme resource, fo
 | future subclass names | PASS: PulseNeoCadeTheme, SlateNeoCadeTheme, BubbleNeoCadeTheme, DaybreakNeoCadeTheme, BurstNeoCadeTheme. |
 | copyright/name-risk reduction | PASS: names are generic dictionary-style words and do not reuse surveyed product names or v0 multiword concept labels. |
 | filter and contrast checks | PASS: naming-only revision does not alter palettes, behavior, or filter audit outcomes. |
+
+### 2026-05-06b - Revision round 2/2 dark-only palette migration (Bubble + Daybreak)
+
+**Trigger:** Phase 3.4 mockup execution surfaced two procedural and substantive issues:
+
+1. **Procedural:** Phase 3.3 originally approved Bubble (`#FFF4FA` + `#7B1B55`, light) and Daybreak (`#EAF7F1` + `#006A68`, light) as light-mode directions, but PROJECT.md "Out of Scope: Light color mode" excludes light mode from v1 entirely. The light approvals contradicted the locked project constraint and should not have been approved at Round 1.
+2. **Substantive:** Phase 3.4 Plan 02 (executed by Codex) silently migrated Bubble + Daybreak to dark palettes (`#241326` + `#FFB3E6` and `#0B2420` + `#76F2D1`) without going back through the Phase 3.3 approval gate. The migration itself is technically sound (both pairs verify WCAG AAA in `.planning/mockups/3.4/wcag-palette-audit.md`) but the procedure was wrong — palette decisions belong to Phase 3.3.
+
+**User decision (2026-05-06b):** Approve the dark migration retroactively. All five v1 directions are dark-mode. Direction identity, naming, personality intent, target use case, and DNA inputs are preserved. The "daylight" and "candy-counter" moods are reinterpreted as bright-accent-on-dark-base rather than light-surface treatments.
+
+| Check | Result |
+|---|---|
+| dark-only project constraint | PASS: all five directions now use dark base colors; complies with PROJECT.md "Out of Scope: Light color mode (v1)". |
+| Bubble revised palette | PASS: `#241326` (dark berry-aubergine) + `#FFB3E6` (light bubblegum pink) — 10.74:1 WCAG AAA. |
+| Daybreak revised palette | PASS: `#0B2420` (dark forest teal) + `#76F2D1` (fresh mint) — 11.96:1 WCAG AAA. |
+| Pulse / Slate / Burst | UNCHANGED: already dark, no revision needed. |
+| direction identity preservation | PASS: names, future subclass forms, DNA inputs, target use cases, personality summaries (intent), and filter audit outcomes preserved; only base/accent hex values and palette description language changed. |
+| five-direction visual distinguishability | PASS: bases span navy/slate/wine/forest-teal/plum (five distinct hue families); accents span lime/sky/pink/mint/gold (five distinct hue families). |
+| broader spread maintained | PASS: D-03 broad personality spread retained — saturated arcade (Pulse), modern minimal (Slate), playful (Bubble), welcoming (Daybreak), expressive statement (Burst). |
+| filter audit | PASS: anti-cyberpunk + anti-texture + universal-axes-still-work + no-base-preselection still hold for revised palettes. |
+| WCAG AAA evidence | PASS: every base/accent pair documented at AAA (>= 7:1) in `.planning/mockups/3.4/wcag-palette-audit.md`; floor of 4.5:1 (AA) exceeded by every pair. |
+| Phase 3.4 mockup execution status | RESET: Phase 3.4 Plan 02 mockup outputs (15 PNGs in `.planning/mockups/3.4/concepts/`) discarded due to a separate shape-language-collapse issue (single template, color-only differentiation). Plan 02 to be re-executed by Claude Code under the corrected `direction-shape-language-spec.md`. |

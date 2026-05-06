@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 3.4 Plan 02 three-image fixed-layout concept checkpoint
-last_updated: "2026-05-06T08:05:26.243Z"
+stopped_at: Phase 3.4 Plan 02 REDIRECTED 2026-05-06b + architecture simplified to single concrete class + data-driven `.tres` per direction 2026-05-06e + `@export` set finalized at 9 properties + naming cleaned + `is_light` semantics 2026-05-06f — Claude Code to re-execute Plan 02 under direction-shape-language-spec.md and the locked architecture (CORRECTIVE-ADDENDUM D-31)
+last_updated: "2026-05-07T04:00:00.000Z"
 last_activity: 2026-05-06
 progress:
   total_phases: 15
@@ -118,9 +118,27 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-06T08:05:26.236Z
-Stopped at: Phase 3.4 Plan 02 three-image fixed-layout concept checkpoint
-Resume file: .planning/mockups/3.4/concept-gallery.html
+Last session: 2026-05-06T20:00:00.000Z
+Stopped at: Phase 3.4 Plan 02 REDIRECTED — first execution rejected (color-only differentiation), redirected for Claude Code re-execution
+Resume file: .planning/mockups/3.4/CLAUDE-CODE-HANDOFF.md (read first), then `.planning/mockups/3.4/image-prompts/direction-shape-language-spec.md`, then `.planning/phases/03.4-visual-direction-flat-extruded-flat-mockup-approval-gate/03.4-02-stage-1-concept-boards-and-finalist-selection-PLAN.md`
+
+## Phase 3.4 Plan 02 redirect (2026-05-06b)
+
+The first execution of Phase 3.4 Plan 02 (by Codex) was rejected by the user. The 15 generated concept PNGs collapsed all five directions into the same UI template with only color tokens varying — every direction looked like the same screen with a hex swap. Two corrective tracks landed on 2026-05-06b:
+
+**Track 1 — Palette correction (closed):** Phase 3.3 Revision Round 2/2 retroactively approved Codex's dark migration of Bubble (#241326 + #FFB3E6) and Daybreak (#0B2420 + #76F2D1). All five v1 directions are now dark, complying with PROJECT.md "Out of Scope: Light color mode (v1)". Direction identity, naming, personality intent, and DNA inputs preserved. See `.planning/research/THEME-DIRECTIONS.md` Verification Log entry 2026-05-06b.
+
+**Track 2 — Shape-language correction (open, ready for re-execution):** New corrective addendum D-28/D-29/D-30 binds Plan 02 re-execution. The new authoritative spec is `.planning/mockups/3.4/image-prompts/direction-shape-language-spec.md` (replaces the deprecated `fixed-control-order-spec.md`). Each direction must commit specific values on ten shape-language axes (corner radius, button anatomy, chip/tab shape, brand mark, density, focus ring, type weights, surface ramp depth, state-layer behavior, raised offset depth) in addition to color tokens. Mockups must pass a greyscale sufficiency test (D-30): each direction must remain identifiable in greyscale by shape language alone.
+
+**Track 3 — Subclass architecture refinement to `@abstract` (closed, 2026-05-06c):** D-31 rewritten. `NeoCadeTheme` is `@tool @abstract class_name NeoCadeTheme extends Theme` per [Godot 4.6 `@abstract` annotation](https://docs.godotengine.org/en/4.6/classes/class_%40gdscript.html#class-gdscript-annotation-abstract); cannot be instantiated directly. All 5 approved directions are concrete subclasses with real `_init()` bake-in (no empty alias). The Phase 3.4 user pick is reframed as the "recommended starter direction" (no longer "the base direction whose defaults are baked into NeoCadeTheme"). Architectural cleanup; does not affect Plan 02 mockup execution.
+
+**Track 4 — Flat addon layout + no root `.tres` (closed, 2026-05-06d):** All `.gd` and `.tres` files live directly at `addons/neocade_theme/` — no `_dev/` or `themes/` subfolders (`fonts/` and `icons/` remain). Root `neocade_theme.tres` is removed entirely. Phase 4 must delete the existing scaffold root `.tres` before authoring the new layout. **The "5 subclass `.gd` files" portion of this track was further simplified by Track 5.**
+
+**Track 5 — Single concrete class + data-driven `.tres` per direction (closed, 2026-05-06e; `@export` set finalized 2026-05-06f):** Final architectural simplification. Replaces the symmetric (06b) and `@abstract` (06c) subclass models with the cleanest possible architecture: **single concrete `NeoCadeTheme` class + N data-only `.tres` files** (godot-minimal-theme proven pattern). The single `addons/neocade_theme/neocade_theme.gd` declares `@tool class_name NeoCadeTheme extends Theme` (concrete, NOT abstract — users can instantiate to author custom themes). Has **9 `@export` properties total** (finalized 2026-05-06f): Core (4) — `base_color`, `accent_color`, `raised`, `platform`; Shape (5, under `@export_group("Shape")`) — `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`. Naming cleaned per user direction 2026-05-06f: drop redundant prefixes (was `corner_radius_base` → now `corner_radius`; was `base_spacing` → now `spacing`); intuitive verbs (was `raised_offset` → now `raised_strength`); group label `"Shape"` not `"Shape Language"`; `Vector2i` convention for any future paired x/y values. The `@export` set is intentionally minimal — limited to values that should be consistent across the entire theme. **Per-direction unique mood lives in Theme Editor entry overrides per `.tres`** (StyleBoxFlat per Control state with direction-specific bg/border/padding/etc., plus icons), NOT in a long list of exports. Dark/light is luminance-derived (`var is_light: bool = base_color.get_luminance() >= 0.5`; dark default; `is_light` flags deviation; renamed/inverted from godot-minimal-theme's `dark_theme` for project-default-dark clarity) — no separate `light_mode` toggle in v1. Each approved direction is purely data: `[gd_resource type="NeoCadeTheme" format=3]` with that direction's `@export` values + Theme Editor authored entry overrides for personality. **No per-direction `.gd` files, no class hierarchy, no subclasses.** v1 ships **1 `.gd` + 5 `.tres`** at the addon root, plus assets in `fonts/` and `icons/`. Consumers preload a specific named direction (`addons/neocade_theme/{name}_neocade_theme.tres`) or instantiate `NeoCadeTheme` for custom themes. The recommended starter direction is the showcase default + README "try this first" suggestion; ships no separate file. Evidence: PROJECT.md "What This Is" / Addon layout / Constraints / Key Decisions row updated; ROADMAP.md Phase 4 success criteria #4 finalized; REQUIREMENTS.md FOUND-02 finalized; Phase 3.4 03.4-CORRECTIVE-ADDENDUM.md D-31 code skeleton finalized with new naming + `is_light` semantics; Phase 3.4 Plan 04 updated; CLAUDE-CODE-HANDOFF.md updated.
+
+**Re-execution executor:** Claude Code, per user direction 2026-05-06b ("i will use Claude Code from here as its clearly superior to UI design").
+
+**Disposition of first-execution outputs:** 15 PNGs in `.planning/mockups/3.4/concepts/` deleted; gallery shells (`concept-gallery.html`, `finalist-gallery.html`, `render.js`, `data/directions.json`, `wcag-palette-audit.md`) kept; the artboard CSS in `src/neocade-mockups.css` will be rewritten by Claude Code during re-execution (the hard-coded `--radius: 12px` artboard rule is the bug locus). The deprecated `fixed-control-order-spec.md` is preserved in-place with a deprecation header for audit trail.
 
 ## Phase 3 → 3.1/3.2 Redirect Notes (2026-05-04)
 

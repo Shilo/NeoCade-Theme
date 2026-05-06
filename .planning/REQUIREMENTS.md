@@ -28,9 +28,9 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Theme Foundation (FOUND)
 
-- [ ] **FOUND-01**: `addons/neocade_theme/` directory layout: `fonts/`, `icons/`, `_dev/` subdirs; root contains `neocade_theme.tres`, `neocade_mobile_theme.tres`, `OFL.txt`, `LICENSE.md`, `README.md`, `CHANGELOG.md`. No `plugin.cfg` (per STACK Decision 5).
-- [ ] **FOUND-02**: `addons/neocade_theme/_dev/generate_themes.gd` is a `@tool` script that produces both `neocade_theme.tres` and `neocade_mobile_theme.tres` from a single `TokenSet` constants block + `TokenSet.mobile` overrides. Single source of truth; drift structurally impossible (per CROSS-PLATFORM 4.2).
-- [ ] **FOUND-03**: Initial run of `generate_themes.gd` produces empty-but-valid `.tres` scaffolds with all theme types declared (35 user-facing Control classes + Window + tooltip types + 13 type variations).
+- [ ] **FOUND-01** *(rewritten 2026-05-06e for single-class data-driven architecture; supersedes prior versions)*: `addons/neocade_theme/` directory layout: `fonts/` and `icons/` subdirs (preserved for asset organization); addon root contains exactly **1 `.gd` file** (`neocade_theme.gd` — `@tool class_name NeoCadeTheme extends Theme`, concrete and instantiable, NOT abstract), **N `.tres` files** (`{name}_neocade_theme.tres`, one per approved direction, each `[gd_resource type="NeoCadeTheme" format=3]` with its direction's `@export` values saved), and addon metadata (`OFL.txt`, `LICENSE.md`, `README.md`, `CHANGELOG.md`, `VERSION`). For the v1 approved set {Pulse, Slate, Bubble, Daybreak, Burst}: **1 `.gd` + 5 `.tres` at the addon root**. **No per-direction `.gd` files** (each direction is purely data on the single class). **No `_dev/` subfolder.** **No `themes/` subfolder.** **No root `neocade_theme.tres`.** **No `neocade_mobile_theme.tres`** (mobile is a `@export platform=MOBILE` toggle on `NeoCadeTheme`). **No `plugin.cfg`** (per STACK Decision 5).
+- [ ] **FOUND-02** *(rewritten 2026-05-06f for finalized 9-property `@export` set + `is_light` semantics)*: `addons/neocade_theme/neocade_theme.gd` is `@tool class_name NeoCadeTheme extends Theme` — the **single, concrete, instantiable** class with **9 `@export` properties total**. **Core (4):** `base_color: Color`, `accent_color: Color`, `raised: bool`, `platform: {DESKTOP, MOBILE, AUTO}`. **Shape (5, under `@export_group("Shape")`):** `corner_radius: int`, `spacing: int`, `raised_strength: int`, `focus_thickness: int`, `outline_width: int`. The `@export` set is intentionally minimal — limited to values that should be consistent across the entire theme. Per-direction unique mood lives in Theme Editor entry overrides per `.tres` (StyleBoxFlat per Control state with direction-specific bg/border/padding/content_margin/icons), NOT in a long list of exports. The `_regenerate_theme()` method dynamically populates derived theme entry color/state values from the `@export` values via formulas; computes `var is_light: bool = base_color.get_luminance() >= 0.5` internally (dark default; `is_light` flags deviation) and branches all conditional formulas on `is_light` (godot-minimal-theme line-56 pattern with renamed/inverted variable for project-default-dark clarity). Setters on every `@export` property trigger `_regenerate_theme()`. The class is **NOT abstract** — users can instance it directly (`NeoCadeTheme.new()`) or save custom `.tres` files of type `NeoCadeTheme` to author their own themes. Convention: any future paired x/y `@export` values use `Vector2i`.
+- [ ] **FOUND-03** *(rewritten 2026-05-06e for single-class data-driven architecture)*: Each per-direction `.tres` at `addons/neocade_theme/{name}_neocade_theme.tres` is `[gd_resource type="NeoCadeTheme" format=3]` with its direction's `@export` values saved. Loading any of these into a Godot scene yields a `NeoCadeTheme` instance that automatically calls `_regenerate_theme()` to populate entries for ALL 35 user-facing Control classes + Window + tooltip types + 13 type variations. **No per-Control entry blocks are serialized** — entries are computed at load time. Optional per-`.tres` Theme Editor entry overrides are stored as additional sections in the `.tres` and survive `_regenerate_theme()` if Phase 4 designs the regenerate logic to preserve manual overrides on a flagged subset of entries.
 
 ### Fonts (FONT)
 
@@ -56,9 +56,9 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
   - Thai / Khmer / Lao / Myanmar — Noto Sans Thai/Khmer/Lao/Myanmar
   - Source: https://fonts.google.com/noto
 
-  Override pattern (per consuming project):
+  Override pattern (per consuming project — pick a specific direction's `.tres`; per flat-layout 2026-05-06d, no root `neocade_theme.tres`):
   ```gdscript
-  var theme = preload("res://addons/neocade_theme/neocade_theme.tres").duplicate()
+  var theme = preload("res://addons/neocade_theme/slate_neocade_theme.tres").duplicate()
   theme.default_font.fallbacks.append(preload("res://your_noto_sans_sc.ttf"))
   # apply theme to scene root
   ```
@@ -120,7 +120,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Mobile Variant (MOBILE)
 
-- [ ] **MOBILE-01**: `addons/neocade_theme/neocade_mobile_theme.tres` ships in v1 alongside the desktop primary, generated from `_dev/generate_themes.gd` `TokenSet.mobile` overrides.
+- [ ] **MOBILE-01** *(rewritten 2026-05-06d; superseded the separate-mobile-tres approach)*: Mobile sizing is a `@export platform=MOBILE` toggle on the abstract `NeoCadeTheme` base class — NOT a separate `.tres` file. Setting `platform=MOBILE` (or `platform=AUTO` on a mobile target) triggers `_regenerate_theme()` to use mobile-tuned constants (44pt iOS / 48dp Android tap targets, 16px body vs 14px desktop, +50% spacing on `space.4+` per Phase 8 mobile-sizing branch). Every concrete subclass `.tres` exposes `platform` as an inherited inspector property; consumers can ship the same subclass `.tres` and switch platforms at instantiation or via `@export platform=AUTO` for runtime detection.
 - [ ] **MOBILE-02**: Tap targets ≥48px (Godot pixels at base scale 1.0) on every interactive Control in the mobile theme. Satisfies iOS HIG 44pt minimum + Material 3 48dp minimum simultaneously.
 - [ ] **MOBILE-03**: Body text 16px on mobile vs 14px desktop. Headings retain their desktop sizes (Inter at opsz=32 + wght=700-800; no scale change for headings).
 - [ ] **MOBILE-04**: Spacing scale +50% on `space.4` and above on mobile. Corner radii STAY IDENTICAL across desktop/mobile (brand identity, not platform-specific).

@@ -1,5 +1,7 @@
 # Phase 3.4 Mockup Pipeline
 
+> **2026-05-06b — Plan 02 REDIRECTED.** First execution (Codex) was rejected. New executor: Claude Code. Read `CLAUDE-CODE-HANDOFF.md` first, then `image-prompts/direction-shape-language-spec.md`. The 15 first-execution concept PNGs in `concepts/` have been deleted; regenerate them under the new spec. The deprecated `image-prompts/fixed-control-order-spec.md` is preserved with a deprecation header for audit trail — do not consume.
+
 This directory contains the visual contract workspace for Phase 3.4. It is planning-only: no production theme resources, scene files, project settings, fonts, icons, or files under `addons/neocade_theme/` are edited here.
 
 ## Phase Boundary
