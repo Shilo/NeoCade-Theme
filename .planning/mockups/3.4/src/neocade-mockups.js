@@ -508,6 +508,35 @@ function renderConceptImage() {
   const target = document.getElementById("conceptImageMount");
   if (!target) return;
   const params = new URLSearchParams(window.location.search);
+  // No direction param = a human opened this internal render template directly.
+  // Show a friendly redirect notice instead of silently defaulting to Pulse.
+  if (!params.get("direction")) {
+    target.innerHTML = `
+      <section class="nc-empty" style="max-width: 720px; margin: 64px auto; padding: 32px;">
+        <h2 style="margin: 0 0 12px;">This is an internal render template</h2>
+        <p style="margin: 0 0 16px; color: var(--muted);">
+          <code>concept-image.html</code> is a single-artboard mount used by
+          <code>render.js</code> to render one direction at a time, parameterized via
+          <code>?direction=&amp;platform=&amp;raised=</code>. It is not meant to be
+          opened directly for review.
+        </p>
+        <p style="margin: 0 0 16px;">
+          To review the 5 directions, open one of these instead:
+        </p>
+        <ul style="margin: 0 0 16px; padding-left: 20px; line-height: 1.7;">
+          <li><a href="concept-gallery.html"><strong>concept-gallery.html</strong></a> — all 5 directions side-by-side with their briefs (richest review)</li>
+          <li><code>concepts/*.png</code> — pre-rendered 15 PNGs (open in any image viewer)</li>
+          <li><code>screenshots/color-overview.png</code> — composite of all 5 desktop-flat artboards</li>
+          <li><code>screenshots/greyscale-sufficiency-test.png</code> — D-30 audit composite (greyscale)</li>
+        </ul>
+        <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">
+          If you really want to render a single direction here for debugging, append e.g.
+          <code>?direction=Pulse&amp;platform=desktop&amp;raised=false</code> to the URL.
+        </p>
+      </section>
+    `;
+    return;
+  }
   const direction = findDirection(params.get("direction")) || NEOCADE_DIRECTIONS[0];
   const platformName = params.get("platform") === "mobile" ? "mobile" : "desktop";
   const raisedFlag = params.get("raised") === "true";
