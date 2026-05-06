@@ -636,6 +636,68 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 
 ---
 
+## 13. Godot Dynamic Theme Architecture sources (added 2026-05-06 by Phase 3.2)
+
+**Source name + location:**
+- Final artifact: `.planning/research/GODOT-DYNAMIC-THEME-RESEARCH.md`
+- Strict verifier output: `.planning/spikes/dynamic-theme/VERIFY-RESULTS.md`
+- Research-only spike: `.planning/spikes/dynamic-theme/`
+- Godot source: `C:/Programming_Files/Godot/godot-master/editor/themes/editor_theme_manager.cpp`, `.h`; `scene/resources/theme.*`; `scene/theme/theme_db.cpp`; `scene/theme/theme_owner.cpp`; `scene/resources/style_box*.{h,cpp}`
+- Existing dissection dependency: `.planning/research/MINIMAL-THEME-DISSECTION.md`
+
+**What was read (Phase 3.2, 2026-05-06):**
+- Godot editor theme generation source around `_create_theme_config()`, `generate_theme()`, editor-settings dependencies, preset handling, and outdated checks.
+- Runtime `Theme` APIs for `set_stylebox`, `set_color`, `set_font`, `set_font_size`, `set_constant`, `set_icon`, type variations, `clear()`, and fallback behavior.
+- `ThemeOwner` and `ThemeDB` fallback lookup behavior to confirm why `has_*` verification is mandatory.
+- `StyleBoxFlat` and `StyleBoxLine` APIs and draw behavior, especially shadow draw gating.
+- Existing `godot-minimal-theme` dissection around `_get_base_color()` and representative Control coverage.
+- Phase 03.2 dynamic Theme spike scripts/resources plus formal Godot 4.6.2 verifier output.
+
+**Source-access status:**
+- Godot source: `local source inspected`.
+- Spike verifier: `executed locally` with Godot `4.6.2.stable.mono.official.71f334935`.
+- Existing dissection: `local prior-phase artifact inspected`.
+
+**What NeoCade adopts:**
+- Dynamic scripted `Theme` architecture: `@tool extends Theme`, exported `base_color`, `accent_color`, `raised`, and `platform` values, deterministic `clear()` + regenerate flow.
+- Runtime `Theme.set_*` APIs as the production mechanism for styleboxes, colors, fonts, font sizes, constants, icons, and type variations.
+- Formula-derived tonal surfaces ported from passivestar-style `_get_base_color()` logic, but driven by NeoCade exports rather than editor settings.
+- Super-first subclass contract: direction subclasses call `super._regenerate()` before personality overrides.
+- `Theme.has_*` coverage verification to avoid fallback-masked missing entries.
+- Godot-only `AUTO` platform resolution with forced DESKTOP/MOBILE escape hatches, feature tags, `OS.get_name()` fallback, and mobile-preferred ambiguous Web behavior.
+
+**What NeoCade rejects:**
+- Shipped dependency on `EditorSettings`, `EditorInterface`, `DisplayServer` system theme colors, `EDSCALE`, or editor custom-theme merge flow.
+- Resource-level inheritance assumptions where a subclass `.tres` magically inherits generated entries without calling superclass code.
+- JavaScript bridge as a Phase 4 dependency for Web platform detection.
+- Soft shadow/elevation behavior for v1; `StyleBoxFlat.shadow_size` must remain zero in generated v1 chrome.
+- Visual acceptance based only on screenshots or default fallback appearance.
+
+**What remains open:**
+- Phase 4 must implement and time the full 35-Control generator; the spike only proves a representative subset.
+- Phase 4+ must add icons, fonts, type variations, and full coverage verifier rows.
+- Phase 10 / UD-5 must handle real-device Android/iOS/Web validation; Phase 3.2 only simulated Web feature-tag cases.
+- Inspector live-edit UX for exported properties should be verified once production addon scripts exist.
+
+**source agreement / conflict notes:**
+- Godot source confirms runtime `Theme` APIs and fallback behavior align with the planned dynamic architecture.
+- Editor theme source confirms the formula/config pattern is useful but editor-bound; NeoCade must port the pattern, not the dependencies.
+- The dynamic spike confirms that saved scripted `.tres` resources can load, regenerate, apply to a Control tree, and roundtrip through `ResourceSaver`.
+- The negative subclass fixture confirms the critical failure mode: skipping `super._regenerate()` leaves detectable coverage gaps.
+
+**strict feasibility outcome:**
+- Overall: PASS for Phase 3.2 representative subset.
+- Formal verifier command: `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path . --script .planning/spikes/dynamic-theme/verify_dynamic_theme_spike.gd`
+- Representative regeneration timing: `187 usec`.
+
+**fallback status:**
+- Recommended architecture: dynamic scripted `Theme`.
+- One fallback retained for contingency: hybrid `@tool` static `.tres` generator if Phase 4 full-matrix dynamic implementation reveals a blocker.
+
+**Confidence:** HIGH for representative architecture feasibility; MEDIUM-HIGH for full v1 feasibility until Phase 4 proves all 35 Controls, icons, fonts, and type variations.
+
+---
+
 ## Summary of Source-Dive Spike Recommendations
 
 Of the nine sources catalogued above, four have HIGH or HIGH-MEDIUM coverage from the initial parallel research pass; the other five have explicit gaps that the roadmap-level spike phases must close:
@@ -664,5 +726,5 @@ Additional spike recommendations not tied to a specific source:
 ---
 
 *Source coverage dossier authored: 2026-05-04*
-*Last updated: 2026-05-04*
+*Last updated: 2026-05-06*
 *Update policy: append per-source updates with date+phase reference as roadmap-level spike phases produce deeper findings.*

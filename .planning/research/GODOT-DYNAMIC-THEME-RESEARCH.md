@@ -295,3 +295,25 @@ Phase 4 must not treat the 187 usec subset timing as a final performance result.
 | 2026-05-06 | 02 | Godot source inspection populated editor generation flow, runtime Theme APIs, StyleBoxFlat constraints, formula port, and anti-pattern decisions | PASS |
 | 2026-05-06 | 03 | Research-only dynamic Theme spike artifacts created under `.planning/spikes/dynamic-theme/`; smoke verifier passed on Godot 4.6.2 | PASS |
 | 2026-05-06 | 04 | Formal strict feasibility verifier passed in Godot 4.6.2; `VERIFY-RESULTS.md` records checks, raw output, serialization inspection, AUTO matrix, and performance note | PASS |
+| 2026-05-06 | 05 | Subclass contract, AUTO strategy, fallback comparison, pitfall catalogue, and Phase 4 architecture recipe finalized | PASS |
+| 2026-05-06 | 06 | `SOURCES.md` Section 13 appended; changed-file scope audit found only `.planning/STATE.md`, Phase 03.2 summaries, research doc, and `.planning/spikes/dynamic-theme/` files | PASS |
+
+## Final Scope Audit
+
+Allowed changed surfaces during Phase 03.2 execution:
+
+- `.planning/STATE.md`
+- `.planning/phases/03.2-godot-dynamic-theme-architecture-research/03.2-01..06-SUMMARY.md`
+- `.planning/research/GODOT-DYNAMIC-THEME-RESEARCH.md`
+- `.planning/research/SOURCES.md`
+- `.planning/spikes/dynamic-theme/`
+
+Forbidden production surfaces checked and not changed:
+
+- `addons/neocade_theme/`
+- `main.tscn`
+- `project.godot`
+- production `.tres` theme resources
+- fonts, icons, and mockup images
+
+Spike code audit found no `EditorSettings`, `EditorInterface`, `EDSCALE`, `JavaScriptBridge`, or positive `shadow_size` dependency in executable spike scripts. The only `addons/neocade_theme/` mention in the spike is the README no-copy boundary.
