@@ -225,6 +225,7 @@ Concretely, "exhaustive" for this project includes (non-exhaustive list):
 | Theme aesthetic anchor: "vibrant arcade hall by day", not "neon noir alley by night" | Concrete mental image to keep researchers/designers oriented. Bright, inviting, energetic — like walking into Round1 or Dave & Buster's, not Blade Runner. | — Pending |
 | Exhaustive research/spiking is a first-class deliverable | Research is mandated to challenge ALL prior inputs (the report, the prototype, and any Pending decision in this doc). The roadmap will include dedicated research/spike phases beyond the initial parallel pass. See Research Charter section. | ✓ Good |
 | Research can override `Pending` Key Decisions; cannot override user's hard constraints | Hard constraints (theme name, anti-cyberpunk, HD-only, full Control coverage, addon distribution path, mockup gate, Inter+Noto Sans primary) require explicit user reconsideration to change. Pending decisions are defeasible by evidence. | ✓ Good |
+| Dynamic `NeoCadeTheme` architecture feasibility — LOCKED for Phase 4 (Phase 3.2 outcome, 2026-05-06) | Strict feasibility gate (export-driven regeneration, super-first subclass overrides, negative-subclass gap detection, runtime saved-`.tres` application, serialization roundtrip, AUTO platform matrix) PASSED 6/6 in Godot 4.6.2 headless against representative Control subset (Button/OptionButton/CheckBox/LineEdit/Tree/PopupMenu/Window/HScrollBar). Subclass contract: super-first `_regenerate()` is mandatory. Hybrid `@tool` static `.tres` generator retained as the single Phase-4 fallback if full-matrix dynamic implementation reveals a blocker. Full 35-Control coverage + icons + fonts + real-device validation remain Phase 4-10 obligations. Evidence: `.planning/research/GODOT-DYNAMIC-THEME-RESEARCH.md`, `.planning/spikes/dynamic-theme/VERIFY-RESULTS.md`. | ✓ Good |
 
 ## Evolution
 
@@ -244,4 +245,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-04 after initialization*
+*Last updated: 2026-05-06 after Phase 3.2*
