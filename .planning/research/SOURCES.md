@@ -724,7 +724,7 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 - External survey rows in THEME-DIRECTIONS.md record retrieved dates individually; all Phase 3.3 survey rows were retrieved 2026-05-06 unless marked as local artifact evidence.
 
 **What NeoCade adopts:**
-- Five peer candidate directions for user review: ArcadePulse, OrbitalSlate, PrizePopPlaza, DaybreakLobby, and FestivalBurst.
+- Five approved peer candidate directions for Phase 3.4 mockup: Pulse, Slate, Bubble, Daybreak, and Burst.
 - Broad-spread personality model: dark saturated arcade, modern minimal dark, playful bubbly, friendly daylight, and expressive statement.
 - Inspiration-only survey discipline: commercial and asset-pack examples validate hierarchy, construction, and personality, but not artwork, exact values, names, or layouts.
 - Per-direction base/accent defaults with arithmetic WCAG AA checks at a stricter 4.5:1 floor for normal text/icons/focus affordances.
@@ -737,7 +737,7 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 - Mockup, image, addon, theme resource, font, icon, scene, project, or `.tres` edits during Phase 3.3.
 
 **What remains open:**
-- User approval, focused revisions, or rejection of the five text-level directions at the Phase 3.3 checkpoint.
+- Phase 3.3 user approval is complete after one naming revision to generic one-word names.
 - Phase 3.4 mockups must visualize the approved directions in both flat and raised modes before selecting finalists.
 - The Phase 3.4 gate still chooses which approved direction becomes the base `NeoCadeTheme` default.
 - Phase 4 converts approved direction recipes into subclass profiles only after Phase 3.4 approval.
@@ -756,7 +756,7 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 - D-11: implemented by this Section 14.
 - D-12/D-13: approval remains text-level and is recorded in THEME-DIRECTIONS.md; no mockups are created here.
 
-**Confidence:** HIGH for text-level direction research readiness; MEDIUM until the user approves or revises the five directions at the checkpoint.
+**Confidence:** HIGH for text-level direction research readiness after the user approved the directions with generic one-word names.
 
 ---
 

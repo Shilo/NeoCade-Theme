@@ -2,7 +2,7 @@
 
 **Phase:** 03.3-theme-direction-research  
 **Created:** 2026-05-06  
-**Status:** Awaiting user text-level approval checkpoint.
+**Status:** Text-level directions approved after one naming revision.
 
 ## Provenance and Scope
 
@@ -98,21 +98,23 @@ Per D-01, D-01b, D-01c, D-04, and D-05, v0 directions are DNA inputs, not automa
 
 | v0 direction | Liked DNA to extract | Rejected traits to drop | Eligible downstream use | Candidate direction(s) informed |
 |---|---|---|---|---|
-| Midnight Marquee | Dark surface, saturated accent energy, LDtk-like arcade/control-panel color confidence. | 3D elements, textured background panels, painterly venue mood. | Color and energy DNA only, flattened through MD3 roles. | ArcadePulse |
+| Midnight Marquee | Dark surface, saturated accent energy, LDtk-like arcade/control-panel color confidence. | 3D elements, textured background panels, painterly venue mood. | Color and energy DNA only, flattened through MD3 roles. | Pulse |
 | Boardwalk Sunset | Only the flat/simple lesson, already covered by D-01c. | Hard-rejected; warm leather/old-fashioned mood, textured/painterly background, baseline recommendation status. | No downstream direction identity; no name carryover. | None |
-| Cabinet Chrome | Dark/clean palette similar to Midnight Marquee, professional arcade/editor confidence. | 3D cabinet framing, chrome/material cue, texture. | Color restraint and neutral-ramp DNA only. | ArcadePulse; OrbitalSlate |
-| Prize Pop Plaza | Childish, friendly, mobile-game vibe; simple raised interactables can work when built from flat fills. | Texture, embossing, jelly/painterly material, asset-art dependency. | Personality lineage may survive because the user loved the concept after flat/extruded-flat filtering. | PrizePopPlaza |
-| Orbital Playdeck | Modern/safest dark theme, big buttons, color only where it matters, nice iOS-like rounding. | Textured backgrounds and any space/sci-fi HUD drift. | Modern minimal dark and restrained accent DNA. | OrbitalSlate |
+| Cabinet Chrome | Dark/clean palette similar to Midnight Marquee, professional arcade/editor confidence. | 3D cabinet framing, chrome/material cue, texture. | Color restraint and neutral-ramp DNA only. | Pulse; Slate |
+| Prize Pop Plaza | Childish, friendly, mobile-game vibe; simple raised interactables can work when built from flat fills. | Texture, embossing, jelly/painterly material, asset-art dependency. | Personality lineage survives as a generic playful direction, but the v0/product-like multiword name does not. | Bubble |
+| Orbital Playdeck | Modern/safest dark theme, big buttons, color only where it matters, nice iOS-like rounding. | Textured backgrounds and any space/sci-fi HUD drift. | Modern minimal dark and restrained accent DNA. | Slate |
 
 ## Candidate Directions
 
 Shared direction constraints: All five are peer candidates per D-03 and D-03b. No base direction is selected here; base direction deferred to Phase 3.4. Each direction must work through the same dynamic `NeoCadeTheme` export model: `raised`, `platform`, `base_color`, and `accent_color`. D-06 seeded archetypes were retained because the survey provided evidence for all five anchors. D-14 and D-15 naming rules are applied through PascalCase future subclass names ending in `NeoCadeTheme`, with no cyber/synth/noir-coded names. D-16 carries Inter Variable Roman, dynamic superclass compatibility, and coverage discipline into every direction.
 
-### ArcadePulseNeoCadeTheme
+Naming revision note: Per user feedback on 2026-05-06, final direction names are generic one-word names. They avoid surveyed product names, v0 multiword concept labels, and source-specific branding. This is a naming-risk reduction, not legal advice.
 
-- Direction display name: Arcade Pulse
-- Future subclass form: ArcadePulseNeoCadeTheme
-- Suggested future `.tres` filename stem: `arcade_pulse_neocade_theme`
+### PulseNeoCadeTheme
+
+- Direction display name: Pulse
+- Future subclass form: PulseNeoCadeTheme
+- Suggested future `.tres` filename stem: `pulse_neocade_theme`
 - Base color: #151A2E
 - Accent color: #8BFF6A
 - Contrast ratio: 13.62:1 - WCAG AA PASS
@@ -126,11 +128,11 @@ Shared direction constraints: All five are peer candidates per D-03 and D-03b. N
 - Rationale: Phase 3.1 supports saturated but controlled color, state layers, and MD3 surface roles; Phase 3.2 supports export-driven base/accent regeneration through one subclass. This direction satisfies D-03 by taking the dark saturated arcade anchor, D-03b by supporting both flat/raised and desktop/mobile, and D-16 by staying Inter-only and Theme-compatible.
 - Filter audit status: PASS; see Filter Audit Summary.
 
-### OrbitalSlateNeoCadeTheme
+### SlateNeoCadeTheme
 
-- Direction display name: Orbital Slate
-- Future subclass form: OrbitalSlateNeoCadeTheme
-- Suggested future `.tres` filename stem: `orbital_slate_neocade_theme`
+- Direction display name: Slate
+- Future subclass form: SlateNeoCadeTheme
+- Suggested future `.tres` filename stem: `slate_neocade_theme`
 - Base color: #111820
 - Accent color: #8BD3FF
 - Contrast ratio: 10.94:1 - WCAG AA PASS
@@ -144,15 +146,15 @@ Shared direction constraints: All five are peer candidates per D-03 and D-03b. N
 - Rationale: Phase 3.1's MD3 role system and state-layer discipline are strongest here; Phase 3.2's dynamic subclass contract lets this direction tune profile values without losing full base coverage. This direction covers the modern minimal dark D-06 anchor while still satisfying D-03b universal axes and D-14/D-15 naming.
 - Filter audit status: PASS; see Filter Audit Summary.
 
-### PrizePopPlazaNeoCadeTheme
+### BubbleNeoCadeTheme
 
-- Direction display name: Prize Pop Plaza
-- Future subclass form: PrizePopPlazaNeoCadeTheme
-- Suggested future `.tres` filename stem: `prize_pop_plaza_neocade_theme`
+- Direction display name: Bubble
+- Future subclass form: BubbleNeoCadeTheme
+- Suggested future `.tres` filename stem: `bubble_neocade_theme`
 - Base color: #FFF4FA
 - Accent color: #7B1B55
 - Contrast ratio: 9.19:1 - WCAG AA PASS
-- Personality / palette / mood summary: Friendly, childlike, and mobile-game-bright with a soft candy-counter base and deep berry accent. This is the playful bubbly option, but "bubbly" is personality, not material: it remains flat, solid, and clean in normal mode. The name survives because the user explicitly loved the concept, while the old textured/embossed treatment does not.
+- Personality / palette / mood summary: Friendly, childlike, and mobile-game-bright with a soft candy-counter base and deep berry accent. This is the playful bubbly option, but "bubbly" is personality, not material: it remains flat, solid, and clean in normal mode. The generic one-word name keeps the playful intent while avoiding v0 multiword or product-like naming.
 - Target use case: Casual games, cozy menus, tutorial-heavy experiences, family-friendly apps, and mobile-first game UIs that need warmth without asset-art dependency.
 - Flat-mode behavior: Controls use rounded solid fills, generous state-layer contrast, and cheerful but sparse accent placement; backgrounds stay simple and unillustrated.
 - Raised-mode behavior: Buttons, stepper-like controls, and selected playful affordances can use 3-5px extruded-flat offsets; large panels and text inputs remain flat so the theme does not become toy-like chrome.
@@ -162,11 +164,11 @@ Shared direction constraints: All five are peer candidates per D-03 and D-03b. N
 - Rationale: Phase 3.1 validates extruded-flat as a solid top shape plus offset darker duplicate; MD3 Expressive supports stronger static personality through color, shape, and hierarchy. Phase 3.2 lets the same subclass support flat/raised and desktop/mobile from exports, satisfying D-03b and D-16.
 - Filter audit status: PASS; see Filter Audit Summary.
 
-### DaybreakLobbyNeoCadeTheme
+### DaybreakNeoCadeTheme
 
-- Direction display name: Daybreak Lobby
-- Future subclass form: DaybreakLobbyNeoCadeTheme
-- Suggested future `.tres` filename stem: `daybreak_lobby_neocade_theme`
+- Direction display name: Daybreak
+- Future subclass form: DaybreakNeoCadeTheme
+- Suggested future `.tres` filename stem: `daybreak_neocade_theme`
 - Base color: #EAF7F1
 - Accent color: #006A68
 - Contrast ratio: 5.85:1 - WCAG AA PASS
@@ -180,11 +182,11 @@ Shared direction constraints: All five are peer candidates per D-03 and D-03b. N
 - Rationale: MD3/MD3 Expressive supports brighter tonal seeds and accessible role pairing, while NeoCade's dynamic base/accent exports let a bright default remain user-adjustable. This direction satisfies D-03 by widening personality spread and D-03b by treating desktop/mobile and flat/raised as universal, not identity.
 - Filter audit status: PASS; see Filter Audit Summary.
 
-### FestivalBurstNeoCadeTheme
+### BurstNeoCadeTheme
 
-- Direction display name: Festival Burst
-- Future subclass form: FestivalBurstNeoCadeTheme
-- Suggested future `.tres` filename stem: `festival_burst_neocade_theme`
+- Direction display name: Burst
+- Future subclass form: BurstNeoCadeTheme
+- Suggested future `.tres` filename stem: `burst_neocade_theme`
 - Base color: #20112E
 - Accent color: #FFD166
 - Contrast ratio: 12.33:1 - WCAG AA PASS
@@ -204,21 +206,23 @@ DESIGN-NEW-DIR-02 and D-07 audit result: all five directions pass after applying
 
 | Direction | anti-cyberpunk | anti-texture | universal-axes-still-work | no base-direction preselection | no mockup or `.tres` output |
 |---|---|---|---|---|---|
-| ArcadePulse | PASS: Arcade energy is role/color hierarchy, not synth/noir framing. | PASS: Solid dark surfaces, no patterns, no embossing, no chrome material. | PASS: flat-mode surface uses #151A2E tonal ladder with #8BFF6A as action/focus; raised-mode depth uses small darker offset on pressable controls; mobile sizing explicitly respects 44pt iOS and 48dp Android floors. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
-| OrbitalSlate | PASS: "Orbital" is retained as modern calm, not space HUD vocabulary. | PASS: Minimal dark surfaces and outlines only. | PASS: flat-mode surface stays quiet and role-driven; raised-mode depth is restrained 1-2px offset/outline for primary actions; mobile sizing expands touch controls to 44pt/48dp while preserving sparse accent. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
-| PrizePopPlaza | PASS: Playful mobile-game tone has no dystopian or scanline framing. | PASS: Candy-like mood is expressed through solid color and shape, not texture, emboss, or glossy material. | PASS: flat-mode surface uses cheerful solids; raised-mode depth uses 3-5px extruded-flat offsets on button-like controls; mobile sizing uses 44pt/48dp targets and denser desktop restraint. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
-| DaybreakLobby | PASS: Daylight social-lobby mood is explicitly non-noir. | PASS: Clean mint/teal solids, no leather/wood/grunge/painterly treatment. | PASS: flat-mode surface uses bright tonal roles and teal focus/action; raised-mode depth lifts only actions/cards-as-actions; mobile sizing adds touch breathing room while meeting 44pt/48dp floors. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
-| FestivalBurst | PASS: Expressive does not mean synth/nightclub; no glow or sci-fi HUD dependency. | PASS: Event-like emphasis comes from color contrast, not decorative materials. | PASS: flat-mode surface uses deep plum role ladder with warm accent; raised-mode depth allows stronger offsets on key buttons only; mobile sizing keeps 44pt/48dp controls and limits accent saturation in dense rows. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
+| Pulse | PASS: Arcade energy is role/color hierarchy, not synth/noir framing. | PASS: Solid dark surfaces, no patterns, no embossing, no chrome material. | PASS: flat-mode surface uses #151A2E tonal ladder with #8BFF6A as action/focus; raised-mode depth uses small darker offset on pressable controls; mobile sizing explicitly respects 44pt iOS and 48dp Android floors. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
+| Slate | PASS: Modern calm is restrained palette behavior, not space HUD vocabulary. | PASS: Minimal dark surfaces and outlines only. | PASS: flat-mode surface stays quiet and role-driven; raised-mode depth is restrained 1-2px offset/outline for primary actions; mobile sizing expands touch controls to 44pt/48dp while preserving sparse accent. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
+| Bubble | PASS: Playful mobile-game tone has no dystopian or scanline framing. | PASS: Candy-like mood is expressed through solid color and shape, not texture, emboss, or glossy material. | PASS: flat-mode surface uses cheerful solids; raised-mode depth uses 3-5px extruded-flat offsets on button-like controls; mobile sizing uses 44pt/48dp targets and denser desktop restraint. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
+| Daybreak | PASS: Daylight social-lobby mood is explicitly non-noir. | PASS: Clean mint/teal solids, no leather/wood/grunge/painterly treatment. | PASS: flat-mode surface uses bright tonal roles and teal focus/action; raised-mode depth lifts only actions/cards-as-actions; mobile sizing adds touch breathing room while meeting 44pt/48dp floors. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
+| Burst | PASS: Expressive does not mean synth/nightclub; no glow or sci-fi HUD dependency. | PASS: Event-like emphasis comes from color contrast, not decorative materials. | PASS: flat-mode surface uses deep plum role ladder with warm accent; raised-mode depth allows stronger offsets on key buttons only; mobile sizing keeps 44pt/48dp controls and limits accent saturation in dense rows. | PASS: Peer candidate only; base direction deferred. | PASS: Research text only. |
 
 No direction is differentiated by being flat, raised, desktop, mobile, or base. All five are personality directions that support the same export axes.
 
 ## User Approval Checkpoint
 
-CHECKPOINT REACHED: Phase 3.3 text-level direction approval is pending.
+CHECKPOINT REACHED / RESOLVED: Phase 3.3 text-level direction approval is complete after one naming revision.
 
 D-12 and D-13 checkpoint scope: approval is text-level only. No mockups, design tokens, subclass code, production addon files, or `.tres` resources are created in Phase 3.3. Phase 3.4 may mock up the approved directions only after this checkpoint is resolved.
 
-Revision round: 0/2
+Revision round: 1/2
+
+User decision, 2026-05-06: revise names to generic one-word names and approve the rest of the direction set. Approved names: Pulse, Slate, Bubble, Daybreak, Burst.
 
 | Option | Meaning | Result |
 |---|---|---|
@@ -230,11 +234,11 @@ Five directions awaiting decision:
 
 | Direction | Future subclass | Base color | Accent color | One-sentence personality summary |
 |---|---|---|---|---|
-| Arcade Pulse | ArcadePulseNeoCadeTheme | #151A2E | #8BFF6A | Dark saturated arcade energy with a near-navy control-panel base and lively green action/focus accent. |
-| Orbital Slate | OrbitalSlateNeoCadeTheme | #111820 | #8BD3FF | Calm modern minimal dark with restrained blue accenting and iOS-like clarity. |
-| Prize Pop Plaza | PrizePopPlazaNeoCadeTheme | #FFF4FA | #7B1B55 | Friendly, childlike, mobile-game-bright, and tactile without texture or embossing. |
-| Daybreak Lobby | DaybreakLobbyNeoCadeTheme | #EAF7F1 | #006A68 | Welcoming daylight arcade by day with mint-clean surfaces and teal wayfinding. |
-| Festival Burst | FestivalBurstNeoCadeTheme | #20112E | #FFD166 | Bold MD3 Expressive statement with deep plum grounding and warm event-like emphasis. |
+| Pulse | PulseNeoCadeTheme | #151A2E | #8BFF6A | Dark saturated arcade energy with a near-navy control-panel base and lively green action/focus accent. |
+| Slate | SlateNeoCadeTheme | #111820 | #8BD3FF | Calm modern minimal dark with restrained blue accenting and iOS-like clarity. |
+| Bubble | BubbleNeoCadeTheme | #FFF4FA | #7B1B55 | Friendly, childlike, mobile-game-bright, and tactile without texture or embossing. |
+| Daybreak | DaybreakNeoCadeTheme | #EAF7F1 | #006A68 | Welcoming daylight arcade by day with mint-clean surfaces and teal wayfinding. |
+| Burst | BurstNeoCadeTheme | #20112E | #FFD166 | Bold MD3 Expressive statement with deep plum grounding and warm event-like emphasis. |
 
 ## Phase 3.3 Verification Log
 
@@ -254,7 +258,7 @@ Five directions awaiting decision:
 |---|---|
 | v0 DNA mapping | PASS: Midnight Marquee, Boardwalk Sunset, Cabinet Chrome, Prize Pop Plaza, and Orbital Playdeck are mapped with liked DNA, rejected traits, and downstream use. |
 | Boardwalk Sunset handling | PASS: hard-rejected and not carried forward as a candidate direction. |
-| candidate count | PASS: exactly five peer candidate directions were documented: ArcadePulse, OrbitalSlate, PrizePopPlaza, DaybreakLobby, and FestivalBurst. |
+| candidate count | PASS: exactly five peer candidate directions were documented: Pulse, Slate, Bubble, Daybreak, and Burst. |
 | D-06 archetype validation | PASS: all five seeded anchors had commercial survey support, so no replacement archetype was needed. |
 | contrast verification | PASS: all base/accent pairs exceed the deliberate 4.5:1 WCAG AA floor for normal text/icons/focus usage. |
 | universal axes | PASS: every direction documents flat-mode behavior, raised-mode behavior, and mobile-sizing notes; none is the flat, raised, desktop, mobile, or base theme. |
@@ -268,13 +272,13 @@ ROADMAP success criteria audit:
 |---|---|---|---|
 | SC-01 | THEME-DIRECTIONS.md produced with 5 candidate directions, subclass-form names, base/accent hex values, WCAG AA contrast, personality summaries, target use cases, filter audit, and rationale. | Candidate Directions section and Filter Audit Summary. | PASS |
 | SC-02 | Names may keep, revise, or replace per fit; Boardwalk Sunset is hard-rejected. | v0 Feedback DNA Mapping and direction naming decisions. | PASS |
-| SC-03 | Five directions span personality space, not five similar themes. | ArcadePulse, OrbitalSlate, PrizePopPlaza, DaybreakLobby, FestivalBurst cover the five D-06 anchors. | PASS |
+| SC-03 | Five directions span personality space, not five similar themes. | Pulse, Slate, Bubble, Daybreak, and Burst cover the five D-06 anchors. | PASS |
 | SC-04 | Per-v0-direction reaction to DNA mapping table exists. | v0 Feedback DNA Mapping table names liked DNA, rejected traits, eligible use, and informed directions. | PASS |
 | SC-05 | Commercial example survey documents 10-15 references and each direction cites surveyed examples. | 14-source Commercial Example Survey; each candidate lists commercial examples used. | PASS |
 | SC-06 | Anti-cyberpunk and anti-texture filter pass per direction. | Filter Audit Summary rows for all five directions. | PASS |
 | SC-07 | Universal flat-MD3 revisions apply across all directions. | Candidate shared constraints plus per-direction flat/raised behavior. | PASS |
 | SC-08 | Base-direction selection is not pre-decided. | Shared constraints and audit state base direction deferred / no base preselection. | PASS |
-| SC-09 | User-approval checkpoint is presented at text level. | User Approval Checkpoint section with approve/revise/reject all choices and Revision round: 0/2. | PENDING USER |
+| SC-09 | User-approval checkpoint is presented at text level. | User approved the direction set after one naming revision; Revision round: 1/2. | PASS |
 | SC-10 | SOURCES.md Section 14 added with adopt/reject/open synthesis. | `.planning/research/SOURCES.md` Section 14. | PASS |
 | SC-11 | No mockup commits and no `.tres` commits. | Changed-file audit limited to `.planning/` markdown workflow artifacts. | PASS |
 
@@ -291,7 +295,7 @@ Context decision audit:
 
 | Decision | Coverage | Status |
 |---|---|---|
-| D-01 | Names kept/revised/replaced by fit: Prize Pop Plaza retained; other direction names revised/replaced; Boardwalk Sunset dropped. | PASS |
+| D-01 | Names revised by fit after user feedback: final names are generic one-word names; Boardwalk Sunset dropped. | PASS |
 | D-01b | base direction deferred to Phase 3.4; no base preselection in Phase 3.3. | PASS |
 | D-01c | Universal no-texture/no-pattern/no-embossing/flat-MD3/dynamic-export constraints apply to all directions. | PASS |
 | D-02 | Input priority is encoded in Provenance and Scope and applied to synthesis. | PASS |
@@ -306,10 +310,20 @@ Context decision audit:
 | D-09 | Inspiration-only discipline stated in source contract and every external survey row. | PASS |
 | D-10 | Required output structure exists. | PASS |
 | D-11 | SOURCES.md Section 14 added. | PASS |
-| D-12 | Approval gate options are approve, revise, reject all. | PENDING USER |
+| D-12 | Approval gate options were approve, revise, reject all; user chose a focused naming revision and approved the rest. | PASS |
 | D-13 | Approval is text-level only before mockups. | PASS |
 | D-14 | Candidate future subclass forms are PascalCase and end in NeoCadeTheme. | PASS |
 | D-15 | Names avoid forbidden cyber/synth/noir coding; Boardwalk Sunset absent as candidate. | PASS |
 | D-16 | Inter Variable Roman and dynamic `NeoCadeTheme` superclass compatibility are preserved. | PASS |
 
 Final no-forbidden-file audit: PASS. No mockup, image, addon, theme resource, font, icon, scene, project, production `.gd`, or `.tres` file was intentionally changed during Phase 3.3 execution.
+
+### 2026-05-06 - Revision round 1/2 naming update
+
+| Check | Result |
+|---|---|
+| user request | PASS: direction names changed to generic one-word names; rest of direction set approved. |
+| final approved names | PASS: Pulse, Slate, Bubble, Daybreak, Burst. |
+| future subclass names | PASS: PulseNeoCadeTheme, SlateNeoCadeTheme, BubbleNeoCadeTheme, DaybreakNeoCadeTheme, BurstNeoCadeTheme. |
+| copyright/name-risk reduction | PASS: names are generic dictionary-style words and do not reuse surveyed product names or v0 multiword concept labels. |
+| filter and contrast checks | PASS: naming-only revision does not alter palettes, behavior, or filter audit outcomes. |
