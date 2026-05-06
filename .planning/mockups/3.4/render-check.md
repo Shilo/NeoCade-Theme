@@ -298,3 +298,150 @@ Local-only artifacts (gitignored, do not commit):
 - Audit composites: 2 PNGs in `screenshots/` re-rendered.
 - Awaiting user gate: `.planning/mockups/3.4/finalist-selection.md` will be written by Plan 02 Task 4 once user picks 1-3 finalists.
 - Plan 03 (finalist 4-grid) does NOT start until that file exists.
+
+## Plan 03 Finalist Audit
+
+**Status (2026-05-06):** Plan 03 Task 3 audit. 6 new finalist PNGs rendered for Pulse — 4-grid (flat × raised × desktop × mobile) plus 2 color-override variants. Coverage matrix artifact (`coverage-matrix.md`) maps every required user-facing Godot 4.6 Control class to a mockup location. The Plan 02 audit above remains valid; this section is additive, not a replacement.
+
+### Finalist list
+
+The Plan 02 Task 4 user gate closed 2026-05-06 with `selection_kind: recommended-starter` (NOT the standard 1-3-finalist menu — see `finalist-selection.md`). Specifically:
+
+- **Pulse** is the v1 **recommended starter** direction = implementation-priority finalist + showcase default + README "try this first" suggestion. Receives full Plan 03 4-grid + color-override row + coverage matrix.
+- **Slate, Bubble, Daybreak, Burst** are NOT rejected. They ship as v1 personality variations (`.tres` files) under the locked single-concrete-class architecture (CORRECTIVE-ADDENDUM D-31, finalized 2026-05-06f). Their visual contracts inherit from the Plan 02 Stage 1 concept boards (15 PNGs already audited above). They do NOT get separate Plan 03 4-grid passes — the architecture (single `.gd` + N data-only `.tres`) makes the same 4-grid behavior automatic for all directions through the dynamic `@export raised` and `@export platform` regeneration contract.
+
+Therefore Plan 03 produces a **single finalist** (Pulse) for full-fidelity 4-grid work; the architectural coverage of the other four is established by Plan 02 + Phase 4 implementation, not by additional Plan 03 mockups.
+
+### Finalist 4-grid cell list
+
+Six PNGs rendered via `node render.js finalist-images` (new mode added in Plan 03 Task 1). Filenames use the `-finalist-` infix to avoid colliding with Plan 02 Stage 1 PNGs (`pulse-desktop-flat.png` etc., which are still present and unchanged):
+
+| Cell | File | Viewport | Configuration |
+|---|---|---|---|
+| 1 | `concepts/pulse-finalist-desktop-flat.png` | 1280×720 logical (2560×1440 PNG) | `raised=false`, `platform=DESKTOP` |
+| 2 | `concepts/pulse-finalist-mobile-flat.png` | 430×1500 logical (860×3000 PNG) | `raised=false`, `platform=MOBILE` |
+| 3 | `concepts/pulse-finalist-desktop-raised.png` | 1280×720 logical (2560×1440 PNG) | `raised=true`, `platform=DESKTOP` |
+| 4 | `concepts/pulse-finalist-mobile-raised.png` | 430×1500 logical (860×3000 PNG) | `raised=true`, `platform=MOBILE` |
+| Override A | `concepts/pulse-finalist-override-warm.png` | 430×1500 logical (860×3000 PNG) | `raised=false`, `platform=MOBILE`, `base_color=#1A1410`, `accent_color=#FFC857` |
+| Override B | `concepts/pulse-finalist-override-ocean.png` | 430×1500 logical (860×3000 PNG) | `raised=false`, `platform=MOBILE`, `base_color=#0F1A22`, `accent_color=#5FE3FF` |
+
+All four 4-grid cells share Pulse's identical 10-axis shape language (axis 1 = 0px corners, axis 2 = bold-accent-fill primary, axis 3 = rectangular-strip tabs, etc.). Only `raised` and `platform` differ between cells. The override row demonstrates the dynamic `NeoCadeTheme` `@export base_color` / `@export accent_color` contract on the same shape language.
+
+### Mobile viewport / tap-target audit
+
+Mobile cells (cell 2, cell 4, both override variants) render at the M3 / iOS HIG floors per `PLATFORM_TOKENS.mobile` in `src/neocade-mockups.js`:
+
+| Token | Mobile floor (M3 / iOS) | Visible in finalist mobile cells |
+|---|---|---|
+| `--button-min` | 48 px (M3 tap-target floor + WCAG 2.5.5 AAA + iOS HIG 44pt) | OPTIONS / CANCEL buttons render at ≥48 px |
+| `--button-min-primary` | 56 px (M3 Extended FAB) | START primary renders at 56 px |
+| `--input-min` | 56 px (M3 filled text field) | "Player alias" input renders at 56 px |
+| `--toggle-min` | 32 px (M3 Switch track) | "Voice" switch thumb renders at 32 px |
+| `--checkbox-size` | 20 px visible (with 12 px tap-padding for full 44 px target) | "Checked" checkbox at 20 px + tap-padding |
+| `--row-min` | 56 px (M3 list-item-one-line) | "Cabinet A" / "Mini-game list" / "Settings row" at 56 px |
+| `--tab-min` | 48 px (M3 Tabs default) | Top nav tabs (Lobby/Cabinets/Profile/Settings) at 48 px |
+| `--body-size` | 16 px (M3 Body Large ≈ iOS 17pt) | Body text legible at viewport scale |
+| `--density-scale` | 1.5 (+50% inter-control gap per architecture revision 2026-05-04) | Visible breathing between rows / button row |
+
+Audit row: **PASS** — every mobile cell hits the M3 floors and exceeds the iOS HIG 44pt minimum tap target. The +50% inter-control gap rule is visible across the 3-card grid (action panel / dialog stack / list/tree).
+
+### Color override row presence audit
+
+The finalist gallery (`finalist-gallery.html`) explicitly contains:
+
+- An `#finalistOverrideRow` section labeled "Color overrides — dynamic `@export` demo".
+- Two override cells, each with: a swatch chip showing the override `base_color`, a swatch chip showing the override `accent_color`, both in `#RRGGBB` form, plus a rendered PNG demonstrating the override applied to Pulse's shape language.
+- Override A — warm amber (`#1A1410` / `#FFC857`).
+- Override B — ocean cyan (`#0F1A22` / `#5FE3FF`).
+- Default-Pulse reference palette also documented in the section header (`#151A2E` / `#8BFF6A`, 13.62:1) with swatch chips, so the reviewer can compare overrides against canonical Pulse without leaving the gallery.
+
+Audit row: **PASS** — color override row is present and demonstrates dynamic `@export` behavior on the same direction.
+
+### Anti-cyberpunk / anti-texture / anti-painterly-chrome audit (finalist)
+
+Each of the 6 finalist PNGs was visually inspected against the same anti-rules from Plan 02 Stage 1:
+
+| Audit row | Cell 1 | Cell 2 | Cell 3 | Cell 4 | Override A | Override B |
+|---|---|---|---|---|---|---|
+| anti-cyberpunk | PASS | PASS | PASS | PASS | PASS | PASS |
+| anti-texture | PASS | PASS | PASS | PASS | PASS | PASS |
+| anti-painterly-chrome / anti-embossing | PASS | PASS | PASS | PASS | PASS | PASS |
+| dark-only compliance (D-28) | PASS | PASS | PASS | PASS | PASS (`#1A1410` dark) | PASS (`#0F1A22` dark) |
+| solid-fill discipline (no gradients on chrome) | PASS | PASS | PASS | PASS | PASS | PASS |
+
+No glow, no neon outlines, no synthwave / nightclub framing, no sci-fi HUD vocabulary, no painted gradients on chrome, no embossing, no leather/wood/grunge backgrounds. Both override variants preserve the anti-rules — warm amber stays cabinet-personality (not casino glow), ocean cyan stays tool/streamer-personality (not sci-fi HUD).
+
+### Text-fit + overlap sanity audit
+
+Mockup content text was inspected for fit and overlap across all 6 PNGs:
+
+| Audit row | Result | Note |
+|---|---|---|
+| text-fit (no clipped labels) | PASS | All button labels, H1 / H2 headers, kicker text, popup body paragraph, list-row labels render fully within their containers in all 6 PNGs. Mobile body text bumped to 16 px (M3 Body Large) sits comfortably within row-min 56 px without clipping. |
+| overlap (no overlapping chrome) | PASS | No control overlaps another in any cell; the action panel / dialog stack / list-tree grid layout maintains a `card_gap` of 14 px on Pulse. The dialog-stack popup body sits cleanly inside the card chrome with the rev-4 `::before` modal scrim extending 8 px past the edge but staying within the card padding. |
+| state-strip footer rendering | PASS | All 5 visible state classes (normal, hover, focus, pressed, disabled) render as distinct visual cells in the artboard footer in all 6 PNGs. |
+| palette swatch footer rendering | PASS | All 4 palette swatches (low, panel, high, accent) render as distinct color cells in the artboard footer in all 6 PNGs. Override variants' swatches reflect the overridden palette correctly (amber accent / cyan accent visible in respective override cells). |
+
+Audit row: **PASS**.
+
+### Per-color offset audit (raised cells)
+
+Cell 3 (`pulse-finalist-desktop-raised.png`) and cell 4 (`pulse-finalist-mobile-raised.png`) inspected for the rev-3 per-color offset behavior (no near-black bottom edges on raised elements):
+
+| Element | Expected offset color (Pulse `#151A2E` base) | Result |
+|---|---|---|
+| START primary button | `mix(#8BFF6A, #151A2E, 40%)` ≈ `#5CA352` (green family) | PASS — green-tinted bottom edge, not near-black |
+| Action panel / dialog stack / list-tree containers | `mix(surface_panel, base, 40%)` (cool slate-tinted) | PASS — slate-tinted bottom edge in Pulse's hue family |
+| Selected Lobby tab | tab + 2px bottom rule + 2 px raised offset | PASS — tinted offset stacks under the inset rule |
+| Brand-mark badge | `--surface-high-offset` | PASS — slate-tinted, not black |
+| State-strip cells | `--surface-high-offset` | PASS — slate-tinted |
+
+Audit row: **PASS** — no near-black bottom edges on raised elements (rev-3 fix in place from Plan 02; finalist renders inherit the same JS `tintTowardBase()` formula).
+
+### Override-variant-specific notes
+
+| Variant | Notes | Result |
+|---|---|---|
+| Override A — warm amber | Same Pulse 0px corners + dense rhythm + cabinet-bezel brand mark; only the bg + accent change. Reads as "warm cabinet hall" not "cyberpunk casino". The amber accent (`#FFC857`) on dark warm base (`#1A1410`) gives a Brawl-Stars-action-hierarchy vibe at WCAG-AA-or-better contrast. | PASS |
+| Override B — ocean cyan | Same Pulse 0px corners + dense rhythm + cabinet-bezel brand mark; only the bg + accent change. Reads as "cool tool / streamer panel" not "sci-fi HUD". The cyan accent (`#5FE3FF`) on dark navy base (`#0F1A22`) demonstrates that Pulse is recognizably Pulse with a cool palette — the shape language is the personality, not the color. | PASS |
+
+Both override variants pass the project's anti-cyberpunk / anti-texture rules and demonstrate the dynamic `@export` contract correctly. Phase 4 consumers can produce additional override `.tres` files following this pattern.
+
+### Forbidden-surface audit (Plan 03)
+
+Allowed in Plan 03:
+- `.planning/mockups/3.4/**/*.html` (`finalist-gallery.html` modified)
+- `.planning/mockups/3.4/**/*.css` (no Plan 03 changes — `src/neocade-mockups.css` unchanged)
+- `.planning/mockups/3.4/**/*.js` (`src/neocade-mockups.js` modified for `?base=&accent=` override params)
+- `.planning/mockups/3.4/**/*.json` (no changes — `data/directions.json` unchanged)
+- `.planning/mockups/3.4/**/*.md` (`coverage-matrix.md` added; this `render-check.md` updated)
+- `.planning/mockups/3.4/concepts/**/*.png` (6 new `pulse-finalist-*.png` added; Stage 1 PNGs unchanged)
+- `.planning/mockups/3.4/render.js` (modified — new `finalist-images` mode)
+
+Forbidden before Phase 4 — verified untouched in Plan 03:
+- `addons/neocade_theme/**` (untouched)
+- `main.tscn` (untouched)
+- `project.godot` (untouched)
+- production `.tres` (no `.tres` files modified)
+- production `.gd` (no `.gd` files modified)
+- fonts / icons subfolders (untouched)
+- historical v0 mockup artifacts: `.planning/mockups/concepts/`, `.planning/mockups/03-direction-boards.*`, `.planning/research/mood-board/` (untouched)
+
+Audit row: **PASS** — no forbidden-surface modifications.
+
+### Plan 03 audit summary
+
+| Marker | Status |
+|---|---|
+| finalist list documented | PASS |
+| 4-grid (flat × raised × desktop × mobile) rendered for Pulse | PASS |
+| mobile viewport + tap-target audit | PASS |
+| color override row presence | PASS |
+| anti-cyberpunk pass | PASS (all 6 PNGs) |
+| anti-texture pass | PASS (all 6 PNGs) |
+| text-fit sanity | PASS |
+| overlap sanity | PASS |
+| forbidden-surface audit | PASS |
+| coverage matrix artifact | PRESENT — `.planning/mockups/3.4/coverage-matrix.md` |
+
+**Overall Plan 03 audit: PASS.** Ready for the Plan 03 Task 4 user-approval gate. The user is asked to confirm Pulse as the recommended starter, approve N final themes from {Pulse, Slate, Bubble, Daybreak, Burst}, and write `.planning/mockups/3.4/final-approval.md` per the gate's resolution. The executor must NOT auto-write `final-approval.md` — the approval is a user authoring step.
