@@ -4,3 +4,6 @@
 opencode.json
 .mcp.json
 .codex/config.toml
+
+# Local verification scratchpad (executor-only)
+.tmp/
