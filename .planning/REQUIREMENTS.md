@@ -34,14 +34,14 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Fonts (FONT)
 
-- [ ] **FONT-01**: Inter Variable Roman (`Inter-Variable.ttf` from Inter v4.x, OFL 1.1) bundled at `addons/neocade_theme/fonts/Inter-Variable.ttf` — **the ONLY font bundled in v1 (Option D, locked 2026-05-04).** Reserved Font Name preserved (file NOT renamed); imported as `FontFile.tres` referenced by `uid://`. `allow_system_fallback` left at default `true` so non-Latin scripts (Arabic, Hebrew, Indic, Thai, CJK, etc.) render via the user's OS system fonts.
+- [x] **FONT-01**: Inter Variable Roman (`Inter-Variable.ttf` from Inter v4.x, OFL 1.1) bundled at `addons/neocade_theme/fonts/Inter-Variable.ttf` — **the ONLY font bundled in v1 (Option D, locked 2026-05-04).** Reserved Font Name preserved (file NOT renamed); imported as `FontFile.tres` referenced by `uid://`. `allow_system_fallback` left at default `true` so non-Latin scripts (Arabic, Hebrew, Indic, Thai, CJK, etc.) render via the user's OS system fonts.
 - ~~[ ] **FONT-02**: Outfit Variable~~ — **STRICKEN 2026-05-04 per FONT-REVIEW.md.** Outfit dropped from v1 per user's consistency principle. Headings handled by Inter Variable at `opsz=32` + heavier `wght`. Outfit may be reconsidered at Phase 3 typography mockup gate (Variant B); if user picks Variant B there, this requirement is reinstated.
 - ~~[ ] **FONT-03**: Noto Sans Variable~~ — **STRICKEN 2026-05-04 (Option D).** Not bundled in v1. Non-Latin scripts handled by Godot's `Font.allow_system_fallback=true` using the user's OS system fonts. README documents how to add Noto Sans (or any preferred coordinated cross-script font) for consumers who want designed-together cross-script harmony.
 - ~~[ ] **FONT-04**: JetBrains Mono Variable~~ — **STRICKEN 2026-05-04 (Option D).** Not bundled in v1. CodeEdit / `[code]` BBCode is rare in shipped games. README documents the override pattern: `code_edit.add_theme_font_override("font", preload("res://your_mono.ttf"))`. Consumers who use code surfaces ship their preferred mono.
-- [ ] **FONT-05**: `OFL.txt` ships Inter's Reserved Font Name notice + copyright block (single-font OFL, since Inter is the only bundled font). Surfaced in README install instructions for downstream projects to embed in their About/Credits.
+- [x] **FONT-05**: `OFL.txt` ships Inter's Reserved Font Name notice + copyright block (single-font OFL, since Inter is the only bundled font). Surfaced in README install instructions for downstream projects to embed in their About/Credits.
 - [ ] **FONT-06**: Theme `default_font` is Inter Variable Roman; `default_font.fallbacks = []` (empty); `default_font.allow_system_fallback = true` (Godot 4.x default — explicit set for clarity in `.tres`). Heading type variations (HeaderLarge / HeaderMedium / HeaderSmall) use Inter at `opsz=32` + heavier `wght` (700-800) via `FontVariation`, NOT a separate display font. Per Pitfall 1.2 (type variations don't inherit fonts from base type), recommend setting font ONLY on `default_font` and using `FontVariation` for heading variations — structurally avoids the inheritance bug.
 - [ ] **FONT-07**: Italic emphasis falls back to synthetic transform on Inter upright (Inter Italic deferred to v1.x per Conflict 1 revision). Body text rendering is acceptable; documented limitation in CHANGELOG.
-- [ ] **FONT-08**: Font import settings: Grayscale antialiasing, Light hinting, Auto subpixel positioning (per STACK + PITFALLS 5.5; verified for GL Compatibility renderer).
+- [x] **FONT-08**: Font import settings: Grayscale antialiasing, Light hinting, Auto subpixel positioning (per STACK + PITFALLS 5.5; verified for GL Compatibility renderer).
 - [ ] **FONT-09**: README documents three consumer-side font override patterns. **Opt-in fonts are NEVER bundled with NeoCade — Option D ships Inter only.** Consumers download and add what their audience needs:
 
   **(a) Multi-script visual harmony.** Inter alone relies on Godot's `Font.allow_system_fallback=true` for non-Latin scripts. System fonts vary by OS and may clash with Inter's metrics. For consumers who care, recommend **script-specific Noto Sans variants** (NOT the generic "Noto Sans" — that mostly covers Latin/Cyrillic/Greek which Inter already handles). All OFL 1.1, designed to harmonize with Inter:
@@ -281,17 +281,17 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | DESIGN-04 | Phase 3.4 Plan 03 (Pulse mobile 4-grid evidence) | — | In Progress |
 | DESIGN-05 | Phase 3.4 Plan 04 (`DESIGN_TOKENS.md` finalized pre-Phase-4) | — | Pending |
 | DESIGN-06 | Phase 3.4 (gate enforcement) | — | Active |
-| FOUND-01 | Phase 4 (addon directory layout) | — | In Progress (Plan 04-01 deleted scaffold root .tres; full layout closes via Plans 04-02/03/06/07/08) |
+| FOUND-01 | Phase 4 (addon directory layout) | — | In Progress (Plan 04-01 deleted scaffold root .tres + authored neocade_theme.gd; Plan 04-02 added fonts/ + OFL.txt; full layout closes via Plans 04-03/06/07/08) |
 | FOUND-02 | Phase 4 (single concrete `NeoCadeTheme` class + 9-property export surface) | — | In Progress (Plan 04-01 authored class shell with all 9 @exports + Platform enum + is_light + reentry guard; formula + binding-table body closes via Plans 04-04/05) |
 | FOUND-03 | Phase 4 (five data-only direction `.tres` resources) | — | Pending |
-| FONT-01 | Phase 4 | — | Pending |
-| FONT-02 | Phase 4 | — | Pending |
-| FONT-03 | Phase 4 | — | Pending |
-| FONT-04 | Phase 4 | — | Pending |
-| FONT-05 | Phase 4 (combined `OFL.txt`) | — | Pending |
-| FONT-06 | Phase 4 (default_font + fallbacks wiring) | — | Pending |
+| FONT-01 | Phase 4 (Plan 04-02 bundled Inter Variable v4.0 with verified SHA256) | — | Complete |
+| FONT-02 | Phase 4 | — | Stricken (UD-4 Option D 2026-05-04 — Outfit removed) |
+| FONT-03 | Phase 4 | — | Stricken (UD-4 Option D 2026-05-04 — Noto Sans removed) |
+| FONT-04 | Phase 4 | — | Stricken (UD-4 Option D 2026-05-04 — JetBrains Mono removed) |
+| FONT-05 | Phase 4 (Plan 04-02 OFL.txt with Reserved Font Name + 2016 Inter Project Authors copyright) | — | Complete |
+| FONT-06 | Phase 4 (default_font + fallbacks wiring) | Plan 04-02 (FontFile + 5 FontVariations cover M3 type scale; default_font wiring closes in Plan 04-05 binding table) | In Progress |
 | FONT-07 | Phase 4 (synthetic italic policy + CHANGELOG note) | — | Pending |
-| FONT-08 | Phase 4 (font import settings) | — | Pending |
+| FONT-08 | Phase 4 (Plan 04-02 set Grayscale AA + Light hinting + Auto subpixel + mipmaps + system fallback in Inter-Variable.ttf.import for GL Compatibility per PITFALLS 5.5) | — | Complete |
 | FONT-09 | Phase 4 (CJK exclusion + README override pattern) | — | Pending |
 | ICON-01 | Phase 4 | — | Pending |
 | ICON-02 | Phase 4 (1:1 icon-slot mapping) | — | Pending |
@@ -306,7 +306,7 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | TOKEN-07 | Phase 3 (stroke widths) | Phase 4 | Pending |
 | TOKEN-08 | Phase 3 (no-shadows policy) | Phase 4 (`shadow_size = -1` everywhere) | Pending |
 | TOKEN-09 | Phase 3 (M3 state-layer model) | Phase 4 | Pending |
-| TOKEN-10 | Phase 3 (M3 type scale spine) | Phase 4 | Pending |
+| TOKEN-10 | Phase 3 (M3 type scale spine) | Phase 4 (Plan 04-02 authored 5 FontVariation .tres covering DESIGN_TOKENS §8.5: HeaderLarge wght=800/opsz=32, HeaderMedium wght=700/opsz=32, HeaderSmall wght=600/opsz=24, Body wght=400, Caption wght=400) | In Progress (font scaffold complete; binding-table wiring closes in 04-05) |
 | COV-01 | Phase 7 (37/37 scorecard desktop coverage closes here) | Phase 5 + Phase 6 (cumulative authoring) | Pending |
 | COV-02 | Phase 5 (Core Controls — BaseButton family) | — | Pending |
 | COV-03 | Phase 5 (Core Controls — text classes) | — | Pending |
