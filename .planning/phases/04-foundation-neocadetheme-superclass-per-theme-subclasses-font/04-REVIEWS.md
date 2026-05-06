@@ -1030,3 +1030,347 @@ Residual risk is low. The strip logic is line-based and conservative around scri
 Phase 4 plans are execution-ready. The 8 plans collectively address all 16 primary requirements (FOUND-01..03, FONT-01/05/06/07/08/09, ICON-01..04) plus the supporting TOKEN-01..10 implementation. The single-class + 5 data-only `.tres` architecture (D-31 / DESIGN_TOKENS.md) is faithfully implemented with the seamless `@exports` ↔ Theme Editor authoring model (CONTEXT.md D-01..D-14).
 
 **Phase 4 unblocked for `/gsd-execute-phase 4`.**
+
+---
+
+# Cross-AI Plan Review — Phase 4 (Cycle 6 — Fresh Independent Pass + Self-Review)
+
+**Reviewed:** 2026-05-06 (post-cycle-5 'CONVERGED' verdict; user requested fresh independent re-review explicitly distrusting OpenCode/DeepSeek)
+**Reviewers:** OpenCode (DeepSeek V4 Pro), Codex, **Claude (orchestrator self-review)**
+**Scope:** Independent top-to-bottom review (NOT a fix-verification framing). Each reviewer asked to find issues prior cycles missed.
+
+## OpenCode Fresh Review (DeepSeek V4 Pro)
+
+## Summary
+
+The 8 plans form a well-structured pipeline: scaffold deletion → class shell → fonts → icons → formulas → iteration engine → Pulse verification → peer themes → metadata. The architecture (single concrete `NeoCadeTheme` class + 5 data-only `.tres` files + additive regeneration) is sound and the plan sequencing is largely correct. However, **two potential bugs** would prevent the code from compiling and running, and **one data discrepancy** would produce visually-wrong output for 4 of the 5 themes.
+
+---
+
+## Strengths
+
+1. **Additive iteration engine design is well-considered.** The D-01 (no `clear()`), D-04 (escape hatch), and reentry-guard (`_regenerating`) form a correct pattern for coexisting formula-driven and Theme-Editor-authored entries.
+2. **Cross-AI review cycle fixes are correctly threaded.** C1 (37-row freeze), C2 (DIRECTION_PRESETS per-direction), C4 (14 variations including CodeLabel), C6 (Godot-serialized `.tres`), N1 (remove `font` from schema), N4 (`.tres` strip post-save), N5 (preserve script linkage) — all integrated coherently through the plan tasks and acceptance criteria.
+3. **Dual verification paths (EditorScript + SceneTree)** provide both interactive and CI-friendly validation. The editor variant is correct for `@tool` resources; the headless variant enables autonomous execution.
+4. **Canonical slot-name freeze (CANONICAL_SLOT_NAMES, Plan 04-05 Task 2.5)** solves the real problem of wrong-slot-name false-positives passing row-count checks.
+5. **Font import is Godot-driven** (Plan 04-02 ensures `.import` sidecars come from Godot's importer, with param enforcement). The FontFile + FontVariation pattern for Inter Variable Roman's opsz/wght axes is correct for Godot 4.6.
+
+---
+
+## Concerns
+
+### HIGH
+
+| # | Concern | Plan & Location | Detail |
+|---|---------|-----------------|--------|
+| **C1** | **DIRECTION_PRESETS values disagree with DESIGN_TOKENS personality spec** | 04-04, Task 3.5 const `DIRECTION_PRESETS` | The hard-coded dictionary in the plan contains state-layer deltas that DO NOT match the canonical DESIGN_TOKENS for 4 of 5 directions. Pulse is correct. The other 4: |
+
+**Detail of C1 — value-by-value trace:**
+
+| Direction | Design Tokens §5 says | Plan 04-04 DIRECTION_PRESETS says |
+|-----------|----------------------|----------------------------------|
+| Slate hover | +4% (§5.2) | `hover_pct: 8.0` |
+| Slate pressed | −6% (§5.2) | `pressed_pct: -12.0` |
+| Bubble hover | +8% (§5.3) | `hover_pct: 10.0` |
+| Bubble pressed | −10% (§5.3) | `pressed_pct: -12.0` |
+| Daybreak hover | +6% (§5.4) | `hover_pct: 8.0` |
+| Daybreak pressed | −6% (§5.4) | `pressed_pct: -12.0` |
+| Burst hover | +8% (§5.5) | `hover_pct: 10.0` |
+| Burst pressed | −12% (§5.5) | `pressed_pct: -14.0` |
+
+The formula `_mix(base_color, state_hover_target, hover_pct / 100.0)` directly consumes these values. A Slate direction loaded from its `.tres` would render hover at 8% lift (twice the approved 4%), producing a visibly more reactive state layer than the Phase 3.4 mockup gate approved. The DESIGN_TOKENS is the Phase 3.4 contract and must be authoritative — the DIRECTION_PRESETS must be reconciled to its values.
+
+**Correction:** The `DIRECTION_PRESETS` const in Plan 04-04 Task 3.5 should use the DESIGN_TOKENS §5 personality values, not the values currently written. Specifically:
+- Slate line: `"hover_pct": 4.0, "pressed_pct": -6.0` (was 8.0/-12.0)
+- Bubble line: `"hover_pct": 8.0, "pressed_pct": -10.0` (was 10.0/-12.0)
+- Daybreak line: `"hover_pct": 6.0, "pressed_pct": -6.0` (was 8.0/-12.0)
+- Burst line: `"hover_pct": 8.0, "pressed_pct": -12.0` (was 10.0/-14.0)
+
+The Plan 04-06 Cycle 2 L2 verification (Pulse-vs-Slate spread_factor smoke test) checks `spread_factor` only — it does NOT assert `hover_pct` or `pressed_pct` per direction. So this discrepancy would pass verification and ship wrong state layers.
+
+---
+
+| # | Concern | Plan & Location | Detail |
+|---|---------|-----------------|--------|
+| **C2** | **GDScript Dictionary dot-notation syntax errors — code will not compile** | 04-04 Task 4, 04-05 Task 3, and 04-02 Task 2 | GDScript 4.x does NOT support `dict.property` for Dictionary access. Must use `dict["property"]` or `dict.get("property")`. The following lines in the plan code snippets are invalid: |
+
+**Plan 04-04 Task 4** — `_regenerate_theme()` body:
+```gdscript
+var spread_factor: float = presets.spread_factor   # INVALID
+var hover_pct: float = presets.hover_pct            # INVALID
+var pressed_pct: float = abs(presets.pressed_pct)   # INVALID
+var disabled_opacity: float = presets.disabled_opacity  # INVALID
+```
+
+**Plan 04-04 Task 4 + Plan 04-05 Task 1** — `tokens` dictionary access:
+```gdscript
+default_font_size = tokens.body      # INVALID
+set_font_size(..., tokens.h1)        # INVALID (appears in Task 1 variation block)
+set_font_size(..., tokens.h2)        # INVALID
+set_font_size(..., tokens.label_)    # INVALID
+set_font_size(..., tokens.body)      # INVALID
+```
+
+**Plan 04-05 Task 3** — `_resolve_recipe` stylebox branch:
+```gdscript
+var density: float = tokens.get("densityScale", 1.0)  # Bracket: correct
+var tap_pad: int = tokens.get("tapPadding", 0)         # Bracket: correct
+```
+(The `tokens.get()` calls ARE valid — those use bracket method. Only the dot-notation calls above fail.)
+
+Every instance of `presets.something` and `tokens.something` (without bracket notation) must be rewritten as `presets["something"]` and `tokens["something"]`. The acceptance criteria grep for specific substrings (e.g., `var spread_factor: float = presets.spread_factor`) so the verify commands will MATCH the broken code and report PASS — a silent false positive. The acceptance criteria must be updated to match bracket-notation patterns.
+
+---
+
+| # | Concern | Plan & Location | Detail |
+|---|---------|-----------------|--------|
+| **C3** | **`.tscn` comment syntax wrong — uses `#` instead of `;`** | 04-01 Task 1 | Godot `.tscn` / `.tres` files use a subset of ConfigFile format. Comments are introduced with `;` (semicolon), NOT `#` (hash). The plan says to insert `# theme = ExtResource(...) - reassigned in Plan 04-07` inside a node block. This may cause a parse error when opening the scene in Godot Editor. The verification command checks for the presence of the `# theme...` prefix but doesn't open the scene in the editor. The plan does include a fallback ("verify by opening `main.tscn` in the editor; the file MUST still parse") but doesn't enforce it before the commit. Fix: use `; theme = ...` for the comment line, or simply leave a blank line (no placeholder comment at all).
+
+---
+
+### MEDIUM
+
+| # | Concern | Plan & Location | Detail |
+|---|---------|-----------------|--------|
+| **C4** | **`.tres` strip helper edge cases under Godot 4.6 native serialization** | 04-06 Task 1, `_strip_theme_entries()` | The line-based textual parser is fragile. Specific edge cases: (a) If Godot serializes a `[sub_resource]` StyleBoxFlat that spans multiple lines (unlikely for flat styleboxes, but possible for complex ones with embedded resources), the section-skip logic that drops `[sub_resource]` lines may miss nested content on subsequent non-bracket lines. (b) After the strip removes `load_steps=N`, the double-space cleanup (`r" {2,}"`) may produce single-space gaps in unusual attribute ordering. Mitigation: the Cycle 4 N5 fix strips `load_steps` and preserves script linkage; the remaining edge cases are low-probability since the `.tres` only contains `@export` scalar values + optional script ref after the strip. Acceptable risk for Phase 4 given the post-strip `< 2048` byte size assertion catches gross failures and `_phase4_verify_headless.gd` validates runtime loading. |
+| **C5** | **Icon `.import` sidecars hand-authored (inconsistent with C5 font fix)** | 04-03 Task 2 | Plan 04-03 hand-authors `.svg.import` sidecars — the same pattern that Cycle 1 C5 explicitly forbade for fonts. The font fix was: "drive materialization through Godot." For SVG icons, the import pipeline is simpler (no FontVariation sub-resources), so hand-authoring is less risky. But the principle of Godot-native serialization should apply consistently. The `importer="texture"` line and `[params]` structure are stable in Godot 4.x, so hand-authoring is tolerable here — but the plan should at minimum document that the sidecar template was verified against Godot 4.6's actual output for a test SVG. |
+| **C6** | **Disabled opacity conflates text and container alpha** | 04-05 Task 3, `_resolve_recipe()` | The `disabled_opacity` from DIRECTION_PRESETS is used for BOTH font alpha and stylebox bg alpha. DESIGN_TOKENS §7.2 distinguishes "38% text / 12% container" (M3 baseline). The per-direction disabled_opacity replaces the 38% text constant, but applying it to stylebox backgrounds means a disabled Button has its container at 42% (Pulse) opacity rather than 12%. In dark modes, a 42%-opaque surface_panel on top of the page color creates a subtle bleed-through effect that may look like glass/popup styling rather than disabled-state dimming. However, DESIGN_TOKENS §6.5 explicitly says "applied as theme_color.a = disabled_opacity in disabled stylebox/font_color slots" — so the plan is following the token contract as written. The §7.2 text is the M3 baseline reference, not the NeoCade override. This is a token-design inconsistency in DESIGN_TOKENS, not a plan error. Flagged as MEDIUM because a design reviewer should confirm whether Pulse's 0.42 disabled container alpha is the intended visual. |
+| **C7** | **Dual verifier logic duplicated — maintenance fragility** | 04-06 Task 2, 04-07 Task 1.5 | `_phase4_verify.gd` (EditorScript) and `_phase4_verify_headless.gd` (SceneTree) contain ~80% identical assertion logic. Any fix to a verification check must be applied to both files. The plan acknowledges this ("duplicated rather than `load`-ed") and tags both for Phase 11 deletion, so the maintenance window is only Phases 4-10. Risk is moderate — a future update that fixes one but not the other would produce inconsistent verification results. |
+
+---
+
+### LOW
+
+| # | Concern | Plan & Location | Detail |
+|---|---------|-----------------|--------|
+| **C8** | **`_regenerate_theme()` runs ~10 times per `.tres` load** | 04-01 Task 2, 04-04 Task 4 | `_init()` → regeneration with class defaults, then 9 setter calls during `.tres` property deserialization → 9 more regenerations. Each runs the full BINDING_TABLE walk. Correct output but ~10× the work. Reentry guard prevents cascading but does not batch the 9 independent setter triggers. For a production `.tres` with ~37 controls × multiple slots, this is potentially hundreds of stylebox allocations per load. Acceptable for v1 given `.tres` is typically loaded once at scene init; can be optimized in v1.x with a dirty-flag batched approach. |
+| **C9** | **`set_font_size` on PanelContainer variations is unnecessary but harmless** | 04-05 Task 1 | `set_font_size("font_size", "CardPanel", tokens.body)` and `set_font_size("font_size", "HeroPanel", tokens.body)` on PanelContainer type variations — PanelContainers don't display text natively, so these are no-ops. Harmless overhead; remove in v1.x polish if desired. |
+| **C10** | **`VERSION` file format: trailing-newline ambiguity** | 04-08 Task 3 | The task says "use `Set-Content -Encoding UTF8 -NoNewline` if the convention is no-trailing-newline, OR the default `Set-Content` (with trailing newline) — verify against project root convention if any." No project-root convention exists. The plan should pick one and commit. Recommend no trailing newline for a single-line file (many tools parse `cat VERSION` without stripping `\n`). |
+| **C11** | **`_strip_load_steps_attr` anchor string inconsistency** | 04-06 Task 1 | The GDScript code block defines `_strip_load_steps_attr()` inside the `_phase4_import.gd` extension. But `_strip_theme_entries` has a `static func` declaration. The docstring says "static func `_strip_load_steps_attr(header_line: String) -> String`" — the `static` keyword matters for calling from `_strip_theme_entries` which is also `static`. This is correct and will compile (both are static), but verify that `_strip_theme_entries` is consistently marked `static` (it is, per the Plan 04-06 code). No issue. |
+
+---
+
+## Suggestions
+
+1. **Reconcile DIRECTION_PRESETS with DESIGN_TOKENS §5 BEFORE execution.** Update the Plan 04-04 Task 3.5 const with the values from §5.1-§5.5 personality specs. The Cycle 2 L2 verification should also assert `hover_pct` and `pressed_pct` per direction, not just `spread_factor`.
+
+2. **Fix all Dictionary dot-notation to bracket notation throughout plans.** This is a mechanical change: `presets.spread_factor` → `presets["spread_factor"]`, `tokens.body` → `tokens["body"]`, etc. Update acceptance criteria grep patterns to bracket-notation equivalents.
+
+3. **Change `.tscn` comment prefix from `#` to `;`** in Plan 04-01 Task 1. Alternatively, drop the placeholder comment entirely and just leave a blank line where the theme property was. The acceptance criteria "parses as a valid `.tscn`" then becomes the verification test.
+
+4. **Add icon import sidecar generation note** in Plan 04-03 Task 2: explicitly state that the template was validated against Godot 4.6's actual output for a test SVG, OR switch to a Godot-driven approach (load SVG, save `.import`, then enforce params programmatically — same pattern as fonts).
+
+5. **Add `hover_pct` and `pressed_pct` per-direction assertions** to the Plan 04-06 verifier (both EditorScript and headless variants). Currently the Cycle 2 L2 fix only checks `spread_factor`. Adding hover/pressed checks catches the C1 discrepancy at verification time.
+
+6. **Consider a batch-dirty optimization note** — in `_regenerate_theme()`, if all 9 setters trigger regeneration independently, a simple `_dirty := false` flag checked at entry and cleared after the walk could batch them. Not needed for v1 but worth a PLAN.md note for v1.x.
+
+---
+
+## Requirement Coverage Trace
+
+| Requirement | Primary Plan | Status |
+|---|---|---|
+| FOUND-01 (addon layout) | 04-01 (delete scaffold, create .gd) + 04-02 (fonts/) + 04-03 (icons/) + 04-06 (pulse.tres) + 04-07 (peer .tres) + 04-08 (metadata) | **Covered** — 04-08 Task 5 verifies the full layout |
+| FOUND-02 (class with 9 exports) | 04-01 (shell) + 04-04 (formulas) + 04-05 (engine) | **Covered** — but C2 (dot-notation) must be fixed for compilation |
+| FOUND-03 (per-direction .tres) | 04-06 (Pulse) + 04-07 (Slate/Bubble/Daybreak/Burst) | **Covered** — but C1 (DIRECTION_PRESETS) must be fixed for visual correctness |
+| FONT-01 (Inter bundled) | 04-02 Task 1, 2 | Covered |
+| FONT-05 (OFL.txt) | 04-02 Task 5 | Covered |
+| FONT-06 (default_font) | 04-05 Task 1 (C3 fix) | Covered |
+| FONT-07 (italic synthetic) | 04-08 CHANGELOG + README | Covered (documented, not implemented) |
+| FONT-08 (import settings) | 04-02 Task 2 | Covered |
+| FONT-09 (CJK override docs) | 04-08 README | Covered |
+| ICON-01 (SVG icons 32×32) | 04-03 Task 1 | Covered |
+| ICON-02 (icon coverage) | 04-03 Task 1 (Button-family) + Phase 6/7 (remainder) | Partially covered (Button-family only; remainder deferred per plan) |
+| ICON-03 (monochrome) | 04-03 Task 1 | Covered |
+| ICON-04 (no external libs) | 04-03 (by construction) | Covered |
+
+All 16 requirements land in specific plans. FONT-02/03/04 are correctly stricken (only Inter shipped). ICON-02 is only partial in Phase 4 (Button-family only; Tree/ColorPicker/FileDialog/ScrollBar icons are Phase 6/7 per the out-of-scope list). This matches the plan design.
+
+---
+
+## What's Missing
+
+1. **No plan verifies `main.tscn` actually opens in Godot Editor** after scaffold deletion + comment replacement. The verification is textual (grep) only. Plan 04-01 should include a manual verification step: "Open the project in Godot Editor and confirm `main.tscn` loads without missing-resource errors."
+
+2. **No plan verifies the `.tres` deserialization load order** (`_init()` before/after property restoration). The existing verification checks that the loaded Pulse `.tres` has correct `@export` values, which implicitly confirms the final state is correct regardless of order. Explicit documentation of the expected order (and why it's fine) would be valuable but isn't required for execution.
+
+3. **No plan addresses Pitfall 3.3 (texture filter mismatch) explicitly.** The icon import sidecars set `mipmaps/generate=true` but do NOT explicitly set the texture filter mode per-resource. In Godot 4.x, per-resource texture filter is set via the import sidecar's `mipmaps/generate=true` plus the project-level setting. The icon plan is implicitly correct (Linear With Mipmaps is the default when mipmaps are generated), but the pitfall specifically warns about pixel-art projects using Nearest filtering overriding theme icons. A Phase 10 or Phase 4 note should address this.
+
+---
+
+## Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| DIRECTION_PRESETS incorrect (C1) | **Certain** — values hardcoded in plan differ from DESIGN_TOKENS | **High** — 4/5 directions render with wrong state layers, failing Phase 3.4 mockup fidelity gate | Fix values before execution; add hover/pressed assertions to Plan 04-06 verifier |
+| GDScript compile failure (C2) | **Certain** — dot-notation on Dictionary is invalid GDScript 4.x | **High** — code will not compile; Phase 4 blocks | Change to bracket notation throughout |
+| `.tscn` parse error (C3) | **Medium** — Godot's ConfigFile parser may reject `#` comments inside node blocks | **Medium** — scene fails to open; Plan 04-07 can't reassign theme | Use `;` prefix or blank line |
+| `.tres` strip helper breakage (C4) | **Low** — format is simple; post-strip size assertion catches gross failures | **Medium** — corrupted `.tres` prevents theme loading | Runtime verify via `_phase4_verify_headless.gd` |
+| Disabled visual differs from design intent (C6) | **Low** (follows DESIGN_TOKENS as written) | **Low** — cosmetic; reversible with DESIGN_TOKENS update | Document in CHANGELOG; revise in v1.x if needed |
+
+**Overall:** The plans are execution-ready after resolving C1, C2, and C3. C1 is the most impactful because it produces incorrect visual output without any verification failure — the L2 smoke test checks `spread_factor` but not `hover_pct`/`pressed_pct`.
+
+---
+
+---
+
+## Codex Fresh Review
+
+**Summary**
+
+I would not call these plans execution-ready yet. The architecture is mostly coherent, but there are several blockers where the plans can pass their own grep checks while still producing an addon that violates Phase 4 contracts or sets theme slots Godot controls do not actually use.
+
+**Strengths**
+
+- The single `NeoCadeTheme extends Theme` direction is consistent with the locked architecture.
+- Pulse-first sequencing is correct.
+- The `ResourceSaver.save()` approach for `.tres` headers is a good correction over hand-authored custom resource headers.
+- The dual verifier idea is strong, especially the headless `SceneTree` variant.
+- The plans correctly focus on additive regeneration and avoid `clear()` inside `_regenerate_theme()`.
+
+**Concerns**
+
+**HIGH — Phase 4 layout contract is violated by helper scripts.**  
+Plans `04-02`, `04-06`, `04-07`, and `04-08` leave `_phase4_import.gd`, `_phase4_verify.gd`, and `_phase4_verify_headless.gd` directly under `addons/neocade_theme/`. That directly conflicts with FOUND-01 / Phase 4 SC#1: addon root contains exactly one `.gd` file, `neocade_theme.gd`. `04-08` even makes these helper scripts required layout files, which reverses the project contract. Move helpers under `.planning/phases/...` or delete them before Phase 4 layout verification.
+
+**HIGH — CANONICAL_SLOT_NAMES contains wrong or incomplete Godot 4.6 slots.**  
+`04-05` claims slot names are frozen, but examples already diverge from Godot 4.6 docs and local dissection. CheckButton uses `checked`, `unchecked`, disabled, and mirrored icon slots, not `on` / `off` per the official CheckButton docs. Tree docs include slots like `hovered_dimmed` and `custom_button`; the plan’s Tree freeze omits them. Button and OptionButton omit mirrored styleboxes despite the local dissection saying upstream sets them and RTL expects them. Worse: Theme `set_icon` / `has_icon` can create arbitrary theme items, so a verifier can pass while Godot never uses those slots.
+
+**HIGH — Icon `.import` files are not safe as planned.**  
+`04-03` hand-authors `.svg.import` files with `path="res://.godot/imported/<name>.svg-<hash>.ctex"` and says placeholders will be normalized. On Windows, `<hash>` is not a valid filename if left literal, and the plan never defines how to compute or replace it. This should follow the font plan: author SVGs, run Godot import, then assert actual generated import params.
+
+**HIGH — `default_font = Inter-Body.tres` conflicts with FONT-06 and breaks README CJK instructions.**  
+`04-05` sets `default_font` to a `FontVariation`. FONT-06 says theme `default_font` is Inter Variable Roman with `fallbacks=[]` and system fallback enabled. `04-08` README then casts `theme.default_font as FontFile`, which fails if `default_font` is `FontVariation`. Use `Inter-Variable.tres` as `default_font`; use FontVariation only for explicit type variations.
+
+**HIGH — `04-05` delegates the hardest implementation instead of specifying it.**  
+Task 2 says the full `BINDING_TABLE` is too long to inline and tells the executor to author it from research. That is not an executable plan at the same rigor as the others. Since SC#7 depends on exact slots, the plan needs either a generated table artifact or an explicit script that introspects/validates the exact table against Godot 4.6 class theme properties.
+
+**MEDIUM — The `.tres` strip helper is plausible but brittle.**  
+The N5 additions help, but the line parser still assumes simple one-line section headers and a narrow resource body whitelist. It also strips generated defaults by text rather than saving a data-only resource intentionally. Safer: generate `.tres`, load it, verify it, then create a second data-only save path that temporarily suppresses regeneration or saves a cleared duplicate outside `_regenerate_theme()`.
+
+**MEDIUM — Font acquisition is not true verification.**  
+`04-02` says capture SHA256 after download. That records what was downloaded; it does not verify against a known-good hash. Pin the release asset URL and expected SHA256 in the plan before execution, or vendor the binary from a known checked-in source.
+
+**LOW — DIRECTION_PRESETS lookup is acceptable but should be hardened.**  
+The peer-load checks catch the main float round-trip risk. I would still add a helper that normalizes direction identity explicitly when creating shipped `.tres` files, or at least assert `base_color.to_html(false)` for every saved file.
+
+**Suggestions**
+
+- Fix the helper-script layout before execution.
+- Replace the slot freeze with a generated/verified table from Godot 4.6 API data, not examples.
+- Change CheckButton icons to `checked` / `unchecked` families; add disabled and mirrored icon slots.
+- Make SVG imports Godot-generated, not hand-authored with fake `.ctex` paths.
+- Set `default_font` to the base `FontFile`, then set variations explicitly.
+- Add one real `godot --headless --script` verification step after `04-05` before any `.tres` generation.
+
+**Risk Assessment**
+
+Current risk is **high**. The plans have strong structure, but two blockers are contract-level: addon layout violates FOUND-01, and the slot verifier can pass wrong slots. Fix those before execution; otherwise Phase 4 may appear green while shipping a theme that is incomplete or structurally noncompliant.
+
+Sources checked: Godot 4.6 `Theme` API, `FontVariation`, `StyleBoxFlat`, `CheckButton`, `CheckBox`, `Tree`, `TabBar`, and `Script.get_script_constant_map()` docs.
+
+---
+
+
+---
+
+## Claude Self-Review (Orchestrator, Shallow)
+
+User explicitly requested: *"i also dont trust OpenCode/Deepseek, so use your best judgement and also do a shallow self review"*. So beyond aggregating the two external reviewers, I validated each HIGH claim against authoritative sources (Godot 4.6 docs via Context7, the actual plan files, DESIGN_TOKENS.md). Reporting which findings are real vs which are false positives.
+
+### Validation of OpenCode HIGH claims
+
+**OpenCode C1 — DIRECTION_PRESETS values disagree with DESIGN_TOKENS §5 for 4 of 5 directions: VALIDATED ✓**
+
+Diffed `DIRECTION_PRESETS` const in Plan 04-04 against DESIGN_TOKENS §5 personality state-layer-deltas lines:
+
+| Direction | DESIGN_TOKENS §5 (authoritative) | Plan 04-04 DIRECTION_PRESETS |
+|---|---|---|
+| Pulse    | hover +6%,  pressed -10%, disabled 0.42 | hover 6.0,  pressed -10.0, disabled 0.42 ✓ |
+| **Slate**    | **hover +4%,  pressed -6%**,  disabled 0.50 | **hover 8.0,  pressed -12.0**, disabled 0.50 ✗ |
+| **Bubble**   | **hover +8%,  pressed -10%**, disabled 0.45 | **hover 10.0, pressed -12.0**, disabled 0.45 ✗ |
+| **Daybreak** | hover +6%, **pressed -6%**,  disabled 0.50 | **hover 8.0,  pressed -12.0**, disabled 0.50 ✗ |
+| **Burst**    | hover +8%,  pressed -12%, disabled 0.45 | **hover 10.0, pressed -14.0**, disabled 0.45 ✗ |
+
+Pulse only correct direction. The other 4 ship with state layers that don't match the Phase 3.4 mockup-approved gate. **Real HIGH.**
+
+**OpenCode C2 — GDScript Dictionary dot-notation invalid: INVALID ✗ (false positive)**
+
+I verified via Context7 / Godot 4.6 docs: dict.key syntax is explicitly supported per `classes/class_dictionary.md` for string keys that are valid identifiers. `presets.spread_factor`, `tokens.body` etc. are valid GDScript 4.x. OpenCode misreads the language spec. **NOT a real concern.**
+
+**OpenCode C3 — `.tscn` comment prefix `#` should be `;`: VALIDATED ✓**
+
+Verified via Context7 / Godot 4.6 docs (`engine_details/file_formats/tscn.md`): TSCN single-line comments use `;` (semicolon), not `#`. Plan 04-01 inserts `# theme = ExtResource(...) - reassigned in Plan 04-07` — wrong prefix. Additionally, Godot will discard ANY comments on save, so the placeholder strategy is fragile. **Real HIGH.**
+
+### Validation of Codex HIGH claims
+
+**Codex HIGH 1 — Helper scripts violate FOUND-01: VALIDATED ✓**
+
+FOUND-01 (verbatim): *"addon root contains exactly **1 `.gd` file** (`neocade_theme.gd`)"*. Plan 04-08 layout verifier explicitly REQUIRES 4 `.gd` files at addon root: `neocade_theme.gd`, `_phase4_import.gd`, `_phase4_verify.gd`, `_phase4_verify_headless.gd`. Strictly violates SC#1. The plan defends this by saying helpers are deleted in Phase 11 — but Phase 4 close state is what SC#1 evaluates against. **Real HIGH.**
+
+**Codex HIGH 2 — CANONICAL_SLOT_NAMES + Plan 04-05 has wrong CheckButton slots: VALIDATED ✓**
+
+Verified via Context7 / Godot 4.6 `class_checkbutton.md`: Theme Icons are `checked`, `checked_disabled`, `checked_disabled_mirrored`, `checked_mirrored`, `unchecked`, `unchecked_disabled`, `unchecked_disabled_mirrored`, `unchecked_mirrored`. Plan 04-05 says *"CheckButton on/off"*. Plan 04-03 names files `toggle_on.svg` / `toggle_off.svg`. Both wrong. Plus the plan misses 6 disabled/mirrored variants. **Real HIGH.**
+
+**Codex HIGH 3 — SVG `.import` files have placeholder `<hash>` paths: VALIDATED ✓**
+
+Plan 04-03 lines 239/247 use literal `<name>` and `<hash>` placeholders in `.import` `path=` and `dest_files=` strings. Line 279 says: *"placeholders will be normalized by Godot on first import"* — works ONLY if workflow is "commit placeholder → run Godot import → re-commit normalized". Plan doesn't enforce the re-commit step; if executor commits the placeholder once and never re-commits, the addon ships broken. **Real HIGH.**
+
+**Codex HIGH 4 — `default_font = FontVariation` conflicts with FONT-06 + breaks README cast: VALIDATED ✓**
+
+- FONT-06: *"Theme `default_font` is Inter Variable Roman; `default_font.fallbacks = []`"* — implies FontFile.
+- Plan 04-05 line 135-136: assigns `FontVariation` (Inter-Body.tres) to `default_font`.
+- Plan 04-08 line 412: README casts `default_font as FontFile`.
+
+`FontVariation` and `FontFile` are sibling types both extending `Font`, NOT cast-compatible. README cast fails at runtime. Fix: `default_font` should be `Inter-Variable.tres` (the FontFile); per-variation FontVariations are set explicitly via `set_font(...)`. **Real HIGH.**
+
+**Codex HIGH 5 — BINDING_TABLE delegated to executor: VALIDATED ✓**
+
+Plan 04-05 Task 2 line 274 says *"too long to inline verbatim here, but the executor authors it directly using the 37-row scorecard..."* and line 345 *"BINDING_TABLE should be ~600-1000 lines"*. This is a delegation, not a plan. The exact slot-name underspecification produces issues like Codex HIGH 2's CheckButton bug. **Real HIGH.**
+
+### Self-Review Independent Findings
+
+**SR1 — OpenCode's cycle-5 LOW about regex token-fusion was INVALID.** I traced `\s*load_steps=\d+` empirically: regex matches ` load_steps=42` (16 chars including leading space). Empty-string replacement leaves the trailing space between `42` and `format` untouched (the regex doesn't extend past digits). No fusion. OpenCode misanalyzed. **Validates the user's distrust of OpenCode/DeepSeek as a reviewer — their flags should not be treated as authoritative without verification.**
+
+**SR2 — `script_class="..."` no-spaces edge case (LOW).** The cycle-4 N5 strip preserves `begins_with("script_class =")` (with spaces). Both prior reviewers and the plan assumed Godot 4.6 always serializes with spaces. Likely fine; runtime `loaded is NeoCadeTheme` would catch regression. **Real LOW.**
+
+**SR3-SR7 — Cross-plan integration spot-checks all clean** (font path consistency, reentry guard correctness, build-helper deletion lineage, main.tscn handling sequence, plan total volume = 4299 lines). No new findings. ✓
+
+### Cycle 6 Aggregate
+
+**Validated HIGH concerns introduced by this fresh pass: 7**
+
+| # | Concern | Source | Plan |
+|---|---|---|---|
+| F1 | DIRECTION_PRESETS values wrong for 4/5 directions | OpenCode C1 (validated) | 04-04 Task 3.5 |
+| F2 | `.tscn` comment prefix `#` should be `;` | OpenCode C3 (validated) | 04-01 Task 1 |
+| F3 | Helper scripts at addon root violate FOUND-01 | Codex HIGH 1 (validated) | 04-02/06/07/08 |
+| F4 | CheckButton slot names `on`/`off` should be `checked`/`unchecked` | Codex HIGH 2 (validated) | 04-03, 04-05 |
+| F5 | SVG `.import` literal `<hash>` placeholders | Codex HIGH 3 (validated) | 04-03 Task 2 |
+| F6 | `default_font` type mismatch (FontVariation vs FontFile) | Codex HIGH 4 (validated) | 04-05 Task 1 vs 04-08 README |
+| F7 | BINDING_TABLE delegated to executor (~600-1000 lines unspecified) | Codex HIGH 5 (validated) | 04-05 Task 2 |
+
+**Invalidated by self-review: 1**
+
+| # | Concern | Source | Verdict |
+|---|---|---|---|
+| - | GDScript dict dot-notation invalid | OpenCode C2 | **FALSE POSITIVE** — `dict.key` is valid in GDScript 4.x for string keys that are valid identifiers (Godot docs explicit) |
+
+**MEDIUMs added in this pass: 4** — strip helper edge cases, icon `.import` Godot-driven generation, hover/pressed verifier coverage, font SHA256 verification.
+
+**LOWs: ~5** — disabled opacity baseline conflict, `_regenerate_theme()` runs ~10× per .tres load, dual verifier duplication, VERSION trailing-newline, `script_class` no-spaces edge case.
+
+### Convergence Status — REOPENED
+
+The cycle-5 "CONVERGED" verdict was premature. The fresh pass identified 7 real HIGH concerns the prior 5 cycles missed. Five cycles of review-replan converged on a plan-set that still contains:
+- Wrong state-layer values for 4 of 5 directions (visible mockup-fidelity regression)
+- Wrong CheckButton icon binding (icons silently don't apply)
+- A forbidden helper-script layout (FOUND-01 violation)
+- A FontVariation/FontFile type conflict (README cast would crash)
+- A BINDING_TABLE delegation that masks ~600-1000 lines of unspecified work
+- A `.tscn` comment prefix typo (parse error)
+- An unreliable `.import` placeholder workflow
+
+Risk assessment: **HIGH** (Codex), **HIGH** (validated against Claude's spot-checks), **MEDIUM-LOW** (OpenCode — but OpenCode's earlier verdicts proven unreliable, so down-weight).
+
+**Recommendation: run cycle 7 replan to address all 7 validated HIGHs.** Each is mechanically fixable with specific edits to specific plans; none requires architectural rework.
