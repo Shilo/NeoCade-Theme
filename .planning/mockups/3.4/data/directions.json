@@ -6,7 +6,11 @@
       "display_name": "Pulse",
       "class_name": "PulseNeoCadeTheme",
       "tres_filename_stem": "pulse_neocade_theme",
-      "concept_image": "concepts/pulse-concept.png",
+      "concept_images": {
+        "desktop_flat": "concepts/pulse-desktop-flat.png",
+        "mobile_flat": "concepts/pulse-mobile-flat.png",
+        "mobile_raised": "concepts/pulse-mobile-raised.png"
+      },
       "base_color": "#151A2E",
       "accent_color": "#8BFF6A",
       "contrast_ratio": "13.62:1",
@@ -20,7 +24,11 @@
       "display_name": "Slate",
       "class_name": "SlateNeoCadeTheme",
       "tres_filename_stem": "slate_neocade_theme",
-      "concept_image": "concepts/slate-concept.png",
+      "concept_images": {
+        "desktop_flat": "concepts/slate-desktop-flat.png",
+        "mobile_flat": "concepts/slate-mobile-flat.png",
+        "mobile_raised": "concepts/slate-mobile-raised.png"
+      },
       "base_color": "#111820",
       "accent_color": "#8BD3FF",
       "contrast_ratio": "10.94:1",
@@ -34,7 +42,11 @@
       "display_name": "Bubble",
       "class_name": "BubbleNeoCadeTheme",
       "tres_filename_stem": "bubble_neocade_theme",
-      "concept_image": "concepts/bubble-concept.png",
+      "concept_images": {
+        "desktop_flat": "concepts/bubble-desktop-flat.png",
+        "mobile_flat": "concepts/bubble-mobile-flat.png",
+        "mobile_raised": "concepts/bubble-mobile-raised.png"
+      },
       "base_color": "#241326",
       "accent_color": "#FFB3E6",
       "contrast_ratio": "10.74:1",
@@ -48,7 +60,11 @@
       "display_name": "Daybreak",
       "class_name": "DaybreakNeoCadeTheme",
       "tres_filename_stem": "daybreak_neocade_theme",
-      "concept_image": "concepts/daybreak-concept.png",
+      "concept_images": {
+        "desktop_flat": "concepts/daybreak-desktop-flat.png",
+        "mobile_flat": "concepts/daybreak-mobile-flat.png",
+        "mobile_raised": "concepts/daybreak-mobile-raised.png"
+      },
       "base_color": "#0B2420",
       "accent_color": "#76F2D1",
       "contrast_ratio": "11.96:1",
@@ -62,7 +78,11 @@
       "display_name": "Burst",
       "class_name": "BurstNeoCadeTheme",
       "tres_filename_stem": "burst_neocade_theme",
-      "concept_image": "concepts/burst-concept.png",
+      "concept_images": {
+        "desktop_flat": "concepts/burst-desktop-flat.png",
+        "mobile_flat": "concepts/burst-mobile-flat.png",
+        "mobile_raised": "concepts/burst-mobile-raised.png"
+      },
       "base_color": "#20112E",
       "accent_color": "#FFD166",
       "contrast_ratio": "12.33:1",

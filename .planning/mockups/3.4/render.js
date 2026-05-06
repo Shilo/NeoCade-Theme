@@ -17,11 +17,17 @@ async function loadPlaywright() {
 }
 
 const CONCEPT_IMAGE_DIRECTIONS = [
-  ["Pulse", "pulse-concept.png"],
-  ["Slate", "slate-concept.png"],
-  ["Bubble", "bubble-concept.png"],
-  ["Daybreak", "daybreak-concept.png"],
-  ["Burst", "burst-concept.png"]
+  ["Pulse", "pulse"],
+  ["Slate", "slate"],
+  ["Bubble", "bubble"],
+  ["Daybreak", "daybreak"],
+  ["Burst", "burst"]
+];
+
+const CONCEPT_IMAGE_VARIANTS = [
+  { name: "desktop-flat", platform: "desktop", raised: false, viewport: { width: 1280, height: 720 } },
+  { name: "mobile-flat", platform: "mobile", raised: false, viewport: { width: 430, height: 932 } },
+  { name: "mobile-raised", platform: "mobile", raised: true, viewport: { width: 430, height: 932 } }
 ];
 
 async function waitForImages(page) {
@@ -45,17 +51,24 @@ async function renderConceptImages(playwright, browserPath, root) {
     executablePath: browserPath
   });
 
-  for (const [direction, fileName] of CONCEPT_IMAGE_DIRECTIONS) {
-    const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
-    const target = pathToFileURL(path.join(root, "concept-image.html")).href;
-    await page.goto(`${target}?direction=${encodeURIComponent(direction)}`);
-    await waitForImages(page);
-    await page.screenshot({ path: path.join(root, "concepts", fileName), fullPage: false });
-    await page.close();
+  const target = pathToFileURL(path.join(root, "concept-image.html")).href;
+  for (const [direction, slug] of CONCEPT_IMAGE_DIRECTIONS) {
+    for (const variant of CONCEPT_IMAGE_VARIANTS) {
+      const page = await browser.newPage({ viewport: variant.viewport, deviceScaleFactor: 1 });
+      const query = new URLSearchParams({
+        direction,
+        platform: variant.platform,
+        raised: String(variant.raised)
+      });
+      await page.goto(`${target}?${query.toString()}`);
+      await waitForImages(page);
+      await page.screenshot({ path: path.join(root, "concepts", `${slug}-${variant.name}.png`), fullPage: false });
+      await page.close();
+    }
   }
 
   await browser.close();
-  console.log("Rendered fixed-order concept images to concepts/*.png");
+  console.log("Rendered 15 fixed-layout concept images to concepts/*.png");
 }
 
 async function main() {

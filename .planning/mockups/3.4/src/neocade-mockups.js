@@ -5,7 +5,11 @@ const NEOCADE_DIRECTIONS = [
     name: "Pulse",
     className: "PulseNeoCadeTheme",
     fileStem: "pulse_neocade_theme",
-    conceptImage: "concepts/pulse-concept.png",
+    conceptImages: {
+      desktopFlat: "concepts/pulse-desktop-flat.png",
+      mobileFlat: "concepts/pulse-mobile-flat.png",
+      mobileRaised: "concepts/pulse-mobile-raised.png"
+    },
     base_color: "#151A2E",
     accent_color: "#8BFF6A",
     contrast: "13.62:1",
@@ -21,7 +25,11 @@ const NEOCADE_DIRECTIONS = [
     name: "Slate",
     className: "SlateNeoCadeTheme",
     fileStem: "slate_neocade_theme",
-    conceptImage: "concepts/slate-concept.png",
+    conceptImages: {
+      desktopFlat: "concepts/slate-desktop-flat.png",
+      mobileFlat: "concepts/slate-mobile-flat.png",
+      mobileRaised: "concepts/slate-mobile-raised.png"
+    },
     base_color: "#111820",
     accent_color: "#8BD3FF",
     contrast: "10.94:1",
@@ -37,7 +45,11 @@ const NEOCADE_DIRECTIONS = [
     name: "Bubble",
     className: "BubbleNeoCadeTheme",
     fileStem: "bubble_neocade_theme",
-    conceptImage: "concepts/bubble-concept.png",
+    conceptImages: {
+      desktopFlat: "concepts/bubble-desktop-flat.png",
+      mobileFlat: "concepts/bubble-mobile-flat.png",
+      mobileRaised: "concepts/bubble-mobile-raised.png"
+    },
     base_color: "#241326",
     accent_color: "#FFB3E6",
     contrast: "10.74:1",
@@ -53,7 +65,11 @@ const NEOCADE_DIRECTIONS = [
     name: "Daybreak",
     className: "DaybreakNeoCadeTheme",
     fileStem: "daybreak_neocade_theme",
-    conceptImage: "concepts/daybreak-concept.png",
+    conceptImages: {
+      desktopFlat: "concepts/daybreak-desktop-flat.png",
+      mobileFlat: "concepts/daybreak-mobile-flat.png",
+      mobileRaised: "concepts/daybreak-mobile-raised.png"
+    },
     base_color: "#0B2420",
     accent_color: "#76F2D1",
     contrast: "11.96:1",
@@ -69,7 +85,11 @@ const NEOCADE_DIRECTIONS = [
     name: "Burst",
     className: "BurstNeoCadeTheme",
     fileStem: "burst_neocade_theme",
-    conceptImage: "concepts/burst-concept.png",
+    conceptImages: {
+      desktopFlat: "concepts/burst-desktop-flat.png",
+      mobileFlat: "concepts/burst-mobile-flat.png",
+      mobileRaised: "concepts/burst-mobile-raised.png"
+    },
     base_color: "#20112E",
     accent_color: "#FFD166",
     contrast: "12.33:1",
@@ -97,6 +117,27 @@ const PLATFORM_TOKENS = {
     density: "44pt / 48dp mobile"
   }
 };
+
+const CONCEPT_VARIANTS = [
+  {
+    key: "desktopFlat",
+    label: "Desktop flat",
+    platform: "desktop",
+    raised: false
+  },
+  {
+    key: "mobileFlat",
+    label: "Mobile flat",
+    platform: "mobile",
+    raised: false
+  },
+  {
+    key: "mobileRaised",
+    label: "Mobile raised",
+    platform: "mobile",
+    raised: true
+  }
+];
 
 function hexToRgb(hex) {
   const clean = hex.replace("#", "");
@@ -279,8 +320,12 @@ function conceptBrief(direction) {
 
 function fillDirectionSection(section, direction) {
   section.setAttribute("style", styleVars(deriveTokens(direction, "desktop")));
+  const conceptImages = section.querySelector("[data-concept-images]");
   const brief = section.querySelector("[data-concept-brief]");
   const variants = section.querySelector("[data-variant-pair]");
+  if (conceptImages && conceptImages.children.length === 0) {
+    conceptImages.innerHTML = CONCEPT_VARIANTS.map((variant) => conceptFigure(direction, variant)).join("");
+  }
   if (brief) {
     brief.innerHTML = conceptBrief(direction);
   }
@@ -292,15 +337,25 @@ function fillDirectionSection(section, direction) {
   }
 }
 
+function conceptFigure(direction, variant) {
+  const src = direction.conceptImages[variant.key];
+  const raisedLabel = variant.raised ? "raised=true" : "raised=false";
+  return `
+    <figure class="nc-concept-card" data-concept-variant="${variant.key}">
+      <img src="${src}" alt="${direction.name} ${variant.label} fixed-layout dark UI mockup">
+      <figcaption>${variant.label} / ${raisedLabel}</figcaption>
+    </figure>
+  `;
+}
+
 function directionConcept(direction) {
   const tokens = deriveTokens(direction, "desktop");
   return `
     <section class="nc-direction-section" style="${styleVars(tokens)}" data-direction="${direction.name}">
       <div class="nc-concept-layout">
-        <figure class="nc-concept-hero">
-          <img src="${direction.conceptImage}" alt="${direction.name} generated dark arcade UI concept">
-          <figcaption>Generated concept image - dark base ${direction.base_color}, accent ${direction.accent_color}, accent contrast ${direction.contrast}</figcaption>
-        </figure>
+        <div class="nc-concept-image-grid" data-concept-images>
+          ${CONCEPT_VARIANTS.map((variant) => conceptFigure(direction, variant)).join("")}
+        </div>
         <div class="nc-concept-brief">
           ${conceptBrief(direction)}
         </div>
@@ -313,16 +368,18 @@ function directionConcept(direction) {
   `;
 }
 
-function conceptArtboard(direction) {
-  const tokens = deriveTokens(direction, "desktop");
+function conceptArtboard(direction, platformName = "desktop", raisedFlag = false) {
+  const tokens = deriveTokens(direction, platformName);
+  const platform = PLATFORM_TOKENS[platformName] || PLATFORM_TOKENS.desktop;
+  const variantLabel = `${platformName === "mobile" ? "Mobile" : "Desktop"} ${raisedFlag ? "raised" : "flat"}`;
   return `
-    <article class="nc-artboard" style="${styleVars(tokens)}" data-direction="${direction.name}" data-fixed-control-order="header-tabs action-panel dialog-stack list-tree states-palette">
+    <article class="nc-artboard ${platformName} ${raisedFlag ? "mode-raised" : "mode-flat"}" style="${styleVars(tokens)}" data-direction="${direction.name}" data-platform="${platformName}" data-raised="${raisedFlag}" data-fixed-control-order="header-tabs action-panel input-toggle dialog-stack list-tree states-palette">
       <header class="nc-art-top">
         <div class="nc-art-brand">
           <span class="nc-art-mark"></span>
           <div>
             <b>${direction.name}</b>
-            <small>${direction.base_color} / ${direction.accent_color} / ${direction.contrast}</small>
+            <small>${variantLabel} / ${platform.label} / ${direction.contrast}</small>
           </div>
         </div>
         <nav class="nc-art-tabs" aria-label="Fixed tabs">
@@ -418,7 +475,9 @@ function renderConceptImage() {
   if (!target) return;
   const params = new URLSearchParams(window.location.search);
   const direction = findDirection(params.get("direction")) || NEOCADE_DIRECTIONS[0];
-  target.innerHTML = conceptArtboard(direction);
+  const platformName = params.get("platform") === "mobile" ? "mobile" : "desktop";
+  const raisedFlag = params.get("raised") === "true";
+  target.innerHTML = conceptArtboard(direction, platformName, raisedFlag);
 }
 
 function renderFinalistPlaceholder() {
