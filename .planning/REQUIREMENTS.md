@@ -297,15 +297,15 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | ICON-02 | Phase 4 (Plan 04-03 covers Button family + CheckBox/CheckButton on/off + OptionButton arrow + LineEdit clear + dialog close — 10 of ~25-40 icon slots; Tree/TabBar/ColorPicker/FileDialog/ScrollBar slots land in Phases 6/7) | — | In Progress |
 | ICON-03 | Phase 4 (Plan 04-03 locked monochrome SVG policy: every Button-family icon strictly single-color #FFFFFF for predictable Godot icon `modulate` tinting; Cross-AI Cycle 1 MEDIUM fix). Pattern applies to all future icons | — | Complete |
 | ICON-04 | Phase 4 (Plan 04-03 ships zero external icon library binaries — Material Symbols / Lucide / Phosphor all excluded per STACK Decision 5 + D-12; only hand-authored SVGs in `addons/neocade_theme/icons/`) | — | Complete |
-| TOKEN-01 | Phase 3 (token values defined) | Phase 4 (generator implements) | Pending |
-| TOKEN-02 | Phase 3 | Phase 4 | Pending |
-| TOKEN-03 | Phase 3 (WCAG AA verification) | Phase 4 | Pending |
+| TOKEN-01 | Phase 3 (token values defined) | Phase 4 (Plan 04-04 derives 5-stop surface ramp `surface_base/low/panel/high/overlay` + `outline_color` via `_mix(base_color, elevate_target, k * spread_factor)` per DESIGN_TOKENS §6.2; binding-table consumption closes in 04-05) | In Progress |
+| TOKEN-02 | Phase 3 | Phase 4 (Plan 04-04 derives `role.primary = accent_color` + `accent_rim = _mix(accent_color, WHITE, 0.5)` per DESIGN_TOKENS §7.1; binding-table consumption closes in 04-05) | In Progress |
+| TOKEN-03 | Phase 3 (WCAG AA verification) | Phase 4 (Plan 04-04 derives `text_strong / text_default / text_muted` with is_light branch per DESIGN_TOKENS §6.4: dark `#F7F8FB` / `#B9C1D0`, light `#1B2230` / `#5A6478`; binding-table consumption closes in 04-05) | In Progress |
 | TOKEN-04 | Phase 3 (`surface.sunken` rejection) | Phase 4 | Pending |
 | TOKEN-05 | Phase 3 (radius scale) | Phase 4 | Pending |
-| TOKEN-06 | Phase 3 (spacing scale + mobile +50%) | Phase 4 | Pending |
+| TOKEN-06 | Phase 3 (spacing scale + mobile +50%) | Phase 4 (Plan 04-04 wires `_platform_tokens(p)` returning the 14-key desktop/mobile sizing dict per DESIGN_TOKENS §10.1 incl. mobile +50% spacing densityScale=1.5; binding-table consumption closes in 04-05) | In Progress |
 | TOKEN-07 | Phase 3 (stroke widths) | Phase 4 | Pending |
-| TOKEN-08 | Phase 3 (no-shadows policy) | Phase 4 (`shadow_size = -1` everywhere) | Pending |
-| TOKEN-09 | Phase 3 (M3 state-layer model) | Phase 4 | Pending |
+| TOKEN-08 | Phase 3 (no-shadows policy) | Phase 4 (Plan 04-04 implements `_make_raised_stylebox(bg, offset_color, intensity)` with `shadow_size = -1` when raised=false per Godot #98162; binding-table consumption closes in 04-05) | In Progress |
+| TOKEN-09 | Phase 3 (M3 state-layer model) | Phase 4 (Plan 04-04 derives `state_hover` + `state_pressed` per DESIGN_TOKENS §6.5 with is_light branch on hover target + per-direction `hover_pct/pressed_pct/disabled_opacity` from DIRECTION_PRESETS; binding-table consumption closes in 04-05) | In Progress |
 | TOKEN-10 | Phase 3 (M3 type scale spine) | Phase 4 (Plan 04-02 authored 5 FontVariation .tres covering DESIGN_TOKENS §8.5: HeaderLarge wght=800/opsz=32, HeaderMedium wght=700/opsz=32, HeaderSmall wght=600/opsz=24, Body wght=400, Caption wght=400) | In Progress (font scaffold complete; binding-table wiring closes in 04-05) |
 | COV-01 | Phase 7 (37/37 scorecard desktop coverage closes here) | Phase 5 + Phase 6 (cumulative authoring) | Pending |
 | COV-02 | Phase 5 (Core Controls — BaseButton family) | — | Pending |
