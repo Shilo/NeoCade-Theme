@@ -1,6 +1,6 @@
 # Phase 3.4 Render Check
 
-**Status:** Foundation ready; concept audit pending Plan 02.
+**Status:** Concept boards rendered and ready for finalist-selection checkpoint.
 
 ## Foundation Checks
 
@@ -24,16 +24,26 @@
 
 | Board | Render artifact | Anti-cyberpunk | Anti-texture | Raised note |
 |---|---|---|---|---|
-| Pulse flat | pending Plan 02 | pending | pending | n/a |
-| Pulse raised | pending Plan 02 | pending | pending | pending |
-| Slate flat | pending Plan 02 | pending | pending | n/a |
-| Slate raised | pending Plan 02 | pending | pending | pending |
-| Bubble flat | pending Plan 02 | pending | pending | n/a |
-| Bubble raised | pending Plan 02 | pending | pending | pending |
-| Daybreak flat | pending Plan 02 | pending | pending | n/a |
-| Daybreak raised | pending Plan 02 | pending | pending | pending |
-| Burst flat | pending Plan 02 | pending | pending | n/a |
-| Burst raised | pending Plan 02 | pending | pending | pending |
+| Pulse flat | `concept-gallery.html` / `screenshots/concept-gallery.png` | PASS | PASS | n/a |
+| Pulse raised | `concept-gallery.html` / `screenshots/concept-gallery.png` | PASS | PASS | 3px hard offset reads active without lifting passive panels. |
+| Slate flat | `concept-gallery.html` / `screenshots/concept-gallery.png` | PASS | PASS | n/a |
+| Slate raised | `concept-gallery.html` / `screenshots/concept-gallery.png` | PASS | PASS | 2px hard offset is intentionally quiet and tool-friendly. |
+| Bubble flat | `concept-gallery.html` / `screenshots/concept-gallery.png` | PASS | PASS | n/a |
+| Bubble raised | `concept-gallery.html` / `screenshots/concept-gallery.png` | PASS | PASS | 5px hard offset is the most playful; still limited to button-like affordances. |
+| Daybreak flat | `concept-gallery.html` / `screenshots/concept-gallery.png` | PASS | PASS | n/a |
+| Daybreak raised | `concept-gallery.html` / `screenshots/concept-gallery.png` | PASS | PASS | 3px hard offset gives daylight actions tactile weight without floating shells. |
+| Burst flat | `concept-gallery.html` / `screenshots/concept-gallery.png` | PASS | PASS | n/a |
+| Burst raised | `concept-gallery.html` / `screenshots/concept-gallery.png` | PASS | PASS | 4px hard offset supports the expressive action style while dense rows stay flat. |
+
+## Concept Render Evidence
+
+- Render command: `NODE_PATH=<bundled Codex node_modules> node .planning/mockups/3.4/render.js concept`
+- Screenshot: `.planning/mockups/3.4/screenshots/concept-gallery.png`
+- Screenshot dimensions: 1440 x 6956
+- Board count: 10 rendered boards, 5 directions x flat/raised.
+- Platform note: Stage 1 uses desktop density for directional comparison; mobile constants are present and exercised in Plan 03 finalist 4-grid.
+- Text/overlap sanity: PASS at 1440px render width; board sections remain grid-contained with responsive fallback CSS.
+- Historical v0 preservation: PASS; no files under `.planning/mockups/concepts/` or `.planning/mockups/03-direction-boards.*` changed.
 
 ## Finalist Readiness
 
