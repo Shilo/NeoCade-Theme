@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-05-06)
 
 Phase: 03.4
 Plan: Not started
-Next: /gsd-plan-review-convergence 3.4 --opencode
+Next: /gsd-execute-phase 3.4
 Status: Ready to execute
 Last activity: 2026-05-06 -- Phase 03.4 planning complete
 
