@@ -569,6 +569,8 @@ NO `plugin.cfg`. Per STACK Decision 5 + CONTEXT.md D-05, the consumer addon is n
     The verify command checks the presence of required files + absence of forbidden files. This task does NOT modify any files; it is a structural assertion that all prior plans landed correctly.
 
     **Cross-AI Cycle 3 N4 fix:** the verify command ALSO asserts that each of the 5 direction `.tres` files (Pulse + 4 peers) is < 2048 bytes (2 KiB) on disk. This is the layout-time double-check on SC#6 ("saved `.tres` files stay data-oriented") complementing Plan 04-06 Task 1 + Plan 04-07 Task 1's per-save assertions. Catches regressions where a future edit re-introduces serialized theme entries into a peer file.
+
+    **Cross-AI Cycle 4 N5 fix (size assertion still holds with preserved script linkage):** Plan 04-06 Task 1's `_strip_theme_entries()` helper was updated to preserve `[ext_resource type="Script" ...]` blocks + `script = ExtResource(...)` / `script_class =` lines + strip stale `load_steps=N`. Preserved script ext_resource adds ~80-150 bytes per file; the < 2048-byte cap holds with margin. No change to Task 5's verify command — the size assertion is unchanged. Runtime `loaded is NeoCadeTheme` validation lives in Plan 04-06/04-07 verifiers (already in place), not here.
   </action>
   <acceptance_criteria>
     - All 12 required files exist at the listed paths.
