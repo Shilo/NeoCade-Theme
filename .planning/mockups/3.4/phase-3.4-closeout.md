@@ -142,3 +142,105 @@ Per SC-07, all Phase 3 v0 historical artifacts remain untouched and findable:
 The `historical` framing is preserved in CLAUDE.md and REDIRECTED.md per the Phase 3 redirect 2026-05-04. Phase 3.4 outputs live exclusively under `.planning/mockups/3.4/` per CONTEXT.md and ROADMAP SC-07.
 
 **SC-07 result: PASS.**
+
+---
+
+## Section 4 — forbidden-surface audit + Phase 4 handoff (Plan 04 Task 4)
+
+### 4.1 forbidden-surface audit (Plan 04 only — current uncommitted state)
+
+The plan's automated verification runs `git status --short` and asserts no entry matches the forbidden-pattern set:
+- `^.. addons/` (production addon directory)
+- `^.. main\.tscn$` (project main scene)
+- `^.. project\.godot$` (project file)
+- `\.tres$` (any production theme resource)
+- `\.gd$` (any production GDScript)
+- `addons.*fonts` (bundled font assets)
+- `addons.*icons` (bundled icon assets)
+
+**At Plan 04 close-of-work the working tree is clean** — `git status --short` returns the only uncommitted entry (`phase-3.4-closeout.md` itself), which after this commit becomes empty. **No production surfaces touched in any Plan 04 task.** Verification: PASS.
+
+### 4.2 forbidden-surface audit (whole-phase scope, Plans 01-04 combined)
+
+The hard blocker per SC-06 / D-15 / D-27 requires that Phase 3.4 in its entirety produces no production styling commits. Audit run as `git diff --name-only 61a118d..HEAD` (Phase 3.4 commit range, from the last pre-Phase-3.4 commit through Plan 04 Task 3).
+
+**Files changed across all of Phase 3.4 (Plans 01-04 combined):**
+- 8 docs/state files under `.planning/` root (`PROJECT.md`, `REQUIREMENTS.md`, `ROADMAP.md`, `STATE.md`, `DESIGN_TOKENS.md`, etc.)
+- All Phase 3.4 mockup artifacts under `.planning/mockups/3.4/` (gallery HTML, 21 PNGs, render scripts, audit MDs, gate-closure files)
+- All Phase 3.4 phase artifacts under `.planning/phases/03.4-*/` (CONTEXT.md, CORRECTIVE-ADDENDUM.md, RESEARCH.md, 4 PLAN files, 4 SUMMARY files — Plan 04 SUMMARY follows this audit)
+- 1 research artifact: `.planning/research/THEME-DIRECTIONS.md` (Revision Round 2/2 dark migration was applied during Phase 3.4)
+
+**Production-surface files changed:** ZERO. Forbidden-pattern grep against the whole-phase diff returns no matches:
+```
+git diff --name-only 61a118d..HEAD | grep -E "^addons/|^main\.tscn$|^project\.godot$|\.tres$|\.gd$" | grep -v "^.planning/"
+→ NONE FOUND - PASS
+```
+
+(The `grep -v "^.planning/"` filter is necessary because `.tres` / `.gd` patterns could match planning-side spike files; the spike artifacts are under `.planning/spikes/dynamic-theme/`, NOT production. The whole-phase audit confirms even those weren't touched in Phase 3.4 — they're inherited from Phase 3.2.)
+
+**Whole-phase forbidden-surface audit: PASS.**
+
+### 4.3 Plan 04 file scope
+
+Plan 04 wrote exactly two files (the plan's `files_modified` declaration):
+| File | Purpose | Commit |
+|---|---|---|
+| `.planning/DESIGN_TOKENS.md` | Phase 4 single-class/data-resource contract (Task 2 deliverable) | `1bd4f7c` |
+| `.planning/mockups/3.4/phase-3.4-closeout.md` | this closeout report (Tasks 1, 3, 4 deliverables) | `cde88ee`, `bb20cb1`, this commit |
+
+Both paths sit inside `.planning/` — never inside `addons/`, never matching `main.tscn` / `project.godot` / `*.tres` / `*.gd`.
+
+### 4.4 Phase 4 handoff
+
+This section is the explicit Phase 4 handoff per the plan's Task 4 mandate. Phase 4 begins after `/gsd-verify-work` of Phase 3.4 closes the phase.
+
+**Phase 4 prerequisite (CLOSED):**
+- `final-approval.md` exists and records the user-approval gate (PASS — Plan 04 Task 1 §1).
+- `DESIGN_TOKENS.md` exists and is the Phase 4 single-class/data-resource contract (PASS — Plan 04 Task 2 §2).
+- forbidden-surface audit confirms no production styling commits exist in Phase 3.4 (PASS — §4.1 + §4.2 above).
+
+**Phase 4 reads:**
+- **PRIMARY:** `.planning/DESIGN_TOKENS.md` — every `@export` value, every formula, every per-Control authoring intent. Phase 4 imports values, ports formulas, and authors per-direction Theme Editor overrides from this single document.
+- Supporting: `.planning/research/GODOT-DYNAMIC-THEME-RESEARCH.md` (Architecture Recipe), `.planning/spikes/dynamic-theme/VERIFY-RESULTS.md` (6/6 strict-gate PASS evidence), `.planning/research/MD3-RESEARCH.md` (M3 grammar), `.planning/research/MINIMAL-THEME-DISSECTION.md` (`_get_base_color` formula reference).
+
+**Approved theme set (5 directions, all ship as data-only `.tres` peers):**
+| Direction | base_color | accent_color | Phase 4 implementation order |
+|---|---|---|---|
+| **Pulse** | `#151A2E` | `#8BFF6A` | implement first (the **Recommended starter**) |
+| Slate    | `#111820` | `#8BD3FF` | implement after Pulse |
+| Bubble   | `#241326` | `#FFB3E6` | implement after Pulse |
+| Daybreak | `#0B2420` | `#76F2D1` | implement after Pulse |
+| Burst    | `#20112E` | `#FFD166` | implement after Pulse |
+
+**Recommended starter:** Pulse — preloaded as the showcase scene's theme + named in the addon README's "try this first" suggestion. Soft commitment only; no architectural privilege over the other four directions. Per D-31 (CORRECTIVE-ADDENDUM 2026-05-06e/f), the recommended starter does NOT bake values into `NeoCadeTheme` class defaults.
+
+**Phase 4 file create / delete / forbid lists** (canonical version in `DESIGN_TOKENS.md` §12.1-§12.3):
+- **CREATE:** `addons/neocade_theme/neocade_theme.gd` (single concrete class, 9 `@export` properties), 5 data-only `.tres` files at addon root (`pulse_neocade_theme.tres`, `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`, `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`), addon metadata (`OFL.txt`, `LICENSE.md`, `README.md`, `CHANGELOG.md`, `VERSION`).
+- **DELETE:** `addons/neocade_theme/neocade_theme.tres` (existing empty Theme scaffold; under the locked architecture no root `.tres` ships). Deletion happens in the FIRST Phase 4 task.
+- **MUST NOT CREATE:** No per-direction `.gd` files. No `themes/` subfolder. No `_dev/` subfolder. No `neocade_mobile_theme.tres`. No `plugin.cfg`.
+
+**Phase 4 architectural lock (referenced in `DESIGN_TOKENS.md` §4):**
+- Single concrete `@tool class_name NeoCadeTheme extends Theme` at `addons/neocade_theme/neocade_theme.gd`.
+- 9 `@export` properties total — Core (4): `base_color`, `accent_color`, `raised`, `platform`. Shape (5, under `@export_group("Shape")`): `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`.
+- `is_light: bool = base_color.get_luminance() >= 0.5` computed in `_regenerate_theme()`. Dark default; flag deviates to light forward-compat.
+- Setters on every `@export` trigger `_regenerate_theme()` (Phase 3.2 6/6 strict-gate PASS pattern).
+
+**Phase 4 verification gates (referenced in `DESIGN_TOKENS.md` §12.5):**
+- All 9 `@export` properties exist with correct types/defaults/group labels.
+- `is_light` flag derives correctly from `base_color.get_luminance()`.
+- All 5 `.tres` files load successfully and produce visually distinct themes matching their Phase 3.4 mockup commitment.
+- Toggling `raised` / `platform` / `base_color` / `accent_color` produces correctly regenerated entries.
+- WCAG audit re-runs reproduce the ratios in `wcag-palette-audit.md`.
+
+### 4.5 Plan 04 closeout — final status
+
+**Plan 04 of Phase 3.4 — CLOSED.**
+
+| Task | Deliverable | Verification | Commit |
+|---|---|---|---|
+| Task 1 | final-approval prerequisite validated | PowerShell verify PASS (4/4 markers) | `cde88ee` |
+| Task 2 | `.planning/DESIGN_TOKENS.md` (12 sections, single-class/data-resource contract) | PowerShell verify PASS (15/15 markers) | `1bd4f7c` |
+| Task 3 | Phase 3.4 success-criteria audit (SC-01..SC-07 + D-01..D-27) | PowerShell verify PASS (19/19 markers) | `bb20cb1` |
+| Task 4 | forbidden-surface audit + Phase 4 handoff | PowerShell verify PASS (4/4 markers) + git-status forbidden-grep PASS | this commit |
+
+**Phase 3.4 — CLOSED.** All seven ROADMAP success criteria PASS. All 27 canonical decisions D-01..D-27 honored (D-11 n/a). All four CORRECTIVE-ADDENDUM decisions D-28..D-31 honored. Phase 4 unblocks after `/gsd-verify-work` confirms.
