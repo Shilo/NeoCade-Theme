@@ -329,6 +329,8 @@ func _regenerate_theme() -> void:
 	set_font("font_separator", "PopupMenu", caption_font)
 	set_font_size("font_size", "PopupMenu", tokens.body)
 	set_font_size("font_separator_size", "PopupMenu", tokens.label_)
+	set_font("font", "ColorPickerButton", body_font)
+	set_font_size("font_size", "ColorPickerButton", tokens.body)
 
 	_last_regeneration_usec = Time.get_ticks_usec() - t0
 	_regenerating = false
@@ -1313,11 +1315,23 @@ const BINDING_TABLE: Dictionary = {
 			"focus":    {"role": "focus_ring",
 							"radius": "shape.secondary_radius"},
 			"disabled": {"role": "surface_panel", "disabled": true,
+							"raised_intensity": 0,
 							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
 			"font_disabled_color": {"role": "text_strong", "disabled": true},
+			"font_focus_color":    {"role": "text_strong"},
+			"font_hover_color":    {"role": "text_strong"},
+			"font_outline_color":  {"role": "outline_color"},
+			"font_pressed_color":  {"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+			"outline_size": {"value": 0},
+		},
+		"icon": {
+			"bg": {"icon": "colorpicker_button_bg"},
 		},
 	},
 	# 8. ConfirmationDialog — explicit traceability entry even though Godot exposes no
