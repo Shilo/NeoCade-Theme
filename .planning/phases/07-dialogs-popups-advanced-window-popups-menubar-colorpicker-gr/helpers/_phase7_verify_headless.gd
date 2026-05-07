@@ -524,9 +524,16 @@ func assert_filedialog_stage() -> void:
 	_assert_filedialog_no_stale_entries(problems, theme)
 	_assert_filedialog_thumbnail_size(problems, theme)
 	_assert_filedialog_shell(problems, theme)
+	_assert_filedialog_icon_mapping(problems)
+	_assert_filedialog_icons_load_as_texture2d(problems, theme)
+	_assert_filedialog_thumbnail_platform_delta(problems)
+	_assert_filedialog_no_extra_artifacts(problems)
 
 	if problems.is_empty():
 		_group_ok(group, "FileDialog official color, constant, icon, and shell coverage is complete")
+		print("PHASE7_COV:COV-06 FileDialog popup-class coverage complete")
+		print("PHASE7_COV:COV-01 FileDialog contributes to desktop structural scorecard closure")
+		print("PHASE7_COV:COV-07 FileDialog shell resolves through dialog/window chrome")
 	else:
 		_group_fail(group, "; ".join(problems))
 
@@ -760,6 +767,87 @@ func _assert_filedialog_shell(problems: Array[String], theme: Theme) -> void:
 	var has_shell := theme.has_stylebox("panel", "AcceptDialog") or theme.has_stylebox("panel", "ConfirmationDialog") or theme.has_stylebox("embedded_border", "Window")
 	if not has_shell:
 		problems.append("FileDialog shell must resolve through AcceptDialog/ConfirmationDialog/Window theme entries")
+
+
+func _assert_filedialog_icon_mapping(problems: Array[String]) -> void:
+	var icon_block: Dictionary = _script_constants().get("BINDING_TABLE", {}).get("FileDialog", {}).get("icon", {})
+	var expected: Dictionary = EXPECTED_PHASE7_ICON_RECIPES["FileDialog"]
+	for slot in expected.keys():
+		if not icon_block.has(slot):
+			problems.append("FileDialog.icon missing canonical slot %s" % String(slot))
+			continue
+		var recipe: Dictionary = icon_block[slot]
+		if recipe.get("icon", "") != expected[slot]:
+			problems.append("FileDialog.icon %s expected %s got %s" % [String(slot), expected[slot], recipe.get("icon", "")])
+
+
+func _assert_filedialog_icons_load_as_texture2d(problems: Array[String], theme: Theme) -> void:
+	var expected: Dictionary = EXPECTED_PHASE7_ICON_RECIPES["FileDialog"]
+	for slot in expected.keys():
+		var slot_name := String(slot)
+		var icon_name := String(expected[slot])
+		var path := "res://addons/neocade_theme/icons/%s.svg" % icon_name
+		var loaded := load(path)
+		if not (loaded is Texture2D):
+			problems.append("FileDialog icon asset %s did not load as Texture2D" % path)
+		if theme.has_icon(slot_name, "FileDialog"):
+			var theme_icon := theme.get_icon(slot_name, "FileDialog")
+			if theme_icon == null or not (theme_icon is Texture2D):
+				problems.append("FileDialog.%s bound icon is not Texture2D" % slot_name)
+
+
+func _assert_filedialog_thumbnail_platform_delta(problems: Array[String]) -> void:
+	var desktop := NeoCadeTheme.new()
+	desktop.platform = NeoCadeTheme.Platform.DESKTOP
+	var mobile := NeoCadeTheme.new()
+	mobile.platform = NeoCadeTheme.Platform.MOBILE
+	if not desktop.has_constant("thumbnail_size", "FileDialog") or not mobile.has_constant("thumbnail_size", "FileDialog"):
+		problems.append("FileDialog.thumbnail_size missing on desktop or mobile platform instance")
+		return
+	var desktop_size := desktop.get_constant("thumbnail_size", "FileDialog")
+	var mobile_size := mobile.get_constant("thumbnail_size", "FileDialog")
+	if desktop_size != 96:
+		problems.append("FileDialog desktop thumbnail_size expected 96 got %d" % desktop_size)
+	if mobile_size <= desktop_size:
+		problems.append("FileDialog mobile thumbnail_size should exceed desktop for Phase 8 tuning, got desktop=%d mobile=%d" % [desktop_size, mobile_size])
+
+
+func _assert_filedialog_no_extra_artifacts(problems: Array[String]) -> void:
+	var expected: Dictionary = EXPECTED_PHASE7_ICON_RECIPES["FileDialog"]
+	var allowed: Array[String] = []
+	for slot in expected.keys():
+		var base := String(expected[slot])
+		allowed.append("%s.svg" % base)
+		allowed.append("%s.svg.import" % base)
+
+	var addon_dir := DirAccess.open("res://addons/neocade_theme")
+	if addon_dir == null:
+		problems.append("could not inspect addon root for FileDialog-specific artifacts")
+	else:
+		addon_dir.list_dir_begin()
+		var root_name := addon_dir.get_next()
+		while root_name != "":
+			if not addon_dir.current_is_dir():
+				var lower := root_name.to_lower()
+				if lower.find("filedialog") != -1 or lower.find("file_dialog") != -1:
+					problems.append("FileDialog-specific artifact outside icons dir: addons/neocade_theme/%s" % root_name)
+			root_name = addon_dir.get_next()
+		addon_dir.list_dir_end()
+
+	var icons_dir := DirAccess.open("res://addons/neocade_theme/icons")
+	if icons_dir == null:
+		problems.append("could not inspect icons dir for FileDialog-specific artifacts")
+		return
+	icons_dir.list_dir_begin()
+	var icon_file := icons_dir.get_next()
+	while icon_file != "":
+		if not icons_dir.current_is_dir() and icon_file.begins_with("filedialog_"):
+			if not allowed.has(icon_file):
+				problems.append("unexpected FileDialog icon-side artifact: addons/neocade_theme/icons/%s" % icon_file)
+			if not (icon_file.ends_with(".svg") or icon_file.ends_with(".svg.import")):
+				problems.append("FileDialog artifact is not SVG/import sidecar: addons/neocade_theme/icons/%s" % icon_file)
+		icon_file = icons_dir.get_next()
+	icons_dir.list_dir_end()
 
 
 func _contrast_ratio(a: Color, b: Color) -> float:
