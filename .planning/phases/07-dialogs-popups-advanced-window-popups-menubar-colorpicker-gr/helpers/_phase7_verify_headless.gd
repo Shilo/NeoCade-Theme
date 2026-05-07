@@ -507,7 +507,28 @@ func assert_popups_menus_stage() -> void:
 
 
 func assert_filedialog_stage() -> void:
-	_group_pending("assert_filedialog_stage", "Plan 07-03 owns FileDialog icons and production coverage")
+	var group := "assert_filedialog_stage"
+	var theme := _loaded_theme()
+	if theme == null:
+		_group_fail(group, "Pulse direction did not reload as NeoCadeTheme")
+		return
+
+	var problems: Array[String] = []
+	_assert_binding_key_present(problems, "FileDialog")
+	_assert_filedialog_binding_matches_official_slots(problems)
+	_append_missing_slots(problems, theme, "FileDialog", "color", ["file_disabled_color", "file_icon_color", "folder_icon_color"])
+	_append_missing_slots(problems, theme, "FileDialog", "constant", ["thumbnail_size"])
+	_append_missing_slots(problems, theme, "FileDialog", "icon", ["back_folder", "clear", "create_folder", "favorite", "favorite_down",
+		"favorite_up", "file", "file_thumbnail", "folder", "folder_thumbnail", "forward_folder", "list_mode", "load",
+		"parent_folder", "reload", "save", "sort", "thumbnail_mode", "toggle_filename_filter", "toggle_hidden"])
+	_assert_filedialog_no_stale_entries(problems, theme)
+	_assert_filedialog_thumbnail_size(problems, theme)
+	_assert_filedialog_shell(problems, theme)
+
+	if problems.is_empty():
+		_group_ok(group, "FileDialog official color, constant, icon, and shell coverage is complete")
+	else:
+		_group_fail(group, "; ".join(problems))
 
 
 func assert_colorpicker_stage() -> void:
@@ -695,6 +716,50 @@ func _assert_popupmenu_metrics(problems: Array[String], theme: Theme) -> void:
 			problems.append("PopupMenu.%s too loose for desktop density: %d" % [String(slot), value])
 	if theme.get_constant("gutter_compact", "PopupMenu") != 1:
 		problems.append("PopupMenu.gutter_compact must be 1")
+
+
+func _assert_filedialog_binding_matches_official_slots(problems: Array[String]) -> void:
+	var file_block: Dictionary = _script_constants().get("BINDING_TABLE", {}).get("FileDialog", {})
+	var expected_block: Dictionary = EXPECTED_SLOT_FREEZE["FileDialog"]
+	for raw_data_type in file_block.keys():
+		var data_type := String(raw_data_type)
+		if not expected_block.has(data_type):
+			problems.append("BINDING_TABLE.FileDialog has unsupported data type %s" % data_type)
+			continue
+		var expected_slots := _sorted_strings(expected_block[data_type])
+		var actual_slots := _sorted_slot_values(file_block.get(data_type, {}))
+		for slot in actual_slots:
+			if not expected_slots.has(slot):
+				problems.append("BINDING_TABLE.FileDialog.%s has unsupported slot %s" % [data_type, slot])
+	for raw_data_type in ["color", "constant", "icon"]:
+		var data_type := String(raw_data_type)
+		var expected_slots := _sorted_strings(expected_block[data_type])
+		var actual_slots := _sorted_slot_values(file_block.get(data_type, {}))
+		for slot in expected_slots:
+			if not actual_slots.has(slot):
+				problems.append("BINDING_TABLE.FileDialog.%s missing official slot %s" % [data_type, slot])
+
+
+func _assert_filedialog_no_stale_entries(problems: Array[String], theme: Theme) -> void:
+	var file_colors: Dictionary = _script_constants().get("BINDING_TABLE", {}).get("FileDialog", {}).get("color", {})
+	if file_colors.has("icon_normal_color"):
+		problems.append("BINDING_TABLE.FileDialog.color still has unsupported icon_normal_color")
+	if theme.has_color("icon_normal_color", "FileDialog"):
+		problems.append("loaded theme still exposes unsupported FileDialog.icon_normal_color")
+
+
+func _assert_filedialog_thumbnail_size(problems: Array[String], theme: Theme) -> void:
+	if not theme.has_constant("thumbnail_size", "FileDialog"):
+		return
+	var size := theme.get_constant("thumbnail_size", "FileDialog")
+	if size < 64 or size > 160:
+		problems.append("FileDialog.thumbnail_size must be desktop-appropriate 64..160, got %d" % size)
+
+
+func _assert_filedialog_shell(problems: Array[String], theme: Theme) -> void:
+	var has_shell := theme.has_stylebox("panel", "AcceptDialog") or theme.has_stylebox("panel", "ConfirmationDialog") or theme.has_stylebox("embedded_border", "Window")
+	if not has_shell:
+		problems.append("FileDialog shell must resolve through AcceptDialog/ConfirmationDialog/Window theme entries")
 
 
 func _contrast_ratio(a: Color, b: Color) -> float:
