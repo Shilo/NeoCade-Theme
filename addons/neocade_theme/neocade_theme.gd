@@ -950,7 +950,14 @@ const BINDING_TABLE: Dictionary = {
 			"unchecked_disabled": {"icon": "checkbutton_unchecked"},
 		},
 	},
-	# 5. CodeEdit — inherits TextEdit; Phase 4 ships base stylebox set (no syntax highlighting per AF-7)
+	# 5. CodeEdit — inherits TextEdit; Phase 4 ships base stylebox set + Phase 5
+	# Plan 05-05 finalizes text chrome (font_readonly_color, font_selected_color)
+	# matching the TextEdit row. CodeEdit syntax highlighting remains OUT OF SCOPE
+	# per FEATURES AF-7 — `assert_codeedit_no_syntax_highlighting` enforces this
+	# by failing if any keyword/function/number/symbol/string/comment slot is
+	# AUTHORED here. Gutter colors (breakpoint_color, code_folding_color,
+	# bookmark_color, executing_line_color, line_length_guideline_color) plus
+	# the `folded` icon are added by Plan 05-05 Task 2.
 	"CodeEdit": {
 		"stylebox": {
 			"normal":    {"role": "surface_low",   "raised_intensity": 0},
@@ -960,6 +967,8 @@ const BINDING_TABLE: Dictionary = {
 		"color": {
 			"font_color":            {"role": "text_default"},
 			"font_placeholder_color":{"role": "text_muted"},
+			"font_readonly_color":   {"role": "text_muted",  "disabled": true},
+			"font_selected_color":   {"role": "text_strong"},
 			"caret_color":           {"role": "role_primary"},
 			"selection_color":       {"role": "accent_offset"},
 			"current_line_color":    {"role": "surface_panel"},
