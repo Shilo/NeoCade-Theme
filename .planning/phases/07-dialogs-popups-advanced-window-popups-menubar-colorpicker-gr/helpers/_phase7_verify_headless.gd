@@ -560,10 +560,12 @@ func assert_colorpicker_stage() -> void:
 		_assert_colorpicker_icons_load_as_texture2d(problems, theme)
 		_assert_colorpicker_no_custom_rendering(problems)
 		_assert_colorpicker_no_extra_artifacts(problems)
+		_assert_colorpickerbutton_stage(problems, theme)
 
 	if problems.is_empty():
-		_group_ok(group, "ColorPicker official focus, color, constant, and icon coverage is complete")
+		_group_ok(group, "ColorPicker and ColorPickerButton official coverage is complete")
 		print("PHASE7_COV:COV-08 ColorPicker advanced-control coverage complete")
+		print("PHASE7_COV:COV-01 ColorPickerButton contributes to desktop structural scorecard closure")
 	else:
 		_group_fail(group, "; ".join(problems))
 
@@ -1005,6 +1007,103 @@ func _assert_colorpicker_no_extra_artifacts(problems: Array[String]) -> void:
 				problems.append("ColorPicker artifact is not SVG/import sidecar: addons/neocade_theme/icons/%s" % icon_file)
 		icon_file = icons_dir.get_next()
 	icons_dir.list_dir_end()
+
+
+func _assert_colorpickerbutton_stage(problems: Array[String], theme: Theme) -> void:
+	_assert_binding_key_present(problems, "ColorPickerButton")
+	_assert_colorpickerbutton_binding_matches_official_slots(problems)
+	_append_missing_slots(problems, theme, "ColorPickerButton", "stylebox", ["disabled", "focus", "hover", "normal", "pressed"])
+	_append_missing_slots(problems, theme, "ColorPickerButton", "color", ["font_color", "font_disabled_color", "font_focus_color",
+		"font_hover_color", "font_outline_color", "font_pressed_color"])
+	_append_missing_slots(problems, theme, "ColorPickerButton", "constant", ["h_separation", "outline_size"])
+	_append_missing_slots(problems, theme, "ColorPickerButton", "font", ["font"])
+	_append_missing_slots(problems, theme, "ColorPickerButton", "font_size", ["font_size"])
+	_append_missing_slots(problems, theme, "ColorPickerButton", "icon", ["bg"])
+	_assert_no_phase7_font_table_entries(problems, ["ColorPickerButton"])
+	_assert_direct_font_calls_after_binding_walk(problems, {
+		"ColorPickerButton.font": "set_font(\"font\", \"ColorPickerButton\"",
+		"ColorPickerButton.font_size": "set_font_size(\"font_size\", \"ColorPickerButton\"",
+	})
+	_assert_colorpickerbutton_icon_mapping(problems)
+	_assert_colorpickerbutton_button_family_recipes(problems)
+	_assert_colorpickerbutton_icon_loads_as_texture2d(problems, theme)
+
+
+func _assert_colorpickerbutton_binding_matches_official_slots(problems: Array[String]) -> void:
+	var button_block: Dictionary = _script_constants().get("BINDING_TABLE", {}).get("ColorPickerButton", {})
+	var expected_block: Dictionary = EXPECTED_SLOT_FREEZE["ColorPickerButton"]
+	for raw_data_type in button_block.keys():
+		var data_type := String(raw_data_type)
+		if data_type == "font" or data_type == "font_size":
+			problems.append("BINDING_TABLE.ColorPickerButton must not contain %s entries" % data_type)
+			continue
+		if not expected_block.has(data_type):
+			problems.append("BINDING_TABLE.ColorPickerButton has unsupported data type %s" % data_type)
+			continue
+		var expected_slots := _sorted_strings(expected_block[data_type])
+		var actual_slots := _sorted_slot_values(button_block.get(data_type, {}))
+		for slot in actual_slots:
+			if not expected_slots.has(slot):
+				problems.append("BINDING_TABLE.ColorPickerButton.%s has unsupported slot %s" % [data_type, slot])
+	for raw_data_type in ["stylebox", "color", "constant", "icon"]:
+		var data_type := String(raw_data_type)
+		var expected_slots := _sorted_strings(expected_block[data_type])
+		var actual_slots := _sorted_slot_values(button_block.get(data_type, {}))
+		for slot in expected_slots:
+			if not actual_slots.has(slot):
+				problems.append("BINDING_TABLE.ColorPickerButton.%s missing official slot %s" % [data_type, slot])
+
+
+func _assert_colorpickerbutton_icon_mapping(problems: Array[String]) -> void:
+	var icon_block: Dictionary = _script_constants().get("BINDING_TABLE", {}).get("ColorPickerButton", {}).get("icon", {})
+	var expected: Dictionary = EXPECTED_PHASE7_ICON_RECIPES["ColorPickerButton"]
+	for slot in expected.keys():
+		if not icon_block.has(slot):
+			problems.append("ColorPickerButton.icon missing canonical slot %s" % String(slot))
+			continue
+		var recipe: Dictionary = icon_block[slot]
+		if recipe.get("icon", "") != expected[slot]:
+			problems.append("ColorPickerButton.icon %s expected %s got %s" % [String(slot), expected[slot], recipe.get("icon", "")])
+
+
+func _assert_colorpickerbutton_button_family_recipes(problems: Array[String]) -> void:
+	var button_block: Dictionary = _script_constants().get("BINDING_TABLE", {}).get("ColorPickerButton", {})
+	var styleboxes: Dictionary = button_block.get("stylebox", {})
+	var expected_roles := {
+		"normal": "surface_panel",
+		"hover": "state_hover",
+		"pressed": "state_pressed",
+		"focus": "focus_ring",
+		"disabled": "surface_panel",
+	}
+	for slot in expected_roles.keys():
+		var recipe: Dictionary = styleboxes.get(slot, {})
+		if recipe.get("role", "") != expected_roles[slot]:
+			problems.append("ColorPickerButton.%s stylebox must follow Button-family role %s" % [String(slot), expected_roles[slot]])
+		if slot != "focus" and not recipe.has("radius"):
+			problems.append("ColorPickerButton.%s stylebox must keep Button-family radius recipe" % String(slot))
+	if styleboxes.get("disabled", {}).get("disabled", false) != true:
+		problems.append("ColorPickerButton.disabled stylebox must use disabled opacity")
+
+	var colors: Dictionary = button_block.get("color", {})
+	for slot in ["font_color", "font_focus_color", "font_hover_color", "font_pressed_color"]:
+		if colors.get(slot, {}).get("role", "") != "text_strong":
+			problems.append("ColorPickerButton.%s must use Button-family text_strong" % slot)
+	if colors.get("font_disabled_color", {}).get("disabled", false) != true:
+		problems.append("ColorPickerButton.font_disabled_color must use disabled opacity")
+	if colors.get("font_outline_color", {}).get("role", "") != "outline_color":
+		problems.append("ColorPickerButton.font_outline_color must use outline_color")
+
+
+func _assert_colorpickerbutton_icon_loads_as_texture2d(problems: Array[String], theme: Theme) -> void:
+	var path := "res://addons/neocade_theme/icons/colorpicker_button_bg.svg"
+	var loaded := load(path)
+	if not (loaded is Texture2D):
+		problems.append("ColorPickerButton bg icon asset %s did not load as Texture2D" % path)
+	if theme.has_icon("bg", "ColorPickerButton"):
+		var theme_icon := theme.get_icon("bg", "ColorPickerButton")
+		if theme_icon == null or not (theme_icon is Texture2D):
+			problems.append("ColorPickerButton.bg bound icon is not Texture2D")
 
 
 func _contrast_ratio(a: Color, b: Color) -> float:
