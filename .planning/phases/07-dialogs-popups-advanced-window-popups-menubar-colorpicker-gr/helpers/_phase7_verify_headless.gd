@@ -17,10 +17,29 @@ extends SceneTree
 const PRODUCTION_GD := "res://addons/neocade_theme/neocade_theme.gd"
 const PULSE_PATH := "res://addons/neocade_theme/pulse_neocade_theme.tres"
 const SLOT_FREEZE_PATH := "res://.planning/phases/07-dialogs-popups-advanced-window-popups-menubar-colorpicker-gr/helpers/phase7-slot-freeze.txt"
+const ROOT_FALLBACK_PATH := "res://addons/neocade_theme/neocade_theme.tres"
+
+const APPROVED_DIRECTIONS := [
+	"res://addons/neocade_theme/pulse_neocade_theme.tres",
+	"res://addons/neocade_theme/slate_neocade_theme.tres",
+	"res://addons/neocade_theme/bubble_neocade_theme.tres",
+	"res://addons/neocade_theme/daybreak_neocade_theme.tres",
+	"res://addons/neocade_theme/burst_neocade_theme.tres",
+]
 
 const EXPECTED_EXPORTS := [
 	"base_color", "accent_color", "raised", "platform",
 	"corner_radius", "spacing", "raised_strength", "focus_thickness", "outline_width",
+]
+
+const SCORECARD_37_TYPES := [
+	"AcceptDialog", "Button", "CheckBox", "CheckButton", "CodeEdit", "ColorPicker",
+	"ColorPickerButton", "ConfirmationDialog", "FileDialog", "FoldableContainer",
+	"GraphEdit", "HScrollBar", "HSlider", "HSplitContainer", "ItemList", "Label",
+	"LineEdit", "LinkButton", "MenuBar", "MenuButton", "OptionButton", "Panel",
+	"PopupMenu", "PopupPanel", "ProgressBar", "RichTextLabel", "SpinBox", "TabBar",
+	"TabContainer", "TextEdit", "TooltipLabel", "TooltipPanel", "Tree", "VScrollBar",
+	"VSlider", "VSplitContainer", "Window",
 ]
 
 const EXPECTED_SLOT_FREEZE := {
@@ -275,6 +294,8 @@ func _run() -> void:
 		assert_colorpicker_stage()
 	if ["graph", "full"].has(_stage):
 		assert_graph_stage()
+	if _stage == "full":
+		assert_full_stage()
 
 
 func _verify_helper_wiring() -> bool:
@@ -616,6 +637,30 @@ func assert_graph_stage() -> void:
 		print("PHASE7_COV:COV-08 Graph advanced-control coverage complete")
 		print("PHASE7_COV:COV-01 Graph stack closes desktop structural scorecard coverage")
 		print("PHASE7_COV:COV-09 Graph focus uses official panel_focus slots only")
+	else:
+		_group_fail(group, "; ".join(problems))
+
+
+func assert_full_stage() -> void:
+	var group := "assert_full_stage"
+	var theme := _loaded_theme()
+	var problems: Array[String] = []
+	if theme == null:
+		problems.append("could not load Pulse NeoCadeTheme resource")
+	else:
+		_assert_scorecard_37_coverage(problems, theme)
+		_assert_phase7_extra_graph_coverage(problems, theme)
+	_assert_direction_resources_data_only(problems)
+	_assert_no_root_fallback_resource(problems)
+	_assert_no_pending_groups_in_full(problems)
+
+	if problems.is_empty():
+		_group_ok(group, "full Phase 7 closure covers 37/37 scorecard rows, graph extras, and data-only direction resources")
+		print("PHASE7_COV:COV-01 desktop structural scorecard closed at 37/37")
+		print("PHASE7_COV:COV-06 popup-class coverage complete")
+		print("PHASE7_COV:COV-07 container/window chrome complete for desktop")
+		print("PHASE7_COV:COV-08 advanced-control coverage complete")
+		print("PHASE7_COV:COV-09 focus discipline preserved")
 	else:
 		_group_fail(group, "; ".join(problems))
 
@@ -1350,6 +1395,76 @@ func _assert_graph_no_extra_artifacts(problems: Array[String]) -> void:
 				problems.append("Graph artifact is not SVG/import sidecar: addons/neocade_theme/icons/%s" % icon_file)
 		icon_file = icons_dir.get_next()
 	icons_dir.list_dir_end()
+
+
+func _assert_scorecard_37_coverage(problems: Array[String], theme: Theme) -> void:
+	if SCORECARD_37_TYPES.size() != 37:
+		problems.append("SCORECARD_37_TYPES size drifted to %d" % SCORECARD_37_TYPES.size())
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	var covered: Array[String] = []
+	for type_name in SCORECARD_37_TYPES:
+		if not binding.has(type_name):
+			problems.append("BINDING_TABLE missing canonical scorecard type %s" % type_name)
+			continue
+		if not _theme_type_has_any_entry(theme, type_name):
+			problems.append("loaded theme has no generated entries for scorecard type %s" % type_name)
+			continue
+		covered.append(type_name)
+	if covered.size() != 37:
+		problems.append("desktop scorecard coverage expected 37/37 got %d/37" % covered.size())
+
+
+func _assert_phase7_extra_graph_coverage(problems: Array[String], theme: Theme) -> void:
+	for type_name in ["GraphNode", "GraphFrame"]:
+		if not _theme_type_has_any_entry(theme, type_name):
+			problems.append("Phase 7 graph extra %s has no generated theme entries" % type_name)
+
+
+func _assert_direction_resources_data_only(problems: Array[String]) -> void:
+	for path in APPROVED_DIRECTIONS:
+		var loaded := ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
+		if loaded == null or not (loaded is NeoCadeTheme):
+			problems.append("%s did not reload as NeoCadeTheme" % path)
+			continue
+		var bytes := FileAccess.get_file_as_bytes(path)
+		if bytes.is_empty():
+			problems.append("%s is missing or empty" % path)
+			continue
+		if bytes.size() >= 2048:
+			problems.append("%s size %d >= 2048 bytes" % [path, bytes.size()])
+		var text := _read_file(path)
+		if text.find("[sub_resource") != -1:
+			problems.append("%s contains [sub_resource block" % path)
+		if text.find("theme_data/") != -1:
+			problems.append("%s contains generated theme_data entry" % path)
+		if text.find("script = ExtResource(") == -1:
+			problems.append("%s missing script ExtResource linkage" % path)
+		if text.find("neocade_theme.gd") == -1:
+			problems.append("%s does not link to the single production script" % path)
+		for key in EXPECTED_EXPORTS:
+			if text.find(key + " = ") == -1:
+				problems.append("%s missing explicit export %s" % [path, key])
+
+
+func _assert_no_root_fallback_resource(problems: Array[String]) -> void:
+	if FileAccess.file_exists(ROOT_FALLBACK_PATH):
+		problems.append("root fallback resource must not exist: %s" % ROOT_FALLBACK_PATH)
+
+
+func _assert_no_pending_groups_in_full(problems: Array[String]) -> void:
+	if not _pending.is_empty():
+		problems.append("full stage still has pending verifier groups: %s" % str(_pending))
+
+
+func _theme_type_has_any_entry(theme: Theme, type_name: String) -> bool:
+	return (
+		theme.get_stylebox_list(type_name).size() > 0
+		or theme.get_color_list(type_name).size() > 0
+		or theme.get_constant_list(type_name).size() > 0
+		or theme.get_font_list(type_name).size() > 0
+		or theme.get_font_size_list(type_name).size() > 0
+		or theme.get_icon_list(type_name).size() > 0
+	)
 
 
 func _contrast_ratio(a: Color, b: Color) -> float:
