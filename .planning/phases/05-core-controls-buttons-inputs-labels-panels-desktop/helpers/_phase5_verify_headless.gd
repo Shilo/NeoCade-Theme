@@ -22,6 +22,13 @@ extends SceneTree
 ##            assert_shape_lookup_integrity, assert_shape_value_integrity,
 ##            assert_shape_recipe_resolution, assert_semantic_role_table,
 ##            assert_no_invented_focus_combos, assert_no_theme_clear.
+##   text-panels  Plan 05-04 staged enforcement. Treats text/label/panel-variation
+##            groups as strict while leaving SpinBox/CodeEdit groups in
+##            tooling/PENDING mode. Strict in the text-panels stage:
+##            assert_variation_count_15, assert_inf_text_normal_font_size,
+##            assert_kicker_chrome, assert_text_label_variation_chrome,
+##            assert_panel_variation_chrome, assert_no_letter_spacing_claim,
+##            assert_no_theme_clear, assert_no_invented_focus_combos.
 ##   strict   Future stage (Plans 05-03..05-07). Treats every PENDING marker as a
 ##            failure and exits non-zero. Wired now so later plans only need to
 ##            change the --stage argument; they do not need to re-author the
@@ -234,8 +241,8 @@ func _parse_args() -> void:
 			i += 1
 		if found:
 			break
-	if _stage != "tooling" and _stage != "strict" and _stage != "shape" and _stage != "buttons":
-		push_error("PHASE5_VERIFY FAIL: unknown --stage '%s' (expected tooling|shape|buttons|strict)" % _stage)
+	if _stage != "tooling" and _stage != "strict" and _stage != "shape" and _stage != "buttons" and _stage != "text-panels":
+		push_error("PHASE5_VERIFY FAIL: unknown --stage '%s' (expected tooling|shape|buttons|text-panels|strict)" % _stage)
 		_stage = "tooling"
 	print("PHASE5_VERIFY: stage=%s" % _stage)
 
@@ -271,6 +278,12 @@ func _run_verifier() -> void:
 	# Plan 05-03 Task 2 polish groups.
 	assert_basebutton_family_shape_aware()
 	assert_checkbox_disabled_icon_reuse()
+	# Plan 05-04 groups (text/label/panel variation chrome + no-letter-spacing-
+	# claim guard). Strict in the `text-panels` stage; tooling elsewhere.
+	assert_no_letter_spacing_claim()
+	assert_kicker_chrome()
+	assert_text_label_variation_chrome()
+	assert_panel_variation_chrome()
 
 
 func _verify_helper_wiring() -> bool:
@@ -327,16 +340,32 @@ func assert_inf_text_normal_font_size() -> void:
 	var group := "assert_inf_text_normal_font_size"
 	var theme := _load_pulse_for_group(group)
 	if theme == null: return
-	var has_normal_size: bool = theme.has_font_size("normal_font_size", "InfoText")
-	var has_wrong_size: bool = theme.has_font_size("font_size", "InfoText")
-	var has_normal_font: bool = theme.has_font("normal_font", "InfoText")
-	if has_normal_size and not has_wrong_size and has_normal_font:
-		_group_ok(group, "InfoText: normal_font set, normal_font_size set, wrong font_size absent")
+	# Plan 05-04 Rule 1 fix: theme.has_font_size walks the type-variation/base-
+	# type inheritance chain AND reports any slot that is documented on the
+	# Control class (e.g., RichTextLabel exposes both `font` and `normal_font`
+	# — Godot returns true for has_font_size("font_size", "InfoText") even when
+	# our generator never set that slot, because the slot exists on the
+	# underlying RichTextLabel type signature).
+	#
+	# The correct test for "explicitly set vs inherited/built-in default" is
+	# `get_font_size_list("InfoText")`, which returns ONLY the slots the
+	# generator authored. Empirical proof captured in
+	# .../helpers/_phase5_diag_inftext.gd: get_font_size_list("InfoText")
+	# returns ["normal_font_size"] when the generator omits font_size, and
+	# ["font_size", "normal_font_size"] when both are set.
+	var size_list: PackedStringArray = theme.get_font_size_list("InfoText")
+	var has_normal_size: bool = (size_list.find("normal_font_size") != -1)
+	var has_wrong_size_authored: bool = (size_list.find("font_size") != -1)
+	var font_list: PackedStringArray = theme.get_font_list("InfoText")
+	var has_normal_font: bool = (font_list.find("normal_font") != -1)
+	if has_normal_size and not has_wrong_size_authored and has_normal_font:
+		_group_ok(group, "InfoText: normal_font set, normal_font_size set, wrong font_size NOT authored (only inherited slot signature, which Godot can't suppress)")
 	else:
 		var details := PackedStringArray()
-		details.append("normal_font_size present=" + str(has_normal_size))
-		details.append("font_size (wrong) present=" + str(has_wrong_size))
-		details.append("normal_font present=" + str(has_normal_font))
+		details.append("normal_font_size authored=" + str(has_normal_size))
+		details.append("font_size authored (must be false)=" + str(has_wrong_size_authored))
+		details.append("normal_font authored=" + str(has_normal_font))
+		details.append("get_font_size_list=" + str(size_list))
 		_group_pending(group, "InfoText size slot not yet at Phase 5 contract: %s" % ", ".join(details))
 
 
@@ -1366,6 +1395,251 @@ func assert_basebutton_family_chrome() -> void:
 		_group_pending(group, "; ".join(problems))
 
 
+# ----- assertion group: no fake letter_spacing claim (Plan 05-04 Task 1) -----
+##
+## Per plan 05-04 Test 5 + DESIGN_TOKENS §8.6 + research constraint: official
+## Godot 4.6 Label theme properties do not expose a Theme-level letter-spacing
+## slot. The Kicker variation may set font, font_size, and font_color only.
+## Tracking/uppercase is content/showcase behavior unless a verified Godot API
+## is found during execution.
+##
+## This group scans the production class source for the literal token
+## "letter_spacing"; if it appears anywhere outside a comment, the verifier
+## fails. If a future Godot release exposes such a constant, the implementer
+## can add a documented citation (Godot 4.6 docs URL) plus a precise
+## introspection assertion proving the constant exists, then this scan can be
+## relaxed -- but never silently.
+func assert_no_letter_spacing_claim() -> void:
+	var group := "assert_no_letter_spacing_claim"
+	var src_text := _read_production_source()
+	if src_text.is_empty():
+		_group_fail(group, "could not read production source")
+		return
+	# Strip comment-only lines so the docstring/comment narrative around this
+	# decision (which legitimately mentions "letter_spacing") isn't flagged.
+	var clean_lines: Array[String] = []
+	for line in src_text.split("\n"):
+		var stripped: String = line.strip_edges()
+		if stripped.begins_with("#"):
+			continue
+		clean_lines.append(line)
+	var clean_text := "\n".join(clean_lines)
+	if clean_text.find("letter_spacing") != -1:
+		var hits: Array[String] = []
+		for line in clean_text.split("\n"):
+			if line.find("letter_spacing") != -1:
+				hits.append(line.strip_edges())
+		_group_fail(group, "production class references `letter_spacing` outside comments (no verified Godot 4.6 API): " + "; ".join(hits))
+		return
+	_group_ok(group, "no `letter_spacing` Theme constant claim in production source (Theme owns font/size/color only for Kicker)")
+
+
+# ----- assertion group: Kicker variation chrome (Plan 05-04 Task 1 + 2) -----
+##
+## Per D-09 / D-10 / DESIGN_TOKENS §8.6 / PITFALLS 1.2:
+##   - TYPE_VARIATIONS["Kicker"] == "Label" (Test 1 / 2 in plan).
+##   - set_font("font", "Kicker", body_font) explicitly (PITFALLS 1.2).
+##   - set_font_size("font_size", "Kicker", tokens.kicker) explicitly.
+##   - font_color differs by direction's `shape.kicker_style` enum:
+##       Pulse  ("uppercase-tracked-accent")     -> role_primary
+##       Slate  ("small-caps-subtle")            -> text_muted
+##       Bubble ("uppercase-tracked-accent")     -> role_primary
+##       Daybreak ("sentence-case-accent")       -> role_primary
+##       Burst  ("uppercase-bold-larger-scale")  -> role_primary
+##     Distinct color expectation: Slate Kicker font_color must equal text_muted
+##     (visibly different from accent on its dark base) while the other 4
+##     directions resolve to role_primary (each their own accent color).
+##
+## The group loads each direction `.tres` and asserts (a) Kicker font + size
+## are present (via get_*_list — has_* walks inheritance and reports built-in
+## Control class slot signatures, masking missing AUTHORED set_*() calls),
+## (b) font_color resolves per the direction's kicker_style.
+func assert_kicker_chrome() -> void:
+	var group := "assert_kicker_chrome"
+	# Phase A: TYPE_VARIATIONS map has Kicker -> Label (also covered by
+	# assert_variation_count_15 but worth duplicating here so this group can be
+	# read in isolation).
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var type_variations: Dictionary = theme.get_script().get_script_constant_map().get("TYPE_VARIATIONS", {})
+	if not type_variations.has("Kicker"):
+		_group_pending(group, "TYPE_VARIATIONS missing `Kicker` (Plan 05-04 Task 1 not done)")
+		return
+	if String(type_variations["Kicker"]) != "Label":
+		_group_fail(group, "TYPE_VARIATIONS['Kicker'] = '%s' (expected 'Label')" % str(type_variations["Kicker"]))
+		return
+	# Phase B: Kicker has explicit font + font_size on every direction (PITFALLS 1.2).
+	# Per direction, font_color must dispatch from the kicker_style enum.
+	var per_direction_expected := {
+		"151A2E": {"role": "role_primary", "kicker_style": "uppercase-tracked-accent"},
+		"111820": {"role": "text_muted",   "kicker_style": "small-caps-subtle"},
+		"241326": {"role": "role_primary", "kicker_style": "uppercase-tracked-accent"},
+		"0B2420": {"role": "role_primary", "kicker_style": "sentence-case-accent"},
+		"20112E": {"role": "role_primary", "kicker_style": "uppercase-bold-larger-scale"},
+	}
+	var problems: Array[String] = []
+	# Reuse the .tres path map from the shape-lookup-integrity group.
+	for hex_key in PHASE5_DIRECTION_TRES_PATHS.keys():
+		var tres_path: String = PHASE5_DIRECTION_TRES_PATHS[hex_key]
+		var loaded: Resource = ResourceLoader.load(tres_path)
+		if loaded == null or not (loaded is NeoCadeTheme):
+			problems.append("could not load %s" % tres_path)
+			continue
+		var t: NeoCadeTheme = loaded
+		# Explicit font + size per Pitfall 1.2 — use get_*_list so we test for
+		# AUTHORED slots, not Godot-inherited Control class defaults.
+		# (Empirical proof: _phase5_diag_inftext.gd shows has_font_size returns
+		# true for inherited slot signatures even when set_*() never authored.)
+		var k_font_list: PackedStringArray = t.get_font_list("Kicker")
+		var k_size_list: PackedStringArray = t.get_font_size_list("Kicker")
+		if k_font_list.find("font") == -1:
+			problems.append("%s missing Kicker.font (not authored)" % tres_path)
+		if k_size_list.find("font_size") == -1:
+			problems.append("%s missing Kicker.font_size (not authored)" % tres_path)
+		# kicker_style enum match against DIRECTION_PRESETS.
+		var expected_meta: Dictionary = per_direction_expected[hex_key]
+		var resolved_presets: Dictionary = t.call("_resolve_direction_presets")
+		if not resolved_presets.has("shape"):
+			problems.append("%s presets has no shape" % tres_path)
+			continue
+		var actual_kicker_style: String = String(resolved_presets.shape.get("kicker_style", ""))
+		if actual_kicker_style != String(expected_meta["kicker_style"]):
+			problems.append("%s shape.kicker_style = '%s' (expected '%s')" % [tres_path, actual_kicker_style, expected_meta["kicker_style"]])
+		# Color check: assert font_color is AUTHORED and resolves to the right
+		# semantic color for the kicker_style enum. role_primary == accent_color
+		# on every direction; text_muted == #B9C1D0 on every dark base (all 5
+		# approved directions are dark per DESIGN_TOKENS §6.4).
+		var k_color_list: PackedStringArray = t.get_color_list("Kicker")
+		if k_color_list.find("font_color") != -1:
+			var actual_color: Color = t.get_color("font_color", "Kicker")
+			if String(expected_meta["role"]) == "role_primary":
+				if not actual_color.is_equal_approx(t.accent_color):
+					problems.append("%s Kicker.font_color = %s (expected accent %s for kicker_style '%s')" % [tres_path, actual_color.to_html(false), t.accent_color.to_html(false), actual_kicker_style])
+			elif String(expected_meta["role"]) == "text_muted":
+				var expected_muted := Color("#B9C1D0")
+				if not actual_color.is_equal_approx(expected_muted):
+					problems.append("%s Kicker.font_color = %s (expected text_muted %s for kicker_style '%s')" % [tres_path, actual_color.to_html(false), expected_muted.to_html(false), actual_kicker_style])
+		else:
+			problems.append("%s missing Kicker.font_color (Plan 05-04 Task 2)" % tres_path)
+	if problems.is_empty():
+		_group_ok(group, "Kicker variation registered, font/size set, font_color dispatches per kicker_style enum on all 5 directions")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+# ----- assertion group: text/label/RTL variation chrome (Plan 05-04 Task 2) -----
+##
+## Per TYPEVAR-02 / TYPEVAR-03 / TYPEVAR-05 + DESIGN_TOKENS §8.5:
+##   - HeaderLarge / HeaderMedium / HeaderSmall / Caption / CodeLabel exist
+##     and have explicit font + font_size + font_color.
+##   - InfoText (RichTextLabel variation) uses normal_font / normal_font_size
+##     (BL-02 fix carry-forward) and has default_color authored.
+##
+## Color contract: Header* and Caption resolve to text_strong (no per-direction
+## override at variation level); InfoText default_color resolves to text_default.
+## CodeLabel uses text_strong by default. Plan 05-04 Task 2 wires per-direction
+## color tints if needed, but the v1 baseline uses the global text_* roles.
+##
+## Uses get_*_list to test for AUTHORED slots — has_* walks inheritance and
+## reports Godot-built-in Control class defaults, which would mask missing
+## explicit set_font / set_font_size / set_color calls.
+func assert_text_label_variation_chrome() -> void:
+	var group := "assert_text_label_variation_chrome"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	var label_variations := ["HeaderLarge", "HeaderMedium", "HeaderSmall", "Caption", "CodeLabel"]
+	for v in label_variations:
+		# Phase 4 already authored font + font_size; Phase 5 must NOT regress that.
+		if theme.get_font_list(v).find("font") == -1:
+			problems.append("%s missing font (not authored)" % v)
+		if theme.get_font_size_list(v).find("font_size") == -1:
+			problems.append("%s missing font_size (not authored)" % v)
+		# Plan 05-04 Task 2 mandate: each label variation has font_color
+		# explicitly authored via BINDING_TABLE so the color refreshes per
+		# direction on theme regenerate.
+		if theme.get_color_list(v).find("font_color") == -1:
+			problems.append("%s missing font_color (Plan 05-04 Task 2)" % v)
+	# InfoText is a RichTextLabel variation: D-16 / BL-02 says it uses
+	# `normal_font` and `normal_font_size`, NOT `font` / `font_size`.
+	var info_font_list: PackedStringArray = theme.get_font_list("InfoText")
+	var info_size_list: PackedStringArray = theme.get_font_size_list("InfoText")
+	var info_color_list: PackedStringArray = theme.get_color_list("InfoText")
+	if info_font_list.find("normal_font") == -1:
+		problems.append("InfoText missing normal_font (BL-02)")
+	if info_size_list.find("normal_font_size") == -1:
+		problems.append("InfoText missing normal_font_size (Plan 05-04 Task 1)")
+	if info_size_list.find("font_size") != -1:
+		problems.append("InfoText has wrong `font_size` slot authored (D-16 BL-02 fix forbids it)")
+	# default_color is the RichTextLabel body color slot.
+	if info_color_list.find("default_color") == -1:
+		problems.append("InfoText missing default_color (Plan 05-04 Task 2)")
+	if problems.is_empty():
+		_group_ok(group, "Label variations + InfoText have correct font/font_size/font_color slots")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+# ----- assertion group: panel-variation chrome (Plan 05-04 Task 3) -----
+##
+## Per TYPEVAR-04 + COV-07 (in-progress) + DESIGN_TOKENS §5.1-§5.5:
+##   - CardPanel and HeroPanel each have a `panel` stylebox.
+##   - The stylebox is direction-specific: corner_radius reads from
+##     shape.card_radius / shape.hero_radius, alpha from
+##     shape.surface_alpha_panels, raised intensity from
+##     shape.raised_lifts.panel.
+##   - Panel and PanelContainer (base classes) keep their `panel` stylebox
+##     but read direction-specific surface_alpha_panels.
+##
+## The verifier loads every approved direction `.tres` and asserts CardPanel /
+## HeroPanel `panel` styleboxes are AUTHORED (via get_stylebox_list — has_*
+## walks inheritance) AND that corner_radius_top_left matches the expected
+## per-direction card_radius / hero_radius.
+func assert_panel_variation_chrome() -> void:
+	var group := "assert_panel_variation_chrome"
+	# Per-direction expected radii (sourced from DIRECTION_PRESETS.shape).
+	var expected_radius := {
+		"151A2E": {"card": 0,  "hero": 0},   # Pulse: rectangular
+		"111820": {"card": 14, "hero": 14},  # Slate: rounded
+		"241326": {"card": 26, "hero": 26},  # Bubble: pillowy
+		"0B2420": {"card": 8,  "hero": 8},   # Daybreak: airy
+		"20112E": {"card": 18, "hero": 18},  # Burst: statement
+	}
+	var problems: Array[String] = []
+	for hex_key in PHASE5_DIRECTION_TRES_PATHS.keys():
+		var tres_path: String = PHASE5_DIRECTION_TRES_PATHS[hex_key]
+		var loaded: Resource = ResourceLoader.load(tres_path)
+		if loaded == null or not (loaded is NeoCadeTheme):
+			problems.append("could not load %s" % tres_path)
+			continue
+		var t: NeoCadeTheme = loaded
+		# Base classes still have a panel stylebox after Phase 5 (carried
+		# forward from Phase 4). Use get_stylebox_list so we check authored
+		# styleboxes only; has_stylebox walks inheritance and would obscure
+		# whether NeoCadeTheme actually authored the slot.
+		for base_t in ["Panel", "PanelContainer"]:
+			if t.get_stylebox_list(base_t).find("panel") == -1:
+				problems.append("%s %s missing panel stylebox (not authored)" % [tres_path, base_t])
+		# Variations must have the panel stylebox AND match radius.
+		for v in ["CardPanel", "HeroPanel"]:
+			if t.get_stylebox_list(v).find("panel") == -1:
+				problems.append("%s %s missing panel stylebox (Plan 05-04 Task 3)" % [tres_path, v])
+				continue
+			var sb: StyleBox = t.get_stylebox("panel", v)
+			if not (sb is StyleBoxFlat):
+				problems.append("%s %s panel is not a StyleBoxFlat (got %s)" % [tres_path, v, sb.get_class()])
+				continue
+			var sbf: StyleBoxFlat = sb
+			var key: String = "card" if v == "CardPanel" else "hero"
+			var expected: int = expected_radius[hex_key][key]
+			if sbf.corner_radius_top_left != expected:
+				problems.append("%s %s.panel corner_radius_top_left = %d (expected %d from shape.%s_radius)" % [tres_path, v, sbf.corner_radius_top_left, expected, key])
+	if problems.is_empty():
+		_group_ok(group, "CardPanel + HeroPanel panel styleboxes match per-direction shape.{card,hero}_radius on all 5 directions; Panel/PanelContainer baselines preserved")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
 # ----- helpers -----
 
 func _load_pulse_for_group(group: String) -> NeoCadeTheme:
@@ -1429,12 +1703,27 @@ func _group_pending(group: String, detail: String) -> void:
 		"assert_no_invented_focus_combos",
 		"assert_no_theme_clear",
 	]
+	# Plan 05-04 strict list: text/label/panel variation chrome + InfoText slot
+	# fix + 15-variation count + no-letter-spacing-claim guard. Shape-stage
+	# guards (no_theme_clear / no_invented_focus_combos) carry forward strict.
+	var text_panels_stage_strict := [
+		"assert_variation_count_15",
+		"assert_inf_text_normal_font_size",
+		"assert_kicker_chrome",
+		"assert_text_label_variation_chrome",
+		"assert_panel_variation_chrome",
+		"assert_no_letter_spacing_claim",
+		"assert_no_theme_clear",
+		"assert_no_invented_focus_combos",
+	]
 	var fail: bool = false
 	if _stage == "strict":
 		fail = true
 	elif _stage == "shape" and group in shape_stage_strict:
 		fail = true
 	elif _stage == "buttons" and group in buttons_stage_strict:
+		fail = true
+	elif _stage == "text-panels" and group in text_panels_stage_strict:
 		fail = true
 	if fail:
 		var label: String = _stage.to_upper()
@@ -1455,8 +1744,8 @@ func _group_fail(group: String, detail: String) -> void:
 func _emit_summary_and_quit() -> void:
 	print("----- PHASE5_VERIFY summary -----")
 	print("  stage:          %s" % _stage)
-	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 = 19.
-	print("  groups OK:      %d / %d" % [_ok_markers.size(), 19])
+	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 + Plan 05-04 added 4 = 23.
+	print("  groups OK:      %d / %d" % [_ok_markers.size(), 23])
 	print("  groups PENDING: %d  %s" % [_pending.size(), str(_pending)])
 	print("  failures:       %d" % _failures.size())
 	for f in _failures:

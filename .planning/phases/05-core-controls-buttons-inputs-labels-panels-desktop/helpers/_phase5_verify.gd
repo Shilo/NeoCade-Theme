@@ -29,6 +29,12 @@ extends EditorScript
 ##   - assert_dangerbutton_role_danger
 ##   - assert_basebutton_family_chrome
 ##
+## Plan 05-04 added text-panels-stage groups (TYPEVAR-02..05 + D-09 + BL-02):
+##   - assert_no_letter_spacing_claim
+##   - assert_kicker_chrome
+##   - assert_text_label_variation_chrome
+##   - assert_panel_variation_chrome
+##
 ## Per D-07: Phase 5 verifier MUST NOT reference invented `pressed_focus`,
 ## `checked_focus`, or `hover_pressed_focus` slots. Focus is the official
 ## `focus` overlay only.
@@ -116,6 +122,12 @@ func _run() -> void:
 	# Plan 05-03 Task 2 polish.
 	assert_basebutton_family_shape_aware()
 	assert_checkbox_disabled_icon_reuse()
+	# Plan 05-04 groups (text/label/panel variation chrome + no-letter-spacing-
+	# claim guard).
+	assert_no_letter_spacing_claim()
+	assert_kicker_chrome()
+	assert_text_label_variation_chrome()
+	assert_panel_variation_chrome()
 	_emit_summary()
 
 
@@ -158,16 +170,22 @@ func assert_inf_text_normal_font_size() -> void:
 	var group := "assert_inf_text_normal_font_size"
 	var theme := _load_pulse_for_group(group)
 	if theme == null: return
-	var has_normal_size: bool = theme.has_font_size("normal_font_size", "InfoText")
-	var has_wrong_size: bool = theme.has_font_size("font_size", "InfoText")
-	var has_normal_font: bool = theme.has_font("normal_font", "InfoText")
-	if has_normal_size and not has_wrong_size and has_normal_font:
-		_group_ok(group, "InfoText: normal_font set, normal_font_size set, wrong font_size absent")
+	# Plan 05-04 Rule 1 fix: theme.has_font_size walks inheritance and reports
+	# Control class signatures, masking missing AUTHORED set_*() calls. Use
+	# get_font_size_list to test for explicitly-set slots only.
+	var size_list: PackedStringArray = theme.get_font_size_list("InfoText")
+	var has_normal_size: bool = (size_list.find("normal_font_size") != -1)
+	var has_wrong_size_authored: bool = (size_list.find("font_size") != -1)
+	var font_list: PackedStringArray = theme.get_font_list("InfoText")
+	var has_normal_font: bool = (font_list.find("normal_font") != -1)
+	if has_normal_size and not has_wrong_size_authored and has_normal_font:
+		_group_ok(group, "InfoText: normal_font set, normal_font_size set, wrong font_size NOT authored")
 	else:
 		var details := PackedStringArray()
-		details.append("normal_font_size present=" + str(has_normal_size))
-		details.append("font_size (wrong) present=" + str(has_wrong_size))
-		details.append("normal_font present=" + str(has_normal_font))
+		details.append("normal_font_size authored=" + str(has_normal_size))
+		details.append("font_size authored (must be false)=" + str(has_wrong_size_authored))
+		details.append("normal_font authored=" + str(has_normal_font))
+		details.append("get_font_size_list=" + str(size_list))
 		_group_pending(group, "InfoText size slot not yet at Phase 5 contract: %s" % ", ".join(details))
 
 
@@ -773,6 +791,163 @@ func assert_no_invented_focus_combos() -> void:
 		_group_fail(group, "D-07 violation: " + "; ".join(violations))
 
 
+# ----- Plan 05-04 assertion groups (text/label/panel variations) -----
+
+func assert_no_letter_spacing_claim() -> void:
+	var group := "assert_no_letter_spacing_claim"
+	var f := FileAccess.open(PRODUCTION_GD, FileAccess.READ)
+	if f == null:
+		_group_fail(group, "could not read production source")
+		return
+	var src_text: String = f.get_as_text()
+	f.close()
+	# Strip comment-only lines so the docstring narrative around this decision
+	# (which legitimately mentions "letter_spacing") isn't flagged.
+	var clean_lines: Array[String] = []
+	for line in src_text.split("\n"):
+		var stripped: String = line.strip_edges()
+		if stripped.begins_with("#"):
+			continue
+		clean_lines.append(line)
+	var clean_text := "\n".join(clean_lines)
+	if clean_text.find("letter_spacing") != -1:
+		var hits: Array[String] = []
+		for line in clean_text.split("\n"):
+			if line.find("letter_spacing") != -1:
+				hits.append(line.strip_edges())
+		_group_fail(group, "production class references `letter_spacing` outside comments (no verified Godot 4.6 API): " + "; ".join(hits))
+		return
+	_group_ok(group, "no `letter_spacing` Theme constant claim in production source (Theme owns font/size/color only for Kicker)")
+
+
+func assert_kicker_chrome() -> void:
+	var group := "assert_kicker_chrome"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var type_variations: Dictionary = theme.get_script().get_script_constant_map().get("TYPE_VARIATIONS", {})
+	if not type_variations.has("Kicker"):
+		_group_pending(group, "TYPE_VARIATIONS missing `Kicker` (Plan 05-04 Task 1 not done)")
+		return
+	if String(type_variations["Kicker"]) != "Label":
+		_group_fail(group, "TYPE_VARIATIONS['Kicker'] = '%s' (expected 'Label')" % str(type_variations["Kicker"]))
+		return
+	var per_direction_expected := {
+		"151A2E": {"role": "role_primary", "kicker_style": "uppercase-tracked-accent"},
+		"111820": {"role": "text_muted",   "kicker_style": "small-caps-subtle"},
+		"241326": {"role": "role_primary", "kicker_style": "uppercase-tracked-accent"},
+		"0B2420": {"role": "role_primary", "kicker_style": "sentence-case-accent"},
+		"20112E": {"role": "role_primary", "kicker_style": "uppercase-bold-larger-scale"},
+	}
+	var problems: Array[String] = []
+	for hex_key in PHASE5_DIRECTION_TRES_PATHS.keys():
+		var tres_path: String = PHASE5_DIRECTION_TRES_PATHS[hex_key]
+		var loaded: Resource = ResourceLoader.load(tres_path)
+		if loaded == null or not (loaded is NeoCadeTheme):
+			problems.append("could not load %s" % tres_path)
+			continue
+		var t: NeoCadeTheme = loaded
+		# Use get_*_list — has_* walks inheritance and reports built-in slots.
+		var k_font_list: PackedStringArray = t.get_font_list("Kicker")
+		var k_size_list: PackedStringArray = t.get_font_size_list("Kicker")
+		if k_font_list.find("font") == -1:
+			problems.append("%s missing Kicker.font (not authored)" % tres_path)
+		if k_size_list.find("font_size") == -1:
+			problems.append("%s missing Kicker.font_size (not authored)" % tres_path)
+		var expected_meta: Dictionary = per_direction_expected[hex_key]
+		var resolved_presets: Dictionary = t.call("_resolve_direction_presets")
+		if not resolved_presets.has("shape"):
+			problems.append("%s presets has no shape" % tres_path)
+			continue
+		var actual_kicker_style: String = String(resolved_presets.shape.get("kicker_style", ""))
+		if actual_kicker_style != String(expected_meta["kicker_style"]):
+			problems.append("%s shape.kicker_style = '%s' (expected '%s')" % [tres_path, actual_kicker_style, expected_meta["kicker_style"]])
+		var k_color_list: PackedStringArray = t.get_color_list("Kicker")
+		if k_color_list.find("font_color") != -1:
+			var actual_color: Color = t.get_color("font_color", "Kicker")
+			if String(expected_meta["role"]) == "role_primary":
+				if not actual_color.is_equal_approx(t.accent_color):
+					problems.append("%s Kicker.font_color = %s (expected accent %s for kicker_style '%s')" % [tres_path, actual_color.to_html(false), t.accent_color.to_html(false), actual_kicker_style])
+			elif String(expected_meta["role"]) == "text_muted":
+				var expected_muted := Color("#B9C1D0")
+				if not actual_color.is_equal_approx(expected_muted):
+					problems.append("%s Kicker.font_color = %s (expected text_muted %s for kicker_style '%s')" % [tres_path, actual_color.to_html(false), expected_muted.to_html(false), actual_kicker_style])
+		else:
+			problems.append("%s missing Kicker.font_color (Plan 05-04 Task 2)" % tres_path)
+	if problems.is_empty():
+		_group_ok(group, "Kicker variation registered, font/size set, font_color dispatches per kicker_style enum on all 5 directions")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+func assert_text_label_variation_chrome() -> void:
+	var group := "assert_text_label_variation_chrome"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	var label_variations := ["HeaderLarge", "HeaderMedium", "HeaderSmall", "Caption", "CodeLabel"]
+	for v in label_variations:
+		if theme.get_font_list(v).find("font") == -1:
+			problems.append("%s missing font (not authored)" % v)
+		if theme.get_font_size_list(v).find("font_size") == -1:
+			problems.append("%s missing font_size (not authored)" % v)
+		if theme.get_color_list(v).find("font_color") == -1:
+			problems.append("%s missing font_color (Plan 05-04 Task 2)" % v)
+	var info_font_list: PackedStringArray = theme.get_font_list("InfoText")
+	var info_size_list: PackedStringArray = theme.get_font_size_list("InfoText")
+	var info_color_list: PackedStringArray = theme.get_color_list("InfoText")
+	if info_font_list.find("normal_font") == -1:
+		problems.append("InfoText missing normal_font (BL-02)")
+	if info_size_list.find("normal_font_size") == -1:
+		problems.append("InfoText missing normal_font_size (Plan 05-04 Task 1)")
+	if info_size_list.find("font_size") != -1:
+		problems.append("InfoText has wrong `font_size` slot authored (D-16 BL-02 fix forbids it)")
+	if info_color_list.find("default_color") == -1:
+		problems.append("InfoText missing default_color (Plan 05-04 Task 2)")
+	if problems.is_empty():
+		_group_ok(group, "Label variations + InfoText have correct font/font_size/font_color slots")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+func assert_panel_variation_chrome() -> void:
+	var group := "assert_panel_variation_chrome"
+	var expected_radius := {
+		"151A2E": {"card": 0,  "hero": 0},
+		"111820": {"card": 14, "hero": 14},
+		"241326": {"card": 26, "hero": 26},
+		"0B2420": {"card": 8,  "hero": 8},
+		"20112E": {"card": 18, "hero": 18},
+	}
+	var problems: Array[String] = []
+	for hex_key in PHASE5_DIRECTION_TRES_PATHS.keys():
+		var tres_path: String = PHASE5_DIRECTION_TRES_PATHS[hex_key]
+		var loaded: Resource = ResourceLoader.load(tres_path)
+		if loaded == null or not (loaded is NeoCadeTheme):
+			problems.append("could not load %s" % tres_path)
+			continue
+		var t: NeoCadeTheme = loaded
+		for base_t in ["Panel", "PanelContainer"]:
+			if t.get_stylebox_list(base_t).find("panel") == -1:
+				problems.append("%s %s missing panel stylebox (not authored)" % [tres_path, base_t])
+		for v in ["CardPanel", "HeroPanel"]:
+			if t.get_stylebox_list(v).find("panel") == -1:
+				problems.append("%s %s missing panel stylebox (Plan 05-04 Task 3)" % [tres_path, v])
+				continue
+			var sb: StyleBox = t.get_stylebox("panel", v)
+			if not (sb is StyleBoxFlat):
+				problems.append("%s %s panel is not a StyleBoxFlat (got %s)" % [tres_path, v, sb.get_class()])
+				continue
+			var sbf: StyleBoxFlat = sb
+			var key: String = "card" if v == "CardPanel" else "hero"
+			var expected: int = expected_radius[hex_key][key]
+			if sbf.corner_radius_top_left != expected:
+				problems.append("%s %s.panel corner_radius_top_left = %d (expected %d from shape.%s_radius)" % [tres_path, v, sbf.corner_radius_top_left, expected, key])
+	if problems.is_empty():
+		_group_ok(group, "CardPanel + HeroPanel panel styleboxes match per-direction shape.{card,hero}_radius on all 5 directions")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
 # ----- shared helpers -----
 
 func _load_pulse_for_group(group: String) -> NeoCadeTheme:
@@ -818,12 +993,24 @@ func _group_pending(group: String, detail: String) -> void:
 		"assert_no_invented_focus_combos",
 		"assert_no_theme_clear",
 	]
+	var text_panels_stage_strict := [
+		"assert_variation_count_15",
+		"assert_inf_text_normal_font_size",
+		"assert_kicker_chrome",
+		"assert_text_label_variation_chrome",
+		"assert_panel_variation_chrome",
+		"assert_no_letter_spacing_claim",
+		"assert_no_theme_clear",
+		"assert_no_invented_focus_combos",
+	]
 	var fail: bool = false
 	if _stage == "strict":
 		fail = true
 	elif _stage == "shape" and group in shape_stage_strict:
 		fail = true
 	elif _stage == "buttons" and group in buttons_stage_strict:
+		fail = true
+	elif _stage == "text-panels" and group in text_panels_stage_strict:
 		fail = true
 	if fail:
 		var label: String = _stage.to_upper()
@@ -844,8 +1031,8 @@ func _group_fail(group: String, detail: String) -> void:
 func _emit_summary() -> void:
 	print("----- PHASE5_VERIFY summary -----")
 	print("  stage:          %s" % _stage)
-	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 = 19.
-	print("  groups OK:      %d / %d" % [_ok_markers.size(), 19])
+	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 + Plan 05-04 added 4 = 23.
+	print("  groups OK:      %d / %d" % [_ok_markers.size(), 23])
 	print("  groups PENDING: %d  %s" % [_pending.size(), str(_pending)])
 	print("  failures:       %d" % _failures.size())
 	for f in _failures:

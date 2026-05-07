@@ -8,3 +8,7 @@ helpers/godot-cli-provenance.txt
 
 # GODOT-CLI-MISSING.md IS committed when present (it documents a checkpoint
 # state for the next agent), so it is not ignored here.
+
+# Per-executor verifier wrapper (ad-hoc convenience; the real verify recipes
+# live inline in the per-task PLAN <verify> blocks).
+helpers/_run-verifier.ps1
