@@ -8,8 +8,8 @@ extends SceneTree
 ##
 ## Stages:
 ##   slot-freeze        Strict foundation gate for Plan 06-01.
-##   tree               Future Plan 06-02 group placeholder.
-##   itemlist-foldable  Future Plan 06-03 group placeholder.
+##   tree               Tree gate from Plan 06-02.
+##   itemlist-foldable  ItemList and FoldableContainer gate from Plan 06-03.
 ##   tabs               Future Plan 06-04 group placeholder.
 ##   range-containers   Future Plan 06-05 group placeholder.
 ##   full               Fails while any future group is pending.
@@ -209,10 +209,14 @@ func _run() -> void:
 	assert_one_addon_root_gd()
 	assert_public_export_lock()
 	assert_slot_freeze_artifact()
-	assert_tree_stage()
-	assert_itemlist_foldable_stage_pending()
-	assert_tabs_stage_pending()
-	assert_range_containers_stage_pending()
+	if ["tree", "itemlist-foldable", "tabs", "range-containers", "full"].has(_stage):
+		assert_tree_stage()
+	if ["itemlist-foldable", "tabs", "range-containers", "full"].has(_stage):
+		assert_itemlist_foldable_stage()
+	if ["tabs", "range-containers", "full"].has(_stage):
+		assert_tabs_stage_pending()
+	if ["range-containers", "full"].has(_stage):
+		assert_range_containers_stage_pending()
 
 
 func _verify_helper_wiring() -> bool:
@@ -385,9 +389,15 @@ func assert_tree_stage() -> void:
 		_group_fail(group, "; ".join(problems))
 
 
-func assert_itemlist_foldable_stage_pending() -> void:
+func assert_itemlist_foldable_stage() -> void:
+	var failure_count := _failures.size()
 	assert_itemlist_stage()
 	assert_foldable_stage()
+	if _failures.size() == failure_count:
+		print("PHASE6_COVERAGE_OK:COV-05 ItemList and FoldableContainer list/control coverage contribution enforced")
+		print("PHASE6_COVERAGE_OK:COV-01 ItemList and FoldableContainer contribute to cumulative 37-Control scorecard")
+		print("PHASE6_COVERAGE_OK:COV-09 ItemList and FoldableContainer use official focus slots")
+		print("PHASE6_CARRY_FORWARD:TYPEVAR-06 ItemList density and Foldable disclosure behavior to document in Phase 8 final variation/mobile spec")
 
 
 func assert_tabs_stage_pending() -> void:
