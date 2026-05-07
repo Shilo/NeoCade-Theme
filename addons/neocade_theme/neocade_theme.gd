@@ -1352,6 +1352,264 @@ const BINDING_TABLE: Dictionary = {
 			"title_height":   {"value": 28},
 		},
 	},
+	# ─── TYPEVAR-01 button variations (Plan 05-03 Task 1) ──────────────────────────────────────
+	# Variation chrome flows through BINDING_TABLE recipes per D-01 (additive iteration only),
+	# D-02 (per-direction shape via DIRECTION_PRESETS.shape), D-03 (recipe schema reads
+	# `shape.<key>` lookups via _lookup_shape), D-04 (closed-enum strategy dispatch via
+	# _apply_primary_strategy / _apply_ghost_strategy added by Plan 05-02 Task 2), and D-07
+	# (focus is the official `focus` overlay only — no pressed_focus / checked_focus / etc.).
+	#
+	# Each variation populates the canonical 6-state Button slot set
+	# (normal/hover/pressed/focus/disabled/hover_pressed) plus font_color slots so Godot's
+	# Button renderer reads them. Phase 4 already wires explicit set_font + set_font_size for
+	# these variations (see _regenerate_theme() lines 205-226) — Plan 05-03 only adds chrome.
+	# 38. PrimaryButton — primary brand action, accent fill via shape.primary_strategy.
+	#
+	# Per-direction recipe data wiring:
+	#   - radius:           shape.primary_radius     (Pulse 0 / Slate 14 / Bubble 999 pill /
+	#                                                 Daybreak 8 / Burst 28 oversized)
+	#   - padding:          shape.primary_padding    (Vector2i per FOUND-02; Pulse 14×10 /
+	#                                                 Slate 16×11 / Bubble 20×14 / Daybreak
+	#                                                 18×12 / Burst 20×14)
+	#   - raised_intensity: shape.raised_lifts.primary (Pulse 3 / Slate 2 / Bubble 6 /
+	#                                                   Daybreak 3 / Burst 5)
+	#   - strategy:         shape.primary_strategy   (5 closed-enum dispatchers in
+	#                                                 _apply_primary_strategy)
+	# `pressed` and `disabled` skip strategy dispatch (sink/disable states stay literal so
+	# the user's mental model of "pressed = darker" stays consistent across directions).
+	"PrimaryButton": {
+		"stylebox": {
+			"normal":        {"role": "role_primary",  "raised_intensity": "shape.raised_lifts.primary",
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"strategy": "shape.primary_strategy"},
+			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.primary",
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"strategy": "shape.primary_strategy"},
+			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+			"focus":         {"role": "focus_ring",
+								"radius": "shape.primary_radius"},
+			"disabled":      {"role": "role_primary",  "disabled": true, "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+		},
+		"color": {
+			"font_color":              {"role": "text_strong"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_strong", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_strong"},
+			"icon_hover_color":        {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_focus_color":        {"role": "text_strong"},
+			"icon_disabled_color":     {"role": "text_strong", "disabled": true},
+			"icon_hover_pressed_color":{"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	# 39. SecondaryButton — alternate action, surface_panel bg, no strategy override.
+	# Uses shape.secondary_radius (per-direction secondary chrome family) and shape.primary_padding
+	# for parity with primary content metrics. Lifts at shape.raised_lifts.secondary (smaller
+	# than primary so the visual hierarchy is preserved when raised=true).
+	"SecondaryButton": {
+		"stylebox": {
+			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"focus":         {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+		},
+		"color": {
+			"font_color":              {"role": "text_strong"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_strong", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_strong"},
+			"icon_hover_color":        {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_focus_color":        {"role": "text_strong"},
+			"icon_disabled_color":     {"role": "text_strong", "disabled": true},
+			"icon_hover_pressed_color":{"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	# 40. GhostButton — outlined / transparent bg via shape.ghost_strategy.
+	# Surface_panel as the recipe `role` provides a non-null bg_color to start from; the ghost
+	# strategy overrides bg_color = TRANSPARENT and applies the per-direction outline
+	# (Pulse 2px accent / Slate 1px accent / Bubble 2px accent + radius 999 / Daybreak 1px
+	# outline_color / Burst 2px accent). Padding mirrors PrimaryButton for visual rhythm.
+	"GhostButton": {
+		"stylebox": {
+			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"strategy": "shape.ghost_strategy"},
+			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.ghost",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"strategy": "shape.ghost_strategy"},
+			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"focus":         {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"strategy": "shape.ghost_strategy"},
+			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+		},
+		"color": {
+			"font_color":              {"role": "role_primary"},
+			"font_hover_color":        {"role": "role_primary"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "role_primary"},
+			"font_disabled_color":     {"role": "role_primary", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "role_primary"},
+			"icon_hover_color":        {"role": "role_primary"},
+			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_focus_color":        {"role": "role_primary"},
+			"icon_disabled_color":     {"role": "role_primary", "disabled": true},
+			"icon_hover_pressed_color":{"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	# 41. DangerButton — destructive action; bg = role_danger (DESIGN_TOKENS §7.1 #FF6E6E
+	# default; per-direction overrides plug into DIRECTION_PRESETS.shape.* in v2 per
+	# Plan 05-02 Task 2 docstring). Plan 05-02 added role_danger to role_table so this
+	# binding does NOT silently fall back to surface_panel (review HIGH gate).
+	# DangerButton uses primary radius/padding (the danger CTA is a primary-grade action).
+	"DangerButton": {
+		"stylebox": {
+			"normal":        {"role": "role_danger",   "raised_intensity": "shape.raised_lifts.primary",
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+			"hover":         {"role": "role_danger",   "raised_intensity": "shape.raised_lifts.primary",
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"alpha": 0.92},
+			"pressed":       {"role": "role_danger",   "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"alpha": 0.78},
+			"focus":         {"role": "focus_ring",
+								"radius": "shape.primary_radius"},
+			"disabled":      {"role": "role_danger",   "disabled": true, "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+			"hover_pressed":{"role": "role_danger",   "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"alpha": 0.78},
+		},
+		"color": {
+			"font_color":              {"role": "text_strong"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_strong", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_strong"},
+			"icon_hover_color":        {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_focus_color":        {"role": "text_strong"},
+			"icon_disabled_color":     {"role": "text_strong", "disabled": true},
+			"icon_hover_pressed_color":{"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	# 42. IconButton — compact, borderless square chrome optimised for an icon glyph.
+	# Uses tokens.tapPadding directly (NOT shape.primary_padding) so the icon stays
+	# centered in a square hit area regardless of direction. Shape.secondary_radius
+	# provides the per-direction corner softness (Pulse 0 rectangular / Slate 14 / Bubble 26 /
+	# Daybreak 8 / Burst 18). Lifts at shape.raised_lifts.ghost so it reads as a "subtle"
+	# affordance compared to primary chrome.
+	"IconButton": {
+		"stylebox": {
+			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
+								"radius": "shape.secondary_radius"},
+			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.ghost",
+								"radius": "shape.secondary_radius"},
+			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius"},
+			"focus":         {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+								"radius": "shape.secondary_radius"},
+			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius"},
+		},
+		"color": {
+			"font_color":              {"role": "text_strong"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_strong", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_default"},
+			"icon_hover_color":        {"role": "role_primary"},
+			"icon_pressed_color":      {"role": "role_primary"},
+			"icon_focus_color":        {"role": "role_primary"},
+			"icon_disabled_color":     {"role": "text_muted",  "disabled": true},
+			"icon_hover_pressed_color":{"role": "role_primary"},
+		},
+		"constant": {
+			"h_separation": {"value": 0},
+		},
+	},
+	# 43. FlatButton — borderless / fully transparent normal state; visible only on hover/
+	# pressed/focus. Per CONTEXT.md TYPEVAR-01: this is the RUNTIME variation, NOT the
+	# editor-only `FlatButton` class. Surface_panel role keeps the slot populated; the
+	# alpha=0.0 zeroes the bg so users see only state-layer changes when interacting.
+	# Never lifts (raised_intensity=0 across all states) — flat by definition.
+	"FlatButton": {
+		"stylebox": {
+			"normal":        {"role": "surface_panel", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"alpha": 0.0},
+			"hover":         {"role": "state_hover",   "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"focus":         {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"alpha": 0.0},
+			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+		},
+		"color": {
+			"font_color":              {"role": "text_default"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_default", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_default"},
+			"icon_hover_color":        {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_focus_color":        {"role": "text_strong"},
+			"icon_disabled_color":     {"role": "text_default", "disabled": true},
+			"icon_hover_pressed_color":{"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+		},
+	},
 }
 
 
