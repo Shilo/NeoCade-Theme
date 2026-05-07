@@ -148,6 +148,21 @@ const EXPECTED_SLOT_FREEZE := {
 	"VSeparator": {"stylebox": ["separator"], "constant": ["separation"]},
 }
 
+const EXPECTED_TREE_ICON_RECIPES := {
+	"arrow": "disclosure_expanded",
+	"arrow_collapsed": "disclosure_collapsed",
+	"arrow_collapsed_mirrored": "disclosure_collapsed_mirrored",
+	"checked": "checkbox_checked",
+	"checked_disabled": "checkbox_checked",
+	"unchecked": "checkbox_unchecked",
+	"unchecked_disabled": "checkbox_unchecked",
+	"indeterminate": "tree_indeterminate",
+	"indeterminate_disabled": "tree_indeterminate",
+	"scroll_hint": "tree_scroll_hint",
+	"select_arrow": "tree_select_arrow",
+	"updown": "tree_updown",
+}
+
 var _stage := "slot-freeze"
 var _failures: Array[String] = []
 var _pending: Array[String] = []
@@ -183,7 +198,7 @@ func _run() -> void:
 	assert_one_addon_root_gd()
 	assert_public_export_lock()
 	assert_slot_freeze_artifact()
-	assert_tree_stage_pending()
+	assert_tree_stage()
 	assert_itemlist_foldable_stage_pending()
 	assert_tabs_stage_pending()
 	assert_range_containers_stage_pending()
@@ -336,8 +351,23 @@ func assert_slot_freeze_artifact() -> void:
 		_group_fail(group, "slot-freeze artifact missing: " + ", ".join(missing))
 
 
-func assert_tree_stage_pending() -> void:
-	_group_pending("assert_tree_stage", "Tree polish and icon groups are owned by Plan 06-02")
+func assert_tree_stage() -> void:
+	var group := "assert_tree_stage"
+	var loaded := ResourceLoader.load(PULSE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE)
+	if loaded == null or not (loaded is NeoCadeTheme):
+		_group_fail(group, "Pulse direction did not load as NeoCadeTheme")
+		return
+	var theme: NeoCadeTheme = loaded
+	var problems: Array[String] = []
+	_assert_tree_slots_present(theme, problems)
+	_assert_tree_cursor_overlays(theme, problems)
+	_assert_tree_focus_discipline(theme, problems)
+	_assert_tree_line_colors(theme, problems)
+	_assert_tree_icon_recipes(problems)
+	if problems.is_empty():
+		_group_ok(group, "Tree official slots, role colors, focus, fonts, constants, and icons are covered")
+	else:
+		_group_fail(group, "; ".join(problems))
 
 
 func assert_itemlist_foldable_stage_pending() -> void:
@@ -350,6 +380,106 @@ func assert_tabs_stage_pending() -> void:
 
 func assert_range_containers_stage_pending() -> void:
 	_group_pending("assert_range_containers_stage", "Range and container polish groups are owned by Plan 06-05")
+
+
+func _assert_tree_slots_present(theme: Theme, problems: Array[String]) -> void:
+	var expected: Dictionary = EXPECTED_SLOT_FREEZE.Tree
+	for slot in expected.stylebox:
+		if not theme.has_stylebox(slot, "Tree"):
+			problems.append("Tree.stylebox missing %s" % slot)
+	for slot in expected.color:
+		if not theme.has_color(slot, "Tree"):
+			problems.append("Tree.color missing %s" % slot)
+	for slot in expected.constant:
+		if not theme.has_constant(slot, "Tree"):
+			problems.append("Tree.constant missing %s" % slot)
+	for slot in expected.font:
+		if not theme.has_font(slot, "Tree"):
+			problems.append("Tree.font missing %s" % slot)
+	for slot in expected.font_size:
+		if not theme.has_font_size(slot, "Tree"):
+			problems.append("Tree.font_size missing %s" % slot)
+	for slot in expected.icon:
+		if not theme.has_icon(slot, "Tree"):
+			problems.append("Tree.icon missing %s" % slot)
+
+
+func _assert_tree_cursor_overlays(theme: Theme, problems: Array[String]) -> void:
+	for slot in ["cursor", "cursor_unfocused", "hovered", "hovered_dimmed"]:
+		var sb := theme.get_stylebox(slot, "Tree") as StyleBoxFlat
+		if sb == null:
+			problems.append("Tree.%s is not a StyleBoxFlat" % slot)
+			continue
+		if sb.bg_color.a >= 1.0:
+			problems.append("Tree.%s overlay is opaque (alpha=%s)" % [slot, str(sb.bg_color.a)])
+
+
+func _assert_tree_focus_discipline(theme: Theme, problems: Array[String]) -> void:
+	var focus := theme.get_stylebox("focus", "Tree") as StyleBoxFlat
+	if focus == null:
+		problems.append("Tree.focus is not a StyleBoxFlat")
+	else:
+		if focus.bg_color.a != 0.0:
+			problems.append("Tree.focus background is not transparent")
+		if focus.border_width_left <= 0 or focus.border_width_top <= 0:
+			problems.append("Tree.focus has no outer border ring")
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	var tree_style: Dictionary = binding.get("Tree", {}).get("stylebox", {})
+	for invalid in ["pressed_focus", "checked_focus", "hover_pressed", "hovered_focus", "selected_hover_focus"]:
+		if tree_style.has(invalid):
+			problems.append("Tree.stylebox has invented combo focus slot %s" % invalid)
+
+
+func _assert_tree_line_colors(theme: NeoCadeTheme, problems: Array[String]) -> void:
+	var base: Color = theme.base_color
+	var accent: Color = theme.accent_color
+	var presets := _direction_presets_for_theme(theme)
+	var spread_factor: float = float(presets.get("spread_factor", 1.0))
+	var elevate_target := Color.BLACK if theme.is_light else Color.WHITE
+	var expected_outline := _mix_color(base, elevate_target, 0.24 * spread_factor)
+	var outline_slots := [
+		"guide_color",
+		"relationship_line_color",
+		"parent_hl_line_color",
+		"children_hl_line_color",
+	]
+	for slot in outline_slots:
+		if not _color_close(theme.get_color(slot, "Tree"), expected_outline):
+			problems.append("Tree.%s does not match derived outline role" % slot)
+	if not _color_close(theme.get_color("drop_position_color", "Tree"), accent):
+		problems.append("Tree.drop_position_color does not match role_primary/accent")
+
+
+func _assert_tree_icon_recipes(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	var tree_icons: Dictionary = binding.get("Tree", {}).get("icon", {})
+	for slot in EXPECTED_TREE_ICON_RECIPES.keys():
+		var expected_icon: String = EXPECTED_TREE_ICON_RECIPES[slot]
+		var recipe: Dictionary = tree_icons.get(slot, {})
+		var actual_icon: String = recipe.get("icon", "")
+		if actual_icon != expected_icon:
+			problems.append("Tree.icon recipe %s expected %s got %s" % [slot, expected_icon, actual_icon])
+
+
+func _direction_presets_for_theme(theme: NeoCadeTheme) -> Dictionary:
+	var constants := _script_constants()
+	var presets: Dictionary = constants.get("DIRECTION_PRESETS", {})
+	var fallback: Dictionary = constants.get("DIRECTION_PRESET_DEFAULT", {})
+	var key := theme.base_color.to_html(false).to_upper()
+	return presets.get(key, fallback)
+
+
+func _mix_color(a: Color, b: Color, amount: float) -> Color:
+	return Color(
+		a.r + (b.r - a.r) * amount,
+		a.g + (b.g - a.g) * amount,
+		a.b + (b.b - a.b) * amount,
+		1.0
+	)
+
+
+func _color_close(a: Color, b: Color, tolerance := 0.004) -> bool:
+	return abs(a.r - b.r) <= tolerance and abs(a.g - b.g) <= tolerance and abs(a.b - b.b) <= tolerance and abs(a.a - b.a) <= tolerance
 
 
 func _script_constants() -> Dictionary:
