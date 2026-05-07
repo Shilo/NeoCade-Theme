@@ -1,0 +1,224 @@
+# BINDING_TABLE_SEED — placeholder (Godot CLI unavailable in executor environment)
+# Source: documented placeholder per Plan 04-05 Cycle 6 F7 fallback ("Run that helper if Godot CLI
+#   is on PATH; otherwise commit the helper + a documented placeholder seed and proceed.")
+# Generated: 2026-05-06 placeholder; real introspection deferred to a Godot-equipped environment.
+# Consume: Task 2 of Plan 04-05 — slot lists per (Type, datatype) become BINDING_TABLE keys.
+#
+# This placeholder is REPLACED on first run of:
+#   godot --headless --editor --script .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_introspect.gd
+# in any environment where Godot 4.6 is on PATH (e.g., user's local Godot install). The slot
+# names listed below are the Plan 04-05 / MINIMAL-THEME-DISSECTION.md authoritative values
+# carried forward as a stand-in until empirical introspection runs. The Cycle 6 F4 root cause
+# (CheckButton dissection said `on`/`off`; Godot 4.6 actually uses `checked`/`unchecked`) is
+# already corrected in this placeholder per the Phase 4 plan freeze.
+
+## Button
+  stylebox: disabled, focus, hover, hover_pressed, hover_pressed_mirrored, normal, normal_mirrored, pressed, pressed_mirrored
+  color: font_color, font_disabled_color, font_focus_color, font_hover_color, font_hover_pressed_color, font_outline_color, font_pressed_color, icon_disabled_color, icon_focus_color, icon_hover_color, icon_hover_pressed_color, icon_normal_color, icon_pressed_color
+  constant: align_to_largest_stylebox, h_separation, icon_max_width, outline_size
+
+## CheckBox
+  stylebox: disabled, focus, hover, hover_pressed, normal, pressed
+  color: font_color, font_disabled_color, font_focus_color, font_hover_color, font_hover_pressed_color, font_outline_color, font_pressed_color
+  constant: check_v_offset, h_separation, icon_max_width, outline_size
+  icon: checked, checked_disabled, radio_checked, radio_checked_disabled, radio_unchecked, radio_unchecked_disabled, unchecked, unchecked_disabled
+
+## CheckButton
+  stylebox: disabled, focus, hover, hover_pressed, normal, pressed
+  color: font_color, font_disabled_color, font_focus_color, font_hover_color, font_hover_pressed_color, font_outline_color, font_pressed_color
+  constant: check_v_offset, h_separation, icon_max_width, outline_size
+  icon: checked, checked_disabled, checked_disabled_mirrored, checked_mirrored, unchecked, unchecked_disabled, unchecked_disabled_mirrored, unchecked_mirrored
+
+## OptionButton
+  stylebox: disabled, disabled_mirrored, focus, hover, hover_mirrored, hover_pressed, hover_pressed_mirrored, normal, normal_mirrored, pressed, pressed_mirrored
+  color: font_color, font_disabled_color, font_focus_color, font_hover_color, font_hover_pressed_color, font_outline_color, font_pressed_color
+  constant: arrow_margin, h_separation, icon_max_width, modulate_arrow, outline_size
+  icon: arrow
+
+## MenuButton
+  stylebox: disabled, focus, hover, hover_pressed, normal, pressed
+  color: font_color, font_disabled_color, font_focus_color, font_hover_color, font_hover_pressed_color, font_outline_color, font_pressed_color
+  constant: h_separation, icon_max_width, outline_size
+
+## MenuBar
+  stylebox: disabled, hover, normal, pressed
+  color: font_color, font_disabled_color, font_focus_color, font_hover_color, font_hover_pressed_color, font_outline_color, font_pressed_color
+  constant: h_separation, outline_size
+
+## LinkButton
+  color: font_color, font_disabled_color, font_focus_color, font_hover_color, font_hover_pressed_color, font_outline_color, font_pressed_color
+  constant: outline_size, underline_spacing
+
+## LineEdit
+  stylebox: focus, normal, read_only
+  color: caret_color, clear_button_color, clear_button_color_pressed, font_color, font_outline_color, font_placeholder_color, font_selected_color, font_uneditable_color, selection_color
+  constant: caret_width, minimum_character_width, outline_size
+  icon: clear
+
+## TextEdit
+  stylebox: focus, normal, read_only
+  color: background_color, caret_background_color, caret_color, current_line_color, font_color, font_outline_color, font_placeholder_color, font_readonly_color, font_selected_color, search_result_border_color, search_result_color, selection_color, word_highlighted_color
+  constant: line_spacing, outline_size
+  icon: space, tab
+
+## CodeEdit
+  stylebox: focus, normal, read_only
+  color: background_color, bookmark_color, brace_mismatch_color, breakpoint_color, caret_background_color, caret_color, code_folding_color, current_line_color, executing_line_color, folded_code_region_color, font_color, font_outline_color, font_placeholder_color, font_readonly_color, font_selected_color, line_length_guideline_color, line_number_color, search_result_border_color, search_result_color, selection_color, word_highlighted_color
+  constant: completion_lines, completion_max_width, completion_scroll_max_width, completion_scroll_width, line_spacing, outline_size
+  icon: bookmark, breakpoint, can_fold, can_fold_code_region, executing_line, folded, folded_code_region, folded_eol_icon, space, tab
+
+## RichTextLabel
+  stylebox: focus, normal
+  color: default_color, font_outline_color, font_selected_color, font_shadow_color, selection_color, table_border, table_even_row_bg, table_odd_row_bg
+  constant: line_separation, outline_size, shadow_offset_x, shadow_offset_y, shadow_outline_size, table_h_separation, table_v_separation, text_highlight_h_padding, text_highlight_v_padding
+
+## Label
+  stylebox: normal
+  color: font_color, font_outline_color, font_shadow_color
+  constant: line_spacing, outline_size, shadow_offset_x, shadow_offset_y, shadow_outline_size
+
+## SpinBox
+  color: down_background_disabled_icon_modulate, down_background_hovered_icon_modulate, down_background_icon_modulate, down_background_pressed_icon_modulate, down_disabled_icon_modulate, down_hovered_icon_modulate, down_icon_modulate, down_pressed_icon_modulate, up_background_disabled_icon_modulate, up_background_hovered_icon_modulate, up_background_icon_modulate, up_background_pressed_icon_modulate, up_disabled_icon_modulate, up_hovered_icon_modulate, up_icon_modulate, up_pressed_icon_modulate
+  constant: buttons_vertical_separation, buttons_width, field_and_buttons_separation
+  icon: updown
+
+## ProgressBar
+  stylebox: background, fill
+  color: font_color, font_outline_color
+  constant: outline_size
+
+## HSlider
+  stylebox: grabber_area, grabber_area_highlight, slider
+  constant: center_grabber, grabber_offset
+  icon: grabber, grabber_disabled, grabber_highlight, tick
+
+## VSlider
+  stylebox: grabber_area, grabber_area_highlight, slider
+  constant: center_grabber, grabber_offset
+  icon: grabber, grabber_disabled, grabber_highlight, tick
+
+## HScrollBar
+  stylebox: grabber, grabber_highlight, grabber_pressed, scroll, scroll_focus
+  icon: decrement, decrement_highlight, decrement_pressed, increment, increment_highlight, increment_pressed
+
+## VScrollBar
+  stylebox: grabber, grabber_highlight, grabber_pressed, scroll, scroll_focus
+  icon: decrement, decrement_highlight, decrement_pressed, increment, increment_highlight, increment_pressed
+
+## Tree
+  stylebox: button_hover, button_pressed, custom_button_hover, custom_button_pressed, cursor, cursor_unfocused, focus, hover, hovered_selected, hovered_selected_focus, panel, selected, selected_focus, title_button_hover, title_button_normal, title_button_pressed
+  color: children_hl_line_color, custom_button_font_highlight, drop_position_color, font_color, font_outline_color, font_selected_color, guide_color, parent_hl_line_color, relationship_line_color
+  constant: button_margin, draw_guides, draw_relationship_lines, h_separation, icon_max_width, inner_item_margin_bottom, inner_item_margin_left, inner_item_margin_right, inner_item_margin_top, item_margin, outline_size, parent_hl_line_blend, parent_hl_line_margin, relationship_line_width, scroll_border, scroll_speed, scrollbar_h_separation, scrollbar_margin_bottom, scrollbar_margin_left, scrollbar_margin_right, scrollbar_margin_top, scrollbar_v_separation, v_separation
+  icon: arrow, arrow_collapsed, arrow_collapsed_mirrored, checked, checked_disabled, indeterminate, indeterminate_disabled, select_arrow, unchecked, unchecked_disabled, updown
+
+## ItemList
+  stylebox: cursor, cursor_unfocused, focus, hovered, hovered_selected, hovered_selected_focus, panel, selected, selected_focus
+  color: font_color, font_hovered_color, font_hovered_selected_color, font_outline_color, font_selected_color, guide_color
+  constant: h_separation, icon_margin, line_separation, outline_size, v_separation
+
+## TabBar
+  stylebox: tab_disabled, tab_focus, tab_hovered, tab_selected, tab_unselected
+  color: drop_mark_color, font_disabled_color, font_hovered_color, font_outline_color, font_selected_color, font_unselected_color, icon_disabled_color, icon_hovered_color, icon_selected_color, icon_unselected_color
+  constant: h_separation, icon_max_width, outline_size
+  icon: close, decrement, decrement_highlight, drop_mark, increment, increment_highlight
+
+## TabContainer
+  stylebox: panel, tab_disabled, tab_focus, tab_hovered, tab_selected, tab_unselected, tabbar_background
+  color: drop_mark_color, font_disabled_color, font_hovered_color, font_outline_color, font_selected_color, font_unselected_color, icon_disabled_color, icon_hovered_color, icon_selected_color, icon_unselected_color, side_margin
+  constant: icon_max_width, outline_size, side_margin
+  icon: decrement, decrement_highlight, drop_mark, increment, increment_highlight, menu, menu_highlight
+
+## PanelContainer
+  stylebox: panel
+
+## Panel
+  stylebox: panel
+
+## PopupPanel
+  stylebox: panel
+
+## PopupMenu
+  stylebox: hover, labeled_separator_left, labeled_separator_right, panel, separator
+  color: font_accelerator_color, font_color, font_disabled_color, font_hover_color, font_outline_color, font_separator_color, font_separator_outline_color
+  constant: h_separation, icon_max_width, indent, item_end_padding, item_start_padding, outline_size, separator_outline_size, v_separation
+  icon: checked, checked_disabled, radio_checked, radio_checked_disabled, radio_unchecked, radio_unchecked_disabled, submenu, submenu_mirrored, unchecked, unchecked_disabled, visibility_hidden, visibility_visible, visibility_xray
+
+## TooltipPanel
+  stylebox: panel
+  color: font_color, font_outline_color
+  constant: outline_size
+
+## TooltipLabel
+  color: font_color, font_outline_color, font_shadow_color
+  constant: outline_size, shadow_offset_x, shadow_offset_y, shadow_outline_size
+
+## AcceptDialog
+  stylebox: panel
+  constant: buttons_min_height, buttons_min_width, buttons_separation, margin_bottom, margin_left, margin_right, margin_top
+
+## ConfirmationDialog
+  stylebox: panel
+  constant: buttons_min_height, buttons_min_width, buttons_separation, margin_bottom, margin_left, margin_right, margin_top
+
+## FileDialog
+  color: file_disabled_color, file_icon_color, folder_icon_color, icon_disabled_color, icon_hover_color, icon_normal_color, icon_pressed_color, message_color
+  icon: back_folder, create_folder, file, file_thumbnail, folder, forward_folder, parent_folder, reload, toggle_filename_filter, toggle_hidden
+
+## Window
+  stylebox: embedded_border, embedded_unfocused_border
+  color: title_color, title_outline_modulate
+  constant: close_h_offset, close_v_offset, resize_margin, title_height, title_outline_size
+  icon: close, close_pressed
+
+## HSeparator
+  constant: separation
+
+## VSeparator
+  constant: separation
+
+## HSplitContainer
+  constant: autohide, minimum_grab_thickness, separation
+  icon: grabber
+
+## VSplitContainer
+  constant: autohide, minimum_grab_thickness, separation
+  icon: grabber
+
+## HFlowContainer
+  constant: h_separation, v_separation
+
+## ColorPicker
+  color: focused_not_editing_cursor_color
+  constant: center_slider_grabbers, label_width, margin, sample_revert_h_margin, sv_height, sv_width
+  icon: add_preset, bar_arrow, color_hue, color_okhsl_hue, color_script, eyedropper, expanded_arrow, folded_arrow, hex_icon, hex_code_icon, menu_option, overbright_indicator, picker_cursor, picker_cursor_bg, picker_hue, picker_shape_circle, picker_shape_okhsl_circle, picker_shape_rectangle, picker_shape_rectangle_wheel, sample_bg, sample_revert, screen_picker, shape_circle, shape_rect, shape_rect_wheel
+
+## ColorPickerButton
+  stylebox: disabled, focus, hover, normal, pressed
+  color: font_color, font_disabled_color, font_focus_color, font_hover_color, font_outline_color, font_pressed_color, icon_disabled_color, icon_focus_color, icon_hover_color, icon_normal_color, icon_pressed_color
+  constant: h_separation, icon_max_width, outline_size
+  icon: bg
+
+## GraphEdit
+  stylebox: menu_panel, panel
+  color: activity, connection_hover_tint_color, connection_rim_color, connection_valid_target_tint_color, grid_major, grid_minor, selection_fill, selection_stroke
+  constant: connection_hover_thickness, connection_lines_antialiased, connection_lines_curvature, connection_lines_thickness, port_hotzone_inner_extent, port_hotzone_outer_extent
+  icon: grid_toggle, layout, minimap, more, reset, snapping_toggle, zoom_in, zoom_out, zoom_reset
+
+## GraphFrame
+  stylebox: panel, panel_selected, titlebar, titlebar_selected
+  color: resizer_color
+  constant: resize_margin, title_h_offset, title_offset, title_v_offset
+  icon: resizer
+
+## GraphNode
+  stylebox: panel, panel_selected, slot, titlebar, titlebar_selected
+  color: resizer_color
+  constant: port_h_offset, port_offset, separation, title_h_offset, title_offset, title_v_offset
+  icon: port, resizer
+
+## FoldableContainer
+  stylebox: focus, panel, title_collapsed, title_collapsed_hover, title_hover, title_panel
+  color: collapsed_font_color, font_color, font_hover_color, font_outline_color, hovered_font_color, title_collapsed_font_color, title_font_color, title_hover_font_color, title_outline_color
+  constant: h_separation, outline_size
+  icon: collapsed_arrow, collapsed_arrow_mirrored, expanded_arrow
+
