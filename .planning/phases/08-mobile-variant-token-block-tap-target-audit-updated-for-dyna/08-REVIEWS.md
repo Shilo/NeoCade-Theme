@@ -1,8 +1,8 @@
 ---
 phase: 8
 reviewers: [opencode]
-reviewed_at: 2026-05-07T05:04:28.6230464-07:00
-cycle: 1
+reviewed_at: 2026-05-07T05:20:17.7026428-07:00
+cycle: 2
 plans_reviewed:
   - 08-01-PLAN.md
   - 08-02-PLAN.md
@@ -16,108 +16,89 @@ plans_reviewed:
 ## OpenCode Review
 
 **Reviewer:** OpenCode / DeepSeek V4 Pro
-**Cycle:** 1 of `/gsd-plan-review-convergence 8 --opencode --chain --auto`
+**Cycle:** 2 of /gsd-plan-review-convergence 8 --opencode --chain --auto
+**Reviewer normalization:** OpenCode follow-up confirmed current_high=0 and current_high_section=none after the raw review emitted one. while listing no HIGH concerns.
 
 ---
 
-## 1. Summary
+# Cross-AI Plan Review - Phase 8 Cycle 2
 
-The five-wave plan is structurally sound, mirrors the successful Phase 6/7 verifier-first pattern, and protects the locked 9-export dynamic architecture. Sequential dependencies are rational: foundation -> production hardening -> strict audit -> documentation -> scene closure. The plans collectively address all ten required REQ-IDs (MOBILE-01..08, DOCS-02, TYPEVAR-06). However, one direct requirements conflict (HeaderLarge font-size delta contradicts MOBILE-03), underspecified audit formulas, and an unresolved 13-vs-15 type-variation discrepancy will cause rework or false passes if not corrected before execution.
+## Summary
 
----
+All five revised plans are substantively improved over Cycle 1. The plans now contain a complete executable tap-target formula contract (37-row table with per-row proxy formulas), unambiguous heading-parity enforcement matching MOBILE-03/D-08, and a clear resolution of the 13-vs-15 type-variation discrepancy anchored to the production `TYPE_VARIATIONS` registry. The plan structure (helper foundation -> token hardening -> strict audit -> root spec -> toggle proof) mirrors the successful Phase 6/7 pattern. The plans are internally consistent, respect the locked 9-export surface, and correctly forbid separate mobile `.tres` / density resources / subclasses / root fallback.
 
-## 2. Strengths
+## Strengths
 
-- **Verifier-first discipline preserved:** Plan 08-01 deploys architecture invariants before any production mutation, exactly replicating the Phase 6/7 pattern that worked.
-- **TDD enforcement embedded:** Plans 08-02 and 08-03 use explicit RED->GREEN cycles with the verifier asserting expected values before production code is corrected.
-- **Raised/platform orthogonality is explicitly tested:** Plan 08-02 Task 3 verifies all four forced combinations (`raised x platform`), preventing the common bug where toggling one silently resets the other.
-- **All five directions are in the audit path:** Plans 08-03 and 08-05 both require all-direction verification, preventing per-direction export drift from defeating the mobile contract.
-- **Forbidden-resource enforcement is relentless:** Every plan cross-checks against `neocade_mobile_theme.tres`, per-density resources, root fallback `.tres`, subclasses, and `Theme.clear()` - appropriate for an architecture where drift risk is explicitly documented.
-- **`MOBILE-DESIGN-SPEC.md` section requirements are well-specified:** Plan 08-04 names concrete required sections (token table, platform behavior, scorecard deltas, traceability table, limitations, handoff notes), giving the doc author a clear template.
+1. **Executable formula contract (08-03):** The `<audit_formula_contract>` block defines helper primitives (`font_y`, `sb_x`, `sb_y`, `icon_w`, `icon_h`, `k`) plus per-category baseline formulas (button, input, row, tab, handle) and a complete 37-row classification table. This is exactly what Cycle 1 H-2 asked for - no formula logic is deferred to implementation anymore.
 
----
+2. **Heading-parity enforcement is now hard-coded in verifier assertions (08-02):** Task 1 explicitly asserts `HeaderLarge = 36` on both platforms and acceptance criteria state "The verifier fails if any Header* type variation shrinks on mobile." Task 2 explicitly corrects any production heading token that currently shrinks. H-1 is structurally resolved.
 
-## 3. Concerns
+3. **15-variation resolution is production-anchored (08-04):** The `<type_variation_source_of_truth>` block declares the production `TYPE_VARIATIONS` dictionary as authoritative, lists all 15 entries by name, supersedes the older 13-entry research wording, and makes the docs verifier fail on any count other than 15. H-3 is definitively resolved.
 
-### HIGH
+4. **Raised/platform orthogonality is tested across all four combinations (08-02 Task 3):** The verifier duplicates Pulse and covers `raised=false/true x platform=DESKTOP/MOBILE`, checking shadow sentinels, content margin persistence, and entry survival after repeated toggles. This is a thorough contact-surface test.
 
-- **H-1: Header font-size delta contradicts MOBILE-03.** Plan 08-02 Task 1 asserts `HeaderLarge` is `36` desktop and `32` mobile - a shrink on mobile. MOBILE-03 and CONTEXT D-08 both state: "Headings retain their desktop sizes" and "title/headline values documented explicitly" (not shrunk). A heading shrinking by 4px on mobile violates the documented brand-identity rule. Either the verifier assertion is wrong, or MOBILE-03 needs updating - but both cannot coexist. This will block the `platform-tokens` stage from passing correctly.
+5. **No mobile/root/per-density resource creation:** Every plan's acceptance criteria explicitly forbid `neocade_mobile_theme.tres`, root fallback `.tres`, per-density resources, subclasses, and per-direction `.gd` files. The verifier architecture stage enforces these as hard assertions, not prose conventions.
 
-- **H-2: Tap-target audit formulas are completely unspecified.** Plan 08-03 is a pass/fail contract plan, yet it defers all per-type formulas to implementation with only a description of intent ("Button-family: font size plus vertical stylebox content margins, with recipe constants"). A contract phase where the audit can produce false passes or false failures because formulas were guessed at implementation time creates a verification integrity risk. At minimum, the plan should codify formula categories with bounds (e.g., "Button Y proxy = max(default_font_size + content_margin_top + content_margin_bottom, tokens.buttonMin)"). Without this, a reviewer cannot assess whether `PASS` results are trustworthy.
+## Cycle 1 HIGH Resolution Check
 
-- **H-3: Unresolved 13-vs-15 type-variation count carried forward.** CONTEXT and RESEARCH.md both flag: "The current script has 15 variation entries, while requirements still speak of 13." Plan 08-04 Task 1 says "include CodeLabel and Kicker if present in TYPE_VARIATIONS" - disclaiming rather than resolving. Plan 08-04 Task 2 likewise says "derive or check current type-variation names instead of relying on the older 13-only wording." This pushes the discrepancy into `MOBILE-DESIGN-SPEC.md`'s TYPEVAR-06 closure without a principled decision on which count is authoritative. A spec that can't state its own variation count is not a spec.
+- **H-1:** RESOLVED. Plan 08-02 Task 1 now asserts HeaderLarge = 36 on both desktop and mobile, and the acceptance criteria explicitly fail if any Header* variation shrinks. The earlier 36->32px contradiction is gone.
+- **H-2:** RESOLVED. Plan 08-03 includes a complete 37-row formula contract with named helper primitives, per-category baseline formulas, and a per-row width/height proxy specification. No formula logic is deferred to implementation.
+- **H-3:** RESOLVED. Plan 08-04 anchors the count to the production `TYPE_VARIATIONS` dictionary, lists all 15 entries by name, supersedes the 13-entry research wording, and makes the docs verifier enforce count = 15.
+
+## Current HIGH Concerns
+
+none
+
+## Concerns
 
 ### MEDIUM
 
-- **M-1: `web_android` / `web_ios` feature tags may not exist in Godot 4.6.** Plan 08-02 Task 2 permits `_resolve_platform()` hardening with feature tags `mobile`, `android`, `ios`, `web_android`, or `web_ios`. Godot's standard `OS.has_feature()` tags for 4.x are `mobile`, `android`, `ios`, and `web`. Tags `web_android` and `web_ios` are not standard Godot feature tags (they exist in some Godot 3.x documentation but not reliably in 4.x). Using them would silently fail, causing web-on-mobile to resolve as DESKTOP. The `web` tag + `OS.get_name()` check is the correct pattern for distinguishing web-on-mobile, but `OS.get_name()` may violate D-06's "no native platform APIs" constraint. This needs explicit resolution.
+- **M-1: FileDialog classification ambiguity (08-03 audit table).** FileDialog is classified as `display` in the classification column but its Pass rule evaluates `thumbnail_size >= 48`. If it's truly display-only, the rule should be `N/A` (matching AcceptDialog/ConfirmationDialog/Window). If the thumbnail is considered an interactive proxy, the classification should be `interactive`. The current combination is internally contradictory, though the audit can resolve this at implementation time.
 
-- **M-2: `main.tscn` is pre-modified before Phase 9 owns it.** Plan 08-05 writes a minimal toggle fixture into `main.tscn` and adds `scripts/phase8_platform_toggle.gd`. Phase 9 must later turn this file into the full 9-section showcase. Without a clear handoff agreement (e.g., Phase 9 replaces the entire scene, or Phase 8's toggle lives in a sub-scene), Phase 9 will either overwrite Phase 8's work or inherit dead toggle script references. The plan should either place the toggle proof in a separate scene (`test_platform_toggle.tscn`) or add an explicit "Phase 9 will replace main.tscn" clause.
-
-- **M-3: 2048-byte size cap on direction `.tres` files is fragile.** Plan 08-01 Task 1 asserts direction `.tres` files "stay under 2048 bytes." Godot's `.tres` format serializes StyleBoxFlat entries with expanding key=value pairs - each new state variation adds dozens of bytes. A `.tres` that passes at 1900 bytes could fail at 2100 bytes after a legitimate styling addition without any architecture violation. A content-based assertion (no `[sub_resource]`, script linkage present, all 9 exports present) is durable; a byte-count assertion will produce false-positives.
-
-- **M-4: Density-bucket verification is documented but never tested.** MOBILE-05 requires proof that one mobile theme covers all Android density buckets via Godot's `content_scale_factor` + stretch modes. Plan 08-04 says the spec must document this, but no plan actually verifies it (e.g., running the tap-target audit at `test_width=1080, test_height=1920` with a `content_scale_factor` multiplier). The audit may pass at base scale 1.0 but fail when Godot's scaling interacts with theme minimums. This is a deferred risk rather than a gap, but MOBILE-05 says Phase 8 closes it.
-
-- **M-5: No ResourceSaver round-trip verification in Plans 08-02 or 08-03.** Plans 08-02 and 08-03 modify `neocade_theme.gd` - which changes the regeneration formulas that determine what gets written into direction `.tres` files during Theme Editor save. Plan 08-05 Task 3 mentions "if any direction-resource ResourceSaver round-trip is needed," but this should be a mandatory checkpoint in the plans that modify `neocade_theme.gd`. A formula change that produces the right runtime values but adds `[sub_resource]` to `.tres` files on save would escape detection until Phase 11 distribution.
+- **M-2: 08-05 Task 1 creates `scripts/phase8_platform_toggle.gd` but the task says to use a "duplicated Pulse direction theme."** If the script calls `theme.duplicate()` on a preloaded resource, subsequent export-mutation tests may not exercise the same code paths as `_regenerate()` triggered by export setters. If the approach is intentionally "duplicate then mutate exports" (triggering setters), the wording should clarify this. Not blocking - the implementation can get this right.
 
 ### LOW
 
-- **L-1: No explicit regression test for Phase 7 desktop coverage.** Plan 08-02 Task 2 modifies production code in `neocade_theme.gd`. If the mobile token corrections accidentally change desktop entries, the Phase 7 37/37 desktop coverage could silently regress. The `platform-tokens` stage should include a guard: after setting `platform=DESKTOP`, verify the resulting theme still has the same entry count as pre-modification state, or run the Phase 7 architecture subset.
+- **L-1: 08-03 audit table uses `input_h("LineEdit")` inside the SpinBox height proxy formula.** SpinBox has its own theme entries; using the LineEdit slot inside its proxy calculation assumes SpinBox inherits or mirrors the LineEdit entry, which may not be true if SpinBox has its own `normal` StyleBox. The implementer should verify the actual slot access pattern.
 
-- **L-2: `logs/` directory creation not specified.** Plan 08-03 commits `logs/08-tap-target-audit.log` to a new `logs/` subdirectory not mentioned in prior plans. The runner script should ensure this directory exists, but neither the runner nor the plan tasks specify `mkdir` creation.
+- **L-2: 08-05 Task 1 mentions creating "only the controls needed to test the proof," but the acceptance criteria only grep-verify the script and scene references, not that the scene has the right set of representative Controls.** A visual runtime gate is implicitly Phase 9. This is fine.
 
-- **L-3: Plan 08-05 Task 2 "full" verifier does not enumerate all checks.** The task describes the `full` stage as including "architecture, platform-token, tap-target, docs, scene-toggle, all-five-direction forced mobile, no-root-fallback, no-mobile-fallback, no-per-density-resource, no-subclass/per-direction-gd, no-Theme.clear, and zero-pending checks." This list is reasonable but should be in the verifier contract itself (or at minimum in the acceptance criteria), not just the task prose, so the verifier author doesn't miss any sub-check.
+## Suggestions
 
-- **L-4: Plan 08-04 Task 1 "all 37 scorecard rows by name" - name source ambiguous.** The context references a 37-row scorecard from FEATURES.md, but the row count and exact names must match the verifier's understanding. If FEATURES.md says 37 and the verifier's scorecard array has 38 or 36, the docs stage will either incorrectly pass or incorrectly fail. The spec check should cross-reference the verifier's scorecard list, not a separately-maintained document.
+1. Resolve M-1 by classifying FileDialog as `interactive` (thumbnail click target) or changing its rule to `N/A` with the thumbnail proxy noted as informational in `notes`.
+2. Add a companion resource-saver strip step to the 08-05 final verification sequence (Task 3) so direction `.tres` files are verified data-only at the end of the phase, not just during intermediate plans.
 
----
+## Risk Assessment
 
-## 4. Suggestions
+- **Architectural drift risk:** LOW. Every plan's architecture stage enforces the 9-export surface, single-`.gd` addon root, five data-only `.tres`, and forbidden resource paths. The verifier is structural, not prose-based.
+- **Mobile sizing correctness risk:** LOW. The formula contract is per-row specific, the 48px floor is explicit, and both RED/GREEN tasks force the audit to fail before production fixes land.
+- **Type-variation staleness risk:** LOW. 08-04 derives the variation list from the production dictionary at verification time, so any future drift would fail the docs stage.
+- **Cross-plan dependency risk:** LOW. The sequential wave structure (01->02->03->04->05) correctly sequences foundation before hardening before audit before docs before toggle proof.
 
-- **S-1 (addresses H-1):** Align HeaderLarge verifier assertion with MOBILE-03. Either change MOBILE-03 to allow heading shrinkage on mobile (with rationale in `MOBILE-DESIGN-SPEC.md`), or change the verifier to assert `HeaderLarge == 36` on both desktop and mobile. A 36->32 heading shrink is unusual for mobile accessibility and warrants explicit justification if kept.
-
-- **S-2 (addresses H-2):** Add a formula appendix to 08-03-PLAN.md. Codify each category's proxy formula in the plan itself, e.g.: `Button Y = tokens.buttonMin` (production constant), `LineEdit Y = tokens.inputMin`, `Tab Y = direct font_size + 2 * tapPadding`, `CheckBox Y = max(icon_size, font_size) + 2 * tapPadding`, etc. This makes the audit verifiable before implementation and prevents implementation from discovering mid-stream that 48px can't be met for certain types.
-
-- **S-3 (addresses H-3):** Resolve 13-vs-15 before executing Plan 08-04. Make `TYPE_VARIATIONS` count authoritative and update REQUIREMENTS.md TYPEVAR-06 to match. If 15 is the new truth, the spec should document all 15. This is a one-line REQUIREMENTS.md update with low blast radius.
-
-- **S-4 (addresses M-1):** Remove `web_android` / `web_ios` from permitted feature tags. Use only `mobile`, `android`, `ios`, `web` in `_resolve_platform()`. For `platform=AUTO` on web, `web` + `OS.get_name()` with `"Android"` or `"iOS"` as fallback (or document the limitation that web-on-mobile detection may not resolve) is more honest than referencing non-existent feature tags.
-
-- **S-5 (addresses M-2):** Move toggle proof to `scripts/test_platform_toggle.tscn` with its own root Control, leaving `main.tscn` untouched for Phase 9. Phase 8 verifier scene-toggle stage checks the alternative scene path. This prevents Phase 9 merge friction.
-
-- **S-6 (addresses M-3):** Remove the 2048-byte assertion. Replace with: "all direction `.tres` files contain no `[sub_resource]`, contain script_link, contain all 9 explicit exports, and serialize cleanly (load->save->reload produces bit-identical content)." This is content-correct and robust.
-
-- **S-7 (addresses M-5):** Add a mandatory ResourceSaver round-trip check to Plan 08-02 Task 2 and Plan 08-03 Task 2 acceptance criteria: "Direction `.tres` files saved after regeneration contain no `[sub_resource]` and bit-identical reload matches."
-
----
-
-## 5. Risk Assessment
-
-**Overall Risk Level: MEDIUM**
-
-The five-wave structure is mature and the verifier-first discipline is well-established from Phases 6-7. The dynamic architecture constraints are well-understood and consistently enforced across all plans. However, the combination of a direct requirements conflict (H-1), completely unspecified audit formulas in a contract phase (H-2), and an unresolved type-variation count (H-3) means the plans cannot execute to completion without decisions being made at implementation time - exactly what a plan should prevent. These three HIGH concerns are all resolvable with small plan amendments (not replanning), but they must be resolved before execution.
 
 ---
 
 ## Consensus Summary
 
-This cycle used the requested single external reviewer: OpenCode with `deepseek/deepseek-v4-pro`.
+This cycle used the requested single external reviewer: OpenCode with deepseek/deepseek-v4-pro.
 
 ### Agreed Strengths
 
 - Single-reviewer cycle; no multi-reviewer agreement data is available.
-- OpenCode found the overall five-plan structure sound and consistent with the Phase 6/7 verifier-first pattern.
-- OpenCode found the forbidden-resource checks, raised/platform orthogonality checks, all-direction audit path, and `MOBILE-DESIGN-SPEC.md` section contract to be strong.
+- OpenCode found the revised five-plan structure sound and aligned with the Phase 6/7 verifier-first pattern.
+- OpenCode confirmed the Cycle 1 HIGH concerns H-1, H-2, and H-3 are resolved by the revised plans.
 
 ### Agreed Concerns
 
 - Single-reviewer cycle; no 2+ reviewer consensus can be computed.
-- Current unresolved HIGH concerns are H-1, H-2, and H-3 below.
+- OpenCode raised no current HIGH concerns.
+- Remaining follow-ups are MEDIUM/LOW: FileDialog classification ambiguity, toggle-script wording, SpinBox proxy assumption, and scene representative-control assertion depth.
 
 ### Divergent Views
 
-- None. Only OpenCode was invoked per the `--opencode` requirement.
+- None. Only OpenCode was invoked per the --opencode requirement.
 
 ## Current HIGH Concerns
 
-- **H-1:** Plan 08-02 Task 1 asserts `HeaderLarge` shrinks from 36px to 32px on mobile, directly contradicting MOBILE-03 / D-08 ("headings retain their desktop sizes"). Both cannot be true; one must change before execution.
-- **H-2:** Plan 08-03 provides no per-type tap-target proxy formulas - all 37-row formula logic is deferred to implementation. A contract phase whose pass/fail audit has unspecified formulas cannot be meaningfully reviewed or trusted.
-- **H-3:** The 13-vs-15 type-variation count discrepancy is acknowledged but deferred across plans 08-03 and 08-04 without a resolution decision. TYPEVAR-06 cannot be "finalized" from an unresolved count.
+none
+
