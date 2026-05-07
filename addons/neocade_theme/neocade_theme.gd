@@ -193,14 +193,21 @@ func _regenerate_theme() -> void:
 	var header_medium_font := preload("res://addons/neocade_theme/fonts/Inter-HeaderMedium.tres") as FontVariation
 	var header_small_font  := preload("res://addons/neocade_theme/fonts/Inter-HeaderSmall.tres") as FontVariation
 	var caption_font       := preload("res://addons/neocade_theme/fonts/Inter-Caption.tres") as FontVariation
-	# 14 variations × set_font (Cross-AI Cycle 1 C4 fix: CodeLabel included)
+	# 15 variations × set_font (Cross-AI Cycle 1 C4 fix: CodeLabel included;
+	# Plan 05-04 D-09: Kicker is the 15th variation per DESIGN_TOKENS §8.6).
 	set_font("font", "HeaderLarge",  header_large_font)
 	set_font("font", "HeaderMedium", header_medium_font)
 	set_font("font", "HeaderSmall",  header_small_font)
 	set_font("font", "Caption",      caption_font)
 	set_font("font", "CodeLabel",    body_font)   # consumer can override to a mono per FONT-04 stricken
-	# BL-02 fix 2026-05-06: InfoText is a RichTextLabel variation; RTL reads `normal_font`,
+	# Kicker (D-09 / Plan 05-04): Inter Variable Roman body weight per UD-4 Option D / D-17.
+	# Per PITFALLS 1.2 type variations DO NOT inherit fonts from Label, so this
+	# explicit set_font is mandatory — without it Kicker falls back to default_font.
+	set_font("font", "Kicker",       body_font)
+	# BL-02 fix 2026-05-06 (D-16): InfoText is a RichTextLabel variation; RTL reads `normal_font`,
 	# not `font` — the `font` slot was silently ignored, falling back to default_font.
+	# The matching size slot is `normal_font_size` (set below); using `font_size`
+	# instead would similarly be silently ignored.
 	set_font("normal_font", "InfoText", body_font)
 	set_font("font", "PrimaryButton",   body_font)
 	set_font("font", "SecondaryButton", body_font)
@@ -217,7 +224,22 @@ func _regenerate_theme() -> void:
 	set_font_size("font_size", "HeaderSmall",  tokens.h2)
 	set_font_size("font_size", "Caption",      tokens.label_)
 	set_font_size("font_size", "CodeLabel",    tokens.label_)
-	set_font_size("font_size", "InfoText",     tokens.body)
+	# Kicker (D-09): tokens.kicker is 12 desktop / 13 mobile per DESIGN_TOKENS §10.1.
+	# Burst's "uppercase-bold-larger-scale" enum is owned by content/showcase since
+	# Theme can't re-tag tracking; the size delta (kicker+1) is held at the
+	# variation level via Burst-specific tres if needed in v1.x. Phase 5 ships the
+	# uniform tokens.kicker baseline; per-direction font_size override (Burst+1)
+	# is deliberately deferred to a future _apply_kicker_size dispatch when
+	# DESIGN_TOKENS §8.6 / FONT-09 is stable.
+	set_font_size("font_size", "Kicker",       tokens.kicker)
+	# BL-02 fix 2026-05-06 (D-16): InfoText is a RichTextLabel variation. The size
+	# slot for RichTextLabel is `normal_font_size`, NOT `font_size`. Using
+	# `font_size` here was a Phase 4-close oversight (the font-slot half was fixed,
+	# the size-slot half was not). Plan 05-04 Task 1 deletes the wrong `font_size`
+	# entry and replaces it with `normal_font_size` to match the `normal_font`
+	# slot name — Godot silently ignores the wrong slot and falls back to
+	# default_font_size.
+	set_font_size("normal_font_size", "InfoText", tokens.body)
 	set_font_size("font_size", "PrimaryButton",   tokens.body)
 	set_font_size("font_size", "SecondaryButton", tokens.body)
 	set_font_size("font_size", "GhostButton",     tokens.body)
@@ -615,11 +637,25 @@ func _resolve_direction_presets() -> Dictionary:
 
 
 # ─── Type variation registry (DESIGN_TOKENS §8.5; PITFALLS 1.2 mandate explicit fonts) ──────
-## 14 NeoCade type variations registered via Theme.set_type_variation() (Cross-AI Cycle 1 C4
-## fix: PICK 14 with CodeLabel INCLUDED — the correct enumeration of TYPEVAR-01..04+05).
+## 15 NeoCade type variations registered via Theme.set_type_variation():
+##   - Phase 4 shipped 14 (Cross-AI Cycle 1 C4 fix included CodeLabel).
+##   - Plan 05-04 (D-09) adds Kicker as the 15th, closing DESIGN_TOKENS §8.6's
+##     explicit Phase 5 todo. Per PITFALLS 1.2, the Kicker entry below is paired
+##     with explicit set_font + set_font_size calls (variations don't inherit
+##     fonts from base type).
 ## Each entry: variation_name → base_type. Phases 5/6/7 author per-direction personality
 ## styleboxes per variation in `.tres` Theme Editor overrides; Phase 4 only registers + sets
-## explicit fonts (Pitfall 1.2: variations don't inherit fonts from base type).
+## explicit fonts.
+##
+## Letter-spacing / case-transform note (research finding, Plan 05-04 Test 5):
+## official Godot 4.6 Label theme properties do NOT expose a Theme-level
+## letter-spacing slot, so the Kicker variation's "uppercase-tracked-accent" /
+## "small-caps-subtle" / "uppercase-bold-larger-scale" tracking + transform
+## semantics live in CONTENT (showcase / consumer-rendered text), NOT in the
+## Theme. Theme owns font / size / color only. Verifier
+## assert_no_letter_spacing_claim guards this contract; if a future Godot
+## release exposes such a constant, the wiring can be added with a documented
+## docs URL plus a precise has_constant assertion in the verifier.
 const TYPE_VARIATIONS: Dictionary = {
 	# Button family (TYPEVAR-01) — 6
 	"PrimaryButton":   "Button",
@@ -628,13 +664,15 @@ const TYPE_VARIATIONS: Dictionary = {
 	"DangerButton":    "Button",
 	"IconButton":      "Button",
 	"FlatButton":      "Button",
-	# Label / heading family (TYPEVAR-02 + TYPEVAR-03) — 5
+	# Label / heading family (TYPEVAR-02) — 5
 	"HeaderLarge":  "Label",
 	"HeaderMedium": "Label",
 	"HeaderSmall":  "Label",
 	"Caption":      "Label",
 	"CodeLabel":    "Label",     # Cross-AI Cycle 1 C4 fix: INCLUDED (was previously dropped)
-	# InfoText (TYPEVAR-05; rich-text small body) — 1
+	# Kicker (TYPEVAR-02 + D-09; Plan 05-04 closes DESIGN_TOKENS §8.6 todo) — 1
+	"Kicker":       "Label",
+	# InfoText (TYPEVAR-03; rich-text small body) — 1
 	"InfoText":     "RichTextLabel",
 	# Panel family (TYPEVAR-04) — 2
 	"CardPanel": "PanelContainer",
