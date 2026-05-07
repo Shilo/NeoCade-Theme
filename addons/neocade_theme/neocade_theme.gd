@@ -812,14 +812,25 @@ const BINDING_TABLE: Dictionary = {
 		},
 	},
 	# 2. Button — 6 styleboxes + font colors + h_separation (PITFALLS 10.3 clean states)
+	# Plan 05-03 Task 2 polish: pull per-direction shape via shape.secondary_radius +
+	# shape.primary_padding + shape.raised_lifts.secondary so base Button chrome reads
+	# the same per-direction language as the TYPEVAR-01 variations. The base Button
+	# uses the SECONDARY family (not primary) — primary chrome is reserved for the
+	# PrimaryButton variation per TYPEVAR-01 / DESIGN_TOKENS §5.
 	"Button": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": 1},  # Cycle 1 MEDIUM reconcile: was 0; lifts when raised=true
-			"hover":          {"role": "state_hover",   "raised_intensity": 1},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0},  # pressed sinks; never lifted
-			"focus":          {"role": "focus_ring"},
-			"disabled":       {"role": "surface_panel", "disabled": true, "raised_intensity": 0},  # Cycle 2 C2: per-direction alpha
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0},
+			"normal":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover":          {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"pressed":        {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},  # pressed sinks; never lifted
+			"focus":          {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":       {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},  # Cycle 2 C2: per-direction alpha
+			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -862,10 +873,15 @@ const BINDING_TABLE: Dictionary = {
 			"check_v_offset": {"value": 0},
 		},
 		"icon": {
-			"checked":         {"icon": "checkbox_checked"},
-			"unchecked":       {"icon": "checkbox_unchecked"},
-			"radio_checked":   {"icon": "radio_checked"},
-			"radio_unchecked": {"icon": "radio_unchecked"},
+			"checked":            {"icon": "checkbox_checked"},
+			"unchecked":          {"icon": "checkbox_unchecked"},
+			"radio_checked":      {"icon": "radio_checked"},
+			"radio_unchecked":    {"icon": "radio_unchecked"},
+			# Plan 05-03 Task 2 polish: REUSE the existing checked/unchecked
+			# SVGs for the disabled variants (Godot 4.6 exposes the slots; the
+			# font_disabled_color tints them through). No new artwork needed.
+			"checked_disabled":   {"icon": "checkbox_checked"},
+			"unchecked_disabled": {"icon": "checkbox_unchecked"},
 		},
 	},
 	# 4. CheckButton — 2 icon slots (Cycle 6 F4 fix: `checked`/`unchecked`, not `on`/`off`)
@@ -887,8 +903,13 @@ const BINDING_TABLE: Dictionary = {
 			"font_hover_pressed_color":{"role": "text_strong"},
 		},
 		"icon": {
-			"checked":   {"icon": "checkbutton_checked"},
-			"unchecked": {"icon": "checkbutton_unchecked"},
+			"checked":            {"icon": "checkbutton_checked"},
+			"unchecked":          {"icon": "checkbutton_unchecked"},
+			# Plan 05-03 Task 2 polish: REUSE existing SVGs for disabled
+			# variants per the Action item; *_mirrored variants stay deferred
+			# to v1.x per Phase 4 CHANGELOG.
+			"checked_disabled":   {"icon": "checkbutton_checked"},
+			"unchecked_disabled": {"icon": "checkbutton_unchecked"},
 		},
 	},
 	# 5. CodeEdit — inherits TextEdit; Phase 4 ships base stylebox set (no syntax highlighting per AF-7)
@@ -913,14 +934,20 @@ const BINDING_TABLE: Dictionary = {
 			"margin": {"value": "tokens.tapPadding"},
 		},
 	},
-	# 7. ColorPickerButton — inherits Button family; minimal Phase 4 baseline
+	# 7. ColorPickerButton — inherits Button family; Plan 05-03 Task 2 polish: shape.* lookups
+	# so the swatch button reads with per-direction radius/padding/lift like Button proper.
 	"ColorPickerButton": {
 		"stylebox": {
-			"normal":   {"role": "surface_panel", "raised_intensity": 1},
-			"hover":    {"role": "state_hover",   "raised_intensity": 1},
-			"pressed":  {"role": "state_pressed", "raised_intensity": 0},
-			"focus":    {"role": "focus_ring"},
-			"disabled": {"role": "surface_panel", "disabled": true},
+			"normal":   {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover":    {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"pressed":  {"role": "state_pressed", "raised_intensity": 0,
+							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"focus":    {"role": "focus_ring",
+							"radius": "shape.secondary_radius"},
+			"disabled": {"role": "surface_panel", "disabled": true,
+							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -1089,14 +1116,22 @@ const BINDING_TABLE: Dictionary = {
 		},
 	},
 	# 20. MenuButton — Button-family states
+	# Plan 05-03 Task 2 polish: shape.secondary_radius + shape.primary_padding +
+	# shape.raised_lifts.secondary so the per-direction shape language flows.
 	"MenuButton": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": 1},
-			"hover":          {"role": "state_hover",   "raised_intensity": 1},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0},
-			"focus":          {"role": "focus_ring"},
-			"disabled":       {"role": "surface_panel", "disabled": true},
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0},
+			"normal":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover":          {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"pressed":        {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"focus":          {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":       {"role": "surface_panel", "disabled": true,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -1110,14 +1145,22 @@ const BINDING_TABLE: Dictionary = {
 		},
 	},
 	# 21. OptionButton — 6 stylebox + arrow icon + arrow_margin constant
+	# Plan 05-03 Task 2 polish: shape.secondary_radius + shape.primary_padding +
+	# shape.raised_lifts.secondary so the per-direction shape language flows.
 	"OptionButton": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": 1},
-			"hover":          {"role": "state_hover",   "raised_intensity": 1},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0},
-			"focus":          {"role": "focus_ring"},
-			"disabled":       {"role": "surface_panel", "disabled": true},
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0},
+			"normal":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover":          {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"pressed":        {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"focus":          {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":       {"role": "surface_panel", "disabled": true,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
