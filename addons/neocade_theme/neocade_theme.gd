@@ -1771,8 +1771,55 @@ const BINDING_TABLE: Dictionary = {
 			"font_selected_color":   {"role": "text_strong"},
 		},
 	},
-	# 51. PanelContainer + 52. CardPanel + 53. HeroPanel rows are added by
-	#     Plan 05-04 Task 3 (panel chrome) — see follow-up commit.
+	# 51. PanelContainer — Phase 4 omitted this base class from BINDING_TABLE
+	#     (only Panel was wired); Phase 5 Plan 05-04 Task 3 adds it so
+	#     per-direction surface_alpha_panels and raised_lifts.panel propagate.
+	#     CardPanel and HeroPanel both extend PanelContainer.
+	"PanelContainer": {
+		"stylebox": {
+			"panel": {
+				"role":             "surface_panel",
+				"alpha":            "shape.surface_alpha_panels",
+				"raised_intensity": "shape.raised_lifts.panel",
+			},
+		},
+	},
+	# 52. CardPanel — PanelContainer variation (TYPEVAR-04). Uses
+	#     shape.card_radius for per-direction radius personality (Pulse 0,
+	#     Slate 14, Bubble 26, Daybreak 8, Burst 18) plus the panel
+	#     surface_alpha and raised lift.
+	"CardPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "surface_panel",
+				"radius":           "shape.card_radius",
+				"alpha":            "shape.surface_alpha_panels",
+				"raised_intensity": "shape.raised_lifts.panel",
+			},
+		},
+		"color": {
+			"font_color": {"role": "text_strong"},
+		},
+	},
+	# 53. HeroPanel — PanelContainer variation (TYPEVAR-04). Uses
+	#     shape.hero_radius (sibling to card_radius; v1 ships matching pairs
+	#     per direction, but the schema lets v2 differentiate hero from card
+	#     for any direction). Surface role is surface_high (one tonal step
+	#     above CardPanel) so a Hero stack reads above a Card in the
+	#     extruded-flat layer order.
+	"HeroPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "surface_high",
+				"radius":           "shape.hero_radius",
+				"alpha":            "shape.surface_alpha_panels",
+				"raised_intensity": "shape.raised_lifts.panel",
+			},
+		},
+		"color": {
+			"font_color": {"role": "text_strong"},
+		},
+	},
 }
 
 
