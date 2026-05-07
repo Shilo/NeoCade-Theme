@@ -316,7 +316,7 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 | 3.4 Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat) | 2/4 complete; Plan 03 paused at Task 4 | Awaiting user final approval | - |
 | 4. Foundation: Single `NeoCadeTheme` class + data `.tres` files + Fonts + Icons | 6/8 (Plans 04-01, 04-02, 04-03, 04-04, 04-05, 04-06 done) | In progress | started 2026-05-06 |
 | 5. Core Controls (Buttons/Inputs/Labels/Panels) | 7/7 | Complete   | 2026-05-07 |
-| 6. Lists/Layout/Range | 0/5 | Planned | - |
+| 6. Lists/Layout/Range | 1/5 | In Progress|  |
 | 7. Dialogs/Popups/Advanced | 0/TBD | Not started | - |
 | 8. Mobile Variant Token Block + Tap-Target Audit | 0/TBD | Not started | - |
 | 9. Showcase + Token Gallery + Theme/Variation Toggles | 0/TBD | Not started | - |
