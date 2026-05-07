@@ -1,0 +1,100 @@
+# Changelog
+
+All notable changes to NeoCade Theme are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added (Phase 4 — Foundation)
+
+- Single concrete `@tool class_name NeoCadeTheme extends Theme` class
+  (`addons/neocade_theme/neocade_theme.gd`) with 9 `@export` properties:
+  - Core: `base_color`, `accent_color`, `raised`, `platform`
+  - Shape: `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`,
+    `outline_width`
+- 5 data-only direction `.tres` files at addon root: `pulse_neocade_theme.tres`
+  (recommended starter), `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`,
+  `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`.
+- Inter Variable Roman font (PINNED to Inter v4.0;
+  SHA256: `746431E950FD28D29B0189D708D4A5852A8458EDB3184387EADCEE9E5E34676C`)
+  bundled at `fonts/Inter-Variable.ttf` with Grayscale AA + Light hinting +
+  Auto subpixel + Mipmaps import settings (per GL Compatibility renderer
+  constraints).
+- 5 FontVariation `.tres` resources covering the M3 type scale: HeaderLarge
+  (wght=800, opsz=32), HeaderMedium (wght=700, opsz=32), HeaderSmall
+  (wght=600, opsz=24), Body (wght=400), Caption (wght=400).
+- 10 bespoke monochrome SVG Button-family icons at `icons/`: check,
+  checkbox_checked, checkbox_unchecked, radio_checked, radio_unchecked,
+  checkbutton_checked, checkbutton_unchecked, arrow_down, clear, close —
+  all 32×32 reference, Scale=2.0 + Linear With Mipmaps import.
+  (Cycle 6 F4 fix 2026-05-06: was `toggle_on`/`toggle_off`; renamed to
+  `checkbutton_checked`/`checkbutton_unchecked` to match Godot 4.6
+  CheckButton's `checked`/`unchecked` icon slot names per
+  class_checkbutton.md. 6 disabled/mirrored CheckButton variants deferred
+  to v1.x.)
+- SIL OFL 1.1 license text + Inter Reserved Font Name notice in `OFL.txt`.
+- Dynamic `_regenerate_theme()` engine that walks BINDING_TABLE covering
+  all 37 canonical scorecard Godot 4.6 Control types (Cross-AI Cycle 2 L3
+  fix: list trimmed to the canonical 37 from
+  MINIMAL-THEME-COVERAGE-DELTA.md; previously included non-canonical
+  entries that are container-chrome or Phase 6/7 polish, not Phase 4
+  baseline): AcceptDialog, Button, CheckBox, CheckButton, CodeEdit,
+  ColorPicker, ColorPickerButton, ConfirmationDialog, FileDialog,
+  FoldableContainer, GraphEdit, HScrollBar, HSlider, HSplitContainer,
+  ItemList, Label, LineEdit, LinkButton, MenuBar, MenuButton, OptionButton,
+  Panel, PopupMenu, PopupPanel, ProgressBar, RichTextLabel, SpinBox, TabBar,
+  TabContainer, TextEdit, TooltipLabel, TooltipPanel, Tree, VScrollBar,
+  VSlider, VSplitContainer, Window.
+- 14 type variations registered with explicit fonts (PITFALLS 1.2;
+  Cross-AI Cycle 1 C4 fix: CodeLabel included): PrimaryButton /
+  SecondaryButton / GhostButton / DangerButton / IconButton / FlatButton /
+  HeaderLarge / HeaderMedium / HeaderSmall / Caption / CodeLabel /
+  InfoText / CardPanel / HeroPanel.
+- `is_light` flag derived from `base_color.get_luminance() >= 0.5`;
+  surface ramp + state layers + text colors flip on `is_light` per
+  DESIGN_TOKENS §6.4.
+- Hard-offset shadow raised mode (`raised = true` produces
+  `shadow_size = raised_strength`, `shadow_offset = (0, raised_strength)`,
+  no blur); flat mode sets `shadow_size = -1` (no shadow).
+- `Platform.AUTO` resolves at runtime via `OS.has_feature("mobile")`.
+
+### Notes (v1.0.0 limitations preserved)
+
+- **No italic glyphs ship in v1.** Inter Italic Variable is deferred to v1.x.
+  Consumers requiring italics use Godot's synthetic italic transform via
+  `FontVariation.transform = Transform2D(...)` or `font_italic` Theme slot
+  where applicable. (FONT-07 deferred per UD-4 Option D.)
+- **No CJK font bundled in v1.** Consumers needing CJK script support
+  append a CJK font (e.g., system Noto Sans CJK) to a duplicated theme's
+  `default_font.fallbacks`. See README "CJK / non-Latin scripts" section.
+  (FONT-09(a) override pattern; UD-2 default behavior.)
+- **No `plugin.cfg`.** This is NOT an editor plugin — consumers preload
+  `.tres` files directly via `preload("res://addons/neocade_theme/...")`.
+  (STACK Decision 5; CONTEXT.md D-05.)
+- **No light mode in v1.** Light surface palettes are forward-compat-flagged
+  via the `is_light` field but the v1 directions all ship with dark base
+  colors. (Deferred to v2.)
+- **No EditorInspectorPlugin in v1.** Theme authoring is via Theme Editor
+  and `@export` properties; no per-slot inspector helper. (Deferred
+  indefinitely; revisit if/when human artists join authoring.)
+- **Binding mechanism (slot-name + property-name table compiled into
+  `neocade_theme.gd`) is REVISABLE.** See class-header docstring +
+  CONTEXT.md D-03; future v1.x may switch to a property-name convention
+  or metadata-tagged Resource model without breaking the public `@export`
+  surface or `.tres` file format.
+
+### Out of scope (v1)
+
+- Light mode + alternate palettes (deferred to v2).
+- Per-direction Theme Editor variation styleboxes (PrimaryButton /
+  GhostButton personality per direction) — Phases 5/6/7 polish, not v1.0.0.
+- Bespoke SVG icons for Tree expand/collapse, ColorPicker, FileDialog,
+  ScrollBar, TabBar — Phases 6/7.
+- Mobile-branch tap-target audit + `MOBILE-DESIGN-SPEC.md` deliverable —
+  Phase 8.
+- Showcase scene with theme picker + raised toggle + platform selector —
+  Phase 9.
+- Asset Library submission — REJECTED for v1 (DIST-05 stricken); v1 ships
+  GitHub-Releases-only.

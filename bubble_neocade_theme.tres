@@ -1,0 +1,15 @@
+[gd_resource type="Theme" script_class="NeoCadeTheme" format=3]
+
+[ext_resource type="Script" uid="uid://d3ldbrvt75ldq" path="res://addons/neocade_theme/neocade_theme.gd" id="1_bubble"]
+
+[resource]
+script = ExtResource("1_bubble")
+base_color = Color(0.141176, 0.0745098, 0.14902, 1)
+accent_color = Color(1, 0.701961, 0.901961, 1)
+raised = false
+platform = 2
+corner_radius = 26
+spacing = 22
+raised_strength = 6
+focus_thickness = 3
+outline_width = 1
