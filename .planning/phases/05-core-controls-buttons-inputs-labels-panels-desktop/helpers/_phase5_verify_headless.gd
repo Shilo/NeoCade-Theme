@@ -39,6 +39,12 @@ extends SceneTree
 ##              - assert_codeedit_gutter_slots
 ##              - assert_text_class_chrome_complete
 ##              - assert_codeedit_no_syntax_highlighting
+##   spinbox  Plan 05-06 staged enforcement. Flips assert_spinbox_icons to
+##            strict (PENDING == FAIL) so the wired SpinBox up/up_disabled/
+##            down/down_disabled icon slots are mandatory. All prior strict
+##            stages carry forward strict so a spinbox regression also catches
+##            buttons / text-panels / text-final regressions. Plan 05-06 is
+##            the last Phase 5 stage before the full strict gate.
 ##   strict   Future stage (Plans 05-03..05-07). Treats every PENDING marker as a
 ##            failure and exits non-zero. Wired now so later plans only need to
 ##            change the --stage argument; they do not need to re-author the
@@ -251,8 +257,8 @@ func _parse_args() -> void:
 			i += 1
 		if found:
 			break
-	if _stage != "tooling" and _stage != "strict" and _stage != "shape" and _stage != "buttons" and _stage != "text-panels" and _stage != "text-final":
-		push_error("PHASE5_VERIFY FAIL: unknown --stage '%s' (expected tooling|shape|buttons|text-panels|text-final|strict)" % _stage)
+	if _stage != "tooling" and _stage != "strict" and _stage != "shape" and _stage != "buttons" and _stage != "text-panels" and _stage != "text-final" and _stage != "spinbox":
+		push_error("PHASE5_VERIFY FAIL: unknown --stage '%s' (expected tooling|shape|buttons|text-panels|text-final|spinbox|strict)" % _stage)
 		_stage = "tooling"
 	print("PHASE5_VERIFY: stage=%s" % _stage)
 
@@ -1891,6 +1897,42 @@ func _group_pending(group: String, detail: String) -> void:
 		"assert_no_theme_clear",
 		"assert_no_invented_focus_combos",
 	]
+	# Plan 05-06 strict list: assert_spinbox_icons flips strict (the four
+	# official Godot 4.6 slot names — up / up_disabled / down / down_disabled —
+	# must be authored). All Plan 05-03 / 05-04 / 05-05 strict groups carry
+	# forward so a spinbox regression also catches earlier-stage regressions.
+	var spinbox_stage_strict := [
+		"assert_spinbox_icons",
+		# Plan 05-05 carry-forward (text-final).
+		"assert_codeedit_gutter_slots",
+		"assert_text_class_chrome_complete",
+		"assert_codeedit_no_syntax_highlighting",
+		# Plan 05-04 carry-forward (text-panels).
+		"assert_variation_count_15",
+		"assert_inf_text_normal_font_size",
+		"assert_kicker_chrome",
+		"assert_text_label_variation_chrome",
+		"assert_panel_variation_chrome",
+		"assert_no_letter_spacing_claim",
+		# Plan 05-03 carry-forward (buttons).
+		"assert_button_variation_rows",
+		"assert_button_variation_states",
+		"assert_button_variation_fonts",
+		"assert_button_strategy_distinctness",
+		"assert_dangerbutton_role_danger",
+		"assert_basebutton_family_chrome",
+		"assert_basebutton_family_shape_aware",
+		"assert_checkbox_disabled_icon_reuse",
+		"assert_focus_overlay_visibility",
+		# Plan 05-02 carry-forward (shape).
+		"assert_shape_lookup_integrity",
+		"assert_shape_value_integrity",
+		"assert_shape_recipe_resolution",
+		"assert_semantic_role_table",
+		# Carry-forward invariants.
+		"assert_no_theme_clear",
+		"assert_no_invented_focus_combos",
+	]
 	var fail: bool = false
 	if _stage == "strict":
 		fail = true
@@ -1901,6 +1943,8 @@ func _group_pending(group: String, detail: String) -> void:
 	elif _stage == "text-panels" and group in text_panels_stage_strict:
 		fail = true
 	elif _stage == "text-final" and group in text_final_stage_strict:
+		fail = true
+	elif _stage == "spinbox" and group in spinbox_stage_strict:
 		fail = true
 	if fail:
 		var label: String = _stage.to_upper()

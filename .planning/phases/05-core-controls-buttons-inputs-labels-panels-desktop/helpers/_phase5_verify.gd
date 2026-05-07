@@ -39,6 +39,9 @@ extends EditorScript
 ##   - assert_text_class_chrome_complete
 ##   - assert_codeedit_no_syntax_highlighting
 ##
+## Plan 05-06 flips assert_spinbox_icons strict in the new `spinbox` stage
+## (COV-03 + COV-01 + D-12). All earlier stages carry forward strict.
+##
 ## Per D-07: Phase 5 verifier MUST NOT reference invented `pressed_focus`,
 ## `checked_focus`, or `hover_pressed_focus` slots. Focus is the official
 ## `focus` overlay only.
@@ -1125,6 +1128,35 @@ func _group_pending(group: String, detail: String) -> void:
 		"assert_no_theme_clear",
 		"assert_no_invented_focus_combos",
 	]
+	# Plan 05-06 strict list: assert_spinbox_icons + carry-forward of all prior
+	# strict groups (buttons / text-panels / text-final / shape / invariants).
+	var spinbox_stage_strict := [
+		"assert_spinbox_icons",
+		"assert_codeedit_gutter_slots",
+		"assert_text_class_chrome_complete",
+		"assert_codeedit_no_syntax_highlighting",
+		"assert_variation_count_15",
+		"assert_inf_text_normal_font_size",
+		"assert_kicker_chrome",
+		"assert_text_label_variation_chrome",
+		"assert_panel_variation_chrome",
+		"assert_no_letter_spacing_claim",
+		"assert_button_variation_rows",
+		"assert_button_variation_states",
+		"assert_button_variation_fonts",
+		"assert_button_strategy_distinctness",
+		"assert_dangerbutton_role_danger",
+		"assert_basebutton_family_chrome",
+		"assert_basebutton_family_shape_aware",
+		"assert_checkbox_disabled_icon_reuse",
+		"assert_focus_overlay_visibility",
+		"assert_shape_lookup_integrity",
+		"assert_shape_value_integrity",
+		"assert_shape_recipe_resolution",
+		"assert_semantic_role_table",
+		"assert_no_theme_clear",
+		"assert_no_invented_focus_combos",
+	]
 	var fail: bool = false
 	if _stage == "strict":
 		fail = true
@@ -1135,6 +1167,8 @@ func _group_pending(group: String, detail: String) -> void:
 	elif _stage == "text-panels" and group in text_panels_stage_strict:
 		fail = true
 	elif _stage == "text-final" and group in text_final_stage_strict:
+		fail = true
+	elif _stage == "spinbox" and group in spinbox_stage_strict:
 		fail = true
 	if fail:
 		var label: String = _stage.to_upper()
