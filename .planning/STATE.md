@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-03-PLAN.md
-last_updated: "2026-05-07T09:09:02.470Z"
+stopped_at: Completed 06-04-PLAN.md
+last_updated: "2026-05-07T09:23:37.239Z"
 last_activity: 2026-05-07
 progress:
   total_phases: 15
   completed_phases: 8
   total_plans: 54
-  completed_plans: 49
-  percent: 91
+  completed_plans: 50
+  percent: 93
 ---
 
 # Project State
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-05-06)
 ## Current Position
 
 Phase: 06 (lists-layout-range-tree-itemlist-tabs-containers-sliders-des) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Next: `/clear` → `/gsd-discuss-phase 6` (per CLAUDE.md — `/clear` allowed only at phase boundaries)
 Status: Ready to execute
 Last activity: 2026-05-07
 
-Progress: [█████████░] 91%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -81,6 +81,7 @@ Progress: [█████████░] 91%
 | Phase 06-lists-layout-range-tree-itemlist-tabs-containers-sliders-des P01 | 12 min | 3 tasks | 8 files |
 | Phase 06-lists-layout-range-tree-itemlist-tabs-containers-sliders-des P02 | 8 min | 3 tasks | 18 files |
 | Phase 06-lists-layout-range-tree-itemlist-tabs-containers-sliders-des P03 | 6 min | 3 tasks | 3 files |
+| Phase 06-lists-layout-range-tree-itemlist-tabs-containers-sliders-des P04 | 8 min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -115,6 +116,9 @@ Recent decisions affecting current work:
 - [Phase 06-lists-layout-range-tree-itemlist-tabs-containers-sliders-des]: ItemList cursor and cursor_unfocused stay semi-transparent overlays while selected rows share Tree accent-offset vocabulary. — Plan 06-03 keeps list focus/hover chrome accessible without opaque cursor blocks and aligns ItemList selection with Tree.
 - [Phase 06-lists-layout-range-tree-itemlist-tabs-containers-sliders-des]: FoldableContainer uses only official Godot 4.6.2 title panel, color, constant, and arrow icon slots. — Plan 06-03 rejects stale Foldable names and reuses the Tree disclosure SVG recipes for mirrored and non-mirrored states.
 - [Phase 06-lists-layout-range-tree-itemlist-tabs-containers-sliders-des]: The itemlist-foldable verifier stage is routed to zero pending groups. — Later tabs and range/container placeholders run only in their owner stages or full verification, so Plan 06-03 can pass independently.
+- [Phase 06-lists-layout-range-tree-itemlist-tabs-containers-sliders-des]: TabBar and TabContainer share identical tab_selected, tab_unselected, tab_hovered, tab_disabled, and tab_focus recipes wherever official slots overlap. — Prevents selected/inactive/hover/focus tab divergence between standalone tab bars and tab containers.
+- [Phase 06-lists-layout-range-tree-itemlist-tabs-containers-sliders-des]: Selected tabs use shape.tab_radius plus shape.raised_lifts.selected_tab and square bottom corners so they read attached to the TabContainer panel. — Uses existing direction personality without adding tab-specific public exports.
+- [Phase 06-lists-layout-range-tree-itemlist-tabs-containers-sliders-des]: TabBar overflow buttons use explicit button_highlight and button_pressed styleboxes; TabContainer menu and menu_highlight both resolve to tab_menu.svg. — Closes the OpenCode review findings while staying on official Godot 4.6.2 slots.
 
 ### Pending Todos
 
@@ -145,8 +149,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-07T09:09:02.462Z
-Stopped at: Completed 06-03-PLAN.md
+Last session: 2026-05-07T09:23:37.199Z
+Stopped at: Completed 06-04-PLAN.md
 Resume file: None
 
 ## Phase 3.4 Plan 02 redirect (2026-05-06b)
