@@ -1691,6 +1691,88 @@ const BINDING_TABLE: Dictionary = {
 			"h_separation": {"value": "tokens.tapPadding"},
 		},
 	},
+	# ─── Phase 5 Plan 05-04: Type-variation rows (TYPEVAR-02..05 + Kicker D-09) ───
+	# These rows extend BINDING_TABLE with the 7 NeoCade text/label/RTL type
+	# variations whose chrome is owned by Plan 05-04 Task 2. The 6 button-family
+	# variations (PrimaryButton..FlatButton) are owned by Plan 05-03 (sibling
+	# wave) and live in the rows above. The 2 panel variations (CardPanel,
+	# HeroPanel) plus PanelContainer are owned by Plan 05-04 Task 3 and follow
+	# this section.
+	#
+	# D-04 invariant: variations not in BINDING_TABLE remain untouched at
+	# regenerate. This section is the variation-side parallel of the 37-row
+	# canonical scorecard above.
+	#
+	# 44. HeaderLarge — Label variation (TYPEVAR-02). Phase 4 set font + size;
+	#     Phase 5 adds explicit font_color via BINDING_TABLE so per-direction
+	#     palette refresh propagates to headings.
+	"HeaderLarge": {
+		"color": {
+			"font_color": {"role": "text_strong"},
+		},
+	},
+	# 45. HeaderMedium — Label variation (TYPEVAR-02).
+	"HeaderMedium": {
+		"color": {
+			"font_color": {"role": "text_strong"},
+		},
+	},
+	# 46. HeaderSmall — Label variation (TYPEVAR-02).
+	"HeaderSmall": {
+		"color": {
+			"font_color": {"role": "text_strong"},
+		},
+	},
+	# 47. Caption — Label variation (TYPEVAR-02). Caption is the small-body
+	#     supporting label; uses text_default (one tonal step softer than
+	#     text_strong) to read as secondary content.
+	"Caption": {
+		"color": {
+			"font_color": {"role": "text_default"},
+		},
+	},
+	# 48. CodeLabel — Label variation (TYPEVAR-02). CodeLabel ships in
+	#     Inter Body weight per FONT-04 stricken / FONT-09 (b); consumer can
+	#     swap a mono via the Theme Editor `font` slot. Color uses text_strong
+	#     (code reads as primary content even when small).
+	"CodeLabel": {
+		"color": {
+			"font_color": {"role": "text_strong"},
+		},
+	},
+	# 49. Kicker — Label variation (TYPEVAR-02 + D-09). The kicker_style
+	#     dispatch (D-04 closed enum sourced verbatim from DESIGN_TOKENS §8.6)
+	#     drives per-direction font_color via _apply_kicker_style():
+	#       Pulse / Bubble  ("uppercase-tracked-accent")    -> role_primary
+	#       Slate           ("small-caps-subtle")           -> text_muted
+	#       Daybreak        ("sentence-case-accent")        -> role_primary
+	#       Burst           ("uppercase-bold-larger-scale") -> role_primary
+	#     Tracking / case-transform / per-direction wght+1 size delta is
+	#     CONTENT-side per the research finding (no Theme-level letter_spacing
+	#     constant in Godot 4.6 Label). Phase 5 verifier
+	#     assert_no_letter_spacing_claim asserts this restraint at the source
+	#     level; assert_kicker_chrome asserts the resolved color matches the
+	#     direction's kicker_style enum end-to-end.
+	"Kicker": {
+		"color": {
+			"font_color": {"kicker_style": "shape.kicker_style"},
+		},
+	},
+	# 50. InfoText — RichTextLabel variation (TYPEVAR-03). Per D-16 / BL-02,
+	#     RTL reads `normal_font` and `normal_font_size` (set in
+	#     _regenerate_theme above), and `default_color` for body text +
+	#     `selection_color` for highlights. font_selected_color is the body
+	#     color when text is inside a user selection (text_strong for contrast
+	#     against the accent_offset highlight).
+	"InfoText": {
+		"color": {
+			"default_color":         {"role": "text_default"},
+			"selection_color":       {"role": "accent_offset"},
+			"font_selected_color":   {"role": "text_strong"},
+		},
+	},
+	# 51. PanelContainer + 52. CardPanel + 53. HeroPanel rows are added by
+	#     Plan 05-04 Task 3 (panel chrome) — see follow-up commit.
 }
 
 
