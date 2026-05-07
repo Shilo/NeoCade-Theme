@@ -163,6 +163,10 @@ const EXPECTED_TREE_ICON_RECIPES := {
 	"updown": "tree_updown",
 }
 
+const EXPECTED_ITEMLIST_ICON_RECIPES := {
+	"scroll_hint": "tree_scroll_hint",
+}
+
 var _stage := "slot-freeze"
 var _failures: Array[String] = []
 var _pending: Array[String] = []
@@ -375,7 +379,8 @@ func assert_tree_stage() -> void:
 
 
 func assert_itemlist_foldable_stage_pending() -> void:
-	_group_pending("assert_itemlist_foldable_stage", "ItemList and FoldableContainer polish groups are owned by Plan 06-03")
+	assert_itemlist_stage()
+	_group_pending("assert_foldable_stage", "FoldableContainer polish group is owned by Plan 06-03 Task 2")
 
 
 func assert_tabs_stage_pending() -> void:
@@ -463,6 +468,118 @@ func _assert_tree_icon_recipes(problems: Array[String]) -> void:
 		var actual_icon: String = recipe.get("icon", "")
 		if actual_icon != expected_icon:
 			problems.append("Tree.icon recipe %s expected %s got %s" % [slot, expected_icon, actual_icon])
+
+
+func assert_itemlist_stage() -> void:
+	var group := "assert_itemlist_stage"
+	var loaded := ResourceLoader.load(PULSE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE)
+	if loaded == null or not (loaded is NeoCadeTheme):
+		_group_fail(group, "Pulse direction did not load as NeoCadeTheme")
+		return
+	var theme: NeoCadeTheme = loaded
+	var problems: Array[String] = []
+	_assert_itemlist_slots_present(theme, problems)
+	_assert_itemlist_cursor_overlays(theme, problems)
+	_assert_itemlist_focus_discipline(theme, problems)
+	_assert_itemlist_selected_vocabulary(theme, problems)
+	_assert_itemlist_line_colors(theme, problems)
+	_assert_itemlist_icon_recipes(problems)
+	if problems.is_empty():
+		_group_ok(group, "ItemList official slots, selection vocabulary, cursor overlays, focus, and scroll hint are covered")
+	else:
+		_group_fail(group, "; ".join(problems))
+
+
+func _assert_itemlist_slots_present(theme: Theme, problems: Array[String]) -> void:
+	var expected: Dictionary = EXPECTED_SLOT_FREEZE.ItemList
+	for slot in expected.stylebox:
+		if not theme.has_stylebox(slot, "ItemList"):
+			problems.append("ItemList.stylebox missing %s" % slot)
+	for slot in expected.color:
+		if not theme.has_color(slot, "ItemList"):
+			problems.append("ItemList.color missing %s" % slot)
+	for slot in expected.constant:
+		if not theme.has_constant(slot, "ItemList"):
+			problems.append("ItemList.constant missing %s" % slot)
+	for slot in expected.font:
+		if not theme.has_font(slot, "ItemList"):
+			problems.append("ItemList.font missing %s" % slot)
+	for slot in expected.font_size:
+		if not theme.has_font_size(slot, "ItemList"):
+			problems.append("ItemList.font_size missing %s" % slot)
+	for slot in expected.icon:
+		if not theme.has_icon(slot, "ItemList"):
+			problems.append("ItemList.icon missing %s" % slot)
+
+
+func _assert_itemlist_cursor_overlays(theme: Theme, problems: Array[String]) -> void:
+	for slot in ["cursor", "cursor_unfocused"]:
+		var sb := theme.get_stylebox(slot, "ItemList") as StyleBoxFlat
+		if sb == null:
+			problems.append("ItemList.%s is not a StyleBoxFlat" % slot)
+			continue
+		if sb.bg_color.a >= 1.0:
+			problems.append("ItemList.%s overlay is opaque (alpha=%s)" % [slot, str(sb.bg_color.a)])
+
+
+func _assert_itemlist_focus_discipline(theme: Theme, problems: Array[String]) -> void:
+	var focus := theme.get_stylebox("focus", "ItemList") as StyleBoxFlat
+	if focus == null:
+		problems.append("ItemList.focus is not a StyleBoxFlat")
+	else:
+		if focus.bg_color.a != 0.0:
+			problems.append("ItemList.focus background is not transparent")
+		if focus.border_width_left <= 0 or focus.border_width_top <= 0:
+			problems.append("ItemList.focus has no outer border ring")
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	var itemlist_style: Dictionary = binding.get("ItemList", {}).get("stylebox", {})
+	for invalid in ["pressed_focus", "checked_focus", "hover_pressed", "hovered_focus", "selected_hover_focus"]:
+		if itemlist_style.has(invalid):
+			problems.append("ItemList.stylebox has invented combo focus slot %s" % invalid)
+
+
+func _assert_itemlist_selected_vocabulary(theme: Theme, problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	var itemlist_style: Dictionary = binding.get("ItemList", {}).get("stylebox", {})
+	var tree_style: Dictionary = binding.get("Tree", {}).get("stylebox", {})
+	for slot in ["selected", "selected_focus", "hovered_selected", "hovered_selected_focus"]:
+		var item_recipe: Dictionary = itemlist_style.get(slot, {})
+		var tree_recipe: Dictionary = tree_style.get(slot, {})
+		if item_recipe.get("role", "") != "accent_offset":
+			problems.append("ItemList.%s does not use accent_offset selected-row role" % slot)
+		if tree_recipe.get("role", "") != "accent_offset":
+			problems.append("Tree.%s no longer exposes the selected-row vocabulary baseline" % slot)
+		var item_sb := theme.get_stylebox(slot, "ItemList") as StyleBoxFlat
+		var tree_sb := theme.get_stylebox(slot, "Tree") as StyleBoxFlat
+		if item_sb == null or tree_sb == null:
+			problems.append("ItemList/Tree %s selected stylebox is missing or wrong type" % slot)
+			continue
+		if not _color_close(item_sb.bg_color, tree_sb.bg_color):
+			problems.append("ItemList.%s bg does not match Tree selected-row vocabulary" % slot)
+
+
+func _assert_itemlist_line_colors(theme: NeoCadeTheme, problems: Array[String]) -> void:
+	var base: Color = theme.base_color
+	var presets := _direction_presets_for_theme(theme)
+	var spread_factor: float = float(presets.get("spread_factor", 1.0))
+	var elevate_target := Color.BLACK if theme.is_light else Color.WHITE
+	var expected_outline := _mix_color(base, elevate_target, 0.24 * spread_factor)
+	for slot in ["guide_color", "font_outline_color"]:
+		if not _color_close(theme.get_color(slot, "ItemList"), expected_outline):
+			problems.append("ItemList.%s does not match derived outline role" % slot)
+	if theme.get_color("scroll_hint_color", "ItemList").a >= 1.0:
+		problems.append("ItemList.scroll_hint_color should remain an alpha-bearing affordance")
+
+
+func _assert_itemlist_icon_recipes(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	var itemlist_icons: Dictionary = binding.get("ItemList", {}).get("icon", {})
+	for slot in EXPECTED_ITEMLIST_ICON_RECIPES.keys():
+		var expected_icon: String = EXPECTED_ITEMLIST_ICON_RECIPES[slot]
+		var recipe: Dictionary = itemlist_icons.get(slot, {})
+		var actual_icon: String = recipe.get("icon", "")
+		if actual_icon != expected_icon:
+			problems.append("ItemList.icon recipe %s expected %s got %s" % [slot, expected_icon, actual_icon])
 
 
 func _direction_presets_for_theme(theme: NeoCadeTheme) -> Dictionary:
