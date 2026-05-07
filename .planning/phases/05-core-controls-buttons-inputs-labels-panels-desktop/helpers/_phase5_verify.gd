@@ -177,11 +177,40 @@ func assert_spinbox_icons() -> void:
 		_group_pending(group, "SpinBox missing official icon slots: " + ", ".join(missing) + " (Plan 05-06)")
 
 
+## Plan 05-02 Task 3: extended to load each `.tres` and confirm
+## _resolve_direction_presets() returns the matching DIRECTION_PRESETS row
+## (not DEFAULT). Mirror of the headless variant — see that file for full
+## documentation.
+const PHASE5_DIRECTION_TRES_PATHS := {
+	"151A2E": "res://addons/neocade_theme/pulse_neocade_theme.tres",
+	"111820": "res://addons/neocade_theme/slate_neocade_theme.tres",
+	"241326": "res://addons/neocade_theme/bubble_neocade_theme.tres",
+	"0B2420": "res://addons/neocade_theme/daybreak_neocade_theme.tres",
+	"20112E": "res://addons/neocade_theme/burst_neocade_theme.tres",
+}
+
+const PHASE5_RECIPE_PATHS := [
+	"shape.primary_radius",
+	"shape.primary_padding",
+	"shape.primary_strategy",
+	"shape.ghost_strategy",
+	"shape.kicker_style",
+	"shape.focus_offset",
+	"shape.surface_alpha_panels",
+	"shape.surface_alpha_popup",
+	"shape.surface_alpha_buttons",
+	"shape.raised_lifts.primary",
+	"shape.raised_lifts.panel",
+	"shape.raised_lifts.dialog",
+]
+
 func assert_shape_lookup_integrity() -> void:
 	var group := "assert_shape_lookup_integrity"
 	var theme := _load_pulse_for_group(group)
 	if theme == null: return
-	var presets: Dictionary = theme.get_script().get_script_constant_map().get("DIRECTION_PRESETS", {})
+	var const_map: Dictionary = theme.get_script().get_script_constant_map()
+	var presets: Dictionary = const_map.get("DIRECTION_PRESETS", {})
+	var default_preset: Dictionary = const_map.get("DIRECTION_PRESET_DEFAULT", {})
 	if presets.is_empty():
 		_group_fail(group, "DIRECTION_PRESETS const not found on production class")
 		return
@@ -208,8 +237,65 @@ func assert_shape_lookup_integrity() -> void:
 				continue
 			if shape_dict[key] == null:
 				problems.append("direction %s shape['%s'] is null" % [hex_key, key])
-	if problems.is_empty() and directions_with_shape == 5:
-		_group_ok(group, "all 5 directions have shape.* sub-blocks with required keys")
+	# Plan 05-02 Task 3: per-direction `.tres` load + recipe-path resolution.
+	var tres_resolved_directions := 0
+	for hex_key in approved_hex_keys:
+		var tres_path: String = PHASE5_DIRECTION_TRES_PATHS.get(hex_key, "")
+		if tres_path == "":
+			problems.append("direction %s has no `.tres` path mapping in verifier" % hex_key)
+			continue
+		var direction_loaded: Resource = ResourceLoader.load(tres_path)
+		if direction_loaded == null or not (direction_loaded is NeoCadeTheme):
+			problems.append("could not load %s as NeoCadeTheme" % tres_path)
+			continue
+		var direction_theme: NeoCadeTheme = direction_loaded
+		var resolved: Dictionary = direction_theme.call("_resolve_direction_presets")
+		if resolved.is_empty():
+			problems.append("%s _resolve_direction_presets returned empty" % tres_path)
+			continue
+		var const_row: Dictionary = presets.get(hex_key, {})
+		if not resolved.has("shape") or not const_row.has("shape"):
+			problems.append("%s resolved row missing shape sub-block" % tres_path)
+			continue
+		var resolved_shape: Dictionary = resolved.shape
+		var const_shape: Dictionary = const_row.shape
+		var loaded_hex: String = direction_theme.base_color.to_html(false).to_upper()
+		if loaded_hex != hex_key:
+			problems.append("%s base_color hex = %s but expected %s" % [tres_path, loaded_hex, hex_key])
+			continue
+		if resolved_shape.get("primary_radius") != const_shape.get("primary_radius"):
+			problems.append("%s primary_radius mismatch" % tres_path)
+		if resolved_shape.get("focus_offset") != const_shape.get("focus_offset"):
+			problems.append("%s focus_offset mismatch" % tres_path)
+		if String(resolved_shape.get("primary_strategy", "")) != String(const_shape.get("primary_strategy", "")):
+			problems.append("%s primary_strategy mismatch" % tres_path)
+		if not direction_theme.has_method("_lookup_shape"):
+			problems.append("%s lacks _lookup_shape" % tres_path)
+			continue
+		for path in PHASE5_RECIPE_PATHS:
+			var v: Variant = direction_theme.call("_lookup_shape", resolved, path)
+			if v == null:
+				problems.append("%s _lookup_shape('%s') returned null" % [tres_path, path])
+		var fo: Variant = direction_theme.call("_lookup_shape", resolved, "shape.focus_offset")
+		if fo != null and (typeof(fo) != TYPE_INT or fo < 0 or fo > 4):
+			problems.append("%s shape.focus_offset out of expected range: %s" % [tres_path, str(fo)])
+		tres_resolved_directions += 1
+	# DEFAULT fallback (D-13).
+	if not default_preset.has("shape"):
+		problems.append("DIRECTION_PRESET_DEFAULT.shape missing (D-13)")
+	else:
+		var default_shape: Dictionary = default_preset.shape
+		var custom: NeoCadeTheme = NeoCadeTheme.new()
+		custom.base_color = Color("#0F0F0F")
+		var custom_resolved: Dictionary = custom.call("_resolve_direction_presets")
+		if not custom_resolved.has("shape"):
+			problems.append("custom NeoCadeTheme.new() resolved row has no shape")
+		else:
+			var custom_shape: Dictionary = custom_resolved.shape
+			if String(custom_shape.get("primary_strategy", "")) != String(default_shape.get("primary_strategy", "")):
+				problems.append("custom theme primary_strategy mismatch with DEFAULT")
+	if problems.is_empty() and directions_with_shape == 5 and tres_resolved_directions == 5:
+		_group_ok(group, "all 5 directions have shape.* sub-blocks; .tres files resolve to per-direction rows; recipe paths non-null incl. focus_offset; DEFAULT fallback works")
 	else:
 		_group_pending(group, "shape sub-blocks not fully populated yet (Plan 05-02): %s" % "; ".join(problems))
 
