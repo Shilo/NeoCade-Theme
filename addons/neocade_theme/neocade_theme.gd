@@ -148,6 +148,21 @@ func _regenerate_theme() -> void:
 	var role_primary: Color = accent_color
 	var accent_rim: Color = _mix(accent_color, Color.WHITE, 0.5)
 
+	# ── Semantic role tokens (DESIGN_TOKENS §7.1; Plan 05-02 Task 2 — review HIGH gate) ──
+	# Defaults sourced verbatim from DESIGN_TOKENS §7.1 "Semantic role tokens" table:
+	#   role.success → #5CC971   role.warning → #FFD166
+	#   role.danger  → #FF6E6E   role.info    → #5FE3FF
+	# These keys MUST be in role_table BEFORE BINDING_TABLE walk so Plan 05-03's
+	# DangerButton (and any future Success/Warning/Info chrome) can bind via
+	# `{"role": "role_danger"}` without silently falling back to surface_panel /
+	# text_strong (which would ship the wrong color and breach §7.1).
+	# Per DESIGN_TOKENS §7.1: "directions may override" — v1 ships the defaults;
+	# direction-specific overrides plug in via DIRECTION_PRESETS.shape.* in v2.
+	var role_success: Color = Color("#5CC971")
+	var role_warning: Color = Color("#FFD166")
+	var role_danger:  Color = Color("#FF6E6E")
+	var role_info:    Color = Color("#5FE3FF")
+
 	# ── BINDING_TABLE walk lands here (Plan 04-05). ──
 	# The locals above are the precomputed inputs every entry-population path consumes.
 	# Iteration is additive only; no Theme reset is permitted in this method (D-01 invariant).
@@ -230,6 +245,11 @@ func _regenerate_theme() -> void:
 		"state_pressed":          state_pressed,
 		"role_primary":           role_primary,
 		"accent_rim":             accent_rim,
+		# Semantic roles (Plan 05-02 Task 2; DESIGN_TOKENS §7.1).
+		"role_success":           role_success,
+		"role_warning":           role_warning,
+		"role_danger":            role_danger,
+		"role_info":              role_info,
 	}
 
 	# ── Walk BINDING_TABLE — additive iteration; entries not in table are LEFT UNTOUCHED (D-04) ──
@@ -1337,24 +1357,233 @@ const BINDING_TABLE: Dictionary = {
 
 # ─── Recipe resolution (Plan 04-05 iteration engine helper) ─────────────────────────────────
 
+## Walks `presets.shape.<dotted_path>` against the active direction's shape sub-block.
+##
+## Plan 05-02 Task 2 (D-03). Recipes reference shape values as strings like
+## `"shape.primary_radius"` or `"shape.raised_lifts.primary"`; this helper splits on `.`
+## and walks the shape Dictionary one key at a time. Returns the leaf value (int / float /
+## Vector2i / StringName / Dictionary) or `null` if any segment is missing.
+##
+## For approved direction presets, missing shape keys are verifier failures (D-02 mandate);
+## the only acceptable null path is when `presets` lacks a `shape` block entirely (custom
+## NeoCadeTheme.new() consumers — those use DIRECTION_PRESET_DEFAULT.shape per D-13).
+func _lookup_shape(presets: Dictionary, dotted_path: String) -> Variant:
+	if not (dotted_path is String) or not dotted_path.begins_with("shape."):
+		return null
+	if not presets.has("shape"):
+		return null
+	var current: Variant = presets["shape"]
+	var segments: PackedStringArray = dotted_path.substr(6).split(".")  # strip "shape."
+	for seg in segments:
+		if seg == "":
+			return null
+		if typeof(current) != TYPE_DICTIONARY:
+			return null
+		var d: Dictionary = current
+		if not d.has(seg):
+			return null
+		current = d[seg]
+	return current
+
+
+## Sets all four StyleBoxFlat corner_radius_* fields to the same int radius.
+## Plan 05-02 Task 2 helper (D-03): factored out so `radius: shape.<key>` recipes
+## can apply uniformly without inlining 4 setters at every call site.
+func _set_radius_all(sb: StyleBoxFlat, r: int) -> void:
+	sb.corner_radius_top_left = r
+	sb.corner_radius_top_right = r
+	sb.corner_radius_bottom_left = r
+	sb.corner_radius_bottom_right = r
+
+
+## Sets StyleBoxFlat content_margin_* from a Vector2i where x=horizontal, y=vertical.
+## Plan 05-02 Task 2 helper (D-03): `padding: shape.<key>` recipes call this so the
+## Vector2i convention (x→left/right, y→top/bottom) is enforced in one place. Phase 4
+## FOUND-02 lock makes Vector2i the canonical paired-x/y type.
+func _set_content_margin_from_padding(sb: StyleBoxFlat, padding: Vector2i) -> void:
+	sb.content_margin_left = padding.x
+	sb.content_margin_right = padding.x
+	sb.content_margin_top = padding.y
+	sb.content_margin_bottom = padding.y
+
+
+## Applies the per-direction primary_strategy mutation to a StyleBoxFlat representing
+## the primary-button bg. Plan 05-02 Task 2 (D-04 first-class enum dispatch).
+##
+## Strategies are sourced VERBATIM from DESIGN_TOKENS §5.1-§5.5:
+##   "bold-accent-fill"        — Pulse: bg=role_primary (accent), thin outline matches accent.
+##   "quiet-pill"              — Slate: bg=surface_panel, thin role_primary border (1px).
+##   "pillowy-fully-rounded"   — Bubble: bg=role_primary, radius forced to 999 (pill) AFTER
+##                               any prior radius set so shape.primary_radius=999 wins.
+##   "friendly-generous"       — Daybreak: bg=role_primary, generous padding already applied
+##                               by `padding: shape.primary_padding` recipe row.
+##   "oversized-statement"     — Burst: bg=role_primary, larger radius applied via shape
+##                               (28 vs base 18); padding already 20×14 from shape.
+##
+## Strategies are CLOSED enums — adding a 6th approved direction in v2 = adding a strategy
+## entry HERE, not editing 14 BINDING_TABLE recipe rows (D-04). Unknown strategy = no-op
+## (verifier asserts the closed-enum invariant; typos surface as PHASE5_GROUP_FAIL).
+func _apply_primary_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_table: Dictionary, presets: Dictionary) -> void:
+	# Strategy values are the StringName literals from DIRECTION_PRESETS.shape.primary_strategy
+	# per direction (sourced verbatim from DESIGN_TOKENS §5.1-§5.5 "primary_strategy" rows).
+	match String(strategy_name):
+		"bold-accent-fill":
+			# Pulse: solid accent fill, accent-tinted outline.
+			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
+			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
+		"quiet-pill":
+			# Slate: muted surface bg + thin accent border (the "iOS quiet pill" read).
+			sb.bg_color = role_table.get("surface_panel", role_table.surface_panel)
+			sb.border_color = role_table.get("role_primary", role_table.outline_color)
+			sb.border_width_left = 1
+			sb.border_width_top = 1
+			sb.border_width_right = 1
+			sb.border_width_bottom = 1
+		"pillowy-fully-rounded":
+			# Bubble: accent fill + radius locked to 999 regardless of prior radius set.
+			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
+			_set_radius_all(sb, 999)
+			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
+		"friendly-generous":
+			# Daybreak: accent fill; padding/radius already applied by shape.* recipe rows.
+			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
+			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
+		"oversized-statement":
+			# Burst: accent fill; oversized radius (28) applied via shape.primary_radius.
+			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
+			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
+		_:
+			# Unknown strategy — Phase 5 verifier flags this as a typo; no mutation here
+			# so the bg from the recipe's `role` lookup stays in place (D-04 escape hatch).
+			pass
+
+
+## Applies the per-direction ghost_strategy mutation to a StyleBoxFlat representing
+## a ghost-button bg. Plan 05-02 Task 2 (D-04 first-class enum dispatch).
+##
+## Strategies are sourced VERBATIM from DESIGN_TOKENS §5.1-§5.5:
+##   "accent-outlined-accent-text"   — Pulse: transparent bg + 2px accent border.
+##   "thin-accent-outline"           — Slate: transparent bg + 1px accent border.
+##   "rounded-ghost-thicker-outline" — Bubble: transparent bg + 2px accent border + radius 999.
+##   "soft-outline"                  — Daybreak / DEFAULT: transparent bg + 1px outline_color.
+##   "normal-accent-ghost"           — Burst: transparent bg + 2px accent border.
+func _apply_ghost_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_table: Dictionary, presets: Dictionary) -> void:
+	# Default to transparent bg; specific strategies override border color/thickness.
+	sb.bg_color = Color(0, 0, 0, 0)
+	match String(strategy_name):
+		"accent-outlined-accent-text":
+			# Pulse ghost: transparent bg + 2px accent border.
+			sb.border_color = role_table.get("role_primary", role_table.outline_color)
+			sb.border_width_left = 2
+			sb.border_width_top = 2
+			sb.border_width_right = 2
+			sb.border_width_bottom = 2
+		"thin-accent-outline":
+			# Slate ghost: 1px accent.
+			sb.border_color = role_table.get("role_primary", role_table.outline_color)
+			sb.border_width_left = 1
+			sb.border_width_top = 1
+			sb.border_width_right = 1
+			sb.border_width_bottom = 1
+		"rounded-ghost-thicker-outline":
+			# Bubble ghost: 2px accent + force radius 999 (pill) to read with the
+			# pillowy primary nearby.
+			sb.border_color = role_table.get("role_primary", role_table.outline_color)
+			sb.border_width_left = 2
+			sb.border_width_top = 2
+			sb.border_width_right = 2
+			sb.border_width_bottom = 2
+			_set_radius_all(sb, 999)
+		"soft-outline":
+			# Daybreak / DEFAULT ghost: 1px outline_color (calmer than accent).
+			sb.border_color = role_table.get("outline_color", role_table.outline_color)
+			sb.border_width_left = 1
+			sb.border_width_top = 1
+			sb.border_width_right = 1
+			sb.border_width_bottom = 1
+		"normal-accent-ghost":
+			# Burst ghost: 2px accent border.
+			sb.border_color = role_table.get("role_primary", role_table.outline_color)
+			sb.border_width_left = 2
+			sb.border_width_top = 2
+			sb.border_width_right = 2
+			sb.border_width_bottom = 2
+		_:
+			# Unknown strategy — verifier flags this; no mutation (D-04 escape hatch).
+			pass
+
+
+## Resolves the kicker font_color for the active direction per `kicker_style`.
+## Plan 05-02 Task 2 (D-09 closes DESIGN_TOKENS §8.6 todo; Plan 05-04 actually wires
+## Kicker into BINDING_TABLE and TYPE_VARIATIONS — this helper exists now so Task 2's
+## verifier `assert_shape_recipe_resolution` finds it; the actual Kicker entry binding
+## happens in Plan 05-04).
+##
+## Styles sourced VERBATIM from DESIGN_TOKENS §8.6:
+##   "uppercase-tracked-accent"      — Pulse / Bubble: accent font_color.
+##   "small-caps-subtle"             — Slate: text_muted font_color.
+##   "sentence-case-accent"          — Daybreak / DEFAULT: accent font_color.
+##   "uppercase-bold-larger-scale"   — Burst: accent font_color (size+weight handled
+##                                     by Plan 05-04's set_font_size / FontVariation wght).
+##
+## Returns the resolved Color so Plan 05-04's color-recipe path can use it directly.
+func _apply_kicker_style(kicker_style: StringName, role_table: Dictionary) -> Color:
+	match String(kicker_style):
+		"uppercase-tracked-accent":
+			return role_table.get("role_primary", role_table.text_strong)
+		"small-caps-subtle":
+			return role_table.get("text_muted", role_table.text_strong)
+		"sentence-case-accent":
+			return role_table.get("role_primary", role_table.text_strong)
+		"uppercase-bold-larger-scale":
+			return role_table.get("role_primary", role_table.text_strong)
+		_:
+			return role_table.get("text_strong", Color.WHITE)
+
+
 ## Resolves a BINDING_TABLE recipe to a concrete value, given the precomputed derivation block.
 ## `data_type` is "stylebox", "color", "constant", "font_size", or "icon".
 ##   (Cross-AI Cycle 2 N1 fix: NO "font" branch — per-Control fonts are handled by
 ##   theme.default_font + the 14 explicit set_font calls on type variations in Task 1.)
+##
+## Plan 05-02 Task 2 (D-03): stylebox branch supports `radius: "shape.<key>"`,
+## `padding: "shape.<key>"`, `alpha: "shape.<key>"`, `raised_intensity: "shape.<key>"`,
+## and `strategy: "shape.<strategy_key>"` — values are dereferenced through `_lookup_shape()`
+## against the active direction's `shape` sub-block. The `disabled: true` carry-over is
+## preserved (Cycle 2 C2). Strategy dispatch is closed-enum per D-04: unknown strategies
+## leave the recipe-default bg in place (D-04 escape hatch) and the verifier flags typos.
+##
 ## Returns null if the recipe references an unknown role or icon (caller skips silently — D-04).
 func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictionary,
 					  tokens: Dictionary, presets: Dictionary) -> Variant:
 	if data_type == "stylebox":
 		var role: String = recipe.get("role", "surface_panel")
-		var raised_intensity: int = recipe.get("raised_intensity", 0)
+		# raised_intensity may be either an int literal or a `shape.<key>` lookup string.
+		var raised_intensity_raw: Variant = recipe.get("raised_intensity", 0)
+		var raised_intensity: int = 0
+		if typeof(raised_intensity_raw) == TYPE_STRING and (raised_intensity_raw as String).begins_with("shape."):
+			var lifted: Variant = _lookup_shape(presets, raised_intensity_raw)
+			if lifted != null and (typeof(lifted) == TYPE_INT or typeof(lifted) == TYPE_FLOAT):
+				raised_intensity = int(lifted)
+		else:
+			raised_intensity = int(raised_intensity_raw)
 		# Cross-AI Cycle 2 C2 fix: disabled flag pulls per-direction alpha from presets,
 		# NOT a hard-coded literal. Recipes carrying "disabled": true get presets.disabled_opacity.
 		var is_disabled: bool = recipe.get("disabled", false)
-		var alpha: float = recipe.get("alpha", 1.0)
+		# Plan 05-02 Task 2 (D-03): alpha may be a literal float or a `shape.<key>` lookup.
+		var alpha_raw: Variant = recipe.get("alpha", 1.0)
+		var alpha: float = 1.0
+		if typeof(alpha_raw) == TYPE_STRING and (alpha_raw as String).begins_with("shape."):
+			var alpha_lookup: Variant = _lookup_shape(presets, alpha_raw)
+			if alpha_lookup != null and (typeof(alpha_lookup) == TYPE_FLOAT or typeof(alpha_lookup) == TYPE_INT):
+				alpha = float(alpha_lookup)
+		else:
+			alpha = float(alpha_raw)
 		if is_disabled:
 			alpha = presets.disabled_opacity
 		if role == "focus_ring":
 			# Focus ring is a special stylebox: transparent bg, accent border, expand outside corner.
+			# Plan 05-02 Task 2: focus_offset comes from shape per D-08 (per-direction gap).
 			var focus_sb := StyleBoxFlat.new()
 			focus_sb.bg_color = Color(0, 0, 0, 0)
 			focus_sb.border_color = role_table.role_primary
@@ -1362,14 +1591,28 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			focus_sb.border_width_top = focus_thickness
 			focus_sb.border_width_right = focus_thickness
 			focus_sb.border_width_bottom = focus_thickness
-			focus_sb.corner_radius_top_left = corner_radius
-			focus_sb.corner_radius_top_right = corner_radius
-			focus_sb.corner_radius_bottom_left = corner_radius
-			focus_sb.corner_radius_bottom_right = corner_radius
-			focus_sb.expand_margin_left = 2
-			focus_sb.expand_margin_top = 2
-			focus_sb.expand_margin_right = 2
-			focus_sb.expand_margin_bottom = 2
+			# Per-direction shape.primary_radius drives the focus ring radius if the
+			# recipe specifies `radius: "shape.<key>"`; otherwise stay on the @export
+			# corner_radius. Plan 05-03 wires the radius lookup for variation-specific
+			# focus rings; the base focus_ring keeps the @export default.
+			var fr_radius: int = corner_radius
+			var fr_radius_raw: Variant = recipe.get("radius", null)
+			if fr_radius_raw != null and typeof(fr_radius_raw) == TYPE_STRING and (fr_radius_raw as String).begins_with("shape."):
+				var fr_r_lookup: Variant = _lookup_shape(presets, fr_radius_raw)
+				if fr_r_lookup != null and (typeof(fr_r_lookup) == TYPE_INT or typeof(fr_r_lookup) == TYPE_FLOAT):
+					fr_radius = int(fr_r_lookup)
+			elif fr_radius_raw != null and (typeof(fr_radius_raw) == TYPE_INT or typeof(fr_radius_raw) == TYPE_FLOAT):
+				fr_radius = int(fr_radius_raw)
+			_set_radius_all(focus_sb, fr_radius)
+			# Per-direction focus_offset (DESIGN_TOKENS §8.2): Pulse=0, Burst=1, others=2.
+			var focus_offset_v: Variant = _lookup_shape(presets, "shape.focus_offset")
+			var focus_offset_int: int = 2
+			if focus_offset_v != null and (typeof(focus_offset_v) == TYPE_INT or typeof(focus_offset_v) == TYPE_FLOAT):
+				focus_offset_int = int(focus_offset_v)
+			focus_sb.expand_margin_left = focus_offset_int
+			focus_sb.expand_margin_top = focus_offset_int
+			focus_sb.expand_margin_right = focus_offset_int
+			focus_sb.expand_margin_bottom = focus_offset_int
 			focus_sb.shadow_size = -1
 			return focus_sb
 		var bg_color: Color = role_table.get(role, role_table.surface_panel)
@@ -1379,35 +1622,91 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		var offset_color: Color = role_table.get(role + "_offset", role_table.surface_panel_offset)
 		var sb_intensity: int = (raised_strength * raised_intensity) if raised else 0
 		var sb := _make_raised_stylebox(bg_color, offset_color, sb_intensity)
-		sb.corner_radius_top_left = corner_radius
-		sb.corner_radius_top_right = corner_radius
-		sb.corner_radius_bottom_left = corner_radius
-		sb.corner_radius_bottom_right = corner_radius
+		# Plan 05-02 Task 2 (D-03): radius may be either the @export `corner_radius` baseline
+		# (no recipe override), an int literal, or a `shape.<key>` lookup. _set_radius_all
+		# applies uniformly. The @export `corner_radius` is the variation-agnostic baseline;
+		# recipes opting into shape.* pin to per-direction values from DESIGN_TOKENS §5.1-§5.5.
+		var radius_raw: Variant = recipe.get("radius", null)
+		var resolved_radius: int = corner_radius
+		if radius_raw != null:
+			if typeof(radius_raw) == TYPE_STRING and (radius_raw as String).begins_with("shape."):
+				var r_lookup: Variant = _lookup_shape(presets, radius_raw)
+				if r_lookup != null and (typeof(r_lookup) == TYPE_INT or typeof(r_lookup) == TYPE_FLOAT):
+					resolved_radius = int(r_lookup)
+			elif typeof(radius_raw) == TYPE_INT or typeof(radius_raw) == TYPE_FLOAT:
+				resolved_radius = int(radius_raw)
+		_set_radius_all(sb, resolved_radius)
 		sb.border_color = role_table.outline_color
 		sb.border_width_left = outline_width
 		sb.border_width_top = outline_width
 		sb.border_width_right = outline_width
 		sb.border_width_bottom = outline_width
-		# Cross-AI Cycle 2 M2 fix: platform-aware margins. DESKTOP (densityScale=1.0,
-		# tapPadding=8) yields the base spacing; MOBILE (densityScale=1.5, tapPadding=12)
-		# produces a visibly larger Button.normal content_margin_*. Plan 04-06's MOBILE
-		# toggle assertion observes this difference.
-		var density: float = tokens.get("densityScale", 1.0)
-		var tap_pad: int = tokens.get("tapPadding", 0)
-		var h_margin: int = int(spacing * density) + tap_pad
-		var v_margin: int = int(spacing * 0.6 * density) + tap_pad
-		sb.content_margin_left = h_margin
-		sb.content_margin_top = v_margin
-		sb.content_margin_right = h_margin
-		sb.content_margin_bottom = v_margin
+		# Plan 05-02 Task 2 (D-03): padding may be a `shape.<key>` Vector2i lookup
+		# OR (default) the platform-aware Phase 4 derivation.
+		var padding_raw: Variant = recipe.get("padding", null)
+		var applied_padding: bool = false
+		if padding_raw != null and typeof(padding_raw) == TYPE_STRING and (padding_raw as String).begins_with("shape."):
+			var pad_lookup: Variant = _lookup_shape(presets, padding_raw)
+			if pad_lookup != null and typeof(pad_lookup) == TYPE_VECTOR2I:
+				_set_content_margin_from_padding(sb, pad_lookup)
+				applied_padding = true
+		if not applied_padding:
+			# Cross-AI Cycle 2 M2 fix: platform-aware margins. DESKTOP (densityScale=1.0,
+			# tapPadding=8) yields the base spacing; MOBILE (densityScale=1.5, tapPadding=12)
+			# produces a visibly larger Button.normal content_margin_*. Plan 04-06's MOBILE
+			# toggle assertion observes this difference.
+			var density: float = tokens.get("densityScale", 1.0)
+			var tap_pad: int = tokens.get("tapPadding", 0)
+			var h_margin: int = int(spacing * density) + tap_pad
+			var v_margin: int = int(spacing * 0.6 * density) + tap_pad
+			sb.content_margin_left = h_margin
+			sb.content_margin_top = v_margin
+			sb.content_margin_right = h_margin
+			sb.content_margin_bottom = v_margin
+		# Plan 05-02 Task 2 (D-04): strategy dispatch (closed-enum, sourced VERBATIM
+		# from DESIGN_TOKENS §5.1-§5.5). Recipes opt-in via `strategy: "shape.primary_strategy"`
+		# (or `"shape.ghost_strategy"`); _apply_primary_strategy / _apply_ghost_strategy
+		# mutate the StyleBoxFlat in place per the active direction's strategy enum.
+		var strategy_raw: Variant = recipe.get("strategy", null)
+		if strategy_raw != null and typeof(strategy_raw) == TYPE_STRING:
+			var strat_lookup: Variant = _lookup_shape(presets, strategy_raw)
+			if strat_lookup != null:
+				var strat_name: StringName = strat_lookup if typeof(strat_lookup) == TYPE_STRING_NAME else StringName(String(strat_lookup))
+				# Dispatch via path: shape.primary_strategy → primary; shape.ghost_strategy → ghost.
+				if (strategy_raw as String).ends_with(".primary_strategy"):
+					_apply_primary_strategy(sb, strat_name, role_table, presets)
+				elif (strategy_raw as String).ends_with(".ghost_strategy"):
+					_apply_ghost_strategy(sb, strat_name, role_table, presets)
+				# Other strategy paths (kicker_style etc.) are NOT dispatched on stylebox;
+				# they're color-recipe territory handled below.
 		return sb
 	elif data_type == "color":
 		var role: String = recipe.get("role", "text_strong")
 		# Cross-AI Cycle 2 C2 fix: disabled flag pulls per-direction alpha from presets.
 		var is_disabled: bool = recipe.get("disabled", false)
-		var alpha: float = recipe.get("alpha", 1.0)
+		# Plan 05-02 Task 2 (D-03): alpha may be a literal or shape.<key> lookup here too.
+		var alpha_raw: Variant = recipe.get("alpha", 1.0)
+		var alpha: float = 1.0
+		if typeof(alpha_raw) == TYPE_STRING and (alpha_raw as String).begins_with("shape."):
+			var alpha_lookup: Variant = _lookup_shape(presets, alpha_raw)
+			if alpha_lookup != null and (typeof(alpha_lookup) == TYPE_FLOAT or typeof(alpha_lookup) == TYPE_INT):
+				alpha = float(alpha_lookup)
+		else:
+			alpha = float(alpha_raw)
 		if is_disabled:
 			alpha = presets.disabled_opacity
+		# Plan 05-02 Task 2 (D-09 prep): recipes can reference `kicker_style: "shape.kicker_style"`
+		# to dispatch per-direction Kicker color. Plan 05-04 wires the actual Kicker
+		# variation entry; the helper is registered here.
+		var kicker_style_raw: Variant = recipe.get("kicker_style", null)
+		if kicker_style_raw != null and typeof(kicker_style_raw) == TYPE_STRING and (kicker_style_raw as String).begins_with("shape."):
+			var kstyle_lookup: Variant = _lookup_shape(presets, kicker_style_raw)
+			if kstyle_lookup != null:
+				var kname: StringName = kstyle_lookup if typeof(kstyle_lookup) == TYPE_STRING_NAME else StringName(String(kstyle_lookup))
+				var kcolor: Color = _apply_kicker_style(kname, role_table)
+				if alpha < 1.0:
+					kcolor = Color(kcolor.r, kcolor.g, kcolor.b, alpha)
+				return kcolor
 		var c: Color = role_table.get(role, role_table.text_strong)
 		if alpha < 1.0:
 			c = Color(c.r, c.g, c.b, alpha)
@@ -1417,6 +1716,13 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		if typeof(value_ref) == TYPE_STRING and (value_ref as String).begins_with("tokens."):
 			var key: String = (value_ref as String).substr(7)
 			return tokens.get(key, 0)
+		# Plan 05-02 Task 2 (D-03): constants/font_sizes can also pull from shape.* (e.g.,
+		# `value: "shape.focus_offset"` for outline widths or focus expand metadata).
+		if typeof(value_ref) == TYPE_STRING and (value_ref as String).begins_with("shape."):
+			var shape_v: Variant = _lookup_shape(presets, value_ref)
+			if shape_v != null and (typeof(shape_v) == TYPE_INT or typeof(shape_v) == TYPE_FLOAT):
+				return int(shape_v)
+			return 0
 		return int(value_ref)
 	elif data_type == "icon":
 		var icon_name: String = recipe.get("icon", "")
