@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 4 Plan 03 complete (Button-family icons + .import sidecars; atomic commit `ec27939`)
-last_updated: "2026-05-06T23:50:11.143Z"
+stopped_at: Phase 4 Plan 05 complete (BINDING_TABLE 37-row freeze + CANONICAL_SLOT_NAMES + 14 type variations + iteration engine; atomic commit `d9e405a`)
+last_updated: "2026-05-07T00:05:00.000Z"
 last_activity: 2026-05-06
 progress:
   total_phases: 15
   completed_phases: 6
   total_plans: 42
-  completed_plans: 35
-  percent: 83
+  completed_plans: 37
+  percent: 88
 ---
 
 # Project State
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-05-06)
 ## Current Position
 
 Phase: 04 (foundation-neocadetheme-superclass-per-theme-subclasses-font) — EXECUTING
-Plan: 5 of 8 (Plans 04-01 + 04-02 + 04-03 complete; next is Plan 04-04 color formulas + role tokens — Wave 2 begins)
-Next: `/gsd-execute-phase 04` continues with Plan 04-04 (color formulas + role tokens)
+Plan: 6 of 8 (Plans 04-01 + 04-02 + 04-03 + 04-04 + 04-05 complete; next is Plan 04-06 Pulse `.tres` + verification helper)
+Next: `/gsd-execute-phase 04` continues with Plan 04-06 (Pulse `.tres` + verification helper)
 Status: Ready to execute
 Last activity: 2026-05-06
 
-Progress: [██████████] 83%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -73,6 +73,7 @@ Progress: [██████████] 83%
 | Phase 03.4 P02 | re-executed 2026-05-06 | 5 tasks | mockup gallery + 15 concept PNGs |
 | Phase 04 P01 | 25 min | 3 tasks | 3 files (1 D, 1 M, 1 A) |
 | Phase 04 P03 | ~7 min | 3 tasks | 20 files (10 SVG + 10 .import sidecars, all A) |
+| Phase 04 P05 | ~25 min | 5 tasks | 3 files (1 M neocade_theme.gd +940 net, 2 A helpers) |
 
 ## Accumulated Context
 
@@ -94,6 +95,8 @@ Recent decisions affecting current work:
 - **Theme-direction phase insertion (2026-05-04; completed 2026-05-06):** **NEW Phase 3.3 inserted** to address gap — original phases 3.1/3.2/3.3 covered design language + architecture + mockups, but NO phase explicitly researched/derived theme directions. Phase 3.3 (Theme Direction Research) derived 5 candidate directions using user's new goals/restrictions + per-v0-direction reactions as DNA + Phase 3.1 findings + commercial flat-MD3 example survey. Outputs `.planning/research/THEME-DIRECTIONS.md` with text-level user approval. **Phase 3.4 Plan 02 selected Pulse as the recommended starter / implementation priority; Slate, Bubble, Daybreak, and Burst remain v1 personality variations.** Recommended starter affects showcase default + README "try this first" only; it does NOT bake Pulse into class defaults.
 - Phase 4 Plan 01 (2026-05-06): NeoCadeTheme class shell authored at `addons/neocade_theme/neocade_theme.gd` — `@tool class_name NeoCadeTheme extends Theme` with 9 @exports (4 Core + 5 Shape under `@export_group("Shape")`), `enum Platform { DESKTOP, MOBILE, AUTO }`, `is_light` luminance-derivation, `_regenerating` reentry guard, `_regenerate_theme()` skeleton, no-`Theme.clear` invariant from day 1, D-03/D-31/D-04/REVISABLE/binding docstring anchors. Empty scaffold `addons/neocade_theme/neocade_theme.tres` deleted; `main.tscn` `theme = ExtResource(...)` line removed entirely (Cycle 6 F2 fix — no placeholder comment because Godot discards `.tscn` comments on save). Atomic commit `d1d596c`.
 - Phase 4 Plan 03 (2026-05-06): Button-family bespoke icons authored — 10 monochrome SVGs at 32×32 reference (`check`, `checkbox_checked/unchecked`, `radio_checked/unchecked`, `checkbutton_checked/unchecked`, `arrow_down`, `clear`, `close`) under `addons/neocade_theme/icons/`. Strict single-color `#FFFFFF` policy (Cross-AI Cycle 1 MEDIUM fix). 10 `.import` sidecars locking `svg/scale=2.0` + `mipmaps/generate=true` + `compress/mode=0` + `process/fix_alpha_border=true`, normalized via `godot --headless --import` (Cycle 6 F5 three-stage workflow) so committed paths use real `.ctex` md5 hashes and Godot-issued `uid://` UUIDs. Atomic commit `ec27939`. ICON-03 + ICON-04 → Complete; ICON-01 + ICON-02 → In Progress (remaining slots land in Phases 6/7 under the same contract).
+- Phase 4 Plan 04 (2026-05-06): Color formulas + role tokens ported into NeoCadeTheme — `_mix` / `_tint_toward_base` color helpers, `_resolve_platform` / `_platform_tokens` platform helpers, `_make_raised_stylebox` raised helper, `DIRECTION_PRESETS` per-direction non-exported parameters keyed by uppercased base_color hex (Pulse=1.3 wide / Slate=0.7 narrow / Bubble=1.0 / Daybreak=1.0 / Burst=1.3 — Cycle 6 F1 reconciliation), `DIRECTION_PRESET_DEFAULT` for custom themes (`disabled_opacity=0.38` legacy fallback), `_resolve_direction_presets()` lookup, and the per-call derivation block in `_regenerate_theme()` (5-stop surface ramp + tinted offsets + text colors + state-layer overlays + role tokens). 277 lines total. D-01 invariant preserved. Atomic commit `be370d6`.
+- Phase 4 Plan 05 (2026-05-06): BINDING_TABLE + iteration engine + 14 type variations — `TYPE_VARIATIONS` (14 entries, CodeLabel INCLUDED per Cycle 1 C4), `CANONICAL_SLOT_NAMES` 22-Control slot-name freeze (Cycle 2 C1; closes verifier accuracy gap), `BINDING_TABLE` 37-key canonical scorecard freeze (Cycle 1 C1) with recipe-as-Dictionary entries (`{"role":..., "raised_intensity":..., "disabled":...}`), `_resolve_recipe()` helper with 5 branches (stylebox/color/constant/font_size/icon — NO font branch per Cycle 2 N1), Cycle 2 C2 fix sourcing disabled_opacity from per-direction presets (no hard-coded 0.38), Cycle 2 M2 fix wiring `tokens.densityScale + tokens.tapPadding` into content_margin (MOBILE > DESKTOP), Cycle 6 F6 fix using FontFile (not FontVariation) for `theme.default_font`, Cycle 6 F4 fix using `checked`/`unchecked` (not `on`/`off`) for CheckButton icon slots. 1216 lines total (+939 net). 10 Button-family icons wired to CheckBox/CheckButton/OptionButton/LineEdit/PopupMenu. `helpers/_phase4_introspect.gd` build-time empirical seed generator + `helpers/BINDING_TABLE_SEED.txt` documented placeholder (Godot CLI unavailable). D-01 invariant preserved. Atomic commit `d9e405a`. FOUND-02 + ICON-02 → Complete for Phase 4 baseline.
 
 ### Pending Todos
 
@@ -124,9 +127,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-06T16:35:00.000Z
-Stopped at: Phase 4 Plan 03 complete (Button-family icons + .import sidecars; atomic commit `ec27939`)
-Resume file: .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-04-color-formulas-and-role-tokens-PLAN.md
+Last session: 2026-05-07T00:05:00.000Z
+Stopped at: Phase 4 Plan 05 complete (BINDING_TABLE 37-row freeze + CANONICAL_SLOT_NAMES + 14 type variations + iteration engine; atomic commit `d9e405a`)
+Resume file: .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-06-pulse-tres-and-verification-PLAN.md
 
 ## Phase 3.4 Plan 02 redirect (2026-05-06b)
 
