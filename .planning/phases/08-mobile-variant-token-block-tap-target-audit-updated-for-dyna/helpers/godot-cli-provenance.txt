@@ -1,0 +1,7 @@
+# Godot CLI Provenance
+
+Resolved at:   2026-05-07T12:25:24.7383987Z
+Resolved by:   Resolve-Godot46.ps1 (search-only)
+Version line:  4.6.2.stable.mono.official.71f334935
+Executable:    C:\Programming_Files\Godot\Godot_v4.6.2-stable_mono_win64\Godot_v4.6.2-stable_mono_win64_console.exe
+

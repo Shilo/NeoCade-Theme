@@ -1,0 +1,51 @@
+NeoCade Phase 8 mobile contract
+
+Godot version source:
+- Resolved locally by helpers/Resolve-Godot46.ps1 from an existing Godot 4.6.x executable.
+
+Approved direction resources:
+- addons/neocade_theme/pulse_neocade_theme.tres
+- addons/neocade_theme/slate_neocade_theme.tres
+- addons/neocade_theme/bubble_neocade_theme.tres
+- addons/neocade_theme/daybreak_neocade_theme.tres
+- addons/neocade_theme/burst_neocade_theme.tres
+
+Forbidden resources and layouts:
+- addons/neocade_theme/neocade_theme.tres is forbidden as a root fallback.
+- addons/neocade_theme/neocade_mobile_theme.tres is forbidden as a sibling mobile resource.
+- Per-density theme resources are forbidden; Android density buckets are handled by Godot scaling/stretch, not extra theme files.
+- Per-direction addon-root .gd subclasses, _dev, and themes folders are forbidden.
+
+Locked 9 exports:
+- base_color
+- accent_color
+- raised
+- platform
+- corner_radius
+- spacing
+- raised_strength
+- focus_thickness
+- outline_width
+
+Forced platform matrix:
+- DESKTOP: deterministic desktop token branch.
+- MOBILE: deterministic mobile token branch.
+- AUTO: host feature based resolver smoke path.
+
+Mobile sizing:
+- 48px is the minimum mobile tap-target floor for enforceable interactive rows.
+- Mobile is a platform export mode on the same five direction resources, not neocade_mobile_theme.tres.
+- Density is represented by Godot scaling/stretch and platform tokens, not per-density resources.
+
+Verifier stages:
+- architecture
+- platform-tokens
+- tap-targets
+- docs
+- scene-toggle
+- full
+
+Tap-target classification policy:
+- interactive rows are audited against documented theme-side sizing formulas.
+- display rows are documented as N/A when they delegate interaction to child controls or engine shell behavior.
+- layout rows are documented as N/A and are never padded into fake tap targets.

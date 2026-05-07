@@ -120,14 +120,14 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Mobile Variant (MOBILE)
 
-- [ ] **MOBILE-01** *(rewritten 2026-05-06d/f; supersedes the separate-mobile-tres and abstract-base approaches)*: Mobile sizing is a `@export platform=MOBILE` toggle on the single concrete `NeoCadeTheme` class — NOT a separate `.tres` file. Setting `platform=MOBILE` (or `platform=AUTO` on a mobile target) triggers `_regenerate_theme()` to use mobile-tuned constants (44pt iOS / 48dp Android tap targets, 16px body vs 14px desktop, +50% spacing on `space.4+` per Phase 8 mobile-sizing branch). Every direction `.tres` exposes `platform`; consumers can ship the same direction `.tres` and switch platforms at instantiation or via `platform=AUTO` for runtime detection.
-- [ ] **MOBILE-02**: Tap targets ≥48px (Godot pixels at base scale 1.0) on every interactive Control in the mobile theme. Satisfies iOS HIG 44pt minimum + Material 3 48dp minimum simultaneously.
+- [x] **MOBILE-01** *(rewritten 2026-05-06d/f; supersedes the separate-mobile-tres and abstract-base approaches)*: Mobile sizing is a `@export platform=MOBILE` toggle on the single concrete `NeoCadeTheme` class — NOT a separate `.tres` file. Setting `platform=MOBILE` (or `platform=AUTO` on a mobile target) triggers `_regenerate_theme()` to use mobile-tuned constants (44pt iOS / 48dp Android tap targets, 16px body vs 14px desktop, +50% spacing on `space.4+` per Phase 8 mobile-sizing branch). Every direction `.tres` exposes `platform`; consumers can ship the same direction `.tres` and switch platforms at instantiation or via `platform=AUTO` for runtime detection.
+- [x] **MOBILE-02**: Tap targets ≥48px (Godot pixels at base scale 1.0) on every interactive Control in the mobile theme. Satisfies iOS HIG 44pt minimum + Material 3 48dp minimum simultaneously.
 - [ ] **MOBILE-03**: Body text 16px on mobile vs 14px desktop. Headings retain their desktop sizes (Inter at opsz=32 + wght=700-800; no scale change for headings).
 - [ ] **MOBILE-04**: Spacing scale +50% on `space.4` and above on mobile. Corner radii STAY IDENTICAL across desktop/mobile (brand identity, not platform-specific).
 - [ ] **MOBILE-05**: One mobile theme covers all Android density buckets (per CROSS-PLATFORM 3.5; Godot uses `content_scale_factor` + stretch modes, NOT density qualifiers). Authored values are dp-equivalent at base scale 1.0.
-- [ ] **MOBILE-06**: Tap-target audit script confirms every interactive Control in mobile theme is ≥48px; runs as part of Phase 8 acceptance.
+- [x] **MOBILE-06**: Tap-target audit script confirms every interactive Control in mobile theme is ≥48px; runs as part of Phase 8 acceptance.
 - [ ] **MOBILE-07**: `MOBILE-DESIGN-SPEC.md` documents every delta vs desktop with concrete numbers + rationale.
-- [ ] **MOBILE-08**: Mobile theme follows iOS HIG + Material 3 mobile guidance loosely (touch targets, type scale, accessibility minima) but retains the NeoCade arcade visual identity. NOT making Godot UI look native iOS or Android.
+- [x] **MOBILE-08**: Mobile theme follows iOS HIG + Material 3 mobile guidance loosely (touch targets, type scale, accessibility minima) but retains the NeoCade arcade visual identity. NOT making Godot UI look native iOS or Android.
 
 ### Showcase Scene (SHOW)
 
