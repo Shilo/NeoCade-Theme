@@ -37,11 +37,12 @@ requirements_addressed:
 must_haves:
   truths:
     - "All five approved directions resolve a complete `DIRECTION_PRESETS.shape` block."
+    - "Semantic role colors (`role_danger`, `role_warning`, `role_success`, `role_info`) exist in the role table before any variation references them."
     - "BINDING_TABLE recipes can read `shape.*` values for radius, padding, alpha, raised intensity, focus offset, and strategies."
     - "Custom `NeoCadeTheme.new()` instances with non-approved colors use `DIRECTION_PRESET_DEFAULT.shape` rather than failing."
   artifacts:
     - path: "addons/neocade_theme/neocade_theme.gd"
-      provides: "DIRECTION_PRESETS.shape, _lookup_shape, and recipe schema extensions"
+      provides: "DIRECTION_PRESETS.shape, semantic role table additions, _lookup_shape, and recipe schema extensions"
     - path: ".planning/phases/05-core-controls-buttons-inputs-labels-panels-desktop/helpers/_phase5_verify_headless.gd"
       provides: "Shape lookup integrity assertions"
   key_links:
@@ -102,6 +103,7 @@ func _resolve_direction_presets() -> Dictionary:
     - Test 1: Each approved direction key (`151A2E`, `111820`, `241326`, `0B2420`, `20112E`) has a `shape` Dictionary with no missing Phase 5 keys.
     - Test 2: `DIRECTION_PRESET_DEFAULT.shape` exists and resolves for a custom non-approved `base_color`.
     - Test 3: Pulse, Slate, Bubble, Daybreak, and Burst preserve their existing `spread_factor`, `hover_pct`, `pressed_pct`, and `disabled_opacity` values while adding shape data.
+    - Test 4: The union of distinct primary strategy values across the five approved directions is at least four, with any shared values matching DESIGN_TOKENS rather than being accidental fallback.
   </behavior>
   <action>Extend `DIRECTION_PRESETS` and `DIRECTION_PRESET_DEFAULT` with a nested `shape` Dictionary per D-02. Source values from `.planning/DESIGN_TOKENS.md` sections 5.1-5.5: Pulse rectangular radius 0 / focus_offset 0 / primary lift 3; Slate radius 14 / focus_offset 2 / primary lift 2; Bubble radius 26 with primary pill radius 999 / focus_offset 2 / primary lift 6; Daybreak radius 8 / focus_offset 2 / primary lift 3; Burst radius 18 with primary radius 28 / focus_offset 1 / primary lift 5. Include `primary_padding` as `Vector2i` per project convention, surface alpha keys, closed `primary_strategy`, `ghost_strategy`, `kicker_style`, and `raised_lifts` with all subkeys from D-02. Do not add new `@export` properties. Do not create, edit, or rename any `.tres` file in this plan.</action>
   <verify>
@@ -119,12 +121,13 @@ func _resolve_direction_presets() -> Dictionary:
     - Test 3: `{"alpha": "shape.surface_alpha_panels"}` changes only `bg_color.a` and preserves color channels.
     - Test 4: `{"raised_intensity": "shape.raised_lifts.primary"}` resolves to the active direction lift value.
     - Test 5: `{"strategy": "shape.primary_strategy"}` dispatches only known strategy enum values and fails loudly in the verifier for typos.
+    - Test 6: `role_danger`, `role_warning`, `role_success`, and `role_info` resolve from `role_table` without falling back to `surface_panel` or `text_strong`.
   </behavior>
-  <action>Add `_lookup_shape(presets: Dictionary, dotted_path: String) -> Variant` that walks `presets.shape` for paths like `shape.raised_lifts.primary`. For approved direction presets, missing shape keys must be verifier failures; fallback is only acceptable for custom colors through `DIRECTION_PRESET_DEFAULT.shape`. Extend `_resolve_recipe()` stylebox and color branches to support `radius`, `padding`, `alpha` from `shape.*`, and `raised_intensity` from either integer literals or `shape.*`. Add small helper functions such as `_set_radius_all()`, `_set_content_margin_from_padding()`, `_apply_primary_strategy()`, `_apply_ghost_strategy()`, and `_apply_kicker_style()` as needed. Keep the existing additive iteration and D-04 escape hatch, and preserve the no-`Theme.clear()` invariant.</action>
+  <action>Add `role_success`, `role_warning`, `role_danger`, and `role_info` derivations inside `_regenerate_theme()` before `role_table` is built, using the semantic role defaults from DESIGN_TOKENS §7.1 (`#5CC971`, `#FFD166`, `#FF6E6E`, `#5FE3FF`) and no new exports. Add those keys to `role_table` so Plan 05-03 can bind DangerButton to `role_danger` without local fallback. Add `_lookup_shape(presets: Dictionary, dotted_path: String) -> Variant` that walks `presets.shape` for paths like `shape.raised_lifts.primary`. For approved direction presets, missing shape keys must be verifier failures; fallback is only acceptable for custom colors through `DIRECTION_PRESET_DEFAULT.shape`. Extend `_resolve_recipe()` stylebox and color branches to support `radius`, `padding`, `alpha` from `shape.*`, and `raised_intensity` from either integer literals or `shape.*`. Add these helper functions as required outputs: `_set_radius_all()`, `_set_content_margin_from_padding()`, `_apply_primary_strategy()`, `_apply_ghost_strategy()`, and `_apply_kicker_style()`. Keep the existing additive iteration and D-04 escape hatch, and preserve the no-`Theme.clear()` invariant. Addresses review HIGH: semantic danger role exists before DangerButton references it.</action>
   <verify>
     <automated>$phaseDir = '.planning/phases/05-core-controls-buttons-inputs-labels-panels-desktop'; $logDir = Join-Path $phaseDir 'logs'; New-Item -ItemType Directory -Force $logDir | Out-Null; $godot = (Get-Content (Join-Path $phaseDir 'helpers/godot-cli-path.txt') -Raw).Trim(); $shapeLog = Join-Path $logDir '05-02-shape-task2.log'; & $godot --headless --path . --script (Join-Path $phaseDir 'helpers/_phase5_verify_headless.gd') -- --stage shape *> $shapeLog; if ($LASTEXITCODE -ne 0) { Get-Content $shapeLog; throw 'shape verifier failed' }; if (Select-String -Path $shapeLog -Pattern '^(ERROR|SCRIPT ERROR):' -Quiet) { Get-Content $shapeLog; throw 'shape verifier log contains ERROR or SCRIPT ERROR' }; $sourceLines = Get-Content addons/neocade_theme/neocade_theme.gd | Where-Object { $_ -notmatch '^\\s*#' }; if (($sourceLines | Select-String -Pattern '\\.clear\\(').Count -ne 0) { throw 'Theme.clear invariant violated' }</automated>
   </verify>
-  <done>Shape recipe keys work through `_resolve_recipe()`, strategy values are closed and verifier-covered, and no non-comment `clear()` call exists.</done>
+  <done>Shape recipe keys work through `_resolve_recipe()`, semantic role keys including `role_danger` resolve without fallback, required strategy/helper functions exist, strategy values are closed and verifier-covered, and no non-comment `clear()` call exists.</done>
 </task>
 
 <task type="auto">

@@ -35,11 +35,11 @@ must_haves:
     - from: "addons/neocade_theme/neocade_theme.gd"
       to: "addons/neocade_theme/icons/spinbox_up.svg"
       via: "BINDING_TABLE icon recipe"
-      pattern: "spinbox_up|up_arrow"
+      pattern: "\"up\"|\"up_disabled\"|spinbox_up"
     - from: "addons/neocade_theme/neocade_theme.gd"
       to: "addons/neocade_theme/icons/spinbox_down.svg"
       via: "BINDING_TABLE icon recipe"
-      pattern: "spinbox_down|down_arrow"
+      pattern: "\"down\"|\"down_disabled\"|spinbox_down"
 ---
 
 <objective>
@@ -93,15 +93,15 @@ SpinBox is a Phase 5 special case. Do not claim COV-04 closure; the remaining ra
   <name>Task 2: Wire SpinBox official icon slots</name>
   <files>addons/neocade_theme/neocade_theme.gd, .planning/phases/05-core-controls-buttons-inputs-labels-panels-desktop/helpers/_phase5_verify_headless.gd</files>
   <behavior>
-    - Test 1: SpinBox up/down icon slots are populated with the new SVG textures.
-    - Test 2: The verifier confirms official Godot 4.6 icon slot names, expected to be `up_arrow` and `down_arrow` unless introspection proves otherwise.
+    - Test 1: SpinBox icon slots `up`, `up_disabled`, `down`, and `down_disabled` are populated with the new SVG textures.
+    - Test 2: The verifier asserts `Theme.get_icon_list("SpinBox")` contains exactly those official compact slot names before accepting the binding.
     - Test 3: SpinBox interior remains LineEdit-style and this task adds only SpinBox-specific constants/icons.
   </behavior>
-  <action>Add SpinBox BINDING_TABLE icon recipes using official Godot 4.6 icon slot names. Start with `up_arrow` and `down_arrow`; if Godot CLI introspection returns different official names, correct the plan implementation to match the introspected list and update the verifier assertion. Do not create any new `.tres` files, and do not claim full COV-04 range-control closure.</action>
+  <action>Add SpinBox BINDING_TABLE icon recipes using the research-verified official Godot 4.6 compact icon slot names: `up`, `up_disabled`, `down`, and `down_disabled`. Bind `up` and `up_disabled` to `spinbox_up.svg`; bind `down` and `down_disabled` to `spinbox_down.svg`. The verifier must call `Theme.get_icon_list("SpinBox")`, assert those four exact names are present, and assert no recipe uses `up_arrow` or `down_arrow`. If introspection disagrees with the research-verified compact names, abort and replan rather than silently choosing another name. Do not create any new `.tres` files, and do not claim full COV-04 range-control closure. Addresses review HIGH: wrong `up_arrow` / `down_arrow` slots are forbidden.</action>
   <verify>
     <automated>$phaseDir = '.planning/phases/05-core-controls-buttons-inputs-labels-panels-desktop'; $logDir = Join-Path $phaseDir 'logs'; New-Item -ItemType Directory -Force $logDir | Out-Null; $godot = (Get-Content (Join-Path $phaseDir 'helpers/godot-cli-path.txt') -Raw).Trim(); $verifyLog = Join-Path $logDir '05-06-spinbox.log'; & $godot --headless --path . --script (Join-Path $phaseDir 'helpers/_phase5_verify_headless.gd') -- --stage spinbox *> $verifyLog; if ($LASTEXITCODE -ne 0) { Get-Content $verifyLog; throw 'spinbox verifier failed' }; if (Select-String -Path $verifyLog -Pattern '^(ERROR|SCRIPT ERROR):' -Quiet) { Get-Content $verifyLog; throw 'spinbox verifier log contains ERROR or SCRIPT ERROR' }</automated>
   </verify>
-  <done>SpinBox up/down icons load through official Godot slots and pass the spinbox verifier.</done>
+  <done>SpinBox `up`, `up_disabled`, `down`, and `down_disabled` icons load through official Godot slots and pass the spinbox verifier; `up_arrow` and `down_arrow` do not appear in the implementation.</done>
 </task>
 
 </tasks>

@@ -19,7 +19,7 @@
 - **D-08:** Phase 5 establishes the COV-09 focus-indicator baseline for Phase 5 Controls; final Tab-walk QA remains Phase 10. [VERIFIED: `05-CONTEXT.md`; `.planning/ROADMAP.md`]
 - **D-09:** `Kicker` is added as the 15th type variation in Phase 5, mapped to `Label`, with explicit font and font size and direction-aware kicker styling. [VERIFIED: `05-CONTEXT.md`; `.planning/DESIGN_TOKENS.md`]
 - **D-10:** `Kicker` counts toward TYPEVAR-06 documentation, finalized in Phase 8. [VERIFIED: `05-CONTEXT.md`; `.planning/ROADMAP.md`]
-- **D-11:** Godot 4.6 CLI is a Phase 5 prerequisite. Plan 01 must install or locate Godot 4.6.x, verify headless import, and document the executable path under the Phase 5 helpers directory. [VERIFIED: `05-CONTEXT.md`]
+- **D-11:** Godot 4.6 CLI is a Phase 5 prerequisite. Plan 01 must locate Godot 4.6.x in search-only mode by default, verify headless import, and document the executable path under the Phase 5 helpers directory. Any download/install requires explicit user approval plus SHA256 documentation before `-AllowInstall` may run. [VERIFIED: `05-CONTEXT.md`; Cycle 1 review reconciliation]
 - **D-12:** Phase 5 extends the dual EditorScript + headless verifier pattern with assertions for 15 variations, shape lookups, variation entries, focus strategy, CodeEdit gutter colors, and SpinBox icons. [VERIFIED: `05-CONTEXT.md`; `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd`]
 - **D-13:** Phase 4's additive iteration invariant remains: never call `Theme.clear()` during regeneration. [VERIFIED: `05-CONTEXT.md`; `addons/neocade_theme/neocade_theme.gd`]
 - **D-14:** The Phase 4 escape hatch remains: variations not in `BINDING_TABLE` are not overwritten by regeneration. [VERIFIED: `05-CONTEXT.md`; `addons/neocade_theme/neocade_theme.gd`]
@@ -51,7 +51,7 @@
 | COV-03 | Theme Label, RichTextLabel, LineEdit, TextEdit, and CodeEdit. | `FEATURES.md` lists the required text slots; CodeEdit syntax highlighting is explicitly out of scope while gutter/chrome slots remain in scope. [VERIFIED: `.planning/research/FEATURES.md`; CITED: https://docs.godotengine.org/en/4.6/classes/class_codeedit.html] |
 | TYPEVAR-01 | Author 6 button type variations. | `TYPE_VARIATIONS` already registers 6 button variations; Phase 5 should add matching `BINDING_TABLE` rows and direction-aware stylebox recipes. [VERIFIED: `addons/neocade_theme/neocade_theme.gd`; `05-CONTEXT.md`] |
 | TYPEVAR-02 | Author Label-family variations. | Phase 5 adds `Kicker` to the existing Label variation set. Official `Label` theme properties do not expose letter spacing, so Kicker tracking cannot be a real `Theme` slot unless Godot adds one later. [VERIFIED: `05-CONTEXT.md`; CITED: https://docs.godotengine.org/en/4.6/classes/class_label.html] |
-| TYPEVAR-03 | Author InfoText RichTextLabel variation. | Current code uses `normal_font` for `InfoText`, matching RichTextLabel's slot model; the planner should also verify `normal_font_size` because the current code still sets `font_size` for `InfoText`. [VERIFIED: `addons/neocade_theme/neocade_theme.gd`; CITED: https://docs.godotengine.org/en/4.6/classes/class_richtextlabel.html] |
+| TYPEVAR-03 | Author InfoText RichTextLabel variation. | Current code uses `normal_font` for `InfoText`, matching RichTextLabel's slot model; the plan should add `normal_font_size` and remove the wrong `font_size` slot for `InfoText`. [VERIFIED: `addons/neocade_theme/neocade_theme.gd`; CITED: https://docs.godotengine.org/en/4.6/classes/class_richtextlabel.html; Cycle 1 review reconciliation] |
 | TYPEVAR-04 | Author CardPanel and HeroPanel variations. | Context requires panel variations to use direction-specific card/hero radius, panel surface alpha, and panel raised lift values from `DIRECTION_PRESETS.shape`. [VERIFIED: `05-CONTEXT.md`; `.planning/DESIGN_TOKENS.md`] |
 | TYPEVAR-05 | Ensure all variations set explicit fonts and font sizes. | Prior project research identifies variation font inheritance as unsafe; Phase 4 already added explicit font wiring, and Phase 5 must add the Kicker pair and test all variation font slots. [VERIFIED: `.planning/research/PITFALLS.md`; `addons/neocade_theme/neocade_theme.gd`] |
 | COV-01 | Cumulative all-Control coverage begins here. | Phase 5 covers the keystone desktop Controls but does not close the 35-Control matrix; Phases 6 and 7 complete the remaining desktop Controls. [VERIFIED: `.planning/ROADMAP.md`; `.planning/REQUIREMENTS.md`] |
@@ -76,9 +76,9 @@ Phase 5 should be planned as a schema-extension and verification phase, not as m
 
 The D-07 focus question resolves to overlay-only for Godot 4.6 Button-family Controls. Official Button theme slots list a separate `focus` stylebox and do not list `pressed_focus` or `checked_focus`; current 4.6 source draws the current state stylebox first, then draws the focus stylebox over it when the Control has focus. The planner should not add invented combo slots; it should instead verify the focus overlay remains visible over pressed, hover_pressed, checked, and disabled-disabled-focus edge states where applicable. [CITED: https://docs.godotengine.org/en/4.6/classes/class_button.html; CITED: https://raw.githubusercontent.com/godotengine/godot/4.6/scene/gui/button.cpp; CITED: https://raw.githubusercontent.com/godotengine/godot/4.6/scene/gui/base_button.cpp]
 
-The blocking operational fact is that `godot` and `godot4` are not currently available on `PATH`, and no `Godot_v4.6*.exe` was found under `C:\Users\shilo` during the environment audit. Plan 01 must install or locate Godot 4.6.x before implementation plans rely on import, ResourceSaver, screenshots, or headless verification. [VERIFIED: local environment audit]
+The blocking operational fact is that `godot` and `godot4` are not currently available on `PATH`, and no `Godot_v4.6*.exe` was found under `C:\Users\shilo` during the environment audit. Plan 01 must locate Godot 4.6.x or pause for explicit user-approved install before implementation plans rely on import, ResourceSaver, screenshots, or headless verification. [VERIFIED: local environment audit; Cycle 1 review reconciliation]
 
-**Primary recommendation:** Plan Phase 5 in four waves: CLI/install + verifier scaffold, shape/strategy schema, variation/control slot population, then ResourceSaver round-trip plus focus/icon/text verification. [VERIFIED: `05-CONTEXT.md`; `.planning/config.json`]
+**Primary recommendation:** Plan Phase 5 in four waves: CLI search/approval gate + verifier scaffold, shape/strategy schema, variation/control slot population, then ResourceSaver round-trip plus focus/icon/text verification. [VERIFIED: `05-CONTEXT.md`; `.planning/config.json`; Cycle 1 review reconciliation]
 
 ## Architectural Responsibility Map
 
@@ -101,7 +101,7 @@ The blocking operational fact is that `godot` and `godot4` are not currently ava
 | Godot Engine | 4.6.x; 4.6.2 is the current 4.6 maintenance release checked in this session | Editor import, headless verification, Theme resource serialization | Project targets Godot 4.6 and Phase 5 requires real Godot `ResourceSaver` round-trips. [VERIFIED: `project.godot`; CITED: https://godotengine.org/article/maintenance-release-godot-4-6-2/] |
 | GDScript `@tool` + `Theme` | Godot 4.6 API | Dynamic theme generation through `set_stylebox`, `set_color`, `set_constant`, `set_font`, `set_font_size`, `set_icon`, and `set_type_variation` | Existing architecture is one concrete tool script extending `Theme`. [VERIFIED: `addons/neocade_theme/neocade_theme.gd`; CITED: https://docs.godotengine.org/en/4.6/classes/class_theme.html] |
 | `StyleBoxFlat` | Godot 4.6 API | Buttons, inputs, panels, focus rings, raised/flat chrome | Project rules prohibit textures, gradients, glow, and shader tricks; StyleBoxFlat gives native corners, borders, margins, alpha, and shadow controls. [VERIFIED: `.planning/PROJECT.md`; CITED: https://docs.godotengine.org/en/4.6/classes/class_styleboxflat.html] |
-| `ResourceSaver` | Godot 4.6 API | Save generated `.tres` resources | Phase 5 explicitly replaces hand-authored fallback with Godot serialization. [VERIFIED: `05-CONTEXT.md`; CITED: https://docs.godotengine.org/en/4.6/classes/class_resourcesaver.html] |
+| `ResourceSaver` | Godot 4.6 API | Save generated `.tres` resources | Phase 5 explicitly replaces hand-authored fallback with Godot serialization, followed by the Phase-4-equivalent strip pass that keeps direction resources data-only. [VERIFIED: `05-CONTEXT.md`; Cycle 1 review reconciliation; CITED: https://docs.godotengine.org/en/4.6/classes/class_resourcesaver.html] |
 | SVG icon resources | Godot import pipeline | CodeEdit folded icon and SpinBox arrows; disabled/toggled Button-family icon slots may reuse existing SVGs where Godot permits | Existing icon contract is 32x32 monochrome SVG with import sidecar. [VERIFIED: `05-CONTEXT.md`; `addons/neocade_theme/icons/`] |
 | Inter Variable Roman | Bundled TTF + FontVariation resources | All Phase 5 typography | Project decision D-17 keeps only Inter Variable Roman bundled. [VERIFIED: `05-CONTEXT.md`; `addons/neocade_theme/fonts/`] |
 
@@ -251,7 +251,7 @@ set_font("normal_font", "InfoText", body_font)
 set_font_size("normal_font_size", "InfoText", tokens.body)
 ```
 
-Planning note: current `neocade_theme.gd` uses `normal_font` for `InfoText` but still appears to set `font_size`; Phase 5 should fix or explicitly verify `normal_font_size`. [VERIFIED: `addons/neocade_theme/neocade_theme.gd`; CITED: https://docs.godotengine.org/en/4.6/classes/class_richtextlabel.html]
+Planning note: current `neocade_theme.gd` uses `normal_font` for `InfoText` but still appears to set `font_size`; Phase 5 should replace that with `normal_font_size` and assert the wrong `font_size` slot is absent. [VERIFIED: `addons/neocade_theme/neocade_theme.gd`; CITED: https://docs.godotengine.org/en/4.6/classes/class_richtextlabel.html; Cycle 1 review reconciliation]
 
 ### Pattern 4: Icon Slot Completion by Reuse First
 
@@ -277,7 +277,7 @@ Official Godot 4.6 SpinBox docs use compact icon slot names such as `up`, `up_di
 | Problem | Don't Build | Use Instead | Why |
 |---------|-------------|-------------|-----|
 | Theme type variation registry | Custom variation inheritance system | `Theme.set_type_variation()` | Godot already supports variation-to-base-type mapping. [CITED: https://docs.godotengine.org/en/4.6/classes/class_theme.html] |
-| Theme resource serialization | Manual `.tres` string authoring | `ResourceSaver.save()` | Phase 5 explicitly requires Godot round-trip and rejects Phase 4's temporary fallback. [VERIFIED: `05-CONTEXT.md`; CITED: ResourceSaver docs] |
+| Theme resource serialization | Manual `.tres` string authoring | `ResourceSaver.save()` followed by `_strip_theme_entries` / `_strip_load_steps_attr` equivalent | Phase 5 explicitly requires Godot round-trip but must strip generated theme entries afterward so the five direction resources remain data-only and under 2 KiB. [VERIFIED: `05-CONTEXT.md`; Cycle 1 review reconciliation; CITED: ResourceSaver docs] |
 | Button focus combinations | Fake `pressed_focus` / `checked_focus` slots | Official `focus` stylebox overlay | Official docs/source show focus as a separate overlay. [CITED: Button docs/source] |
 | Kicker tracking | Undocumented Label constants | Document limitation; use color/font/size in Theme and uppercase content where needed | Official Label theme properties do not expose letter spacing. [CITED: Label docs] |
 | CodeEdit syntax theme | Theme-driven syntax highlighter | Gutter/chrome theme slots only | Syntax colors are outside Phase 5 and outside the theme-surface target. [VERIFIED: `.planning/research/FEATURES.md`] |
@@ -298,7 +298,7 @@ Official Godot 4.6 SpinBox docs use compact icon slot names such as `up`, `up_di
 
 **What goes wrong:** `InfoText` gets `font_size` instead of `normal_font_size`, so the explicit size may not apply. [VERIFIED: `addons/neocade_theme/neocade_theme.gd`; CITED: RichTextLabel docs]  
 **Why it happens:** Label uses `font`/`font_size`, while RichTextLabel uses `normal_font`/`normal_font_size`. [CITED: https://docs.godotengine.org/en/4.6/classes/class_richtextlabel.html]  
-**How to avoid:** Add a Wave 0 assertion for `Theme.has_font_size("normal_font_size", "InfoText")`. [VERIFIED: `05-CONTEXT.md`]  
+**How to avoid:** Add a Wave 0 assertion for `Theme.has_font_size("normal_font_size", "InfoText") == true` and `Theme.has_font_size("font_size", "InfoText") == false`. [VERIFIED: `05-CONTEXT.md`; Cycle 1 review reconciliation]
 **Warning signs:** Verifier only checks type variation registration, not actual font slot names. [VERIFIED: `.planning/research/PITFALLS.md`]
 
 ### Pitfall 3: Shape Fallback Hiding Typos
@@ -398,7 +398,7 @@ If the exact Godot assertion method names differ, the plan should use the equiva
 | Old Approach | Current Approach | When Changed | Impact |
 |--------------|------------------|--------------|--------|
 | Separate desktop/mobile output resources | One dynamic Theme script with platform branch and data-only peer `.tres` files | Phase 4 architecture lock | Phase 5 must not add new direction or mobile resources. [VERIFIED: `.planning/PROJECT.md`; `05-CONTEXT.md`] |
-| Hand-authored `.tres` fallback | Godot CLI + `ResourceSaver.save()` | Phase 5 D-11 | Plan 01 is blocking until Godot 4.6.x exists locally. [VERIFIED: `05-CONTEXT.md`; local environment audit] |
+| Hand-authored `.tres` fallback | Godot CLI + `ResourceSaver.save()` + strip helper | Phase 5 D-11 + Cycle 1 review reconciliation | Plan 01 is blocking until Godot 4.6.x exists locally or user approves install; Plan 05-07 strips ResourceSaver output to preserve data-only files. [VERIFIED: `05-CONTEXT.md`; local environment audit] |
 | 14 type variations | 15 type variations including `Kicker` | Phase 5 D-09 | Verifier and docs must count 15, not 14. [VERIFIED: `05-CONTEXT.md`] |
 | Speculative focus combo entries | Official focus overlay | Phase 5 research | Planner should not author unsupported combo slots. [CITED: Button docs/source] |
 | InfoText `font` ambiguity | RichTextLabel `normal_font` slot | Phase 4 BL-02 close | Phase 5 should also verify `normal_font_size`. [VERIFIED: `04-VERIFICATION.md`; `addons/neocade_theme/neocade_theme.gd`] |
@@ -426,7 +426,7 @@ All claims in this research were verified against local project files, official 
    Resolution: Phase 5 implements only Theme-owned Kicker behavior: `font`, `font_size`, and direction-aware `font_color`. It does not invent a `Label.letter_spacing` Theme constant. Uppercase/tracking remains content/showcase behavior or a v1.x follow-up unless a source-verified Godot API is found during execution.
 
 3. **InfoText `normal_font_size`.**  
-   Resolution: Plan 05-04 fixes InfoText sizing to use RichTextLabel's `normal_font_size` slot alongside the already-correct `normal_font` slot, and the Wave 0 verifier asserts this invariant before later variation chrome is accepted.
+   Resolution: Plan 05-04 fixes InfoText sizing to use RichTextLabel's `normal_font_size` slot alongside the already-correct `normal_font` slot, deletes the wrong `font_size` slot, and the Wave 0 verifier asserts both presence and absence before later variation chrome is accepted.
 
 4. **Disabled/toggled icon reuse.**  
    Resolution: Phase 5 reuses existing CheckBox/CheckButton SVGs for disabled/toggled variants where Godot exposes tintable icon slots, and verifies official slot coverage. New Phase 5 icon authoring is limited to CodeEdit folded and SpinBox up/down icons.
@@ -435,7 +435,7 @@ All claims in this research were verified against local project files, official 
 
 | Dependency | Required By | Available | Version | Fallback |
 |------------|-------------|-----------|---------|----------|
-| Godot CLI (`godot`) | Import, ResourceSaver, headless verifier, screenshots | No | - | Install/locate Godot 4.6.x in Plan 01. [VERIFIED: local environment audit] |
+| Godot CLI (`godot`) | Import, ResourceSaver, headless verifier, screenshots | No | - | Search-only locate in Plan 01; user-approved install/download requires official URL plus SHA256. [VERIFIED: local environment audit; Cycle 1 review reconciliation] |
 | Godot CLI (`godot4`) | Alternate command name | No | - | Same as above. [VERIFIED: local environment audit] |
 | Godot 4.6 executable under `C:\Users\shilo` | Manual path fallback | No | - | User-selected install path documented in helper file. [VERIFIED: local environment audit] |
 | Node.js | Context7 CLI fallback | Yes | v25.0.0 | Not needed for implementation. [VERIFIED: local environment audit] |
@@ -444,7 +444,7 @@ All claims in this research were verified against local project files, official 
 
 **Missing dependencies with no fallback:**
 
-- Godot 4.6.x CLI is blocking for Phase 5 implementation because D-11 retires hand-authored `.tres` fallback. [VERIFIED: `05-CONTEXT.md`; local environment audit]
+- Godot 4.6.x CLI is blocking for Phase 5 implementation because D-11 retires hand-authored `.tres` fallback. Plan 01 must not download/install it autonomously; missing CLI pauses for user path/approval and SHA256 documentation. [VERIFIED: `05-CONTEXT.md`; local environment audit; Cycle 1 review reconciliation]
 
 **Missing dependencies with fallback:**
 
