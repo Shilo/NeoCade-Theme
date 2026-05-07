@@ -456,7 +456,53 @@ func assert_slot_freeze_artifact() -> void:
 
 
 func assert_popups_menus_stage() -> void:
-	_group_pending("assert_popups_menus_stage", "Plan 07-02 owns Window, PopupPanel, PopupMenu, AcceptDialog, ConfirmationDialog, TooltipPanel, TooltipLabel, and MenuBar production coverage")
+	var group := "assert_popups_menus_stage"
+	var theme := _loaded_theme()
+	if theme == null:
+		_group_fail(group, "Pulse direction did not reload as NeoCadeTheme")
+		return
+
+	var problems: Array[String] = []
+	_append_missing_slots(problems, theme, "Window", "stylebox", ["embedded_border", "embedded_unfocused_border"])
+	_append_missing_slots(problems, theme, "Window", "color", ["title_color", "title_outline_modulate"])
+	_append_missing_slots(problems, theme, "Window", "constant", ["close_h_offset", "close_v_offset", "resize_margin", "title_height", "title_outline_size"])
+	_append_missing_slots(problems, theme, "Window", "font", ["title_font"])
+	_append_missing_slots(problems, theme, "Window", "font_size", ["title_font_size"])
+	_append_missing_slots(problems, theme, "Window", "icon", ["close", "close_pressed"])
+
+	_append_missing_slots(problems, theme, "PopupPanel", "stylebox", ["panel"])
+	_append_missing_slots(problems, theme, "AcceptDialog", "stylebox", ["panel"])
+	_append_missing_slots(problems, theme, "AcceptDialog", "constant", ["buttons_separation"])
+	_assert_binding_key_present(problems, "ConfirmationDialog")
+	_append_missing_slots(problems, theme, "ConfirmationDialog", "stylebox", ["panel"])
+	_append_missing_slots(problems, theme, "TooltipPanel", "stylebox", ["panel"])
+	_append_missing_slots(problems, theme, "TooltipLabel", "color", ["font_color", "font_outline_color", "font_shadow_color"])
+	_append_missing_slots(problems, theme, "TooltipLabel", "constant", ["outline_size", "shadow_offset_x", "shadow_offset_y"])
+	_append_missing_slots(problems, theme, "TooltipLabel", "font", ["font"])
+	_append_missing_slots(problems, theme, "TooltipLabel", "font_size", ["font_size"])
+	_append_missing_slots(problems, theme, "MenuBar", "stylebox", ["normal", "hover", "pressed", "disabled"])
+	_append_missing_slots(problems, theme, "MenuBar", "color", ["font_color", "font_disabled_color", "font_focus_color", "font_hover_color",
+		"font_hover_pressed_color", "font_outline_color", "font_pressed_color"])
+	_append_missing_slots(problems, theme, "MenuBar", "constant", ["h_separation", "outline_size"])
+	_append_missing_slots(problems, theme, "MenuBar", "font", ["font"])
+	_append_missing_slots(problems, theme, "MenuBar", "font_size", ["font_size"])
+
+	_assert_no_phase7_font_table_entries(problems, ["Window", "TooltipLabel", "MenuBar"])
+	_assert_direct_font_calls_after_binding_walk(problems, {
+		"Window.title_font": "set_font(\"title_font\", \"Window\"",
+		"Window.title_font_size": "set_font_size(\"title_font_size\", \"Window\"",
+		"TooltipLabel.font": "set_font(\"font\", \"TooltipLabel\"",
+		"TooltipLabel.font_size": "set_font_size(\"font_size\", \"TooltipLabel\"",
+		"MenuBar.font": "set_font(\"font\", \"MenuBar\"",
+		"MenuBar.font_size": "set_font_size(\"font_size\", \"MenuBar\"",
+	})
+	_assert_tooltip_readability(problems, theme)
+	_assert_popup_shells_no_soft_shadow(problems, theme)
+
+	if problems.is_empty():
+		_group_ok(group, "Window, popup/dialog shells, Tooltip, and MenuBar production coverage is complete")
+	else:
+		_group_fail(group, "; ".join(problems))
 
 
 func assert_filedialog_stage() -> void:
@@ -469,6 +515,126 @@ func assert_colorpicker_stage() -> void:
 
 func assert_graph_stage() -> void:
 	_group_pending("assert_graph_stage", "Plan 07-05 owns GraphEdit, GraphNode, and GraphFrame production coverage")
+
+
+func _loaded_theme() -> NeoCadeTheme:
+	var loaded := ResourceLoader.load(PULSE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE)
+	if loaded == null or not (loaded is NeoCadeTheme):
+		return null
+	return loaded
+
+
+func _append_missing_slots(problems: Array[String], theme: Theme, type_name: String, data_type: String, slots: Array) -> void:
+	for raw_slot in slots:
+		var slot := String(raw_slot)
+		var has_slot := false
+		match data_type:
+			"stylebox":
+				has_slot = theme.has_stylebox(slot, type_name)
+			"color":
+				has_slot = theme.has_color(slot, type_name)
+			"constant":
+				has_slot = theme.has_constant(slot, type_name)
+			"font":
+				has_slot = theme.has_font(slot, type_name)
+			"font_size":
+				has_slot = theme.has_font_size(slot, type_name)
+			"icon":
+				has_slot = theme.has_icon(slot, type_name)
+		if not has_slot:
+			problems.append("%s.%s missing %s" % [type_name, data_type, slot])
+
+
+func _assert_binding_key_present(problems: Array[String], type_name: String) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	if not binding.has(type_name):
+		problems.append("BINDING_TABLE missing explicit %s key" % type_name)
+
+
+func _assert_no_phase7_font_table_entries(problems: Array[String], type_names: Array) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	for raw_type in type_names:
+		var type_name := String(raw_type)
+		var type_block: Dictionary = binding.get(type_name, {})
+		if type_block.has("font"):
+			problems.append("BINDING_TABLE.%s must not contain font entries" % type_name)
+		if type_block.has("font_size"):
+			problems.append("BINDING_TABLE.%s must not contain font_size entries" % type_name)
+
+
+func _assert_direct_font_calls_after_binding_walk(problems: Array[String], required_calls: Dictionary) -> void:
+	var source := _read_production_source_non_comment()
+	var walk_index := source.find("for theme_type in BINDING_TABLE.keys():")
+	if walk_index == -1:
+		problems.append("BINDING_TABLE walk not found in _regenerate_theme() source")
+		return
+	for label in required_calls.keys():
+		var needle := String(required_calls[label])
+		var index := source.find(needle)
+		if index == -1:
+			problems.append("%s missing direct call %s" % [String(label), needle])
+		elif index < walk_index:
+			problems.append("%s direct call must occur after BINDING_TABLE walk" % String(label))
+
+
+func _assert_tooltip_readability(problems: Array[String], theme: Theme) -> void:
+	var label_color := theme.get_color("font_color", "TooltipLabel")
+	var panel := theme.get_stylebox("panel", "TooltipPanel")
+	if panel is StyleBoxFlat:
+		var bg := (panel as StyleBoxFlat).bg_color
+		var ratio := _contrast_ratio(label_color, bg)
+		if ratio < 4.5:
+			problems.append("TooltipLabel contrast below AA: %.2f" % ratio)
+	else:
+		problems.append("TooltipPanel.panel is not StyleBoxFlat")
+	if theme.get_constant("shadow_offset_x", "TooltipLabel") != 0:
+		problems.append("TooltipLabel.shadow_offset_x must be 0")
+	if theme.get_constant("shadow_offset_y", "TooltipLabel") != 0:
+		problems.append("TooltipLabel.shadow_offset_y must be 0")
+	if theme.get_color("font_shadow_color", "TooltipLabel").a > 0.05:
+		problems.append("TooltipLabel.font_shadow_color must be transparent")
+
+
+func _assert_popup_shells_no_soft_shadow(problems: Array[String], theme: Theme) -> void:
+	var shell_slots := {
+		"Window": ["embedded_border", "embedded_unfocused_border"],
+		"PopupPanel": ["panel"],
+		"AcceptDialog": ["panel"],
+		"ConfirmationDialog": ["panel"],
+		"TooltipPanel": ["panel"],
+	}
+	for type_name in shell_slots.keys():
+		for raw_slot in shell_slots[type_name]:
+			var slot := String(raw_slot)
+			if not theme.has_stylebox(slot, type_name):
+				continue
+			var sb := theme.get_stylebox(slot, type_name)
+			if not (sb is StyleBoxFlat):
+				problems.append("%s.%s must use StyleBoxFlat, not texture chrome" % [type_name, slot])
+				continue
+			var flat := sb as StyleBoxFlat
+			if flat.shadow_size > 0:
+				problems.append("%s.%s must not use soft shadow_size=%d" % [type_name, slot, flat.shadow_size])
+
+
+func _contrast_ratio(a: Color, b: Color) -> float:
+	var l1 := _relative_luminance(a)
+	var l2 := _relative_luminance(b)
+	if l1 < l2:
+		var tmp := l1
+		l1 = l2
+		l2 = tmp
+	return (l1 + 0.05) / (l2 + 0.05)
+
+
+func _relative_luminance(c: Color) -> float:
+	return 0.2126 * _srgb_channel(c.r) + 0.7152 * _srgb_channel(c.g) + 0.0722 * _srgb_channel(c.b)
+
+
+func _srgb_channel(value: float) -> float:
+	if value <= 0.03928:
+		return value / 12.92
+	return pow((value + 0.055) / 1.055, 2.4)
 
 
 func _script_constants() -> Dictionary:
