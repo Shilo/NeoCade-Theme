@@ -1310,12 +1310,24 @@ const BINDING_TABLE: Dictionary = {
 			"font_selected_color": {"role": "text_strong"},
 		},
 	},
-	# 27. SpinBox — inherits LineEdit; Phase 4 ships button separation constants
+	# 27. SpinBox — inherits LineEdit; Phase 4 ships button separation constants;
+	# Plan 05-06 Task 2 wires the four official Godot 4.6 icon slots
+	# (`up` / `up_disabled` / `down` / `down_disabled`). NOT `up_arrow` /
+	# `down_arrow` (legacy names from earlier Godot — verifier explicitly
+	# forbids those). Disabled variants REUSE the base SVG (Wave 3 CheckBox
+	# `disabled_icon` reuse pattern); Godot tints them through the
+	# disabled state at draw time so two SVGs cover all four slots.
 	"SpinBox": {
 		"constant": {
 			"buttons_vertical_separation": {"value": 2},
 			"buttons_width":                {"value": 16},
 			"field_and_buttons_separation":{"value": 4},
+		},
+		"icon": {
+			"up":           {"icon": "spinbox_up"},
+			"up_disabled":  {"icon": "spinbox_up"},
+			"down":         {"icon": "spinbox_down"},
+			"down_disabled":{"icon": "spinbox_down"},
 		},
 	},
 	# 28. TabBar — 5 stylebox + tab font/icon colors
