@@ -226,6 +226,9 @@ func _regenerate_theme() -> void:
 	set_font("font", "ItemList", body_font)
 	# FoldableContainer likewise exposes a single official title/body font slot.
 	set_font("font", "FoldableContainer", body_font)
+	# Tabs expose explicit font slots outside the BINDING_TABLE schema.
+	set_font("font", "TabBar", body_font)
+	set_font("font", "TabContainer", body_font)
 
 	# ── Set per-variation font sizes (DESIGN_TOKENS §8.5 + tokens) ──
 	set_font_size("font_size", "HeaderLarge",  tokens.h1)
@@ -1488,19 +1491,31 @@ const BINDING_TABLE: Dictionary = {
 			"down_disabled":{"icon": "spinbox_down"},
 		},
 	},
-	# 28. TabBar — 5 stylebox + tab font/icon colors
+	# 28. TabBar — official Godot 4.6.2 tab strip slots. Shared tab state
+	# recipes intentionally mirror TabContainer for every overlapping tab_* stylebox
+	# (D-08); overflow button slots are compact icon-button surfaces, not primary buttons.
 	"TabBar": {
 		"stylebox": {
-			"tab_selected":   {"role": "surface_high",  "raised_intensity": 1},
-			"tab_unselected": {"role": "surface_low",   "raised_intensity": 0},
-			"tab_hovered":    {"role": "state_hover",   "raised_intensity": 0},
-			"tab_disabled":   {"role": "surface_low",   "disabled": true},
-			"tab_focus":      {"role": "focus_ring"},
+			"button_highlight": {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.unselected_tab",
+									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+			"button_pressed":   {"role": "state_pressed", "raised_intensity": 0,
+									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+			"tab_selected":     {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.selected_tab",
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 6)},
+			"tab_unselected":   {"role": "surface_low",   "raised_intensity": "shape.raised_lifts.unselected_tab",
+									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+			"tab_hovered":      {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.unselected_tab",
+									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+			"tab_disabled":     {"role": "surface_low",   "disabled": true, "raised_intensity": 0,
+									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius"},
 		},
 		"color": {
 			"font_selected_color":   {"role": "text_strong"},
 			"font_unselected_color": {"role": "text_muted"},
 			"font_hovered_color":    {"role": "text_strong"},
+			"font_outline_color":    {"role": "outline_color"},
 			"font_disabled_color":   {"role": "text_muted", "disabled": true},
 			"icon_selected_color":   {"role": "text_strong"},
 			"icon_unselected_color": {"role": "text_muted"},
@@ -1509,17 +1524,36 @@ const BINDING_TABLE: Dictionary = {
 			"drop_mark_color":       {"role": "role_primary"},
 		},
 		"constant": {
-			"h_separation": {"value": "tokens.tapPadding"},
+			"h_separation":           {"value": 2},
+			"hover_switch_wait_msec": {"value": 180},
+			"icon_max_width":         {"value": 24},
+			"outline_size":           {"value": 0},
+		},
+		"font_size": {
+			"font_size": {"value": "tokens.body"},
+		},
+		"icon": {
+			"close":               {"icon": "close"},
+			"increment":           {"icon": "tab_increment"},
+			"increment_highlight": {"icon": "tab_increment"},
+			"decrement":           {"icon": "tab_decrement"},
+			"decrement_highlight": {"icon": "tab_decrement"},
+			"drop_mark":           {"icon": "tab_drop_mark"},
 		},
 	},
-	# 29. TabContainer — TabBar set + panel + tabbar_background
+	# 29. TabContainer — shared TabBar tab_* recipes plus content panel and menu icons.
 	"TabContainer": {
 		"stylebox": {
-			"tab_selected":     {"role": "surface_high",  "raised_intensity": 1},
-			"tab_unselected":   {"role": "surface_low",   "raised_intensity": 0},
-			"tab_hovered":      {"role": "state_hover",   "raised_intensity": 0},
-			"tab_disabled":     {"role": "surface_low",   "disabled": true},
-			"tab_focus":        {"role": "focus_ring"},
+			"tab_selected":     {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.selected_tab",
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 6)},
+			"tab_unselected":   {"role": "surface_low",   "raised_intensity": "shape.raised_lifts.unselected_tab",
+									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+			"tab_hovered":      {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.unselected_tab",
+									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+			"tab_disabled":     {"role": "surface_low",   "disabled": true, "raised_intensity": 0,
+									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius"},
 			"panel":            {"role": "surface_panel", "raised_intensity": 0},
 			"tabbar_background":{"role": "surface_base",  "raised_intensity": 0},
 		},
@@ -1527,8 +1561,31 @@ const BINDING_TABLE: Dictionary = {
 			"font_selected_color":   {"role": "text_strong"},
 			"font_unselected_color": {"role": "text_muted"},
 			"font_hovered_color":    {"role": "text_strong"},
+			"font_outline_color":    {"role": "outline_color"},
 			"font_disabled_color":   {"role": "text_muted", "disabled": true},
+			"icon_selected_color":   {"role": "text_strong"},
+			"icon_unselected_color": {"role": "text_muted"},
+			"icon_hovered_color":    {"role": "text_strong"},
+			"icon_disabled_color":   {"role": "text_muted", "disabled": true},
 			"drop_mark_color":       {"role": "role_primary"},
+		},
+		"constant": {
+			"icon_max_width":   {"value": 24},
+			"icon_separation":  {"value": 6},
+			"outline_size":     {"value": 0},
+			"side_margin":      {"value": "tokens.tapPadding"},
+		},
+		"font_size": {
+			"font_size": {"value": "tokens.body"},
+		},
+		"icon": {
+			"increment":           {"icon": "tab_increment"},
+			"increment_highlight": {"icon": "tab_increment"},
+			"decrement":           {"icon": "tab_decrement"},
+			"decrement_highlight": {"icon": "tab_decrement"},
+			"drop_mark":           {"icon": "tab_drop_mark"},
+			"menu":                {"icon": "tab_menu"},
+			"menu_highlight":      {"icon": "tab_menu"},
 		},
 	},
 	# 30. TextEdit — 3 stylebox set
@@ -2117,6 +2174,15 @@ func _set_radius_all(sb: StyleBoxFlat, r: int) -> void:
 	sb.corner_radius_bottom_right = r
 
 
+## Selected tabs should visually attach to the TabContainer panel: top corners keep the
+## direction tab radius, bottom corners are square so the tab reads as part of the content.
+func _set_tab_connected_radius(sb: StyleBoxFlat, r: int) -> void:
+	sb.corner_radius_top_left = r
+	sb.corner_radius_top_right = r
+	sb.corner_radius_bottom_left = 0
+	sb.corner_radius_bottom_right = 0
+
+
 ## Sets StyleBoxFlat content_margin_* from a Vector2i where x=horizontal, y=vertical.
 ## Plan 05-02 Task 2 helper (D-03): `padding: shape.<key>` recipes call this so the
 ## Vector2i convention (x→left/right, y→top/bottom) is enforced in one place. Phase 4
@@ -2357,6 +2423,9 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			elif typeof(radius_raw) == TYPE_INT or typeof(radius_raw) == TYPE_FLOAT:
 				resolved_radius = int(radius_raw)
 		_set_radius_all(sb, resolved_radius)
+		var corner_profile: String = str(recipe.get("corner_profile", ""))
+		if corner_profile == "tab_connected":
+			_set_tab_connected_radius(sb, resolved_radius)
 		sb.border_color = role_table.outline_color
 		sb.border_width_left = outline_width
 		sb.border_width_top = outline_width
@@ -2371,6 +2440,9 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			if pad_lookup != null and typeof(pad_lookup) == TYPE_VECTOR2I:
 				_set_content_margin_from_padding(sb, pad_lookup)
 				applied_padding = true
+		elif padding_raw != null and typeof(padding_raw) == TYPE_VECTOR2I:
+			_set_content_margin_from_padding(sb, padding_raw)
+			applied_padding = true
 		if not applied_padding:
 			# Cross-AI Cycle 2 M2 fix: platform-aware margins. DESKTOP (densityScale=1.0,
 			# tapPadding=8) yields the base spacing; MOBILE (densityScale=1.5, tapPadding=12)
