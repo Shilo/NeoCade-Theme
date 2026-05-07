@@ -24,7 +24,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3.3: Theme Direction Research — 5 Flat-MD3 Candidate Directions (INSERTED 2026-05-04 theme-direction insertion)** - Derived and text-approved 5 dark flat-MD3/extruded-flat directions: Pulse, Slate, Bubble, Daybreak, Burst. All five pass anti-cyberpunk, anti-texture, dark-mode, and WCAG checks. Output: `.planning/research/THEME-DIRECTIONS.md` + SOURCES.md Section 14. Completed 2026-05-06.
 - [~] **Phase 3.4: Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat) (INSERTED 2026-05-04; was Phase 3.2 → 3.3 before theme-direction insertion)** - Mockups for the 5 approved directions from Phase 3.3. Plan 02 re-execution produced 15 Stage 1 concept PNGs and closed the selection gate: **Pulse is the v1 recommended starter / implementation priority; Slate, Bubble, Daybreak, and Burst still ship as v1 personality variations.** Plan 03 built the full-fidelity Pulse 4-grid (flat × raised × desktop × mobile), full Control/state coverage matrix, color override preview row, and render-check audit, and is now paused at the user final approval gate (`final-approval.md` missing). Hard gate before Phase 4.
 - [ ] **Phase 4: Foundation — Single `NeoCadeTheme` Class + Data-Only Direction `.tres` Files + Fonts + Icons (UPDATED 2026-05-06f)** - Implements `addons/neocade_theme/neocade_theme.gd` as the single concrete `@tool class_name NeoCadeTheme extends Theme` with the finalized 9-property export set. Ships 5 data-only direction resources at the addon root (`pulse_neocade_theme.tres`, `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`, `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`) plus Inter Variable Roman and bespoke SVG icons. No subclasses, no per-direction `.gd`, no `_dev/`, no `themes/`, no root `neocade_theme.tres`, no `neocade_mobile_theme.tres`.
-- [ ] **Phase 5: Core Controls — Buttons, Inputs, Labels, Panels (desktop)** - 7 BaseButton family + 5 text classes + Label/RichTextLabel + Panel/PanelContainer with type variations
+- [x] **Phase 5: Core Controls — Buttons, Inputs, Labels, Panels (desktop)** - 7 BaseButton family + 5 text classes + Label/RichTextLabel + Panel/PanelContainer with type variations (completed 2026-05-07)
 - [ ] **Phase 6: Lists, Layout, Range — Tree, ItemList, Tabs, Containers, Sliders (desktop)** - Tree (16 styleboxes/12 icons) + ItemList + TabBar/TabContainer + range controls + container chrome
 - [ ] **Phase 7: Dialogs, Popups, Advanced — Window, Popups, MenuBar, ColorPicker, Graph (desktop)** - Popup-class controls themed as first-class types + ColorPicker (16 icons) + Graph stack
 - [ ] **Phase 8: Mobile Variant Authoring** - mobile-sizing branch in `NeoCadeTheme._regenerate_theme()` (triggered by `@export platform=MOBILE`), tap-target audit, MOBILE-DESIGN-SPEC.md *(no separate `neocade_mobile_theme.tres`; mobile is a platform export on the single concrete class)*
@@ -198,7 +198,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. **All 6 Button type variations + 5 Label type variations + 1 RichTextLabel + 2 Panel variations declared:** PrimaryButton / SecondaryButton / GhostButton / DangerButton / IconButton / FlatButton; HeaderLarge / HeaderMedium / HeaderSmall / Caption / CodeLabel; InfoText; CardPanel / HeroPanel — all 14 variations declared in `.tres`. Fonts are set EXPLICITLY on every variation (per PITFALLS 1.2 — type variations DO NOT inherit fonts from base, even when stylebox inheritance works); verified in a runtime scene, not just editor preview.
   4. **Panel + PanelContainer + SpinBox themed:** Panel and PanelContainer have base + variations; SpinBox themed end-to-end (line edit + arrows).
   5. **Focus stylebox is an OUTER ring, not a fill replacement (Pitfall 1.1):** Focus rendered as 2px ring drawn OUTSIDE corner radius bounds in `role.primary`; verified that focus remains visible under hover, pressed, AND checked combinations (Tab-walk a test scene with one of each); shadow alpha on every StyleBoxFlat is `shadow_size = -1` (the disable value per Godot #98162).
-**Plans:** 6/7 plans executed
+**Plans:** 7/7 plans complete
 
 Plans:
 - [ ] `05-01-godot-cli-and-phase5-verifier-scaffold-PLAN.md` — Resolve Godot 4.6 CLI and create Phase 5 verifier scaffolding.
@@ -308,7 +308,7 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 | 3.3 Theme Direction Research (5 candidate directions) | 3/3 | Complete | 2026-05-06 |
 | 3.4 Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat) | 2/4 complete; Plan 03 paused at Task 4 | Awaiting user final approval | - |
 | 4. Foundation: Single `NeoCadeTheme` class + data `.tres` files + Fonts + Icons | 6/8 (Plans 04-01, 04-02, 04-03, 04-04, 04-05, 04-06 done) | In progress | started 2026-05-06 |
-| 5. Core Controls (Buttons/Inputs/Labels/Panels) | 6/7 | In Progress|  |
+| 5. Core Controls (Buttons/Inputs/Labels/Panels) | 7/7 | Complete   | 2026-05-07 |
 | 6. Lists/Layout/Range | 0/TBD | Not started | - |
 | 7. Dialogs/Popups/Advanced | 0/TBD | Not started | - |
 | 8. Mobile Variant Token Block + Tap-Target Audit | 0/TBD | Not started | - |
