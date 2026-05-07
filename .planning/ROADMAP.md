@@ -82,7 +82,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. **Step 4 — Representative full-fidelity approval:** Selected finalists receive representative desktop Control-family HTML mockups and mobile mockups at 360×800 + 768×1024 with tap-target overlays (≥48px), realistic content, visible key states, contrast math, and HTML-to-Godot fidelity disclaimers. This is a representative approval artifact, not the exhaustive 35-class implementation gallery; exhaustive Godot coverage is delivered in Phases 5-7 and proven in Phase 9/10. User approves one final direction (max 3 targeted mockup revision rounds; if not approved by round 3, `03-ESCALATION.md` captures options before proceeding).
   6. **Token spec finalized:** `DESIGN_TOKENS.md` committed before Phase 4 starts, containing both desktop and mobile token blocks (color tokens with WCAG AA-verified contrast, M3 type scale with concrete sizes, 8-step spacing scale, 4-rung corner radius, integer stroke widths, color-only elevation per Conflict 3, M3 deterministic state-layer model per TOKEN-09).
   7. **Hard blocker enforcement:** No `.tres` styling commits exist on the branch when Phase 3 closes; Phase 4 cannot start until Step 3 user approval is logged in writing.
-**Plans**: TBD
+**Plans**:
+- **Wave 1:** `07-01-PLAN.md` — Freeze official Phase 7 Godot 4.6.2 slots and add verifier/ResourceSaver helper foundation.
+- **Wave 2 *(blocked on Wave 1 completion)*:** `07-02-PLAN.md` — Theme Window, popup/dialog shells, tooltips, MenuBar, and PopupMenu.
+- **Wave 3 *(blocked on Wave 2 completion)*:** `07-03-PLAN.md` — Theme FileDialog and bind all official FileDialog icon slots.
+- **Wave 4 *(blocked on Wave 3 completion)*:** `07-04-PLAN.md` — Theme ColorPicker and ColorPickerButton with exact official icon/focus coverage.
+- **Wave 5 *(blocked on Wave 4 completion)*:** `07-05-PLAN.md` — Theme GraphEdit/GraphNode/GraphFrame and run full verification plus ResourceSaver round-trip.
 **UI hint**: yes
 
 > **REDIRECTED 2026-05-04 — Phase 3 status:** First iteration reached Plan 03-03 (finalist selection gate checkpoint) before the user rejected the painterly arcade-venue direction. **All 5 direction concept images and direction boards are preserved** under `.planning/mockups/concepts/` and `.planning/mockups/03-direction-boards.*` as v0 historical reference. The user may revisit any historical direction later, but each must be re-rendered through the flat-MD3 filter before becoming a v1 candidate. **Boardwalk Sunset (the original recommended baseline) is explicitly rejected by the user.** Phase 3 will not be re-executed; its functionality is replaced by Phase 3.1 (visual research) + Phase 3.2 (architecture research) + Phase 3.3 (theme-direction research) + Phase 3.4 (flat/extruded-flat mockup approval gate).
@@ -317,7 +322,7 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 | 4. Foundation: Single `NeoCadeTheme` class + data `.tres` files + Fonts + Icons | 6/8 (Plans 04-01, 04-02, 04-03, 04-04, 04-05, 04-06 done) | In progress | started 2026-05-06 |
 | 5. Core Controls (Buttons/Inputs/Labels/Panels) | 7/7 | Complete   | 2026-05-07 |
 | 6. Lists/Layout/Range | 5/5 | Complete | 2026-05-07 |
-| 7. Dialogs/Popups/Advanced | 0/TBD | Not started | - |
+| 7. Dialogs/Popups/Advanced | 0/5 | Ready to execute | - |
 | 8. Mobile Variant Token Block + Tap-Target Audit | 0/TBD | Not started | - |
 | 9. Showcase + Token Gallery + Theme/Variation Toggles | 0/TBD | Not started | - |
 | 10. QA + Cross-Platform Export Validation | 0/TBD | Not started | - |
