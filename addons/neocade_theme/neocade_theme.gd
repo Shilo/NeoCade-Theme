@@ -1261,10 +1261,43 @@ const BINDING_TABLE: Dictionary = {
 			"folded": {"icon": "code_folded"},
 		},
 	},
-	# 6. ColorPicker — minimal Phase 4 baseline (full coverage Phase 7)
+	# 6. ColorPicker — official Godot 4.6.2 focus chrome, desktop metrics, and icon surface.
+	# Engine-rendered hue/SV fields stay engine-owned; NeoCade only binds Theme slots.
 	"ColorPicker": {
+		"stylebox": {
+			"picker_focus_circle":    {"role": "focus_ring", "radius": 999},
+			"picker_focus_rectangle": {"role": "focus_ring", "radius": 2},
+			"sample_focus":           {"role": "focus_ring",
+										"radius": "shape.secondary_radius"},
+		},
+		"color": {
+			"focused_not_editing_cursor_color": {"role": "role_primary"},
+		},
 		"constant": {
-			"margin": {"value": "tokens.tapPadding"},
+			"center_slider_grabbers": {"value": 1},
+			"h_width":                {"value": 24},
+			"label_width":            {"value": 64},
+			"margin":                 {"value": "tokens.tapPadding"},
+			"sv_height":              {"value": 180},
+			"sv_width":               {"value": 240},
+		},
+		"icon": {
+			"add_preset":           {"icon": "colorpicker_add_preset"},
+			"bar_arrow":            {"icon": "colorpicker_bar_arrow"},
+			"color_hue":            {"icon": "colorpicker_color_hue"},
+			"color_script":         {"icon": "colorpicker_color_script"},
+			"expanded_arrow":       {"icon": "colorpicker_expanded_arrow"},
+			"folded_arrow":         {"icon": "colorpicker_folded_arrow"},
+			"menu_option":          {"icon": "colorpicker_menu_option"},
+			"overbright_indicator": {"icon": "colorpicker_overbright_indicator"},
+			"picker_cursor":        {"icon": "colorpicker_picker_cursor"},
+			"picker_cursor_bg":     {"icon": "colorpicker_picker_cursor_bg"},
+			"sample_bg":            {"icon": "colorpicker_sample_bg"},
+			"sample_revert":        {"icon": "colorpicker_sample_revert"},
+			"screen_picker":        {"icon": "colorpicker_screen_picker"},
+			"shape_circle":         {"icon": "colorpicker_shape_circle"},
+			"shape_rect":           {"icon": "colorpicker_shape_rect"},
+			"shape_rect_wheel":     {"icon": "colorpicker_shape_rect_wheel"},
 		},
 	},
 	# 7. ColorPickerButton — inherits Button family; Plan 05-03 Task 2 polish: shape.* lookups
