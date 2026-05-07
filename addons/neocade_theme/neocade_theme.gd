@@ -688,15 +688,49 @@ const TYPE_VARIATIONS: Dictionary = {
 ## theme, replacing the previous "broad row-count check" that could pass with wrong slot names.
 ## BINDING_TABLE recipe slot-keys MUST match these arrays exactly.
 const CANONICAL_SLOT_NAMES: Dictionary = {
-	# Tree — 16 stylebox slots (per MINIMAL-THEME-DISSECTION.md §Tree, lines 689-720)
-	# NOTE: upstream collapses many to one stylebox; NeoCade preserves the slot-name set.
+	# Tree — official Godot 4.6.2 slot freeze from Phase 6 local probe
+	# (logs/06-research-slot-probe.log). `hover` is intentionally absent; the
+	# official row-hover slot is `hovered`.
 	"Tree": {
-		"stylebox": ["panel", "focus", "title_button_normal", "title_button_pressed", "title_button_hover",
-					 "button_hover", "button_pressed", "hover", "selected", "selected_focus",
-					 "hovered_selected", "hovered_selected_focus", "custom_button_hover", "custom_button_pressed",
-					 "cursor", "cursor_unfocused"],
-		"color": ["font_color", "guide_color", "drop_position_color", "parent_hl_line_color"],
-		"constant": ["v_separation", "inner_item_margin_left", "inner_item_margin_right"],
+		"stylebox": {
+			"button_hover": true,
+			"button_pressed": true,
+			"cursor": true,
+			"cursor_unfocused": true,
+			"custom_button": true,
+			"custom_button_hover": true,
+			"custom_button_pressed": true,
+			"focus": true,
+			"hovered": true,
+			"hovered_dimmed": true,
+			"hovered_selected": true,
+			"hovered_selected_focus": true,
+			"panel": true,
+			"selected": true,
+			"selected_focus": true,
+			"title_button_hover": true,
+			"title_button_normal": true,
+			"title_button_pressed": true,
+		},
+		"color": ["children_hl_line_color", "custom_button_font_highlight", "drop_position_color",
+				  "font_color", "font_disabled_color", "font_hovered_color",
+				  "font_hovered_dimmed_color", "font_hovered_selected_color", "font_outline_color",
+				  "font_selected_color", "guide_color", "parent_hl_line_color",
+				  "relationship_line_color", "scroll_hint_color", "title_button_color"],
+		"constant": ["button_margin", "check_h_separation", "children_hl_line_width",
+					 "dragging_unfold_wait_msec", "draw_guides", "draw_relationship_lines",
+					 "h_separation", "icon_h_separation", "icon_max_width",
+					 "inner_item_margin_bottom", "inner_item_margin_left", "inner_item_margin_right",
+					 "inner_item_margin_top", "item_margin", "outline_size", "parent_hl_line_margin",
+					 "parent_hl_line_width", "relationship_line_width", "scroll_border",
+					 "scroll_speed", "scrollbar_h_separation", "scrollbar_margin_bottom",
+					 "scrollbar_margin_left", "scrollbar_margin_right", "scrollbar_margin_top",
+					 "scrollbar_v_separation", "v_separation"],
+		"font": ["font", "title_button_font"],
+		"font_size": ["font_size", "title_button_font_size"],
+		"icon": ["arrow", "arrow_collapsed", "arrow_collapsed_mirrored", "checked",
+				 "checked_disabled", "indeterminate", "indeterminate_disabled", "scroll_hint",
+				 "select_arrow", "unchecked", "unchecked_disabled", "updown"],
 	},
 	# Button — 6 stylebox + 5+ font colors (per MINIMAL-THEME-DISSECTION.md §Button)
 	# NOTE: upstream sets 12 styleboxes (incl. _mirrored variants); v1 ships 6 base + Godot
@@ -760,42 +794,130 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 	"Window": {
 		"stylebox": ["embedded_border", "embedded_unfocused_border"],
 	},
-	# HScrollBar — 5 stylebox slots (per MINIMAL-THEME-DISSECTION.md §HScrollBar)
+	# HScrollBar — official Godot 4.6.2 slot freeze
 	"HScrollBar": {
 		"stylebox": ["scroll", "scroll_focus", "grabber", "grabber_highlight", "grabber_pressed"],
+		"icon": ["decrement", "decrement_highlight", "decrement_pressed",
+				 "increment", "increment_highlight", "increment_pressed"],
 	},
-	# VScrollBar — 5 stylebox slots (mirror of HScrollBar)
+	# VScrollBar — official Godot 4.6.2 slot freeze
 	"VScrollBar": {
 		"stylebox": ["scroll", "scroll_focus", "grabber", "grabber_highlight", "grabber_pressed"],
+		"icon": ["decrement", "decrement_highlight", "decrement_pressed",
+				 "increment", "increment_highlight", "increment_pressed"],
 	},
-	# ItemList — 6 styleboxes + colors + 1 constant (per MINIMAL-THEME-DISSECTION.md §ItemList)
+	# ItemList — official Godot 4.6.2 slot freeze
 	"ItemList": {
 		"stylebox": ["panel", "focus", "cursor", "cursor_unfocused", "hovered", "selected", "selected_focus",
 					 "hovered_selected", "hovered_selected_focus"],
-		"color": ["guide_color"],
-		"constant": ["v_separation"],
+		"color": ["font_color", "font_hovered_color", "font_hovered_selected_color",
+				  "font_outline_color", "font_selected_color", "guide_color", "scroll_hint_color"],
+		"constant": ["h_separation", "icon_margin", "line_separation", "outline_size", "v_separation"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+		"icon": ["scroll_hint"],
 	},
-	# TabBar — 5 stylebox + 8 colors (per MINIMAL-THEME-DISSECTION.md §TabBar)
+	# TabBar — official Godot 4.6.2 slot freeze. Legacy tab-separation notes
+	# are absent in the local probe and must not be bound without new evidence.
 	"TabBar": {
-		"stylebox": ["tab_selected", "tab_unselected", "tab_hovered", "tab_disabled", "tab_focus"],
-		"color": ["font_selected_color", "font_unselected_color", "font_hovered_color", "font_disabled_color",
-				  "icon_selected_color", "icon_unselected_color", "icon_hovered_color", "icon_disabled_color"],
+		"stylebox": ["button_highlight", "button_pressed", "tab_disabled", "tab_focus",
+					 "tab_hovered", "tab_selected", "tab_unselected"],
+		"color": ["drop_mark_color", "font_disabled_color", "font_hovered_color", "font_outline_color",
+				  "font_selected_color", "font_unselected_color", "icon_disabled_color",
+				  "icon_hovered_color", "icon_selected_color", "icon_unselected_color"],
+		"constant": ["h_separation", "hover_switch_wait_msec", "icon_max_width", "outline_size"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+		"icon": ["close", "decrement", "decrement_highlight", "drop_mark",
+				 "increment", "increment_highlight"],
 	},
-	# TabContainer — same TabBar set + panel + tabbar_background
+	# TabContainer — official Godot 4.6.2 slot freeze. Legacy tab-separation
+	# notes are absent in the local probe and must not be bound without new evidence.
 	"TabContainer": {
 		"stylebox": ["tab_selected", "tab_unselected", "tab_hovered", "tab_disabled", "tab_focus",
 					 "panel", "tabbar_background"],
+		"color": ["drop_mark_color", "font_disabled_color", "font_hovered_color", "font_outline_color",
+				  "font_selected_color", "font_unselected_color", "icon_disabled_color",
+				  "icon_hovered_color", "icon_selected_color", "icon_unselected_color"],
+		"constant": ["icon_max_width", "icon_separation", "outline_size", "side_margin"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+		"icon": ["decrement", "decrement_highlight", "drop_mark", "increment",
+				 "increment_highlight", "menu", "menu_highlight"],
 	},
-	# HSlider / VSlider — slider stylebox per MINIMAL-THEME-DISSECTION.md
+	# FoldableContainer — official Godot 4.6.2 slot freeze.
+	"FoldableContainer": {
+		"stylebox": ["focus", "panel", "title_collapsed_hover_panel",
+					 "title_collapsed_panel", "title_hover_panel", "title_panel"],
+		"color": ["collapsed_font_color", "font_color", "font_outline_color", "hover_font_color"],
+		"constant": ["h_separation", "outline_size"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+		"icon": ["expanded_arrow", "expanded_arrow_mirrored", "folded_arrow", "folded_arrow_mirrored"],
+	},
+	# HSlider / VSlider — official Godot 4.6.2 slot freeze.
 	"HSlider": {
 		"stylebox": ["slider", "grabber_area", "grabber_area_highlight"],
+		"constant": ["center_grabber", "grabber_offset", "tick_offset"],
+		"icon": ["grabber", "grabber_disabled", "grabber_highlight", "tick"],
 	},
 	"VSlider": {
 		"stylebox": ["slider", "grabber_area", "grabber_area_highlight"],
+		"constant": ["center_grabber", "grabber_offset", "tick_offset"],
+		"icon": ["grabber", "grabber_disabled", "grabber_highlight", "tick"],
 	},
-	# ProgressBar — 2 styleboxes
+	# ProgressBar — official Godot 4.6.2 slot freeze.
 	"ProgressBar": {
 		"stylebox": ["background", "fill"],
+		"color": ["font_color", "font_outline_color"],
+		"constant": ["outline_size"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+	},
+	# Container/layout controls — official Godot 4.6.2 slot freeze.
+	"ScrollContainer": {
+		"stylebox": ["focus", "panel"],
+		"color": ["scroll_hint_horizontal_color", "scroll_hint_vertical_color"],
+		"icon": ["scroll_hint_horizontal", "scroll_hint_vertical"],
+	},
+	"SplitContainer": {
+		"stylebox": ["split_bar_background"],
+		"color": ["touch_dragger_color", "touch_dragger_hover_color", "touch_dragger_pressed_color"],
+		"constant": ["autohide", "minimum_grab_thickness", "separation"],
+		"icon": ["h_grabber", "h_touch_dragger", "v_grabber", "v_touch_dragger"],
+	},
+	"HSplitContainer": {
+		"stylebox": ["split_bar_background"],
+		"constant": ["autohide", "minimum_grab_thickness", "separation"],
+		"icon": ["grabber", "touch_dragger"],
+	},
+	"VSplitContainer": {
+		"stylebox": ["split_bar_background"],
+		"constant": ["autohide", "minimum_grab_thickness", "separation"],
+		"icon": ["grabber", "touch_dragger"],
+	},
+	"MarginContainer": {
+		"constant": ["margin_bottom", "margin_left", "margin_right", "margin_top"],
+	},
+	"HBoxContainer": {
+		"constant": ["separation"],
+	},
+	"VBoxContainer": {
+		"constant": ["separation"],
+	},
+	"FlowContainer": {
+		"constant": ["h_separation", "v_separation"],
+	},
+	"GridContainer": {
+		"constant": ["h_separation", "v_separation"],
+	},
+	"HSeparator": {
+		"stylebox": ["separator"],
+		"constant": ["separation"],
+	},
+	"VSeparator": {
+		"stylebox": ["separator"],
+		"constant": ["separation"],
 	},
 	# Label — 1 stylebox + 1 color
 	"Label": {
@@ -1049,15 +1171,18 @@ const BINDING_TABLE: Dictionary = {
 	# 10. FoldableContainer — minimal Phase 4 baseline (Phase 6 polish completes)
 	"FoldableContainer": {
 		"stylebox": {
-			"panel":           {"role": "surface_panel", "raised_intensity": 0},
-			"title_panel":     {"role": "surface_high",  "raised_intensity": 0},
-			"title_hover":     {"role": "state_hover",   "raised_intensity": 0},
-			"title_collapsed": {"role": "surface_panel", "raised_intensity": 0},
-			"focus":           {"role": "focus_ring"},
+			"panel":                       {"role": "surface_panel", "raised_intensity": 0},
+			"title_panel":                 {"role": "surface_high",  "raised_intensity": 0},
+			"title_hover_panel":           {"role": "state_hover",   "raised_intensity": 0},
+			"title_collapsed_panel":       {"role": "surface_panel", "raised_intensity": 0},
+			"title_collapsed_hover_panel": {"role": "state_hover",   "raised_intensity": 0},
+			"focus":                       {"role": "focus_ring"},
 		},
 		"color": {
-			"font_color":       {"role": "text_default"},
-			"title_font_color": {"role": "text_strong"},
+			"font_color":           {"role": "text_default"},
+			"hover_font_color":     {"role": "text_strong"},
+			"collapsed_font_color": {"role": "text_strong"},
+			"font_outline_color":   {"role": "outline_color"},
 		},
 	},
 	# 11. GraphEdit — minimal Phase 4 baseline (Phase 7 graph polish)
@@ -1402,7 +1527,7 @@ const BINDING_TABLE: Dictionary = {
 			"panel": {"role": "surface_overlay", "raised_intensity": 1},
 		},
 	},
-	# 33. Tree — 16 styleboxes per CANONICAL_SLOT_NAMES (PITFALLS 1.7 first-class)
+	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
 	"Tree": {
 		"stylebox": {
 			"panel":                  {"role": "surface_low",   "raised_intensity": 0},
@@ -1412,7 +1537,9 @@ const BINDING_TABLE: Dictionary = {
 			"title_button_hover":     {"role": "state_hover",   "raised_intensity": 0},
 			"button_hover":           {"role": "state_hover",   "raised_intensity": 0},
 			"button_pressed":         {"role": "state_pressed", "raised_intensity": 0},
-			"hover":                  {"role": "state_hover",   "raised_intensity": 0},
+			"custom_button":          {"role": "surface_panel", "raised_intensity": 0},
+			"hovered":                {"role": "state_hover",   "raised_intensity": 0},
+			"hovered_dimmed":         {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.55},
 			"selected":               {"role": "accent_offset", "raised_intensity": 0},
 			"selected_focus":         {"role": "accent_offset", "raised_intensity": 0},
 			"hovered_selected":       {"role": "accent_offset", "raised_intensity": 0},
