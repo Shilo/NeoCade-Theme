@@ -325,6 +325,10 @@ func _regenerate_theme() -> void:
 	set_font_size("font_size", "TooltipLabel", tokens.body)
 	set_font("font", "MenuBar", body_font)
 	set_font_size("font_size", "MenuBar", tokens.body)
+	set_font("font", "PopupMenu", body_font)
+	set_font("font_separator", "PopupMenu", caption_font)
+	set_font_size("font_size", "PopupMenu", tokens.body)
+	set_font_size("font_separator_size", "PopupMenu", tokens.label_)
 
 	_last_regeneration_usec = Time.get_ticks_usec() - t0
 	_regenerating = false
@@ -1610,32 +1614,50 @@ const BINDING_TABLE: Dictionary = {
 			"panel": {"role": "surface_panel", "raised_intensity": 0},
 		},
 	},
-	# 23. PopupMenu — 5 styleboxes + 3 constants + checked/unchecked/submenu icons
+	# 23. PopupMenu — dense menu rows, structural separators, full icon coverage.
 	"PopupMenu": {
 		"stylebox": {
-			"panel":                 {"role": "surface_high",  "raised_intensity": 1},
-			"hover":                 {"role": "state_hover",   "raised_intensity": 0},
-			"separator":             {"role": "outline_color", "raised_intensity": 0},
-			"labeled_separator_left":{"role": "outline_color", "raised_intensity": 0},
-			"labeled_separator_right":{"role": "outline_color", "raised_intensity": 0},
+			"panel":                 {"role": "surface_overlay", "raised_intensity": 0,
+									  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
+			"hover":                 {"role": "state_hover",    "raised_intensity": 0, "alpha": 0.36},
+			"separator":             {"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
+									  "padding": Vector2i(0, 0)},
+			"labeled_separator_left":{"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
+									  "padding": Vector2i(0, 0)},
+			"labeled_separator_right":{"role": "outline_color", "raised_intensity": 0, "alpha": 0.55,
+									  "padding": Vector2i(0, 0)},
 		},
 		"color": {
-			"font_color":           {"role": "text_default"},
-			"font_hover_color":     {"role": "text_strong"},
-			"font_disabled_color":  {"role": "text_default", "disabled": true},
-			"font_separator_color": {"role": "text_muted"},
+			"font_color":            {"role": "text_default"},
+			"font_hover_color":      {"role": "text_strong"},
+			"font_disabled_color":   {"role": "text_default", "disabled": true},
+			"font_outline_color":    {"role": "outline_color"},
+			"font_separator_color":  {"role": "text_muted"},
+			"font_separator_outline_color":{"role": "outline_color"},
 			"font_accelerator_color":{"role": "text_muted"},
 		},
 		"constant": {
-			"v_separation":     {"value": "tokens.tapPadding"},
-			"h_separation":     {"value": "tokens.tapPadding"},
-			"item_start_padding":{"value": "tokens.tapPadding"},
+			"gutter_compact":         {"value": 1},
+			"h_separation":           {"value": 6},
+			"icon_max_width":         {"value": 18},
+			"indent":                 {"value": 16},
+			"item_end_padding":       {"value": 8},
+			"item_start_padding":     {"value": 8},
+			"outline_size":           {"value": 0},
+			"separator_outline_size": {"value": 0},
+			"v_separation":           {"value": 4},
 		},
 		"icon": {
-			"checked":         {"icon": "checkbox_checked"},
-			"unchecked":       {"icon": "checkbox_unchecked"},
-			"radio_checked":   {"icon": "radio_checked"},
-			"radio_unchecked": {"icon": "radio_unchecked"},
+			"checked":                  {"icon": "checkbox_checked"},
+			"checked_disabled":         {"icon": "checkbox_checked"},
+			"unchecked":                {"icon": "checkbox_unchecked"},
+			"unchecked_disabled":       {"icon": "checkbox_unchecked"},
+			"radio_checked":            {"icon": "radio_checked"},
+			"radio_checked_disabled":   {"icon": "radio_checked"},
+			"radio_unchecked":          {"icon": "radio_unchecked"},
+			"radio_unchecked_disabled": {"icon": "radio_unchecked"},
+			"submenu":                  {"icon": "popup_submenu"},
+			"submenu_mirrored":         {"icon": "popup_submenu_mirrored"},
 		},
 	},
 	# 24. PopupPanel — first-class popup Window-boundary shell.
