@@ -47,7 +47,7 @@ func _init() -> void:
 			failures.append("%s: ResourceSaver.save failed with error %d" % [path, save_result])
 			continue
 
-		var strip_error := _strip_theme_entries(path)
+		var strip_error := _strip_theme_entries(path, snapshot)
 		if not strip_error.is_empty():
 			failures.append("%s: strip failed: %s" % [path, strip_error])
 			continue
@@ -147,7 +147,7 @@ func _assert_data_only_file(path: String) -> String:
 ## - [resource] header
 ## - script/script_class linkage
 ## - the nine public @export assignments
-static func _strip_theme_entries(path: String) -> String:
+static func _strip_theme_entries(path: String, snapshot: Dictionary) -> String:
 	var src := FileAccess.open(path, FileAccess.READ)
 	if src == null:
 		return "cannot open %s for read" % path
@@ -158,6 +158,7 @@ static func _strip_theme_entries(path: String) -> String:
 	var out: PackedStringArray = []
 	var section := ""
 	var skip_section := false
+	var written_exports: Dictionary = {}
 
 	for raw_line in lines:
 		var line: String = raw_line
@@ -195,9 +196,14 @@ static func _strip_theme_entries(path: String) -> String:
 			var key := stripped.split("=", true, 1)[0].strip_edges()
 			if EXPORT_KEYS.has(key):
 				out.append(line)
+				written_exports[key] = true
 			continue
 		if section == "":
 			out.append(line)
+
+	for key in EXPORT_KEYS:
+		if not written_exports.has(key):
+			out.append(_format_export_line(key, snapshot.get(key)))
 
 	var final_text := "\n".join(out)
 	if not final_text.ends_with("\n"):
@@ -213,6 +219,30 @@ static func _strip_theme_entries(path: String) -> String:
 	if size >= 2048:
 		return "post-strip size %d >= 2048" % size
 	return ""
+
+
+static func _format_export_line(key: String, value: Variant) -> String:
+	if value is Color:
+		var color: Color = value
+		return "%s = Color(%s, %s, %s, %s)" % [
+			key,
+			_float_text(color.r),
+			_float_text(color.g),
+			_float_text(color.b),
+			_float_text(color.a),
+		]
+	if typeof(value) == TYPE_BOOL:
+		return "%s = %s" % [key, "true" if bool(value) else "false"]
+	return "%s = %s" % [key, str(value)]
+
+
+static func _float_text(value: float) -> String:
+	var text := "%.7f" % value
+	while text.find(".") != -1 and text.ends_with("0"):
+		text = text.substr(0, text.length() - 1)
+	if text.ends_with("."):
+		text = text.substr(0, text.length() - 1)
+	return text
 
 
 static func _strip_load_steps_attr(header_line: String) -> String:
