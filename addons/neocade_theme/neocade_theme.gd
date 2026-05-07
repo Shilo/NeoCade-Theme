@@ -224,6 +224,8 @@ func _regenerate_theme() -> void:
 	# ItemList exposes one official font slot. Keep it explicit because BINDING_TABLE
 	# intentionally has no font branch.
 	set_font("font", "ItemList", body_font)
+	# FoldableContainer likewise exposes a single official title/body font slot.
+	set_font("font", "FoldableContainer", body_font)
 
 	# ── Set per-variation font sizes (DESIGN_TOKENS §8.5 + tokens) ──
 	set_font_size("font_size", "HeaderLarge",  tokens.h1)
@@ -1188,8 +1190,21 @@ const BINDING_TABLE: Dictionary = {
 		"color": {
 			"font_color":           {"role": "text_default"},
 			"hover_font_color":     {"role": "text_strong"},
-			"collapsed_font_color": {"role": "text_strong"},
+			"collapsed_font_color": {"role": "text_default"},
 			"font_outline_color":   {"role": "outline_color"},
+		},
+		"constant": {
+			"h_separation": {"value": 6},
+			"outline_size": {"value": 0},
+		},
+		"font_size": {
+			"font_size": {"value": "tokens.body"},
+		},
+		"icon": {
+			"expanded_arrow":           {"icon": "disclosure_expanded"},
+			"expanded_arrow_mirrored":  {"icon": "disclosure_expanded_mirrored"},
+			"folded_arrow":             {"icon": "disclosure_collapsed"},
+			"folded_arrow_mirrored":    {"icon": "disclosure_collapsed_mirrored"},
 		},
 	},
 	# 11. GraphEdit — minimal Phase 4 baseline (Phase 7 graph polish)
