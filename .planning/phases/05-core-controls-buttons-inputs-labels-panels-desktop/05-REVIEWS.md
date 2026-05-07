@@ -3,7 +3,7 @@ phase: 05-core-controls-buttons-inputs-labels-panels-desktop
 reviewers:
   - OpenCode (deepseek/deepseek-v4-pro)
   - Claude (claude -p)
-reviewed_at: "2026-05-06T20:15:21.4832699-07:00"
+reviewed_at: "2026-05-06T20:41:53.9964027-07:00"
 plans_reviewed:
   - 05-01-godot-cli-and-phase5-verifier-scaffold-PLAN.md
   - 05-02-direction-shape-schema-and-recipe-resolution-PLAN.md
@@ -154,3 +154,96 @@ Revise. The plan set is well-architected - the dependency ordering (CLI bootstra
 
 Current unresolved HIGH concerns after Cycle 1: **4**.
 
+
+# Phase 05 Cross-AI Plan Review - Cycle 2
+
+**Reviewed at:** 2026-05-06T20:41:53.9964027-07:00
+**Cycle context:** Review after Cycle 1 replan for `/gsd-plan-review-convergence 5 --opencode --claude`.
+**Review scope:** Revised Phase 05 plans only. No PLAN files were edited during this review step.
+
+## OpenCode Review
+
+**Reviewer:** OpenCode via `opencode run --model deepseek/deepseek-v4-pro -`
+**Exit code:** 0
+
+## Verdict
+
+**Proceed.** OpenCode found **0 unresolved HIGH concerns** after Cycle 2.
+
+## Cycle 1 HIGH Resolution Check
+
+- **HIGH 1 - SpinBox icon slot names:** **Resolved.** Plan 05-06 now hard-codes `up`, `up_disabled`, `down`, and `down_disabled`, with no `up_arrow` / `down_arrow` fallback. The verifier introspects `Theme.get_icon_list("SpinBox")` for those exact names, rejects the old names, and Plan 05-01 plus Plan 05-07 repeat the same assertion set.
+- **HIGH 2 - Godot autonomous download/install:** **Resolved.** Plan 05-01 is search-only by default and blocks on a human checkpoint before any install. `-AllowInstall` requires an explicit official URL plus `-ExpectedSha256`, verifies with `Get-FileHash`, and writes `godot-cli-provenance.txt`.
+- **HIGH 3 - DangerButton role token:** **Resolved.** Plan 05-02 adds explicit `role_danger`, `role_warning`, `role_success`, and `role_info` derivations before `role_table` is consumed. Plan 05-03 depends on 05-02 and forbids local fallback for DangerButton.
+- **HIGH 4 - ResourceSaver `.tres` data-only round-trip:** **Resolved.** Plan 05-07 now specifies a concrete Phase-4-equivalent strip pass, preserving script linkage and the nine exports while removing `load_steps`, non-script ext_resources, `[sub_resource]` blocks, generated theme entries, and `theme_data/...` lines. The post-strip gate asserts byte size, no generated sections, and export-value stability.
+
+## New Concerns
+
+OpenCode reported no new HIGH, MEDIUM, or LOW concerns in Cycle 2.
+
+## Current HIGH Concerns
+
+None.
+
+## Claude Review
+
+**Reviewer:** Claude via `claude -p -`
+**Exit code:** 0
+
+## Verdict
+
+**Proceed.** Claude found **0 unresolved HIGH concerns** after Cycle 2.
+
+## Cycle 1 HIGH Resolution Check
+
+- **HIGH 1 - SpinBox icon slot names:** **Resolved.** Plan 05-06 binds `up` / `up_disabled` to `spinbox_up.svg` and `down` / `down_disabled` to `spinbox_down.svg`, requires `Theme.get_icon_list("SpinBox")` introspection, rejects `up_arrow` / `down_arrow`, and aborts for replan if introspection disagrees. Plan 05-01 and Plan 05-07 independently reassert the compact slot set.
+- **HIGH 2 - Godot autonomous download/install:** **Resolved.** Plan 05-01 has `autonomous: false`, defaults `Resolve-Godot46.ps1` to `-VerifyOnly`, explicitly forbids downloading/installing/extracting/executing network-fetched binaries in that mode, writes `GODOT-CLI-MISSING.md` when no executable is found, and gates any install behind a blocking human checkpoint with URL and SHA256 provenance.
+- **HIGH 3 - DangerButton role token:** **Resolved.** Plan 05-02 derives `role_success`, `role_warning`, `role_danger`, and `role_info` inside `_regenerate_theme()` from `DESIGN_TOKENS` defaults, lifts them into `role_table`, and verifies no fallback to `surface_panel` or `text_strong`. Plan 05-03 consumes `role_danger` only after 05-02.
+- **HIGH 4 - ResourceSaver `.tres` data-only round-trip:** **Resolved.** Plan 05-07 specifies `_phase5_resource_saver.gd` loading each `.tres`, snapshotting all nine export values, calling `ResourceSaver.save()`, running `_strip_theme_entries` plus `_strip_load_steps_attr`, and asserting no `[sub_resource]`, no `theme_data/`, under-2-KiB size, and byte-stable exported values.
+
+## New Concerns
+
+### HIGH
+
+None.
+
+### MEDIUM
+
+- `[MEDIUM]` **Plan 05-01 verifier stage may demand future Phase 5 content too early.** Claude noted that `assert_spinbox_icons`, `assert_codeedit_gutter_slots`, `assert_inf_text_normal_font_size`, and `assert_variation_count_15` describe assertions whose content is not authored until later plans. Recommended clarification: in the `tooling` stage, groups should establish contracts and markers, then harden content assertions only in their dedicated later stages.
+- `[MEDIUM]` **Plan 05-07 should post-strip reload the saved resources.** The strip pass text invariants are strong, but Claude recommended a post-strip `ResourceLoader.load(path)` assertion that the file still loads as `NeoCadeTheme` and has a representative stylebox, so header/resource `script_class` placement cannot silently break reloadability.
+- `[MEDIUM]` **Plan 05-04 should remove the Label letter-spacing escape hatch.** Research already concludes Godot 4.6 Label has no Theme-level letter-spacing slot, so leaving an introspection escape hatch could encourage a fake constant.
+
+### LOW
+
+- `[LOW]` **Plan 05-02 `.clear(` PowerShell scan is weaker than the verifier.** It filters full-line comments but may still match strings or trailing comments. The verifier group remains the stronger gate.
+- `[LOW]` **Plan 05-03 IconButton padding still has optionality.** Claude recommended committing to one deterministic source, such as `tokens.tapPadding`.
+- `[LOW]` **Plan 05-05 should pin the `line_number_color` recipe source.** The slot is asserted, but its role/value source should be explicit.
+- `[LOW]` **Plan 05-04 Burst Kicker verification wording could be tighter.** If the verifier checks font weight rather than font reference/size, the plan should name the exact expected resource behavior.
+
+## Current HIGH Concerns
+
+None.
+
+## Consensus Summary
+
+### Agreed Cycle 1 HIGH Closure
+
+- **SpinBox slots:** Both reviewers agree the revised plans fully resolve the slot-name conflict by requiring `up`, `up_disabled`, `down`, and `down_disabled`, backed by introspection and negative checks for `up_arrow` / `down_arrow`.
+- **Godot install/download:** Both reviewers agree autonomous download/install is no longer allowed. Default behavior is search-only, and install requires explicit user approval plus SHA256 provenance.
+- **DangerButton role:** Both reviewers agree `role_danger` is now introduced before use, verified through the shared role table, and protected from fallback behavior.
+- **ResourceSaver/data-only strip pass:** Both reviewers agree Plan 05-07 now contains a concrete Phase-4-equivalent strip pass with data-only invariants.
+
+### Remaining Non-HIGH Work
+
+- OpenCode reported no new concerns.
+- Claude reported three MEDIUM and four LOW concerns. These are useful implementation-plan polish notes, but Claude did not classify any as convergence blockers.
+
+### Unresolved HIGH Count
+
+Current unresolved HIGH concerns after Cycle 2: **0**.
+
+CYCLE_SUMMARY: current_high=0
+
+## Current HIGH Concerns
+
+None.
