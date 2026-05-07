@@ -59,6 +59,49 @@ extends SceneTree
 ##                                         list is data, not pattern, so the
 ##                                         scanner is not self-invalidating.)
 ##
+## Plan 05-03 added buttons-stage groups (TYPEVAR-01 + COV-02 + D-07):
+##   - assert_button_variation_rows      (Plan 05-03 Task 1: BINDING_TABLE has
+##                                         all six TYPEVAR-01 variation rows
+##                                         (PrimaryButton, SecondaryButton,
+##                                         GhostButton, DangerButton,
+##                                         IconButton, FlatButton).)
+##   - assert_button_variation_states    (Plan 05-03 Task 1: each variation
+##                                         exposes the official Button state
+##                                         set: normal/hover/pressed/focus/
+##                                         disabled/hover_pressed where the
+##                                         strategy is non-flat. FlatButton
+##                                         may use transparent normal.)
+##   - assert_button_variation_fonts     (Plan 05-03 Task 1 / PITFALLS 1.2:
+##                                         each variation has explicit
+##                                         `font` and `font_size` registered
+##                                         on the Theme — variations do NOT
+##                                         inherit fonts from base type.)
+##   - assert_button_strategy_distinctness (Plan 05-03 Task 1 / D-04: at
+##                                         least 4 distinct primary_strategy
+##                                         values are exercised across the 5
+##                                         approved directions; sentinel
+##                                         against accidental strategy
+##                                         collapse.)
+##   - assert_dangerbutton_role_danger    (Plan 05-03 Task 1 review HIGH
+##                                         gate: DangerButton.normal bg
+##                                         resolves to role_danger
+##                                         (#FF6E6E default), NOT
+##                                         surface_panel — proves the
+##                                         semantic role wired by Plan 05-02
+##                                         Task 2 actually flows through.)
+##   - assert_basebutton_family_chrome   (Plan 05-03 Task 2 / COV-02: the
+##                                         seven BaseButton-family Controls
+##                                         (Button, CheckBox, CheckButton,
+##                                         OptionButton, MenuButton,
+##                                         ColorPickerButton, LinkButton)
+##                                         have their official slot set
+##                                         populated. LinkButton is
+##                                         text-only — no normal stylebox.)
+##   - assert_focus_overlay_visibility (Plan 05-03 Task 3): updated to
+##                                         require focus on every variation
+##                                         in the buttons-stage strict
+##                                         set.
+##
 ## Per D-07: Godot 4.6 Button-family uses official `focus` overlay; verifier MUST
 ## NOT reference invented `pressed_focus`, `checked_focus`, or `hover_pressed_focus`
 ## slots.
@@ -119,6 +162,45 @@ const PHASE5_FOCUS_TYPES := [
 	"GhostButton",
 ]
 
+# Plan 05-03: TYPEVAR-01 button variations. The six runtime button variations
+# the dynamic generator must produce per direction. FlatButton here is the
+# RUNTIME variation per TYPEVAR-01 (not the editor-only `FlatButton` Godot
+# class).
+const PHASE5_BUTTON_VARIATIONS := [
+	"PrimaryButton",
+	"SecondaryButton",
+	"GhostButton",
+	"DangerButton",
+	"IconButton",
+	"FlatButton",
+]
+
+# Plan 05-03 Task 2 / COV-02: the seven BaseButton-family Controls Phase 5 must
+# theme. LinkButton is text-only and is asserted differently (no normal
+# stylebox required) downstream.
+const PHASE5_BASEBUTTON_FAMILY := [
+	"Button",
+	"CheckBox",
+	"CheckButton",
+	"OptionButton",
+	"MenuButton",
+	"ColorPickerButton",
+	"LinkButton",
+]
+
+# Plan 05-03 Task 1 / D-04: each variation row should populate this state set
+# (the official Godot 4.6 Button slot list). FlatButton is allowed to leave
+# `disabled` plus an additional state on transparent bg — see
+# assert_button_variation_states for the relaxed rule.
+const PHASE5_BUTTON_VARIATION_STATES := [
+	"normal",
+	"hover",
+	"pressed",
+	"focus",
+	"disabled",
+	"hover_pressed",
+]
+
 # ----- argv parsing -----
 var _stage: String = "tooling"
 var _failures: Array[String] = []
@@ -152,8 +234,8 @@ func _parse_args() -> void:
 			i += 1
 		if found:
 			break
-	if _stage != "tooling" and _stage != "strict" and _stage != "shape":
-		push_error("PHASE5_VERIFY FAIL: unknown --stage '%s' (expected tooling|shape|strict)" % _stage)
+	if _stage != "tooling" and _stage != "strict" and _stage != "shape" and _stage != "buttons":
+		push_error("PHASE5_VERIFY FAIL: unknown --stage '%s' (expected tooling|shape|buttons|strict)" % _stage)
 		_stage = "tooling"
 	print("PHASE5_VERIFY: stage=%s" % _stage)
 
@@ -178,6 +260,17 @@ func _run_verifier() -> void:
 	assert_shape_recipe_resolution()
 	assert_semantic_role_table()
 	assert_no_invented_focus_combos()
+	# Plan 05-03 groups (Button variations + BaseButton-family chrome).
+	# These are strict in `buttons` stage; carry-forward strict in `strict`.
+	assert_button_variation_rows()
+	assert_button_variation_states()
+	assert_button_variation_fonts()
+	assert_button_strategy_distinctness()
+	assert_dangerbutton_role_danger()
+	assert_basebutton_family_chrome()
+	# Plan 05-03 Task 2 polish groups.
+	assert_basebutton_family_shape_aware()
+	assert_checkbox_disabled_icon_reuse()
 
 
 func _verify_helper_wiring() -> bool:
@@ -491,7 +584,10 @@ func assert_focus_overlay_visibility() -> void:
 	# Variations may not exist yet at the Phase 4 baseline; accept missing focus
 	# on variations as PENDING but treat missing focus on base controls as FAIL.
 	var base_controls := ["Button", "CheckBox", "CheckButton", "OptionButton", "LineEdit", "TextEdit"]
-	var variations := ["PrimaryButton", "SecondaryButton", "GhostButton"]
+	# Plan 05-03 Task 3: every TYPEVAR-01 button variation must expose `focus`.
+	# IconButton + FlatButton are added relative to the Plan 01 baseline so the
+	# buttons-stage gate enforces focus across the full variation set.
+	var variations := PHASE5_BUTTON_VARIATIONS
 	for base in base_controls:
 		if not theme.has_stylebox("focus", base):
 			missing_focus.append(base + " (base)")
@@ -919,6 +1015,357 @@ func assert_no_invented_focus_combos() -> void:
 		_group_fail(group, "D-07 violation: " + "; ".join(violations))
 
 
+# ----- Plan 05-03 assertion groups (TYPEVAR-01 + COV-02) -----
+
+# ----- assertion group: BINDING_TABLE has all six button variation rows ------
+##
+## Plan 05-03 Task 1 / TYPEVAR-01: each of PrimaryButton, SecondaryButton,
+## GhostButton, DangerButton, IconButton, FlatButton must have a row in
+## BINDING_TABLE so the dynamic generator emits chrome on every regenerate.
+## D-14 is preserved: variations not in BINDING_TABLE remain untouched, so
+## the absence of a row is a real invariant violation, not a degraded state.
+func assert_button_variation_rows() -> void:
+	var group := "assert_button_variation_rows"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var const_map: Dictionary = theme.get_script().get_script_constant_map()
+	var binding_table: Dictionary = const_map.get("BINDING_TABLE", {})
+	if binding_table.is_empty():
+		_group_fail(group, "BINDING_TABLE const not found on production class")
+		return
+	var missing: Array[String] = []
+	for v in PHASE5_BUTTON_VARIATIONS:
+		if not binding_table.has(v):
+			missing.append(v)
+	if missing.is_empty():
+		_group_ok(group, "all six TYPEVAR-01 button variation rows present in BINDING_TABLE: " + ", ".join(PHASE5_BUTTON_VARIATIONS))
+	else:
+		_group_pending(group, "missing TYPEVAR-01 button variation rows in BINDING_TABLE: " + ", ".join(missing))
+
+
+# ----- assertion group: each variation has the official Button state set ----
+##
+## Plan 05-03 Task 1 / D-04: per-direction chrome runs through the same state
+## set Godot 4.6 Button uses (normal/hover/pressed/focus/disabled/hover_pressed).
+## Each variation must populate the WHOLE set so consumers tabbing/clicking
+## across states see consistent personality. FlatButton may use a transparent
+## bg on `normal` (recipe sets bg_color.a == 0) but the slot must still be
+## present.
+##
+## D-07 invariant: only the official `focus` overlay is asserted.
+## `pressed_focus` / `checked_focus` / `hover_pressed_focus` are forbidden by
+## assert_no_invented_focus_combos.
+func assert_button_variation_states() -> void:
+	var group := "assert_button_variation_states"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	for v in PHASE5_BUTTON_VARIATIONS:
+		for state in PHASE5_BUTTON_VARIATION_STATES:
+			if not theme.has_stylebox(state, v):
+				problems.append("%s.%s missing" % [v, state])
+	if problems.is_empty():
+		_group_ok(group, "all six button variations expose the full state set on Pulse: " + ", ".join(PHASE5_BUTTON_VARIATION_STATES))
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+# ----- assertion group: each variation has explicit font + font_size --------
+##
+## Plan 05-03 Task 1 / PITFALLS 1.2 / D-17: type variations do NOT inherit
+## fonts from their base type. Phase 4 already wires explicit set_font +
+## set_font_size for the six button variations (lines 205-226 of the
+## production class). Phase 5 must keep that wiring; if a future regenerate
+## strips it, this group catches the regression.
+func assert_button_variation_fonts() -> void:
+	var group := "assert_button_variation_fonts"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	for v in PHASE5_BUTTON_VARIATIONS:
+		if not theme.has_font("font", v):
+			problems.append("%s.font missing (PITFALLS 1.2 — variations do NOT inherit fonts)" % v)
+		if not theme.has_font_size("font_size", v):
+			problems.append("%s.font_size missing" % v)
+	if problems.is_empty():
+		_group_ok(group, "all six button variations have explicit `font` + `font_size` (Inter Variable Roman per D-17)")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+# ----- assertion group: distinct primary strategies across directions -------
+##
+## Plan 05-03 Task 1 / D-04 sentinel: at least 4 distinct primary_strategy
+## values must be exercised across the 5 approved directions when generating
+## PrimaryButton chrome. Without this assertion a buggy strategy dispatcher
+## could silently collapse all 5 directions onto the same default and the 5
+## directions would visually look identical on Primary chrome.
+##
+## We exercise this by loading each approved direction's `.tres` (so the
+## live hex-keyed lookup runs), reading `shape.primary_strategy` via
+## `_lookup_shape`, and tallying distinct values. Mirrors the strategy-set
+## guard in assert_shape_value_integrity but framed at the variation layer
+## so a regression in the BINDING_TABLE recipe (e.g., recipe inlines the
+## strategy as a literal instead of referencing `shape.primary_strategy`)
+## still surfaces here.
+func assert_button_strategy_distinctness() -> void:
+	var group := "assert_button_strategy_distinctness"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	if not theme.has_method("_lookup_shape"):
+		_group_pending(group, "_lookup_shape missing (Plan 05-02 not landed)")
+		return
+	var const_map: Dictionary = theme.get_script().get_script_constant_map()
+	var presets: Dictionary = const_map.get("DIRECTION_PRESETS", {})
+	if presets.is_empty():
+		_group_fail(group, "DIRECTION_PRESETS const not found on production class")
+		return
+	var primary_seen: Dictionary = {}
+	var ghost_seen: Dictionary = {}
+	for hex_key in ["151A2E", "111820", "241326", "0B2420", "20112E"]:
+		var sub: Dictionary = presets.get(hex_key, {})
+		if sub.is_empty():
+			continue
+		var ps_v: Variant = theme.call("_lookup_shape", sub, "shape.primary_strategy")
+		if ps_v != null:
+			primary_seen[String(ps_v)] = true
+		var gs_v: Variant = theme.call("_lookup_shape", sub, "shape.ghost_strategy")
+		if gs_v != null:
+			ghost_seen[String(gs_v)] = true
+	var problems: Array[String] = []
+	if primary_seen.size() < 4:
+		problems.append("primary_strategy distinct count = %d (expected >= 4 across 5 directions): %s" % [primary_seen.size(), str(primary_seen.keys())])
+	if ghost_seen.size() < 4:
+		problems.append("ghost_strategy distinct count = %d (expected >= 4 across 5 directions): %s" % [ghost_seen.size(), str(ghost_seen.keys())])
+	if problems.is_empty():
+		_group_ok(group, "primary_strategy + ghost_strategy each expose >=4 distinct values across 5 directions: primary=%s ghost=%s" % [str(primary_seen.keys()), str(ghost_seen.keys())])
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+# ----- assertion group: DangerButton resolves to role_danger ----------------
+##
+## Plan 05-03 Task 1 review HIGH gate: the BINDING_TABLE row for DangerButton
+## must reference the `role_danger` semantic role added by Plan 05-02 Task 2,
+## NOT fall back to `surface_panel` / `text_strong`. We assert this two ways:
+##   1. The Pulse theme's DangerButton.normal stylebox bg_color matches the
+##      §7.1 default `#FF6E6E` (allowing the per-direction state-layer mix
+##      not to apply because `role_danger` is a fixed semantic color the
+##      role_table looks up directly — recipes that do NOT set `alpha` or
+##      `disabled` flags get the unmodified role color).
+##   2. The font_color slot resolves to a Color (text on the danger surface)
+##      rather than null.
+## If the chrome ever falls back to surface_panel, bg_color would equal the
+## per-direction surface_panel mix, NOT the danger red, and the assertion
+## fails loudly.
+func assert_dangerbutton_role_danger() -> void:
+	var group := "assert_dangerbutton_role_danger"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	if not theme.has_stylebox("normal", "DangerButton"):
+		_group_pending(group, "DangerButton.normal stylebox missing (Plan 05-03 Task 1 not yet landed)")
+		return
+	var sb: StyleBox = theme.get_stylebox("normal", "DangerButton")
+	if sb == null:
+		_group_pending(group, "DangerButton.normal returned null stylebox")
+		return
+	if not (sb is StyleBoxFlat):
+		_group_fail(group, "DangerButton.normal is not a StyleBoxFlat (got %s)" % sb.get_class())
+		return
+	var fsb: StyleBoxFlat = sb
+	var expected_danger := Color("#FF6E6E")
+	# Compare RGB only — alpha may differ if a recipe later layers translucency.
+	var rgb_match := is_equal_approx(fsb.bg_color.r, expected_danger.r) \
+		and is_equal_approx(fsb.bg_color.g, expected_danger.g) \
+		and is_equal_approx(fsb.bg_color.b, expected_danger.b)
+	if not rgb_match:
+		_group_pending(group, "DangerButton.normal bg_color = %s; expected role_danger = %s (recipe likely fell back to surface_panel)" % [fsb.bg_color.to_html(false), expected_danger.to_html(false)])
+		return
+	# Sanity: font_color slot resolves (text on danger surface).
+	if not theme.has_color("font_color", "DangerButton"):
+		_group_pending(group, "DangerButton.font_color missing — recipe row incomplete")
+		return
+	_group_ok(group, "DangerButton.normal resolves to role_danger #%s (Plan 05-02 semantic role flowed through)" % fsb.bg_color.to_html(false).to_upper())
+
+
+# ----- assertion group: BaseButton-family slot coverage ---------------------
+##
+## Plan 05-03 Task 2 / COV-02: the seven BaseButton-family Controls Phase 5
+## owns must have their official Godot 4.6 slot set populated. Phase 4 set
+## the baseline; Plan 05-03 Task 2 confirms Plan 05-02 / Plan 05-03 Task 1
+## did not regress.
+##
+## Per-class slot expectations:
+##   - Button / OptionButton / MenuButton / ColorPickerButton: 6 styleboxes
+##     (normal/hover/pressed/focus/disabled/hover_pressed where the class
+##     supports it; ColorPickerButton's API does not expose hover_pressed
+##     officially, so we treat it as optional).
+##   - CheckBox / CheckButton: 4 base styleboxes minimum (normal/hover/
+##     pressed/focus) plus the icon set Phase 4 provides.
+##   - LinkButton: text-only — NO normal stylebox is expected (LinkButton
+##     renders without a filled chrome). We assert font_color is set for
+##     normal/hover and that the LinkButton row does NOT carry a `normal`
+##     stylebox recipe (regression catch: someone adds filled chrome that
+##     Godot would not draw).
+## Plan 05-03 Task 2 polish: BaseButton-family rows reference Plan 05-02
+## shape.* recipes so per-direction radius / padding / lift differences flow
+## through the base controls (not just TYPEVAR-01 variations). Without this
+## polish, MenuButton/OptionButton/ColorPickerButton would render with the
+## flat @export `corner_radius` baseline regardless of direction, while
+## PrimaryButton / SecondaryButton would visibly differ — a UI inconsistency
+## reviewed in Phase 4 D-04.
+##
+## Verification: load the production source, scan each base BINDING_TABLE row
+## (Button / OptionButton / MenuButton / ColorPickerButton — CheckBox /
+## CheckButton intentionally skip the radius/padding key because they are
+## icon-driven, not chrome-driven), and assert the row contains a `shape.`
+## reference somewhere in the stylebox sub-block (the `radius` or `padding`
+## key with a `shape.<...>` value). Failure mode: PENDING in tooling, FAIL
+## in buttons / strict.
+func assert_basebutton_family_shape_aware() -> void:
+	var group := "assert_basebutton_family_shape_aware"
+	var src_text := _read_production_source()
+	if src_text.is_empty():
+		_group_fail(group, "could not read production source")
+		return
+	# Per Phase 4 commentary, CheckBox + CheckButton are intentionally
+	# icon-driven; their stylebox slots stay on the @export corner_radius
+	# baseline. The 4 Button-style classes below all benefit from
+	# direction-aware chrome.
+	var shape_aware_targets := ["Button", "OptionButton", "MenuButton", "ColorPickerButton"]
+	# Anchor search past CANONICAL_SLOT_NAMES so we hit BINDING_TABLE rows
+	# instead of the slot-enumeration rows (which have the same `"Button":`
+	# header but no recipes). BINDING_TABLE_BEGIN is the const declaration
+	# line; we search after that.
+	var binding_table_anchor: int = src_text.find("const BINDING_TABLE")
+	if binding_table_anchor == -1:
+		_group_fail(group, "BINDING_TABLE const declaration not found in production source")
+		return
+	# Walk each top-level row in BINDING_TABLE and look for a stylebox
+	# entry whose value contains `"shape."` (either radius or padding key).
+	var problems: Array[String] = []
+	for klass in shape_aware_targets:
+		# Find the row header AFTER the BINDING_TABLE anchor so we never
+		# hit the CANONICAL_SLOT_NAMES dict that has the same key form.
+		var header: String = "\"" + String(klass) + "\":"
+		var idx: int = src_text.find(header, binding_table_anchor)
+		if idx == -1:
+			problems.append("%s row not found in BINDING_TABLE" % klass)
+			continue
+		# Take the next ~4000 characters (rows are short) and look for shape.
+		var window: String = src_text.substr(idx, 4000)
+		# Stop the window at the next top-level NUMBERED row header to avoid
+		# bleeding into adjacent classes. Format is `\n\t# <digit>. <Klass>`.
+		# Inline polish comments like `\n\t# Plan 05-03 Task 2 polish: ...`
+		# do not start with a digit so they are NOT treated as a row boundary.
+		var search_start: int = 1
+		while true:
+			var cut: int = window.find("\n\t# ", search_start)
+			if cut == -1:
+				break
+			# Check the character after `\n\t# `: only digit-prefixed comments
+			# are class headers. (Pre-existing class headers in this file all
+			# follow `# <number>. <Class>` format.)
+			var next_char_idx: int = cut + 4  # past "\n\t# "
+			if next_char_idx < window.length():
+				var ch: String = window.substr(next_char_idx, 1)
+				if ch >= "0" and ch <= "9":
+					window = window.substr(0, cut)
+					break
+			search_start = cut + 1
+		if window.find("\"shape.") == -1 and window.find("'shape.") == -1:
+			problems.append("%s BINDING_TABLE row has no `shape.*` recipe references (Plan 05-03 Task 2)" % klass)
+	if problems.is_empty():
+		_group_ok(group, "Button / OptionButton / MenuButton / ColorPickerButton rows reference shape.* recipes (Plan 05-02 wiring flows through)")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+## Plan 05-03 Task 2 polish: CheckBox + CheckButton expose disabled-state
+## icon slots that REUSE the existing checked / unchecked SVGs (per the
+## Action item: "reuse existing SVGs for disabled/toggled where Godot
+## exposes tintable icon slots, unless Godot introspection proves a
+## distinct slot name"). Phase 4 commentary in CANONICAL_SLOT_NAMES already
+## documents that Godot 4.6 CheckButton exposes:
+##   checked, checked_disabled, checked_disabled_mirrored, checked_mirrored,
+##   unchecked, unchecked_disabled, unchecked_disabled_mirrored,
+##   unchecked_mirrored
+## Phase 4 shipped only the 2 primary slots; Plan 05-03 Task 2 closes the
+## reuse contract: every disabled slot binds to the same checked/unchecked
+## SVG so the icon stays visible (Godot's font_disabled_color tints it).
+##
+## Tested by introspecting the live theme's icon list per class.
+func assert_checkbox_disabled_icon_reuse() -> void:
+	var group := "assert_checkbox_disabled_icon_reuse"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	# CheckButton: checked_disabled + unchecked_disabled (skip *_mirrored —
+	# Phase 4 commentary defers them to v1.x; we add them only if Godot
+	# requires them, which it does NOT per docs).
+	var cb_icons: PackedStringArray = theme.get_icon_list("CheckButton")
+	for ic in ["checked_disabled", "unchecked_disabled"]:
+		if cb_icons.find(ic) == -1:
+			problems.append("CheckButton.%s missing — reuse the existing checkbutton_checked / checkbutton_unchecked SVG" % ic)
+	# CheckBox: checked_disabled + unchecked_disabled (Phase 4 wired
+	# checked/unchecked + radio_checked/radio_unchecked already).
+	var cx_icons: PackedStringArray = theme.get_icon_list("CheckBox")
+	for ic in ["checked_disabled", "unchecked_disabled"]:
+		if cx_icons.find(ic) == -1:
+			problems.append("CheckBox.%s missing — reuse the existing checkbox_checked / checkbox_unchecked SVG" % ic)
+	if problems.is_empty():
+		_group_ok(group, "CheckBox + CheckButton disabled icon slots reuse existing SVGs (no new artwork required)")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+func assert_basebutton_family_chrome() -> void:
+	var group := "assert_basebutton_family_chrome"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	# Filled chrome controls — focus + at least normal/hover/pressed/disabled.
+	var filled_chrome := ["Button", "CheckBox", "CheckButton", "OptionButton", "MenuButton", "ColorPickerButton"]
+	var required_filled := ["normal", "hover", "pressed", "focus", "disabled"]
+	for klass in filled_chrome:
+		for state in required_filled:
+			if not theme.has_stylebox(state, klass):
+				problems.append("%s.%s missing" % [klass, state])
+	# Optional hover_pressed: Button / CheckBox / CheckButton / OptionButton /
+	# MenuButton expose it in Godot 4.6; ColorPickerButton's docs don't list
+	# it, so we don't enforce it there.
+	for klass in ["Button", "CheckBox", "CheckButton", "OptionButton", "MenuButton"]:
+		if not theme.has_stylebox("hover_pressed", klass):
+			problems.append("%s.hover_pressed missing" % klass)
+	# CheckBox + CheckButton icon coverage Phase 4 ships (regression catch).
+	for klass in ["CheckBox"]:
+		var icons_required := ["checked", "unchecked", "radio_checked", "radio_unchecked"]
+		var icon_list: PackedStringArray = theme.get_icon_list(klass)
+		for ic in icons_required:
+			if icon_list.find(ic) == -1:
+				problems.append("%s icon `%s` missing" % [klass, ic])
+	for klass in ["CheckButton"]:
+		var icon_list2: PackedStringArray = theme.get_icon_list(klass)
+		for ic in ["checked", "unchecked"]:
+			if icon_list2.find(ic) == -1:
+				problems.append("%s icon `%s` missing" % [klass, ic])
+	# LinkButton: text-only. We require font_color slots populated and assert
+	# the production source's BINDING_TABLE row does NOT carry a `normal`
+	# stylebox recipe.
+	for slot in ["font_color", "font_hover_color", "font_focus_color"]:
+		if not theme.has_color(slot, "LinkButton"):
+			problems.append("LinkButton.%s missing" % slot)
+	# Regression catch: BINDING_TABLE.LinkButton must NOT contain a stylebox
+	# block. We probe via the live theme: has_stylebox should be false for
+	# `normal` after a regenerate, since the recipe row carries no stylebox.
+	if theme.has_stylebox("normal", "LinkButton"):
+		problems.append("LinkButton.normal stylebox present — LinkButton is text-only; filled chrome is not drawn by Godot's LinkButton renderer")
+	if problems.is_empty():
+		_group_ok(group, "all 7 BaseButton-family controls expose their official slot set; LinkButton stays text-only")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
 # ----- helpers -----
 
 func _load_pulse_for_group(group: String) -> NeoCadeTheme:
@@ -950,7 +1397,31 @@ func _group_pending(group: String, detail: String) -> void:
 	# marker check passes. In strict stage, PENDING is a FAIL.
 	# In shape stage, PENDING is a FAIL only for the shape-related groups
 	# that Plan 05-02 owns; the rest stay tooling-style.
+	# In buttons stage (Plan 05-03), PENDING is a FAIL only for the
+	# buttons-related groups (variation rows, states, fonts, strategy
+	# distinctness, role_danger, BaseButton-family chrome, focus overlay,
+	# and the carry-forward shape + invariant groups Plan 05-02 already
+	# pinned strict).
 	var shape_stage_strict := [
+		"assert_shape_lookup_integrity",
+		"assert_shape_value_integrity",
+		"assert_shape_recipe_resolution",
+		"assert_semantic_role_table",
+		"assert_no_invented_focus_combos",
+		"assert_no_theme_clear",
+	]
+	var buttons_stage_strict := [
+		"assert_button_variation_rows",
+		"assert_button_variation_states",
+		"assert_button_variation_fonts",
+		"assert_button_strategy_distinctness",
+		"assert_dangerbutton_role_danger",
+		"assert_basebutton_family_chrome",
+		"assert_basebutton_family_shape_aware",
+		"assert_checkbox_disabled_icon_reuse",
+		"assert_focus_overlay_visibility",
+		# Plan 05-02 carry-forward: shape groups stay strict in `buttons`
+		# stage because the buttons recipes depend on them resolving.
 		"assert_shape_lookup_integrity",
 		"assert_shape_value_integrity",
 		"assert_shape_recipe_resolution",
@@ -962,6 +1433,8 @@ func _group_pending(group: String, detail: String) -> void:
 	if _stage == "strict":
 		fail = true
 	elif _stage == "shape" and group in shape_stage_strict:
+		fail = true
+	elif _stage == "buttons" and group in buttons_stage_strict:
 		fail = true
 	if fail:
 		var label: String = _stage.to_upper()
@@ -982,7 +1455,8 @@ func _group_fail(group: String, detail: String) -> void:
 func _emit_summary_and_quit() -> void:
 	print("----- PHASE5_VERIFY summary -----")
 	print("  stage:          %s" % _stage)
-	print("  groups OK:      %d / %d" % [_ok_markers.size(), 11])
+	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 = 19.
+	print("  groups OK:      %d / %d" % [_ok_markers.size(), 19])
 	print("  groups PENDING: %d  %s" % [_pending.size(), str(_pending)])
 	print("  failures:       %d" % _failures.size())
 	for f in _failures:
