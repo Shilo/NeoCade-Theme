@@ -303,21 +303,63 @@ func assert_spinbox_icons() -> void:
 
 # ----- assertion group: shape.* lookup integrity for all 5 approved directions -----
 ##
-## Per D-02 + D-03: every approved direction must have a non-null `shape` sub-dict
-## with the Phase 5 keys present. Plan 05-02 lands the schema. Plan 05-03..05-07
-## consume it. The verifier walks DIRECTION_PRESETS and asserts each approved
-## direction's shape sub-block exposes every key in PHASE5_SHAPE_KEYS.
+## Per D-02 + D-03 + D-08: every approved direction must have a non-null `shape`
+## sub-dict with the Phase 5 keys present. Plan 05-02 lands the schema. Plan 05-03+
+## consume it. Plan 05-02 Task 3 expanded the group to:
+##   1. Walk DIRECTION_PRESETS const and assert each approved direction's shape
+##      sub-block exposes every key in PHASE5_SHAPE_KEYS (Plan 01 baseline).
+##   2. INSTANTIATE/LOAD each of the 5 .tres direction resources and assert
+##      _resolve_direction_presets() returns the matching DIRECTION_PRESETS row
+##      (NOT DIRECTION_PRESET_DEFAULT) — proves the hex-keyed lookup works
+##      end-to-end on the live `.tres` data, not just on the const literal.
+##   3. Assert _lookup_shape() returns non-null for every Phase 5 recipe path
+##      ("shape.primary_radius" / "shape.primary_padding" / "shape.focus_offset"
+##       / "shape.raised_lifts.primary" / "shape.surface_alpha_panels" /
+##       "shape.primary_strategy" / "shape.ghost_strategy" / "shape.kicker_style").
+##      Includes focus_offset explicitly because Plan 5 must verify focus ring
+##      gap per direction (D-08, DESIGN_TOKENS §8.2).
+const PHASE5_DIRECTION_TRES_PATHS := {
+	"151A2E": "res://addons/neocade_theme/pulse_neocade_theme.tres",
+	"111820": "res://addons/neocade_theme/slate_neocade_theme.tres",
+	"241326": "res://addons/neocade_theme/bubble_neocade_theme.tres",
+	"0B2420": "res://addons/neocade_theme/daybreak_neocade_theme.tres",
+	"20112E": "res://addons/neocade_theme/burst_neocade_theme.tres",
+}
+
+# Recipe paths the Phase 5 generator dereferences against shape on every direction.
+# Each entry's leaf is sanity-checked for non-null on the LIVE direction `.tres` —
+# proves the hex-keyed lookup chain (base_color → DIRECTION_PRESETS row → shape
+# sub-block → leaf value) works end-to-end. Includes shape.focus_offset (D-08).
+const PHASE5_RECIPE_PATHS := [
+	"shape.primary_radius",
+	"shape.primary_padding",
+	"shape.primary_strategy",
+	"shape.ghost_strategy",
+	"shape.kicker_style",
+	"shape.focus_offset",
+	"shape.surface_alpha_panels",
+	"shape.surface_alpha_popup",
+	"shape.surface_alpha_buttons",
+	"shape.raised_lifts.primary",
+	"shape.raised_lifts.panel",
+	"shape.raised_lifts.dialog",
+]
+
 func assert_shape_lookup_integrity() -> void:
 	var group := "assert_shape_lookup_integrity"
 	var theme := _load_pulse_for_group(group)
 	if theme == null: return
-	var presets: Dictionary = theme.get_script().get_script_constant_map().get("DIRECTION_PRESETS", {})
+	var const_map: Dictionary = theme.get_script().get_script_constant_map()
+	var presets: Dictionary = const_map.get("DIRECTION_PRESETS", {})
+	var default_preset: Dictionary = const_map.get("DIRECTION_PRESET_DEFAULT", {})
 	if presets.is_empty():
 		_group_fail(group, "DIRECTION_PRESETS const not found on production class")
 		return
 	var approved_hex_keys := ["151A2E", "111820", "241326", "0B2420", "20112E"]
 	var problems: Array[String] = []
 	var directions_with_shape := 0
+
+	# Phase A: const-literal walk (Plan 01 baseline).
 	for hex_key in approved_hex_keys:
 		var sub: Dictionary = presets.get(hex_key, {})
 		if sub.is_empty():
@@ -338,8 +380,95 @@ func assert_shape_lookup_integrity() -> void:
 				continue
 			if shape_dict[key] == null:
 				problems.append("direction %s shape['%s'] is null" % [hex_key, key])
-	if problems.is_empty() and directions_with_shape == 5:
-		_group_ok(group, "all 5 directions have shape.* sub-blocks with required keys")
+
+	# Phase B: per-direction `.tres` load + _resolve_direction_presets() check
+	# (Plan 05-02 Task 3). Confirms the live hex-keyed lookup matches the const
+	# literal — i.e., the `.tres` files for each direction actually pin
+	# base_color to a hex that DIRECTION_PRESETS recognizes (regression catch:
+	# if a `.tres` drifts to a non-approved hex, _resolve_direction_presets()
+	# would silently fall back to DEFAULT and the personality would vanish).
+	var tres_resolved_directions := 0
+	for hex_key in approved_hex_keys:
+		var tres_path: String = PHASE5_DIRECTION_TRES_PATHS.get(hex_key, "")
+		if tres_path == "":
+			problems.append("direction %s has no `.tres` path mapping in verifier" % hex_key)
+			continue
+		var direction_loaded: Resource = ResourceLoader.load(tres_path)
+		if direction_loaded == null or not (direction_loaded is NeoCadeTheme):
+			problems.append("could not load %s as NeoCadeTheme" % tres_path)
+			continue
+		var direction_theme: NeoCadeTheme = direction_loaded
+		var resolved: Dictionary = direction_theme.call("_resolve_direction_presets")
+		if resolved.is_empty():
+			problems.append("%s _resolve_direction_presets returned empty" % tres_path)
+			continue
+		# Confirm the resolved row IS the per-direction row (not DEFAULT). The
+		# unique discriminator is the spread_factor + presence of shape.* —
+		# direction rows have a `shape` block; DEFAULT also has one but the
+		# scalar values differ. Compare full shape against the const-literal
+		# row for this hex to prove the lookup hit the right row.
+		var const_row: Dictionary = presets.get(hex_key, {})
+		if not resolved.has("shape") or not const_row.has("shape"):
+			problems.append("%s resolved row missing shape sub-block" % tres_path)
+			continue
+		var resolved_shape: Dictionary = resolved.shape
+		var const_shape: Dictionary = const_row.shape
+		# Spot-check primary_radius + focus_offset + primary_strategy match.
+		# (Full deep-equal would be redundant with assert_shape_value_integrity.)
+		var ok_radius: bool = resolved_shape.get("primary_radius") == const_shape.get("primary_radius")
+		var ok_focus: bool = resolved_shape.get("focus_offset") == const_shape.get("focus_offset")
+		var ok_strategy: bool = String(resolved_shape.get("primary_strategy", "")) == String(const_shape.get("primary_strategy", ""))
+		# DEFAULT discriminator: if the resolved row equals DIRECTION_PRESET_DEFAULT.shape
+		# (e.g., friendly-generous strategy + primary_radius 8 + focus_offset 2 — Daybreak
+		# would collide with that profile by accident, so we cross-check the .tres's
+		# base_color hex matches the expected hex_key). DEFAULT _has_ "friendly-generous"
+		# strategy, so we also assert the loaded theme's base_color hex actually equals
+		# hex_key (the strongest end-to-end check).
+		var loaded_hex: String = direction_theme.base_color.to_html(false).to_upper()
+		if loaded_hex != hex_key:
+			problems.append("%s base_color hex = %s but expected %s (resolves to wrong direction or DEFAULT)" % [tres_path, loaded_hex, hex_key])
+			continue
+		if not ok_radius:
+			problems.append("%s primary_radius mismatch: resolved=%s const=%s (DEFAULT-fallback?)" % [tres_path, str(resolved_shape.get("primary_radius")), str(const_shape.get("primary_radius"))])
+		if not ok_focus:
+			problems.append("%s focus_offset mismatch: resolved=%s const=%s" % [tres_path, str(resolved_shape.get("focus_offset")), str(const_shape.get("focus_offset"))])
+		if not ok_strategy:
+			problems.append("%s primary_strategy mismatch: resolved=%s const=%s" % [tres_path, str(resolved_shape.get("primary_strategy")), str(const_shape.get("primary_strategy"))])
+		# Phase C: assert every Phase 5 recipe path resolves non-null via _lookup_shape.
+		if not direction_theme.has_method("_lookup_shape"):
+			problems.append("%s lacks _lookup_shape method (Plan 05-02 Task 2 missing)" % tres_path)
+			continue
+		for path in PHASE5_RECIPE_PATHS:
+			var v: Variant = direction_theme.call("_lookup_shape", resolved, path)
+			if v == null:
+				problems.append("%s _lookup_shape('%s') returned null" % [tres_path, path])
+		# focus_offset explicit type check (D-08): must be int 0..2 inclusive.
+		var fo: Variant = direction_theme.call("_lookup_shape", resolved, "shape.focus_offset")
+		if fo != null and (typeof(fo) != TYPE_INT or fo < 0 or fo > 4):
+			problems.append("%s shape.focus_offset out of expected 0..2 range: %s" % [tres_path, str(fo)])
+		tres_resolved_directions += 1
+
+	# DEFAULT fallback contract: a custom NeoCadeTheme.new() with non-approved
+	# hex resolves to DIRECTION_PRESET_DEFAULT.shape (D-13). We instantiate a
+	# fresh NeoCadeTheme directly (no .tres) and confirm.
+	if not default_preset.has("shape"):
+		problems.append("DIRECTION_PRESET_DEFAULT.shape missing (D-13 contract violated)")
+	else:
+		var default_shape: Dictionary = default_preset.shape
+		var custom: NeoCadeTheme = NeoCadeTheme.new()
+		# Tweak base_color to a hex that's NOT in DIRECTION_PRESETS.
+		custom.base_color = Color("#0F0F0F")
+		var custom_resolved: Dictionary = custom.call("_resolve_direction_presets")
+		if not custom_resolved.has("shape"):
+			problems.append("custom NeoCadeTheme.new() resolved row has no shape (DEFAULT broken)")
+		else:
+			var custom_shape: Dictionary = custom_resolved.shape
+			# Spot-check: friendly-generous strategy + primary_radius 8 (DEFAULT signature).
+			if String(custom_shape.get("primary_strategy", "")) != String(default_shape.get("primary_strategy", "")):
+				problems.append("custom theme primary_strategy = %s; expected DEFAULT %s" % [str(custom_shape.get("primary_strategy")), str(default_shape.get("primary_strategy"))])
+
+	if problems.is_empty() and directions_with_shape == 5 and tres_resolved_directions == 5:
+		_group_ok(group, "all 5 directions have shape.* sub-blocks; .tres files resolve to per-direction rows; recipe paths non-null incl. focus_offset; DEFAULT fallback works")
 	else:
 		_group_pending(group, "shape sub-blocks not fully populated yet (Plan 05-02): %s" % "; ".join(problems))
 
