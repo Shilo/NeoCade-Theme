@@ -1,4 +1,4 @@
-extends RefCounted
+extends SceneTree
 class_name Phase8TapTargetAudit
 
 const PHASE8_TAP_TARGET_AUDIT := true
@@ -51,6 +51,11 @@ const SCORECARD_37 := [
 	{"type": "VSplitContainer", "classification": "interactive", "formula": "minimum_grab_thickness/separation/touch dragger proxy"},
 	{"type": "Window", "classification": "display", "formula": "engine/window-managed titlebar hit rects"},
 ]
+
+func _init() -> void:
+	var result := run_audit()
+	emit_report(result)
+	quit(1 if int(result.failures) > 0 else 0)
 
 static func run_audit() -> Dictionary:
 	var rows: Array[Dictionary] = []
@@ -129,10 +134,10 @@ static func _proxy_size(theme: Theme, type_name: String) -> Vector2:
 		"CodeEdit", "LineEdit", "TextEdit":
 			return Vector2(56, max(56, _font_y(theme, type_name) + _sb_y(theme, type_name, "normal")))
 		"SpinBox":
-			var input_h := max(56, _font_y(theme, "LineEdit") + _sb_y(theme, "LineEdit", "normal"))
+			var input_h: float = max(56, _font_y(theme, "LineEdit") + _sb_y(theme, "LineEdit", "normal"))
 			return Vector2(max(56, input_h + _icon_w(theme, "SpinBox", "up")), max(56, input_h, _icon_h(theme, "SpinBox", "up") + _icon_h(theme, "SpinBox", "down")))
 		"FileDialog":
-			var thumb := _k(theme, "FileDialog", "thumbnail_size")
+			var thumb: int = _k(theme, "FileDialog", "thumbnail_size")
 			return Vector2(thumb, thumb)
 		"FoldableContainer":
 			return Vector2(max(48, _font_y(theme, type_name) + _icon_w(theme, type_name, "expanded_arrow") + _k(theme, type_name, "h_separation")), max(48, _font_y(theme, type_name) + _sb_y(theme, type_name, "title_panel")))

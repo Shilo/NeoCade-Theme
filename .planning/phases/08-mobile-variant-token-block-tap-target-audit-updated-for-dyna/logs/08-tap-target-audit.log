@@ -1,0 +1,376 @@
+Godot Engine v4.6.2.stable.mono.official.71f334935 - https://godotengine.org
+
+PHASE8_TAP_TARGET_AUDIT platform=MOBILE floor=48px
+totals: PASS=250 LIMITED=10 N/A=110 FAIL=0
+Pulse raised=false type=AcceptDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Pulse raised=false type=Button class=interactive width=70.0 height=48.0 status=PASS formula=button_w/Button.normal + button_h/Button.normal notes=theme-side proxy meets 48px floor
+Pulse raised=false type=CheckBox class=interactive width=106.0 height=72.0 status=PASS formula=checkbox icon/text/separation + Button-family normal notes=theme-side proxy meets 48px floor
+Pulse raised=false type=CheckButton class=interactive width=94.0 height=72.0 status=PASS formula=checkbutton icon/text + Button-family normal notes=theme-side proxy meets 48px floor
+Pulse raised=false type=CodeEdit class=interactive width=56.0 height=72.0 status=PASS formula=tokens.inputMin + input_h(CodeEdit.normal) notes=theme-side proxy meets 48px floor
+Pulse raised=false type=ColorPicker class=interactive width=240.0 height=180.0 status=PASS formula=picker constants sv/h widths/heights and cursor/bar icons notes=theme-side proxy meets 48px floor
+Pulse raised=false type=ColorPickerButton class=interactive width=134.0 height=64.0 status=PASS formula=button_w/ColorPickerButton.normal + button_h notes=theme-side proxy meets 48px floor
+Pulse raised=false type=ConfirmationDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Pulse raised=false type=FileDialog class=display width=0.0 height=0.0 status=N/A formula=thumbnail_size proxy; shell buttons inherit Button notes=not an enforceable interactive tap target
+Pulse raised=false type=FoldableContainer class=interactive width=86.0 height=72.0 status=PASS formula=title font + arrow + h_separation + title_panel notes=theme-side proxy meets 48px floor
+Pulse raised=false type=GraphEdit class=interactive width=48.0 height=48.0 status=PASS formula=port_hotzone_inner_extent + port_hotzone_outer_extent notes=theme-side proxy meets 48px floor
+Pulse raised=false type=HScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Pulse raised=false type=HSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Pulse raised=false type=HSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Pulse raised=false type=ItemList class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separation/inner margins notes=theme-side proxy meets 48px floor
+Pulse raised=false type=Label class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Pulse raised=false type=LineEdit class=interactive width=56.0 height=72.0 status=PASS formula=tokens.inputMin + input_h(LineEdit.normal) notes=theme-side proxy meets 48px floor
+Pulse raised=false type=LinkButton class=interactive width=48.0 height=48.0 status=LIMITED formula=font + underline/outline proxy; limited by no stylebox minimum notes=Godot exposes no stylebox/minimum-size theme slot for LinkButton; proxy is font/underline only
+Pulse raised=false type=MenuBar class=interactive width=48.0 height=48.0 status=PASS formula=font + h_separation + normal stylebox notes=theme-side proxy meets 48px floor
+Pulse raised=false type=MenuButton class=interactive width=70.0 height=48.0 status=PASS formula=button_w/MenuButton.normal + button_h notes=theme-side proxy meets 48px floor
+Pulse raised=false type=OptionButton class=interactive width=134.0 height=48.0 status=PASS formula=button_w/OptionButton.normal + button_h notes=theme-side proxy meets 48px floor
+Pulse raised=false type=Panel class=layout width=0.0 height=0.0 status=N/A formula=panel chrome is not interactive notes=not an enforceable interactive tap target
+Pulse raised=false type=PopupMenu class=interactive width=50.0 height=48.0 status=PASS formula=font + item padding + icon_max_width + v_separation notes=theme-side proxy meets 48px floor
+Pulse raised=false type=PopupPanel class=display width=0.0 height=0.0 status=N/A formula=popup shell delegates tap targets notes=not an enforceable interactive tap target
+Pulse raised=false type=ProgressBar class=display width=0.0 height=0.0 status=N/A formula=indicator is not a tap target notes=not an enforceable interactive tap target
+Pulse raised=false type=RichTextLabel class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Pulse raised=false type=SpinBox class=interactive width=136.0 height=128.0 status=PASS formula=LineEdit input proxy + up/down icons notes=theme-side proxy meets 48px floor
+Pulse raised=false type=TabBar class=interactive width=118.0 height=48.0 status=PASS formula=tab font + tab_selected margins + close icon notes=theme-side proxy meets 48px floor
+Pulse raised=false type=TabContainer class=interactive width=58.0 height=48.0 status=PASS formula=tab strip font + tab_selected margins + icon_separation notes=theme-side proxy meets 48px floor
+Pulse raised=false type=TextEdit class=interactive width=56.0 height=72.0 status=PASS formula=tokens.inputMin + input_h(TextEdit.normal) notes=theme-side proxy meets 48px floor
+Pulse raised=false type=TooltipLabel class=display width=0.0 height=0.0 status=N/A formula=tooltip text is not a tap target notes=not an enforceable interactive tap target
+Pulse raised=false type=TooltipPanel class=display width=0.0 height=0.0 status=N/A formula=tooltip shell is not a tap target notes=not an enforceable interactive tap target
+Pulse raised=false type=Tree class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separations/icon width notes=theme-side proxy meets 48px floor
+Pulse raised=false type=VScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Pulse raised=false type=VSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Pulse raised=false type=VSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Pulse raised=false type=Window class=display width=0.0 height=0.0 status=N/A formula=engine/window-managed titlebar hit rects notes=not an enforceable interactive tap target
+Pulse raised=true type=AcceptDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Pulse raised=true type=Button class=interactive width=70.0 height=48.0 status=PASS formula=button_w/Button.normal + button_h/Button.normal notes=theme-side proxy meets 48px floor
+Pulse raised=true type=CheckBox class=interactive width=106.0 height=72.0 status=PASS formula=checkbox icon/text/separation + Button-family normal notes=theme-side proxy meets 48px floor
+Pulse raised=true type=CheckButton class=interactive width=94.0 height=72.0 status=PASS formula=checkbutton icon/text + Button-family normal notes=theme-side proxy meets 48px floor
+Pulse raised=true type=CodeEdit class=interactive width=56.0 height=72.0 status=PASS formula=tokens.inputMin + input_h(CodeEdit.normal) notes=theme-side proxy meets 48px floor
+Pulse raised=true type=ColorPicker class=interactive width=240.0 height=180.0 status=PASS formula=picker constants sv/h widths/heights and cursor/bar icons notes=theme-side proxy meets 48px floor
+Pulse raised=true type=ColorPickerButton class=interactive width=134.0 height=64.0 status=PASS formula=button_w/ColorPickerButton.normal + button_h notes=theme-side proxy meets 48px floor
+Pulse raised=true type=ConfirmationDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Pulse raised=true type=FileDialog class=display width=0.0 height=0.0 status=N/A formula=thumbnail_size proxy; shell buttons inherit Button notes=not an enforceable interactive tap target
+Pulse raised=true type=FoldableContainer class=interactive width=86.0 height=72.0 status=PASS formula=title font + arrow + h_separation + title_panel notes=theme-side proxy meets 48px floor
+Pulse raised=true type=GraphEdit class=interactive width=48.0 height=48.0 status=PASS formula=port_hotzone_inner_extent + port_hotzone_outer_extent notes=theme-side proxy meets 48px floor
+Pulse raised=true type=HScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Pulse raised=true type=HSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Pulse raised=true type=HSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Pulse raised=true type=ItemList class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separation/inner margins notes=theme-side proxy meets 48px floor
+Pulse raised=true type=Label class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Pulse raised=true type=LineEdit class=interactive width=56.0 height=72.0 status=PASS formula=tokens.inputMin + input_h(LineEdit.normal) notes=theme-side proxy meets 48px floor
+Pulse raised=true type=LinkButton class=interactive width=48.0 height=48.0 status=LIMITED formula=font + underline/outline proxy; limited by no stylebox minimum notes=Godot exposes no stylebox/minimum-size theme slot for LinkButton; proxy is font/underline only
+Pulse raised=true type=MenuBar class=interactive width=48.0 height=48.0 status=PASS formula=font + h_separation + normal stylebox notes=theme-side proxy meets 48px floor
+Pulse raised=true type=MenuButton class=interactive width=70.0 height=48.0 status=PASS formula=button_w/MenuButton.normal + button_h notes=theme-side proxy meets 48px floor
+Pulse raised=true type=OptionButton class=interactive width=134.0 height=48.0 status=PASS formula=button_w/OptionButton.normal + button_h notes=theme-side proxy meets 48px floor
+Pulse raised=true type=Panel class=layout width=0.0 height=0.0 status=N/A formula=panel chrome is not interactive notes=not an enforceable interactive tap target
+Pulse raised=true type=PopupMenu class=interactive width=50.0 height=48.0 status=PASS formula=font + item padding + icon_max_width + v_separation notes=theme-side proxy meets 48px floor
+Pulse raised=true type=PopupPanel class=display width=0.0 height=0.0 status=N/A formula=popup shell delegates tap targets notes=not an enforceable interactive tap target
+Pulse raised=true type=ProgressBar class=display width=0.0 height=0.0 status=N/A formula=indicator is not a tap target notes=not an enforceable interactive tap target
+Pulse raised=true type=RichTextLabel class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Pulse raised=true type=SpinBox class=interactive width=136.0 height=128.0 status=PASS formula=LineEdit input proxy + up/down icons notes=theme-side proxy meets 48px floor
+Pulse raised=true type=TabBar class=interactive width=118.0 height=48.0 status=PASS formula=tab font + tab_selected margins + close icon notes=theme-side proxy meets 48px floor
+Pulse raised=true type=TabContainer class=interactive width=58.0 height=48.0 status=PASS formula=tab strip font + tab_selected margins + icon_separation notes=theme-side proxy meets 48px floor
+Pulse raised=true type=TextEdit class=interactive width=56.0 height=72.0 status=PASS formula=tokens.inputMin + input_h(TextEdit.normal) notes=theme-side proxy meets 48px floor
+Pulse raised=true type=TooltipLabel class=display width=0.0 height=0.0 status=N/A formula=tooltip text is not a tap target notes=not an enforceable interactive tap target
+Pulse raised=true type=TooltipPanel class=display width=0.0 height=0.0 status=N/A formula=tooltip shell is not a tap target notes=not an enforceable interactive tap target
+Pulse raised=true type=Tree class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separations/icon width notes=theme-side proxy meets 48px floor
+Pulse raised=true type=VScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Pulse raised=true type=VSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Pulse raised=true type=VSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Pulse raised=true type=Window class=display width=0.0 height=0.0 status=N/A formula=engine/window-managed titlebar hit rects notes=not an enforceable interactive tap target
+Slate raised=false type=AcceptDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Slate raised=false type=Button class=interactive width=76.0 height=50.0 status=PASS formula=button_w/Button.normal + button_h/Button.normal notes=theme-side proxy meets 48px floor
+Slate raised=false type=CheckBox class=interactive width=118.0 height=78.0 status=PASS formula=checkbox icon/text/separation + Button-family normal notes=theme-side proxy meets 48px floor
+Slate raised=false type=CheckButton class=interactive width=106.0 height=78.0 status=PASS formula=checkbutton icon/text + Button-family normal notes=theme-side proxy meets 48px floor
+Slate raised=false type=CodeEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(CodeEdit.normal) notes=theme-side proxy meets 48px floor
+Slate raised=false type=ColorPicker class=interactive width=240.0 height=180.0 status=PASS formula=picker constants sv/h widths/heights and cursor/bar icons notes=theme-side proxy meets 48px floor
+Slate raised=false type=ColorPickerButton class=interactive width=140.0 height=64.0 status=PASS formula=button_w/ColorPickerButton.normal + button_h notes=theme-side proxy meets 48px floor
+Slate raised=false type=ConfirmationDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Slate raised=false type=FileDialog class=display width=0.0 height=0.0 status=N/A formula=thumbnail_size proxy; shell buttons inherit Button notes=not an enforceable interactive tap target
+Slate raised=false type=FoldableContainer class=interactive width=86.0 height=78.0 status=PASS formula=title font + arrow + h_separation + title_panel notes=theme-side proxy meets 48px floor
+Slate raised=false type=GraphEdit class=interactive width=48.0 height=48.0 status=PASS formula=port_hotzone_inner_extent + port_hotzone_outer_extent notes=theme-side proxy meets 48px floor
+Slate raised=false type=HScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Slate raised=false type=HSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Slate raised=false type=HSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Slate raised=false type=ItemList class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separation/inner margins notes=theme-side proxy meets 48px floor
+Slate raised=false type=Label class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Slate raised=false type=LineEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(LineEdit.normal) notes=theme-side proxy meets 48px floor
+Slate raised=false type=LinkButton class=interactive width=48.0 height=48.0 status=LIMITED formula=font + underline/outline proxy; limited by no stylebox minimum notes=Godot exposes no stylebox/minimum-size theme slot for LinkButton; proxy is font/underline only
+Slate raised=false type=MenuBar class=interactive width=48.0 height=48.0 status=PASS formula=font + h_separation + normal stylebox notes=theme-side proxy meets 48px floor
+Slate raised=false type=MenuButton class=interactive width=76.0 height=50.0 status=PASS formula=button_w/MenuButton.normal + button_h notes=theme-side proxy meets 48px floor
+Slate raised=false type=OptionButton class=interactive width=140.0 height=50.0 status=PASS formula=button_w/OptionButton.normal + button_h notes=theme-side proxy meets 48px floor
+Slate raised=false type=Panel class=layout width=0.0 height=0.0 status=N/A formula=panel chrome is not interactive notes=not an enforceable interactive tap target
+Slate raised=false type=PopupMenu class=interactive width=50.0 height=48.0 status=PASS formula=font + item padding + icon_max_width + v_separation notes=theme-side proxy meets 48px floor
+Slate raised=false type=PopupPanel class=display width=0.0 height=0.0 status=N/A formula=popup shell delegates tap targets notes=not an enforceable interactive tap target
+Slate raised=false type=ProgressBar class=display width=0.0 height=0.0 status=N/A formula=indicator is not a tap target notes=not an enforceable interactive tap target
+Slate raised=false type=RichTextLabel class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Slate raised=false type=SpinBox class=interactive width=142.0 height=128.0 status=PASS formula=LineEdit input proxy + up/down icons notes=theme-side proxy meets 48px floor
+Slate raised=false type=TabBar class=interactive width=118.0 height=48.0 status=PASS formula=tab font + tab_selected margins + close icon notes=theme-side proxy meets 48px floor
+Slate raised=false type=TabContainer class=interactive width=58.0 height=48.0 status=PASS formula=tab strip font + tab_selected margins + icon_separation notes=theme-side proxy meets 48px floor
+Slate raised=false type=TextEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(TextEdit.normal) notes=theme-side proxy meets 48px floor
+Slate raised=false type=TooltipLabel class=display width=0.0 height=0.0 status=N/A formula=tooltip text is not a tap target notes=not an enforceable interactive tap target
+Slate raised=false type=TooltipPanel class=display width=0.0 height=0.0 status=N/A formula=tooltip shell is not a tap target notes=not an enforceable interactive tap target
+Slate raised=false type=Tree class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separations/icon width notes=theme-side proxy meets 48px floor
+Slate raised=false type=VScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Slate raised=false type=VSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Slate raised=false type=VSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Slate raised=false type=Window class=display width=0.0 height=0.0 status=N/A formula=engine/window-managed titlebar hit rects notes=not an enforceable interactive tap target
+Slate raised=true type=AcceptDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Slate raised=true type=Button class=interactive width=76.0 height=50.0 status=PASS formula=button_w/Button.normal + button_h/Button.normal notes=theme-side proxy meets 48px floor
+Slate raised=true type=CheckBox class=interactive width=118.0 height=78.0 status=PASS formula=checkbox icon/text/separation + Button-family normal notes=theme-side proxy meets 48px floor
+Slate raised=true type=CheckButton class=interactive width=106.0 height=78.0 status=PASS formula=checkbutton icon/text + Button-family normal notes=theme-side proxy meets 48px floor
+Slate raised=true type=CodeEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(CodeEdit.normal) notes=theme-side proxy meets 48px floor
+Slate raised=true type=ColorPicker class=interactive width=240.0 height=180.0 status=PASS formula=picker constants sv/h widths/heights and cursor/bar icons notes=theme-side proxy meets 48px floor
+Slate raised=true type=ColorPickerButton class=interactive width=140.0 height=64.0 status=PASS formula=button_w/ColorPickerButton.normal + button_h notes=theme-side proxy meets 48px floor
+Slate raised=true type=ConfirmationDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Slate raised=true type=FileDialog class=display width=0.0 height=0.0 status=N/A formula=thumbnail_size proxy; shell buttons inherit Button notes=not an enforceable interactive tap target
+Slate raised=true type=FoldableContainer class=interactive width=86.0 height=78.0 status=PASS formula=title font + arrow + h_separation + title_panel notes=theme-side proxy meets 48px floor
+Slate raised=true type=GraphEdit class=interactive width=48.0 height=48.0 status=PASS formula=port_hotzone_inner_extent + port_hotzone_outer_extent notes=theme-side proxy meets 48px floor
+Slate raised=true type=HScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Slate raised=true type=HSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Slate raised=true type=HSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Slate raised=true type=ItemList class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separation/inner margins notes=theme-side proxy meets 48px floor
+Slate raised=true type=Label class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Slate raised=true type=LineEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(LineEdit.normal) notes=theme-side proxy meets 48px floor
+Slate raised=true type=LinkButton class=interactive width=48.0 height=48.0 status=LIMITED formula=font + underline/outline proxy; limited by no stylebox minimum notes=Godot exposes no stylebox/minimum-size theme slot for LinkButton; proxy is font/underline only
+Slate raised=true type=MenuBar class=interactive width=48.0 height=48.0 status=PASS formula=font + h_separation + normal stylebox notes=theme-side proxy meets 48px floor
+Slate raised=true type=MenuButton class=interactive width=76.0 height=50.0 status=PASS formula=button_w/MenuButton.normal + button_h notes=theme-side proxy meets 48px floor
+Slate raised=true type=OptionButton class=interactive width=140.0 height=50.0 status=PASS formula=button_w/OptionButton.normal + button_h notes=theme-side proxy meets 48px floor
+Slate raised=true type=Panel class=layout width=0.0 height=0.0 status=N/A formula=panel chrome is not interactive notes=not an enforceable interactive tap target
+Slate raised=true type=PopupMenu class=interactive width=50.0 height=48.0 status=PASS formula=font + item padding + icon_max_width + v_separation notes=theme-side proxy meets 48px floor
+Slate raised=true type=PopupPanel class=display width=0.0 height=0.0 status=N/A formula=popup shell delegates tap targets notes=not an enforceable interactive tap target
+Slate raised=true type=ProgressBar class=display width=0.0 height=0.0 status=N/A formula=indicator is not a tap target notes=not an enforceable interactive tap target
+Slate raised=true type=RichTextLabel class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Slate raised=true type=SpinBox class=interactive width=142.0 height=128.0 status=PASS formula=LineEdit input proxy + up/down icons notes=theme-side proxy meets 48px floor
+Slate raised=true type=TabBar class=interactive width=118.0 height=48.0 status=PASS formula=tab font + tab_selected margins + close icon notes=theme-side proxy meets 48px floor
+Slate raised=true type=TabContainer class=interactive width=58.0 height=48.0 status=PASS formula=tab strip font + tab_selected margins + icon_separation notes=theme-side proxy meets 48px floor
+Slate raised=true type=TextEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(TextEdit.normal) notes=theme-side proxy meets 48px floor
+Slate raised=true type=TooltipLabel class=display width=0.0 height=0.0 status=N/A formula=tooltip text is not a tap target notes=not an enforceable interactive tap target
+Slate raised=true type=TooltipPanel class=display width=0.0 height=0.0 status=N/A formula=tooltip shell is not a tap target notes=not an enforceable interactive tap target
+Slate raised=true type=Tree class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separations/icon width notes=theme-side proxy meets 48px floor
+Slate raised=true type=VScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Slate raised=true type=VSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Slate raised=true type=VSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Slate raised=true type=Window class=display width=0.0 height=0.0 status=N/A formula=engine/window-managed titlebar hit rects notes=not an enforceable interactive tap target
+Bubble raised=false type=AcceptDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Bubble raised=false type=Button class=interactive width=88.0 height=58.0 status=PASS formula=button_w/Button.normal + button_h/Button.normal notes=theme-side proxy meets 48px floor
+Bubble raised=false type=CheckBox class=interactive width=118.0 height=78.0 status=PASS formula=checkbox icon/text/separation + Button-family normal notes=theme-side proxy meets 48px floor
+Bubble raised=false type=CheckButton class=interactive width=106.0 height=78.0 status=PASS formula=checkbutton icon/text + Button-family normal notes=theme-side proxy meets 48px floor
+Bubble raised=false type=CodeEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(CodeEdit.normal) notes=theme-side proxy meets 48px floor
+Bubble raised=false type=ColorPicker class=interactive width=240.0 height=180.0 status=PASS formula=picker constants sv/h widths/heights and cursor/bar icons notes=theme-side proxy meets 48px floor
+Bubble raised=false type=ColorPickerButton class=interactive width=152.0 height=64.0 status=PASS formula=button_w/ColorPickerButton.normal + button_h notes=theme-side proxy meets 48px floor
+Bubble raised=false type=ConfirmationDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Bubble raised=false type=FileDialog class=display width=0.0 height=0.0 status=N/A formula=thumbnail_size proxy; shell buttons inherit Button notes=not an enforceable interactive tap target
+Bubble raised=false type=FoldableContainer class=interactive width=86.0 height=78.0 status=PASS formula=title font + arrow + h_separation + title_panel notes=theme-side proxy meets 48px floor
+Bubble raised=false type=GraphEdit class=interactive width=48.0 height=48.0 status=PASS formula=port_hotzone_inner_extent + port_hotzone_outer_extent notes=theme-side proxy meets 48px floor
+Bubble raised=false type=HScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Bubble raised=false type=HSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Bubble raised=false type=HSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Bubble raised=false type=ItemList class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separation/inner margins notes=theme-side proxy meets 48px floor
+Bubble raised=false type=Label class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Bubble raised=false type=LineEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(LineEdit.normal) notes=theme-side proxy meets 48px floor
+Bubble raised=false type=LinkButton class=interactive width=48.0 height=48.0 status=LIMITED formula=font + underline/outline proxy; limited by no stylebox minimum notes=Godot exposes no stylebox/minimum-size theme slot for LinkButton; proxy is font/underline only
+Bubble raised=false type=MenuBar class=interactive width=48.0 height=48.0 status=PASS formula=font + h_separation + normal stylebox notes=theme-side proxy meets 48px floor
+Bubble raised=false type=MenuButton class=interactive width=88.0 height=58.0 status=PASS formula=button_w/MenuButton.normal + button_h notes=theme-side proxy meets 48px floor
+Bubble raised=false type=OptionButton class=interactive width=152.0 height=58.0 status=PASS formula=button_w/OptionButton.normal + button_h notes=theme-side proxy meets 48px floor
+Bubble raised=false type=Panel class=layout width=0.0 height=0.0 status=N/A formula=panel chrome is not interactive notes=not an enforceable interactive tap target
+Bubble raised=false type=PopupMenu class=interactive width=50.0 height=48.0 status=PASS formula=font + item padding + icon_max_width + v_separation notes=theme-side proxy meets 48px floor
+Bubble raised=false type=PopupPanel class=display width=0.0 height=0.0 status=N/A formula=popup shell delegates tap targets notes=not an enforceable interactive tap target
+Bubble raised=false type=ProgressBar class=display width=0.0 height=0.0 status=N/A formula=indicator is not a tap target notes=not an enforceable interactive tap target
+Bubble raised=false type=RichTextLabel class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Bubble raised=false type=SpinBox class=interactive width=142.0 height=128.0 status=PASS formula=LineEdit input proxy + up/down icons notes=theme-side proxy meets 48px floor
+Bubble raised=false type=TabBar class=interactive width=118.0 height=48.0 status=PASS formula=tab font + tab_selected margins + close icon notes=theme-side proxy meets 48px floor
+Bubble raised=false type=TabContainer class=interactive width=58.0 height=48.0 status=PASS formula=tab strip font + tab_selected margins + icon_separation notes=theme-side proxy meets 48px floor
+Bubble raised=false type=TextEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(TextEdit.normal) notes=theme-side proxy meets 48px floor
+Bubble raised=false type=TooltipLabel class=display width=0.0 height=0.0 status=N/A formula=tooltip text is not a tap target notes=not an enforceable interactive tap target
+Bubble raised=false type=TooltipPanel class=display width=0.0 height=0.0 status=N/A formula=tooltip shell is not a tap target notes=not an enforceable interactive tap target
+Bubble raised=false type=Tree class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separations/icon width notes=theme-side proxy meets 48px floor
+Bubble raised=false type=VScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Bubble raised=false type=VSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Bubble raised=false type=VSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Bubble raised=false type=Window class=display width=0.0 height=0.0 status=N/A formula=engine/window-managed titlebar hit rects notes=not an enforceable interactive tap target
+Bubble raised=true type=AcceptDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Bubble raised=true type=Button class=interactive width=88.0 height=58.0 status=PASS formula=button_w/Button.normal + button_h/Button.normal notes=theme-side proxy meets 48px floor
+Bubble raised=true type=CheckBox class=interactive width=118.0 height=78.0 status=PASS formula=checkbox icon/text/separation + Button-family normal notes=theme-side proxy meets 48px floor
+Bubble raised=true type=CheckButton class=interactive width=106.0 height=78.0 status=PASS formula=checkbutton icon/text + Button-family normal notes=theme-side proxy meets 48px floor
+Bubble raised=true type=CodeEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(CodeEdit.normal) notes=theme-side proxy meets 48px floor
+Bubble raised=true type=ColorPicker class=interactive width=240.0 height=180.0 status=PASS formula=picker constants sv/h widths/heights and cursor/bar icons notes=theme-side proxy meets 48px floor
+Bubble raised=true type=ColorPickerButton class=interactive width=152.0 height=64.0 status=PASS formula=button_w/ColorPickerButton.normal + button_h notes=theme-side proxy meets 48px floor
+Bubble raised=true type=ConfirmationDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Bubble raised=true type=FileDialog class=display width=0.0 height=0.0 status=N/A formula=thumbnail_size proxy; shell buttons inherit Button notes=not an enforceable interactive tap target
+Bubble raised=true type=FoldableContainer class=interactive width=86.0 height=78.0 status=PASS formula=title font + arrow + h_separation + title_panel notes=theme-side proxy meets 48px floor
+Bubble raised=true type=GraphEdit class=interactive width=48.0 height=48.0 status=PASS formula=port_hotzone_inner_extent + port_hotzone_outer_extent notes=theme-side proxy meets 48px floor
+Bubble raised=true type=HScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Bubble raised=true type=HSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Bubble raised=true type=HSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Bubble raised=true type=ItemList class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separation/inner margins notes=theme-side proxy meets 48px floor
+Bubble raised=true type=Label class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Bubble raised=true type=LineEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(LineEdit.normal) notes=theme-side proxy meets 48px floor
+Bubble raised=true type=LinkButton class=interactive width=48.0 height=48.0 status=LIMITED formula=font + underline/outline proxy; limited by no stylebox minimum notes=Godot exposes no stylebox/minimum-size theme slot for LinkButton; proxy is font/underline only
+Bubble raised=true type=MenuBar class=interactive width=48.0 height=48.0 status=PASS formula=font + h_separation + normal stylebox notes=theme-side proxy meets 48px floor
+Bubble raised=true type=MenuButton class=interactive width=88.0 height=58.0 status=PASS formula=button_w/MenuButton.normal + button_h notes=theme-side proxy meets 48px floor
+Bubble raised=true type=OptionButton class=interactive width=152.0 height=58.0 status=PASS formula=button_w/OptionButton.normal + button_h notes=theme-side proxy meets 48px floor
+Bubble raised=true type=Panel class=layout width=0.0 height=0.0 status=N/A formula=panel chrome is not interactive notes=not an enforceable interactive tap target
+Bubble raised=true type=PopupMenu class=interactive width=50.0 height=48.0 status=PASS formula=font + item padding + icon_max_width + v_separation notes=theme-side proxy meets 48px floor
+Bubble raised=true type=PopupPanel class=display width=0.0 height=0.0 status=N/A formula=popup shell delegates tap targets notes=not an enforceable interactive tap target
+Bubble raised=true type=ProgressBar class=display width=0.0 height=0.0 status=N/A formula=indicator is not a tap target notes=not an enforceable interactive tap target
+Bubble raised=true type=RichTextLabel class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Bubble raised=true type=SpinBox class=interactive width=142.0 height=128.0 status=PASS formula=LineEdit input proxy + up/down icons notes=theme-side proxy meets 48px floor
+Bubble raised=true type=TabBar class=interactive width=118.0 height=48.0 status=PASS formula=tab font + tab_selected margins + close icon notes=theme-side proxy meets 48px floor
+Bubble raised=true type=TabContainer class=interactive width=58.0 height=48.0 status=PASS formula=tab strip font + tab_selected margins + icon_separation notes=theme-side proxy meets 48px floor
+Bubble raised=true type=TextEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(TextEdit.normal) notes=theme-side proxy meets 48px floor
+Bubble raised=true type=TooltipLabel class=display width=0.0 height=0.0 status=N/A formula=tooltip text is not a tap target notes=not an enforceable interactive tap target
+Bubble raised=true type=TooltipPanel class=display width=0.0 height=0.0 status=N/A formula=tooltip shell is not a tap target notes=not an enforceable interactive tap target
+Bubble raised=true type=Tree class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separations/icon width notes=theme-side proxy meets 48px floor
+Bubble raised=true type=VScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Bubble raised=true type=VSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Bubble raised=true type=VSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Bubble raised=true type=Window class=display width=0.0 height=0.0 status=N/A formula=engine/window-managed titlebar hit rects notes=not an enforceable interactive tap target
+Daybreak raised=false type=AcceptDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Daybreak raised=false type=Button class=interactive width=82.0 height=52.0 status=PASS formula=button_w/Button.normal + button_h/Button.normal notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=CheckBox class=interactive width=124.0 height=82.0 status=PASS formula=checkbox icon/text/separation + Button-family normal notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=CheckButton class=interactive width=112.0 height=82.0 status=PASS formula=checkbutton icon/text + Button-family normal notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=CodeEdit class=interactive width=56.0 height=82.0 status=PASS formula=tokens.inputMin + input_h(CodeEdit.normal) notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=ColorPicker class=interactive width=240.0 height=180.0 status=PASS formula=picker constants sv/h widths/heights and cursor/bar icons notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=ColorPickerButton class=interactive width=146.0 height=64.0 status=PASS formula=button_w/ColorPickerButton.normal + button_h notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=ConfirmationDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Daybreak raised=false type=FileDialog class=display width=0.0 height=0.0 status=N/A formula=thumbnail_size proxy; shell buttons inherit Button notes=not an enforceable interactive tap target
+Daybreak raised=false type=FoldableContainer class=interactive width=86.0 height=82.0 status=PASS formula=title font + arrow + h_separation + title_panel notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=GraphEdit class=interactive width=48.0 height=48.0 status=PASS formula=port_hotzone_inner_extent + port_hotzone_outer_extent notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=HScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=HSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=HSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=ItemList class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separation/inner margins notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=Label class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Daybreak raised=false type=LineEdit class=interactive width=56.0 height=82.0 status=PASS formula=tokens.inputMin + input_h(LineEdit.normal) notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=LinkButton class=interactive width=48.0 height=48.0 status=LIMITED formula=font + underline/outline proxy; limited by no stylebox minimum notes=Godot exposes no stylebox/minimum-size theme slot for LinkButton; proxy is font/underline only
+Daybreak raised=false type=MenuBar class=interactive width=48.0 height=48.0 status=PASS formula=font + h_separation + normal stylebox notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=MenuButton class=interactive width=82.0 height=52.0 status=PASS formula=button_w/MenuButton.normal + button_h notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=OptionButton class=interactive width=146.0 height=52.0 status=PASS formula=button_w/OptionButton.normal + button_h notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=Panel class=layout width=0.0 height=0.0 status=N/A formula=panel chrome is not interactive notes=not an enforceable interactive tap target
+Daybreak raised=false type=PopupMenu class=interactive width=50.0 height=48.0 status=PASS formula=font + item padding + icon_max_width + v_separation notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=PopupPanel class=display width=0.0 height=0.0 status=N/A formula=popup shell delegates tap targets notes=not an enforceable interactive tap target
+Daybreak raised=false type=ProgressBar class=display width=0.0 height=0.0 status=N/A formula=indicator is not a tap target notes=not an enforceable interactive tap target
+Daybreak raised=false type=RichTextLabel class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Daybreak raised=false type=SpinBox class=interactive width=146.0 height=128.0 status=PASS formula=LineEdit input proxy + up/down icons notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=TabBar class=interactive width=118.0 height=48.0 status=PASS formula=tab font + tab_selected margins + close icon notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=TabContainer class=interactive width=58.0 height=48.0 status=PASS formula=tab strip font + tab_selected margins + icon_separation notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=TextEdit class=interactive width=56.0 height=82.0 status=PASS formula=tokens.inputMin + input_h(TextEdit.normal) notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=TooltipLabel class=display width=0.0 height=0.0 status=N/A formula=tooltip text is not a tap target notes=not an enforceable interactive tap target
+Daybreak raised=false type=TooltipPanel class=display width=0.0 height=0.0 status=N/A formula=tooltip shell is not a tap target notes=not an enforceable interactive tap target
+Daybreak raised=false type=Tree class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separations/icon width notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=VScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=VSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=VSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Daybreak raised=false type=Window class=display width=0.0 height=0.0 status=N/A formula=engine/window-managed titlebar hit rects notes=not an enforceable interactive tap target
+Daybreak raised=true type=AcceptDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Daybreak raised=true type=Button class=interactive width=82.0 height=52.0 status=PASS formula=button_w/Button.normal + button_h/Button.normal notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=CheckBox class=interactive width=124.0 height=82.0 status=PASS formula=checkbox icon/text/separation + Button-family normal notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=CheckButton class=interactive width=112.0 height=82.0 status=PASS formula=checkbutton icon/text + Button-family normal notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=CodeEdit class=interactive width=56.0 height=82.0 status=PASS formula=tokens.inputMin + input_h(CodeEdit.normal) notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=ColorPicker class=interactive width=240.0 height=180.0 status=PASS formula=picker constants sv/h widths/heights and cursor/bar icons notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=ColorPickerButton class=interactive width=146.0 height=64.0 status=PASS formula=button_w/ColorPickerButton.normal + button_h notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=ConfirmationDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Daybreak raised=true type=FileDialog class=display width=0.0 height=0.0 status=N/A formula=thumbnail_size proxy; shell buttons inherit Button notes=not an enforceable interactive tap target
+Daybreak raised=true type=FoldableContainer class=interactive width=86.0 height=82.0 status=PASS formula=title font + arrow + h_separation + title_panel notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=GraphEdit class=interactive width=48.0 height=48.0 status=PASS formula=port_hotzone_inner_extent + port_hotzone_outer_extent notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=HScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=HSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=HSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=ItemList class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separation/inner margins notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=Label class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Daybreak raised=true type=LineEdit class=interactive width=56.0 height=82.0 status=PASS formula=tokens.inputMin + input_h(LineEdit.normal) notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=LinkButton class=interactive width=48.0 height=48.0 status=LIMITED formula=font + underline/outline proxy; limited by no stylebox minimum notes=Godot exposes no stylebox/minimum-size theme slot for LinkButton; proxy is font/underline only
+Daybreak raised=true type=MenuBar class=interactive width=48.0 height=48.0 status=PASS formula=font + h_separation + normal stylebox notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=MenuButton class=interactive width=82.0 height=52.0 status=PASS formula=button_w/MenuButton.normal + button_h notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=OptionButton class=interactive width=146.0 height=52.0 status=PASS formula=button_w/OptionButton.normal + button_h notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=Panel class=layout width=0.0 height=0.0 status=N/A formula=panel chrome is not interactive notes=not an enforceable interactive tap target
+Daybreak raised=true type=PopupMenu class=interactive width=50.0 height=48.0 status=PASS formula=font + item padding + icon_max_width + v_separation notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=PopupPanel class=display width=0.0 height=0.0 status=N/A formula=popup shell delegates tap targets notes=not an enforceable interactive tap target
+Daybreak raised=true type=ProgressBar class=display width=0.0 height=0.0 status=N/A formula=indicator is not a tap target notes=not an enforceable interactive tap target
+Daybreak raised=true type=RichTextLabel class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Daybreak raised=true type=SpinBox class=interactive width=146.0 height=128.0 status=PASS formula=LineEdit input proxy + up/down icons notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=TabBar class=interactive width=118.0 height=48.0 status=PASS formula=tab font + tab_selected margins + close icon notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=TabContainer class=interactive width=58.0 height=48.0 status=PASS formula=tab strip font + tab_selected margins + icon_separation notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=TextEdit class=interactive width=56.0 height=82.0 status=PASS formula=tokens.inputMin + input_h(TextEdit.normal) notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=TooltipLabel class=display width=0.0 height=0.0 status=N/A formula=tooltip text is not a tap target notes=not an enforceable interactive tap target
+Daybreak raised=true type=TooltipPanel class=display width=0.0 height=0.0 status=N/A formula=tooltip shell is not a tap target notes=not an enforceable interactive tap target
+Daybreak raised=true type=Tree class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separations/icon width notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=VScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=VSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=VSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Daybreak raised=true type=Window class=display width=0.0 height=0.0 status=N/A formula=engine/window-managed titlebar hit rects notes=not an enforceable interactive tap target
+Burst raised=false type=AcceptDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Burst raised=false type=Button class=interactive width=88.0 height=58.0 status=PASS formula=button_w/Button.normal + button_h/Button.normal notes=theme-side proxy meets 48px floor
+Burst raised=false type=CheckBox class=interactive width=118.0 height=78.0 status=PASS formula=checkbox icon/text/separation + Button-family normal notes=theme-side proxy meets 48px floor
+Burst raised=false type=CheckButton class=interactive width=106.0 height=78.0 status=PASS formula=checkbutton icon/text + Button-family normal notes=theme-side proxy meets 48px floor
+Burst raised=false type=CodeEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(CodeEdit.normal) notes=theme-side proxy meets 48px floor
+Burst raised=false type=ColorPicker class=interactive width=240.0 height=180.0 status=PASS formula=picker constants sv/h widths/heights and cursor/bar icons notes=theme-side proxy meets 48px floor
+Burst raised=false type=ColorPickerButton class=interactive width=152.0 height=64.0 status=PASS formula=button_w/ColorPickerButton.normal + button_h notes=theme-side proxy meets 48px floor
+Burst raised=false type=ConfirmationDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Burst raised=false type=FileDialog class=display width=0.0 height=0.0 status=N/A formula=thumbnail_size proxy; shell buttons inherit Button notes=not an enforceable interactive tap target
+Burst raised=false type=FoldableContainer class=interactive width=86.0 height=78.0 status=PASS formula=title font + arrow + h_separation + title_panel notes=theme-side proxy meets 48px floor
+Burst raised=false type=GraphEdit class=interactive width=48.0 height=48.0 status=PASS formula=port_hotzone_inner_extent + port_hotzone_outer_extent notes=theme-side proxy meets 48px floor
+Burst raised=false type=HScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Burst raised=false type=HSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Burst raised=false type=HSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Burst raised=false type=ItemList class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separation/inner margins notes=theme-side proxy meets 48px floor
+Burst raised=false type=Label class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Burst raised=false type=LineEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(LineEdit.normal) notes=theme-side proxy meets 48px floor
+Burst raised=false type=LinkButton class=interactive width=48.0 height=48.0 status=LIMITED formula=font + underline/outline proxy; limited by no stylebox minimum notes=Godot exposes no stylebox/minimum-size theme slot for LinkButton; proxy is font/underline only
+Burst raised=false type=MenuBar class=interactive width=48.0 height=48.0 status=PASS formula=font + h_separation + normal stylebox notes=theme-side proxy meets 48px floor
+Burst raised=false type=MenuButton class=interactive width=88.0 height=58.0 status=PASS formula=button_w/MenuButton.normal + button_h notes=theme-side proxy meets 48px floor
+Burst raised=false type=OptionButton class=interactive width=152.0 height=58.0 status=PASS formula=button_w/OptionButton.normal + button_h notes=theme-side proxy meets 48px floor
+Burst raised=false type=Panel class=layout width=0.0 height=0.0 status=N/A formula=panel chrome is not interactive notes=not an enforceable interactive tap target
+Burst raised=false type=PopupMenu class=interactive width=50.0 height=48.0 status=PASS formula=font + item padding + icon_max_width + v_separation notes=theme-side proxy meets 48px floor
+Burst raised=false type=PopupPanel class=display width=0.0 height=0.0 status=N/A formula=popup shell delegates tap targets notes=not an enforceable interactive tap target
+Burst raised=false type=ProgressBar class=display width=0.0 height=0.0 status=N/A formula=indicator is not a tap target notes=not an enforceable interactive tap target
+Burst raised=false type=RichTextLabel class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Burst raised=false type=SpinBox class=interactive width=142.0 height=128.0 status=PASS formula=LineEdit input proxy + up/down icons notes=theme-side proxy meets 48px floor
+Burst raised=false type=TabBar class=interactive width=118.0 height=48.0 status=PASS formula=tab font + tab_selected margins + close icon notes=theme-side proxy meets 48px floor
+Burst raised=false type=TabContainer class=interactive width=58.0 height=48.0 status=PASS formula=tab strip font + tab_selected margins + icon_separation notes=theme-side proxy meets 48px floor
+Burst raised=false type=TextEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(TextEdit.normal) notes=theme-side proxy meets 48px floor
+Burst raised=false type=TooltipLabel class=display width=0.0 height=0.0 status=N/A formula=tooltip text is not a tap target notes=not an enforceable interactive tap target
+Burst raised=false type=TooltipPanel class=display width=0.0 height=0.0 status=N/A formula=tooltip shell is not a tap target notes=not an enforceable interactive tap target
+Burst raised=false type=Tree class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separations/icon width notes=theme-side proxy meets 48px floor
+Burst raised=false type=VScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Burst raised=false type=VSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Burst raised=false type=VSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Burst raised=false type=Window class=display width=0.0 height=0.0 status=N/A formula=engine/window-managed titlebar hit rects notes=not an enforceable interactive tap target
+Burst raised=true type=AcceptDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Burst raised=true type=Button class=interactive width=88.0 height=58.0 status=PASS formula=button_w/Button.normal + button_h/Button.normal notes=theme-side proxy meets 48px floor
+Burst raised=true type=CheckBox class=interactive width=118.0 height=78.0 status=PASS formula=checkbox icon/text/separation + Button-family normal notes=theme-side proxy meets 48px floor
+Burst raised=true type=CheckButton class=interactive width=106.0 height=78.0 status=PASS formula=checkbutton icon/text + Button-family normal notes=theme-side proxy meets 48px floor
+Burst raised=true type=CodeEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(CodeEdit.normal) notes=theme-side proxy meets 48px floor
+Burst raised=true type=ColorPicker class=interactive width=240.0 height=180.0 status=PASS formula=picker constants sv/h widths/heights and cursor/bar icons notes=theme-side proxy meets 48px floor
+Burst raised=true type=ColorPickerButton class=interactive width=152.0 height=64.0 status=PASS formula=button_w/ColorPickerButton.normal + button_h notes=theme-side proxy meets 48px floor
+Burst raised=true type=ConfirmationDialog class=display width=0.0 height=0.0 status=N/A formula=dialog shell delegates tap targets to child Buttons notes=not an enforceable interactive tap target
+Burst raised=true type=FileDialog class=display width=0.0 height=0.0 status=N/A formula=thumbnail_size proxy; shell buttons inherit Button notes=not an enforceable interactive tap target
+Burst raised=true type=FoldableContainer class=interactive width=86.0 height=78.0 status=PASS formula=title font + arrow + h_separation + title_panel notes=theme-side proxy meets 48px floor
+Burst raised=true type=GraphEdit class=interactive width=48.0 height=48.0 status=PASS formula=port_hotzone_inner_extent + port_hotzone_outer_extent notes=theme-side proxy meets 48px floor
+Burst raised=true type=HScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Burst raised=true type=HSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Burst raised=true type=HSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Burst raised=true type=ItemList class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separation/inner margins notes=theme-side proxy meets 48px floor
+Burst raised=true type=Label class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Burst raised=true type=LineEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(LineEdit.normal) notes=theme-side proxy meets 48px floor
+Burst raised=true type=LinkButton class=interactive width=48.0 height=48.0 status=LIMITED formula=font + underline/outline proxy; limited by no stylebox minimum notes=Godot exposes no stylebox/minimum-size theme slot for LinkButton; proxy is font/underline only
+Burst raised=true type=MenuBar class=interactive width=48.0 height=48.0 status=PASS formula=font + h_separation + normal stylebox notes=theme-side proxy meets 48px floor
+Burst raised=true type=MenuButton class=interactive width=88.0 height=58.0 status=PASS formula=button_w/MenuButton.normal + button_h notes=theme-side proxy meets 48px floor
+Burst raised=true type=OptionButton class=interactive width=152.0 height=58.0 status=PASS formula=button_w/OptionButton.normal + button_h notes=theme-side proxy meets 48px floor
+Burst raised=true type=Panel class=layout width=0.0 height=0.0 status=N/A formula=panel chrome is not interactive notes=not an enforceable interactive tap target
+Burst raised=true type=PopupMenu class=interactive width=50.0 height=48.0 status=PASS formula=font + item padding + icon_max_width + v_separation notes=theme-side proxy meets 48px floor
+Burst raised=true type=PopupPanel class=display width=0.0 height=0.0 status=N/A formula=popup shell delegates tap targets notes=not an enforceable interactive tap target
+Burst raised=true type=ProgressBar class=display width=0.0 height=0.0 status=N/A formula=indicator is not a tap target notes=not an enforceable interactive tap target
+Burst raised=true type=RichTextLabel class=display width=0.0 height=0.0 status=N/A formula=text display is not a tap target notes=not an enforceable interactive tap target
+Burst raised=true type=SpinBox class=interactive width=142.0 height=128.0 status=PASS formula=LineEdit input proxy + up/down icons notes=theme-side proxy meets 48px floor
+Burst raised=true type=TabBar class=interactive width=118.0 height=48.0 status=PASS formula=tab font + tab_selected margins + close icon notes=theme-side proxy meets 48px floor
+Burst raised=true type=TabContainer class=interactive width=58.0 height=48.0 status=PASS formula=tab strip font + tab_selected margins + icon_separation notes=theme-side proxy meets 48px floor
+Burst raised=true type=TextEdit class=interactive width=56.0 height=78.0 status=PASS formula=tokens.inputMin + input_h(TextEdit.normal) notes=theme-side proxy meets 48px floor
+Burst raised=true type=TooltipLabel class=display width=0.0 height=0.0 status=N/A formula=tooltip text is not a tap target notes=not an enforceable interactive tap target
+Burst raised=true type=TooltipPanel class=display width=0.0 height=0.0 status=N/A formula=tooltip shell is not a tap target notes=not an enforceable interactive tap target
+Burst raised=true type=Tree class=interactive width=48.0 height=48.0 status=PASS formula=row_h from font/separations/icon width notes=theme-side proxy meets 48px floor
+Burst raised=true type=VScrollBar class=interactive width=64.0 height=64.0 status=PASS formula=grabber margins and decrement/increment icons notes=theme-side proxy meets 48px floor
+Burst raised=true type=VSlider class=interactive width=64.0 height=64.0 status=PASS formula=grabber icon and grabber_area stylebox notes=theme-side proxy meets 48px floor
+Burst raised=true type=VSplitContainer class=interactive width=48.0 height=48.0 status=PASS formula=minimum_grab_thickness/separation/touch dragger proxy notes=theme-side proxy meets 48px floor
+Burst raised=true type=Window class=display width=0.0 height=0.0 status=N/A formula=engine/window-managed titlebar hit rects notes=not an enforceable interactive tap target
+limitations: LIMITED rows document missing theme-side minimums; display/layout rows are N/A and not fake-padded.
+summary: 0 failures

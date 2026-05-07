@@ -138,7 +138,43 @@ func assert_platform_tokens_stage() -> void:
 		_group_fail(group, "; ".join(problems))
 
 func assert_tap_targets_stage() -> void:
-	_group_pending("tap-targets", "Plan 08-03 owns strict 48px audit closure")
+	var group := "tap-targets"
+	var problems: Array[String] = []
+	var script := load(TAP_AUDIT_PATH)
+	if script == null:
+		_group_fail(group, "tap-target audit helper did not load")
+		return
+	var result: Dictionary = script.run_audit()
+	if int(result.get("failures", 0)) > 0:
+		for row: Dictionary in result.get("rows", []):
+			if String(row.get("status", "")) == "FAIL":
+				problems.append("%s raised=%s %s %.1fx%.1f %s" % [
+					row.get("direction", ""),
+					str(row.get("raised", false)),
+					row.get("type", ""),
+					float(row.get("width_proxy", 0)),
+					float(row.get("height_proxy", 0)),
+					row.get("notes", "")
+				])
+	var directions: Dictionary = {}
+	var raised_values: Dictionary = {}
+	var row_count := 0
+	for row: Dictionary in result.get("rows", []):
+		directions[String(row.get("direction", ""))] = true
+		raised_values[str(row.get("raised", false))] = true
+		row_count += 1
+	if directions.size() != APPROVED_DIRECTIONS.size():
+		problems.append("audit did not cover all five directions, got %s" % str(directions.keys()))
+	if not (raised_values.has("false") and raised_values.has("true")):
+		problems.append("audit did not cover both raised=false and raised=true")
+	if row_count != APPROVED_DIRECTIONS.size() * 2 * SCORECARD_37_TYPES.size():
+		problems.append("audit row count expected %d got %d" % [APPROVED_DIRECTIONS.size() * 2 * SCORECARD_37_TYPES.size(), row_count])
+	if problems.is_empty():
+		_group_ok(group, "forced mobile tap-target audit passes with %d PASS, %d LIMITED, %d N/A, 0 FAIL" % [
+			int(result.get("passed", 0)), int(result.get("limited", 0)), int(result.get("na", 0))
+		])
+	else:
+		_group_fail(group, "; ".join(problems))
 
 func assert_docs_stage() -> void:
 	_group_pending("docs", "Plan 08-04 owns MOBILE-DESIGN-SPEC.md")
