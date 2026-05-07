@@ -73,6 +73,8 @@ The convergence command auto-loops: `gsd-plan-phase` → `gsd-review --opencode`
 
 **Recovery & special commands:** `/gsd-resume-work` (session start), `/gsd-progress` (uncertain — also use when user says "where are we"/"continue"), `/gsd-pause-work` (handoff), `/gsd-undo`, `/gsd-audit-uat`, `/gsd-ship` (after Phase 11).
 
-**Refuse:** parallel `/gsd-*` commands (state collisions); hand-editing `.planning/*` mid-execution; `/gsd-autonomous` on this project (mockup gate + UD-1/UD-5 require user input — Phases 5-7 only with explicit user confirmation).
+**Refuse:** parallel `/gsd-*` commands (state collisions); hand-editing `.planning/*` mid-execution; `/gsd-autonomous` on this project for Phase 9+ (UD-5 real-device matrix + Phase 9 visual approval + Phase 11 ship gate require user input).
+
+**Autonomy override (2026-05-07):** User authorized `/gsd-autonomous` scope-limited to Phases 6, 7, and 8. Mockup gate (Phase 3.4) is closed; UD-1 (MCP swap) is no longer blocking these phases; UD-5 only matters for Phase 10. Within the scope `[6, 7, 8]`, the discuss → plan-review-convergence → execute → verify cycle may run unattended. Settings to support this are in `.planning/config.json` (`workflow.discuss_mode: "quick"`, `workflow.use_worktrees: false` per Wave 4 mismatch lesson, `workflow._phases_6_8_autonomous_authorized` marker). Handoff document: `.planning/HANDOFF-PHASES-6-8-AUTONOMOUS.md`. Full Phase 9 onward still requires user gates.
 
 **Auto mode:** execute autonomously on mechanical work; do NOT auto-resolve user-decision gates (UD-1..UD-6, mockup approval, real-device confirmations); confirm destructive git actions even in auto mode.
