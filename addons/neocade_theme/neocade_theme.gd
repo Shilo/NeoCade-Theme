@@ -1410,17 +1410,86 @@ const BINDING_TABLE: Dictionary = {
 			"folded_arrow_mirrored":    {"icon": "disclosure_collapsed_mirrored"},
 		},
 	},
-	# 11. GraphEdit — minimal Phase 4 baseline (Phase 7 graph polish)
+	# 11. GraphEdit — basic-v1 graph canvas, toolbar, connection, selection, and focus slots.
 	"GraphEdit": {
 		"stylebox": {
-			"panel":      {"role": "surface_low",   "raised_intensity": 0},
-			"menu_panel": {"role": "surface_panel", "raised_intensity": 0},
+			"panel":       {"role": "surface_low",   "raised_intensity": 0,
+							"radius": "shape.secondary_radius", "padding": Vector2i(0, 0)},
+			"menu_panel":  {"role": "surface_panel", "raised_intensity": 0,
+							"radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+			"panel_focus": {"role": "focus_ring",    "radius": "shape.secondary_radius"},
 		},
 		"color": {
-			"grid_major":       {"role": "outline_color"},
-			"grid_minor":       {"role": "outline_color"},
-			"selection_fill":   {"role": "accent_offset"},
-			"selection_stroke": {"role": "role_primary"},
+			"activity":                           {"role": "role_primary",  "alpha": 0.95},
+			"connection_hover_tint_color":        {"role": "role_primary",  "alpha": 0.88},
+			"connection_rim_color":               {"role": "outline_color", "alpha": 0.60},
+			"connection_valid_target_tint_color": {"role": "role_success",  "alpha": 0.88},
+			"grid_major":                         {"role": "outline_color", "alpha": 0.42},
+			"grid_minor":                         {"role": "outline_color", "alpha": 0.18},
+			"selection_fill":                     {"role": "role_primary",  "alpha": 0.24},
+			"selection_stroke":                   {"role": "role_primary"},
+		},
+		"constant": {
+			"connection_hover_thickness": {"value": 3},
+			"port_hotzone_inner_extent":  {"value": 12},
+			"port_hotzone_outer_extent":  {"value": 20},
+		},
+		"icon": {
+			"grid_toggle":     {"icon": "graph_grid_toggle"},
+			"layout":          {"icon": "graph_layout"},
+			"minimap_toggle":  {"icon": "graph_minimap_toggle"},
+			"snapping_toggle": {"icon": "graph_snapping_toggle"},
+			"zoom_in":         {"icon": "graph_zoom_in"},
+			"zoom_out":        {"icon": "graph_zoom_out"},
+			"zoom_reset":      {"icon": "graph_zoom_reset"},
+		},
+	},
+	# 11a. GraphNode — compact functional graph panel with explicit selected/focus/slot states.
+	"GraphNode": {
+		"stylebox": {
+			"panel":             {"role": "surface_panel", "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 8)},
+			"panel_focus":       {"role": "focus_ring",    "radius": "shape.card_radius"},
+			"panel_selected":    {"role": "surface_high",  "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 8)},
+			"slot":              {"role": "surface_low",   "raised_intensity": 0,
+								  "radius": 4, "padding": Vector2i(6, 2), "alpha": 0.26},
+			"slot_selected":     {"role": "role_primary",  "raised_intensity": 0,
+								  "radius": 4, "padding": Vector2i(6, 2), "alpha": 0.30},
+			"titlebar":          {"role": "surface_high",  "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 5)},
+			"titlebar_selected": {"role": "accent_offset", "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 5), "alpha": 0.62},
+		},
+		"color": {
+			"resizer_color": {"role": "text_muted", "alpha": 0.90},
+		},
+		"constant": {
+			"port_h_offset": {"value": 8},
+			"separation":    {"value": 4},
+		},
+		"icon": {
+			"port":    {"icon": "graph_port"},
+			"resizer": {"icon": "graph_resizer"},
+		},
+	},
+	# 11b. GraphFrame — flat grouping chrome for graph regions, sharing the resizer asset.
+	"GraphFrame": {
+		"stylebox": {
+			"panel":             {"role": "surface_low",   "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 8), "alpha": 0.28},
+			"panel_selected":    {"role": "role_primary",  "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 8), "alpha": 0.34},
+			"titlebar":          {"role": "surface_panel", "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 4), "alpha": 0.42},
+			"titlebar_selected": {"role": "accent_offset", "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 4), "alpha": 0.46},
+		},
+		"color": {
+			"resizer_color": {"role": "text_muted", "alpha": 0.85},
+		},
+		"icon": {
+			"resizer": {"icon": "graph_resizer"},
 		},
 	},
 	# 12. HScrollBar — official styleboxes plus six increment/decrement icon slots.
