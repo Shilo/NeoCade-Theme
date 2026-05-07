@@ -256,7 +256,19 @@ Plans:
   3. **`MOBILE-DESIGN-SPEC.md` committed:** Documents every desktop-vs-mobile delta with concrete numbers and rationale (e.g. "Button.minimum_size.y: desktop 32 / mobile 48 — satisfies iOS HIG 44pt + Material 3 48dp simultaneously"); covers all 37 Controls in the scorecard; references CROSS-PLATFORM.md per-target table; documents that one dynamic theme covers all Android density buckets via Godot's `content_scale_factor` + stretch modes (NOT per-density `.tres` files); documents that `platform=AUTO` is the recommended setting for cross-platform consumers.
   4. **Theme toggle wired in test scene (or showcase if Phase 9 is started):** A toggle button in the test scene cycles a single direction `.tres`'s `platform` export between DESKTOP / MOBILE / AUTO, plus a separate toggle for `raised` (true/false). Cycling produces correct re-rendered entries (per PITFALLS 10.3 clean state switching); tap targets visibly grow when switching to MOBILE; visual identity (palette, typography, corner radii) stays consistent across all platform settings — proving brand-identity preservation.
   5. **Mobile retains theme identity across all directions:** Each approved direction resource produces correctly sized mobile entries when toggled to `platform=MOBILE`; no direction loses its personality or accidentally overrides mobile sizing. The mobile branch follows iOS HIG + Material 3 minimums for tap targets / type scale / accessibility but explicitly does NOT mimic native iOS or Android visual language (verified by visual review against Phase 3.4 mobile mockup approval).
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- **Wave 1:** `08-01-PLAN.md` - Create the Phase 8 verifier, tap-target audit foundation, and mobile contract artifact.
+- **Wave 2 *(blocked on Wave 1 completion)*:** `08-02-PLAN.md` - Harden forced platform token behavior and raised/platform orthogonality.
+- **Wave 3 *(blocked on Wave 2 completion)*:** `08-03-PLAN.md` - Pass the all-direction forced-mobile 48px tap-target audit.
+- **Wave 4 *(blocked on Wave 3 completion)*:** `08-04-PLAN.md` - Author root `MOBILE-DESIGN-SPEC.md` with 37-row and type-variation traceability.
+- **Wave 5 *(blocked on Wave 4 completion)*:** `08-05-PLAN.md` - Wire the minimal platform/raised test-scene proof and close full verification.
+
+Cross-cutting constraints:
+- Preserve the dynamic architecture: one concrete `addons/neocade_theme/neocade_theme.gd`, five data-only direction `.tres` resources, and the locked 9-export surface.
+- Do not create `neocade_mobile_theme.tres`, per-density theme resources, subclasses, per-direction scripts, root fallback `.tres`, `_dev/`, or `themes/`.
+- Verification must cover forced `DESKTOP`, forced `MOBILE`, host `AUTO`, all five directions in forced mobile mode, 48px tap-target audit, raised/platform orthogonality, no `Theme.clear`, and root `MOBILE-DESIGN-SPEC.md`.
 **UI hint**: yes
 
 ### Phase 9: Showcase + Token Gallery + Theme/Variation Toggles (UPDATED for dynamic architecture)
