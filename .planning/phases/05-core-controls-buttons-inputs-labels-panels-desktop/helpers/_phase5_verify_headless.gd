@@ -45,10 +45,33 @@ extends SceneTree
 ##            stages carry forward strict so a spinbox regression also catches
 ##            buttons / text-panels / text-final regressions. Plan 05-06 is
 ##            the last Phase 5 stage before the full strict gate.
-##   strict   Future stage (Plans 05-03..05-07). Treats every PENDING marker as a
-##            failure and exits non-zero. Wired now so later plans only need to
-##            change the --stage argument; they do not need to re-author the
-##            verifier.
+##   final    Plan 05-07 staged enforcement (Wave 7). Flips three new groups
+##            strict on top of all prior strict stages:
+##              - assert_resource_data_only      — every approved direction
+##                                                  `.tres` is < 2 KiB, contains
+##                                                  no [sub_resource], no
+##                                                  theme_data/, and reloads
+##                                                  as NeoCadeTheme (D-06).
+##              - assert_flat_no_shadow_when_off — for raised=false on every
+##                                                  approved direction, every
+##                                                  generated StyleBoxFlat has
+##                                                  shadow_size == -1 and
+##                                                  shadow_offset == ZERO.
+##              - assert_raised_hard_offset_shadow — for raised=true on every
+##                                                  approved direction, every
+##                                                  generated StyleBoxFlat with
+##                                                  shadow_size > 0 has
+##                                                  shadow_offset.x == 0 and
+##                                                  shadow_offset.y == shadow_size
+##                                                  (hard offset, no blur, no
+##                                                  side drift). Recipes with
+##                                                  raised_intensity == 0 yield
+##                                                  shadow_size == 0 (allowed).
+##            All Plan 05-06 / 05-05 / 05-04 / 05-03 / 05-02 strict groups
+##            carry forward strict.
+##   strict   Treats every PENDING marker as a failure and exits non-zero.
+##            Wired now so later plans only need to change the --stage
+##            argument; they do not need to re-author the verifier.
 ##
 ## Per D-12 (Phase 5 CONTEXT.md), the named groups are:
 ##   - assert_variation_count_15
@@ -257,8 +280,8 @@ func _parse_args() -> void:
 			i += 1
 		if found:
 			break
-	if _stage != "tooling" and _stage != "strict" and _stage != "shape" and _stage != "buttons" and _stage != "text-panels" and _stage != "text-final" and _stage != "spinbox":
-		push_error("PHASE5_VERIFY FAIL: unknown --stage '%s' (expected tooling|shape|buttons|text-panels|text-final|spinbox|strict)" % _stage)
+	if _stage != "tooling" and _stage != "strict" and _stage != "shape" and _stage != "buttons" and _stage != "text-panels" and _stage != "text-final" and _stage != "spinbox" and _stage != "final":
+		push_error("PHASE5_VERIFY FAIL: unknown --stage '%s' (expected tooling|shape|buttons|text-panels|text-final|spinbox|final|strict)" % _stage)
 		_stage = "tooling"
 	print("PHASE5_VERIFY: stage=%s" % _stage)
 
@@ -306,6 +329,11 @@ func _run_verifier() -> void:
 	# text-final too via the strict list below.
 	assert_text_class_chrome_complete()
 	assert_codeedit_no_syntax_highlighting()
+	# Plan 05-07 groups (Wave 7 — final ResourceSaver round-trip + raised
+	# shadow contract). Strict in the `final` stage; tooling elsewhere.
+	assert_resource_data_only()
+	assert_flat_no_shadow_when_off()
+	assert_raised_hard_offset_shadow()
 
 
 func _verify_helper_wiring() -> bool:
@@ -1802,6 +1830,197 @@ func assert_codeedit_no_syntax_highlighting() -> void:
 		_group_fail(group, "AF-7 violation: CodeEdit has AUTHORED syntax-highlighting slots (out of Phase 5 scope): " + ", ".join(found))
 
 
+# ----- assertion group: data-only direction `.tres` (Plan 05-07 Task 2 / D-06) -----
+##
+## Per D-06 + PROJECT.md: each approved direction `.tres` is data-only —
+## script linkage + 9 @export values only. The verifier:
+##   1. Reads each direction `.tres` raw from disk.
+##   2. Asserts size < 2048 bytes.
+##   3. Asserts no `[sub_resource` line is present (regenerated entries do not
+##      leak into the file).
+##   4. Asserts no `theme_data/` line is present (per-Control state entries do
+##      not leak in).
+##   5. Asserts the file re-loads as `NeoCadeTheme` and has the Phase 4
+##      baseline (Button.normal stylebox populates via _regenerate_theme()).
+## All five approved directions are checked.
+func assert_resource_data_only() -> void:
+	var group := "assert_resource_data_only"
+	var problems: Array[String] = []
+	for path in PHASE5_DIRECTION_TRES_PATHS.values():
+		var bytes_arr: PackedByteArray = FileAccess.get_file_as_bytes(path)
+		if bytes_arr.is_empty():
+			problems.append("%s: file missing or empty" % path)
+			continue
+		var size: int = bytes_arr.size()
+		if size >= 2048:
+			problems.append("%s: size %d >= 2048 bytes (D-06 / SC#6)" % [path, size])
+		var f := FileAccess.open(path, FileAccess.READ)
+		if f == null:
+			problems.append("%s: cannot open for read" % path)
+			continue
+		var text: String = f.get_as_text()
+		f.close()
+		if text.find("[sub_resource") != -1:
+			problems.append("%s: contains [sub_resource block (D-06 violated)" % path)
+		if text.find("theme_data/") != -1:
+			problems.append("%s: contains theme_data/ entry (D-06 violated)" % path)
+		# Reload + Phase 4 baseline.
+		var loaded: Resource = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
+		if loaded == null or not (loaded is NeoCadeTheme):
+			problems.append("%s: did not re-load as NeoCadeTheme" % path)
+			continue
+		var t: NeoCadeTheme = loaded
+		if not t.has_stylebox("normal", "Button"):
+			problems.append("%s: post-strip Phase 4 baseline regression — Button.normal missing" % path)
+	if problems.is_empty():
+		_group_ok(group, "all 5 direction `.tres` files data-only, < 2 KiB, no [sub_resource], no theme_data/, reload as NeoCadeTheme with Phase 4 baseline")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+# ----- assertion group: flat-mode shadow contract (Plan 05-07 Task 2) -----
+##
+## Per `_make_raised_stylebox` (DESIGN_TOKENS §9 + Conflict 3): when
+## `raised=false`, every generated `StyleBoxFlat` must have:
+##   - `shadow_size == -1` (Godot's "no shadow" sentinel per #98162)
+##   - `shadow_offset == Vector2.ZERO`
+## The verifier instantiates a fresh `NeoCadeTheme` per approved direction
+## (loading the `.tres` triggers `_regenerate_theme()` which populates every
+## entry), explicitly forces `raised=false` to be safe, then walks every
+## authored StyleBoxFlat across every authored theme type and asserts the
+## invariant. Non-StyleBoxFlat styleboxes (StyleBoxEmpty etc.) are skipped —
+## the contract is on the FLAT family only.
+func assert_flat_no_shadow_when_off() -> void:
+	var group := "assert_flat_no_shadow_when_off"
+	var problems: Array[String] = []
+	for hex_key in PHASE5_DIRECTION_TRES_PATHS.keys():
+		var path: String = PHASE5_DIRECTION_TRES_PATHS[hex_key]
+		var loaded: Resource = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
+		if loaded == null or not (loaded is NeoCadeTheme):
+			problems.append("%s: did not load as NeoCadeTheme" % path)
+			continue
+		var t: NeoCadeTheme = loaded
+		# Force raised=false to be defensive (the .tres files all ship raised=false
+		# by design per Phase 4, but the contract says "loaded with raised=false").
+		# Setting the property fires the setter which re-runs _regenerate_theme().
+		if t.raised:
+			t.raised = false
+		# Walk every authored theme type and every authored stylebox slot.
+		var type_list: PackedStringArray = t.get_stylebox_type_list()
+		var bad_count: int = 0
+		var bad_examples: Array[String] = []
+		for ttype in type_list:
+			var slot_list: PackedStringArray = t.get_stylebox_list(ttype)
+			for slot in slot_list:
+				var sb: StyleBox = t.get_stylebox(slot, ttype)
+				if not (sb is StyleBoxFlat):
+					continue
+				var sbf: StyleBoxFlat = sb
+				if sbf.shadow_size != -1 or sbf.shadow_offset != Vector2.ZERO:
+					bad_count += 1
+					if bad_examples.size() < 3:
+						bad_examples.append("%s.%s: shadow_size=%d offset=%s" % [ttype, slot, sbf.shadow_size, str(sbf.shadow_offset)])
+		if bad_count > 0:
+			problems.append("%s (raised=false): %d StyleBoxFlat have non-(-1) shadow_size or non-ZERO offset; e.g. %s" % [path, bad_count, "; ".join(bad_examples)])
+	if problems.is_empty():
+		_group_ok(group, "raised=false: every generated StyleBoxFlat has shadow_size == -1 and shadow_offset == ZERO across all 5 directions")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+# ----- assertion group: raised-mode hard-offset shadow contract (Plan 05-07 Task 2) -----
+##
+## Per `_make_raised_stylebox` (DESIGN_TOKENS §9 + FLAT-3D-UI-RESEARCH.md):
+## when `raised=true`, every generated `StyleBoxFlat` must have hard-offset
+## shadow semantics:
+##   - `shadow_offset.x == 0`
+##   - `shadow_offset.y == shadow_size`  (shadow drops straight down by exactly
+##                                         the shadow size — the extruded-flat
+##                                         3D primitive)
+##   - `shadow_size == raised_strength * raised_intensity` for some recipe-side
+##     `raised_intensity >= 0`. When the recipe sets `raised_intensity == 0`
+##     (e.g. the focus_ring slot, pressed states, panel inner styleboxes),
+##     `shadow_size == 0` is permitted; that is still the "hard offset" form
+##     (no blur, no glow, no texture) — just no visible drop.
+##
+## The verifier asserts the structural form: every authored StyleBoxFlat under
+## raised=true must satisfy `shadow_offset == Vector2(0, shadow_size)`. We
+## additionally verify that any non-zero `shadow_size` is a non-negative
+## multiple of `raised_strength` (proof that intensity flowed through
+## `_make_raised_stylebox(bg, offset, raised_strength * raised_intensity)`).
+##
+## Focus styleboxes (`role: "focus_ring"`) hard-set `shadow_size = -1` per the
+## production class — those are exempt from the raised contract because focus
+## is an outer-ring overlay, not a fill stylebox.
+func assert_raised_hard_offset_shadow() -> void:
+	var group := "assert_raised_hard_offset_shadow"
+	var problems: Array[String] = []
+	for hex_key in PHASE5_DIRECTION_TRES_PATHS.keys():
+		var path: String = PHASE5_DIRECTION_TRES_PATHS[hex_key]
+		var loaded: Resource = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
+		if loaded == null or not (loaded is NeoCadeTheme):
+			problems.append("%s: did not load as NeoCadeTheme" % path)
+			continue
+		var t: NeoCadeTheme = loaded
+		# Force raised=true (re-fires the setter -> _regenerate_theme()).
+		t.raised = true
+		var raised_strength_v: int = t.raised_strength
+		var type_list: PackedStringArray = t.get_stylebox_type_list()
+		var bad_count: int = 0
+		var bad_examples: Array[String] = []
+		for ttype in type_list:
+			var slot_list: PackedStringArray = t.get_stylebox_list(ttype)
+			for slot in slot_list:
+				var sb: StyleBox = t.get_stylebox(slot, ttype)
+				if not (sb is StyleBoxFlat):
+					continue
+				var sbf: StyleBoxFlat = sb
+				# Focus rings are exempt — the production class hard-sets
+				# `shadow_size = -1` and `shadow_offset = ZERO` for ALL recipes
+				# whose role is "focus_ring", regardless of `raised`. The
+				# focus_ring slot name varies across BINDING_TABLE rows (`focus`
+				# on Button-family, `tab_focus` on TabBar/TabContainer,
+				# `scroll_focus` on H/VScrollBar) so a slot-name allowlist
+				# would drift; instead we use the unambiguous structural
+				# signature: shadow_size == -1 + shadow_offset == ZERO is the
+				# explicit "no shadow" sentinel that only the focus_ring
+				# branch produces under raised=true (the raised branch in
+				# `_make_raised_stylebox` always emits non-negative shadow_size).
+				# This also gracefully exempts any future focus-ring slot
+				# wiring that lands in Phase 6/7.
+				var ss: int = sbf.shadow_size
+				var so: Vector2 = sbf.shadow_offset
+				if ss == -1 and so == Vector2.ZERO:
+					# focus_ring (or any other "no shadow" stylebox) — exempt.
+					continue
+				if ss < 0:
+					# Anything other than -1 is undefined / a bug.
+					bad_count += 1
+					if bad_examples.size() < 3:
+						bad_examples.append("%s.%s: shadow_size=%d < 0 (raised=true should produce >= 0 unless explicit focus-ring -1 + ZERO offset)" % [ttype, slot, ss])
+					continue
+				# Hard offset: shadow drops straight down by exactly shadow_size.
+				if so.x != 0.0 or so.y != float(ss):
+					bad_count += 1
+					if bad_examples.size() < 3:
+						bad_examples.append("%s.%s: shadow_size=%d but shadow_offset=%s (expected (0, %d) hard offset)" % [ttype, slot, ss, str(so), ss])
+					continue
+				# shadow_size must be a non-negative multiple of raised_strength
+				# (proof that the recipe flowed through _make_raised_stylebox with
+				# intensity = raised_strength * raised_intensity_recipe; when the
+				# recipe pins raised_intensity == 0 we get shadow_size == 0).
+				if raised_strength_v > 0 and (ss % raised_strength_v) != 0:
+					bad_count += 1
+					if bad_examples.size() < 3:
+						bad_examples.append("%s.%s: shadow_size=%d not a multiple of raised_strength=%d (recipe drift?)" % [ttype, slot, ss, raised_strength_v])
+		if bad_count > 0:
+			problems.append("%s (raised=true): %d StyleBoxFlat violate hard-offset contract; e.g. %s" % [path, bad_count, "; ".join(bad_examples)])
+	if problems.is_empty():
+		_group_ok(group, "raised=true: every generated StyleBoxFlat has shadow_offset == Vector2(0, shadow_size); shadow_size is a non-negative multiple of raised_strength; focus rings exempt (-1)")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
 # ----- helpers -----
 
 func _load_pulse_for_group(group: String) -> NeoCadeTheme:
@@ -1933,6 +2152,47 @@ func _group_pending(group: String, detail: String) -> void:
 		"assert_no_theme_clear",
 		"assert_no_invented_focus_combos",
 	]
+	# Plan 05-07 strict list: data-only `.tres` + flat-mode shadow_size==-1
+	# + raised-mode hard-offset shadow contract. ALL prior strict groups
+	# carry forward strict (a final regression catches every earlier-wave
+	# regression too). This is the cumulative Phase 5 gate.
+	var final_stage_strict := [
+		# Plan 05-07 NEW.
+		"assert_resource_data_only",
+		"assert_flat_no_shadow_when_off",
+		"assert_raised_hard_offset_shadow",
+		# Plan 05-06 carry-forward.
+		"assert_spinbox_icons",
+		# Plan 05-05 carry-forward.
+		"assert_codeedit_gutter_slots",
+		"assert_text_class_chrome_complete",
+		"assert_codeedit_no_syntax_highlighting",
+		# Plan 05-04 carry-forward.
+		"assert_variation_count_15",
+		"assert_inf_text_normal_font_size",
+		"assert_kicker_chrome",
+		"assert_text_label_variation_chrome",
+		"assert_panel_variation_chrome",
+		"assert_no_letter_spacing_claim",
+		# Plan 05-03 carry-forward.
+		"assert_button_variation_rows",
+		"assert_button_variation_states",
+		"assert_button_variation_fonts",
+		"assert_button_strategy_distinctness",
+		"assert_dangerbutton_role_danger",
+		"assert_basebutton_family_chrome",
+		"assert_basebutton_family_shape_aware",
+		"assert_checkbox_disabled_icon_reuse",
+		"assert_focus_overlay_visibility",
+		# Plan 05-02 carry-forward.
+		"assert_shape_lookup_integrity",
+		"assert_shape_value_integrity",
+		"assert_shape_recipe_resolution",
+		"assert_semantic_role_table",
+		# Carry-forward invariants.
+		"assert_no_theme_clear",
+		"assert_no_invented_focus_combos",
+	]
 	var fail: bool = false
 	if _stage == "strict":
 		fail = true
@@ -1945,6 +2205,8 @@ func _group_pending(group: String, detail: String) -> void:
 	elif _stage == "text-final" and group in text_final_stage_strict:
 		fail = true
 	elif _stage == "spinbox" and group in spinbox_stage_strict:
+		fail = true
+	elif _stage == "final" and group in final_stage_strict:
 		fail = true
 	if fail:
 		var label: String = _stage.to_upper()
@@ -1965,8 +2227,8 @@ func _group_fail(group: String, detail: String) -> void:
 func _emit_summary_and_quit() -> void:
 	print("----- PHASE5_VERIFY summary -----")
 	print("  stage:          %s" % _stage)
-	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 + Plan 05-04 added 4 + Plan 05-05 added 2 = 25.
-	print("  groups OK:      %d / %d" % [_ok_markers.size(), 25])
+	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 + Plan 05-04 added 4 + Plan 05-05 added 2 + Plan 05-07 added 3 = 28.
+	print("  groups OK:      %d / %d" % [_ok_markers.size(), 28])
 	print("  groups PENDING: %d  %s" % [_pending.size(), str(_pending)])
 	print("  failures:       %d" % _failures.size())
 	for f in _failures:

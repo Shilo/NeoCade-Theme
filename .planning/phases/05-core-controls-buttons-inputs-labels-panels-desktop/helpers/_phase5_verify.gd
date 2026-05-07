@@ -139,6 +139,10 @@ func _run() -> void:
 	# highlighting scope guard).
 	assert_text_class_chrome_complete()
 	assert_codeedit_no_syntax_highlighting()
+	# Plan 05-07 groups (Wave 7 — final ResourceSaver + raised shadow contract).
+	assert_resource_data_only()
+	assert_flat_no_shadow_when_off()
+	assert_raised_hard_offset_shadow()
 	_emit_summary()
 
 
@@ -1057,6 +1061,144 @@ func assert_codeedit_no_syntax_highlighting() -> void:
 		_group_fail(group, "AF-7 violation: CodeEdit has AUTHORED syntax-highlighting slots (out of Phase 5 scope): " + ", ".join(found))
 
 
+# ----- assertion group: data-only direction `.tres` (Plan 05-07 Task 2 / D-06) -----
+##
+## Mirror of headless variant: assert each approved direction `.tres` is
+## data-only (script linkage + 9 @export values; size < 2 KiB; no
+## [sub_resource] block; no theme_data/ entry; reloads as NeoCadeTheme with
+## Phase 4 baseline).
+func assert_resource_data_only() -> void:
+	var group := "assert_resource_data_only"
+	var problems: Array[String] = []
+	for path in PHASE5_DIRECTION_TRES_PATHS.values():
+		var bytes_arr: PackedByteArray = FileAccess.get_file_as_bytes(path)
+		if bytes_arr.is_empty():
+			problems.append("%s: file missing or empty" % path)
+			continue
+		var size: int = bytes_arr.size()
+		if size >= 2048:
+			problems.append("%s: size %d >= 2048 bytes (D-06)" % [path, size])
+		var f := FileAccess.open(path, FileAccess.READ)
+		if f == null:
+			problems.append("%s: cannot open" % path)
+			continue
+		var text: String = f.get_as_text()
+		f.close()
+		if text.find("[sub_resource") != -1:
+			problems.append("%s: contains [sub_resource (D-06)" % path)
+		if text.find("theme_data/") != -1:
+			problems.append("%s: contains theme_data/ (D-06)" % path)
+		var loaded: Resource = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
+		if loaded == null or not (loaded is NeoCadeTheme):
+			problems.append("%s: did not re-load as NeoCadeTheme" % path)
+			continue
+		var t: NeoCadeTheme = loaded
+		if not t.has_stylebox("normal", "Button"):
+			problems.append("%s: post-strip Phase 4 baseline regression — Button.normal missing" % path)
+	if problems.is_empty():
+		_group_ok(group, "all 5 direction `.tres` files data-only, < 2 KiB, no [sub_resource], no theme_data/, reload as NeoCadeTheme with Phase 4 baseline")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+# ----- assertion group: flat-mode shadow contract (Plan 05-07 Task 2) -----
+##
+## Mirror of headless variant: when raised=false, every generated StyleBoxFlat
+## must have shadow_size == -1 and shadow_offset == ZERO across all 5
+## directions.
+func assert_flat_no_shadow_when_off() -> void:
+	var group := "assert_flat_no_shadow_when_off"
+	var problems: Array[String] = []
+	for hex_key in PHASE5_DIRECTION_TRES_PATHS.keys():
+		var path: String = PHASE5_DIRECTION_TRES_PATHS[hex_key]
+		var loaded: Resource = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
+		if loaded == null or not (loaded is NeoCadeTheme):
+			problems.append("%s: did not load as NeoCadeTheme" % path)
+			continue
+		var t: NeoCadeTheme = loaded
+		if t.raised:
+			t.raised = false
+		var type_list: PackedStringArray = t.get_stylebox_type_list()
+		var bad_count: int = 0
+		var bad_examples: Array[String] = []
+		for ttype in type_list:
+			var slot_list: PackedStringArray = t.get_stylebox_list(ttype)
+			for slot in slot_list:
+				var sb: StyleBox = t.get_stylebox(slot, ttype)
+				if not (sb is StyleBoxFlat):
+					continue
+				var sbf: StyleBoxFlat = sb
+				if sbf.shadow_size != -1 or sbf.shadow_offset != Vector2.ZERO:
+					bad_count += 1
+					if bad_examples.size() < 3:
+						bad_examples.append("%s.%s: shadow_size=%d offset=%s" % [ttype, slot, sbf.shadow_size, str(sbf.shadow_offset)])
+		if bad_count > 0:
+			problems.append("%s (raised=false): %d StyleBoxFlat have non-(-1) shadow_size or non-ZERO offset; e.g. %s" % [path, bad_count, "; ".join(bad_examples)])
+	if problems.is_empty():
+		_group_ok(group, "raised=false: every generated StyleBoxFlat has shadow_size == -1 and shadow_offset == ZERO across all 5 directions")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+# ----- assertion group: raised-mode hard-offset shadow contract (Plan 05-07 Task 2) -----
+##
+## Mirror of headless variant: when raised=true, every generated StyleBoxFlat
+## has hard-offset shadow semantics (shadow_offset == Vector2(0, shadow_size);
+## shadow_size is a non-negative multiple of raised_strength). Focus rings
+## are exempt (production class hard-sets shadow_size=-1 for them).
+func assert_raised_hard_offset_shadow() -> void:
+	var group := "assert_raised_hard_offset_shadow"
+	var problems: Array[String] = []
+	for hex_key in PHASE5_DIRECTION_TRES_PATHS.keys():
+		var path: String = PHASE5_DIRECTION_TRES_PATHS[hex_key]
+		var loaded: Resource = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
+		if loaded == null or not (loaded is NeoCadeTheme):
+			problems.append("%s: did not load as NeoCadeTheme" % path)
+			continue
+		var t: NeoCadeTheme = loaded
+		t.raised = true
+		var raised_strength_v: int = t.raised_strength
+		var type_list: PackedStringArray = t.get_stylebox_type_list()
+		var bad_count: int = 0
+		var bad_examples: Array[String] = []
+		for ttype in type_list:
+			var slot_list: PackedStringArray = t.get_stylebox_list(ttype)
+			for slot in slot_list:
+				var sb: StyleBox = t.get_stylebox(slot, ttype)
+				if not (sb is StyleBoxFlat):
+					continue
+				var sbf: StyleBoxFlat = sb
+				# Focus rings are exempt by structural signature
+				# (shadow_size == -1 + shadow_offset == ZERO). Slot-name varies
+				# across BINDING_TABLE rows (focus / tab_focus / scroll_focus);
+				# the production class hard-sets shadow_size=-1 for ALL
+				# focus_ring recipes regardless of slot name.
+				var ss: int = sbf.shadow_size
+				var so: Vector2 = sbf.shadow_offset
+				if ss == -1 and so == Vector2.ZERO:
+					continue
+				if ss < 0:
+					bad_count += 1
+					if bad_examples.size() < 3:
+						bad_examples.append("%s.%s: shadow_size=%d < 0 (raised=true should produce >= 0 unless explicit focus-ring -1 + ZERO offset)" % [ttype, slot, ss])
+					continue
+				if so.x != 0.0 or so.y != float(ss):
+					bad_count += 1
+					if bad_examples.size() < 3:
+						bad_examples.append("%s.%s: shadow_size=%d but shadow_offset=%s (expected (0, %d))" % [ttype, slot, ss, str(so), ss])
+					continue
+				if raised_strength_v > 0 and (ss % raised_strength_v) != 0:
+					bad_count += 1
+					if bad_examples.size() < 3:
+						bad_examples.append("%s.%s: shadow_size=%d not a multiple of raised_strength=%d" % [ttype, slot, ss, raised_strength_v])
+		if bad_count > 0:
+			problems.append("%s (raised=true): %d StyleBoxFlat violate hard-offset contract; e.g. %s" % [path, bad_count, "; ".join(bad_examples)])
+	if problems.is_empty():
+		_group_ok(group, "raised=true: every generated StyleBoxFlat has shadow_offset == Vector2(0, shadow_size); shadow_size is a non-negative multiple of raised_strength; focus rings exempt (-1)")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
 # ----- shared helpers -----
 
 func _load_pulse_for_group(group: String) -> NeoCadeTheme:
@@ -1157,6 +1299,40 @@ func _group_pending(group: String, detail: String) -> void:
 		"assert_no_theme_clear",
 		"assert_no_invented_focus_combos",
 	]
+	# Plan 05-07 strict list: data-only `.tres` + flat-mode shadow_size==-1
+	# + raised-mode hard-offset shadow contract; carries forward ALL prior
+	# strict groups so a final regression also catches earlier-stage
+	# regressions.
+	var final_stage_strict := [
+		"assert_resource_data_only",
+		"assert_flat_no_shadow_when_off",
+		"assert_raised_hard_offset_shadow",
+		"assert_spinbox_icons",
+		"assert_codeedit_gutter_slots",
+		"assert_text_class_chrome_complete",
+		"assert_codeedit_no_syntax_highlighting",
+		"assert_variation_count_15",
+		"assert_inf_text_normal_font_size",
+		"assert_kicker_chrome",
+		"assert_text_label_variation_chrome",
+		"assert_panel_variation_chrome",
+		"assert_no_letter_spacing_claim",
+		"assert_button_variation_rows",
+		"assert_button_variation_states",
+		"assert_button_variation_fonts",
+		"assert_button_strategy_distinctness",
+		"assert_dangerbutton_role_danger",
+		"assert_basebutton_family_chrome",
+		"assert_basebutton_family_shape_aware",
+		"assert_checkbox_disabled_icon_reuse",
+		"assert_focus_overlay_visibility",
+		"assert_shape_lookup_integrity",
+		"assert_shape_value_integrity",
+		"assert_shape_recipe_resolution",
+		"assert_semantic_role_table",
+		"assert_no_theme_clear",
+		"assert_no_invented_focus_combos",
+	]
 	var fail: bool = false
 	if _stage == "strict":
 		fail = true
@@ -1169,6 +1345,8 @@ func _group_pending(group: String, detail: String) -> void:
 	elif _stage == "text-final" and group in text_final_stage_strict:
 		fail = true
 	elif _stage == "spinbox" and group in spinbox_stage_strict:
+		fail = true
+	elif _stage == "final" and group in final_stage_strict:
 		fail = true
 	if fail:
 		var label: String = _stage.to_upper()
@@ -1189,8 +1367,8 @@ func _group_fail(group: String, detail: String) -> void:
 func _emit_summary() -> void:
 	print("----- PHASE5_VERIFY summary -----")
 	print("  stage:          %s" % _stage)
-	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 + Plan 05-04 added 4 + Plan 05-05 added 2 = 25.
-	print("  groups OK:      %d / %d" % [_ok_markers.size(), 25])
+	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 + Plan 05-04 added 4 + Plan 05-05 added 2 + Plan 05-07 added 3 = 28.
+	print("  groups OK:      %d / %d" % [_ok_markers.size(), 28])
 	print("  groups PENDING: %d  %s" % [_pending.size(), str(_pending)])
 	print("  failures:       %d" % _failures.size())
 	for f in _failures:
