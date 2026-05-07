@@ -86,7 +86,56 @@ func assert_architecture_stage() -> void:
 		_group_fail(group, "; ".join(problems))
 
 func assert_platform_tokens_stage() -> void:
-	_group_pending("platform-tokens", "Plan 08-02 owns forced platform/mobile token assertions")
+	var group := "platform-tokens"
+	var problems: Array[String] = []
+	var desktop := _configured_theme(NeoCadeTheme.Platform.DESKTOP, false)
+	var mobile := _configured_theme(NeoCadeTheme.Platform.MOBILE, false)
+	var auto_theme := _configured_theme(NeoCadeTheme.Platform.AUTO, false)
+	if desktop == null or mobile == null or auto_theme == null:
+		_group_fail(group, "could not duplicate Pulse for DESKTOP/MOBILE/AUTO")
+		return
+
+	_expect_equal(problems, "desktop default_font_size", desktop.default_font_size, 14)
+	_expect_equal(problems, "mobile default_font_size", mobile.default_font_size, 16)
+	_expect_font_size(problems, desktop, "HeaderLarge", "font_size", 36)
+	_expect_font_size(problems, mobile, "HeaderLarge", "font_size", 36)
+	_expect_font_size(problems, desktop, "HeaderMedium", "font_size", 22)
+	_expect_font_size(problems, mobile, "HeaderMedium", "font_size", 22)
+	_expect_font_size(problems, desktop, "HeaderSmall", "font_size", 22)
+	_expect_font_size(problems, mobile, "HeaderSmall", "font_size", 22)
+	_expect_font_size(problems, desktop, "Caption", "font_size", 12)
+	_expect_font_size(problems, mobile, "Caption", "font_size", 14)
+	_expect_font_size(problems, desktop, "Kicker", "font_size", 12)
+	_expect_font_size(problems, mobile, "Kicker", "font_size", 13)
+	_expect_constant(problems, desktop, "FileDialog", "thumbnail_size", 96)
+	_expect_constant(problems, mobile, "FileDialog", "thumbnail_size", 128)
+	_expect_constant(problems, desktop, "Button", "h_separation", 8)
+	_expect_constant(problems, mobile, "Button", "h_separation", 12)
+
+	var desktop_button := _stylebox_flat(desktop, "Button", "normal")
+	var mobile_button := _stylebox_flat(mobile, "Button", "normal")
+	if desktop_button == null or mobile_button == null:
+		problems.append("Button.normal stylebox missing on desktop or mobile")
+	else:
+		if mobile_button.content_margin_top <= desktop_button.content_margin_top:
+			problems.append("Button.normal mobile vertical margin must exceed desktop")
+		if _radius_tuple(mobile_button) != _radius_tuple(desktop_button):
+			problems.append("Button.normal radius changed across desktop/mobile")
+	var desktop_focus := _stylebox_flat(desktop, "Button", "focus")
+	var mobile_focus := _stylebox_flat(mobile, "Button", "focus")
+	if desktop_focus == null or mobile_focus == null:
+		problems.append("Button.focus stylebox missing on desktop or mobile")
+	else:
+		if desktop_focus.border_width_left != mobile_focus.border_width_left:
+			problems.append("focus border width changed across desktop/mobile")
+	if not auto_theme.has_stylebox("normal", "Button"):
+		problems.append("AUTO did not resolve/regenerate representative Button.normal")
+
+	_append_raised_platform_orthogonality(problems)
+	if problems.is_empty():
+		_group_ok(group, "DESKTOP, MOBILE, AUTO, typography, spacing, radius, and raised/platform toggles are deterministic")
+	else:
+		_group_fail(group, "; ".join(problems))
 
 func assert_tap_targets_stage() -> void:
 	_group_pending("tap-targets", "Plan 08-03 owns strict 48px audit closure")
@@ -163,6 +212,97 @@ func _load_direction(path: String) -> NeoCadeTheme:
 	if loaded is NeoCadeTheme:
 		return loaded
 	return null
+
+func _configured_theme(platform_value: NeoCadeTheme.Platform, raised_value: bool) -> NeoCadeTheme:
+	var base := _load_direction(PULSE_PATH)
+	if base == null:
+		return null
+	var theme: NeoCadeTheme = base.duplicate(true)
+	theme.raised = raised_value
+	theme.platform = platform_value
+	return theme
+
+func _append_raised_platform_orthogonality(problems: Array[String]) -> void:
+	var desktop_flat := _configured_theme(NeoCadeTheme.Platform.DESKTOP, false)
+	var desktop_raised := _configured_theme(NeoCadeTheme.Platform.DESKTOP, true)
+	var mobile_flat := _configured_theme(NeoCadeTheme.Platform.MOBILE, false)
+	var mobile_raised := _configured_theme(NeoCadeTheme.Platform.MOBILE, true)
+	var combos := {
+		"raised=false/platform=DESKTOP": desktop_flat,
+		"raised=true/platform=DESKTOP": desktop_raised,
+		"raised=false/platform=MOBILE": mobile_flat,
+		"raised=true/platform=MOBILE": mobile_raised,
+	}
+	for combo in combos.keys():
+		var theme: NeoCadeTheme = combos[combo]
+		if theme == null:
+			problems.append("%s did not create a theme" % combo)
+			continue
+		for type_name in ["Button", "LineEdit", "Tree"]:
+			if not _theme_type_has_any_entry(theme, type_name):
+				problems.append("%s lost representative %s entries" % [combo, type_name])
+	var flat_sb := _stylebox_flat(desktop_flat, "Button", "normal")
+	var raised_sb := _stylebox_flat(desktop_raised, "Button", "normal")
+	if flat_sb == null or raised_sb == null:
+		problems.append("raised/platform check missing Button.normal")
+	else:
+		if flat_sb.shadow_size != -1:
+			problems.append("raised=false/platform=DESKTOP expected no-shadow sentinel -1 got %d" % flat_sb.shadow_size)
+		if raised_sb.shadow_size <= 0 or raised_sb.shadow_offset.y <= 0:
+			problems.append("raised=true/platform=DESKTOP expected positive hard offset")
+	var desktop_raised_button := _stylebox_flat(desktop_raised, "Button", "normal")
+	var mobile_raised_button := _stylebox_flat(mobile_raised, "Button", "normal")
+	var desktop_flat_button := _stylebox_flat(desktop_flat, "Button", "normal")
+	var mobile_flat_button := _stylebox_flat(mobile_flat, "Button", "normal")
+	if desktop_raised_button != null and mobile_raised_button != null:
+		if mobile_raised_button.content_margin_top <= desktop_raised_button.content_margin_top:
+			problems.append("mobile raised Button margin must exceed desktop raised")
+	if desktop_flat_button != null and mobile_flat_button != null:
+		if mobile_flat_button.content_margin_top <= desktop_flat_button.content_margin_top:
+			problems.append("mobile flat Button margin must exceed desktop flat")
+	var toggled := _configured_theme(NeoCadeTheme.Platform.DESKTOP, true)
+	if toggled != null:
+		toggled.platform = NeoCadeTheme.Platform.MOBILE
+		toggled.platform = NeoCadeTheme.Platform.DESKTOP
+		toggled.platform = NeoCadeTheme.Platform.MOBILE
+		for type_name in ["Button", "LineEdit", "Tree"]:
+			if not _theme_type_has_any_entry(toggled, type_name):
+				problems.append("repeated platform toggles after raised removed %s entries" % type_name)
+
+func _expect_equal(problems: Array[String], label: String, actual: int, expected: int) -> void:
+	if actual != expected:
+		problems.append("%s expected %d got %d" % [label, expected, actual])
+
+func _expect_font_size(problems: Array[String], theme: Theme, type_name: String, slot: String, expected: int) -> void:
+	if not theme.has_font_size(slot, type_name):
+		problems.append("%s.%s font_size missing" % [type_name, slot])
+		return
+	_expect_equal(problems, "%s.%s" % [type_name, slot], theme.get_font_size(slot, type_name), expected)
+
+func _expect_constant(problems: Array[String], theme: Theme, type_name: String, slot: String, expected: int) -> void:
+	if not theme.has_constant(slot, type_name):
+		problems.append("%s.%s constant missing" % [type_name, slot])
+		return
+	_expect_equal(problems, "%s.%s" % [type_name, slot], theme.get_constant(slot, type_name), expected)
+
+func _stylebox_flat(theme: Theme, type_name: String, slot: String) -> StyleBoxFlat:
+	if theme == null or not theme.has_stylebox(slot, type_name):
+		return null
+	var sb := theme.get_stylebox(slot, type_name)
+	return sb as StyleBoxFlat
+
+func _radius_tuple(sb: StyleBoxFlat) -> Array[int]:
+	return [sb.corner_radius_top_left, sb.corner_radius_top_right, sb.corner_radius_bottom_left, sb.corner_radius_bottom_right]
+
+func _theme_type_has_any_entry(theme: Theme, type_name: String) -> bool:
+	return (
+		theme.get_stylebox_list(type_name).size() > 0
+		or theme.get_color_list(type_name).size() > 0
+		or theme.get_constant_list(type_name).size() > 0
+		or theme.get_font_list(type_name).size() > 0
+		or theme.get_font_size_list(type_name).size() > 0
+		or theme.get_icon_list(type_name).size() > 0
+	)
 
 func _read_file(path: String) -> String:
 	var f := FileAccess.open(path, FileAccess.READ)

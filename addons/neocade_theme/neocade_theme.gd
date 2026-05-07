@@ -374,7 +374,7 @@ func _platform_tokens(p: Platform) -> Dictionary:
 			"checkboxSize": 20,
 			"body": 16,
 			"label_": 14,
-			"h1": 32,
+			"h1": 36,
 			"h2": 22,
 			"kicker": 13,
 			"rowMin": 56,
@@ -2899,10 +2899,12 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		if padding_raw != null and typeof(padding_raw) == TYPE_STRING and (padding_raw as String).begins_with("shape."):
 			var pad_lookup: Variant = _lookup_shape(presets, padding_raw)
 			if pad_lookup != null and typeof(pad_lookup) == TYPE_VECTOR2I:
-				_set_content_margin_from_padding(sb, pad_lookup)
+				var density: float = tokens.get("densityScale", 1.0)
+				_set_content_margin_from_padding(sb, Vector2i(int(round(pad_lookup.x * density)), int(round(pad_lookup.y * density))))
 				applied_padding = true
 		elif padding_raw != null and typeof(padding_raw) == TYPE_VECTOR2I:
-			_set_content_margin_from_padding(sb, padding_raw)
+			var density: float = tokens.get("densityScale", 1.0)
+			_set_content_margin_from_padding(sb, Vector2i(int(round((padding_raw as Vector2i).x * density)), int(round((padding_raw as Vector2i).y * density))))
 			applied_padding = true
 		if not applied_padding:
 			# Cross-AI Cycle 2 M2 fix: platform-aware margins. DESKTOP (densityScale=1.0,
