@@ -498,9 +498,10 @@ func assert_popups_menus_stage() -> void:
 	})
 	_assert_tooltip_readability(problems, theme)
 	_assert_popup_shells_no_soft_shadow(problems, theme)
+	_assert_popupmenu_stage(problems, theme)
 
 	if problems.is_empty():
-		_group_ok(group, "Window, popup/dialog shells, Tooltip, and MenuBar production coverage is complete")
+		_group_ok(group, "Window, popup/dialog shells, Tooltip, MenuBar, and PopupMenu production coverage is complete")
 	else:
 		_group_fail(group, "; ".join(problems))
 
@@ -615,6 +616,85 @@ func _assert_popup_shells_no_soft_shadow(problems: Array[String], theme: Theme) 
 			var flat := sb as StyleBoxFlat
 			if flat.shadow_size > 0:
 				problems.append("%s.%s must not use soft shadow_size=%d" % [type_name, slot, flat.shadow_size])
+
+
+func _assert_popupmenu_stage(problems: Array[String], theme: Theme) -> void:
+	_append_missing_slots(problems, theme, "PopupMenu", "stylebox", ["panel", "hover", "separator", "labeled_separator_left", "labeled_separator_right"])
+	_append_missing_slots(problems, theme, "PopupMenu", "color", ["font_accelerator_color", "font_color", "font_disabled_color", "font_hover_color",
+		"font_outline_color", "font_separator_color", "font_separator_outline_color"])
+	_append_missing_slots(problems, theme, "PopupMenu", "constant", ["gutter_compact", "h_separation", "icon_max_width", "indent",
+		"item_end_padding", "item_start_padding", "outline_size", "separator_outline_size", "v_separation"])
+	_append_missing_slots(problems, theme, "PopupMenu", "font", ["font", "font_separator"])
+	_append_missing_slots(problems, theme, "PopupMenu", "font_size", ["font_size", "font_separator_size"])
+	_append_missing_slots(problems, theme, "PopupMenu", "icon", ["checked", "checked_disabled", "radio_checked", "radio_checked_disabled",
+		"radio_unchecked", "radio_unchecked_disabled", "submenu", "submenu_mirrored", "unchecked", "unchecked_disabled"])
+	_assert_no_phase7_font_table_entries(problems, ["PopupMenu"])
+	_assert_direct_font_calls_after_binding_walk(problems, {
+		"PopupMenu.font": "set_font(\"font\", \"PopupMenu\"",
+		"PopupMenu.font_separator": "set_font(\"font_separator\", \"PopupMenu\"",
+		"PopupMenu.font_size": "set_font_size(\"font_size\", \"PopupMenu\"",
+		"PopupMenu.font_separator_size": "set_font_size(\"font_separator_size\", \"PopupMenu\"",
+	})
+	_assert_popupmenu_icon_mapping(problems)
+	_assert_popupmenu_separators(problems, theme)
+	_assert_popupmenu_metrics(problems, theme)
+
+
+func _assert_popupmenu_icon_mapping(problems: Array[String]) -> void:
+	var icon_block: Dictionary = _script_constants().get("BINDING_TABLE", {}).get("PopupMenu", {}).get("icon", {})
+	var expected: Dictionary = EXPECTED_PHASE7_ICON_RECIPES["PopupMenu"]
+	for slot in expected.keys():
+		if not icon_block.has(slot):
+			problems.append("PopupMenu.icon missing canonical slot %s" % String(slot))
+			continue
+		var recipe: Dictionary = icon_block[slot]
+		if recipe.get("icon", "") != expected[slot]:
+			problems.append("PopupMenu.icon %s expected %s got %s" % [String(slot), expected[slot], recipe.get("icon", "")])
+	var reuse_pairs := {
+		"checked_disabled": "checked",
+		"unchecked_disabled": "unchecked",
+		"radio_checked_disabled": "radio_checked",
+		"radio_unchecked_disabled": "radio_unchecked",
+	}
+	for disabled_slot in reuse_pairs.keys():
+		var base_slot: String = reuse_pairs[disabled_slot]
+		if icon_block.has(disabled_slot) and icon_block.has(base_slot):
+			if icon_block[disabled_slot].get("icon", "") != icon_block[base_slot].get("icon", ""):
+				problems.append("PopupMenu.%s must reuse %s artwork" % [String(disabled_slot), base_slot])
+
+
+func _assert_popupmenu_separators(problems: Array[String], theme: Theme) -> void:
+	for slot in ["separator", "labeled_separator_left", "labeled_separator_right"]:
+		if not theme.has_stylebox(slot, "PopupMenu"):
+			continue
+		var sb := theme.get_stylebox(slot, "PopupMenu")
+		if not (sb is StyleBoxFlat):
+			problems.append("PopupMenu.%s separator must be StyleBoxFlat" % slot)
+			continue
+		var flat := sb as StyleBoxFlat
+		if flat.content_margin_left != 0 or flat.content_margin_right != 0 or flat.content_margin_top != 0 or flat.content_margin_bottom != 0:
+			problems.append("PopupMenu.%s separator must have zero content margins" % slot)
+		if flat.bg_color.a > 0.75:
+			problems.append("PopupMenu.%s separator alpha too panel-like: %.2f" % [slot, flat.bg_color.a])
+
+
+func _assert_popupmenu_metrics(problems: Array[String], theme: Theme) -> void:
+	var max_values := {
+		"v_separation": 6,
+		"h_separation": 8,
+		"item_start_padding": 10,
+		"item_end_padding": 10,
+		"indent": 24,
+		"icon_max_width": 24,
+		"outline_size": 1,
+		"separator_outline_size": 1,
+	}
+	for slot in max_values.keys():
+		var value := theme.get_constant(String(slot), "PopupMenu")
+		if value > int(max_values[slot]):
+			problems.append("PopupMenu.%s too loose for desktop density: %d" % [String(slot), value])
+	if theme.get_constant("gutter_compact", "PopupMenu") != 1:
+		problems.append("PopupMenu.gutter_compact must be 1")
 
 
 func _contrast_ratio(a: Color, b: Color) -> float:
