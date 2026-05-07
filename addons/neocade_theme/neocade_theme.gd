@@ -316,6 +316,16 @@ func _regenerate_theme() -> void:
 				# explicitly excludes "font". If they did, _resolve_recipe returns null
 				# (its switch has no font branch), and the value==null check above skips.
 
+	# Phase 7 popup/menu font slots must stay outside BINDING_TABLE. Godot exposes these
+	# as real Theme font/font_size entries, but the binding iterator intentionally has no
+	# font branch and review convergence requires direct calls after the table walk.
+	set_font("title_font", "Window", header_small_font)
+	set_font_size("title_font_size", "Window", tokens.body)
+	set_font("font", "TooltipLabel", body_font)
+	set_font_size("font_size", "TooltipLabel", tokens.body)
+	set_font("font", "MenuBar", body_font)
+	set_font_size("font_size", "MenuBar", tokens.body)
+
 	_last_regeneration_usec = Time.get_ticks_usec() - t0
 	_regenerating = false
 
@@ -1085,17 +1095,14 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 ## Resource model post-Phase-4. The public @export surface + .tres format are stable; only
 ## the internal binding mechanism would change.
 const BINDING_TABLE: Dictionary = {
-	# 1. AcceptDialog — minimal panel + button container constants (Phase 4 baseline)
+	# 1. AcceptDialog — explicit popup shell plus official button-container spacing.
 	"AcceptDialog": {
 		"stylebox": {
-			"panel": {"role": "surface_panel", "raised_intensity": 1},
+			"panel": {"role": "surface_overlay", "raised_intensity": 0,
+					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
 		},
 		"constant": {
 			"buttons_separation": {"value": "tokens.tapPadding"},
-			"margin_top":    {"value": "tokens.tapPadding"},
-			"margin_bottom": {"value": "tokens.tapPadding"},
-			"margin_left":   {"value": "tokens.tapPadding"},
-			"margin_right":  {"value": "tokens.tapPadding"},
 		},
 	},
 	# 2. Button — 6 styleboxes + font colors + h_separation (PITFALLS 10.3 clean states)
@@ -1274,10 +1281,12 @@ const BINDING_TABLE: Dictionary = {
 			"font_disabled_color": {"role": "text_strong", "disabled": true},
 		},
 	},
-	# 8. ConfirmationDialog — same as AcceptDialog
+	# 8. ConfirmationDialog — explicit traceability entry even though Godot exposes no
+	# own slots in the local probe; runtime inheritance still reads this shell cleanly.
 	"ConfirmationDialog": {
 		"stylebox": {
-			"panel": {"role": "surface_panel", "raised_intensity": 1},
+			"panel": {"role": "surface_overlay", "raised_intensity": 0,
+					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
 		},
 		"constant": {
 			"buttons_separation": {"value": "tokens.tapPadding"},
@@ -1507,22 +1516,30 @@ const BINDING_TABLE: Dictionary = {
 			"underline_spacing": {"value": 2},
 		},
 	},
-	# 19. MenuBar — minimal Button-family inheritance + h_separation
+	# 19. MenuBar — low-emphasis menu triggers with complete official colors/metrics.
 	"MenuBar": {
 		"stylebox": {
-			"normal":   {"role": "surface_base", "raised_intensity": 0},
-			"hover":    {"role": "state_hover",  "raised_intensity": 0},
-			"pressed":  {"role": "state_pressed","raised_intensity": 0},
-			"disabled": {"role": "surface_base", "disabled": true},
+			"normal":   {"role": "surface_base", "raised_intensity": 0, "alpha": 0.0,
+						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
+			"hover":    {"role": "state_hover",  "raised_intensity": 0, "alpha": 0.42,
+						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
+			"pressed":  {"role": "state_pressed","raised_intensity": 0, "alpha": 0.70,
+						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
+			"disabled": {"role": "surface_base", "disabled": true, "raised_intensity": 0,
+						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
 		},
 		"color": {
-			"font_color":          {"role": "text_strong"},
-			"font_hover_color":    {"role": "text_strong"},
-			"font_pressed_color":  {"role": "text_strong"},
-			"font_disabled_color": {"role": "text_strong", "disabled": true},
+			"font_color":               {"role": "text_default"},
+			"font_hover_color":         {"role": "text_strong"},
+			"font_pressed_color":       {"role": "text_strong"},
+			"font_focus_color":         {"role": "role_primary"},
+			"font_hover_pressed_color": {"role": "text_strong"},
+			"font_outline_color":       {"role": "outline_color"},
+			"font_disabled_color":      {"role": "text_default", "disabled": true},
 		},
 		"constant": {
-			"h_separation": {"value": "tokens.tapPadding"},
+			"h_separation": {"value": 4},
+			"outline_size": {"value": 0},
 		},
 	},
 	# 20. MenuButton — Button-family states
@@ -1621,10 +1638,11 @@ const BINDING_TABLE: Dictionary = {
 			"radio_unchecked": {"icon": "radio_unchecked"},
 		},
 	},
-	# 24. PopupPanel — 1 stylebox (PITFALLS 1.7 first-class)
+	# 24. PopupPanel — first-class popup Window-boundary shell.
 	"PopupPanel": {
 		"stylebox": {
-			"panel": {"role": "surface_high", "raised_intensity": 1},
+			"panel": {"role": "surface_overlay", "raised_intensity": 0,
+					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
 		},
 	},
 	# 25. ProgressBar — 2 styleboxes
@@ -1790,16 +1808,25 @@ const BINDING_TABLE: Dictionary = {
 			"current_line_color":    {"role": "surface_panel"},
 		},
 	},
-	# 31. TooltipLabel — colors only (NeoCade-additive)
+	# 31. TooltipLabel — readable tooltip text with no offset shadow.
 	"TooltipLabel": {
 		"color": {
-			"font_color": {"role": "text_strong"},
+			"font_color":         {"role": "text_strong"},
+			"font_outline_color": {"role": "outline_color"},
+			"font_shadow_color":  {"role": "surface_base", "alpha": 0.0},
+		},
+		"constant": {
+			"outline_size":    {"value": 0},
+			"shadow_offset_x": {"value": 0},
+			"shadow_offset_y": {"value": 0},
 		},
 	},
-	# 32. TooltipPanel — 1 stylebox (PITFALLS 1.7 first-class)
+	# 32. TooltipPanel — compact first-class tooltip structure.
 	"TooltipPanel": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay", "raised_intensity": 1},
+			"panel": {"role": "surface_overlay", "raised_intensity": 0,
+					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
+					  "padding": Vector2i(8, 5)},
 		},
 	},
 	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
@@ -1989,18 +2016,28 @@ const BINDING_TABLE: Dictionary = {
 			"separation": {"value": 4},
 		},
 	},
-	# 37. Window — 2 stylebox slots (PITFALLS 1.7 first-class)
+	# 37. Window — embedded chrome complete, quiet, and popup-boundary safe.
 	"Window": {
 		"stylebox": {
-			"embedded_border":          {"role": "surface_overlay", "raised_intensity": 1},
-			"embedded_unfocused_border":{"role": "surface_overlay", "raised_intensity": 0},
+			"embedded_border":          {"role": "surface_overlay", "raised_intensity": 0,
+										 "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
+			"embedded_unfocused_border":{"role": "surface_high", "raised_intensity": 0,
+										 "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
 		},
 		"color": {
-			"title_color": {"role": "text_strong"},
+			"title_color":            {"role": "text_strong"},
+			"title_outline_modulate": {"role": "outline_color"},
 		},
 		"constant": {
-			"close_h_offset": {"value": 8},
-			"title_height":   {"value": 28},
+			"close_h_offset":    {"value": 8},
+			"close_v_offset":    {"value": 6},
+			"resize_margin":     {"value": 6},
+			"title_height":      {"value": 32},
+			"title_outline_size":{"value": 0},
+		},
+		"icon": {
+			"close":         {"icon": "close"},
+			"close_pressed": {"icon": "close"},
 		},
 	},
 	# ─── TYPEVAR-01 button variations (Plan 05-03 Task 1) ──────────────────────────────────────
