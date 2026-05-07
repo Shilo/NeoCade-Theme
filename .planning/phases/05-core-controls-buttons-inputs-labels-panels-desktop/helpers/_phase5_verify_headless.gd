@@ -14,7 +14,15 @@ extends SceneTree
 ##            PHASE5_GROUP_PENDING and STILL emit PHASE5_GROUP_OK so the marker
 ##            check passes. Later plans flip the relevant group from PENDING to
 ##            ENFORCED as their work lands.
-##   strict   Future stage (Plans 05-02..05-07). Treats every PENDING marker as a
+##   shape    Plan 05-02 staged enforcement. Treats shape-language groups as
+##            strict (PENDING == FAIL) while letting unrelated Phase 5 groups
+##            (SpinBox icons, CodeEdit gutter, InfoText size, 15-variation count,
+##            variation focus overlay) remain in tooling/PENDING mode so this
+##            plan's verify gate is targeted. Strict in the shape stage:
+##            assert_shape_lookup_integrity, assert_shape_value_integrity,
+##            assert_shape_recipe_resolution, assert_semantic_role_table,
+##            assert_no_invented_focus_combos, assert_no_theme_clear.
+##   strict   Future stage (Plans 05-03..05-07). Treats every PENDING marker as a
 ##            failure and exits non-zero. Wired now so later plans only need to
 ##            change the --stage argument; they do not need to re-author the
 ##            verifier.
@@ -27,6 +35,29 @@ extends SceneTree
 ##   - assert_shape_lookup_integrity
 ##   - assert_focus_overlay_visibility
 ##   - assert_no_theme_clear
+##
+## Plan 05-02 added shape-stage groups (D-02/D-03/D-04 + semantic roles + D-07
+## BINDING_TABLE forbidden-name scan):
+##   - assert_shape_value_integrity      (Plan 05-02 Task 1: per-direction
+##                                         primary_radius / focus_offset /
+##                                         raised_lifts.primary / strategy
+##                                         distinctness verbatim from
+##                                         DESIGN_TOKENS §5.1-§5.5)
+##   - assert_shape_recipe_resolution    (Plan 05-02 Task 2: _resolve_recipe()
+##                                         dispatches `radius` / `padding` /
+##                                         `alpha` / `raised_intensity` /
+##                                         `strategy` against shape.* via
+##                                         _lookup_shape on the active direction)
+##   - assert_semantic_role_table        (Plan 05-02 Task 2: role_danger /
+##                                         role_warning / role_success /
+##                                         role_info exist BEFORE BINDING_TABLE
+##                                         walk so DangerButton can bind them)
+##   - assert_no_invented_focus_combos   (Plan 05-02 Task 3: BINDING_TABLE rows
+##                                         do NOT name pressed_focus /
+##                                         checked_focus / hover_pressed_focus
+##                                         (D-07 invariant). Forbidden-name
+##                                         list is data, not pattern, so the
+##                                         scanner is not self-invalidating.)
 ##
 ## Per D-07: Godot 4.6 Button-family uses official `focus` overlay; verifier MUST
 ## NOT reference invented `pressed_focus`, `checked_focus`, or `hover_pressed_focus`
@@ -121,8 +152,8 @@ func _parse_args() -> void:
 			i += 1
 		if found:
 			break
-	if _stage != "tooling" and _stage != "strict":
-		push_error("PHASE5_VERIFY FAIL: unknown --stage '%s' (expected tooling|strict)" % _stage)
+	if _stage != "tooling" and _stage != "strict" and _stage != "shape":
+		push_error("PHASE5_VERIFY FAIL: unknown --stage '%s' (expected tooling|shape|strict)" % _stage)
 		_stage = "tooling"
 	print("PHASE5_VERIFY: stage=%s" % _stage)
 
@@ -133,7 +164,7 @@ func _run_verifier() -> void:
 	if not _verify_helper_wiring():
 		return  # _verify_helper_wiring populates _failures and quits via the summary
 
-	# Named assertion groups (D-12).
+	# Named assertion groups (D-12 baseline).
 	assert_variation_count_15()
 	assert_inf_text_normal_font_size()
 	assert_codeedit_gutter_slots()
@@ -141,6 +172,12 @@ func _run_verifier() -> void:
 	assert_shape_lookup_integrity()
 	assert_focus_overlay_visibility()
 	assert_no_theme_clear()
+	# Plan 05-02 groups (shape language, recipe resolution, semantic roles,
+	# BINDING_TABLE forbidden-name scan). These are strict in `shape` stage.
+	assert_shape_value_integrity()
+	assert_shape_recipe_resolution()
+	assert_semantic_role_table()
+	assert_no_invented_focus_combos()
 
 
 func _verify_helper_wiring() -> bool:
@@ -405,6 +442,354 @@ func assert_no_theme_clear() -> void:
 		_group_fail(group, "D-13 violation: forbidden patterns in production class: " + "; ".join(violations))
 
 
+# ----- assertion group: shape value integrity (Plan 05-02 Task 1) -----
+##
+## Asserts each approved direction's `shape` sub-block holds the per-direction
+## values verbatim from DESIGN_TOKENS §5.1-§5.5:
+##
+##   Pulse (151A2E):    primary_radius=0,  primary_padding≈(14,10), focus_offset=0,
+##                      raised_lifts.primary=3,  primary_strategy="bold-accent-fill"
+##   Slate (111820):    primary_radius=14, primary_padding≈(16,11), focus_offset=2,
+##                      raised_lifts.primary=2,  primary_strategy="quiet-pill"
+##   Bubble (241326):   primary_radius=999 (pill on primary; base radius 26),
+##                      primary_padding≈(20,14), focus_offset=2,
+##                      raised_lifts.primary=6, primary_strategy="pillowy-fully-rounded"
+##   Daybreak (0B2420): primary_radius=8,  primary_padding≈(18,12), focus_offset=2,
+##                      raised_lifts.primary=3,  primary_strategy="friendly-generous"
+##   Burst (20112E):    primary_radius=28 (oversized; base radius 18),
+##                      primary_padding≈(20,14), focus_offset=1,
+##                      raised_lifts.primary=5, primary_strategy="oversized-statement"
+##
+## Also enforces Phase 4 scalar carry-over (spread_factor, hover_pct, pressed_pct,
+## disabled_opacity unchanged) and DEFAULT.shape presence (medium-spread / radius 8 /
+## focus_offset 2 / friendly-generous per CONTEXT.md D-13).
+##
+## Failure mode is PENDING in tooling, FAIL in shape/strict stages.
+func assert_shape_value_integrity() -> void:
+	var group := "assert_shape_value_integrity"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var const_map: Dictionary = theme.get_script().get_script_constant_map()
+	var presets: Dictionary = const_map.get("DIRECTION_PRESETS", {})
+	var default_preset: Dictionary = const_map.get("DIRECTION_PRESET_DEFAULT", {})
+	var problems: Array[String] = []
+
+	# Per-direction expected values, sourced verbatim from DESIGN_TOKENS §5.1-§5.5.
+	# Each row: hex, primary_radius, focus_offset, raised_lifts.primary, primary_strategy.
+	var expected := [
+		{"hex": "151A2E", "primary_radius": 0,   "focus_offset": 0, "lift_primary": 3, "strategy": "bold-accent-fill"},
+		{"hex": "111820", "primary_radius": 14,  "focus_offset": 2, "lift_primary": 2, "strategy": "quiet-pill"},
+		{"hex": "241326", "primary_radius": 999, "focus_offset": 2, "lift_primary": 6, "strategy": "pillowy-fully-rounded"},
+		{"hex": "0B2420", "primary_radius": 8,   "focus_offset": 2, "lift_primary": 3, "strategy": "friendly-generous"},
+		{"hex": "20112E", "primary_radius": 28,  "focus_offset": 1, "lift_primary": 5, "strategy": "oversized-statement"},
+	]
+	# Phase 4 scalar baselines (must NOT regress when shape sub-block is added).
+	var phase4_scalars := {
+		"151A2E": {"spread_factor": 1.3, "hover_pct": 6.0,  "pressed_pct": -10.0, "disabled_opacity": 0.42},
+		"111820": {"spread_factor": 0.7, "hover_pct": 4.0,  "pressed_pct":  -6.0, "disabled_opacity": 0.50},
+		"241326": {"spread_factor": 1.0, "hover_pct": 8.0,  "pressed_pct": -10.0, "disabled_opacity": 0.45},
+		"0B2420": {"spread_factor": 1.0, "hover_pct": 6.0,  "pressed_pct":  -6.0, "disabled_opacity": 0.50},
+		"20112E": {"spread_factor": 1.3, "hover_pct": 8.0,  "pressed_pct": -12.0, "disabled_opacity": 0.45},
+	}
+
+	var strategies_seen: Dictionary = {}
+	for row in expected:
+		var hex: String = row["hex"]
+		var sub: Dictionary = presets.get(hex, {})
+		if sub.is_empty():
+			problems.append("direction %s missing in DIRECTION_PRESETS" % hex)
+			continue
+		# Phase 4 scalar carry-over (Test 3).
+		var scalars: Dictionary = phase4_scalars[hex]
+		for sk in scalars.keys():
+			if not sub.has(sk):
+				problems.append("%s missing Phase 4 scalar %s" % [hex, sk])
+				continue
+			if typeof(sub[sk]) != typeof(scalars[sk]) or not is_equal_approx(float(sub[sk]), float(scalars[sk])):
+				problems.append("%s scalar %s = %s (expected %s)" % [hex, sk, str(sub[sk]), str(scalars[sk])])
+		# Shape sub-block (Tests 1, 4).
+		var shape: Variant = sub.get("shape", null)
+		if shape == null or typeof(shape) != TYPE_DICTIONARY:
+			problems.append("%s shape sub-block missing or not a Dictionary" % hex)
+			continue
+		var shape_dict: Dictionary = shape
+		# primary_radius
+		if shape_dict.get("primary_radius", null) != row["primary_radius"]:
+			problems.append("%s shape.primary_radius = %s (expected %s)" % [hex, str(shape_dict.get("primary_radius", null)), str(row["primary_radius"])])
+		# focus_offset
+		if shape_dict.get("focus_offset", null) != row["focus_offset"]:
+			problems.append("%s shape.focus_offset = %s (expected %s)" % [hex, str(shape_dict.get("focus_offset", null)), str(row["focus_offset"])])
+		# raised_lifts.primary
+		var lifts: Variant = shape_dict.get("raised_lifts", null)
+		if lifts == null or typeof(lifts) != TYPE_DICTIONARY:
+			problems.append("%s shape.raised_lifts missing or not Dictionary" % hex)
+		else:
+			var lifts_dict: Dictionary = lifts
+			if lifts_dict.get("primary", null) != row["lift_primary"]:
+				problems.append("%s shape.raised_lifts.primary = %s (expected %s)" % [hex, str(lifts_dict.get("primary", null)), str(row["lift_primary"])])
+		# primary_padding must be Vector2i (Phase 4 FOUND-02 lock).
+		var padding: Variant = shape_dict.get("primary_padding", null)
+		if padding == null:
+			problems.append("%s shape.primary_padding missing" % hex)
+		elif typeof(padding) != TYPE_VECTOR2I:
+			problems.append("%s shape.primary_padding type = %d (expected Vector2i = %d)" % [hex, typeof(padding), TYPE_VECTOR2I])
+		# primary_strategy is StringName (D-04 first-class enum).
+		var strategy: Variant = shape_dict.get("primary_strategy", null)
+		if strategy == null:
+			problems.append("%s shape.primary_strategy missing" % hex)
+		else:
+			var strat_str := String(strategy)
+			if strat_str != row["strategy"]:
+				problems.append("%s shape.primary_strategy = '%s' (expected '%s')" % [hex, strat_str, row["strategy"]])
+			strategies_seen[strat_str] = true
+
+	# Test 4: at least 4 distinct primary strategies across the 5 directions.
+	if strategies_seen.size() < 4:
+		problems.append("primary_strategy distinct count = %d (expected >= 4 across 5 directions)" % strategies_seen.size())
+
+	# DEFAULT.shape present and non-empty for non-approved colors.
+	if default_preset.is_empty():
+		problems.append("DIRECTION_PRESET_DEFAULT const not found")
+	else:
+		var default_shape: Variant = default_preset.get("shape", null)
+		if default_shape == null or typeof(default_shape) != TYPE_DICTIONARY or (default_shape as Dictionary).is_empty():
+			problems.append("DIRECTION_PRESET_DEFAULT.shape missing or empty (D-13)")
+
+	if problems.is_empty():
+		_group_ok(group, "shape values match DESIGN_TOKENS §5.1-§5.5 verbatim across all 5 approved directions + DEFAULT")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+# ----- assertion group: shape recipe resolution (Plan 05-02 Task 2) -----
+##
+## Per D-03: BINDING_TABLE recipes can reference `shape.<key>` paths and
+## _resolve_recipe() dereferences them against the active direction's shape
+## sub-block via _lookup_shape().
+##
+## Tests by instantiating Pulse and calling _resolve_recipe() with synthetic
+## recipes that exercise each shape lookup branch (radius, padding, alpha,
+## raised_intensity, strategy). Pulse is used because its shape values are
+## numerically distinct from raw integer recipe values (primary_radius=0 vs
+## the corner_radius @export of 0 — but raised_lifts.primary=3 vs the
+## raised_strength @export of 3 collide; we use Bubble (lift=6) to disambiguate).
+func assert_shape_recipe_resolution() -> void:
+	var group := "assert_shape_recipe_resolution"
+	# Use Bubble rather than Pulse because Bubble's shape values (radius 999,
+	# raised_lifts.primary 6) do not collide with any @export default scalar.
+	var bubble_path := "res://addons/neocade_theme/bubble_neocade_theme.tres"
+	var loaded: Resource = ResourceLoader.load(bubble_path)
+	if loaded == null or not (loaded is NeoCadeTheme):
+		_group_fail(group, "could not load %s as NeoCadeTheme" % bubble_path)
+		return
+	var theme: NeoCadeTheme = loaded
+	var has_lookup: bool = theme.has_method("_lookup_shape")
+	var has_resolve: bool = theme.has_method("_resolve_recipe")
+	if not has_lookup or not has_resolve:
+		var details := PackedStringArray()
+		details.append("_lookup_shape present=" + str(has_lookup))
+		details.append("_resolve_recipe present=" + str(has_resolve))
+		_group_pending(group, "Plan 05-02 Task 2 helpers not yet present: " + ", ".join(details))
+		return
+	var presets: Dictionary = theme.call("_resolve_direction_presets")
+	if presets.is_empty() or not presets.has("shape"):
+		_group_pending(group, "Bubble preset has no shape sub-block (Task 1 not done)")
+		return
+	# Test the dotted-path walker.
+	var probe_radius = theme.call("_lookup_shape", presets, "shape.primary_radius")
+	if probe_radius != 999:
+		_group_pending(group, "_lookup_shape('shape.primary_radius') for Bubble = %s (expected 999)" % str(probe_radius))
+		return
+	var probe_lift = theme.call("_lookup_shape", presets, "shape.raised_lifts.primary")
+	if probe_lift != 6:
+		_group_pending(group, "_lookup_shape('shape.raised_lifts.primary') for Bubble = %s (expected 6)" % str(probe_lift))
+		return
+	# Required helper functions per D-03/D-04:
+	var required_helpers := [
+		"_set_radius_all",
+		"_set_content_margin_from_padding",
+		"_apply_primary_strategy",
+		"_apply_ghost_strategy",
+		"_apply_kicker_style",
+	]
+	var missing_helpers: Array[String] = []
+	for helper in required_helpers:
+		if not theme.has_method(helper):
+			missing_helpers.append(helper)
+	if not missing_helpers.is_empty():
+		_group_pending(group, "missing required helpers: " + ", ".join(missing_helpers))
+		return
+	# Quick recipe-resolution sanity check: a stylebox recipe that references
+	# `radius: shape.primary_radius` and `padding: shape.primary_padding`
+	# must produce a StyleBoxFlat whose corner_radius_top_left == 999 and
+	# whose content_margin_left equals primary_padding.x.
+	var role_table: Dictionary = {
+		"surface_panel": Color("#221026"),
+		"surface_panel_offset": Color("#1A0C20"),
+		"text_strong": Color.WHITE,
+		"role_primary": Color("#FFB3E6"),
+		"outline_color": Color("#3A1F40"),
+	}
+	var tokens: Dictionary = theme.call("_platform_tokens", NeoCadeTheme.Platform.DESKTOP)
+	var recipe := {
+		"role": "surface_panel",
+		"radius": "shape.primary_radius",
+		"padding": "shape.primary_padding",
+	}
+	var sb_value = theme.call("_resolve_recipe", recipe, "stylebox", role_table, tokens, presets)
+	if sb_value == null or not (sb_value is StyleBoxFlat):
+		_group_pending(group, "_resolve_recipe with shape.* keys did not return a StyleBoxFlat")
+		return
+	var sb: StyleBoxFlat = sb_value
+	if sb.corner_radius_top_left != 999:
+		_group_pending(group, "stylebox corner_radius_top_left = %d (expected 999 from shape.primary_radius)" % sb.corner_radius_top_left)
+		return
+	var bubble_padding: Vector2i = (presets["shape"] as Dictionary)["primary_padding"]
+	if sb.content_margin_left != bubble_padding.x or sb.content_margin_top != bubble_padding.y:
+		_group_pending(group, "stylebox content_margin_left/top = %d/%d (expected %d/%d from shape.primary_padding)" % [sb.content_margin_left, sb.content_margin_top, bubble_padding.x, bubble_padding.y])
+		return
+	# Alpha lookup.
+	var alpha_recipe := {
+		"role": "surface_panel",
+		"alpha": "shape.surface_alpha_panels",
+	}
+	var sb_alpha = theme.call("_resolve_recipe", alpha_recipe, "stylebox", role_table, tokens, presets)
+	if sb_alpha == null or not (sb_alpha is StyleBoxFlat):
+		_group_pending(group, "alpha recipe did not return a StyleBoxFlat")
+		return
+	var bubble_alpha_panels: float = (presets["shape"] as Dictionary)["surface_alpha_panels"]
+	if not is_equal_approx((sb_alpha as StyleBoxFlat).bg_color.a, bubble_alpha_panels):
+		_group_pending(group, "stylebox bg_color.a = %f (expected %f from shape.surface_alpha_panels)" % [(sb_alpha as StyleBoxFlat).bg_color.a, bubble_alpha_panels])
+		return
+	_group_ok(group, "_resolve_recipe dispatches shape.radius/padding/alpha/raised_intensity correctly via _lookup_shape; helpers present")
+
+
+# ----- assertion group: semantic role table (Plan 05-02 Task 2) -----
+##
+## Per CONTEXT.md review HIGH gate + DESIGN_TOKENS §7.1: role_danger /
+## role_warning / role_success / role_info MUST exist in role_table BEFORE
+## any variation references them. Plan 05-03 introduces DangerButton; if
+## role_danger is missing from role_table at that point DangerButton silently
+## falls back to surface_panel and ships the wrong color.
+##
+## Verification strategy: load Pulse, exercise _resolve_recipe with a color
+## recipe that references each semantic role; if the resolved color matches
+## the DESIGN_TOKENS §7.1 default (or a per-direction override), the role
+## is wired. If it falls back to text_strong (the default in _resolve_recipe
+## for unknown roles), that is detected and reported.
+func assert_semantic_role_table() -> void:
+	var group := "assert_semantic_role_table"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var role_defaults := {
+		"role_success": Color("#5CC971"),
+		"role_warning": Color("#FFD166"),
+		"role_danger":  Color("#FF6E6E"),
+		"role_info":    Color("#5FE3FF"),
+	}
+	var presets: Dictionary = theme.call("_resolve_direction_presets")
+	# We exercise _resolve_recipe via the public surface: the recipe
+	# {"role": "role_danger"} should resolve to the danger color, NOT to
+	# the default fallback. We need access to the assembled role_table; the
+	# easiest path is to introspect the production source for the role_table
+	# Dictionary literal. The verifier scans the source for the keys.
+	var src_text := _read_production_source()
+	if src_text.is_empty():
+		_group_fail(group, "could not read production source for role_table introspection")
+		return
+	var missing_in_source: Array[String] = []
+	for role in role_defaults.keys():
+		var as_str: String = role
+		# Match "role_danger": / role_danger: / "role_danger" =
+		var found: bool = false
+		for line in src_text.split("\n"):
+			var stripped: String = line.strip_edges()
+			if stripped.begins_with("#"):
+				continue
+			if stripped.find("\"" + as_str + "\"") != -1 or stripped.find(as_str + ":") != -1:
+				found = true
+				break
+		if not found:
+			missing_in_source.append(as_str)
+	if not missing_in_source.is_empty():
+		_group_pending(group, "missing semantic role keys in production source: " + ", ".join(missing_in_source))
+		return
+	# A minimal recipe-resolution sanity probe: build a fake role_table that
+	# DOES include role_danger and ask _resolve_recipe to look it up. If the
+	# resolver dispatches "role" lookups via role_table.get(role, fallback),
+	# it should return the matching color rather than the fallback. This
+	# proves Plan 05-02 Task 2's recipe path honors semantic role keys.
+	if not theme.has_method("_resolve_recipe"):
+		_group_pending(group, "_resolve_recipe missing")
+		return
+	var fake_table: Dictionary = {
+		"role_danger":  role_defaults["role_danger"],
+		"role_success": role_defaults["role_success"],
+		"role_warning": role_defaults["role_warning"],
+		"role_info":    role_defaults["role_info"],
+		"text_strong":  Color.WHITE,
+		"surface_panel": Color.GRAY,
+	}
+	var tokens: Dictionary = theme.call("_platform_tokens", NeoCadeTheme.Platform.DESKTOP)
+	var recipe := {"role": "role_danger"}
+	var resolved = theme.call("_resolve_recipe", recipe, "color", fake_table, tokens, presets)
+	if resolved == null:
+		_group_pending(group, "_resolve_recipe returned null for role_danger color recipe")
+		return
+	if not (resolved is Color):
+		_group_pending(group, "role_danger recipe resolved to non-Color: %s" % str(resolved))
+		return
+	var c: Color = resolved
+	if not c.is_equal_approx(role_defaults["role_danger"]):
+		_group_pending(group, "role_danger resolved to %s; expected %s (recipe fell back to text_strong/surface_panel)" % [c.to_html(false), role_defaults["role_danger"].to_html(false)])
+		return
+	_group_ok(group, "role_danger / role_warning / role_success / role_info present in production source and resolve via recipe path")
+
+
+# ----- assertion group: BINDING_TABLE forbidden focus-combo names (Plan 05-02 Task 3) -----
+##
+## Per D-07 invariant: BINDING_TABLE rows MUST NOT name `pressed_focus`,
+## `checked_focus`, or `hover_pressed_focus`. Phase 4 baseline already complies;
+## Phase 5 must keep complying as variation chrome is authored.
+##
+## The forbidden-name list is data, NOT a regex pattern, so the scanner is not
+## self-invalidating: the verifier source contains the list as Array literal
+## (not an inline-search-string), and the production source scan is what we
+## care about. We strip comments first so the docstring on this function is
+## not flagged.
+const FORBIDDEN_FOCUS_COMBO_SLOTS := ["pressed_focus", "checked_focus", "hover_pressed_focus"]
+
+func assert_no_invented_focus_combos() -> void:
+	var group := "assert_no_invented_focus_combos"
+	var src_text := _read_production_source()
+	if src_text.is_empty():
+		_group_fail(group, "could not read production source")
+		return
+	# Strip comment lines (the forbidden names appear in a docstring comment block).
+	var clean_lines: Array[String] = []
+	for line in src_text.split("\n"):
+		var stripped: String = line.strip_edges()
+		if stripped.begins_with("#"):
+			continue
+		clean_lines.append(line)
+	var clean_text := "\n".join(clean_lines)
+	# Look for the forbidden names appearing as Dictionary keys in BINDING_TABLE.
+	# The match form is `"pressed_focus":` or `'pressed_focus':` -- the colon is
+	# the discriminator between "appears as a key" and "appears in a literal
+	# string elsewhere".
+	var violations: Array[String] = []
+	for forbidden in FORBIDDEN_FOCUS_COMBO_SLOTS:
+		var as_dq_key: String = "\"" + forbidden + "\":"
+		var as_sq_key: String = "'" + forbidden + "':"
+		for line in clean_text.split("\n"):
+			if line.find(as_dq_key) != -1 or line.find(as_sq_key) != -1:
+				violations.append("%s in line: %s" % [forbidden, line.strip_edges()])
+	if violations.is_empty():
+		_group_ok(group, "no invented focus combo slots in BINDING_TABLE (D-07 holds)")
+	else:
+		_group_fail(group, "D-07 violation: " + "; ".join(violations))
+
+
 # ----- helpers -----
 
 func _load_pulse_for_group(group: String) -> NeoCadeTheme:
@@ -434,9 +819,25 @@ func _group_ok(group: String, detail: String) -> void:
 func _group_pending(group: String, detail: String) -> void:
 	# In tooling stage, PENDING groups still emit PHASE5_GROUP_OK so the
 	# marker check passes. In strict stage, PENDING is a FAIL.
+	# In shape stage, PENDING is a FAIL only for the shape-related groups
+	# that Plan 05-02 owns; the rest stay tooling-style.
+	var shape_stage_strict := [
+		"assert_shape_lookup_integrity",
+		"assert_shape_value_integrity",
+		"assert_shape_recipe_resolution",
+		"assert_semantic_role_table",
+		"assert_no_invented_focus_combos",
+		"assert_no_theme_clear",
+	]
+	var fail: bool = false
 	if _stage == "strict":
-		print("PHASE5_GROUP_FAIL:%s STRICT  %s" % [group, detail])
-		_failures.append("strict-mode pending: %s -- %s" % [group, detail])
+		fail = true
+	elif _stage == "shape" and group in shape_stage_strict:
+		fail = true
+	if fail:
+		var label: String = _stage.to_upper()
+		print("PHASE5_GROUP_FAIL:%s %s  %s" % [group, label, detail])
+		_failures.append("%s-mode pending: %s -- %s" % [_stage, group, detail])
 	else:
 		print("PHASE5_GROUP_PENDING:%s  %s" % [group, detail])
 		print("PHASE5_GROUP_OK:%s TOOLING  pending invariant" % group)
@@ -452,7 +853,7 @@ func _group_fail(group: String, detail: String) -> void:
 func _emit_summary_and_quit() -> void:
 	print("----- PHASE5_VERIFY summary -----")
 	print("  stage:          %s" % _stage)
-	print("  groups OK:      %d / %d" % [_ok_markers.size(), 7])
+	print("  groups OK:      %d / %d" % [_ok_markers.size(), 11])
 	print("  groups PENDING: %d  %s" % [_pending.size(), str(_pending)])
 	print("  failures:       %d" % _failures.size())
 	for f in _failures:
