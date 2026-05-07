@@ -152,16 +152,18 @@ func _regenerate_theme() -> void:
 	# The locals above are the precomputed inputs every entry-population path consumes.
 	# Iteration is additive only; no Theme reset is permitted in this method (D-01 invariant).
 
-	# ── Theme defaults (Cross-AI Cycle 1 C3 fix + Cycle 6 F6 fix 2026-05-06; FONT-06 closure) ──
+	# ── Theme defaults (Cross-AI Cycle 1 C3 fix + Cycle 6 F6 fix; BL-01 fix 2026-05-06) ──
 	# Set the theme-level default_font + default_font_size BEFORE the BINDING_TABLE walk
 	# so any Control type without an explicit per-type font entry still renders in Inter.
-	# F6 fix: default_font is the FontFile (Inter-Variable.tres), NOT a FontVariation.
+	# BL-01 fix: load Inter-Variable.ttf directly (Godot 4 imports .ttf as FontFile via
+	# the .import sidecar). Previously preloaded Inter-Variable.tres which round-tripped
+	# the binary as PackedByteArray, doubling the bundle size.
 	# FontVariation and FontFile both extend Font but are NOT cast-compatible — Plan 04-08
 	# README's `theme.default_font as FontFile` only works if default_font IS a FontFile.
 	# Per FONT-06: "Theme default_font is Inter Variable Roman; default_font.fallbacks = []"
-	# — implies FontFile (the .ttf wrapper). Inter-Body.tres (FontVariation wght=400) is
-	# used below for explicit set_font calls on body-weight Controls/variations.
-	var inter_file := preload("res://addons/neocade_theme/fonts/Inter-Variable.tres") as FontFile
+	# — implies FontFile. Inter-Body.tres (FontVariation wght=400) is used below for
+	# explicit set_font calls on body-weight Controls/variations.
+	var inter_file := preload("res://addons/neocade_theme/fonts/Inter-Variable.ttf") as FontFile
 	default_font = inter_file
 	default_font_size = tokens.body
 	var body_font := preload("res://addons/neocade_theme/fonts/Inter-Body.tres") as FontVariation
@@ -182,7 +184,9 @@ func _regenerate_theme() -> void:
 	set_font("font", "HeaderSmall",  header_small_font)
 	set_font("font", "Caption",      caption_font)
 	set_font("font", "CodeLabel",    body_font)   # consumer can override to a mono per FONT-04 stricken
-	set_font("font", "InfoText",     body_font)
+	# BL-02 fix 2026-05-06: InfoText is a RichTextLabel variation; RTL reads `normal_font`,
+	# not `font` — the `font` slot was silently ignored, falling back to default_font.
+	set_font("normal_font", "InfoText", body_font)
 	set_font("font", "PrimaryButton",   body_font)
 	set_font("font", "SecondaryButton", body_font)
 	set_font("font", "GhostButton",     body_font)
