@@ -1,0 +1,264 @@
+Phase 7 Official Slot Freeze
+============================
+
+Generated for: Phase 07 Plan 01 Task 1
+Engine: Godot 4.6.2.stable.mono.official.71f334935
+Source log: .planning/phases/07-dialogs-popups-advanced-window-popups-menubar-colorpicker-gr/logs/07-research-slot-probe.log
+Probe command provenance: local Godot 4.6.2 headless ThemeDB default-theme introspection
+
+Known stale names intentionally absent:
+- FileDialog color: icon_normal_color
+- FileDialog icon: file_up
+- GraphEdit/GraphNode/GraphFrame invented focus-combo styleboxes: panel_selected_focus, slot_focus, titlebar_focus
+
+Canonical icon filename families:
+- PopupMenu submenu slots use popup_submenu and popup_submenu_mirrored.
+- FileDialog official icon slots use filedialog_<slot>.
+- ColorPicker official icon slots use colorpicker_<slot>; ColorPickerButton bg uses colorpicker_button_bg.
+- GraphEdit/GraphNode/GraphFrame official icon slots use graph_<slot>.
+- Existing generic reuse is allowlisted only for Window close/close_pressed and PopupMenu check/radio base/disabled slots.
+
+Window
+------
+stylebox:
+embedded_border, embedded_unfocused_border
+
+color:
+title_color, title_outline_modulate
+
+constant:
+close_h_offset, close_v_offset, resize_margin, title_height, title_outline_size
+
+font:
+title_font
+
+font_size:
+title_font_size
+
+icon:
+close, close_pressed
+
+PopupPanel
+----------
+stylebox:
+panel
+
+color:
+
+constant:
+
+font:
+
+font_size:
+
+icon:
+
+PopupMenu
+---------
+stylebox:
+hover, labeled_separator_left, labeled_separator_right, panel, separator
+
+color:
+font_accelerator_color, font_color, font_disabled_color, font_hover_color, font_outline_color, font_separator_color, font_separator_outline_color
+
+constant:
+gutter_compact, h_separation, icon_max_width, indent, item_end_padding, item_start_padding, outline_size, separator_outline_size, v_separation
+
+font:
+font, font_separator
+
+font_size:
+font_separator_size, font_size
+
+icon:
+checked, checked_disabled, radio_checked, radio_checked_disabled, radio_unchecked, radio_unchecked_disabled, submenu, submenu_mirrored, unchecked, unchecked_disabled
+
+AcceptDialog
+------------
+stylebox:
+panel
+
+color:
+
+constant:
+buttons_separation
+
+font:
+
+font_size:
+
+icon:
+
+ConfirmationDialog
+------------------
+stylebox:
+
+color:
+
+constant:
+
+font:
+
+font_size:
+
+icon:
+
+FileDialog
+----------
+stylebox:
+
+color:
+file_disabled_color, file_icon_color, folder_icon_color
+
+constant:
+thumbnail_size
+
+font:
+
+font_size:
+
+icon:
+back_folder, clear, create_folder, favorite, favorite_down, favorite_up, file, file_thumbnail, folder, folder_thumbnail, forward_folder, list_mode, load, parent_folder, reload, save, sort, thumbnail_mode, toggle_filename_filter, toggle_hidden
+
+TooltipPanel
+------------
+stylebox:
+panel
+
+color:
+
+constant:
+
+font:
+
+font_size:
+
+icon:
+
+TooltipLabel
+------------
+stylebox:
+
+color:
+font_color, font_outline_color, font_shadow_color
+
+constant:
+outline_size, shadow_offset_x, shadow_offset_y
+
+font:
+font
+
+font_size:
+font_size
+
+icon:
+
+MenuBar
+-------
+stylebox:
+disabled, hover, normal, pressed
+
+color:
+font_color, font_disabled_color, font_focus_color, font_hover_color, font_hover_pressed_color, font_outline_color, font_pressed_color
+
+constant:
+h_separation, outline_size
+
+font:
+font
+
+font_size:
+font_size
+
+icon:
+
+ColorPicker
+-----------
+stylebox:
+picker_focus_circle, picker_focus_rectangle, sample_focus
+
+color:
+focused_not_editing_cursor_color
+
+constant:
+center_slider_grabbers, h_width, label_width, margin, sv_height, sv_width
+
+font:
+
+font_size:
+
+icon:
+add_preset, bar_arrow, color_hue, color_script, expanded_arrow, folded_arrow, menu_option, overbright_indicator, picker_cursor, picker_cursor_bg, sample_bg, sample_revert, screen_picker, shape_circle, shape_rect, shape_rect_wheel
+
+ColorPickerButton
+-----------------
+stylebox:
+disabled, focus, hover, normal, pressed
+
+color:
+font_color, font_disabled_color, font_focus_color, font_hover_color, font_outline_color, font_pressed_color
+
+constant:
+h_separation, outline_size
+
+font:
+font
+
+font_size:
+font_size
+
+icon:
+bg
+
+GraphEdit
+---------
+stylebox:
+menu_panel, panel, panel_focus
+
+color:
+activity, connection_hover_tint_color, connection_rim_color, connection_valid_target_tint_color, grid_major, grid_minor, selection_fill, selection_stroke
+
+constant:
+connection_hover_thickness, port_hotzone_inner_extent, port_hotzone_outer_extent
+
+font:
+
+font_size:
+
+icon:
+grid_toggle, layout, minimap_toggle, snapping_toggle, zoom_in, zoom_out, zoom_reset
+
+GraphNode
+---------
+stylebox:
+panel, panel_focus, panel_selected, slot, slot_selected, titlebar, titlebar_selected
+
+color:
+resizer_color
+
+constant:
+port_h_offset, separation
+
+font:
+
+font_size:
+
+icon:
+port, resizer
+
+GraphFrame
+----------
+stylebox:
+panel, panel_selected, titlebar, titlebar_selected
+
+color:
+resizer_color
+
+constant:
+
+font:
+
+font_size:
+
+icon:
+resizer
