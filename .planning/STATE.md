@@ -4,8 +4,8 @@ milestone: v1.0.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 4 Plan 06 complete (Pulse `.tres` + dual EditorScript+headless verification helpers; atomic commit `a3e219f`)
-last_updated: "2026-05-06T17:18:00.000Z"
-last_activity: 2026-05-06
+last_updated: "2026-05-07T00:29:25.546Z"
+last_activity: 2026-05-07
 progress:
   total_phases: 15
   completed_phases: 6
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-05-06)
 ## Current Position
 
 Phase: 04 (foundation-neocadetheme-superclass-per-theme-subclasses-font) — EXECUTING
-Plan: 7 of 8 (Plans 04-01 + 04-02 + 04-03 + 04-04 + 04-05 + 04-06 complete; next is Plan 04-07 Slate/Bubble/Daybreak/Burst peer `.tres` files + main.tscn theme assignment)
+Plan: 8 of 8 (Plans 04-01 + 04-02 + 04-03 + 04-04 + 04-05 + 04-06 complete; next is Plan 04-07 Slate/Bubble/Daybreak/Burst peer `.tres` files + main.tscn theme assignment)
 Next: `/gsd-execute-phase 04` continues with Plan 04-07 (peer direction `.tres` files)
 Status: Ready to execute
-Last activity: 2026-05-06
+Last activity: 2026-05-07
 
 Progress: [█████████░] 90%
 
@@ -75,6 +75,7 @@ Progress: [█████████░] 90%
 | Phase 04 P03 | ~7 min | 3 tasks | 20 files (10 SVG + 10 .import sidecars, all A) |
 | Phase 04 P05 | ~25 min | 5 tasks | 3 files (1 M neocade_theme.gd +940 net, 2 A helpers) |
 | Phase 04 P06 | ~18 min | 3 tasks | 4 files (1 A pulse_neocade_theme.tres, 2 A verify helpers, 1 M _phase4_import.gd +148 net) |
+| Phase 04 P07 | 12min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -99,6 +100,7 @@ Recent decisions affecting current work:
 - Phase 4 Plan 04 (2026-05-06): Color formulas + role tokens ported into NeoCadeTheme — `_mix` / `_tint_toward_base` color helpers, `_resolve_platform` / `_platform_tokens` platform helpers, `_make_raised_stylebox` raised helper, `DIRECTION_PRESETS` per-direction non-exported parameters keyed by uppercased base_color hex (Pulse=1.3 wide / Slate=0.7 narrow / Bubble=1.0 / Daybreak=1.0 / Burst=1.3 — Cycle 6 F1 reconciliation), `DIRECTION_PRESET_DEFAULT` for custom themes (`disabled_opacity=0.38` legacy fallback), `_resolve_direction_presets()` lookup, and the per-call derivation block in `_regenerate_theme()` (5-stop surface ramp + tinted offsets + text colors + state-layer overlays + role tokens). 277 lines total. D-01 invariant preserved. Atomic commit `be370d6`.
 - Phase 4 Plan 05 (2026-05-06): BINDING_TABLE + iteration engine + 14 type variations — `TYPE_VARIATIONS` (14 entries, CodeLabel INCLUDED per Cycle 1 C4), `CANONICAL_SLOT_NAMES` 22-Control slot-name freeze (Cycle 2 C1; closes verifier accuracy gap), `BINDING_TABLE` 37-key canonical scorecard freeze (Cycle 1 C1) with recipe-as-Dictionary entries (`{"role":..., "raised_intensity":..., "disabled":...}`), `_resolve_recipe()` helper with 5 branches (stylebox/color/constant/font_size/icon — NO font branch per Cycle 2 N1), Cycle 2 C2 fix sourcing disabled_opacity from per-direction presets (no hard-coded 0.38), Cycle 2 M2 fix wiring `tokens.densityScale + tokens.tapPadding` into content_margin (MOBILE > DESKTOP), Cycle 6 F6 fix using FontFile (not FontVariation) for `theme.default_font`, Cycle 6 F4 fix using `checked`/`unchecked` (not `on`/`off`) for CheckButton icon slots. 1216 lines total (+939 net). 10 Button-family icons wired to CheckBox/CheckButton/OptionButton/LineEdit/PopupMenu. `helpers/_phase4_introspect.gd` build-time empirical seed generator + `helpers/BINDING_TABLE_SEED.txt` documented placeholder (Godot CLI unavailable). D-01 invariant preserved. Atomic commit `d9e405a`. FOUND-02 + ICON-02 → Complete for Phase 4 baseline.
 - Phase 4 Plan 06 (2026-05-06): Pulse `.tres` (recommended starter direction) + dual verification helpers — `addons/neocade_theme/pulse_neocade_theme.tres` (445 bytes, form-2 serialization: `[gd_resource type="Theme" script_class="NeoCadeTheme"]` + `[ext_resource type="Script"]` + `script = ExtResource(...)` inside `[resource]` — script linkage preserved per Cycle 4 N5 so the file loads as a `NeoCadeTheme` instance; SC#6 data-only by construction at < 2 KiB). `_phase4_import.gd` extended with `_save_pulse_tres()` + static `_strip_theme_entries(path)` (Cycle 3 N4 Fix A) + static `_strip_load_steps_attr(header_line)` (Cycle 4 N5 RegEx helper). Dual `.planning/phases/04-.../helpers/_phase4_verify.gd` (EditorScript) + `_phase4_verify_headless.gd` (SceneTree headless) with shared assertion battery: 9-@export check, BINDING_TABLE.size() == 37 (C1), TYPE_VARIATIONS.size() == 14 with CodeLabel (C4), CANONICAL_SLOT_NAMES iteration (C1), 0.42 disabled-alpha (C2), MOBILE > DESKTOP margin (M2), Pulse vs Slate spread differentiation (L2), per-direction hover/pressed/disabled value freeze (Cycle 6 F1). Cycle 6 F3 path discipline preserved: addon root contains exactly 1 `.gd` file (`neocade_theme.gd`); helpers under `.planning/phases/04-.../helpers/`. Godot CLI unavailable in executor environment — Pulse `.tres` hand-authored to byte-identical form per BINDING_TABLE_SEED.txt precedent (Plan 04-05 Cycle 6 F7 fallback); generator pass wired and ready for first run on Godot-equipped machine. Atomic commit `a3e219f`. FOUND-03 → Complete.
+- [Phase ?]: Phase 4 Plan 07 (2026-05-06): Peer direction .tres files (Slate/Bubble/Daybreak/Burst) shipped per DESIGN_TOKENS §5.2-§5.5 — _phase4_import.gd extended with _save_peer_tres() (Cycle 2 M1: declared AND called inside _init()); _phase4_verify.gd + _phase4_verify_headless.gd extended with peer-load battery closing the Cycle 2 M3 gap (each peer loaded, asserted is NeoCadeTheme, has_stylebox(normal, Button), and spread_factor matched against DIRECTION_PRESETS 0.7/1.0/1.0/1.3); main.tscn theme override restored to pulse_neocade_theme.tres (CONTEXT.md D-13 recommended starter; Plan 04-01 Cycle 6 F2 fix had cleared it). Godot CLI unavailable in executor; peer .tres hand-authored byte-aligned with _save_peer_tres+_strip_theme_entries output (Plan 04-06 Cycle 6 F7 fallback precedent). Atomic commit a39c4aa. FOUND-03 5-direction set complete.
 
 ### Pending Todos
 
@@ -129,9 +131,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-06T17:18:00.000Z
+Last session: 2026-05-07T00:29:17.370Z
 Stopped at: Phase 4 Plan 06 complete (Pulse `.tres` + dual EditorScript+headless verification helpers; atomic commit `a3e219f`)
-Resume file: .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-07-peer-tres-and-main-tscn-PLAN.md (when authored)
+Resume file: None
 
 ## Phase 3.4 Plan 02 redirect (2026-05-06b)
 
