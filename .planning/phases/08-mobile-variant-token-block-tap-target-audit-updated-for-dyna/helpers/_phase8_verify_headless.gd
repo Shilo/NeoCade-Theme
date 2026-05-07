@@ -211,7 +211,31 @@ func assert_docs_stage() -> void:
 		_group_fail(group, "; ".join(problems))
 
 func assert_scene_toggle_stage() -> void:
-	_group_pending("scene-toggle", "Plan 08-05 owns runtime toggle proof")
+	var group := "scene-toggle"
+	var problems: Array[String] = []
+	var scene := _read_file("res://main.tscn")
+	var script := _read_file("res://scripts/phase8_platform_toggle.gd")
+	if scene.find("scripts/phase8_platform_toggle.gd") == -1:
+		problems.append("main.tscn does not reference scripts/phase8_platform_toggle.gd")
+	if scene.find("pulse_neocade_theme.tres") == -1:
+		problems.append("main.tscn does not keep Pulse theme as initial theme")
+	for token in [
+		"NeoCadeTheme.Platform.DESKTOP",
+		"NeoCadeTheme.Platform.MOBILE",
+		"NeoCadeTheme.Platform.AUTO",
+		"pulse_neocade_theme.tres",
+		"theme = _theme",
+		"_theme.raised",
+	]:
+		if script.find(token) == -1:
+			problems.append("phase8_platform_toggle.gd missing token: %s" % token)
+	for control_name in ["Button.new()", "LineEdit.new()", "CheckBox.new()", "OptionButton.new()", "TabBar.new()"]:
+		if script.find(control_name) == -1:
+			problems.append("phase8_platform_toggle.gd missing representative control: %s" % control_name)
+	if problems.is_empty():
+		_group_ok(group, "main.tscn wires a minimal Pulse platform/raised toggle proof outside the addon root")
+	else:
+		_group_fail(group, "; ".join(problems))
 
 func assert_full_stage() -> void:
 	if _pending.is_empty():
