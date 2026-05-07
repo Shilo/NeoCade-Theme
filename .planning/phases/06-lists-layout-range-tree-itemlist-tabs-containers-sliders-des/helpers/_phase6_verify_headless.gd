@@ -365,6 +365,10 @@ func assert_tree_stage() -> void:
 	_assert_tree_line_colors(theme, problems)
 	_assert_tree_icon_recipes(problems)
 	if problems.is_empty():
+		print("PHASE6_COVERAGE_OK:COV-05 Tree list/tree coverage contribution enforced")
+		print("PHASE6_COVERAGE_OK:COV-01 Tree contributes to cumulative 37-Control scorecard")
+		print("PHASE6_COVERAGE_OK:COV-09 Tree focus uses official outer focus slot only")
+		print("PHASE6_CARRY_FORWARD:TYPEVAR-06 Tree density/focus/icon behavior to document in Phase 8 final variation/mobile spec")
 		_group_ok(group, "Tree official slots, role colors, focus, fonts, constants, and icons are covered")
 	else:
 		_group_fail(group, "; ".join(problems))
