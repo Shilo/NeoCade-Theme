@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
-status: phase_boundary
-stopped_at: Phase 8 verified complete; stop at Phase 9 boundary and run /clear before Phase 9
-last_updated: "2026-05-07T12:41:42.473Z"
-last_activity: 2026-05-07 -- Phase 08 verification complete
+status: autonomous_complete
+stopped_at: Phase 11 verification complete; UAT/manual device checks deferred per user instruction
+last_updated: "2026-05-07T23:59:00.000Z"
+last_activity: 2026-05-07 -- Phases 09-11 completed autonomously; release workflow prepared
 progress:
   total_phases: 15
-  completed_phases: 12
-  total_plans: 64
-  completed_plans: 61
-  percent: 95
+  completed_phases: 14
+  total_plans: 67
+  completed_plans: 64
+  percent: 96
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-06)
 
 **Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships **5 approved data-only direction `.tres` files** (Pulse, Slate, Bubble, Daybreak, Burst) of type `NeoCadeTheme`, plus one concrete `addons/neocade_theme/neocade_theme.gd` class. Consumer toggles `raised` / `platform` / `base_color` / `accent_color` exports for flat/raised × desktop/mobile/AUTO variations — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect). **Dynamic-theme architecture** feasibility-validated 2026-05-06 (Phase 3.2 strict gate 6/6 PASS in Godot 4.6.2), then simplified 2026-05-06e/f: single concrete `@tool class_name NeoCadeTheme extends Theme`, 9 exports, luminance-derived `is_light`, no subclasses, no `_dev/`, no `themes/`, no root `.tres`, no `neocade_mobile_theme.tres`.
-**Current focus:** Phase 09 — showcase-+-token-gallery-+-theme/variation-toggles-(updated-for-dynamic-architecture)
+**Current focus:** Milestone implementation complete through Phase 11. Manual screenshot/device/UAT checks are deferred and documented.
 
 ## Current Position
 
-Phase: 9
-Plan: Not started
-Next: `/clear`
-Status: Phase boundary — Phase 8 verified; clear before starting Phase 9
-Last activity: 2026-05-07 -- Phase 08 verification complete
+Phase: 11
+Plan: Complete
+Next: Manual release/UAT when ready
+Status: Autonomous chain complete — Phases 09, 10, and 11 verified with deferred UAT
+Last activity: 2026-05-07 -- Phase 11 verification complete
 
-Progress: [███████████████████░] 61/64 plans (95%)
+Progress: [███████████████████░] 64/67 plans (96%; redirected Phase 3 historical partial remains preserved)
 
 ## Performance Metrics
 

@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (Phase 9 — Showcase)
+
+- Live `res://main.tscn` showcase implemented with nine sections: Buttons,
+  Text Inputs, Numbers & Range, Selection & Lists, Containers & Layout,
+  Dialogs & Popups, Advanced & Graph, Token Gallery, and Coverage 37/37.
+- Runtime showcase controls for Pulse / Slate / Bubble / Daybreak / Burst /
+  Godot default, `raised` flat/raised variation, and `platform`
+  Desktop/Mobile/Auto mode.
+- BBCode demo with bold/color/italic/code markup, multi-script label sample,
+  token swatches, type samples, radius scale, and coverage verification strip.
+- `accessibility_name` metadata wiring on programmatically created interactive
+  showcase Controls.
+- `export_presets.cfg` with Web, Windows, Linux, macOS, Android, and iOS named
+  presets for QA and release automation.
+
+### Added (Phase 10 — QA package)
+
+- Static QA reports for contrast, focus, coverage, export readiness,
+  fresh-install dry-run checklist, and deferred manual/device UAT matrix.
+- `CONTRIBUTING.md` documentation warning maintainers to avoid Control
+  inspector theme editing and to use the dedicated Theme editor or
+  `NeoCadeTheme` regeneration flow.
+
+### Added (Phase 11 — Distribution)
+
+- GitHub Actions release workflow for one-click manual releases: CI import,
+  showcase open, version bump, changelog slice extraction, addon archive,
+  Web showcase export, GitHub Pages deployment, and GitHub Release publication.
+
 ### Added (Phase 4 — Foundation)
 
 - Single concrete `@tool class_name NeoCadeTheme extends Theme` class
@@ -114,7 +143,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ScrollBar, TabBar — Phases 6/7.
 - Mobile-branch tap-target audit + `MOBILE-DESIGN-SPEC.md` deliverable —
   Phase 8.
-- Showcase scene with theme picker + raised toggle + platform selector —
-  Phase 9.
 - Asset Library submission — REJECTED for v1 (DIST-05 stricken); v1 ships
   GitHub-Releases-only.

@@ -22,15 +22,15 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3.1: Source-Dive — Material Design 3, MD3 Expressive, and Flat-3D Game UI Research (INSERTED 2026-05-04)** - Exhaustive research on Material Design 3 (current spec: color/type/shape/motion/components/dynamic-color/surface-tinting), MD3 Expressive (newer evolution), and the "Flat-3D Game UI" / "Extruded Flat UI" pattern as exemplified by the user's itch.io references. Produces `.planning/research/MD3-RESEARCH.md` + `.planning/research/FLAT-3D-UI-RESEARCH.md`. **Parallel-eligible with Phase 3.2.** No mockups, no `.tres` work; pure research. (completed 2026-05-06)
 - [x] **Phase 3.2: Source-Dive — Godot Dynamic Theme Architecture Research (INSERTED 2026-05-04 architecture revision)** - **Feasibility validation FIRST**, then architecture recipe. Reverse-engineered Godot's editor theme (`editor/themes/editor_theme_manager.cpp`) for the `base_color`/`accent_color`/`contrast` → theme entries flow, ported the relevant `godot-minimal-theme` formula ideas to export-driven theme generation, and validated the dynamic Theme spike at `.planning/spikes/dynamic-theme/`. Produces `.planning/research/GODOT-DYNAMIC-THEME-RESEARCH.md` + spike + SOURCES.md Section 13. Completed 2026-05-06; later simplified by the 2026-05-06e/f single-class data-driven architecture.
 - [x] **Phase 3.3: Theme Direction Research — 5 Flat-MD3 Candidate Directions (INSERTED 2026-05-04 theme-direction insertion)** - Derived and text-approved 5 dark flat-MD3/extruded-flat directions: Pulse, Slate, Bubble, Daybreak, Burst. All five pass anti-cyberpunk, anti-texture, dark-mode, and WCAG checks. Output: `.planning/research/THEME-DIRECTIONS.md` + SOURCES.md Section 14. Completed 2026-05-06.
-- [~] **Phase 3.4: Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat) (INSERTED 2026-05-04; was Phase 3.2 → 3.3 before theme-direction insertion)** - Mockups for the 5 approved directions from Phase 3.3. Plan 02 re-execution produced 15 Stage 1 concept PNGs and closed the selection gate: **Pulse is the v1 recommended starter / implementation priority; Slate, Bubble, Daybreak, and Burst still ship as v1 personality variations.** Plan 03 built the full-fidelity Pulse 4-grid (flat × raised × desktop × mobile), full Control/state coverage matrix, color override preview row, and render-check audit, and is now paused at the user final approval gate (`final-approval.md` missing). Hard gate before Phase 4.
-- [ ] **Phase 4: Foundation — Single `NeoCadeTheme` Class + Data-Only Direction `.tres` Files + Fonts + Icons (UPDATED 2026-05-06f)** - Implements `addons/neocade_theme/neocade_theme.gd` as the single concrete `@tool class_name NeoCadeTheme extends Theme` with the finalized 9-property export set. Ships 5 data-only direction resources at the addon root (`pulse_neocade_theme.tres`, `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`, `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`) plus Inter Variable Roman and bespoke SVG icons. No subclasses, no per-direction `.gd`, no `_dev/`, no `themes/`, no root `neocade_theme.tres`, no `neocade_mobile_theme.tres`.
+- [x] **Phase 3.4: Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat) (INSERTED 2026-05-04; was Phase 3.2 → 3.3 before theme-direction insertion)** - Mockups for the 5 approved directions from Phase 3.3 closed the revised gate. **Pulse is the v1 recommended starter / implementation priority; Slate, Bubble, Daybreak, and Burst still ship as v1 personality variations.** `DESIGN_TOKENS.md` is finalized and Phase 4 has consumed it.
+- [x] **Phase 4: Foundation — Single `NeoCadeTheme` Class + Data-Only Direction `.tres` Files + Fonts + Icons (UPDATED 2026-05-06f)** - Implements `addons/neocade_theme/neocade_theme.gd` as the single concrete `@tool class_name NeoCadeTheme extends Theme` with the finalized 9-property export set. Ships 5 data-only direction resources at the addon root (`pulse_neocade_theme.tres`, `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`, `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`) plus Inter Variable Roman and bespoke SVG icons. No subclasses, no per-direction `.gd`, no `_dev/`, no `themes/`, no root `neocade_theme.tres`, no `neocade_mobile_theme.tres`.
 - [x] **Phase 5: Core Controls — Buttons, Inputs, Labels, Panels (desktop)** - 7 BaseButton family + 5 text classes + Label/RichTextLabel + Panel/PanelContainer with type variations (completed 2026-05-07)
 - [x] **Phase 6: Lists, Layout, Range — Tree, ItemList, Tabs, Containers, Sliders (desktop)** - Tree (16 styleboxes/12 icons) + ItemList + TabBar/TabContainer + range controls + container chrome (completed 2026-05-07)
-- [ ] **Phase 7: Dialogs, Popups, Advanced — Window, Popups, MenuBar, ColorPicker, Graph (desktop)** - Popup-class controls themed as first-class types + ColorPicker (16 icons) + Graph stack
+- [x] **Phase 7: Dialogs, Popups, Advanced — Window, Popups, MenuBar, ColorPicker, Graph (desktop)** - Popup-class controls themed as first-class types + ColorPicker (16 icons) + Graph stack (completed 2026-05-07)
 - [x] **Phase 8: Mobile Variant Authoring** - mobile-sizing branch in `NeoCadeTheme._regenerate_theme()` (triggered by `@export platform=MOBILE`), tap-target audit, MOBILE-DESIGN-SPEC.md *(no separate `neocade_mobile_theme.tres`; mobile is a platform export on the single concrete class)* (completed 2026-05-07)
-- [ ] **Phase 9: Showcase + Token Gallery + Theme/Variation Toggles** - `res://main.tscn` with 9 sections + theme picker (Pulse/Slate/Bubble/Daybreak/Burst + Godot default), raised toggle, and platform selector
-- [ ] **Phase 10: QA + Cross-Platform Export Validation** - Dual-renderer screenshot pass, accessibility QA, per-target export validation across all 6 Godot targets
-- [ ] **Phase 11: Distribution — GitHub Actions Release** - Single manually-triggered workflow: CI checks → auto-version-bump → commit/tag/push → addon zip via `git archive` → Godot Web export of showcase scene → publish GitHub Release with both artifacts + CHANGELOG slice as body. NO Asset Library submission.
+- [x] **Phase 9: Showcase + Token Gallery + Theme/Variation Toggles** - `res://main.tscn` with 9 sections + theme picker (Pulse/Slate/Bubble/Daybreak/Burst + Godot default), raised toggle, and platform selector (completed 2026-05-07)
+- [x] **Phase 10: QA + Cross-Platform Export Validation** - Autonomous QA evidence package complete; manual screenshot/device UAT deferred and documented (completed 2026-05-07)
+- [x] **Phase 11: Distribution — GitHub Actions Release** - Single manually-triggered workflow prepared: CI checks → auto-version-bump → commit/tag/push → addon zip via `git archive` → Godot Web export of showcase scene → publish GitHub Release with both artifacts + CHANGELOG slice as body. NO Asset Library submission. (completed 2026-05-07)
 
 **Optional buffer:** Cross-Platform Hardening Spike (4-8 hours, inserted as Phase 10.1 only if Phase 10 surfaces real-device regressions).
 
@@ -330,15 +330,15 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 | 3.1 Source-Dive: MD3 + MD3 Expressive + Flat-3D Game UI | 6/6 | Complete    | 2026-05-06 |
 | 3.2 Source-Dive: Godot Dynamic Theme Architecture | 6/6 | Complete | 2026-05-06 |
 | 3.3 Theme Direction Research (5 candidate directions) | 3/3 | Complete | 2026-05-06 |
-| 3.4 Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat) | 2/4 complete; Plan 03 paused at Task 4 | Awaiting user final approval | - |
-| 4. Foundation: Single `NeoCadeTheme` class + data `.tres` files + Fonts + Icons | 6/8 (Plans 04-01, 04-02, 04-03, 04-04, 04-05, 04-06 done) | In progress | started 2026-05-06 |
+| 3.4 Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat) | 4/4 | Complete | 2026-05-06 |
+| 4. Foundation: Single `NeoCadeTheme` class + data `.tres` files + Fonts + Icons | 8/8 | Complete | 2026-05-07 |
 | 5. Core Controls (Buttons/Inputs/Labels/Panels) | 7/7 | Complete   | 2026-05-07 |
 | 6. Lists/Layout/Range | 5/5 | Complete | 2026-05-07 |
-| 7. Dialogs/Popups/Advanced | 0/5 | Ready to execute | - |
+| 7. Dialogs/Popups/Advanced | 5/5 | Complete | 2026-05-07 |
 | 8. Mobile Variant Token Block + Tap-Target Audit | 5/5 | Complete | 2026-05-07 |
-| 9. Showcase + Token Gallery + Theme/Variation Toggles | 0/TBD | Not started | - |
-| 10. QA + Cross-Platform Export Validation | 0/TBD | Not started | - |
-| 11. Distribution | 0/TBD | Not started | - |
+| 9. Showcase + Token Gallery + Theme/Variation Toggles | 1/1 | Complete | 2026-05-07 |
+| 10. QA + Cross-Platform Export Validation | 1/1 | Complete (manual/device UAT deferred) | 2026-05-07 |
+| 11. Distribution | 1/1 | Complete (workflow prepared; release not triggered) | 2026-05-07 |
 
 ---
 
@@ -369,5 +369,5 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 
 ---
 *Roadmap authored: 2026-05-04 from SUMMARY.md 11-phase plan + REQUIREMENTS.md traceability*
-*Last updated: 2026-05-06 — synchronized with Phase 3.4 Plan 02 closeout, Pulse recommended-starter selection, and single-class/data-`.tres` architecture*
+*Last updated: 2026-05-07 — autonomous Phase 9-11 closeout; UAT/device QA deferred per user instruction*
 *Mockup approval gate is non-negotiable per PROJECT.md hard constraint*

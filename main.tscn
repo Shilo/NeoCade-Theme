@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://beivemw6fcnld"]
 
 [ext_resource type="Theme" path="res://addons/neocade_theme/pulse_neocade_theme.tres" id="1_pulse_theme"]
-[ext_resource type="Script" path="res://scripts/phase8_platform_toggle.gd" id="2_phase8_toggle"]
+[ext_resource type="Script" path="res://scripts/showcase.gd" id="2_showcase"]
 
 [node name="Main" type="Control" unique_id=645311781]
 layout_mode = 3
@@ -11,4 +11,4 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_pulse_theme")
-script = ExtResource("2_phase8_toggle")
+script = ExtResource("2_showcase")

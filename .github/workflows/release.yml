@@ -1,0 +1,194 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy-pages.outputs.page_url }}
+    env:
+      GODOT_VERSION: 4.6.2-stable
+      GODOT_VERSION_DIR: 4.6.2.stable
+      GODOT_ZIP_NAME: Godot_v4.6.2-stable_linux.x86_64
+      GODOT_TEMPLATES_NAME: Godot_v4.6.2-stable_export_templates.tpz
+      VERSION_FILE: addons/neocade_theme/VERSION
+      CHANGELOG_FILE: addons/neocade_theme/CHANGELOG.md
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Compute next version
+        id: version
+        run: |
+          set -e
+          if [ ! -f "$VERSION_FILE" ]; then
+            echo "::error::VERSION file not found at $VERSION_FILE"
+            exit 1
+          fi
+
+          CURRENT=$(tr -d '[:space:]' < "$VERSION_FILE")
+          if ! echo "$CURRENT" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Current version '$CURRENT' is not MAJOR.MINOR.PATCH"
+            exit 1
+          fi
+
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          if [ "$MINOR" -ge 9 ]; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+          else
+            MINOR=$((MINOR + 1))
+          fi
+          PATCH=0
+
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "Bumping ${CURRENT} -> ${NEW_VERSION}"
+          echo "NEW_VERSION=${NEW_VERSION}" >> "$GITHUB_ENV"
+          echo "RELEASE_DATE=$(date -u +%Y-%m-%d)" >> "$GITHUB_ENV"
+
+      - name: Download Godot
+        run: |
+          set -e
+          wget -q "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/${GODOT_ZIP_NAME}.zip" -O godot.zip
+          unzip -q godot.zip
+          mv "${GODOT_ZIP_NAME}" godot
+          chmod +x godot
+          ./godot --version
+
+      - name: Download export templates
+        run: |
+          set -e
+          wget -q "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/${GODOT_TEMPLATES_NAME}" -O export_templates.tpz
+          unzip -q export_templates.tpz -d export_templates
+          mkdir -p "$HOME/.local/share/godot/export_templates/${GODOT_VERSION_DIR}"
+          cp export_templates/templates/* "$HOME/.local/share/godot/export_templates/${GODOT_VERSION_DIR}/"
+
+      - name: Headless project import
+        run: |
+          set +e
+          ./godot --headless --path . --import --quit-after 2 2> import_stderr.log
+          echo "import exit code: $?"
+          if grep -qE '^(ERROR|SCRIPT ERROR):' import_stderr.log; then
+            echo "::error::Godot import produced errors:"
+            cat import_stderr.log
+            exit 1
+          fi
+          echo "Import clean."
+
+      - name: Headless-open showcase scene
+        run: |
+          set +e
+          ./godot --headless --path . --quit-after 2 res://main.tscn 2> open_stderr.log
+          echo "open exit code: $?"
+          if grep -qE '^(ERROR|SCRIPT ERROR):' open_stderr.log; then
+            echo "::error::Showcase scene open produced errors:"
+            cat open_stderr.log
+            exit 1
+          fi
+          echo "Showcase open clean."
+
+      - name: Bump VERSION
+        run: |
+          set -e
+          printf '%s\n' "${NEW_VERSION}" > "$VERSION_FILE"
+          grep -qE "^${NEW_VERSION}$" "$VERSION_FILE"
+
+      - name: Rewrite CHANGELOG header
+        run: |
+          set -e
+          sed -i -E "s/^## \[Unreleased\].*$/## [${NEW_VERSION}] — ${RELEASE_DATE}/" "$CHANGELOG_FILE"
+          grep -qE "^## \[${NEW_VERSION}\] — ${RELEASE_DATE}$" "$CHANGELOG_FILE"
+          ! grep -qE "^## \[Unreleased\]" "$CHANGELOG_FILE"
+
+      - name: Build Web showcase
+        run: |
+          set +e
+          mkdir -p build/web
+          ./godot --headless --path . --export-release "Web" build/web/index.html 2> web_export_stderr.log
+          echo "web export exit code: $?"
+          if grep -qE '^(ERROR|SCRIPT ERROR):' web_export_stderr.log; then
+            echo "::error::Web export produced errors:"
+            cat web_export_stderr.log
+            exit 1
+          fi
+          test -f build/web/index.html
+          test -f build/web/index.pck
+          echo "Web export clean."
+
+      - name: Package Web showcase zip
+        run: |
+          set -e
+          (cd build/web && zip -qr "../../neocade_theme-showcase-web-v${NEW_VERSION}.zip" .)
+          ls -la "neocade_theme-showcase-web-v${NEW_VERSION}.zip"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+      - name: Deploy Pages
+        id: deploy-pages
+        uses: actions/deploy-pages@v4
+
+      - name: Commit, tag, push
+        run: |
+          set -e
+          git add "$VERSION_FILE" "$CHANGELOG_FILE"
+          git commit -m "chore(release): v${NEW_VERSION}"
+          git tag -a "v${NEW_VERSION}" -m "NeoCade Theme v${NEW_VERSION}"
+          git push origin HEAD:main
+          git push origin "v${NEW_VERSION}"
+
+      - name: Build addon zip via git archive
+        run: |
+          set -e
+          git archive --format=zip \
+            --prefix="neocade_theme-v${NEW_VERSION}/" \
+            -o "neocade_theme-v${NEW_VERSION}.zip" \
+            "v${NEW_VERSION}" -- addons/neocade_theme/
+          unzip -l "neocade_theme-v${NEW_VERSION}.zip" | head -30
+
+      - name: Extract CHANGELOG slice
+        run: |
+          set -e
+          awk -v ver="${NEW_VERSION}" '
+            /^## \[/ {
+              if (in_section) { exit }
+              if (index($0, "[" ver "]") > 0) { in_section = 1; print; next }
+            }
+            in_section { print }
+          ' "$CHANGELOG_FILE" > release-notes-body.md
+          sed -i -e :a -e '/^[[:space:]]*$/{$d;N;ba' -e '}' release-notes-body.md
+          if [ ! -s release-notes-body.md ]; then
+            echo "::error::release-notes-body.md is empty"
+            exit 1
+          fi
+          head -20 release-notes-body.md
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ env.NEW_VERSION }}
+          name: NeoCade Theme v${{ env.NEW_VERSION }}
+          body_path: release-notes-body.md
+          files: |
+            neocade_theme-v${{ env.NEW_VERSION }}.zip
+            neocade_theme-showcase-web-v${{ env.NEW_VERSION }}.zip
+          draft: false
+          prerelease: false
