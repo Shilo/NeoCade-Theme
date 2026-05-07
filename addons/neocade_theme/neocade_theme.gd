@@ -360,7 +360,7 @@ func _resolve_platform() -> Platform:
 		return Platform.MOBILE if OS.has_feature("mobile") else Platform.DESKTOP
 	return platform
 
-## Returns the 14-key platform-tokens table for the given resolved Platform per DESIGN_TOKENS §10.1.
+## Returns the platform-token table for the given resolved Platform per DESIGN_TOKENS §10.1.
 ## The return is a Dictionary so Plan 04-05's BINDING_TABLE walk can read tokens by string key.
 func _platform_tokens(p: Platform) -> Dictionary:
 	if p == Platform.MOBILE:
@@ -377,6 +377,7 @@ func _platform_tokens(p: Platform) -> Dictionary:
 			"kicker": 13,
 			"rowMin": 56,
 			"tabMin": 48,
+			"thumbnailSize": 128,
 			"tapPadding": 12,
 			"densityScale": 1.5,
 		}
@@ -393,6 +394,7 @@ func _platform_tokens(p: Platform) -> Dictionary:
 		"kicker": 12,
 		"rowMin": 36,
 		"tabMin": 32,
+		"thumbnailSize": 96,
 		"tapPadding": 8,
 		"densityScale": 1.0,
 	}
@@ -1296,15 +1298,39 @@ const BINDING_TABLE: Dictionary = {
 			"buttons_separation": {"value": "tokens.tapPadding"},
 		},
 	},
-	# 9. FileDialog — minimal Phase 4 baseline (file/folder icons defer to Phase 7)
+	# 9. FileDialog — official Godot 4.6.2 colors, thumbnail metric, and icon surface.
+	# Shell chrome resolves through AcceptDialog/Window; local 4.6.2 exposes no FileDialog
+	# stylebox slots, so no unsupported FileDialog.panel entry is written here.
 	"FileDialog": {
-		"stylebox": {
-			"panel": {"role": "surface_panel", "raised_intensity": 1},
-		},
 		"color": {
 			"file_disabled_color": {"role": "text_muted",  "disabled": true},
 			"file_icon_color":     {"role": "text_default"},
-			"folder_icon_color":   {"role": "role_primary"},
+			"folder_icon_color":   {"role": "accent_offset"},
+		},
+		"constant": {
+			"thumbnail_size": {"value": "tokens.thumbnailSize"},
+		},
+		"icon": {
+			"back_folder":            {"icon": "filedialog_back_folder"},
+			"clear":                  {"icon": "filedialog_clear"},
+			"create_folder":          {"icon": "filedialog_create_folder"},
+			"favorite":               {"icon": "filedialog_favorite"},
+			"favorite_down":          {"icon": "filedialog_favorite_down"},
+			"favorite_up":            {"icon": "filedialog_favorite_up"},
+			"file":                   {"icon": "filedialog_file"},
+			"file_thumbnail":         {"icon": "filedialog_file_thumbnail"},
+			"folder":                 {"icon": "filedialog_folder"},
+			"folder_thumbnail":       {"icon": "filedialog_folder_thumbnail"},
+			"forward_folder":         {"icon": "filedialog_forward_folder"},
+			"list_mode":              {"icon": "filedialog_list_mode"},
+			"load":                   {"icon": "filedialog_load"},
+			"parent_folder":          {"icon": "filedialog_parent_folder"},
+			"reload":                 {"icon": "filedialog_reload"},
+			"save":                   {"icon": "filedialog_save"},
+			"sort":                   {"icon": "filedialog_sort"},
+			"thumbnail_mode":         {"icon": "filedialog_thumbnail_mode"},
+			"toggle_filename_filter": {"icon": "filedialog_toggle_filename_filter"},
+			"toggle_hidden":          {"icon": "filedialog_toggle_hidden"},
 		},
 	},
 	# 10. FoldableContainer — minimal Phase 4 baseline (Phase 6 polish completes)
