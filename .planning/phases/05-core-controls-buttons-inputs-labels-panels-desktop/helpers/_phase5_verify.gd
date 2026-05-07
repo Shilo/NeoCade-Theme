@@ -21,6 +21,14 @@ extends EditorScript
 ##   - assert_semantic_role_table
 ##   - assert_no_invented_focus_combos
 ##
+## Plan 05-03 added buttons-stage groups (TYPEVAR-01 + COV-02 + D-07):
+##   - assert_button_variation_rows
+##   - assert_button_variation_states
+##   - assert_button_variation_fonts
+##   - assert_button_strategy_distinctness
+##   - assert_dangerbutton_role_danger
+##   - assert_basebutton_family_chrome
+##
 ## Per D-07: Phase 5 verifier MUST NOT reference invented `pressed_focus`,
 ## `checked_focus`, or `hover_pressed_focus` slots. Focus is the official
 ## `focus` overlay only.
@@ -53,6 +61,25 @@ const PHASE5_SHAPE_KEYS := [
 	"focus_offset",
 	"kicker_style",
 ]
+# Plan 05-03 Task 1.
+const PHASE5_BUTTON_VARIATIONS := [
+	"PrimaryButton",
+	"SecondaryButton",
+	"GhostButton",
+	"DangerButton",
+	"IconButton",
+	"FlatButton",
+]
+const PHASE5_BUTTON_VARIATION_STATES := ["normal", "hover", "pressed", "focus", "disabled", "hover_pressed"]
+const PHASE5_BASEBUTTON_FAMILY := [
+	"Button",
+	"CheckBox",
+	"CheckButton",
+	"OptionButton",
+	"MenuButton",
+	"ColorPickerButton",
+	"LinkButton",
+]
 
 # Stage selection in EditorScript context: edit `_stage` below to run strict mode
 # from the editor (CI calls the headless variant with --stage strict).
@@ -79,6 +106,13 @@ func _run() -> void:
 	assert_shape_recipe_resolution()
 	assert_semantic_role_table()
 	assert_no_invented_focus_combos()
+	# Plan 05-03 groups.
+	assert_button_variation_rows()
+	assert_button_variation_states()
+	assert_button_variation_fonts()
+	assert_button_strategy_distinctness()
+	assert_dangerbutton_role_danger()
+	assert_basebutton_family_chrome()
 	_emit_summary()
 
 
@@ -505,6 +539,146 @@ func assert_semantic_role_table() -> void:
 
 const FORBIDDEN_FOCUS_COMBO_SLOTS := ["pressed_focus", "checked_focus", "hover_pressed_focus"]
 
+
+# ----- Plan 05-03 assertion groups (mirror of headless variant) -----
+
+func assert_button_variation_rows() -> void:
+	var group := "assert_button_variation_rows"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var binding_table: Dictionary = theme.get_script().get_script_constant_map().get("BINDING_TABLE", {})
+	if binding_table.is_empty():
+		_group_fail(group, "BINDING_TABLE const not found")
+		return
+	var missing: Array[String] = []
+	for v in PHASE5_BUTTON_VARIATIONS:
+		if not binding_table.has(v):
+			missing.append(v)
+	if missing.is_empty():
+		_group_ok(group, "all six TYPEVAR-01 button variation rows present")
+	else:
+		_group_pending(group, "missing TYPEVAR-01 button variation rows: " + ", ".join(missing))
+
+
+func assert_button_variation_states() -> void:
+	var group := "assert_button_variation_states"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	for v in PHASE5_BUTTON_VARIATIONS:
+		for state in PHASE5_BUTTON_VARIATION_STATES:
+			if not theme.has_stylebox(state, v):
+				problems.append("%s.%s missing" % [v, state])
+	if problems.is_empty():
+		_group_ok(group, "all six button variations expose the full state set on Pulse")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+func assert_button_variation_fonts() -> void:
+	var group := "assert_button_variation_fonts"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	for v in PHASE5_BUTTON_VARIATIONS:
+		if not theme.has_font("font", v):
+			problems.append("%s.font missing (PITFALLS 1.2)" % v)
+		if not theme.has_font_size("font_size", v):
+			problems.append("%s.font_size missing" % v)
+	if problems.is_empty():
+		_group_ok(group, "all six button variations have explicit `font` + `font_size` (D-17)")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+func assert_button_strategy_distinctness() -> void:
+	var group := "assert_button_strategy_distinctness"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	if not theme.has_method("_lookup_shape"):
+		_group_pending(group, "_lookup_shape missing (Plan 05-02)")
+		return
+	var presets: Dictionary = theme.get_script().get_script_constant_map().get("DIRECTION_PRESETS", {})
+	if presets.is_empty():
+		_group_fail(group, "DIRECTION_PRESETS const not found")
+		return
+	var primary_seen: Dictionary = {}
+	var ghost_seen: Dictionary = {}
+	for hex_key in ["151A2E", "111820", "241326", "0B2420", "20112E"]:
+		var sub: Dictionary = presets.get(hex_key, {})
+		if sub.is_empty(): continue
+		var ps_v: Variant = theme.call("_lookup_shape", sub, "shape.primary_strategy")
+		if ps_v != null: primary_seen[String(ps_v)] = true
+		var gs_v: Variant = theme.call("_lookup_shape", sub, "shape.ghost_strategy")
+		if gs_v != null: ghost_seen[String(gs_v)] = true
+	var problems: Array[String] = []
+	if primary_seen.size() < 4:
+		problems.append("primary_strategy distinct count = %d" % primary_seen.size())
+	if ghost_seen.size() < 4:
+		problems.append("ghost_strategy distinct count = %d" % ghost_seen.size())
+	if problems.is_empty():
+		_group_ok(group, "primary + ghost strategies each expose >=4 distinct values across 5 directions")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+func assert_dangerbutton_role_danger() -> void:
+	var group := "assert_dangerbutton_role_danger"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	if not theme.has_stylebox("normal", "DangerButton"):
+		_group_pending(group, "DangerButton.normal missing (Plan 05-03 not yet landed)")
+		return
+	var sb: StyleBox = theme.get_stylebox("normal", "DangerButton")
+	if not (sb is StyleBoxFlat):
+		_group_fail(group, "DangerButton.normal is not a StyleBoxFlat")
+		return
+	var fsb: StyleBoxFlat = sb
+	var expected := Color("#FF6E6E")
+	var rgb_match := is_equal_approx(fsb.bg_color.r, expected.r) \
+		and is_equal_approx(fsb.bg_color.g, expected.g) \
+		and is_equal_approx(fsb.bg_color.b, expected.b)
+	if not rgb_match:
+		_group_pending(group, "DangerButton.normal bg_color = %s; expected role_danger = %s" % [fsb.bg_color.to_html(false), expected.to_html(false)])
+		return
+	if not theme.has_color("font_color", "DangerButton"):
+		_group_pending(group, "DangerButton.font_color missing")
+		return
+	_group_ok(group, "DangerButton.normal resolves to role_danger #%s (Plan 05-02 semantic role flowed through)" % fsb.bg_color.to_html(false).to_upper())
+
+
+func assert_basebutton_family_chrome() -> void:
+	var group := "assert_basebutton_family_chrome"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	var filled := ["Button", "CheckBox", "CheckButton", "OptionButton", "MenuButton", "ColorPickerButton"]
+	for klass in filled:
+		for state in ["normal", "hover", "pressed", "focus", "disabled"]:
+			if not theme.has_stylebox(state, klass):
+				problems.append("%s.%s missing" % [klass, state])
+	for klass in ["Button", "CheckBox", "CheckButton", "OptionButton", "MenuButton"]:
+		if not theme.has_stylebox("hover_pressed", klass):
+			problems.append("%s.hover_pressed missing" % klass)
+	for ic in ["checked", "unchecked", "radio_checked", "radio_unchecked"]:
+		var icons: PackedStringArray = theme.get_icon_list("CheckBox")
+		if icons.find(ic) == -1:
+			problems.append("CheckBox icon `%s` missing" % ic)
+	for ic in ["checked", "unchecked"]:
+		var icons2: PackedStringArray = theme.get_icon_list("CheckButton")
+		if icons2.find(ic) == -1:
+			problems.append("CheckButton icon `%s` missing" % ic)
+	for slot in ["font_color", "font_hover_color", "font_focus_color"]:
+		if not theme.has_color(slot, "LinkButton"):
+			problems.append("LinkButton.%s missing" % slot)
+	if theme.has_stylebox("normal", "LinkButton"):
+		problems.append("LinkButton.normal stylebox present — LinkButton must stay text-only")
+	if problems.is_empty():
+		_group_ok(group, "all 7 BaseButton-family controls expose their official slot set; LinkButton stays text-only")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
 func assert_no_invented_focus_combos() -> void:
 	var group := "assert_no_invented_focus_combos"
 	var f := FileAccess.open(PRODUCTION_GD, FileAccess.READ)
@@ -550,9 +724,25 @@ func _group_ok(group: String, detail: String) -> void:
 
 func _group_pending(group: String, detail: String) -> void:
 	# Mirror the headless variant's stage policy: shape stage is strict for
-	# shape-related groups; strict stage is strict for everything; tooling
+	# shape-related groups; buttons stage is strict for buttons groups +
+	# carry-forward shape; strict stage is strict for everything; tooling
 	# is permissive.
 	var shape_stage_strict := [
+		"assert_shape_lookup_integrity",
+		"assert_shape_value_integrity",
+		"assert_shape_recipe_resolution",
+		"assert_semantic_role_table",
+		"assert_no_invented_focus_combos",
+		"assert_no_theme_clear",
+	]
+	var buttons_stage_strict := [
+		"assert_button_variation_rows",
+		"assert_button_variation_states",
+		"assert_button_variation_fonts",
+		"assert_button_strategy_distinctness",
+		"assert_dangerbutton_role_danger",
+		"assert_basebutton_family_chrome",
+		"assert_focus_overlay_visibility",
 		"assert_shape_lookup_integrity",
 		"assert_shape_value_integrity",
 		"assert_shape_recipe_resolution",
@@ -564,6 +754,8 @@ func _group_pending(group: String, detail: String) -> void:
 	if _stage == "strict":
 		fail = true
 	elif _stage == "shape" and group in shape_stage_strict:
+		fail = true
+	elif _stage == "buttons" and group in buttons_stage_strict:
 		fail = true
 	if fail:
 		var label: String = _stage.to_upper()
@@ -584,7 +776,8 @@ func _group_fail(group: String, detail: String) -> void:
 func _emit_summary() -> void:
 	print("----- PHASE5_VERIFY summary -----")
 	print("  stage:          %s" % _stage)
-	print("  groups OK:      %d / %d" % [_ok_markers.size(), 11])
+	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 6 = 17.
+	print("  groups OK:      %d / %d" % [_ok_markers.size(), 17])
 	print("  groups PENDING: %d  %s" % [_pending.size(), str(_pending)])
 	print("  failures:       %d" % _failures.size())
 	for f in _failures:
