@@ -229,6 +229,8 @@ func _regenerate_theme() -> void:
 	# Tabs expose explicit font slots outside the BINDING_TABLE schema.
 	set_font("font", "TabBar", body_font)
 	set_font("font", "TabContainer", body_font)
+	# ProgressBar exposes an official font slot for optional percentage/text display.
+	set_font("font", "ProgressBar", body_font)
 
 	# ── Set per-variation font sizes (DESIGN_TOKENS §8.5 + tokens) ──
 	set_font_size("font_size", "HeaderLarge",  tokens.h1)
@@ -1223,29 +1225,93 @@ const BINDING_TABLE: Dictionary = {
 			"selection_stroke": {"role": "role_primary"},
 		},
 	},
-	# 12. HScrollBar — 5 stylebox slots
+	# 12. HScrollBar — official styleboxes plus six increment/decrement icon slots.
 	"HScrollBar": {
 		"stylebox": {
-			"scroll":            {"role": "surface_low",   "raised_intensity": 0},
+			"scroll":            {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
 			"scroll_focus":      {"role": "focus_ring"},
-			"grabber":           {"role": "surface_high",  "raised_intensity": 0},
-			"grabber_highlight": {"role": "state_hover",   "raised_intensity": 0},
-			"grabber_pressed":   {"role": "state_pressed", "raised_intensity": 0},
+			"grabber":           {"role": "surface_high",  "raised_intensity": 1, "padding": Vector2i(2, 2)},
+			"grabber_highlight": {"role": "state_hover",   "raised_intensity": 1, "padding": Vector2i(2, 2), "alpha": 0.72},
+			"grabber_pressed":   {"role": "state_pressed", "raised_intensity": 0, "padding": Vector2i(2, 2), "alpha": 0.82},
+		},
+		"icon": {
+			"decrement":           {"icon": "scrollbar_left"},
+			"decrement_highlight": {"icon": "scrollbar_left"},
+			"decrement_pressed":   {"icon": "scrollbar_left"},
+			"increment":           {"icon": "scrollbar_right"},
+			"increment_highlight": {"icon": "scrollbar_right"},
+			"increment_pressed":   {"icon": "scrollbar_right"},
 		},
 	},
-	# 13. HSlider — slider track + grabber_area + highlight
+	# 13. HSlider — visible calm track plus official grabber/tick icons.
 	"HSlider": {
 		"stylebox": {
-			"slider":                  {"role": "surface_low",   "raised_intensity": 0},
-			"grabber_area":            {"role": "role_primary",  "raised_intensity": 0},
-			"grabber_area_highlight":  {"role": "accent_offset", "raised_intensity": 0},
+			"slider":                  {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"grabber_area":            {"role": "role_primary",  "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"grabber_area_highlight":  {"role": "accent_offset", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"constant": {
+			"center_grabber": {"value": 1},
+			"grabber_offset": {"value": 0},
+			"tick_offset":    {"value": 8},
+		},
+		"icon": {
+			"grabber":           {"icon": "slider_grabber"},
+			"grabber_disabled":  {"icon": "slider_grabber"},
+			"grabber_highlight": {"icon": "slider_grabber"},
+			"tick":              {"icon": "slider_tick"},
 		},
 	},
-	# 14. HSplitContainer — separation only (chrome is grabber icon)
-	"HSplitContainer": {
+	# 13a. ScrollContainer — quiet overflow panel plus official focus and hint slots.
+	"ScrollContainer": {
+		"stylebox": {
+			"focus": {"role": "focus_ring"},
+			"panel": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"color": {
+			"scroll_hint_horizontal_color": {"role": "role_primary", "alpha": 0.72},
+			"scroll_hint_vertical_color":   {"role": "role_primary", "alpha": 0.72},
+		},
+		"icon": {
+			"scroll_hint_horizontal": {"icon": "scroll_hint_horizontal"},
+			"scroll_hint_vertical":   {"icon": "scroll_hint_vertical"},
+		},
+	},
+	# 13b. SplitContainer — base class owns h/v grabbers and touch-dragger colors.
+	"SplitContainer": {
+		"stylebox": {
+			"split_bar_background": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"color": {
+			"touch_dragger_color":         {"role": "text_muted"},
+			"touch_dragger_hover_color":   {"role": "role_primary", "alpha": 0.84},
+			"touch_dragger_pressed_color": {"role": "role_primary"},
+		},
 		"constant": {
+			"autohide":               {"value": 0},
+			"minimum_grab_thickness": {"value": "tokens.tapPadding"},
 			"separation":             {"value": "tokens.tapPadding"},
-			"minimum_grab_thickness": {"value": 6},
+		},
+		"icon": {
+			"h_grabber":       {"icon": "split_grabber_h"},
+			"h_touch_dragger": {"icon": "split_touch_dragger_h"},
+			"v_grabber":       {"icon": "split_grabber_v"},
+			"v_touch_dragger": {"icon": "split_touch_dragger_v"},
+		},
+	},
+	# 14. HSplitContainer — split-bar chrome plus official grabber/touch-dragger icons.
+	"HSplitContainer": {
+		"stylebox": {
+			"split_bar_background": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"constant": {
+			"autohide":               {"value": 0},
+			"separation":             {"value": "tokens.tapPadding"},
+			"minimum_grab_thickness": {"value": "tokens.tapPadding"},
+		},
+		"icon": {
+			"grabber":       {"icon": "split_grabber_h"},
+			"touch_dragger": {"icon": "split_touch_dragger_h"},
 		},
 	},
 	# 15. ItemList — official Godot 4.6.2 slots. Cursor overlays stay alpha-bearing
@@ -1452,11 +1518,18 @@ const BINDING_TABLE: Dictionary = {
 	# 25. ProgressBar — 2 styleboxes
 	"ProgressBar": {
 		"stylebox": {
-			"background": {"role": "surface_low",  "raised_intensity": 0},
-			"fill":       {"role": "role_primary", "raised_intensity": 0},
+			"background": {"role": "surface_low",  "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"fill":       {"role": "role_primary", "raised_intensity": 0, "padding": Vector2i(0, 0)},
 		},
 		"color": {
-			"font_color": {"role": "text_strong"},
+			"font_color":         {"role": "text_strong"},
+			"font_outline_color": {"role": "outline_color"},
+		},
+		"constant": {
+			"outline_size": {"value": 0},
+		},
+		"font_size": {
+			"font_size": {"value": "tokens.body"},
 		},
 	},
 	# 26. RichTextLabel — 1 stylebox + colors
@@ -1704,29 +1777,104 @@ const BINDING_TABLE: Dictionary = {
 			"updown":                    {"icon": "tree_updown"},
 		},
 	},
-	# 34. VScrollBar — mirror of HScrollBar
+	# 34. VScrollBar — mirror of HScrollBar with vertical directional icons.
 	"VScrollBar": {
 		"stylebox": {
-			"scroll":            {"role": "surface_low",   "raised_intensity": 0},
+			"scroll":            {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
 			"scroll_focus":      {"role": "focus_ring"},
-			"grabber":           {"role": "surface_high",  "raised_intensity": 0},
-			"grabber_highlight": {"role": "state_hover",   "raised_intensity": 0},
-			"grabber_pressed":   {"role": "state_pressed", "raised_intensity": 0},
+			"grabber":           {"role": "surface_high",  "raised_intensity": 1, "padding": Vector2i(2, 2)},
+			"grabber_highlight": {"role": "state_hover",   "raised_intensity": 1, "padding": Vector2i(2, 2), "alpha": 0.72},
+			"grabber_pressed":   {"role": "state_pressed", "raised_intensity": 0, "padding": Vector2i(2, 2), "alpha": 0.82},
+		},
+		"icon": {
+			"decrement":           {"icon": "scrollbar_up"},
+			"decrement_highlight": {"icon": "scrollbar_up"},
+			"decrement_pressed":   {"icon": "scrollbar_up"},
+			"increment":           {"icon": "scrollbar_down"},
+			"increment_highlight": {"icon": "scrollbar_down"},
+			"increment_pressed":   {"icon": "scrollbar_down"},
 		},
 	},
-	# 35. VSlider — mirror of HSlider
+	# 35. VSlider — transposed mirror of HSlider.
 	"VSlider": {
 		"stylebox": {
-			"slider":                 {"role": "surface_low",   "raised_intensity": 0},
-			"grabber_area":           {"role": "role_primary",  "raised_intensity": 0},
-			"grabber_area_highlight": {"role": "accent_offset", "raised_intensity": 0},
+			"slider":                 {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"grabber_area":           {"role": "role_primary",  "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"grabber_area_highlight": {"role": "accent_offset", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"constant": {
+			"center_grabber": {"value": 1},
+			"grabber_offset": {"value": 0},
+			"tick_offset":    {"value": 8},
+		},
+		"icon": {
+			"grabber":           {"icon": "slider_grabber"},
+			"grabber_disabled":  {"icon": "slider_grabber"},
+			"grabber_highlight": {"icon": "slider_grabber"},
+			"tick":              {"icon": "slider_tick"},
 		},
 	},
-	# 36. VSplitContainer — mirror of HSplitContainer
+	# 36. VSplitContainer — mirror of HSplitContainer with vertical affordance icons.
 	"VSplitContainer": {
+		"stylebox": {
+			"split_bar_background": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
 		"constant": {
+			"autohide":               {"value": 0},
 			"separation":             {"value": "tokens.tapPadding"},
-			"minimum_grab_thickness": {"value": 6},
+			"minimum_grab_thickness": {"value": "tokens.tapPadding"},
+		},
+		"icon": {
+			"grabber":       {"icon": "split_grabber_v"},
+			"touch_dragger": {"icon": "split_touch_dragger_v"},
+		},
+	},
+	# 36a. Layout-only containers — constants only; no fake surfaces.
+	"MarginContainer": {
+		"constant": {
+			"margin_bottom": {"value": "tokens.tapPadding"},
+			"margin_left":   {"value": "tokens.tapPadding"},
+			"margin_right":  {"value": "tokens.tapPadding"},
+			"margin_top":    {"value": "tokens.tapPadding"},
+		},
+	},
+	"HBoxContainer": {
+		"constant": {
+			"separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	"VBoxContainer": {
+		"constant": {
+			"separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	"FlowContainer": {
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+			"v_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	"GridContainer": {
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+			"v_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	# 36b. Separators — outline-color rules with modest spacing only.
+	"HSeparator": {
+		"stylebox": {
+			"separator": {"role": "outline_color", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"constant": {
+			"separation": {"value": 4},
+		},
+	},
+	"VSeparator": {
+		"stylebox": {
+			"separator": {"role": "outline_color", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"constant": {
+			"separation": {"value": 4},
 		},
 	},
 	# 37. Window — 2 stylebox slots (PITFALLS 1.7 first-class)
