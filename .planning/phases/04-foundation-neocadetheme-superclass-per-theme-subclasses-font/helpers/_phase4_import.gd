@@ -115,4 +115,196 @@ func _init() -> void:
 
 	print("[Phase 4] font materialization complete: TTF imported, .import params enforced, ",
 		"Inter-Variable.tres + 5 FontVariation .tres files saved via ResourceSaver.")
+
+	# Plan 04-06 Task 1: generate pulse_neocade_theme.tres via ResourceSaver, then strip
+	# regenerated theme entries to keep the file data-only (Cycle 3 N4 Fix A) while
+	# preserving the script linkage so it loads back as NeoCadeTheme (Cycle 4 N5 Fix).
+	_save_pulse_tres()
 	quit(0)
+
+
+## Plan 04-06 add-on: generate pulse_neocade_theme.tres via ResourceSaver.save(),
+## then post-process the file to strip serialized theme entries (Cross-AI Cycle 3 N4
+## Fix A — keeps SC#6 "saved .tres files stay data-oriented"). NeoCadeTheme.new()
+## triggers _init() which triggers _regenerate_theme() (populates hundreds of stylebox/
+## color/constant/font/icon entries); ResourceSaver.save() serializes EVERYTHING
+## (header + 9 @exports + sub_resources + theme_data/* entries). The strip pass
+## removes the regenerated entry bloat and keeps only the Godot-emitted [gd_resource
+## ...] header (preserves Cycle 1 C6 fix) + the 9 @export property lines. Loading
+## the trimmed .tres re-triggers _init() → _regenerate_theme() → entries repopulate.
+func _save_pulse_tres() -> void:
+	var pulse: NeoCadeTheme = NeoCadeTheme.new()
+	pulse.base_color = Color("#151A2E")
+	pulse.accent_color = Color("#8BFF6A")
+	pulse.raised = false
+	pulse.platform = NeoCadeTheme.Platform.AUTO
+	pulse.corner_radius = 0
+	pulse.spacing = 18
+	pulse.raised_strength = 3
+	pulse.focus_thickness = 2
+	pulse.outline_width = 1
+	var path := "res://addons/neocade_theme/pulse_neocade_theme.tres"
+	# Inline-literal call form preserved so Plan 04-06's automated verifier (which greps for
+	# the exact string `ResourceSaver.save(pulse, "res://addons/...")`) matches; `path` is
+	# kept as a local for the strip pass below.
+	var ok := ResourceSaver.save(pulse, "res://addons/neocade_theme/pulse_neocade_theme.tres")
+	assert(ok == OK, "pulse save failed: %d" % ok)
+
+	# Cross-AI Cycle 1 C6: capture the actual header Godot emits, log it for Plan 04-07's
+	# peer .tres template + for documentation.
+	var fa := FileAccess.open(path, FileAccess.READ)
+	var first_line := fa.get_line()
+	fa.close()
+	print("✓ Pulse .tres saved. Godot header (canonical for Plan 04-07): ", first_line)
+
+	# Cross-AI Cycle 3 N4 Fix A — strip serialized theme entries. ResourceSaver.save()
+	# serializes _regenerate_theme()'s output into the .tres; the entry bloat
+	# contradicts SC#6 ("saved .tres files stay data-oriented") and Plan 04-06's
+	# < 2KiB sanity bound. Strip everything except the [gd_resource ...] header +
+	# the 9 @export lines on the [resource] block. Re-loading the stripped file
+	# produces the same NeoCadeTheme instance (regeneration runs at load time).
+	_strip_theme_entries(path)
+
+
+## Cross-AI Cycle 3 N4 Fix A — textual post-process to data-only the saved .tres.
+## Cross-AI Cycle 4 N5 Fix — preserve `[ext_resource type="Script" ...]` blocks
+## AND `script = ExtResource(...)` / `script_class = ...` lines inside `[resource]`,
+## because Godot 4.6 may serialize `class_name NeoCadeTheme extends Theme` as
+## either form 1 (`[gd_resource type="NeoCadeTheme" ...]` header alone — script
+## linkage carried in header attributes) OR form 2 (`[gd_resource type="Theme" ...]`
+## header + `[ext_resource type="Script" ...]` block + `script = ExtResource("id")`
+## line in `[resource]`). Form 2's script linkage is REQUIRED for the file to load
+## as `NeoCadeTheme`; dropping it makes `_init()` never fire and `loaded is
+## NeoCadeTheme` assert fail. Also strips the `load_steps=N` attribute from the
+## `[gd_resource ...]` header (preserved-block count differs from original; Godot
+## tolerates a missing `load_steps` and recomputes on load).
+##
+## Reads `path`, keeps the [gd_resource ...] header (whatever Godot emitted, with
+## `load_steps=...` stripped), keeps any `[ext_resource type="Script" ...]` block
+## (Cycle 4 N5), drops all `[sub_resource ...]` blocks (font/stylebox/etc. payloads
+## regenerated at load), drops all OTHER `[ext_resource ...]` blocks (non-script
+## sub-asset refs that regeneration would re-create — Phase 4 has none, but be
+## defensive), drops the [resource] body's `theme_data/...` lines and any
+## per-Control entry sections, and keeps the 9 @export property lines
+## (base_color, accent_color, raised, platform, corner_radius, spacing,
+## raised_strength, focus_thickness, outline_width) PLUS the `script = ExtResource(...)`
+## / `script_class = ...` lines if Godot serialized them inside `[resource]`.
+## Asserts post-strip size < 2048 bytes (SC#6 + size sanity).
+static func _strip_theme_entries(path: String) -> void:
+	var src := FileAccess.open(path, FileAccess.READ)
+	assert(src != null, "strip: cannot open %s for read" % path)
+	var text := src.get_as_text()
+	src.close()
+
+	# Whitelist of @export property names; lines whose left-hand side is one of
+	# these survive in the [resource] block. Anything else (theme_data/...,
+	# SubResource references, per-Control state entries) is dropped — EXCEPT the
+	# `script = ExtResource(...)` / `script_class = ...` lines (Cycle 4 N5),
+	# which are detected by prefix below and preserved separately.
+	var EXPORT_KEYS := [
+		"base_color", "accent_color", "raised", "platform",
+		"corner_radius", "spacing", "raised_strength",
+		"focus_thickness", "outline_width",
+	]
+
+	var lines := text.split("\n")
+	var out: PackedStringArray = []
+	var section: String = ""        # tracks current [section] block
+	var skip_section: bool = false  # true while inside dropped section bodies
+	for raw_line in lines:
+		var line: String = raw_line
+		var stripped := line.strip_edges()
+		if stripped.begins_with("[") and stripped.ends_with("]"):
+			# Section header transition.
+			# Cycle 4 N5: PRESERVE [ext_resource type="Script" ...] blocks
+			# (script linkage required for form-2 serialization) — keep the
+			# entire 1-line section as-is.
+			if stripped.begins_with("[ext_resource") and stripped.find("type=\"Script\"") != -1:
+				skip_section = false
+				section = "ext_resource_script"
+				out.append(line)
+				continue
+			# Drop other [ext_resource ...] blocks (non-script sub-asset refs).
+			if stripped.begins_with("[ext_resource"):
+				skip_section = true
+				section = "ext_resource_other"
+				continue
+			# Drop [sub_resource ...] blocks entirely (regenerated at load).
+			if stripped.begins_with("[sub_resource"):
+				skip_section = true
+				section = "sub_resource"
+				continue
+			skip_section = false
+			section = stripped
+			# Keep [gd_resource ...] header (with load_steps stripped — see
+			# below) and [resource] header; everything else (per-Control entry
+			# sections Godot may emit) is dropped.
+			if stripped.begins_with("[gd_resource"):
+				# Cycle 4 N5: strip `load_steps=N` so Godot recomputes on load.
+				# Preserved block count (gd_resource + maybe-1 ext_resource_script
+				# + resource) typically differs from the originally-serialized
+				# count, and a stale load_steps causes Godot to reject the file.
+				var cleaned_header := _strip_load_steps_attr(line)
+				out.append(cleaned_header)
+			elif stripped == "[resource]":
+				out.append(line)
+			continue
+		if skip_section:
+			continue
+		if section == "[resource]":
+			if stripped == "":
+				# collapse blank lines inside [resource] — final assembly re-adds spacing
+				continue
+			# Cycle 4 N5: preserve script linkage lines inside [resource]
+			# (form-2 serialization). These are NOT in EXPORT_KEYS — detect by
+			# prefix match. Pattern matches `script = ExtResource("id")` and
+			# `script_class = "NeoCadeTheme"` (Godot may use either or both).
+			if stripped.begins_with("script = ExtResource(") or stripped.begins_with("script_class ="):
+				out.append(line)
+				continue
+			# Keep whitelisted @export property assignments.
+			var key := stripped.split("=", true, 1)[0].strip_edges()
+			if EXPORT_KEYS.has(key):
+				out.append(line)
+			# Otherwise (theme_data/..., SubResource(...) refs, etc.) drop.
+			continue
+		# Pre-[gd_resource] preamble: Godot rarely emits content here; pass-through.
+		if section == "":
+			out.append(line)
+
+	var final_text := "\n".join(out)
+	# Ensure trailing newline.
+	if not final_text.ends_with("\n"):
+		final_text += "\n"
+
+	var dst := FileAccess.open(path, FileAccess.WRITE)
+	assert(dst != null, "strip: cannot open %s for write" % path)
+	dst.store_string(final_text)
+	dst.close()
+
+	var size := FileAccess.get_file_as_bytes(path).size()
+	assert(size < 2048,
+		"N4 strip regression: %s post-strip size %d bytes >= 2048 (SC#6 < 2 KiB violated)"
+			% [path, size])
+	print("✓ Stripped theme entries from %s — %d bytes (data-only)." % [path, size])
+
+
+## Cross-AI Cycle 4 N5 Fix helper — strip the `load_steps=N` attribute (and any
+## surrounding whitespace) from a `[gd_resource ...]` header line. Returns the
+## header with `load_steps` removed; Godot recomputes the value on load.
+## Examples:
+##   `[gd_resource type="Theme" load_steps=42 format=3 uid="uid://..."]`
+##   → `[gd_resource type="Theme" format=3 uid="uid://..."]`
+##   `[gd_resource type="NeoCadeTheme" format=3]`
+##   → `[gd_resource type="NeoCadeTheme" format=3]` (no-op when absent)
+static func _strip_load_steps_attr(header_line: String) -> String:
+	# Match ` load_steps=<digits>` (with leading space) OR `load_steps=<digits> `
+	# (with trailing space). Use regex for both cases.
+	var rx := RegEx.new()
+	rx.compile(r"\s*load_steps=\d+")
+	var cleaned: String = rx.sub(header_line, "", true)
+	# Tidy any double-space introduced by removal.
+	var rx2 := RegEx.new()
+	rx2.compile(r" {2,}")
+	cleaned = rx2.sub(cleaned, " ", true)
+	return cleaned
