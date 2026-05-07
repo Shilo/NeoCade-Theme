@@ -177,7 +177,38 @@ func assert_tap_targets_stage() -> void:
 		_group_fail(group, "; ".join(problems))
 
 func assert_docs_stage() -> void:
-	_group_pending("docs", "Plan 08-04 owns MOBILE-DESIGN-SPEC.md")
+	var group := "docs"
+	var problems: Array[String] = []
+	if not FileAccess.file_exists(MOBILE_SPEC_PATH):
+		_group_fail(group, "MOBILE-DESIGN-SPEC.md missing at repository root")
+		return
+	var text := _read_file(MOBILE_SPEC_PATH)
+	var required := [
+		"MOBILE-01", "MOBILE-02", "MOBILE-03", "MOBILE-04", "MOBILE-05",
+		"MOBILE-06", "MOBILE-07", "MOBILE-08", "DOCS-02", "TYPEVAR-06",
+		"Pulse", "Slate", "Bubble", "Daybreak", "Burst",
+		"DESKTOP", "MOBILE", "AUTO", "platform=AUTO",
+		"neocade_mobile_theme.tres", "48px",
+		"08-tap-target-audit.log", "37-row", "15 type variations",
+	]
+	for token in required:
+		if text.find(token) == -1:
+			problems.append("MOBILE-DESIGN-SPEC.md missing token: %s" % token)
+	for type_name in SCORECARD_37_TYPES:
+		if text.find(type_name) == -1:
+			problems.append("MOBILE-DESIGN-SPEC.md missing scorecard row: %s" % type_name)
+	var variations := _type_variation_names()
+	if variations.size() != 15:
+		problems.append("TYPE_VARIATIONS expected 15 entries, got %d: %s" % [variations.size(), str(variations)])
+	for variation in variations:
+		if text.find(variation) == -1:
+			problems.append("MOBILE-DESIGN-SPEC.md missing type variation: %s" % variation)
+	if text.find("all 13 type variations") != -1:
+		problems.append("MOBILE-DESIGN-SPEC.md contains stale all 13 type variations wording")
+	if problems.is_empty():
+		_group_ok(group, "root mobile design spec covers requirements, scorecard rows, directions, platforms, and 15 type variations")
+	else:
+		_group_fail(group, "; ".join(problems))
 
 func assert_scene_toggle_stage() -> void:
 	_group_pending("scene-toggle", "Plan 08-05 owns runtime toggle proof")
@@ -339,6 +370,21 @@ func _theme_type_has_any_entry(theme: Theme, type_name: String) -> bool:
 		or theme.get_font_size_list(type_name).size() > 0
 		or theme.get_icon_list(type_name).size() > 0
 	)
+
+func _type_variation_names() -> Array[String]:
+	var constants := _script_constants()
+	var variations: Dictionary = constants.get("TYPE_VARIATIONS", {})
+	var names: Array[String] = []
+	for key in variations.keys():
+		names.append(String(key))
+	names.sort()
+	return names
+
+func _script_constants() -> Dictionary:
+	var loaded := _load_direction(PULSE_PATH)
+	if loaded == null:
+		return {}
+	return loaded.get_script().get_script_constant_map()
 
 func _read_file(path: String) -> String:
 	var f := FileAccess.open(path, FileAccess.READ)

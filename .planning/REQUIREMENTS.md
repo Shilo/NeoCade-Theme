@@ -116,7 +116,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [ ] **TYPEVAR-03**: 1 RichTextLabel type variation: InfoText.
 - [ ] **TYPEVAR-04**: 2 Panel type variations: CardPanel, HeroPanel.
 - [ ] **TYPEVAR-05**: Fonts set explicitly on every type variation (per PITFALLS 1.2 — type variations DO NOT inherit fonts from base type, even when stylebox inheritance works). Verify under runtime QA, not editor preview.
-- [ ] **TYPEVAR-06** *(reconciled 2026-05-07; supersedes the original 13-variation research seed)*: All 15 production type variations are documented in `MOBILE-DESIGN-SPEC.md` and `DESIGN_TOKENS.md` with concrete usage examples. Source of truth is `addons/neocade_theme/neocade_theme.gd::TYPE_VARIATIONS`: PrimaryButton, SecondaryButton, GhostButton, DangerButton, IconButton, FlatButton, HeaderLarge, HeaderMedium, HeaderSmall, Caption, CodeLabel, Kicker, InfoText, CardPanel, HeroPanel.
+- [x] **TYPEVAR-06** *(reconciled 2026-05-07; supersedes the original 13-variation research seed)*: All 15 production type variations are documented in `MOBILE-DESIGN-SPEC.md` and `DESIGN_TOKENS.md` with concrete usage examples. Source of truth is `addons/neocade_theme/neocade_theme.gd::TYPE_VARIATIONS`: PrimaryButton, SecondaryButton, GhostButton, DangerButton, IconButton, FlatButton, HeaderLarge, HeaderMedium, HeaderSmall, Caption, CodeLabel, Kicker, InfoText, CardPanel, HeroPanel.
 
 ### Mobile Variant (MOBILE)
 
@@ -124,9 +124,9 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [x] **MOBILE-02**: Tap targets ≥48px (Godot pixels at base scale 1.0) on every interactive Control in the mobile theme. Satisfies iOS HIG 44pt minimum + Material 3 48dp minimum simultaneously.
 - [x] **MOBILE-03**: Body text 16px on mobile vs 14px desktop. Headings retain their desktop sizes (Inter at opsz=32 + wght=700-800; no scale change for headings).
 - [x] **MOBILE-04**: Spacing scale +50% on `space.4` and above on mobile. Corner radii STAY IDENTICAL across desktop/mobile (brand identity, not platform-specific).
-- [ ] **MOBILE-05**: One mobile theme covers all Android density buckets (per CROSS-PLATFORM 3.5; Godot uses `content_scale_factor` + stretch modes, NOT density qualifiers). Authored values are dp-equivalent at base scale 1.0.
+- [x] **MOBILE-05**: One mobile theme covers all Android density buckets (per CROSS-PLATFORM 3.5; Godot uses `content_scale_factor` + stretch modes, NOT density qualifiers). Authored values are dp-equivalent at base scale 1.0.
 - [x] **MOBILE-06**: Tap-target audit script confirms every interactive Control in mobile theme is ≥48px; runs as part of Phase 8 acceptance.
-- [ ] **MOBILE-07**: `MOBILE-DESIGN-SPEC.md` documents every delta vs desktop with concrete numbers + rationale.
+- [x] **MOBILE-07**: `MOBILE-DESIGN-SPEC.md` documents every delta vs desktop with concrete numbers + rationale.
 - [x] **MOBILE-08**: Mobile theme follows iOS HIG + Material 3 mobile guidance loosely (touch targets, type scale, accessibility minima) but retains the NeoCade arcade visual identity. NOT making Godot UI look native iOS or Android.
 
 ### Showcase Scene (SHOW)
@@ -194,7 +194,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 ### Documentation (DOCS)
 
 - [ ] **DOCS-01**: `DESIGN_TOKENS.md` is committed before Phase 4 begins (FOUND-02 dependency); contains finalized desktop + mobile token blocks, sourced from approved Phase 3 mockups.
-- [ ] **DOCS-02**: `MOBILE-DESIGN-SPEC.md` documents every mobile delta vs desktop with concrete numbers + rationale (MOBILE-07 deliverable).
+- [x] **DOCS-02**: `MOBILE-DESIGN-SPEC.md` documents every mobile delta vs desktop with concrete numbers + rationale (MOBILE-07 deliverable).
 - [ ] **DOCS-03**: `EDITOR-COVERAGE.md` (already exists; per MAJ-7 review finding) maps which Editor surfaces are themed in v1 vs which fall back to default.
 - [ ] **DOCS-04**: README.md is comprehensive: project description; **install path = "Download `neocade_theme-v<VERSION>.zip` from GitHub Releases, extract `addons/neocade_theme/` into your project's `addons/` folder"** (no Asset Library reference); usage examples (project theme + per-scene theme + optional editor theme); cross-platform notes; accessibility notes; **font override patterns** (Noto Sans for non-Latin harmony, mono for CodeEdit, Inter Italic) per FONT-09; **link to web showcase** (`neocade_theme-showcase-web-v<VERSION>.zip` from the same release — extract and serve, or "play in browser" GitHub Pages link if v1.x adds it); editor-coverage map link (EDITOR-COVERAGE.md); license; attributions; link to GitHub repo.
 - [x] **DOCS-05**: SOURCES.md is updated by Phase 1, 2, 3 source-dive spike outputs (RES-01..03) with new findings.
