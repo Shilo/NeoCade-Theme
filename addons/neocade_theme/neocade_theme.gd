@@ -221,6 +221,9 @@ func _regenerate_theme() -> void:
 	# keeps rows dense/readable; title buttons get a header-weight Inter variation.
 	set_font("font", "Tree",              body_font)
 	set_font("title_button_font", "Tree", header_small_font)
+	# ItemList exposes one official font slot. Keep it explicit because BINDING_TABLE
+	# intentionally has no font branch.
+	set_font("font", "ItemList", body_font)
 
 	# ── Set per-variation font sizes (DESIGN_TOKENS §8.5 + tokens) ──
 	set_font_size("font_size", "HeaderLarge",  tokens.h1)
@@ -1227,30 +1230,41 @@ const BINDING_TABLE: Dictionary = {
 			"minimum_grab_thickness": {"value": 6},
 		},
 	},
-	# 15. ItemList — 9 stylebox slots + colors + constants
+	# 15. ItemList — official Godot 4.6.2 slots. Cursor overlays stay alpha-bearing
+	# because Godot draws them above row content (Phase 6 D-04).
 	"ItemList": {
 		"stylebox": {
 			"panel":                  {"role": "surface_low",   "raised_intensity": 0},
 			"focus":                  {"role": "focus_ring"},
-			"cursor":                 {"role": "state_hover",   "raised_intensity": 0},
-			"cursor_unfocused":       {"role": "state_hover",   "raised_intensity": 0},
-			"hovered":                {"role": "state_hover",   "raised_intensity": 0},
-			"selected":               {"role": "accent_offset", "raised_intensity": 0},
-			"selected_focus":         {"role": "accent_offset", "raised_intensity": 0},
-			"hovered_selected":       {"role": "accent_offset", "raised_intensity": 0},
-			"hovered_selected_focus": {"role": "accent_offset", "raised_intensity": 0},
+			"cursor":                 {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.24},
+			"cursor_unfocused":       {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.14},
+			"hovered":                {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.20},
+			"selected":               {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
+			"selected_focus":         {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
+			"hovered_selected":       {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
+			"hovered_selected_focus": {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
 		},
 		"color": {
-			"font_color":               {"role": "text_default"},
-			"font_hovered_color":       {"role": "text_strong"},
-			"font_selected_color":      {"role": "text_strong"},
+			"font_color":                  {"role": "text_default"},
+			"font_hovered_color":          {"role": "text_strong"},
+			"font_selected_color":         {"role": "text_strong"},
 			"font_hovered_selected_color": {"role": "text_strong"},
-			"guide_color":              {"role": "outline_color"},
+			"font_outline_color":          {"role": "outline_color"},
+			"guide_color":                 {"role": "outline_color"},
+			"scroll_hint_color":           {"role": "role_primary", "alpha": 0.82},
 		},
 		"constant": {
-			"v_separation":  {"value": "tokens.tapPadding"},
-			"h_separation":  {"value": "tokens.tapPadding"},
+			"v_separation":    {"value": "tokens.tapPadding"},
+			"h_separation":    {"value": "tokens.tapPadding"},
+			"icon_margin":     {"value": 6},
 			"line_separation": {"value": 2},
+			"outline_size":    {"value": 0},
+		},
+		"font_size": {
+			"font_size": {"value": "tokens.body"},
+		},
+		"icon": {
+			"scroll_hint": {"icon": "tree_scroll_hint"},
 		},
 	},
 	# 16. Label — 1 stylebox + 1 color
