@@ -22,8 +22,11 @@ func _init() -> void:
 	# Inline the same assertion logic as _phase4_verify.gd._verify_pulse() — duplicated
 	# rather than `load`-ed to keep this file standalone (the helper file is a few KB; KISS).
 	var failures: Array[String] = []
-	if theme.base_color != Color("#151A2E"): failures.append("base_color mismatch")
-	if theme.accent_color != Color("#8BFF6A"): failures.append("accent_color mismatch")
+	# BL-01 follow-up 2026-05-06: compare via hex string, not Color != Color. The .tres
+	# serializer truncates floats to 7 digits, so loaded Color values are not byte-equal
+	# to Color("#hex") constructed in code. Hex round-trips match exactly.
+	if theme.base_color.to_html(false).to_upper() != "151A2E": failures.append("base_color mismatch (got %s)" % theme.base_color.to_html(false).to_upper())
+	if theme.accent_color.to_html(false).to_upper() != "8BFF6A": failures.append("accent_color mismatch (got %s)" % theme.accent_color.to_html(false).to_upper())
 	if theme.raised: failures.append("raised should be false")
 	if theme.platform != NeoCadeTheme.Platform.AUTO: failures.append("platform mismatch")
 	if theme.corner_radius != 0: failures.append("corner_radius mismatch")
@@ -134,7 +137,7 @@ func _init() -> void:
 		{"file": "burst_neocade_theme.tres",    "expected_spread": 1.3, "base": Color("#20112E")},
 	]
 	for d in peers:
-		var peer_path := "res://addons/neocade_theme/" + d.file
+		var peer_path: String = "res://addons/neocade_theme/" + str(d.file)
 		var peer_loaded: Resource = ResourceLoader.load(peer_path)
 		if peer_loaded == null:
 			failures.append("peer load null: %s" % d.file)
@@ -145,8 +148,9 @@ func _init() -> void:
 		var pt: NeoCadeTheme = peer_loaded
 		if not pt.has_stylebox("normal", "Button"):
 			failures.append("peer %s missing Button.normal stylebox" % d.file)
-		if pt.base_color != d.base:
-			failures.append("peer %s base_color mismatch" % d.file)
+		var expected_hex: String = (d.base as Color).to_html(false).to_upper()
+		if pt.base_color.to_html(false).to_upper() != expected_hex:
+			failures.append("peer %s base_color mismatch (got %s, expected %s)" % [d.file, pt.base_color.to_html(false).to_upper(), expected_hex])
 		var pp: Dictionary = pt._resolve_direction_presets()
 		if abs(pp.spread_factor - d.expected_spread) > 0.001:
 			failures.append("peer %s spread_factor %f != %f" % [d.file, pp.spread_factor, d.expected_spread])

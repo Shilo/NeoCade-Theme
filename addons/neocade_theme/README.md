@@ -79,8 +79,9 @@ CJK fallback to the theme's `default_font.fallbacks`:
 ```gdscript
 func _ready() -> void:
     var theme: NeoCadeTheme = preload("res://addons/neocade_theme/pulse_neocade_theme.tres").duplicate()
-    # theme.default_font is the FontFile (Inter-Variable.tres) per FONT-06; the cast succeeds.
-    # Cycle 6 F6 fix 2026-05-06: confirmed default_font is FontFile, not FontVariation.
+    # theme.default_font is the FontFile (Inter-Variable.ttf, imported by Godot)
+    # per FONT-06; the cast succeeds. Godot 4 imports .ttf as a FontFile resource
+    # via the .ttf.import sidecar, so we reference the .ttf directly.
     var inter: FontFile = theme.default_font as FontFile
     var cjk_fallback: FontFile = preload("res://path/to/NotoSansCJK-Regular.ttf")
     inter.fallbacks = [cjk_fallback]
@@ -127,7 +128,7 @@ label.add_theme_font_override("font_italic", preload("res://addons/neocade_theme
 
 # Option B — author a FontVariation with a skew transform:
 var italic := FontVariation.new()
-italic.base_font = preload("res://addons/neocade_theme/fonts/Inter-Variable.tres")
+italic.base_font = preload("res://addons/neocade_theme/fonts/Inter-Variable.ttf")
 italic.transform = Transform2D(1.0, tan(deg_to_rad(12)), 0.0, 1.0, 0.0, 0.0)
 ```
 

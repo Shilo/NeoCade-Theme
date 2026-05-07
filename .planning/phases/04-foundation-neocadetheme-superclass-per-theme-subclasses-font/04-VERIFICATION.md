@@ -1,9 +1,12 @@
 ---
 phase: 04-foundation-neocadetheme-superclass-per-theme-subclasses-font
 verified: 2026-05-06T19:15:00Z
-status: human_needed
-score: 8/8 success-criteria structurally verified; 2 advisory blockers escalated to user
+re_verified: 2026-05-07T00:30:00Z
+status: passed
+score: 8/8 success criteria structurally verified; 2 advisory blockers fixed; headless verifier PASS on all 5 themes
 code_review_blockers_assessed: yes
+code_review_blockers_resolved: yes (BL-01 + BL-02 both fixed 2026-05-07)
+human_uat_status: complete (all 3 items resolved, see 04-HUMAN-UAT.md)
 gaps: []
 human_verification:
   - test: "Decide BL-01: ResourceSaver round-trip ships Inter font twice (.ttf 843 KB + Inter-Variable.tres 1.15 MB ≈ 2.0 MB total) versus the PROJECT.md / FONT-REVIEW.md '~810 KB total bundle' pledge."

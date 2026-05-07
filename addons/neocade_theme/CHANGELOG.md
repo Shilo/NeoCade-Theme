@@ -60,6 +60,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   no blur); flat mode sets `shadow_size = -1` (no shadow).
 - `Platform.AUTO` resolves at runtime via `OS.has_feature("mobile")`.
 
+### Fixed (Phase 4 post-review, 2026-05-06)
+
+- **BL-01 (font bundle bloat)**: removed `fonts/Inter-Variable.tres` and
+  repointed the 5 FontVariation `.tres` files + the class's `default_font`
+  preload to `fonts/Inter-Variable.ttf` directly (Godot 4 imports `.ttf` as
+  a `FontFile` resource via the `.import` sidecar). Bundle size dropped
+  from ~2.0 MB back to ~857 KB, matching the FONT-REVIEW.md ~810 KB pledge.
+  The previous `.tres` round-trip was inlining the Inter binary as a
+  `PackedByteArray`, shipping the font twice.
+- **BL-02 (RichTextLabel slot-name typo)**: changed
+  `set_font("font", "InfoText", body_font)` to
+  `set_font("normal_font", "InfoText", body_font)` at
+  `neocade_theme.gd:189`. RichTextLabel reads `normal_font` (not `font`),
+  so the explicit per-variation font set was previously silently dropped
+  and InfoText fell back to `theme.default_font`.
+- Verifier helper: switched `Color != Color` strict equality to hex-string
+  comparison (`to_html(false).to_upper()`) since `.tres` serializer
+  truncates floats to 7 digits and loaded values don't byte-equal
+  in-code-constructed `Color("#hex")` literals.
+
 ### Notes (v1.0.0 limitations preserved)
 
 - **No italic glyphs ship in v1.** Inter Italic Variable is deferred to v1.x.
