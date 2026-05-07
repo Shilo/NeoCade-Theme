@@ -198,7 +198,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. **All 6 Button type variations + 5 Label type variations + 1 RichTextLabel + 2 Panel variations declared:** PrimaryButton / SecondaryButton / GhostButton / DangerButton / IconButton / FlatButton; HeaderLarge / HeaderMedium / HeaderSmall / Caption / CodeLabel; InfoText; CardPanel / HeroPanel — all 14 variations declared in `.tres`. Fonts are set EXPLICITLY on every variation (per PITFALLS 1.2 — type variations DO NOT inherit fonts from base, even when stylebox inheritance works); verified in a runtime scene, not just editor preview.
   4. **Panel + PanelContainer + SpinBox themed:** Panel and PanelContainer have base + variations; SpinBox themed end-to-end (line edit + arrows).
   5. **Focus stylebox is an OUTER ring, not a fill replacement (Pitfall 1.1):** Focus rendered as 2px ring drawn OUTSIDE corner radius bounds in `role.primary`; verified that focus remains visible under hover, pressed, AND checked combinations (Tab-walk a test scene with one of each); shadow alpha on every StyleBoxFlat is `shadow_size = -1` (the disable value per Godot #98162).
-**Plans:** 5/7 plans executed
+**Plans:** 6/7 plans executed
 
 Plans:
 - [ ] `05-01-godot-cli-and-phase5-verifier-scaffold-PLAN.md` — Resolve Godot 4.6 CLI and create Phase 5 verifier scaffolding.
@@ -308,7 +308,7 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 | 3.3 Theme Direction Research (5 candidate directions) | 3/3 | Complete | 2026-05-06 |
 | 3.4 Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat) | 2/4 complete; Plan 03 paused at Task 4 | Awaiting user final approval | - |
 | 4. Foundation: Single `NeoCadeTheme` class + data `.tres` files + Fonts + Icons | 6/8 (Plans 04-01, 04-02, 04-03, 04-04, 04-05, 04-06 done) | In progress | started 2026-05-06 |
-| 5. Core Controls (Buttons/Inputs/Labels/Panels) | 5/7 | In Progress|  |
+| 5. Core Controls (Buttons/Inputs/Labels/Panels) | 6/7 | In Progress|  |
 | 6. Lists/Layout/Range | 0/TBD | Not started | - |
 | 7. Dialogs/Popups/Advanced | 0/TBD | Not started | - |
 | 8. Mobile Variant Token Block + Tap-Target Audit | 0/TBD | Not started | - |
