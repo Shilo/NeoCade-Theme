@@ -167,6 +167,13 @@ const EXPECTED_ITEMLIST_ICON_RECIPES := {
 	"scroll_hint": "tree_scroll_hint",
 }
 
+const EXPECTED_FOLDABLE_ICON_RECIPES := {
+	"expanded_arrow": "disclosure_expanded",
+	"expanded_arrow_mirrored": "disclosure_expanded_mirrored",
+	"folded_arrow": "disclosure_collapsed",
+	"folded_arrow_mirrored": "disclosure_collapsed_mirrored",
+}
+
 var _stage := "slot-freeze"
 var _failures: Array[String] = []
 var _pending: Array[String] = []
@@ -380,7 +387,7 @@ func assert_tree_stage() -> void:
 
 func assert_itemlist_foldable_stage_pending() -> void:
 	assert_itemlist_stage()
-	_group_pending("assert_foldable_stage", "FoldableContainer polish group is owned by Plan 06-03 Task 2")
+	assert_foldable_stage()
 
 
 func assert_tabs_stage_pending() -> void:
@@ -580,6 +587,100 @@ func _assert_itemlist_icon_recipes(problems: Array[String]) -> void:
 		var actual_icon: String = recipe.get("icon", "")
 		if actual_icon != expected_icon:
 			problems.append("ItemList.icon recipe %s expected %s got %s" % [slot, expected_icon, actual_icon])
+
+
+func assert_foldable_stage() -> void:
+	var group := "assert_foldable_stage"
+	var loaded := ResourceLoader.load(PULSE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE)
+	if loaded == null or not (loaded is NeoCadeTheme):
+		_group_fail(group, "Pulse direction did not load as NeoCadeTheme")
+		return
+	var theme: NeoCadeTheme = loaded
+	var problems: Array[String] = []
+	_assert_foldable_slots_present(theme, problems)
+	_assert_foldable_focus_discipline(theme, problems)
+	_assert_foldable_header_chrome(problems)
+	_assert_foldable_stale_slots_absent(theme, problems)
+	_assert_foldable_icon_recipes(problems)
+	if problems.is_empty():
+		_group_ok(group, "FoldableContainer official slots, section header chrome, focus, and disclosure icons are covered")
+	else:
+		_group_fail(group, "; ".join(problems))
+
+
+func _assert_foldable_slots_present(theme: Theme, problems: Array[String]) -> void:
+	var expected: Dictionary = EXPECTED_SLOT_FREEZE.FoldableContainer
+	for slot in expected.stylebox:
+		if not theme.has_stylebox(slot, "FoldableContainer"):
+			problems.append("FoldableContainer.stylebox missing %s" % slot)
+	for slot in expected.color:
+		if not theme.has_color(slot, "FoldableContainer"):
+			problems.append("FoldableContainer.color missing %s" % slot)
+	for slot in expected.constant:
+		if not theme.has_constant(slot, "FoldableContainer"):
+			problems.append("FoldableContainer.constant missing %s" % slot)
+	for slot in expected.font:
+		if not theme.has_font(slot, "FoldableContainer"):
+			problems.append("FoldableContainer.font missing %s" % slot)
+	for slot in expected.font_size:
+		if not theme.has_font_size(slot, "FoldableContainer"):
+			problems.append("FoldableContainer.font_size missing %s" % slot)
+	for slot in expected.icon:
+		if not theme.has_icon(slot, "FoldableContainer"):
+			problems.append("FoldableContainer.icon missing %s" % slot)
+
+
+func _assert_foldable_focus_discipline(theme: Theme, problems: Array[String]) -> void:
+	var focus := theme.get_stylebox("focus", "FoldableContainer") as StyleBoxFlat
+	if focus == null:
+		problems.append("FoldableContainer.focus is not a StyleBoxFlat")
+	else:
+		if focus.bg_color.a != 0.0:
+			problems.append("FoldableContainer.focus background is not transparent")
+		if focus.border_width_left <= 0 or focus.border_width_top <= 0:
+			problems.append("FoldableContainer.focus has no outer border ring")
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	var foldable_style: Dictionary = binding.get("FoldableContainer", {}).get("stylebox", {})
+	for invalid in ["pressed_focus", "checked_focus", "hover_pressed", "title_focus", "title_hover"]:
+		if foldable_style.has(invalid):
+			problems.append("FoldableContainer.stylebox has invalid focus/title slot %s" % invalid)
+
+
+func _assert_foldable_header_chrome(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	var foldable_style: Dictionary = binding.get("FoldableContainer", {}).get("stylebox", {})
+	var expected_roles := {
+		"title_panel": ["surface_panel", "surface_high", "surface_overlay"],
+		"title_hover_panel": ["state_hover"],
+		"title_collapsed_panel": ["surface_panel", "surface_high", "surface_overlay"],
+		"title_collapsed_hover_panel": ["state_hover"],
+	}
+	for slot in expected_roles.keys():
+		var recipe: Dictionary = foldable_style.get(slot, {})
+		var role: String = recipe.get("role", "")
+		if not (expected_roles[slot] as Array).has(role):
+			problems.append("FoldableContainer.%s role %s is not section/tab-panel chrome" % [slot, role])
+		if ["role_primary", "accent_offset", "state_pressed"].has(role):
+			problems.append("FoldableContainer.%s uses push-button/selected role %s" % [slot, role])
+
+
+func _assert_foldable_stale_slots_absent(theme: Theme, problems: Array[String]) -> void:
+	for bad in ["title_hover", "title_collapsed"]:
+		if theme.has_stylebox(bad, "FoldableContainer"):
+			problems.append("FoldableContainer stale stylebox %s is present" % bad)
+	if theme.has_color("title_font_color", "FoldableContainer"):
+		problems.append("FoldableContainer stale color title_font_color is present")
+
+
+func _assert_foldable_icon_recipes(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	var foldable_icons: Dictionary = binding.get("FoldableContainer", {}).get("icon", {})
+	for slot in EXPECTED_FOLDABLE_ICON_RECIPES.keys():
+		var expected_icon: String = EXPECTED_FOLDABLE_ICON_RECIPES[slot]
+		var recipe: Dictionary = foldable_icons.get(slot, {})
+		var actual_icon: String = recipe.get("icon", "")
+		if actual_icon != expected_icon:
+			problems.append("FoldableContainer.icon recipe %s expected %s got %s" % [slot, expected_icon, actual_icon])
 
 
 func _direction_presets_for_theme(theme: NeoCadeTheme) -> Dictionary:
