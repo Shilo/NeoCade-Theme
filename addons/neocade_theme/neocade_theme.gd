@@ -359,23 +359,233 @@ func _make_raised_stylebox(bg: Color, offset_color: Color, intensity: int) -> St
 ##
 ## Lookup is by base_color hex (uppercased, no alpha — matches `Color.to_html(false)`).
 ## Fallback default is medium-spread / M3-baseline if no match.
+##
+## Phase 5 Plan 05-02 (D-02 / D-03 / D-04) adds the `shape` sub-Dictionary on every row.
+## Shape values are sourced VERBATIM from DESIGN_TOKENS §5.1-§5.5 ("Theme Editor override
+## intent" lines). The shape block carries per-direction shape language (radii, paddings,
+## raised lifts, surface alphas, primary/ghost/kicker strategies, focus_offset) so
+## BINDING_TABLE recipes can reference `shape.<key>` paths via `_lookup_shape()`. Strategy
+## names are first-class enums per D-04: adding a 6th direction in v2 = adding a strategy
+## entry, not editing 14 recipes.
 const DIRECTION_PRESETS: Dictionary = {
-	# Per-direction values reconciled to DESIGN_TOKENS §5.1-§5.5 verbatim (Cycle 6 F1 fix 2026-05-06).
-	# Pulse — base=#151A2E, accent=#8BFF6A, spread=wide, hover=+6, pressed=-10, disabled=0.42 (DESIGN_TOKENS §5.1)
-	"151A2E": {"spread_factor": 1.3, "hover_pct": 6.0, "pressed_pct": -10.0, "disabled_opacity": 0.42},
-	# Slate — base=#111820, accent=#8BD3FF, spread=narrow, hover=+4 (subdued), pressed=-6, disabled=0.50 (DESIGN_TOKENS §5.2)
-	"111820": {"spread_factor": 0.7, "hover_pct": 4.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50},
-	# Bubble — base=#241326, accent=#FFB3E6, spread=medium, hover=+8, pressed=-10, disabled=0.45 (DESIGN_TOKENS §5.3)
-	"241326": {"spread_factor": 1.0, "hover_pct": 8.0, "pressed_pct": -10.0, "disabled_opacity": 0.45},
-	# Daybreak — base=#0B2420, accent=#76F2D1, spread=medium, hover=+6, pressed=-6, disabled=0.50 (DESIGN_TOKENS §5.4)
-	"0B2420": {"spread_factor": 1.0, "hover_pct": 6.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50},
-	# Burst — base=#20112E, accent=#FFD166, spread=wide, hover=+8, pressed=-12, disabled=0.45 (DESIGN_TOKENS §5.5)
-	"20112E": {"spread_factor": 1.3, "hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.45},
+	# ─── Pulse — base=#151A2E, accent=#8BFF6A (DESIGN_TOKENS §5.1) ───
+	# Personality: arcade-cabinet rectangular; radius=0; tight-cabinet focus ring (offset=0).
+	# Buttons rectangular (radius 0), padding 14×10 desktop, primary strategy = bold-accent-fill.
+	# Surface alpha all 1.00 (cabinet hardware is solid).
+	"151A2E": {
+		"spread_factor": 1.3, "hover_pct": 6.0, "pressed_pct": -10.0, "disabled_opacity": 0.42,
+		"shape": {
+			"primary_radius":        0,
+			"primary_padding":       Vector2i(14, 10),
+			"primary_strategy":      &"bold-accent-fill",
+			"ghost_strategy":        &"accent-outlined-accent-text",
+			"secondary_radius":      0,
+			"tab_radius":            0,
+			"chip_radius":           0,
+			"card_radius":           0,
+			"hero_radius":           0,
+			"surface_alpha_panels":  1.00,
+			"surface_alpha_popup":   1.00,
+			"surface_alpha_buttons": 1.00,
+			"raised_lifts": {
+				"primary":         3,
+				"secondary":       1,
+				"ghost":           1,
+				"selected_tab":    2,
+				"unselected_tab":  2,
+				"panel":           3,
+				"dialog":          3,
+				"list":            3,
+				"mark":            3,
+				"selected_row":    0,  # Pulse rows do NOT lift (§5.1 raised lifts line)
+				"chip":            3,
+			},
+			"focus_offset":  0,
+			"kicker_style":  &"uppercase-tracked-accent",
+		},
+	},
+	# ─── Slate — base=#111820, accent=#8BD3FF (DESIGN_TOKENS §5.2) ───
+	# Personality: iOS-premium-quiet; radius=14 rounded-pill; ios-style-offset focus (offset=2).
+	# Buttons rounded (radius 14), padding 16×11 desktop, primary strategy = quiet-pill.
+	# Tabs/chips full pill (radius 999). Surface alpha popup 0.92 (iOS NavigationBar bleed).
+	"111820": {
+		"spread_factor": 0.7, "hover_pct": 4.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
+		"shape": {
+			"primary_radius":        14,
+			"primary_padding":       Vector2i(16, 11),
+			"primary_strategy":      &"quiet-pill",
+			"ghost_strategy":        &"thin-accent-outline",
+			"secondary_radius":      14,
+			"tab_radius":            999,
+			"chip_radius":           999,
+			"card_radius":           14,
+			"hero_radius":           14,
+			"surface_alpha_panels":  1.00,
+			"surface_alpha_popup":   0.92,
+			"surface_alpha_buttons": 1.00,
+			"raised_lifts": {
+				"primary":         2,
+				"secondary":       1,
+				"ghost":           1,
+				"selected_tab":    1,
+				"unselected_tab":  1,
+				"panel":           2,
+				"dialog":          2,
+				"list":            2,
+				"mark":            2,
+				"selected_row":    1,
+				"chip":            2,
+			},
+			"focus_offset":  2,
+			"kicker_style":  &"small-caps-subtle",
+		},
+	},
+	# ─── Bubble — base=#241326, accent=#FFB3E6 (DESIGN_TOKENS §5.3) ───
+	# Personality: candy-pillowy; base radius 26 / primary radius 999 (pill on primary
+	# specifically per §5.3); cheerful-chunky focus (offset=2). Padding 20×14 desktop.
+	# Tabs/chips fully-rounded pill (radius 999). Surface alpha all 1.00 (candy is opaque).
+	"241326": {
+		"spread_factor": 1.0, "hover_pct": 8.0, "pressed_pct": -10.0, "disabled_opacity": 0.45,
+		"shape": {
+			"primary_radius":        999,
+			"primary_padding":       Vector2i(20, 14),
+			"primary_strategy":      &"pillowy-fully-rounded",
+			"ghost_strategy":        &"rounded-ghost-thicker-outline",
+			"secondary_radius":      26,
+			"tab_radius":            999,
+			"chip_radius":           999,
+			"card_radius":           26,
+			"hero_radius":           26,
+			"surface_alpha_panels":  1.00,
+			"surface_alpha_popup":   1.00,
+			"surface_alpha_buttons": 1.00,
+			"raised_lifts": {
+				"primary":         6,
+				"secondary":       3,
+				"ghost":           3,
+				"selected_tab":    4,
+				"unselected_tab":  4,
+				"panel":           6,
+				"dialog":          6,
+				"list":            6,
+				"mark":            6,
+				"selected_row":    3,
+				"chip":            6,
+			},
+			"focus_offset":  2,
+			"kicker_style":  &"uppercase-tracked-accent",
+		},
+	},
+	# ─── Daybreak — base=#0B2420, accent=#76F2D1 (DESIGN_TOKENS §5.4) ───
+	# Personality: airy-welcoming-lobby; radius=8 gently rounded; airy-mint focus (offset=2).
+	# Buttons radius 8, padding 18×12 desktop, primary strategy = friendly-generous.
+	# Surface alpha popup 0.90 + panels 0.96 (airy bleed) but buttons 1.00 (tappability).
+	"0B2420": {
+		"spread_factor": 1.0, "hover_pct": 6.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
+		"shape": {
+			"primary_radius":        8,
+			"primary_padding":       Vector2i(18, 12),
+			"primary_strategy":      &"friendly-generous",
+			"ghost_strategy":        &"soft-outline",
+			"secondary_radius":      8,
+			"tab_radius":            8,
+			"chip_radius":           8,
+			"card_radius":           8,
+			"hero_radius":           8,
+			"surface_alpha_panels":  0.96,
+			"surface_alpha_popup":   0.90,
+			"surface_alpha_buttons": 1.00,
+			"raised_lifts": {
+				"primary":         3,
+				"secondary":       1,
+				"ghost":           1,
+				"selected_tab":    2,
+				"unselected_tab":  2,
+				"panel":           3,
+				"dialog":          3,
+				"list":            3,
+				"mark":            3,
+				"selected_row":    1,
+				"chip":            3,
+			},
+			"focus_offset":  2,
+			"kicker_style":  &"sentence-case-accent",
+		},
+	},
+	# ─── Burst — base=#20112E, accent=#FFD166 (DESIGN_TOKENS §5.5) ───
+	# Personality: event-celebration-statement; base radius 18 / primary radius 28 (oversized
+	# per §5.5); dramatic-event focus (offset=1). Padding 20×14 desktop. Tabs radius 16.
+	# Surface alpha all 1.00 (celebration posters solid). Primary strategy = oversized-statement.
+	"20112E": {
+		"spread_factor": 1.3, "hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.45,
+		"shape": {
+			"primary_radius":        28,
+			"primary_padding":       Vector2i(20, 14),
+			"primary_strategy":      &"oversized-statement",
+			"ghost_strategy":        &"normal-accent-ghost",
+			"secondary_radius":      18,
+			"tab_radius":            16,
+			"chip_radius":           16,
+			"card_radius":           18,
+			"hero_radius":           18,
+			"surface_alpha_panels":  1.00,
+			"surface_alpha_popup":   1.00,
+			"surface_alpha_buttons": 1.00,
+			"raised_lifts": {
+				"primary":         5,
+				"secondary":       2,
+				"ghost":           2,
+				"selected_tab":    3,
+				"unselected_tab":  3,
+				"panel":           5,
+				"dialog":          5,
+				"list":            5,
+				"mark":            5,
+				"selected_row":    2,
+				"chip":            5,
+			},
+			"focus_offset":  1,
+			"kicker_style":  &"uppercase-bold-larger-scale",
+		},
+	},
 }
 
 ## Default (when base_color doesn't match any of the 5 approved directions — custom themes).
+##
+## Per CONTEXT.md D-13: medium-spread / medium-radius defaults. shape.* values give
+## NeoCadeTheme.new() consumers with non-approved hex a stable base — the chrome reads as
+## "friendly-generous" (Daybreak's strategy) at radius 8 / focus_offset 2 / surface alpha 1.00.
 const DIRECTION_PRESET_DEFAULT: Dictionary = {
 	"spread_factor": 1.0, "hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.38,
+	"shape": {
+		"primary_radius":        8,
+		"primary_padding":       Vector2i(16, 11),
+		"primary_strategy":      &"friendly-generous",
+		"ghost_strategy":        &"soft-outline",
+		"secondary_radius":      8,
+		"tab_radius":            8,
+		"chip_radius":           8,
+		"card_radius":           8,
+		"hero_radius":           8,
+		"surface_alpha_panels":  1.00,
+		"surface_alpha_popup":   1.00,
+		"surface_alpha_buttons": 1.00,
+		"raised_lifts": {
+			"primary":         3,
+			"secondary":       1,
+			"ghost":           1,
+			"selected_tab":    2,
+			"unselected_tab":  2,
+			"panel":           3,
+			"dialog":          3,
+			"list":            3,
+			"mark":            3,
+			"selected_row":    1,
+			"chip":            3,
+		},
+		"focus_offset":  2,
+		"kicker_style":  &"sentence-case-accent",
+	},
 }
 
 ## Returns the per-direction sub-dict for `base_color`. Lookup is by uppercased hex without alpha.
