@@ -429,12 +429,17 @@ func assert_tabs_stage() -> void:
 	var theme: NeoCadeTheme = loaded
 	var problems: Array[String] = []
 	_assert_tab_slots_present(theme, problems)
+	_assert_tab_table_owns_official_slots(problems)
 	_assert_tab_shared_style_recipes(problems)
 	_assert_tab_shape_recipes(theme, problems)
 	_assert_tab_focus_discipline(theme, problems)
 	_assert_tab_stale_slots_absent(theme, problems)
 	_assert_tab_icon_recipes(problems)
 	if problems.is_empty():
+		print("PHASE6_COVERAGE_OK:COV-05 TabBar and TabContainer list/tab coverage contribution enforced")
+		print("PHASE6_COVERAGE_OK:COV-01 TabBar and TabContainer contribute to cumulative 37-Control scorecard")
+		print("PHASE6_COVERAGE_OK:COV-09 TabBar and TabContainer use transparent outer tab_focus rings")
+		print("PHASE6_CARRY_FORWARD:TYPEVAR-06 Tab shared state/icon behavior to document in Phase 8 final variation/mobile spec")
 		_group_ok(group, "TabBar and TabContainer official slots, shared recipes, focus, constants, fonts, and icons are covered")
 	else:
 		_group_fail(group, "; ".join(problems))
@@ -750,6 +755,18 @@ func _assert_tab_slots_present(theme: Theme, problems: Array[String]) -> void:
 		for slot in expected.icon:
 			if not theme.has_icon(slot, type_name):
 				problems.append("%s.icon missing %s" % [type_name, slot])
+
+
+func _assert_tab_table_owns_official_slots(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	for type_name in ["TabBar", "TabContainer"]:
+		var expected: Dictionary = EXPECTED_SLOT_FREEZE[type_name]
+		var type_block: Dictionary = binding.get(type_name, {})
+		for data_type in ["stylebox", "color", "constant", "font_size", "icon"]:
+			var slot_block: Dictionary = type_block.get(data_type, {})
+			for slot in expected.get(data_type, []):
+				if not slot_block.has(slot):
+					problems.append("BINDING_TABLE.%s.%s missing explicit recipe for %s" % [type_name, data_type, slot])
 
 
 func _assert_tab_shared_style_recipes(problems: Array[String]) -> void:
