@@ -268,6 +268,9 @@ func _run_verifier() -> void:
 	assert_button_strategy_distinctness()
 	assert_dangerbutton_role_danger()
 	assert_basebutton_family_chrome()
+	# Plan 05-03 Task 2 polish groups.
+	assert_basebutton_family_shape_aware()
+	assert_checkbox_disabled_icon_reuse()
 
 
 func _verify_helper_wiring() -> bool:
@@ -1204,6 +1207,97 @@ func assert_dangerbutton_role_danger() -> void:
 ##     normal/hover and that the LinkButton row does NOT carry a `normal`
 ##     stylebox recipe (regression catch: someone adds filled chrome that
 ##     Godot would not draw).
+## Plan 05-03 Task 2 polish: BaseButton-family rows reference Plan 05-02
+## shape.* recipes so per-direction radius / padding / lift differences flow
+## through the base controls (not just TYPEVAR-01 variations). Without this
+## polish, MenuButton/OptionButton/ColorPickerButton would render with the
+## flat @export `corner_radius` baseline regardless of direction, while
+## PrimaryButton / SecondaryButton would visibly differ — a UI inconsistency
+## reviewed in Phase 4 D-04.
+##
+## Verification: load the production source, scan each base BINDING_TABLE row
+## (Button / OptionButton / MenuButton / ColorPickerButton — CheckBox /
+## CheckButton intentionally skip the radius/padding key because they are
+## icon-driven, not chrome-driven), and assert the row contains a `shape.`
+## reference somewhere in the stylebox sub-block (the `radius` or `padding`
+## key with a `shape.<...>` value). Failure mode: PENDING in tooling, FAIL
+## in buttons / strict.
+func assert_basebutton_family_shape_aware() -> void:
+	var group := "assert_basebutton_family_shape_aware"
+	var src_text := _read_production_source()
+	if src_text.is_empty():
+		_group_fail(group, "could not read production source")
+		return
+	# Per Phase 4 commentary, CheckBox + CheckButton are intentionally
+	# icon-driven; their stylebox slots stay on the @export corner_radius
+	# baseline. The 4 Button-style classes below all benefit from
+	# direction-aware chrome.
+	var shape_aware_targets := ["Button", "OptionButton", "MenuButton", "ColorPickerButton"]
+	# Walk each top-level row in BINDING_TABLE and look for a stylebox
+	# entry whose value contains `"shape."` (either radius or padding key).
+	var problems: Array[String] = []
+	for klass in shape_aware_targets:
+		# Find the row header.
+		var header: String = "\"" + String(klass) + "\":"
+		var idx: int = src_text.find(header)
+		if idx == -1:
+			problems.append("%s row not found in BINDING_TABLE" % klass)
+			continue
+		# Take the next ~3000 characters (rows are short) and look for shape.
+		var window: String = src_text.substr(idx, 3000)
+		# Stop the window at the next top-level row to avoid bleeding into the
+		# adjacent class. Top-level rows are indented by exactly one tab.
+		# A simple heuristic: cut at the next occurrence of a closing brace
+		# followed by `,\n\t# ` (next row's comment header).
+		var cut := window.find("\n\t# ")
+		if cut > 0:
+			window = window.substr(0, cut)
+		if window.find("\"shape.") == -1 and window.find("'shape.") == -1:
+			problems.append("%s BINDING_TABLE row has no `shape.*` recipe references (Plan 05-03 Task 2)" % klass)
+	if problems.is_empty():
+		_group_ok(group, "Button / OptionButton / MenuButton / ColorPickerButton rows reference shape.* recipes (Plan 05-02 wiring flows through)")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+## Plan 05-03 Task 2 polish: CheckBox + CheckButton expose disabled-state
+## icon slots that REUSE the existing checked / unchecked SVGs (per the
+## Action item: "reuse existing SVGs for disabled/toggled where Godot
+## exposes tintable icon slots, unless Godot introspection proves a
+## distinct slot name"). Phase 4 commentary in CANONICAL_SLOT_NAMES already
+## documents that Godot 4.6 CheckButton exposes:
+##   checked, checked_disabled, checked_disabled_mirrored, checked_mirrored,
+##   unchecked, unchecked_disabled, unchecked_disabled_mirrored,
+##   unchecked_mirrored
+## Phase 4 shipped only the 2 primary slots; Plan 05-03 Task 2 closes the
+## reuse contract: every disabled slot binds to the same checked/unchecked
+## SVG so the icon stays visible (Godot's font_disabled_color tints it).
+##
+## Tested by introspecting the live theme's icon list per class.
+func assert_checkbox_disabled_icon_reuse() -> void:
+	var group := "assert_checkbox_disabled_icon_reuse"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	# CheckButton: checked_disabled + unchecked_disabled (skip *_mirrored —
+	# Phase 4 commentary defers them to v1.x; we add them only if Godot
+	# requires them, which it does NOT per docs).
+	var cb_icons: PackedStringArray = theme.get_icon_list("CheckButton")
+	for ic in ["checked_disabled", "unchecked_disabled"]:
+		if cb_icons.find(ic) == -1:
+			problems.append("CheckButton.%s missing — reuse the existing checkbutton_checked / checkbutton_unchecked SVG" % ic)
+	# CheckBox: checked_disabled + unchecked_disabled (Phase 4 wired
+	# checked/unchecked + radio_checked/radio_unchecked already).
+	var cx_icons: PackedStringArray = theme.get_icon_list("CheckBox")
+	for ic in ["checked_disabled", "unchecked_disabled"]:
+		if cx_icons.find(ic) == -1:
+			problems.append("CheckBox.%s missing — reuse the existing checkbox_checked / checkbox_unchecked SVG" % ic)
+	if problems.is_empty():
+		_group_ok(group, "CheckBox + CheckButton disabled icon slots reuse existing SVGs (no new artwork required)")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
 func assert_basebutton_family_chrome() -> void:
 	var group := "assert_basebutton_family_chrome"
 	var theme := _load_pulse_for_group(group)
@@ -1302,6 +1396,8 @@ func _group_pending(group: String, detail: String) -> void:
 		"assert_button_strategy_distinctness",
 		"assert_dangerbutton_role_danger",
 		"assert_basebutton_family_chrome",
+		"assert_basebutton_family_shape_aware",
+		"assert_checkbox_disabled_icon_reuse",
 		"assert_focus_overlay_visibility",
 		# Plan 05-02 carry-forward: shape groups stay strict in `buttons`
 		# stage because the buttons recipes depend on them resolving.
@@ -1338,8 +1434,8 @@ func _group_fail(group: String, detail: String) -> void:
 func _emit_summary_and_quit() -> void:
 	print("----- PHASE5_VERIFY summary -----")
 	print("  stage:          %s" % _stage)
-	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 6 = 17.
-	print("  groups OK:      %d / %d" % [_ok_markers.size(), 17])
+	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 = 19.
+	print("  groups OK:      %d / %d" % [_ok_markers.size(), 19])
 	print("  groups PENDING: %d  %s" % [_pending.size(), str(_pending)])
 	print("  failures:       %d" % _failures.size())
 	for f in _failures:

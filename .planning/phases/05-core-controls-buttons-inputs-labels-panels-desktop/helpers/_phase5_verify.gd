@@ -113,6 +113,9 @@ func _run() -> void:
 	assert_button_strategy_distinctness()
 	assert_dangerbutton_role_danger()
 	assert_basebutton_family_chrome()
+	# Plan 05-03 Task 2 polish.
+	assert_basebutton_family_shape_aware()
+	assert_checkbox_disabled_icon_reuse()
 	_emit_summary()
 
 
@@ -647,6 +650,53 @@ func assert_dangerbutton_role_danger() -> void:
 	_group_ok(group, "DangerButton.normal resolves to role_danger #%s (Plan 05-02 semantic role flowed through)" % fsb.bg_color.to_html(false).to_upper())
 
 
+func assert_basebutton_family_shape_aware() -> void:
+	var group := "assert_basebutton_family_shape_aware"
+	var f := FileAccess.open(PRODUCTION_GD, FileAccess.READ)
+	if f == null:
+		_group_fail(group, "could not read production source")
+		return
+	var src_text: String = f.get_as_text()
+	f.close()
+	var shape_aware_targets := ["Button", "OptionButton", "MenuButton", "ColorPickerButton"]
+	var problems: Array[String] = []
+	for klass in shape_aware_targets:
+		var header: String = "\"" + String(klass) + "\":"
+		var idx: int = src_text.find(header)
+		if idx == -1:
+			problems.append("%s row not found in BINDING_TABLE" % klass)
+			continue
+		var window: String = src_text.substr(idx, 3000)
+		var cut: int = window.find("\n\t# ")
+		if cut > 0:
+			window = window.substr(0, cut)
+		if window.find("\"shape.") == -1 and window.find("'shape.") == -1:
+			problems.append("%s row has no `shape.*` recipe references (Plan 05-03 Task 2)" % klass)
+	if problems.is_empty():
+		_group_ok(group, "Button / OptionButton / MenuButton / ColorPickerButton rows reference shape.* recipes")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+func assert_checkbox_disabled_icon_reuse() -> void:
+	var group := "assert_checkbox_disabled_icon_reuse"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	var cb_icons: PackedStringArray = theme.get_icon_list("CheckButton")
+	for ic in ["checked_disabled", "unchecked_disabled"]:
+		if cb_icons.find(ic) == -1:
+			problems.append("CheckButton.%s missing — reuse the existing checkbutton SVG" % ic)
+	var cx_icons: PackedStringArray = theme.get_icon_list("CheckBox")
+	for ic in ["checked_disabled", "unchecked_disabled"]:
+		if cx_icons.find(ic) == -1:
+			problems.append("CheckBox.%s missing — reuse the existing checkbox SVG" % ic)
+	if problems.is_empty():
+		_group_ok(group, "CheckBox + CheckButton disabled icon slots reuse existing SVGs")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
 func assert_basebutton_family_chrome() -> void:
 	var group := "assert_basebutton_family_chrome"
 	var theme := _load_pulse_for_group(group)
@@ -742,6 +792,8 @@ func _group_pending(group: String, detail: String) -> void:
 		"assert_button_strategy_distinctness",
 		"assert_dangerbutton_role_danger",
 		"assert_basebutton_family_chrome",
+		"assert_basebutton_family_shape_aware",
+		"assert_checkbox_disabled_icon_reuse",
 		"assert_focus_overlay_visibility",
 		"assert_shape_lookup_integrity",
 		"assert_shape_value_integrity",
@@ -776,8 +828,8 @@ func _group_fail(group: String, detail: String) -> void:
 func _emit_summary() -> void:
 	print("----- PHASE5_VERIFY summary -----")
 	print("  stage:          %s" % _stage)
-	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 6 = 17.
-	print("  groups OK:      %d / %d" % [_ok_markers.size(), 17])
+	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 = 19.
+	print("  groups OK:      %d / %d" % [_ok_markers.size(), 19])
 	print("  groups PENDING: %d  %s" % [_pending.size(), str(_pending)])
 	print("  failures:       %d" % _failures.size())
 	for f in _failures:
