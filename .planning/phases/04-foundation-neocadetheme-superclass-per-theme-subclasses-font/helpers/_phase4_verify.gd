@@ -178,7 +178,7 @@ func _verify_peers() -> void:
 		{"file": "burst_neocade_theme.tres",    "expected_spread": 1.3, "base": Color("#20112E")},
 	]
 	for d in peers:
-		var path := "res://addons/neocade_theme/" + d.file
+		var path: String = "res://addons/neocade_theme/" + str(d.file)
 		var loaded: Resource = ResourceLoader.load(path)
 		assert(loaded != null, "peer load null: %s" % d.file)
 		assert(loaded is NeoCadeTheme, "peer not NeoCadeTheme: %s" % d.file)

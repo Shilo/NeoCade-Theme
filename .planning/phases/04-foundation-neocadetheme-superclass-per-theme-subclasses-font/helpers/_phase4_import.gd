@@ -152,7 +152,7 @@ func _save_peer_tres() -> void:
 		t.raised_strength = d.raised_strength
 		t.focus_thickness = d.focus_thickness
 		t.outline_width = d.outline_width
-		var path := "res://addons/neocade_theme/" + d.file
+		var path: String = "res://addons/neocade_theme/" + str(d.file)
 		var ok := ResourceSaver.save(t, path)
 		assert(ok == OK, "%s save failed: %d" % [d.file, ok])
 		# Cross-AI Cycle 3 N4 Fix A — strip serialized theme entries (re-uses the
