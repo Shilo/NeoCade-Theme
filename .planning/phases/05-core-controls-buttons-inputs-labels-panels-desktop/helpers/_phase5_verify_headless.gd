@@ -1233,25 +1233,46 @@ func assert_basebutton_family_shape_aware() -> void:
 	# baseline. The 4 Button-style classes below all benefit from
 	# direction-aware chrome.
 	var shape_aware_targets := ["Button", "OptionButton", "MenuButton", "ColorPickerButton"]
+	# Anchor search past CANONICAL_SLOT_NAMES so we hit BINDING_TABLE rows
+	# instead of the slot-enumeration rows (which have the same `"Button":`
+	# header but no recipes). BINDING_TABLE_BEGIN is the const declaration
+	# line; we search after that.
+	var binding_table_anchor: int = src_text.find("const BINDING_TABLE")
+	if binding_table_anchor == -1:
+		_group_fail(group, "BINDING_TABLE const declaration not found in production source")
+		return
 	# Walk each top-level row in BINDING_TABLE and look for a stylebox
 	# entry whose value contains `"shape."` (either radius or padding key).
 	var problems: Array[String] = []
 	for klass in shape_aware_targets:
-		# Find the row header.
+		# Find the row header AFTER the BINDING_TABLE anchor so we never
+		# hit the CANONICAL_SLOT_NAMES dict that has the same key form.
 		var header: String = "\"" + String(klass) + "\":"
-		var idx: int = src_text.find(header)
+		var idx: int = src_text.find(header, binding_table_anchor)
 		if idx == -1:
 			problems.append("%s row not found in BINDING_TABLE" % klass)
 			continue
-		# Take the next ~3000 characters (rows are short) and look for shape.
-		var window: String = src_text.substr(idx, 3000)
-		# Stop the window at the next top-level row to avoid bleeding into the
-		# adjacent class. Top-level rows are indented by exactly one tab.
-		# A simple heuristic: cut at the next occurrence of a closing brace
-		# followed by `,\n\t# ` (next row's comment header).
-		var cut := window.find("\n\t# ")
-		if cut > 0:
-			window = window.substr(0, cut)
+		# Take the next ~4000 characters (rows are short) and look for shape.
+		var window: String = src_text.substr(idx, 4000)
+		# Stop the window at the next top-level NUMBERED row header to avoid
+		# bleeding into adjacent classes. Format is `\n\t# <digit>. <Klass>`.
+		# Inline polish comments like `\n\t# Plan 05-03 Task 2 polish: ...`
+		# do not start with a digit so they are NOT treated as a row boundary.
+		var search_start: int = 1
+		while true:
+			var cut: int = window.find("\n\t# ", search_start)
+			if cut == -1:
+				break
+			# Check the character after `\n\t# `: only digit-prefixed comments
+			# are class headers. (Pre-existing class headers in this file all
+			# follow `# <number>. <Class>` format.)
+			var next_char_idx: int = cut + 4  # past "\n\t# "
+			if next_char_idx < window.length():
+				var ch: String = window.substr(next_char_idx, 1)
+				if ch >= "0" and ch <= "9":
+					window = window.substr(0, cut)
+					break
+			search_start = cut + 1
 		if window.find("\"shape.") == -1 and window.find("'shape.") == -1:
 			problems.append("%s BINDING_TABLE row has no `shape.*` recipe references (Plan 05-03 Task 2)" % klass)
 	if problems.is_empty():

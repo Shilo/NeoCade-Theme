@@ -659,17 +659,33 @@ func assert_basebutton_family_shape_aware() -> void:
 	var src_text: String = f.get_as_text()
 	f.close()
 	var shape_aware_targets := ["Button", "OptionButton", "MenuButton", "ColorPickerButton"]
+	# Anchor past CANONICAL_SLOT_NAMES so we hit BINDING_TABLE rows.
+	var binding_table_anchor: int = src_text.find("const BINDING_TABLE")
+	if binding_table_anchor == -1:
+		_group_fail(group, "BINDING_TABLE const declaration not found in production source")
+		return
 	var problems: Array[String] = []
 	for klass in shape_aware_targets:
 		var header: String = "\"" + String(klass) + "\":"
-		var idx: int = src_text.find(header)
+		var idx: int = src_text.find(header, binding_table_anchor)
 		if idx == -1:
 			problems.append("%s row not found in BINDING_TABLE" % klass)
 			continue
-		var window: String = src_text.substr(idx, 3000)
-		var cut: int = window.find("\n\t# ")
-		if cut > 0:
-			window = window.substr(0, cut)
+		var window: String = src_text.substr(idx, 4000)
+		# Cut at next `\n\t# <digit>` (numbered class header), not at any inline
+		# `\n\t# ...` comment that may appear within the row body.
+		var search_start: int = 1
+		while true:
+			var cut: int = window.find("\n\t# ", search_start)
+			if cut == -1:
+				break
+			var next_char_idx: int = cut + 4
+			if next_char_idx < window.length():
+				var ch: String = window.substr(next_char_idx, 1)
+				if ch >= "0" and ch <= "9":
+					window = window.substr(0, cut)
+					break
+			search_start = cut + 1
 		if window.find("\"shape.") == -1 and window.find("'shape.") == -1:
 			problems.append("%s row has no `shape.*` recipe references (Plan 05-03 Task 2)" % klass)
 	if problems.is_empty():
