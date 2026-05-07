@@ -539,7 +539,33 @@ func assert_filedialog_stage() -> void:
 
 
 func assert_colorpicker_stage() -> void:
-	_group_pending("assert_colorpicker_stage", "Plan 07-04 owns ColorPicker and ColorPickerButton icons and production coverage")
+	var group := "assert_colorpicker_stage"
+	var theme := _loaded_theme()
+	var problems: Array[String] = []
+	if theme == null:
+		problems.append("could not load Pulse NeoCadeTheme resource")
+	else:
+		_assert_binding_key_present(problems, "ColorPicker")
+		_assert_colorpicker_binding_matches_official_slots(problems)
+		_append_missing_slots(problems, theme, "ColorPicker", "stylebox", ["picker_focus_circle", "picker_focus_rectangle", "sample_focus"])
+		_append_missing_slots(problems, theme, "ColorPicker", "color", ["focused_not_editing_cursor_color"])
+		_append_missing_slots(problems, theme, "ColorPicker", "constant", ["center_slider_grabbers", "h_width", "label_width", "margin", "sv_height", "sv_width"])
+		_append_missing_slots(problems, theme, "ColorPicker", "icon", ["add_preset", "bar_arrow", "color_hue", "color_script",
+			"expanded_arrow", "folded_arrow", "menu_option", "overbright_indicator", "picker_cursor", "picker_cursor_bg",
+			"sample_bg", "sample_revert", "screen_picker", "shape_circle", "shape_rect", "shape_rect_wheel"])
+		_assert_colorpicker_focus_styleboxes(problems, theme)
+		_assert_colorpicker_cursor_color(problems, theme)
+		_assert_colorpicker_desktop_constants(problems, theme)
+		_assert_colorpicker_icon_mapping(problems)
+		_assert_colorpicker_icons_load_as_texture2d(problems, theme)
+		_assert_colorpicker_no_custom_rendering(problems)
+		_assert_colorpicker_no_extra_artifacts(problems)
+
+	if problems.is_empty():
+		_group_ok(group, "ColorPicker official focus, color, constant, and icon coverage is complete")
+		print("PHASE7_COV:COV-08 ColorPicker advanced-control coverage complete")
+	else:
+		_group_fail(group, "; ".join(problems))
 
 
 func assert_graph_stage() -> void:
@@ -846,6 +872,137 @@ func _assert_filedialog_no_extra_artifacts(problems: Array[String]) -> void:
 				problems.append("unexpected FileDialog icon-side artifact: addons/neocade_theme/icons/%s" % icon_file)
 			if not (icon_file.ends_with(".svg") or icon_file.ends_with(".svg.import")):
 				problems.append("FileDialog artifact is not SVG/import sidecar: addons/neocade_theme/icons/%s" % icon_file)
+		icon_file = icons_dir.get_next()
+	icons_dir.list_dir_end()
+
+
+func _assert_colorpicker_binding_matches_official_slots(problems: Array[String]) -> void:
+	var color_block: Dictionary = _script_constants().get("BINDING_TABLE", {}).get("ColorPicker", {})
+	var expected_block: Dictionary = EXPECTED_SLOT_FREEZE["ColorPicker"]
+	for raw_data_type in color_block.keys():
+		var data_type := String(raw_data_type)
+		if not expected_block.has(data_type):
+			problems.append("BINDING_TABLE.ColorPicker has unsupported data type %s" % data_type)
+			continue
+		var expected_slots := _sorted_strings(expected_block[data_type])
+		var actual_slots := _sorted_slot_values(color_block.get(data_type, {}))
+		for slot in actual_slots:
+			if not expected_slots.has(slot):
+				problems.append("BINDING_TABLE.ColorPicker.%s has unsupported slot %s" % [data_type, slot])
+	for raw_data_type in ["stylebox", "color", "constant", "icon"]:
+		var data_type := String(raw_data_type)
+		var expected_slots := _sorted_strings(expected_block[data_type])
+		var actual_slots := _sorted_slot_values(color_block.get(data_type, {}))
+		for slot in expected_slots:
+			if not actual_slots.has(slot):
+				problems.append("BINDING_TABLE.ColorPicker.%s missing official slot %s" % [data_type, slot])
+
+
+func _assert_colorpicker_focus_styleboxes(problems: Array[String], theme: Theme) -> void:
+	for slot in ["picker_focus_circle", "picker_focus_rectangle", "sample_focus"]:
+		if not theme.has_stylebox(slot, "ColorPicker"):
+			continue
+		var sb := theme.get_stylebox(slot, "ColorPicker")
+		if not (sb is StyleBoxFlat):
+			problems.append("ColorPicker.%s must use StyleBoxFlat focus chrome" % slot)
+			continue
+		var flat := sb as StyleBoxFlat
+		if flat.bg_color.a > 0.05:
+			problems.append("ColorPicker.%s focus bg must stay transparent, alpha=%.2f" % [slot, flat.bg_color.a])
+		if flat.border_color.a < 0.8:
+			problems.append("ColorPicker.%s focus border must be visible" % slot)
+		if flat.shadow_size > 0:
+			problems.append("ColorPicker.%s must not use soft shadow_size=%d" % [slot, flat.shadow_size])
+
+
+func _assert_colorpicker_cursor_color(problems: Array[String], theme: Theme) -> void:
+	if not theme.has_color("focused_not_editing_cursor_color", "ColorPicker"):
+		return
+	var cursor := theme.get_color("focused_not_editing_cursor_color", "ColorPicker")
+	if cursor.a < 0.9:
+		problems.append("ColorPicker.focused_not_editing_cursor_color must be opaque enough")
+	if cursor.get_luminance() < 0.2:
+		problems.append("ColorPicker.focused_not_editing_cursor_color is too dark for the picker UI")
+
+
+func _assert_colorpicker_desktop_constants(problems: Array[String], theme: Theme) -> void:
+	var expected := {
+		"center_slider_grabbers": 1,
+		"h_width": 24,
+		"label_width": 64,
+		"margin": 8,
+		"sv_height": 180,
+		"sv_width": 240,
+	}
+	for slot in expected.keys():
+		if not theme.has_constant(String(slot), "ColorPicker"):
+			continue
+		var value := theme.get_constant(String(slot), "ColorPicker")
+		if value != int(expected[slot]):
+			problems.append("ColorPicker.%s expected %d got %d" % [String(slot), int(expected[slot]), value])
+
+
+func _assert_colorpicker_icon_mapping(problems: Array[String]) -> void:
+	var icon_block: Dictionary = _script_constants().get("BINDING_TABLE", {}).get("ColorPicker", {}).get("icon", {})
+	var expected: Dictionary = EXPECTED_PHASE7_ICON_RECIPES["ColorPicker"]
+	for slot in expected.keys():
+		if not icon_block.has(slot):
+			problems.append("ColorPicker.icon missing canonical slot %s" % String(slot))
+			continue
+		var recipe: Dictionary = icon_block[slot]
+		if recipe.get("icon", "") != expected[slot]:
+			problems.append("ColorPicker.icon %s expected %s got %s" % [String(slot), expected[slot], recipe.get("icon", "")])
+
+
+func _assert_colorpicker_icons_load_as_texture2d(problems: Array[String], theme: Theme) -> void:
+	var expected: Dictionary = EXPECTED_PHASE7_ICON_RECIPES["ColorPicker"]
+	for slot in expected.keys():
+		var slot_name := String(slot)
+		var icon_name := String(expected[slot])
+		var path := "res://addons/neocade_theme/icons/%s.svg" % icon_name
+		var loaded := load(path)
+		if not (loaded is Texture2D):
+			problems.append("ColorPicker icon asset %s did not load as Texture2D" % path)
+		if theme.has_icon(slot_name, "ColorPicker"):
+			var theme_icon := theme.get_icon(slot_name, "ColorPicker")
+			if theme_icon == null or not (theme_icon is Texture2D):
+				problems.append("ColorPicker.%s bound icon is not Texture2D" % slot_name)
+
+
+func _assert_colorpicker_no_custom_rendering(problems: Array[String]) -> void:
+	var lower := _read_production_source_non_comment().to_lower()
+	for forbidden in ["shader", "imagetexture", "gradienttexture", "noise_texture", "sampler"]:
+		var pos := lower.find("colorpicker")
+		while pos != -1:
+			var line_start := lower.rfind("\n", pos)
+			var line_end := lower.find("\n", pos)
+			var line := lower.substr(line_start + 1, (line_end - line_start - 1) if line_end != -1 else lower.length() - line_start - 1)
+			if line.find(forbidden) != -1:
+				problems.append("ColorPicker custom rendering keyword found in production source: %s" % forbidden)
+				break
+			pos = lower.find("colorpicker", pos + "colorpicker".length())
+
+
+func _assert_colorpicker_no_extra_artifacts(problems: Array[String]) -> void:
+	var expected: Dictionary = EXPECTED_PHASE7_ICON_RECIPES["ColorPicker"]
+	var allowed: Array[String] = ["colorpicker_button_bg.svg", "colorpicker_button_bg.svg.import"]
+	for slot in expected.keys():
+		var base := String(expected[slot])
+		allowed.append("%s.svg" % base)
+		allowed.append("%s.svg.import" % base)
+
+	var icons_dir := DirAccess.open("res://addons/neocade_theme/icons")
+	if icons_dir == null:
+		problems.append("could not inspect icons dir for ColorPicker-specific artifacts")
+		return
+	icons_dir.list_dir_begin()
+	var icon_file := icons_dir.get_next()
+	while icon_file != "":
+		if not icons_dir.current_is_dir() and icon_file.begins_with("colorpicker_"):
+			if not allowed.has(icon_file):
+				problems.append("unexpected ColorPicker icon-side artifact: addons/neocade_theme/icons/%s" % icon_file)
+			if not (icon_file.ends_with(".svg") or icon_file.ends_with(".svg.import")):
+				problems.append("ColorPicker artifact is not SVG/import sidecar: addons/neocade_theme/icons/%s" % icon_file)
 		icon_file = icons_dir.get_next()
 	icons_dir.list_dir_end()
 
