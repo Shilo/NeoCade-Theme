@@ -27,7 +27,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Core Controls — Buttons, Inputs, Labels, Panels (desktop)** - 7 BaseButton family + 5 text classes + Label/RichTextLabel + Panel/PanelContainer with type variations (completed 2026-05-07)
 - [x] **Phase 6: Lists, Layout, Range — Tree, ItemList, Tabs, Containers, Sliders (desktop)** - Tree (16 styleboxes/12 icons) + ItemList + TabBar/TabContainer + range controls + container chrome (completed 2026-05-07)
 - [ ] **Phase 7: Dialogs, Popups, Advanced — Window, Popups, MenuBar, ColorPicker, Graph (desktop)** - Popup-class controls themed as first-class types + ColorPicker (16 icons) + Graph stack
-- [ ] **Phase 8: Mobile Variant Authoring** - mobile-sizing branch in `NeoCadeTheme._regenerate_theme()` (triggered by `@export platform=MOBILE`), tap-target audit, MOBILE-DESIGN-SPEC.md *(no separate `neocade_mobile_theme.tres`; mobile is a platform export on the single concrete class)*
+- [x] **Phase 8: Mobile Variant Authoring** - mobile-sizing branch in `NeoCadeTheme._regenerate_theme()` (triggered by `@export platform=MOBILE`), tap-target audit, MOBILE-DESIGN-SPEC.md *(no separate `neocade_mobile_theme.tres`; mobile is a platform export on the single concrete class)* (completed 2026-05-07)
 - [ ] **Phase 9: Showcase + Token Gallery + Theme/Variation Toggles** - `res://main.tscn` with 9 sections + theme picker (Pulse/Slate/Bubble/Daybreak/Burst + Godot default), raised toggle, and platform selector
 - [ ] **Phase 10: QA + Cross-Platform Export Validation** - Dual-renderer screenshot pass, accessibility QA, per-target export validation across all 6 Godot targets
 - [ ] **Phase 11: Distribution — GitHub Actions Release** - Single manually-triggered workflow: CI checks → auto-version-bump → commit/tag/push → addon zip via `git archive` → Godot Web export of showcase scene → publish GitHub Release with both artifacts + CHANGELOG slice as body. NO Asset Library submission.
@@ -335,7 +335,7 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 | 5. Core Controls (Buttons/Inputs/Labels/Panels) | 7/7 | Complete   | 2026-05-07 |
 | 6. Lists/Layout/Range | 5/5 | Complete | 2026-05-07 |
 | 7. Dialogs/Popups/Advanced | 0/5 | Ready to execute | - |
-| 8. Mobile Variant Token Block + Tap-Target Audit | 0/TBD | Not started | - |
+| 8. Mobile Variant Token Block + Tap-Target Audit | 5/5 | Complete | 2026-05-07 |
 | 9. Showcase + Token Gallery + Theme/Variation Toggles | 0/TBD | Not started | - |
 | 10. QA + Cross-Platform Export Validation | 0/TBD | Not started | - |
 | 11. Distribution | 0/TBD | Not started | - |

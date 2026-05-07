@@ -322,15 +322,15 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | TYPEVAR-03 | Phase 5 (RichTextLabel InfoText) | — | Pending |
 | TYPEVAR-04 | Phase 5 (2 Panel variations) | — | Pending |
 | TYPEVAR-05 | Phase 5 (fonts set explicitly per variation) | Phase 6 + 7 (any variations declared in later phases follow same pattern) | Pending |
-| TYPEVAR-06 | Phase 8 (`MOBILE-DESIGN-SPEC.md` + `DESIGN_TOKENS.md` finalized with all 15 production variations from `TYPE_VARIATIONS`) | Phase 5 + 6 + 7 (variation declarations and polish; Kicker added after original 13-seed wording) | Pending |
-| MOBILE-01 | Phase 8 | — | Pending |
-| MOBILE-02 | Phase 8 (≥48px tap targets) | — | Pending |
-| MOBILE-03 | Phase 8 (16px body / heading parity) | — | Pending |
-| MOBILE-04 | Phase 8 (spacing +50% / radii unchanged) | — | Pending |
-| MOBILE-05 | Phase 8 (single mobile theme covers all density buckets) | — | Pending |
-| MOBILE-06 | Phase 8 (tap-target audit script) | — | Pending |
-| MOBILE-07 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Pending |
-| MOBILE-08 | Phase 8 (NeoCade identity preservation) | — | Pending |
+| TYPEVAR-06 | Phase 8 (`MOBILE-DESIGN-SPEC.md` + `DESIGN_TOKENS.md` finalized with all 15 production variations from `TYPE_VARIATIONS`) | Phase 5 + 6 + 7 (variation declarations and polish; Kicker added after original 13-seed wording) | Complete |
+| MOBILE-01 | Phase 8 | — | Complete |
+| MOBILE-02 | Phase 8 (≥48px tap targets) | — | Complete |
+| MOBILE-03 | Phase 8 (16px body / heading parity) | — | Complete |
+| MOBILE-04 | Phase 8 (spacing +50% / radii unchanged) | — | Complete |
+| MOBILE-05 | Phase 8 (single mobile theme covers all density buckets) | — | Complete |
+| MOBILE-06 | Phase 8 (tap-target audit script) | — | Complete |
+| MOBILE-07 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Complete |
+| MOBILE-08 | Phase 8 (NeoCade identity preservation) | — | Complete |
 | SHOW-01 | Phase 9 (`res://main.tscn` as project main scene) | — | Pending |
 | SHOW-02 | Phase 9 (9 sections / 37 scorecard rows covered) | — | Pending |
 | SHOW-03 | Phase 9 (realistic sample content) | — | Pending |
@@ -379,7 +379,7 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | DIST-18 | Phase 9 (head_include export preset) + Phase 10 (deploy verification — `crossOriginIsolated===true`) | — | Pending |
 | DIST-19 | Phase 11 prerequisite (repo public OR user has Pro+ plan) | — | Pending — confirm repo visibility |
 | DOCS-01 | Phase 3 (`DESIGN_TOKENS.md` pre-Phase-4) | — | Pending |
-| DOCS-02 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Pending |
+| DOCS-02 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Complete |
 | DOCS-03 | Already complete (EDITOR-COVERAGE.md exists) | — | Complete |
 | DOCS-04 | Phase 11 (README — closes DIST-04) | — | Pending |
 | DOCS-05 | Phase 1 (initial SOURCES.md update) | Phase 2 + Phase 3.x (continuous update through source-dive spikes) | Complete / Ongoing |
