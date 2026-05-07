@@ -7,3 +7,7 @@ accent_color = Color(0.545098, 0.827451, 1, 1)
 corner_radius = 14
 spacing = 22
 raised_strength = 2
+raised = false
+platform = 2
+focus_thickness = 2
+outline_width = 1

@@ -217,6 +217,20 @@ func _regenerate_theme() -> void:
 	set_font("font", "FlatButton",      body_font)
 	set_font("font", "CardPanel",       body_font)
 	set_font("font", "HeroPanel",       header_medium_font)
+	# Tree exposes explicit font slots outside the BINDING_TABLE schema. The body face
+	# keeps rows dense/readable; title buttons get a header-weight Inter variation.
+	set_font("font", "Tree",              body_font)
+	set_font("title_button_font", "Tree", header_small_font)
+	# ItemList exposes one official font slot. Keep it explicit because BINDING_TABLE
+	# intentionally has no font branch.
+	set_font("font", "ItemList", body_font)
+	# FoldableContainer likewise exposes a single official title/body font slot.
+	set_font("font", "FoldableContainer", body_font)
+	# Tabs expose explicit font slots outside the BINDING_TABLE schema.
+	set_font("font", "TabBar", body_font)
+	set_font("font", "TabContainer", body_font)
+	# ProgressBar exposes an official font slot for optional percentage/text display.
+	set_font("font", "ProgressBar", body_font)
 
 	# ── Set per-variation font sizes (DESIGN_TOKENS §8.5 + tokens) ──
 	set_font_size("font_size", "HeaderLarge",  tokens.h1)
@@ -302,6 +316,22 @@ func _regenerate_theme() -> void:
 				# explicitly excludes "font". If they did, _resolve_recipe returns null
 				# (its switch has no font branch), and the value==null check above skips.
 
+	# Phase 7 popup/menu font slots must stay outside BINDING_TABLE. Godot exposes these
+	# as real Theme font/font_size entries, but the binding iterator intentionally has no
+	# font branch and review convergence requires direct calls after the table walk.
+	set_font("title_font", "Window", header_small_font)
+	set_font_size("title_font_size", "Window", tokens.body)
+	set_font("font", "TooltipLabel", body_font)
+	set_font_size("font_size", "TooltipLabel", tokens.body)
+	set_font("font", "MenuBar", body_font)
+	set_font_size("font_size", "MenuBar", tokens.body)
+	set_font("font", "PopupMenu", body_font)
+	set_font("font_separator", "PopupMenu", caption_font)
+	set_font_size("font_size", "PopupMenu", tokens.body)
+	set_font_size("font_separator_size", "PopupMenu", tokens.label_)
+	set_font("font", "ColorPickerButton", body_font)
+	set_font_size("font_size", "ColorPickerButton", tokens.body)
+
 	_last_regeneration_usec = Time.get_ticks_usec() - t0
 	_regenerating = false
 
@@ -332,7 +362,7 @@ func _resolve_platform() -> Platform:
 		return Platform.MOBILE if OS.has_feature("mobile") else Platform.DESKTOP
 	return platform
 
-## Returns the 14-key platform-tokens table for the given resolved Platform per DESIGN_TOKENS §10.1.
+## Returns the platform-token table for the given resolved Platform per DESIGN_TOKENS §10.1.
 ## The return is a Dictionary so Plan 04-05's BINDING_TABLE walk can read tokens by string key.
 func _platform_tokens(p: Platform) -> Dictionary:
 	if p == Platform.MOBILE:
@@ -344,11 +374,12 @@ func _platform_tokens(p: Platform) -> Dictionary:
 			"checkboxSize": 20,
 			"body": 16,
 			"label_": 14,
-			"h1": 32,
+			"h1": 36,
 			"h2": 22,
 			"kicker": 13,
 			"rowMin": 56,
 			"tabMin": 48,
+			"thumbnailSize": 128,
 			"tapPadding": 12,
 			"densityScale": 1.5,
 		}
@@ -365,6 +396,7 @@ func _platform_tokens(p: Platform) -> Dictionary:
 		"kicker": 12,
 		"rowMin": 36,
 		"tabMin": 32,
+		"thumbnailSize": 96,
 		"tapPadding": 8,
 		"densityScale": 1.0,
 	}
@@ -688,15 +720,49 @@ const TYPE_VARIATIONS: Dictionary = {
 ## theme, replacing the previous "broad row-count check" that could pass with wrong slot names.
 ## BINDING_TABLE recipe slot-keys MUST match these arrays exactly.
 const CANONICAL_SLOT_NAMES: Dictionary = {
-	# Tree — 16 stylebox slots (per MINIMAL-THEME-DISSECTION.md §Tree, lines 689-720)
-	# NOTE: upstream collapses many to one stylebox; NeoCade preserves the slot-name set.
+	# Tree — official Godot 4.6.2 slot freeze from Phase 6 local probe
+	# (logs/06-research-slot-probe.log). `hover` is intentionally absent; the
+	# official row-hover slot is `hovered`.
 	"Tree": {
-		"stylebox": ["panel", "focus", "title_button_normal", "title_button_pressed", "title_button_hover",
-					 "button_hover", "button_pressed", "hover", "selected", "selected_focus",
-					 "hovered_selected", "hovered_selected_focus", "custom_button_hover", "custom_button_pressed",
-					 "cursor", "cursor_unfocused"],
-		"color": ["font_color", "guide_color", "drop_position_color", "parent_hl_line_color"],
-		"constant": ["v_separation", "inner_item_margin_left", "inner_item_margin_right"],
+		"stylebox": {
+			"button_hover": true,
+			"button_pressed": true,
+			"cursor": true,
+			"cursor_unfocused": true,
+			"custom_button": true,
+			"custom_button_hover": true,
+			"custom_button_pressed": true,
+			"focus": true,
+			"hovered": true,
+			"hovered_dimmed": true,
+			"hovered_selected": true,
+			"hovered_selected_focus": true,
+			"panel": true,
+			"selected": true,
+			"selected_focus": true,
+			"title_button_hover": true,
+			"title_button_normal": true,
+			"title_button_pressed": true,
+		},
+		"color": ["children_hl_line_color", "custom_button_font_highlight", "drop_position_color",
+				  "font_color", "font_disabled_color", "font_hovered_color",
+				  "font_hovered_dimmed_color", "font_hovered_selected_color", "font_outline_color",
+				  "font_selected_color", "guide_color", "parent_hl_line_color",
+				  "relationship_line_color", "scroll_hint_color", "title_button_color"],
+		"constant": ["button_margin", "check_h_separation", "children_hl_line_width",
+					 "dragging_unfold_wait_msec", "draw_guides", "draw_relationship_lines",
+					 "h_separation", "icon_h_separation", "icon_max_width",
+					 "inner_item_margin_bottom", "inner_item_margin_left", "inner_item_margin_right",
+					 "inner_item_margin_top", "item_margin", "outline_size", "parent_hl_line_margin",
+					 "parent_hl_line_width", "relationship_line_width", "scroll_border",
+					 "scroll_speed", "scrollbar_h_separation", "scrollbar_margin_bottom",
+					 "scrollbar_margin_left", "scrollbar_margin_right", "scrollbar_margin_top",
+					 "scrollbar_v_separation", "v_separation"],
+		"font": ["font", "title_button_font"],
+		"font_size": ["font_size", "title_button_font_size"],
+		"icon": ["arrow", "arrow_collapsed", "arrow_collapsed_mirrored", "checked",
+				 "checked_disabled", "indeterminate", "indeterminate_disabled", "scroll_hint",
+				 "select_arrow", "unchecked", "unchecked_disabled", "updown"],
 	},
 	# Button — 6 stylebox + 5+ font colors (per MINIMAL-THEME-DISSECTION.md §Button)
 	# NOTE: upstream sets 12 styleboxes (incl. _mirrored variants); v1 ships 6 base + Godot
@@ -743,59 +809,260 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 	"TextEdit": {
 		"stylebox": ["normal", "focus", "read_only"],
 	},
-	# PopupMenu — 5 stylebox + 3 constants (per MINIMAL-THEME-DISSECTION.md §PopupMenu)
-	"PopupMenu": {
-		"stylebox": ["panel", "hover", "separator", "labeled_separator_left", "labeled_separator_right"],
-		"constant": ["item_start_padding", "v_separation", "h_separation"],
-	},
-	# PopupPanel — 1 stylebox
-	"PopupPanel": {
-		"stylebox": ["panel"],
-	},
-	# TooltipPanel — 1 stylebox
-	"TooltipPanel": {
-		"stylebox": ["panel"],
-	},
-	# Window — 2 stylebox slots (per MINIMAL-THEME-DISSECTION.md §Window — NeoCade-additive)
+	# Phase 7 popup/dialog/advanced controls — official Godot 4.6.2 slot freeze
+	# from logs/07-research-slot-probe.log. Empty arrays are intentional for probed
+	# data types with no official slots.
 	"Window": {
 		"stylebox": ["embedded_border", "embedded_unfocused_border"],
+		"color": ["title_color", "title_outline_modulate"],
+		"constant": ["close_h_offset", "close_v_offset", "resize_margin", "title_height", "title_outline_size"],
+		"font": ["title_font"],
+		"font_size": ["title_font_size"],
+		"icon": ["close", "close_pressed"],
 	},
-	# HScrollBar — 5 stylebox slots (per MINIMAL-THEME-DISSECTION.md §HScrollBar)
+	"PopupPanel": {
+		"stylebox": ["panel"],
+		"color": [],
+		"constant": [],
+		"font": [],
+		"font_size": [],
+		"icon": [],
+	},
+	"PopupMenu": {
+		"stylebox": ["panel", "hover", "separator", "labeled_separator_left", "labeled_separator_right"],
+		"color": ["font_accelerator_color", "font_color", "font_disabled_color", "font_hover_color",
+				  "font_outline_color", "font_separator_color", "font_separator_outline_color"],
+		"constant": ["gutter_compact", "h_separation", "icon_max_width", "indent", "item_end_padding",
+					 "item_start_padding", "outline_size", "separator_outline_size", "v_separation"],
+		"font": ["font", "font_separator"],
+		"font_size": ["font_separator_size", "font_size"],
+		"icon": ["checked", "checked_disabled", "radio_checked", "radio_checked_disabled",
+				 "radio_unchecked", "radio_unchecked_disabled", "submenu", "submenu_mirrored",
+				 "unchecked", "unchecked_disabled"],
+	},
+	"AcceptDialog": {
+		"stylebox": ["panel"],
+		"color": [],
+		"constant": ["buttons_separation"],
+		"font": [],
+		"font_size": [],
+		"icon": [],
+	},
+	"ConfirmationDialog": {
+		"stylebox": [],
+		"color": [],
+		"constant": [],
+		"font": [],
+		"font_size": [],
+		"icon": [],
+	},
+	"FileDialog": {
+		"stylebox": [],
+		"color": ["file_disabled_color", "file_icon_color", "folder_icon_color"],
+		"constant": ["thumbnail_size"],
+		"font": [],
+		"font_size": [],
+		"icon": ["back_folder", "clear", "create_folder", "favorite", "favorite_down",
+				 "favorite_up", "file", "file_thumbnail", "folder", "folder_thumbnail",
+				 "forward_folder", "list_mode", "load", "parent_folder", "reload", "save",
+				 "sort", "thumbnail_mode", "toggle_filename_filter", "toggle_hidden"],
+	},
+	"TooltipPanel": {
+		"stylebox": ["panel"],
+		"color": [],
+		"constant": [],
+		"font": [],
+		"font_size": [],
+		"icon": [],
+	},
+	"TooltipLabel": {
+		"stylebox": [],
+		"color": ["font_color", "font_outline_color", "font_shadow_color"],
+		"constant": ["outline_size", "shadow_offset_x", "shadow_offset_y"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+		"icon": [],
+	},
+	"MenuBar": {
+		"stylebox": ["disabled", "hover", "normal", "pressed"],
+		"color": ["font_color", "font_disabled_color", "font_focus_color", "font_hover_color",
+				  "font_hover_pressed_color", "font_outline_color", "font_pressed_color"],
+		"constant": ["h_separation", "outline_size"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+		"icon": [],
+	},
+	"ColorPicker": {
+		"stylebox": ["picker_focus_circle", "picker_focus_rectangle", "sample_focus"],
+		"color": ["focused_not_editing_cursor_color"],
+		"constant": ["center_slider_grabbers", "h_width", "label_width", "margin", "sv_height", "sv_width"],
+		"font": [],
+		"font_size": [],
+		"icon": ["add_preset", "bar_arrow", "color_hue", "color_script", "expanded_arrow",
+				 "folded_arrow", "menu_option", "overbright_indicator", "picker_cursor",
+				 "picker_cursor_bg", "sample_bg", "sample_revert", "screen_picker",
+				 "shape_circle", "shape_rect", "shape_rect_wheel"],
+	},
+	"ColorPickerButton": {
+		"stylebox": ["disabled", "focus", "hover", "normal", "pressed"],
+		"color": ["font_color", "font_disabled_color", "font_focus_color", "font_hover_color",
+				  "font_outline_color", "font_pressed_color"],
+		"constant": ["h_separation", "outline_size"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+		"icon": ["bg"],
+	},
+	"GraphEdit": {
+		"stylebox": ["menu_panel", "panel", "panel_focus"],
+		"color": ["activity", "connection_hover_tint_color", "connection_rim_color",
+				  "connection_valid_target_tint_color", "grid_major", "grid_minor",
+				  "selection_fill", "selection_stroke"],
+		"constant": ["connection_hover_thickness", "port_hotzone_inner_extent", "port_hotzone_outer_extent"],
+		"font": [],
+		"font_size": [],
+		"icon": ["grid_toggle", "layout", "minimap_toggle", "snapping_toggle",
+				 "zoom_in", "zoom_out", "zoom_reset"],
+	},
+	"GraphNode": {
+		"stylebox": ["panel", "panel_focus", "panel_selected", "slot", "slot_selected", "titlebar", "titlebar_selected"],
+		"color": ["resizer_color"],
+		"constant": ["port_h_offset", "separation"],
+		"font": [],
+		"font_size": [],
+		"icon": ["port", "resizer"],
+	},
+	"GraphFrame": {
+		"stylebox": ["panel", "panel_selected", "titlebar", "titlebar_selected"],
+		"color": ["resizer_color"],
+		"constant": [],
+		"font": [],
+		"font_size": [],
+		"icon": ["resizer"],
+	},
+	# HScrollBar — official Godot 4.6.2 slot freeze
 	"HScrollBar": {
 		"stylebox": ["scroll", "scroll_focus", "grabber", "grabber_highlight", "grabber_pressed"],
+		"icon": ["decrement", "decrement_highlight", "decrement_pressed",
+				 "increment", "increment_highlight", "increment_pressed"],
 	},
-	# VScrollBar — 5 stylebox slots (mirror of HScrollBar)
+	# VScrollBar — official Godot 4.6.2 slot freeze
 	"VScrollBar": {
 		"stylebox": ["scroll", "scroll_focus", "grabber", "grabber_highlight", "grabber_pressed"],
+		"icon": ["decrement", "decrement_highlight", "decrement_pressed",
+				 "increment", "increment_highlight", "increment_pressed"],
 	},
-	# ItemList — 6 styleboxes + colors + 1 constant (per MINIMAL-THEME-DISSECTION.md §ItemList)
+	# ItemList — official Godot 4.6.2 slot freeze
 	"ItemList": {
 		"stylebox": ["panel", "focus", "cursor", "cursor_unfocused", "hovered", "selected", "selected_focus",
 					 "hovered_selected", "hovered_selected_focus"],
-		"color": ["guide_color"],
-		"constant": ["v_separation"],
+		"color": ["font_color", "font_hovered_color", "font_hovered_selected_color",
+				  "font_outline_color", "font_selected_color", "guide_color", "scroll_hint_color"],
+		"constant": ["h_separation", "icon_margin", "line_separation", "outline_size", "v_separation"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+		"icon": ["scroll_hint"],
 	},
-	# TabBar — 5 stylebox + 8 colors (per MINIMAL-THEME-DISSECTION.md §TabBar)
+	# TabBar — official Godot 4.6.2 slot freeze. Legacy tab-separation notes
+	# are absent in the local probe and must not be bound without new evidence.
 	"TabBar": {
-		"stylebox": ["tab_selected", "tab_unselected", "tab_hovered", "tab_disabled", "tab_focus"],
-		"color": ["font_selected_color", "font_unselected_color", "font_hovered_color", "font_disabled_color",
-				  "icon_selected_color", "icon_unselected_color", "icon_hovered_color", "icon_disabled_color"],
+		"stylebox": ["button_highlight", "button_pressed", "tab_disabled", "tab_focus",
+					 "tab_hovered", "tab_selected", "tab_unselected"],
+		"color": ["drop_mark_color", "font_disabled_color", "font_hovered_color", "font_outline_color",
+				  "font_selected_color", "font_unselected_color", "icon_disabled_color",
+				  "icon_hovered_color", "icon_selected_color", "icon_unselected_color"],
+		"constant": ["h_separation", "hover_switch_wait_msec", "icon_max_width", "outline_size"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+		"icon": ["close", "decrement", "decrement_highlight", "drop_mark",
+				 "increment", "increment_highlight"],
 	},
-	# TabContainer — same TabBar set + panel + tabbar_background
+	# TabContainer — official Godot 4.6.2 slot freeze. Legacy tab-separation
+	# notes are absent in the local probe and must not be bound without new evidence.
 	"TabContainer": {
 		"stylebox": ["tab_selected", "tab_unselected", "tab_hovered", "tab_disabled", "tab_focus",
 					 "panel", "tabbar_background"],
+		"color": ["drop_mark_color", "font_disabled_color", "font_hovered_color", "font_outline_color",
+				  "font_selected_color", "font_unselected_color", "icon_disabled_color",
+				  "icon_hovered_color", "icon_selected_color", "icon_unselected_color"],
+		"constant": ["icon_max_width", "icon_separation", "outline_size", "side_margin"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+		"icon": ["decrement", "decrement_highlight", "drop_mark", "increment",
+				 "increment_highlight", "menu", "menu_highlight"],
 	},
-	# HSlider / VSlider — slider stylebox per MINIMAL-THEME-DISSECTION.md
+	# FoldableContainer — official Godot 4.6.2 slot freeze.
+	"FoldableContainer": {
+		"stylebox": ["focus", "panel", "title_collapsed_hover_panel",
+					 "title_collapsed_panel", "title_hover_panel", "title_panel"],
+		"color": ["collapsed_font_color", "font_color", "font_outline_color", "hover_font_color"],
+		"constant": ["h_separation", "outline_size"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+		"icon": ["expanded_arrow", "expanded_arrow_mirrored", "folded_arrow", "folded_arrow_mirrored"],
+	},
+	# HSlider / VSlider — official Godot 4.6.2 slot freeze.
 	"HSlider": {
 		"stylebox": ["slider", "grabber_area", "grabber_area_highlight"],
+		"constant": ["center_grabber", "grabber_offset", "tick_offset"],
+		"icon": ["grabber", "grabber_disabled", "grabber_highlight", "tick"],
 	},
 	"VSlider": {
 		"stylebox": ["slider", "grabber_area", "grabber_area_highlight"],
+		"constant": ["center_grabber", "grabber_offset", "tick_offset"],
+		"icon": ["grabber", "grabber_disabled", "grabber_highlight", "tick"],
 	},
-	# ProgressBar — 2 styleboxes
+	# ProgressBar — official Godot 4.6.2 slot freeze.
 	"ProgressBar": {
 		"stylebox": ["background", "fill"],
+		"color": ["font_color", "font_outline_color"],
+		"constant": ["outline_size"],
+		"font": ["font"],
+		"font_size": ["font_size"],
+	},
+	# Container/layout controls — official Godot 4.6.2 slot freeze.
+	"ScrollContainer": {
+		"stylebox": ["focus", "panel"],
+		"color": ["scroll_hint_horizontal_color", "scroll_hint_vertical_color"],
+		"icon": ["scroll_hint_horizontal", "scroll_hint_vertical"],
+	},
+	"SplitContainer": {
+		"stylebox": ["split_bar_background"],
+		"color": ["touch_dragger_color", "touch_dragger_hover_color", "touch_dragger_pressed_color"],
+		"constant": ["autohide", "minimum_grab_thickness", "separation"],
+		"icon": ["h_grabber", "h_touch_dragger", "v_grabber", "v_touch_dragger"],
+	},
+	"HSplitContainer": {
+		"stylebox": ["split_bar_background"],
+		"constant": ["autohide", "minimum_grab_thickness", "separation"],
+		"icon": ["grabber", "touch_dragger"],
+	},
+	"VSplitContainer": {
+		"stylebox": ["split_bar_background"],
+		"constant": ["autohide", "minimum_grab_thickness", "separation"],
+		"icon": ["grabber", "touch_dragger"],
+	},
+	"MarginContainer": {
+		"constant": ["margin_bottom", "margin_left", "margin_right", "margin_top"],
+	},
+	"HBoxContainer": {
+		"constant": ["separation"],
+	},
+	"VBoxContainer": {
+		"constant": ["separation"],
+	},
+	"FlowContainer": {
+		"constant": ["h_separation", "v_separation"],
+	},
+	"GridContainer": {
+		"constant": ["h_separation", "v_separation"],
+	},
+	"HSeparator": {
+		"stylebox": ["separator"],
+		"constant": ["separation"],
+	},
+	"VSeparator": {
+		"stylebox": ["separator"],
+		"constant": ["separation"],
 	},
 	# Label — 1 stylebox + 1 color
 	"Label": {
@@ -836,17 +1103,14 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 ## Resource model post-Phase-4. The public @export surface + .tres format are stable; only
 ## the internal binding mechanism would change.
 const BINDING_TABLE: Dictionary = {
-	# 1. AcceptDialog — minimal panel + button container constants (Phase 4 baseline)
+	# 1. AcceptDialog — explicit popup shell plus official button-container spacing.
 	"AcceptDialog": {
 		"stylebox": {
-			"panel": {"role": "surface_panel", "raised_intensity": 1},
+			"panel": {"role": "surface_overlay", "raised_intensity": 0,
+					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
 		},
 		"constant": {
 			"buttons_separation": {"value": "tokens.tapPadding"},
-			"margin_top":    {"value": "tokens.tapPadding"},
-			"margin_bottom": {"value": "tokens.tapPadding"},
-			"margin_left":   {"value": "tokens.tapPadding"},
-			"margin_right":  {"value": "tokens.tapPadding"},
 		},
 	},
 	# 2. Button — 6 styleboxes + font colors + h_separation (PITFALLS 10.3 clean states)
@@ -999,10 +1263,43 @@ const BINDING_TABLE: Dictionary = {
 			"folded": {"icon": "code_folded"},
 		},
 	},
-	# 6. ColorPicker — minimal Phase 4 baseline (full coverage Phase 7)
+	# 6. ColorPicker — official Godot 4.6.2 focus chrome, desktop metrics, and icon surface.
+	# Engine-rendered hue/SV fields stay engine-owned; NeoCade only binds Theme slots.
 	"ColorPicker": {
+		"stylebox": {
+			"picker_focus_circle":    {"role": "focus_ring", "radius": 999},
+			"picker_focus_rectangle": {"role": "focus_ring", "radius": 2},
+			"sample_focus":           {"role": "focus_ring",
+										"radius": "shape.secondary_radius"},
+		},
+		"color": {
+			"focused_not_editing_cursor_color": {"role": "role_primary"},
+		},
 		"constant": {
-			"margin": {"value": "tokens.tapPadding"},
+			"center_slider_grabbers": {"value": 1},
+			"h_width":                {"value": 24},
+			"label_width":            {"value": 64},
+			"margin":                 {"value": "tokens.tapPadding"},
+			"sv_height":              {"value": 180},
+			"sv_width":               {"value": 240},
+		},
+		"icon": {
+			"add_preset":           {"icon": "colorpicker_add_preset"},
+			"bar_arrow":            {"icon": "colorpicker_bar_arrow"},
+			"color_hue":            {"icon": "colorpicker_color_hue"},
+			"color_script":         {"icon": "colorpicker_color_script"},
+			"expanded_arrow":       {"icon": "colorpicker_expanded_arrow"},
+			"folded_arrow":         {"icon": "colorpicker_folded_arrow"},
+			"menu_option":          {"icon": "colorpicker_menu_option"},
+			"overbright_indicator": {"icon": "colorpicker_overbright_indicator"},
+			"picker_cursor":        {"icon": "colorpicker_picker_cursor"},
+			"picker_cursor_bg":     {"icon": "colorpicker_picker_cursor_bg"},
+			"sample_bg":            {"icon": "colorpicker_sample_bg"},
+			"sample_revert":        {"icon": "colorpicker_sample_revert"},
+			"screen_picker":        {"icon": "colorpicker_screen_picker"},
+			"shape_circle":         {"icon": "colorpicker_shape_circle"},
+			"shape_rect":           {"icon": "colorpicker_shape_rect"},
+			"shape_rect_wheel":     {"icon": "colorpicker_shape_rect_wheel"},
 		},
 	},
 	# 7. ColorPickerButton — inherits Button family; Plan 05-03 Task 2 polish: shape.* lookups
@@ -1018,110 +1315,307 @@ const BINDING_TABLE: Dictionary = {
 			"focus":    {"role": "focus_ring",
 							"radius": "shape.secondary_radius"},
 			"disabled": {"role": "surface_panel", "disabled": true,
+							"raised_intensity": 0,
 							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
 			"font_disabled_color": {"role": "text_strong", "disabled": true},
+			"font_focus_color":    {"role": "text_strong"},
+			"font_hover_color":    {"role": "text_strong"},
+			"font_outline_color":  {"role": "outline_color"},
+			"font_pressed_color":  {"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+			"outline_size": {"value": 0},
+		},
+		"icon": {
+			"bg": {"icon": "colorpicker_button_bg"},
 		},
 	},
-	# 8. ConfirmationDialog — same as AcceptDialog
+	# 8. ConfirmationDialog — explicit traceability entry even though Godot exposes no
+	# own slots in the local probe; runtime inheritance still reads this shell cleanly.
 	"ConfirmationDialog": {
 		"stylebox": {
-			"panel": {"role": "surface_panel", "raised_intensity": 1},
+			"panel": {"role": "surface_overlay", "raised_intensity": 0,
+					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
 		},
 		"constant": {
 			"buttons_separation": {"value": "tokens.tapPadding"},
 		},
 	},
-	# 9. FileDialog — minimal Phase 4 baseline (file/folder icons defer to Phase 7)
+	# 9. FileDialog — official Godot 4.6.2 colors, thumbnail metric, and icon surface.
+	# Shell chrome resolves through AcceptDialog/Window; local 4.6.2 exposes no FileDialog
+	# stylebox slots, so no unsupported FileDialog.panel entry is written here.
 	"FileDialog": {
-		"stylebox": {
-			"panel": {"role": "surface_panel", "raised_intensity": 1},
-		},
 		"color": {
 			"file_disabled_color": {"role": "text_muted",  "disabled": true},
 			"file_icon_color":     {"role": "text_default"},
-			"folder_icon_color":   {"role": "role_primary"},
-			"icon_normal_color":   {"role": "text_default"},
+			"folder_icon_color":   {"role": "accent_offset"},
+		},
+		"constant": {
+			"thumbnail_size": {"value": "tokens.thumbnailSize"},
+		},
+		"icon": {
+			"back_folder":            {"icon": "filedialog_back_folder"},
+			"clear":                  {"icon": "filedialog_clear"},
+			"create_folder":          {"icon": "filedialog_create_folder"},
+			"favorite":               {"icon": "filedialog_favorite"},
+			"favorite_down":          {"icon": "filedialog_favorite_down"},
+			"favorite_up":            {"icon": "filedialog_favorite_up"},
+			"file":                   {"icon": "filedialog_file"},
+			"file_thumbnail":         {"icon": "filedialog_file_thumbnail"},
+			"folder":                 {"icon": "filedialog_folder"},
+			"folder_thumbnail":       {"icon": "filedialog_folder_thumbnail"},
+			"forward_folder":         {"icon": "filedialog_forward_folder"},
+			"list_mode":              {"icon": "filedialog_list_mode"},
+			"load":                   {"icon": "filedialog_load"},
+			"parent_folder":          {"icon": "filedialog_parent_folder"},
+			"reload":                 {"icon": "filedialog_reload"},
+			"save":                   {"icon": "filedialog_save"},
+			"sort":                   {"icon": "filedialog_sort"},
+			"thumbnail_mode":         {"icon": "filedialog_thumbnail_mode"},
+			"toggle_filename_filter": {"icon": "filedialog_toggle_filename_filter"},
+			"toggle_hidden":          {"icon": "filedialog_toggle_hidden"},
 		},
 	},
 	# 10. FoldableContainer — minimal Phase 4 baseline (Phase 6 polish completes)
 	"FoldableContainer": {
 		"stylebox": {
-			"panel":           {"role": "surface_panel", "raised_intensity": 0},
-			"title_panel":     {"role": "surface_high",  "raised_intensity": 0},
-			"title_hover":     {"role": "state_hover",   "raised_intensity": 0},
-			"title_collapsed": {"role": "surface_panel", "raised_intensity": 0},
-			"focus":           {"role": "focus_ring"},
+			"panel":                       {"role": "surface_panel", "raised_intensity": 0},
+			"title_panel":                 {"role": "surface_high",  "raised_intensity": 0},
+			"title_hover_panel":           {"role": "state_hover",   "raised_intensity": 0},
+			"title_collapsed_panel":       {"role": "surface_panel", "raised_intensity": 0},
+			"title_collapsed_hover_panel": {"role": "state_hover",   "raised_intensity": 0},
+			"focus":                       {"role": "focus_ring"},
 		},
 		"color": {
-			"font_color":       {"role": "text_default"},
-			"title_font_color": {"role": "text_strong"},
+			"font_color":           {"role": "text_default"},
+			"hover_font_color":     {"role": "text_strong"},
+			"collapsed_font_color": {"role": "text_default"},
+			"font_outline_color":   {"role": "outline_color"},
+		},
+		"constant": {
+			"h_separation": {"value": 6},
+			"outline_size": {"value": 0},
+		},
+		"font_size": {
+			"font_size": {"value": "tokens.body"},
+		},
+		"icon": {
+			"expanded_arrow":           {"icon": "disclosure_expanded"},
+			"expanded_arrow_mirrored":  {"icon": "disclosure_expanded_mirrored"},
+			"folded_arrow":             {"icon": "disclosure_collapsed"},
+			"folded_arrow_mirrored":    {"icon": "disclosure_collapsed_mirrored"},
 		},
 	},
-	# 11. GraphEdit — minimal Phase 4 baseline (Phase 7 graph polish)
+	# 11. GraphEdit — basic-v1 graph canvas, toolbar, connection, selection, and focus slots.
 	"GraphEdit": {
 		"stylebox": {
-			"panel":      {"role": "surface_low",   "raised_intensity": 0},
-			"menu_panel": {"role": "surface_panel", "raised_intensity": 0},
+			"panel":       {"role": "surface_low",   "raised_intensity": 0,
+							"radius": "shape.secondary_radius", "padding": Vector2i(0, 0)},
+			"menu_panel":  {"role": "surface_panel", "raised_intensity": 0,
+							"radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+			"panel_focus": {"role": "focus_ring",    "radius": "shape.secondary_radius"},
 		},
 		"color": {
-			"grid_major":       {"role": "outline_color"},
-			"grid_minor":       {"role": "outline_color"},
-			"selection_fill":   {"role": "accent_offset"},
-			"selection_stroke": {"role": "role_primary"},
+			"activity":                           {"role": "role_primary",  "alpha": 0.95},
+			"connection_hover_tint_color":        {"role": "role_primary",  "alpha": 0.88},
+			"connection_rim_color":               {"role": "outline_color", "alpha": 0.60},
+			"connection_valid_target_tint_color": {"role": "role_success",  "alpha": 0.88},
+			"grid_major":                         {"role": "outline_color", "alpha": 0.42},
+			"grid_minor":                         {"role": "outline_color", "alpha": 0.18},
+			"selection_fill":                     {"role": "role_primary",  "alpha": 0.24},
+			"selection_stroke":                   {"role": "role_primary"},
+		},
+		"constant": {
+			"connection_hover_thickness": {"value": 3},
+			"port_hotzone_inner_extent":  {"value": 12},
+			"port_hotzone_outer_extent":  {"value": 20},
+		},
+		"icon": {
+			"grid_toggle":     {"icon": "graph_grid_toggle"},
+			"layout":          {"icon": "graph_layout"},
+			"minimap_toggle":  {"icon": "graph_minimap_toggle"},
+			"snapping_toggle": {"icon": "graph_snapping_toggle"},
+			"zoom_in":         {"icon": "graph_zoom_in"},
+			"zoom_out":        {"icon": "graph_zoom_out"},
+			"zoom_reset":      {"icon": "graph_zoom_reset"},
 		},
 	},
-	# 12. HScrollBar — 5 stylebox slots
+	# 11a. GraphNode — compact functional graph panel with explicit selected/focus/slot states.
+	"GraphNode": {
+		"stylebox": {
+			"panel":             {"role": "surface_panel", "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 8)},
+			"panel_focus":       {"role": "focus_ring",    "radius": "shape.card_radius"},
+			"panel_selected":    {"role": "surface_high",  "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 8)},
+			"slot":              {"role": "surface_low",   "raised_intensity": 0,
+								  "radius": 4, "padding": Vector2i(6, 2), "alpha": 0.26},
+			"slot_selected":     {"role": "role_primary",  "raised_intensity": 0,
+								  "radius": 4, "padding": Vector2i(6, 2), "alpha": 0.30},
+			"titlebar":          {"role": "surface_high",  "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 5)},
+			"titlebar_selected": {"role": "accent_offset", "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 5), "alpha": 0.62},
+		},
+		"color": {
+			"resizer_color": {"role": "text_muted", "alpha": 0.90},
+		},
+		"constant": {
+			"port_h_offset": {"value": 8},
+			"separation":    {"value": 4},
+		},
+		"icon": {
+			"port":    {"icon": "graph_port"},
+			"resizer": {"icon": "graph_resizer"},
+		},
+	},
+	# 11b. GraphFrame — flat grouping chrome for graph regions, sharing the resizer asset.
+	"GraphFrame": {
+		"stylebox": {
+			"panel":             {"role": "surface_low",   "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 8), "alpha": 0.28},
+			"panel_selected":    {"role": "role_primary",  "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 8), "alpha": 0.34},
+			"titlebar":          {"role": "surface_panel", "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 4), "alpha": 0.42},
+			"titlebar_selected": {"role": "accent_offset", "raised_intensity": 0,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 4), "alpha": 0.46},
+		},
+		"color": {
+			"resizer_color": {"role": "text_muted", "alpha": 0.85},
+		},
+		"icon": {
+			"resizer": {"icon": "graph_resizer"},
+		},
+	},
+	# 12. HScrollBar — official styleboxes plus six increment/decrement icon slots.
 	"HScrollBar": {
 		"stylebox": {
-			"scroll":            {"role": "surface_low",   "raised_intensity": 0},
+			"scroll":            {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
 			"scroll_focus":      {"role": "focus_ring"},
-			"grabber":           {"role": "surface_high",  "raised_intensity": 0},
-			"grabber_highlight": {"role": "state_hover",   "raised_intensity": 0},
-			"grabber_pressed":   {"role": "state_pressed", "raised_intensity": 0},
+			"grabber":           {"role": "surface_high",  "raised_intensity": 1, "padding": Vector2i(2, 2)},
+			"grabber_highlight": {"role": "state_hover",   "raised_intensity": 1, "padding": Vector2i(2, 2), "alpha": 0.72},
+			"grabber_pressed":   {"role": "state_pressed", "raised_intensity": 0, "padding": Vector2i(2, 2), "alpha": 0.82},
+		},
+		"icon": {
+			"decrement":           {"icon": "scrollbar_left"},
+			"decrement_highlight": {"icon": "scrollbar_left"},
+			"decrement_pressed":   {"icon": "scrollbar_left"},
+			"increment":           {"icon": "scrollbar_right"},
+			"increment_highlight": {"icon": "scrollbar_right"},
+			"increment_pressed":   {"icon": "scrollbar_right"},
 		},
 	},
-	# 13. HSlider — slider track + grabber_area + highlight
+	# 13. HSlider — visible calm track plus official grabber/tick icons.
 	"HSlider": {
 		"stylebox": {
-			"slider":                  {"role": "surface_low",   "raised_intensity": 0},
-			"grabber_area":            {"role": "role_primary",  "raised_intensity": 0},
-			"grabber_area_highlight":  {"role": "accent_offset", "raised_intensity": 0},
+			"slider":                  {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"grabber_area":            {"role": "role_primary",  "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"grabber_area_highlight":  {"role": "accent_offset", "raised_intensity": 0, "padding": Vector2i(0, 0)},
 		},
-	},
-	# 14. HSplitContainer — separation only (chrome is grabber icon)
-	"HSplitContainer": {
 		"constant": {
-			"separation":             {"value": "tokens.tapPadding"},
-			"minimum_grab_thickness": {"value": 6},
+			"center_grabber": {"value": 1},
+			"grabber_offset": {"value": 0},
+			"tick_offset":    {"value": 8},
+		},
+		"icon": {
+			"grabber":           {"icon": "slider_grabber"},
+			"grabber_disabled":  {"icon": "slider_grabber"},
+			"grabber_highlight": {"icon": "slider_grabber"},
+			"tick":              {"icon": "slider_tick"},
 		},
 	},
-	# 15. ItemList — 9 stylebox slots + colors + constants
+	# 13a. ScrollContainer — quiet overflow panel plus official focus and hint slots.
+	"ScrollContainer": {
+		"stylebox": {
+			"focus": {"role": "focus_ring"},
+			"panel": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"color": {
+			"scroll_hint_horizontal_color": {"role": "role_primary", "alpha": 0.72},
+			"scroll_hint_vertical_color":   {"role": "role_primary", "alpha": 0.72},
+		},
+		"icon": {
+			"scroll_hint_horizontal": {"icon": "scroll_hint_horizontal"},
+			"scroll_hint_vertical":   {"icon": "scroll_hint_vertical"},
+		},
+	},
+	# 13b. SplitContainer — base class owns h/v grabbers and touch-dragger colors.
+	"SplitContainer": {
+		"stylebox": {
+			"split_bar_background": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"color": {
+			"touch_dragger_color":         {"role": "text_muted"},
+			"touch_dragger_hover_color":   {"role": "role_primary", "alpha": 0.84},
+			"touch_dragger_pressed_color": {"role": "role_primary"},
+		},
+		"constant": {
+			"autohide":               {"value": 0},
+			"minimum_grab_thickness": {"value": "tokens.tapPadding"},
+			"separation":             {"value": "tokens.tapPadding"},
+		},
+		"icon": {
+			"h_grabber":       {"icon": "split_grabber_h"},
+			"h_touch_dragger": {"icon": "split_touch_dragger_h"},
+			"v_grabber":       {"icon": "split_grabber_v"},
+			"v_touch_dragger": {"icon": "split_touch_dragger_v"},
+		},
+	},
+	# 14. HSplitContainer — split-bar chrome plus official grabber/touch-dragger icons.
+	"HSplitContainer": {
+		"stylebox": {
+			"split_bar_background": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"constant": {
+			"autohide":               {"value": 0},
+			"separation":             {"value": "tokens.tapPadding"},
+			"minimum_grab_thickness": {"value": "tokens.tapPadding"},
+		},
+		"icon": {
+			"grabber":       {"icon": "split_grabber_h"},
+			"touch_dragger": {"icon": "split_touch_dragger_h"},
+		},
+	},
+	# 15. ItemList — official Godot 4.6.2 slots. Cursor overlays stay alpha-bearing
+	# because Godot draws them above row content (Phase 6 D-04).
 	"ItemList": {
 		"stylebox": {
 			"panel":                  {"role": "surface_low",   "raised_intensity": 0},
 			"focus":                  {"role": "focus_ring"},
-			"cursor":                 {"role": "state_hover",   "raised_intensity": 0},
-			"cursor_unfocused":       {"role": "state_hover",   "raised_intensity": 0},
-			"hovered":                {"role": "state_hover",   "raised_intensity": 0},
-			"selected":               {"role": "accent_offset", "raised_intensity": 0},
-			"selected_focus":         {"role": "accent_offset", "raised_intensity": 0},
-			"hovered_selected":       {"role": "accent_offset", "raised_intensity": 0},
-			"hovered_selected_focus": {"role": "accent_offset", "raised_intensity": 0},
+			"cursor":                 {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.24},
+			"cursor_unfocused":       {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.14},
+			"hovered":                {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.20},
+			"selected":               {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
+			"selected_focus":         {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
+			"hovered_selected":       {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
+			"hovered_selected_focus": {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
 		},
 		"color": {
-			"font_color":               {"role": "text_default"},
-			"font_hovered_color":       {"role": "text_strong"},
-			"font_selected_color":      {"role": "text_strong"},
+			"font_color":                  {"role": "text_default"},
+			"font_hovered_color":          {"role": "text_strong"},
+			"font_selected_color":         {"role": "text_strong"},
 			"font_hovered_selected_color": {"role": "text_strong"},
-			"guide_color":              {"role": "outline_color"},
+			"font_outline_color":          {"role": "outline_color"},
+			"guide_color":                 {"role": "outline_color"},
+			"scroll_hint_color":           {"role": "role_primary", "alpha": 0.82},
 		},
 		"constant": {
-			"v_separation":  {"value": "tokens.tapPadding"},
-			"h_separation":  {"value": "tokens.tapPadding"},
+			"v_separation":    {"value": "tokens.tapPadding"},
+			"h_separation":    {"value": "tokens.tapPadding"},
+			"icon_margin":     {"value": 6},
 			"line_separation": {"value": 2},
+			"outline_size":    {"value": 0},
+		},
+		"font_size": {
+			"font_size": {"value": "tokens.body"},
+		},
+		"icon": {
+			"scroll_hint": {"icon": "tree_scroll_hint"},
 		},
 	},
 	# 16. Label — 1 stylebox + 1 color
@@ -1168,22 +1662,30 @@ const BINDING_TABLE: Dictionary = {
 			"underline_spacing": {"value": 2},
 		},
 	},
-	# 19. MenuBar — minimal Button-family inheritance + h_separation
+	# 19. MenuBar — low-emphasis menu triggers with complete official colors/metrics.
 	"MenuBar": {
 		"stylebox": {
-			"normal":   {"role": "surface_base", "raised_intensity": 0},
-			"hover":    {"role": "state_hover",  "raised_intensity": 0},
-			"pressed":  {"role": "state_pressed","raised_intensity": 0},
-			"disabled": {"role": "surface_base", "disabled": true},
+			"normal":   {"role": "surface_base", "raised_intensity": 0, "alpha": 0.0,
+						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
+			"hover":    {"role": "state_hover",  "raised_intensity": 0, "alpha": 0.42,
+						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
+			"pressed":  {"role": "state_pressed","raised_intensity": 0, "alpha": 0.70,
+						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
+			"disabled": {"role": "surface_base", "disabled": true, "raised_intensity": 0,
+						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
 		},
 		"color": {
-			"font_color":          {"role": "text_strong"},
-			"font_hover_color":    {"role": "text_strong"},
-			"font_pressed_color":  {"role": "text_strong"},
-			"font_disabled_color": {"role": "text_strong", "disabled": true},
+			"font_color":               {"role": "text_default"},
+			"font_hover_color":         {"role": "text_strong"},
+			"font_pressed_color":       {"role": "text_strong"},
+			"font_focus_color":         {"role": "role_primary"},
+			"font_hover_pressed_color": {"role": "text_strong"},
+			"font_outline_color":       {"role": "outline_color"},
+			"font_disabled_color":      {"role": "text_default", "disabled": true},
 		},
 		"constant": {
-			"h_separation": {"value": "tokens.tapPadding"},
+			"h_separation": {"value": 4},
+			"outline_size": {"value": 0},
 		},
 	},
 	# 20. MenuButton — Button-family states
@@ -1254,48 +1756,74 @@ const BINDING_TABLE: Dictionary = {
 			"panel": {"role": "surface_panel", "raised_intensity": 0},
 		},
 	},
-	# 23. PopupMenu — 5 styleboxes + 3 constants + checked/unchecked/submenu icons
+	# 23. PopupMenu — dense menu rows, structural separators, full icon coverage.
 	"PopupMenu": {
 		"stylebox": {
-			"panel":                 {"role": "surface_high",  "raised_intensity": 1},
-			"hover":                 {"role": "state_hover",   "raised_intensity": 0},
-			"separator":             {"role": "outline_color", "raised_intensity": 0},
-			"labeled_separator_left":{"role": "outline_color", "raised_intensity": 0},
-			"labeled_separator_right":{"role": "outline_color", "raised_intensity": 0},
+			"panel":                 {"role": "surface_overlay", "raised_intensity": 0,
+									  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
+			"hover":                 {"role": "state_hover",    "raised_intensity": 0, "alpha": 0.36},
+			"separator":             {"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
+									  "padding": Vector2i(0, 0)},
+			"labeled_separator_left":{"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
+									  "padding": Vector2i(0, 0)},
+			"labeled_separator_right":{"role": "outline_color", "raised_intensity": 0, "alpha": 0.55,
+									  "padding": Vector2i(0, 0)},
 		},
 		"color": {
-			"font_color":           {"role": "text_default"},
-			"font_hover_color":     {"role": "text_strong"},
-			"font_disabled_color":  {"role": "text_default", "disabled": true},
-			"font_separator_color": {"role": "text_muted"},
+			"font_color":            {"role": "text_default"},
+			"font_hover_color":      {"role": "text_strong"},
+			"font_disabled_color":   {"role": "text_default", "disabled": true},
+			"font_outline_color":    {"role": "outline_color"},
+			"font_separator_color":  {"role": "text_muted"},
+			"font_separator_outline_color":{"role": "outline_color"},
 			"font_accelerator_color":{"role": "text_muted"},
 		},
 		"constant": {
-			"v_separation":     {"value": "tokens.tapPadding"},
-			"h_separation":     {"value": "tokens.tapPadding"},
-			"item_start_padding":{"value": "tokens.tapPadding"},
+			"gutter_compact":         {"value": 1},
+			"h_separation":           {"value": 6},
+			"icon_max_width":         {"value": 18},
+			"indent":                 {"value": 16},
+			"item_end_padding":       {"value": 8},
+			"item_start_padding":     {"value": 8},
+			"outline_size":           {"value": 0},
+			"separator_outline_size": {"value": 0},
+			"v_separation":           {"value": 4},
 		},
 		"icon": {
-			"checked":         {"icon": "checkbox_checked"},
-			"unchecked":       {"icon": "checkbox_unchecked"},
-			"radio_checked":   {"icon": "radio_checked"},
-			"radio_unchecked": {"icon": "radio_unchecked"},
+			"checked":                  {"icon": "checkbox_checked"},
+			"checked_disabled":         {"icon": "checkbox_checked"},
+			"unchecked":                {"icon": "checkbox_unchecked"},
+			"unchecked_disabled":       {"icon": "checkbox_unchecked"},
+			"radio_checked":            {"icon": "radio_checked"},
+			"radio_checked_disabled":   {"icon": "radio_checked"},
+			"radio_unchecked":          {"icon": "radio_unchecked"},
+			"radio_unchecked_disabled": {"icon": "radio_unchecked"},
+			"submenu":                  {"icon": "popup_submenu"},
+			"submenu_mirrored":         {"icon": "popup_submenu_mirrored"},
 		},
 	},
-	# 24. PopupPanel — 1 stylebox (PITFALLS 1.7 first-class)
+	# 24. PopupPanel — first-class popup Window-boundary shell.
 	"PopupPanel": {
 		"stylebox": {
-			"panel": {"role": "surface_high", "raised_intensity": 1},
+			"panel": {"role": "surface_overlay", "raised_intensity": 0,
+					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
 		},
 	},
 	# 25. ProgressBar — 2 styleboxes
 	"ProgressBar": {
 		"stylebox": {
-			"background": {"role": "surface_low",  "raised_intensity": 0},
-			"fill":       {"role": "role_primary", "raised_intensity": 0},
+			"background": {"role": "surface_low",  "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"fill":       {"role": "role_primary", "raised_intensity": 0, "padding": Vector2i(0, 0)},
 		},
 		"color": {
-			"font_color": {"role": "text_strong"},
+			"font_color":         {"role": "text_strong"},
+			"font_outline_color": {"role": "outline_color"},
+		},
+		"constant": {
+			"outline_size": {"value": 0},
+		},
+		"font_size": {
+			"font_size": {"value": "tokens.body"},
 		},
 	},
 	# 26. RichTextLabel — 1 stylebox + colors
@@ -1330,19 +1858,31 @@ const BINDING_TABLE: Dictionary = {
 			"down_disabled":{"icon": "spinbox_down"},
 		},
 	},
-	# 28. TabBar — 5 stylebox + tab font/icon colors
+	# 28. TabBar — official Godot 4.6.2 tab strip slots. Shared tab state
+	# recipes intentionally mirror TabContainer for every overlapping tab_* stylebox
+	# (D-08); overflow button slots are compact icon-button surfaces, not primary buttons.
 	"TabBar": {
 		"stylebox": {
-			"tab_selected":   {"role": "surface_high",  "raised_intensity": 1},
-			"tab_unselected": {"role": "surface_low",   "raised_intensity": 0},
-			"tab_hovered":    {"role": "state_hover",   "raised_intensity": 0},
-			"tab_disabled":   {"role": "surface_low",   "disabled": true},
-			"tab_focus":      {"role": "focus_ring"},
+			"button_highlight": {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.unselected_tab",
+									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+			"button_pressed":   {"role": "state_pressed", "raised_intensity": 0,
+									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+			"tab_selected":     {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.selected_tab",
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 6)},
+			"tab_unselected":   {"role": "surface_low",   "raised_intensity": "shape.raised_lifts.unselected_tab",
+									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+			"tab_hovered":      {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.unselected_tab",
+									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+			"tab_disabled":     {"role": "surface_low",   "disabled": true, "raised_intensity": 0,
+									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius"},
 		},
 		"color": {
 			"font_selected_color":   {"role": "text_strong"},
 			"font_unselected_color": {"role": "text_muted"},
 			"font_hovered_color":    {"role": "text_strong"},
+			"font_outline_color":    {"role": "outline_color"},
 			"font_disabled_color":   {"role": "text_muted", "disabled": true},
 			"icon_selected_color":   {"role": "text_strong"},
 			"icon_unselected_color": {"role": "text_muted"},
@@ -1351,17 +1891,36 @@ const BINDING_TABLE: Dictionary = {
 			"drop_mark_color":       {"role": "role_primary"},
 		},
 		"constant": {
-			"h_separation": {"value": "tokens.tapPadding"},
+			"h_separation":           {"value": 2},
+			"hover_switch_wait_msec": {"value": 180},
+			"icon_max_width":         {"value": 24},
+			"outline_size":           {"value": 0},
+		},
+		"font_size": {
+			"font_size": {"value": "tokens.body"},
+		},
+		"icon": {
+			"close":               {"icon": "close"},
+			"increment":           {"icon": "tab_increment"},
+			"increment_highlight": {"icon": "tab_increment"},
+			"decrement":           {"icon": "tab_decrement"},
+			"decrement_highlight": {"icon": "tab_decrement"},
+			"drop_mark":           {"icon": "tab_drop_mark"},
 		},
 	},
-	# 29. TabContainer — TabBar set + panel + tabbar_background
+	# 29. TabContainer — shared TabBar tab_* recipes plus content panel and menu icons.
 	"TabContainer": {
 		"stylebox": {
-			"tab_selected":     {"role": "surface_high",  "raised_intensity": 1},
-			"tab_unselected":   {"role": "surface_low",   "raised_intensity": 0},
-			"tab_hovered":      {"role": "state_hover",   "raised_intensity": 0},
-			"tab_disabled":     {"role": "surface_low",   "disabled": true},
-			"tab_focus":        {"role": "focus_ring"},
+			"tab_selected":     {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.selected_tab",
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 6)},
+			"tab_unselected":   {"role": "surface_low",   "raised_intensity": "shape.raised_lifts.unselected_tab",
+									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+			"tab_hovered":      {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.unselected_tab",
+									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+			"tab_disabled":     {"role": "surface_low",   "disabled": true, "raised_intensity": 0,
+									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius"},
 			"panel":            {"role": "surface_panel", "raised_intensity": 0},
 			"tabbar_background":{"role": "surface_base",  "raised_intensity": 0},
 		},
@@ -1369,8 +1928,31 @@ const BINDING_TABLE: Dictionary = {
 			"font_selected_color":   {"role": "text_strong"},
 			"font_unselected_color": {"role": "text_muted"},
 			"font_hovered_color":    {"role": "text_strong"},
+			"font_outline_color":    {"role": "outline_color"},
 			"font_disabled_color":   {"role": "text_muted", "disabled": true},
+			"icon_selected_color":   {"role": "text_strong"},
+			"icon_unselected_color": {"role": "text_muted"},
+			"icon_hovered_color":    {"role": "text_strong"},
+			"icon_disabled_color":   {"role": "text_muted", "disabled": true},
 			"drop_mark_color":       {"role": "role_primary"},
+		},
+		"constant": {
+			"icon_max_width":   {"value": 24},
+			"icon_separation":  {"value": 6},
+			"outline_size":     {"value": 0},
+			"side_margin":      {"value": "tokens.tapPadding"},
+		},
+		"font_size": {
+			"font_size": {"value": "tokens.body"},
+		},
+		"icon": {
+			"increment":           {"icon": "tab_increment"},
+			"increment_highlight": {"icon": "tab_increment"},
+			"decrement":           {"icon": "tab_decrement"},
+			"decrement_highlight": {"icon": "tab_decrement"},
+			"drop_mark":           {"icon": "tab_drop_mark"},
+			"menu":                {"icon": "tab_menu"},
+			"menu_highlight":      {"icon": "tab_menu"},
 		},
 	},
 	# 30. TextEdit — 3 stylebox set
@@ -1390,92 +1972,236 @@ const BINDING_TABLE: Dictionary = {
 			"current_line_color":    {"role": "surface_panel"},
 		},
 	},
-	# 31. TooltipLabel — colors only (NeoCade-additive)
+	# 31. TooltipLabel — readable tooltip text with no offset shadow.
 	"TooltipLabel": {
 		"color": {
-			"font_color": {"role": "text_strong"},
+			"font_color":         {"role": "text_strong"},
+			"font_outline_color": {"role": "outline_color"},
+			"font_shadow_color":  {"role": "surface_base", "alpha": 0.0},
+		},
+		"constant": {
+			"outline_size":    {"value": 0},
+			"shadow_offset_x": {"value": 0},
+			"shadow_offset_y": {"value": 0},
 		},
 	},
-	# 32. TooltipPanel — 1 stylebox (PITFALLS 1.7 first-class)
+	# 32. TooltipPanel — compact first-class tooltip structure.
 	"TooltipPanel": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay", "raised_intensity": 1},
+			"panel": {"role": "surface_overlay", "raised_intensity": 0,
+					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
+					  "padding": Vector2i(8, 5)},
 		},
 	},
-	# 33. Tree — 16 styleboxes per CANONICAL_SLOT_NAMES (PITFALLS 1.7 first-class)
+	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
 	"Tree": {
 		"stylebox": {
 			"panel":                  {"role": "surface_low",   "raised_intensity": 0},
 			"focus":                  {"role": "focus_ring"},
 			"title_button_normal":    {"role": "surface_panel", "raised_intensity": 0},
-			"title_button_pressed":   {"role": "state_pressed", "raised_intensity": 0},
-			"title_button_hover":     {"role": "state_hover",   "raised_intensity": 0},
-			"button_hover":           {"role": "state_hover",   "raised_intensity": 0},
-			"button_pressed":         {"role": "state_pressed", "raised_intensity": 0},
-			"hover":                  {"role": "state_hover",   "raised_intensity": 0},
+			"title_button_pressed":   {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.78},
+			"title_button_hover":     {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.30},
+			"button_hover":           {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.28},
+			"button_pressed":         {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.78},
+			"custom_button":          {"role": "surface_panel", "raised_intensity": 0},
+			"hovered":                {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.22},
+			"hovered_dimmed":         {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.12},
 			"selected":               {"role": "accent_offset", "raised_intensity": 0},
 			"selected_focus":         {"role": "accent_offset", "raised_intensity": 0},
 			"hovered_selected":       {"role": "accent_offset", "raised_intensity": 0},
 			"hovered_selected_focus": {"role": "accent_offset", "raised_intensity": 0},
-			"custom_button_hover":    {"role": "state_hover",   "raised_intensity": 0},
-			"custom_button_pressed":  {"role": "state_pressed", "raised_intensity": 0},
-			"cursor":                 {"role": "state_hover",   "raised_intensity": 0},
-			"cursor_unfocused":       {"role": "state_hover",   "raised_intensity": 0},
+			"custom_button_hover":    {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.30},
+			"custom_button_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.82},
+			"cursor":                 {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.26},
+			"cursor_unfocused":       {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.16},
 		},
 		"color": {
-			"font_color":           {"role": "text_default"},
-			"font_selected_color":  {"role": "text_strong"},
-			"guide_color":          {"role": "outline_color"},
-			"drop_position_color":  {"role": "role_primary"},
-			"parent_hl_line_color":{"role": "outline_color"},
-			"relationship_line_color":{"role": "outline_color"},
+			"children_hl_line_color":      {"role": "outline_color"},
+			"custom_button_font_highlight":{"role": "role_primary"},
+			"drop_position_color":         {"role": "role_primary"},
+			"font_color":                  {"role": "text_default"},
+			"font_disabled_color":         {"role": "text_default", "disabled": true},
+			"font_hovered_color":          {"role": "text_strong"},
+			"font_hovered_dimmed_color":   {"role": "text_muted"},
+			"font_hovered_selected_color": {"role": "text_strong"},
+			"font_outline_color":          {"role": "outline_color"},
+			"font_selected_color":         {"role": "text_strong"},
+			"guide_color":                 {"role": "outline_color"},
+			"parent_hl_line_color":        {"role": "outline_color"},
+			"relationship_line_color":     {"role": "outline_color"},
+			"scroll_hint_color":           {"role": "role_primary", "alpha": 0.82},
+			"title_button_color":          {"role": "text_strong"},
 		},
 		"constant": {
-			"v_separation":            {"value": "tokens.tapPadding"},
-			"inner_item_margin_left":  {"value": "tokens.tapPadding"},
-			"inner_item_margin_right": {"value": "tokens.tapPadding"},
-			"inner_item_margin_top":   {"value": 0},
-			"inner_item_margin_bottom":{"value": 0},
-			"item_margin":             {"value": 4},
+			"button_margin":             {"value": 4},
+			"check_h_separation":        {"value": 6},
+			"children_hl_line_width":    {"value": 1},
+			"dragging_unfold_wait_msec": {"value": 1000},
+			"draw_guides":               {"value": 1},
+			"draw_relationship_lines":   {"value": 1},
+			"h_separation":              {"value": 8},
+			"icon_h_separation":         {"value": 6},
+			"icon_max_width":            {"value": 0},
+			"inner_item_margin_bottom":  {"value": 2},
+			"inner_item_margin_left":    {"value": 4},
+			"inner_item_margin_right":   {"value": 4},
+			"inner_item_margin_top":     {"value": 2},
+			"item_margin":               {"value": 4},
+			"outline_size":              {"value": 0},
+			"parent_hl_line_margin":     {"value": 4},
+			"parent_hl_line_width":      {"value": 1},
+			"relationship_line_width":   {"value": 1},
+			"scroll_border":             {"value": 18},
+			"scroll_speed":              {"value": 12},
+			"scrollbar_h_separation":    {"value": 4},
+			"scrollbar_margin_bottom":   {"value": 0},
+			"scrollbar_margin_left":     {"value": 0},
+			"scrollbar_margin_right":    {"value": 0},
+			"scrollbar_margin_top":      {"value": 0},
+			"scrollbar_v_separation":    {"value": 4},
+			"v_separation":              {"value": 2},
+		},
+		"font_size": {
+			"font_size":              {"value": "tokens.body"},
+			"title_button_font_size": {"value": "tokens.body"},
+		},
+		"icon": {
+			"arrow":                     {"icon": "disclosure_expanded"},
+			"arrow_collapsed":           {"icon": "disclosure_collapsed"},
+			"arrow_collapsed_mirrored":  {"icon": "disclosure_collapsed_mirrored"},
+			"checked":                   {"icon": "checkbox_checked"},
+			"checked_disabled":          {"icon": "checkbox_checked"},
+			"indeterminate":             {"icon": "tree_indeterminate"},
+			"indeterminate_disabled":    {"icon": "tree_indeterminate"},
+			"scroll_hint":               {"icon": "tree_scroll_hint"},
+			"select_arrow":              {"icon": "tree_select_arrow"},
+			"unchecked":                 {"icon": "checkbox_unchecked"},
+			"unchecked_disabled":        {"icon": "checkbox_unchecked"},
+			"updown":                    {"icon": "tree_updown"},
 		},
 	},
-	# 34. VScrollBar — mirror of HScrollBar
+	# 34. VScrollBar — mirror of HScrollBar with vertical directional icons.
 	"VScrollBar": {
 		"stylebox": {
-			"scroll":            {"role": "surface_low",   "raised_intensity": 0},
+			"scroll":            {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
 			"scroll_focus":      {"role": "focus_ring"},
-			"grabber":           {"role": "surface_high",  "raised_intensity": 0},
-			"grabber_highlight": {"role": "state_hover",   "raised_intensity": 0},
-			"grabber_pressed":   {"role": "state_pressed", "raised_intensity": 0},
+			"grabber":           {"role": "surface_high",  "raised_intensity": 1, "padding": Vector2i(2, 2)},
+			"grabber_highlight": {"role": "state_hover",   "raised_intensity": 1, "padding": Vector2i(2, 2), "alpha": 0.72},
+			"grabber_pressed":   {"role": "state_pressed", "raised_intensity": 0, "padding": Vector2i(2, 2), "alpha": 0.82},
+		},
+		"icon": {
+			"decrement":           {"icon": "scrollbar_up"},
+			"decrement_highlight": {"icon": "scrollbar_up"},
+			"decrement_pressed":   {"icon": "scrollbar_up"},
+			"increment":           {"icon": "scrollbar_down"},
+			"increment_highlight": {"icon": "scrollbar_down"},
+			"increment_pressed":   {"icon": "scrollbar_down"},
 		},
 	},
-	# 35. VSlider — mirror of HSlider
+	# 35. VSlider — transposed mirror of HSlider.
 	"VSlider": {
 		"stylebox": {
-			"slider":                 {"role": "surface_low",   "raised_intensity": 0},
-			"grabber_area":           {"role": "role_primary",  "raised_intensity": 0},
-			"grabber_area_highlight": {"role": "accent_offset", "raised_intensity": 0},
+			"slider":                 {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"grabber_area":           {"role": "role_primary",  "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"grabber_area_highlight": {"role": "accent_offset", "raised_intensity": 0, "padding": Vector2i(0, 0)},
 		},
-	},
-	# 36. VSplitContainer — mirror of HSplitContainer
-	"VSplitContainer": {
 		"constant": {
-			"separation":             {"value": "tokens.tapPadding"},
-			"minimum_grab_thickness": {"value": 6},
+			"center_grabber": {"value": 1},
+			"grabber_offset": {"value": 0},
+			"tick_offset":    {"value": 8},
+		},
+		"icon": {
+			"grabber":           {"icon": "slider_grabber"},
+			"grabber_disabled":  {"icon": "slider_grabber"},
+			"grabber_highlight": {"icon": "slider_grabber"},
+			"tick":              {"icon": "slider_tick"},
 		},
 	},
-	# 37. Window — 2 stylebox slots (PITFALLS 1.7 first-class)
+	# 36. VSplitContainer — mirror of HSplitContainer with vertical affordance icons.
+	"VSplitContainer": {
+		"stylebox": {
+			"split_bar_background": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"constant": {
+			"autohide":               {"value": 0},
+			"separation":             {"value": "tokens.tapPadding"},
+			"minimum_grab_thickness": {"value": "tokens.tapPadding"},
+		},
+		"icon": {
+			"grabber":       {"icon": "split_grabber_v"},
+			"touch_dragger": {"icon": "split_touch_dragger_v"},
+		},
+	},
+	# 36a. Layout-only containers — constants only; no fake surfaces.
+	"MarginContainer": {
+		"constant": {
+			"margin_bottom": {"value": "tokens.tapPadding"},
+			"margin_left":   {"value": "tokens.tapPadding"},
+			"margin_right":  {"value": "tokens.tapPadding"},
+			"margin_top":    {"value": "tokens.tapPadding"},
+		},
+	},
+	"HBoxContainer": {
+		"constant": {
+			"separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	"VBoxContainer": {
+		"constant": {
+			"separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	"FlowContainer": {
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+			"v_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	"GridContainer": {
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+			"v_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	# 36b. Separators — outline-color rules with modest spacing only.
+	"HSeparator": {
+		"stylebox": {
+			"separator": {"role": "outline_color", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"constant": {
+			"separation": {"value": 4},
+		},
+	},
+	"VSeparator": {
+		"stylebox": {
+			"separator": {"role": "outline_color", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+		},
+		"constant": {
+			"separation": {"value": 4},
+		},
+	},
+	# 37. Window — embedded chrome complete, quiet, and popup-boundary safe.
 	"Window": {
 		"stylebox": {
-			"embedded_border":          {"role": "surface_overlay", "raised_intensity": 1},
-			"embedded_unfocused_border":{"role": "surface_overlay", "raised_intensity": 0},
+			"embedded_border":          {"role": "surface_overlay", "raised_intensity": 0,
+										 "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
+			"embedded_unfocused_border":{"role": "surface_high", "raised_intensity": 0,
+										 "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
 		},
 		"color": {
-			"title_color": {"role": "text_strong"},
+			"title_color":            {"role": "text_strong"},
+			"title_outline_modulate": {"role": "outline_color"},
 		},
 		"constant": {
-			"close_h_offset": {"value": 8},
-			"title_height":   {"value": 28},
+			"close_h_offset":    {"value": 8},
+			"close_v_offset":    {"value": 6},
+			"resize_margin":     {"value": 6},
+			"title_height":      {"value": 32},
+			"title_outline_size":{"value": 0},
+		},
+		"icon": {
+			"close":         {"icon": "close"},
+			"close_pressed": {"icon": "close"},
 		},
 	},
 	# ─── TYPEVAR-01 button variations (Plan 05-03 Task 1) ──────────────────────────────────────
@@ -1909,6 +2635,15 @@ func _set_radius_all(sb: StyleBoxFlat, r: int) -> void:
 	sb.corner_radius_bottom_right = r
 
 
+## Selected tabs should visually attach to the TabContainer panel: top corners keep the
+## direction tab radius, bottom corners are square so the tab reads as part of the content.
+func _set_tab_connected_radius(sb: StyleBoxFlat, r: int) -> void:
+	sb.corner_radius_top_left = r
+	sb.corner_radius_top_right = r
+	sb.corner_radius_bottom_left = 0
+	sb.corner_radius_bottom_right = 0
+
+
 ## Sets StyleBoxFlat content_margin_* from a Vector2i where x=horizontal, y=vertical.
 ## Plan 05-02 Task 2 helper (D-03): `padding: shape.<key>` recipes call this so the
 ## Vector2i convention (x→left/right, y→top/bottom) is enforced in one place. Phase 4
@@ -2149,6 +2884,9 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			elif typeof(radius_raw) == TYPE_INT or typeof(radius_raw) == TYPE_FLOAT:
 				resolved_radius = int(radius_raw)
 		_set_radius_all(sb, resolved_radius)
+		var corner_profile: String = str(recipe.get("corner_profile", ""))
+		if corner_profile == "tab_connected":
+			_set_tab_connected_radius(sb, resolved_radius)
 		sb.border_color = role_table.outline_color
 		sb.border_width_left = outline_width
 		sb.border_width_top = outline_width
@@ -2161,8 +2899,13 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		if padding_raw != null and typeof(padding_raw) == TYPE_STRING and (padding_raw as String).begins_with("shape."):
 			var pad_lookup: Variant = _lookup_shape(presets, padding_raw)
 			if pad_lookup != null and typeof(pad_lookup) == TYPE_VECTOR2I:
-				_set_content_margin_from_padding(sb, pad_lookup)
+				var density: float = tokens.get("densityScale", 1.0)
+				_set_content_margin_from_padding(sb, Vector2i(int(round(pad_lookup.x * density)), int(round(pad_lookup.y * density))))
 				applied_padding = true
+		elif padding_raw != null and typeof(padding_raw) == TYPE_VECTOR2I:
+			var density: float = tokens.get("densityScale", 1.0)
+			_set_content_margin_from_padding(sb, Vector2i(int(round((padding_raw as Vector2i).x * density)), int(round((padding_raw as Vector2i).y * density))))
+			applied_padding = true
 		if not applied_padding:
 			# Cross-AI Cycle 2 M2 fix: platform-aware margins. DESKTOP (densityScale=1.0,
 			# tapPadding=8) yields the base spacing; MOBILE (densityScale=1.5, tapPadding=12)
