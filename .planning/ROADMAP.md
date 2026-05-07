@@ -222,8 +222,8 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] `06-01-PLAN.md` — Freeze official Godot 4.6.2 slots and create strict Phase 6 verification/ResourceSaver helpers.
-- [ ] `06-02-PLAN.md` — Theme Tree fully with official slots, dense data-view behavior, focus, constants, and disclosure/check/sort icons.
+- [x] `06-01-PLAN.md` — Freeze official Godot 4.6.2 slots and create strict Phase 6 verification/ResourceSaver helpers.
+- [x] `06-02-PLAN.md` — Theme Tree fully with official slots, dense data-view behavior, focus, constants, and disclosure/check/sort icons.
 - [ ] `06-03-PLAN.md` — Theme ItemList and FoldableContainer with shared list-selection and disclosure header vocabulary.
 - [ ] `06-04-PLAN.md` — Theme TabBar and TabContainer with a shared tab model plus navigation/menu/drop/close icons.
 - [ ] `06-05-PLAN.md` — Theme range controls and container chrome, then run full all-direction ResourceSaver round-trip verification.
@@ -316,7 +316,7 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 | 3.4 Visual Direction Mockup + Approval Gate (Flat / Extruded-Flat) | 2/4 complete; Plan 03 paused at Task 4 | Awaiting user final approval | - |
 | 4. Foundation: Single `NeoCadeTheme` class + data `.tres` files + Fonts + Icons | 6/8 (Plans 04-01, 04-02, 04-03, 04-04, 04-05, 04-06 done) | In progress | started 2026-05-06 |
 | 5. Core Controls (Buttons/Inputs/Labels/Panels) | 7/7 | Complete   | 2026-05-07 |
-| 6. Lists/Layout/Range | 1/5 | In Progress|  |
+| 6. Lists/Layout/Range | 2/5 | In Progress|  |
 | 7. Dialogs/Popups/Advanced | 0/TBD | Not started | - |
 | 8. Mobile Variant Token Block + Tap-Target Audit | 0/TBD | Not started | - |
 | 9. Showcase + Token Gallery + Theme/Variation Toggles | 0/TBD | Not started | - |
