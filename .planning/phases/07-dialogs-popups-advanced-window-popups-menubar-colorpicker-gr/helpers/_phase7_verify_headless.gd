@@ -571,7 +571,53 @@ func assert_colorpicker_stage() -> void:
 
 
 func assert_graph_stage() -> void:
-	_group_pending("assert_graph_stage", "Plan 07-05 owns GraphEdit, GraphNode, and GraphFrame production coverage")
+	var group := "assert_graph_stage"
+	var theme := _loaded_theme()
+	var problems: Array[String] = []
+	if theme == null:
+		problems.append("could not load Pulse NeoCadeTheme resource")
+	else:
+		_assert_binding_key_present(problems, "GraphEdit")
+		_assert_binding_key_present(problems, "GraphNode")
+		_assert_binding_key_present(problems, "GraphFrame")
+		_assert_graph_binding_matches_official_slots(problems, "GraphEdit")
+		_assert_graph_binding_matches_official_slots(problems, "GraphNode")
+		_assert_graph_binding_matches_official_slots(problems, "GraphFrame")
+
+		_append_missing_slots(problems, theme, "GraphEdit", "stylebox", ["menu_panel", "panel", "panel_focus"])
+		_append_missing_slots(problems, theme, "GraphEdit", "color", ["activity", "connection_hover_tint_color",
+			"connection_rim_color", "connection_valid_target_tint_color", "grid_major", "grid_minor",
+			"selection_fill", "selection_stroke"])
+		_append_missing_slots(problems, theme, "GraphEdit", "constant", ["connection_hover_thickness",
+			"port_hotzone_inner_extent", "port_hotzone_outer_extent"])
+		_append_missing_slots(problems, theme, "GraphEdit", "icon", ["grid_toggle", "layout", "minimap_toggle",
+			"snapping_toggle", "zoom_in", "zoom_out", "zoom_reset"])
+
+		_append_missing_slots(problems, theme, "GraphNode", "stylebox", ["panel", "panel_focus", "panel_selected",
+			"slot", "slot_selected", "titlebar", "titlebar_selected"])
+		_append_missing_slots(problems, theme, "GraphNode", "color", ["resizer_color"])
+		_append_missing_slots(problems, theme, "GraphNode", "constant", ["port_h_offset", "separation"])
+		_append_missing_slots(problems, theme, "GraphNode", "icon", ["port", "resizer"])
+
+		_append_missing_slots(problems, theme, "GraphFrame", "stylebox", ["panel", "panel_selected", "titlebar",
+			"titlebar_selected"])
+		_append_missing_slots(problems, theme, "GraphFrame", "color", ["resizer_color"])
+		_append_missing_slots(problems, theme, "GraphFrame", "icon", ["resizer"])
+
+		_assert_graph_icon_mapping(problems)
+		_assert_graph_icons_load_as_texture2d(problems, theme)
+		_assert_graphedit_canvas_colors(problems, theme)
+		_assert_graphnode_compact_functional(problems, theme)
+		_assert_graphframe_flat_grouping(problems, theme)
+		_assert_graph_no_extra_artifacts(problems)
+
+	if problems.is_empty():
+		_group_ok(group, "GraphEdit, GraphNode, and GraphFrame official coverage is complete")
+		print("PHASE7_COV:COV-08 Graph advanced-control coverage complete")
+		print("PHASE7_COV:COV-01 Graph stack closes desktop structural scorecard coverage")
+		print("PHASE7_COV:COV-09 Graph focus uses official panel_focus slots only")
+	else:
+		_group_fail(group, "; ".join(problems))
 
 
 func _loaded_theme() -> NeoCadeTheme:
@@ -1104,6 +1150,206 @@ func _assert_colorpickerbutton_icon_loads_as_texture2d(problems: Array[String], 
 		var theme_icon := theme.get_icon("bg", "ColorPickerButton")
 		if theme_icon == null or not (theme_icon is Texture2D):
 			problems.append("ColorPickerButton.bg bound icon is not Texture2D")
+
+
+func _assert_graph_binding_matches_official_slots(problems: Array[String], type_name: String) -> void:
+	var graph_block: Dictionary = _script_constants().get("BINDING_TABLE", {}).get(type_name, {})
+	var expected_block: Dictionary = EXPECTED_SLOT_FREEZE[type_name]
+	for raw_data_type in graph_block.keys():
+		var data_type := String(raw_data_type)
+		if not expected_block.has(data_type):
+			problems.append("BINDING_TABLE.%s has unsupported data type %s" % [type_name, data_type])
+			continue
+		var expected_slots := _sorted_strings(expected_block[data_type])
+		var actual_slots := _sorted_slot_values(graph_block.get(data_type, {}))
+		for slot in actual_slots:
+			if not expected_slots.has(slot):
+				problems.append("BINDING_TABLE.%s.%s has unsupported slot %s" % [type_name, data_type, slot])
+	for raw_data_type in expected_block.keys():
+		var data_type := String(raw_data_type)
+		var expected_slots := _sorted_strings(expected_block[data_type])
+		var actual_slots := _sorted_slot_values(graph_block.get(data_type, {}))
+		for slot in expected_slots:
+			if not actual_slots.has(slot):
+				problems.append("BINDING_TABLE.%s.%s missing official slot %s" % [type_name, data_type, slot])
+
+
+func _assert_graph_icon_mapping(problems: Array[String]) -> void:
+	for type_name in ["GraphEdit", "GraphNode", "GraphFrame"]:
+		var icon_block: Dictionary = _script_constants().get("BINDING_TABLE", {}).get(type_name, {}).get("icon", {})
+		var expected: Dictionary = EXPECTED_PHASE7_ICON_RECIPES[type_name]
+		for slot in expected.keys():
+			if not icon_block.has(slot):
+				problems.append("%s.icon missing canonical slot %s" % [type_name, String(slot)])
+				continue
+			var recipe: Dictionary = icon_block[slot]
+			if recipe.get("icon", "") != expected[slot]:
+				problems.append("%s.icon %s expected %s got %s" % [type_name, String(slot), expected[slot], recipe.get("icon", "")])
+
+
+func _assert_graph_icons_load_as_texture2d(problems: Array[String], theme: Theme) -> void:
+	for type_name in ["GraphEdit", "GraphNode", "GraphFrame"]:
+		var expected: Dictionary = EXPECTED_PHASE7_ICON_RECIPES[type_name]
+		for slot in expected.keys():
+			var slot_name := String(slot)
+			var icon_name := String(expected[slot])
+			var path := "res://addons/neocade_theme/icons/%s.svg" % icon_name
+			var loaded := load(path)
+			if not (loaded is Texture2D):
+				problems.append("%s icon asset %s did not load as Texture2D" % [type_name, path])
+			if theme.has_icon(slot_name, type_name):
+				var theme_icon := theme.get_icon(slot_name, type_name)
+				if theme_icon == null or not (theme_icon is Texture2D):
+					problems.append("%s.%s bound icon is not Texture2D" % [type_name, slot_name])
+
+
+func _assert_graphedit_canvas_colors(problems: Array[String], theme: Theme) -> void:
+	if theme.has_stylebox("panel_focus", "GraphEdit"):
+		var focus := theme.get_stylebox("panel_focus", "GraphEdit")
+		if focus is StyleBoxFlat:
+			var flat_focus := focus as StyleBoxFlat
+			if flat_focus.bg_color.a > 0.05:
+				problems.append("GraphEdit.panel_focus must be a transparent focus ring")
+			if flat_focus.border_color.a < 0.8:
+				problems.append("GraphEdit.panel_focus border must be visible")
+			if flat_focus.shadow_size > 0:
+				problems.append("GraphEdit.panel_focus must not use soft shadow_size=%d" % flat_focus.shadow_size)
+		else:
+			problems.append("GraphEdit.panel_focus must be StyleBoxFlat")
+
+	if theme.has_color("grid_major", "GraphEdit") and theme.has_color("grid_minor", "GraphEdit"):
+		var major := theme.get_color("grid_major", "GraphEdit")
+		var minor := theme.get_color("grid_minor", "GraphEdit")
+		if minor.a >= major.a:
+			problems.append("GraphEdit.grid_minor should be subtler than grid_major")
+		if major.a < 0.25:
+			problems.append("GraphEdit.grid_major alpha too low for usable graph canvas: %.2f" % major.a)
+	if theme.has_color("selection_fill", "GraphEdit") and theme.get_color("selection_fill", "GraphEdit").a > 0.45:
+		problems.append("GraphEdit.selection_fill should stay translucent")
+	if theme.has_color("selection_stroke", "GraphEdit") and theme.get_color("selection_stroke", "GraphEdit").a < 0.85:
+		problems.append("GraphEdit.selection_stroke must be visibly opaque")
+	for slot in ["activity", "connection_hover_tint_color", "connection_valid_target_tint_color"]:
+		if theme.has_color(slot, "GraphEdit") and theme.get_color(slot, "GraphEdit").a < 0.75:
+			problems.append("GraphEdit.%s must remain visible against dark directions" % slot)
+	if theme.has_color("connection_rim_color", "GraphEdit") and theme.get_color("connection_rim_color", "GraphEdit").a < 0.45:
+		problems.append("GraphEdit.connection_rim_color alpha too low for connection readability")
+
+	var expected_constants := {
+		"connection_hover_thickness": 3,
+		"port_hotzone_inner_extent": 12,
+		"port_hotzone_outer_extent": 20,
+	}
+	for slot in expected_constants.keys():
+		if theme.has_constant(String(slot), "GraphEdit"):
+			var value := theme.get_constant(String(slot), "GraphEdit")
+			if value != int(expected_constants[slot]):
+				problems.append("GraphEdit.%s expected %d got %d" % [String(slot), int(expected_constants[slot]), value])
+
+
+func _assert_graphnode_compact_functional(problems: Array[String], theme: Theme) -> void:
+	_assert_graph_styleboxes_are_flat_shadow_free(problems, theme, "GraphNode",
+		["panel", "panel_focus", "panel_selected", "slot", "slot_selected", "titlebar", "titlebar_selected"])
+	_assert_transparent_focus_stylebox(problems, theme, "GraphNode", "panel_focus")
+	if theme.has_stylebox("panel", "GraphNode"):
+		var panel := theme.get_stylebox("panel", "GraphNode") as StyleBoxFlat
+		if panel != null and (panel.content_margin_left > 14 or panel.content_margin_top > 12):
+			problems.append("GraphNode.panel margins should stay compact")
+	if theme.has_stylebox("titlebar", "GraphNode"):
+		var titlebar := theme.get_stylebox("titlebar", "GraphNode") as StyleBoxFlat
+		if titlebar != null and titlebar.content_margin_top > 10:
+			problems.append("GraphNode.titlebar vertical padding should stay compact")
+	if theme.has_stylebox("slot", "GraphNode"):
+		var slot := theme.get_stylebox("slot", "GraphNode") as StyleBoxFlat
+		if slot != null and slot.bg_color.a > 0.45:
+			problems.append("GraphNode.slot should be a subtle row/port affordance, not a nested card")
+	if theme.has_stylebox("panel", "GraphNode") and theme.has_stylebox("panel_selected", "GraphNode"):
+		var normal := theme.get_stylebox("panel", "GraphNode") as StyleBoxFlat
+		var selected := theme.get_stylebox("panel_selected", "GraphNode") as StyleBoxFlat
+		if normal != null and selected != null and selected.bg_color.is_equal_approx(normal.bg_color):
+			problems.append("GraphNode.panel_selected must visibly differ from panel")
+	if theme.has_color("resizer_color", "GraphNode") and theme.get_color("resizer_color", "GraphNode").a < 0.75:
+		problems.append("GraphNode.resizer_color must be visible")
+	if theme.has_constant("port_h_offset", "GraphNode"):
+		var h_offset := theme.get_constant("port_h_offset", "GraphNode")
+		if h_offset < 0 or h_offset > 16:
+			problems.append("GraphNode.port_h_offset should stay compact/readable, got %d" % h_offset)
+	if theme.has_constant("separation", "GraphNode"):
+		var separation := theme.get_constant("separation", "GraphNode")
+		if separation < 2 or separation > 10:
+			problems.append("GraphNode.separation should stay compact/readable, got %d" % separation)
+
+
+func _assert_graphframe_flat_grouping(problems: Array[String], theme: Theme) -> void:
+	_assert_graph_styleboxes_are_flat_shadow_free(problems, theme, "GraphFrame",
+		["panel", "panel_selected", "titlebar", "titlebar_selected"])
+	if theme.has_stylebox("panel", "GraphFrame"):
+		var panel := theme.get_stylebox("panel", "GraphFrame") as StyleBoxFlat
+		if panel != null and panel.bg_color.a > 0.65:
+			problems.append("GraphFrame.panel should stay grouping-oriented and translucent")
+	if theme.has_stylebox("panel", "GraphFrame") and theme.has_stylebox("panel_selected", "GraphFrame"):
+		var normal := theme.get_stylebox("panel", "GraphFrame") as StyleBoxFlat
+		var selected := theme.get_stylebox("panel_selected", "GraphFrame") as StyleBoxFlat
+		if normal != null and selected != null and selected.bg_color.a <= normal.bg_color.a:
+			problems.append("GraphFrame.panel_selected should have a modest selected lift over panel")
+	if theme.has_stylebox("titlebar", "GraphFrame"):
+		var titlebar := theme.get_stylebox("titlebar", "GraphFrame") as StyleBoxFlat
+		if titlebar != null and titlebar.content_margin_top > 8:
+			problems.append("GraphFrame.titlebar should stay dense and grouping-oriented")
+	if theme.has_color("resizer_color", "GraphFrame") and theme.get_color("resizer_color", "GraphFrame").a < 0.7:
+		problems.append("GraphFrame.resizer_color must be visible")
+
+
+func _assert_graph_styleboxes_are_flat_shadow_free(problems: Array[String], theme: Theme, type_name: String, slots: Array) -> void:
+	for raw_slot in slots:
+		var slot := String(raw_slot)
+		if not theme.has_stylebox(slot, type_name):
+			continue
+		var sb := theme.get_stylebox(slot, type_name)
+		if not (sb is StyleBoxFlat):
+			problems.append("%s.%s must use StyleBoxFlat graph chrome" % [type_name, slot])
+			continue
+		var flat := sb as StyleBoxFlat
+		if flat.shadow_size > 0:
+			problems.append("%s.%s must not use soft shadow_size=%d" % [type_name, slot, flat.shadow_size])
+
+
+func _assert_transparent_focus_stylebox(problems: Array[String], theme: Theme, type_name: String, slot: String) -> void:
+	if not theme.has_stylebox(slot, type_name):
+		return
+	var sb := theme.get_stylebox(slot, type_name)
+	if not (sb is StyleBoxFlat):
+		problems.append("%s.%s must use StyleBoxFlat focus chrome" % [type_name, slot])
+		return
+	var flat := sb as StyleBoxFlat
+	if flat.bg_color.a > 0.05:
+		problems.append("%s.%s focus bg must stay transparent" % [type_name, slot])
+	if flat.border_color.a < 0.8:
+		problems.append("%s.%s focus border must be visible" % [type_name, slot])
+
+
+func _assert_graph_no_extra_artifacts(problems: Array[String]) -> void:
+	var allowed: Array[String] = []
+	for type_name in ["GraphEdit", "GraphNode", "GraphFrame"]:
+		var expected: Dictionary = EXPECTED_PHASE7_ICON_RECIPES[type_name]
+		for slot in expected.keys():
+			var base := String(expected[slot])
+			allowed.append("%s.svg" % base)
+			allowed.append("%s.svg.import" % base)
+
+	var icons_dir := DirAccess.open("res://addons/neocade_theme/icons")
+	if icons_dir == null:
+		problems.append("could not inspect icons dir for Graph-specific artifacts")
+		return
+	icons_dir.list_dir_begin()
+	var icon_file := icons_dir.get_next()
+	while icon_file != "":
+		if not icons_dir.current_is_dir() and icon_file.begins_with("graph_"):
+			if not allowed.has(icon_file):
+				problems.append("unexpected Graph icon-side artifact: addons/neocade_theme/icons/%s" % icon_file)
+			if not (icon_file.ends_with(".svg") or icon_file.ends_with(".svg.import")):
+				problems.append("Graph artifact is not SVG/import sidecar: addons/neocade_theme/icons/%s" % icon_file)
+		icon_file = icons_dir.get_next()
+	icons_dir.list_dir_end()
 
 
 func _contrast_ratio(a: Color, b: Color) -> float:
