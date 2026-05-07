@@ -417,27 +417,19 @@ All claims in this research were verified against local project files, official 
 |---|-------|---------|---------------|
 | - | None | - | - |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Where will Godot 4.6.x be installed?**  
-   What we know: `godot`, `godot4`, and `Godot_v4.6*.exe` under `C:\Users\shilo` were not found. [VERIFIED: local environment audit]  
-   What's unclear: The final executable path. [VERIFIED: local environment audit]  
-   Recommendation: Plan 01 should install or locate Godot 4.6.2 stable, then write `helpers/godot-cli-path.txt`. [CITED: Godot 4.6.2 release]
+1. **Godot 4.6.x install path handling.**  
+   Resolution: Plan 05-01 does not assume a fixed install path. `Resolve-Godot46.ps1` searches environment variables, PATH commands, and common Windows locations; if needed it installs/locates Godot 4.6.x and writes the verified absolute executable path to `helpers/godot-cli-path.txt` per D-11. All later plans read that file.
 
-2. **How should Kicker represent tracking?**  
-   What we know: Godot 4.6 Label theme properties do not expose `letter_spacing`. [CITED: Label docs]  
-   What's unclear: Whether to document tracking as content/showcase behavior or add a Kicker-specific FontVariation for Burst weight only. [VERIFIED: `05-CONTEXT.md`; `addons/neocade_theme/fonts/`]  
-   Recommendation: Do not invent a Label constant; implement color/font/size in Theme and record tracking as a known limitation unless a source-verified Godot API is found. [CITED: Label docs]
+2. **Kicker tracking.**  
+   Resolution: Phase 5 implements only Theme-owned Kicker behavior: `font`, `font_size`, and direction-aware `font_color`. It does not invent a `Label.letter_spacing` Theme constant. Uppercase/tracking remains content/showcase behavior or a v1.x follow-up unless a source-verified Godot API is found during execution.
 
-3. **Does InfoText need a font-size slot fix before variation chrome?**  
-   What we know: `normal_font` is present for `InfoText`; current code appears to set `font_size` instead of `normal_font_size`. [VERIFIED: `addons/neocade_theme/neocade_theme.gd`]  
-   What's unclear: Whether a current verifier catches this mismatch. [VERIFIED: `.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-VERIFICATION.md`]  
-   Recommendation: Make this a Wave 0 verifier assertion and fix if failing. [CITED: RichTextLabel docs]
+3. **InfoText `normal_font_size`.**  
+   Resolution: Plan 05-04 fixes InfoText sizing to use RichTextLabel's `normal_font_size` slot alongside the already-correct `normal_font` slot, and the Wave 0 verifier asserts this invariant before later variation chrome is accepted.
 
-4. **Which disabled/toggled icon slots should reuse existing SVGs?**  
-   What we know: `FEATURES.md` lists disabled CheckBox/CheckButton icon slots, and existing SVGs cover checked/unchecked/on/off shapes. [VERIFIED: `.planning/research/FEATURES.md`; `addons/neocade_theme/icons/`]  
-   What's unclear: Whether separate disabled SVG files are needed or the same texture can be used with disabled colors. [CITED: CheckBox/CheckButton docs]  
-   Recommendation: Reuse existing SVGs first and verify every official icon slot is populated. [VERIFIED: `05-CONTEXT.md`]
+4. **Disabled/toggled icon reuse.**  
+   Resolution: Phase 5 reuses existing CheckBox/CheckButton SVGs for disabled/toggled variants where Godot exposes tintable icon slots, and verifies official slot coverage. New Phase 5 icon authoring is limited to CodeEdit folded and SpinBox up/down icons.
 
 ## Environment Availability
 
