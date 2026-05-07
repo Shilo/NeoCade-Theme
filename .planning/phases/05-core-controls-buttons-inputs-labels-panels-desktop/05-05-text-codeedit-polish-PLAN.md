@@ -94,7 +94,7 @@ CodeEdit scope is gutter/chrome only. Syntax highlighting remains out of scope p
   </behavior>
   <action>Update Label, RichTextLabel, LineEdit, TextEdit, and CodeEdit BINDING_TABLE rows to finalize desktop text polish for COV-03. Preserve the Plan 05-04 InfoText `normal_font` / `normal_font_size` correction. Keep CodeEdit syntax highlighting out of scope; only text chrome, selection/caret/read-only state, focus, and gutter-adjacent Theme slots belong here.</action>
   <verify>
-    <automated>$phaseDir = '.planning/phases/05-core-controls-buttons-inputs-labels-panels-desktop'; $godot = (Get-Content (Join-Path $phaseDir 'helpers/godot-cli-path.txt') -Raw).Trim(); & $godot --headless --path . --script (Join-Path $phaseDir 'helpers/_phase5_verify_headless.gd') -- --stage text-final</automated>
+    <automated>$phaseDir = '.planning/phases/05-core-controls-buttons-inputs-labels-panels-desktop'; $logDir = Join-Path $phaseDir 'logs'; New-Item -ItemType Directory -Force $logDir | Out-Null; $godot = (Get-Content (Join-Path $phaseDir 'helpers/godot-cli-path.txt') -Raw).Trim(); $textFinalLog = Join-Path $logDir '05-05-text-final-task1.log'; & $godot --headless --path . --script (Join-Path $phaseDir 'helpers/_phase5_verify_headless.gd') -- --stage text-final *> $textFinalLog; if ($LASTEXITCODE -ne 0) { Get-Content $textFinalLog; throw 'text-final verifier failed' }; if (Select-String -Path $textFinalLog -Pattern '^(ERROR|SCRIPT ERROR):' -Quiet) { Get-Content $textFinalLog; throw 'text-final verifier log contains ERROR or SCRIPT ERROR' }</automated>
   </verify>
   <done>COV-03 text class structural checks pass, InfoText remains on RichTextLabel slots, and no syntax-highlighting scope creep is introduced.</done>
 </task>
