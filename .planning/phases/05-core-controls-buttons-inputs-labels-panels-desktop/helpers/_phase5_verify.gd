@@ -35,6 +35,10 @@ extends EditorScript
 ##   - assert_text_label_variation_chrome
 ##   - assert_panel_variation_chrome
 ##
+## Plan 05-05 added text-final-stage groups (COV-03 + AF-7 + D-12):
+##   - assert_text_class_chrome_complete
+##   - assert_codeedit_no_syntax_highlighting
+##
 ## Per D-07: Phase 5 verifier MUST NOT reference invented `pressed_focus`,
 ## `checked_focus`, or `hover_pressed_focus` slots. Focus is the official
 ## `focus` overlay only.
@@ -128,6 +132,10 @@ func _run() -> void:
 	assert_kicker_chrome()
 	assert_text_label_variation_chrome()
 	assert_panel_variation_chrome()
+	# Plan 05-05 groups (text-class chrome completeness + CodeEdit no-syntax-
+	# highlighting scope guard).
+	assert_text_class_chrome_complete()
+	assert_codeedit_no_syntax_highlighting()
 	_emit_summary()
 
 
@@ -193,18 +201,22 @@ func assert_codeedit_gutter_slots() -> void:
 	var group := "assert_codeedit_gutter_slots"
 	var theme := _load_pulse_for_group(group)
 	if theme == null: return
+	# Plan 05-05 Rule 1 fix (carry-forward of Wave 4 fix on assert_inf_text_*):
+	# theme.has_color walks Control inheritance and reports built-in CodeEdit
+	# class slot signatures. Use get_color_list() to test for AUTHORED slots only.
+	var color_list: PackedStringArray = theme.get_color_list("CodeEdit")
 	var missing_colors: Array[String] = []
 	for slot in PHASE5_CODEEDIT_GUTTER_COLORS:
-		if not theme.has_color(slot, "CodeEdit"):
+		if color_list.find(slot) == -1:
 			missing_colors.append(slot)
 	var icon_list: PackedStringArray = theme.get_icon_list("CodeEdit")
 	var has_folded: bool = (icon_list.find(PHASE5_CODEEDIT_FOLDED_ICON) != -1)
 	if missing_colors.is_empty() and has_folded:
-		_group_ok(group, "CodeEdit gutter colors all populated and `folded` icon present")
+		_group_ok(group, "CodeEdit gutter colors all AUTHORED and `folded` icon present")
 	else:
 		var details := PackedStringArray()
 		if not missing_colors.is_empty():
-			details.append("missing gutter colors: " + ", ".join(missing_colors))
+			details.append("missing AUTHORED gutter colors: " + ", ".join(missing_colors))
 		if not has_folded:
 			details.append("missing `folded` icon (Plan 05-05)")
 		_group_pending(group, "; ".join(details))
@@ -948,6 +960,100 @@ func assert_panel_variation_chrome() -> void:
 		_group_pending(group, "; ".join(problems))
 
 
+# ----- assertion group: text-class chrome completeness (Plan 05-05 Task 1) -----
+##
+## Mirror of headless variant. See _phase5_verify_headless.gd for full
+## documentation. Probes via get_*_list().find != -1 for AUTHORED slots only.
+const PHASE5_TEXT_CLASS_CHROME_REQUIREMENTS := {
+	"Label": {
+		"color": ["font_color"],
+		"stylebox": ["normal"],
+	},
+	"RichTextLabel": {
+		"color": ["default_color", "selection_color", "font_selected_color"],
+		"stylebox": ["normal", "focus"],
+	},
+	"LineEdit": {
+		"color": [
+			"font_color", "font_placeholder_color", "font_uneditable_color",
+			"font_selected_color", "caret_color", "selection_color",
+		],
+		"stylebox": ["normal", "focus", "read_only"],
+	},
+	"TextEdit": {
+		"color": [
+			"font_color", "font_placeholder_color", "font_readonly_color",
+			"font_selected_color", "caret_color", "selection_color",
+			"current_line_color",
+		],
+		"stylebox": ["normal", "focus", "read_only"],
+	},
+	"CodeEdit": {
+		"color": [
+			"font_color", "font_placeholder_color", "font_readonly_color",
+			"font_selected_color", "caret_color", "selection_color",
+			"current_line_color",
+		],
+		"stylebox": ["normal", "focus", "read_only"],
+	},
+}
+
+func assert_text_class_chrome_complete() -> void:
+	var group := "assert_text_class_chrome_complete"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	for type_name in PHASE5_TEXT_CLASS_CHROME_REQUIREMENTS.keys():
+		var requirements: Dictionary = PHASE5_TEXT_CLASS_CHROME_REQUIREMENTS[type_name]
+		var color_list: PackedStringArray = theme.get_color_list(type_name)
+		for slot in requirements.get("color", []):
+			if color_list.find(slot) == -1:
+				problems.append("%s missing AUTHORED color slot `%s`" % [type_name, slot])
+		var stylebox_list: PackedStringArray = theme.get_stylebox_list(type_name)
+		for slot in requirements.get("stylebox", []):
+			if stylebox_list.find(slot) == -1:
+				problems.append("%s missing AUTHORED stylebox slot `%s`" % [type_name, slot])
+	if problems.is_empty():
+		_group_ok(group, "Label / RichTextLabel / LineEdit / TextEdit / CodeEdit text chrome AUTHORED across font/caret/selection/placeholder/read_only/focus slots")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+# ----- assertion group: CodeEdit no syntax highlighting scope creep (Plan 05-05 Task 1) -----
+##
+## Mirror of headless variant. See _phase5_verify_headless.gd for full
+## documentation. AF-7 scope guard.
+const PHASE5_CODEEDIT_FORBIDDEN_SYNTAX_COLORS := [
+	"keyword_color",
+	"function_color",
+	"number_color",
+	"member_variable_color",
+	"symbol_color",
+	"control_flow_keyword_color",
+	"brace_mismatch_color",
+	"string_color",
+	"base_type_color",
+	"engine_type_color",
+	"user_type_color",
+	"comment_color",
+	"doc_comment_color",
+]
+
+func assert_codeedit_no_syntax_highlighting() -> void:
+	var group := "assert_codeedit_no_syntax_highlighting"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var color_list: PackedStringArray = theme.get_color_list("CodeEdit")
+	var found: Array[String] = []
+	for slot in PHASE5_CODEEDIT_FORBIDDEN_SYNTAX_COLORS:
+		if color_list.find(slot) != -1:
+			found.append(slot)
+	if found.is_empty():
+		_group_ok(group, "CodeEdit has no AUTHORED syntax-highlighting color slots (AF-7 honored)")
+	else:
+		_group_fail(group, "AF-7 violation: CodeEdit has AUTHORED syntax-highlighting slots (out of Phase 5 scope): " + ", ".join(found))
+
+
 # ----- shared helpers -----
 
 func _load_pulse_for_group(group: String) -> NeoCadeTheme:
@@ -1003,6 +1109,22 @@ func _group_pending(group: String, detail: String) -> void:
 		"assert_no_theme_clear",
 		"assert_no_invented_focus_combos",
 	]
+	# Plan 05-05 strict list: text-class chrome completeness + CodeEdit gutter
+	# slots + no-syntax-highlighting scope guard. Plan 05-04 text-panels groups
+	# carry forward strict.
+	var text_final_stage_strict := [
+		"assert_codeedit_gutter_slots",
+		"assert_text_class_chrome_complete",
+		"assert_codeedit_no_syntax_highlighting",
+		"assert_variation_count_15",
+		"assert_inf_text_normal_font_size",
+		"assert_kicker_chrome",
+		"assert_text_label_variation_chrome",
+		"assert_panel_variation_chrome",
+		"assert_no_letter_spacing_claim",
+		"assert_no_theme_clear",
+		"assert_no_invented_focus_combos",
+	]
 	var fail: bool = false
 	if _stage == "strict":
 		fail = true
@@ -1011,6 +1133,8 @@ func _group_pending(group: String, detail: String) -> void:
 	elif _stage == "buttons" and group in buttons_stage_strict:
 		fail = true
 	elif _stage == "text-panels" and group in text_panels_stage_strict:
+		fail = true
+	elif _stage == "text-final" and group in text_final_stage_strict:
 		fail = true
 	if fail:
 		var label: String = _stage.to_upper()
@@ -1031,8 +1155,8 @@ func _group_fail(group: String, detail: String) -> void:
 func _emit_summary() -> void:
 	print("----- PHASE5_VERIFY summary -----")
 	print("  stage:          %s" % _stage)
-	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 + Plan 05-04 added 4 = 23.
-	print("  groups OK:      %d / %d" % [_ok_markers.size(), 23])
+	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 + Plan 05-04 added 4 + Plan 05-05 added 2 = 25.
+	print("  groups OK:      %d / %d" % [_ok_markers.size(), 25])
 	print("  groups PENDING: %d  %s" % [_pending.size(), str(_pending)])
 	print("  failures:       %d" % _failures.size())
 	for f in _failures:
