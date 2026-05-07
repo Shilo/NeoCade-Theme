@@ -951,13 +951,24 @@ const BINDING_TABLE: Dictionary = {
 		},
 	},
 	# 5. CodeEdit — inherits TextEdit; Phase 4 ships base stylebox set + Phase 5
-	# Plan 05-05 finalizes text chrome (font_readonly_color, font_selected_color)
-	# matching the TextEdit row. CodeEdit syntax highlighting remains OUT OF SCOPE
-	# per FEATURES AF-7 — `assert_codeedit_no_syntax_highlighting` enforces this
-	# by failing if any keyword/function/number/symbol/string/comment slot is
-	# AUTHORED here. Gutter colors (breakpoint_color, code_folding_color,
-	# bookmark_color, executing_line_color, line_length_guideline_color) plus
-	# the `folded` icon are added by Plan 05-05 Task 2.
+	# Plan 05-05 Task 1 finalizes text chrome (font_readonly_color,
+	# font_selected_color) + Task 2 wires gutter colors and the official Godot
+	# 4.6 `folded` icon slot. CodeEdit syntax highlighting remains OUT OF SCOPE
+	# per FEATURES AF-7 — `assert_codeedit_no_syntax_highlighting` fails if any
+	# keyword/function/number/symbol/string/comment slot is AUTHORED here.
+	#
+	# Gutter color recipe rationale (DESIGN_TOKENS roles):
+	#   breakpoint_color           -> role_danger   (red stop indicator)
+	#   code_folding_color         -> text_muted    (gutter chrome)
+	#   bookmark_color             -> role_warning  (yellow bookmark)
+	#   executing_line_color       -> role_primary  (active line = accent)
+	#   line_length_guideline_color-> outline_color (subtle column guide)
+	#   line_number_color          -> text_muted    (gutter chrome; baseline)
+	#
+	# Folded icon: CONTEXT D-12 + Godot 4.6 official slot name `folded`. The
+	# verifier introspects Theme.get_icon_list("CodeEdit") and asserts `folded`
+	# is the slot name; if Godot 4.6 disagreed, Task 2 would abort and replan
+	# rather than silently picking a different slot.
 	"CodeEdit": {
 		"stylebox": {
 			"normal":    {"role": "surface_low",   "raised_intensity": 0},
@@ -973,6 +984,19 @@ const BINDING_TABLE: Dictionary = {
 			"selection_color":       {"role": "accent_offset"},
 			"current_line_color":    {"role": "surface_panel"},
 			"line_number_color":     {"role": "text_muted"},
+			# Plan 05-05 Task 2: gutter color slots (Godot 4.6 official names).
+			"breakpoint_color":            {"role": "role_danger"},
+			"code_folding_color":          {"role": "text_muted"},
+			"bookmark_color":              {"role": "role_warning"},
+			"executing_line_color":        {"role": "role_primary"},
+			"line_length_guideline_color": {"role": "outline_color"},
+		},
+		"icon": {
+			# Plan 05-05 Task 2: official Godot 4.6 CodeEdit `folded` icon slot.
+			# 32x32 monochrome white SVG per Phase 4 D-11 icon contract; `.import`
+			# sidecar uses svg/scale=2.0 + mipmaps/generate=true + compress/mode=0
+			# + process/fix_alpha_border=true.
+			"folded": {"icon": "code_folded"},
 		},
 	},
 	# 6. ColorPicker — minimal Phase 4 baseline (full coverage Phase 7)
