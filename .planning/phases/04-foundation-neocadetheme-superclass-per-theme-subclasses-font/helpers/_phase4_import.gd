@@ -120,7 +120,46 @@ func _init() -> void:
 	# regenerated theme entries to keep the file data-only (Cycle 3 N4 Fix A) while
 	# preserving the script linkage so it loads back as NeoCadeTheme (Cycle 4 N5 Fix).
 	_save_pulse_tres()
+	# Plan 04-07 Task 1: generate the 4 peer direction .tres files (Slate, Bubble,
+	# Daybreak, Burst) via ResourceSaver, applying the same strip pass.
+	_save_peer_tres()
 	quit(0)
+
+
+## Plan 04-07 add-on: generate the 4 peer direction .tres files via ResourceSaver.save().
+## Headers match whatever Godot 4.6 emitted for pulse_neocade_theme.tres (Plan 04-06).
+## Cross-AI Cycle 3 N4 Fix A + Cycle 4 N5 Fix: after each save, _strip_theme_entries(path)
+## is called (the static helper authored in Plan 04-06; Cycle 4 N5 updated it to preserve
+## [ext_resource type="Script" ...] blocks + `script = ExtResource(...)` / `script_class =`
+## lines inside [resource] + strip stale `load_steps=N` from header so Godot recomputes on
+## load). Each peer ends data-only AND retains the script linkage required to load as
+## NeoCadeTheme — `_verify_peers()` (Plan 04-07 Task 1.5) asserts that.
+func _save_peer_tres() -> void:
+	var peers := [
+		{"file": "slate_neocade_theme.tres",    "base": Color("#111820"), "accent": Color("#8BD3FF"), "corner_radius": 14, "spacing": 22, "raised_strength": 2, "focus_thickness": 2, "outline_width": 1},
+		{"file": "bubble_neocade_theme.tres",   "base": Color("#241326"), "accent": Color("#FFB3E6"), "corner_radius": 26, "spacing": 22, "raised_strength": 6, "focus_thickness": 3, "outline_width": 1},
+		{"file": "daybreak_neocade_theme.tres", "base": Color("#0B2420"), "accent": Color("#76F2D1"), "corner_radius": 8,  "spacing": 24, "raised_strength": 3, "focus_thickness": 2, "outline_width": 1},
+		{"file": "burst_neocade_theme.tres",    "base": Color("#20112E"), "accent": Color("#FFD166"), "corner_radius": 18, "spacing": 22, "raised_strength": 5, "focus_thickness": 3, "outline_width": 1},
+	]
+	for d in peers:
+		var t: NeoCadeTheme = NeoCadeTheme.new()
+		t.base_color = d.base
+		t.accent_color = d.accent
+		t.raised = false
+		t.platform = NeoCadeTheme.Platform.AUTO
+		t.corner_radius = d.corner_radius
+		t.spacing = d.spacing
+		t.raised_strength = d.raised_strength
+		t.focus_thickness = d.focus_thickness
+		t.outline_width = d.outline_width
+		var path := "res://addons/neocade_theme/" + d.file
+		var ok := ResourceSaver.save(t, path)
+		assert(ok == OK, "%s save failed: %d" % [d.file, ok])
+		# Cross-AI Cycle 3 N4 Fix A — strip serialized theme entries (re-uses the
+		# static helper authored in Plan 04-06's _save_pulse_tres()). Each peer
+		# ends data-only: [gd_resource ...] header + 9 @export lines, < 2 KiB.
+		_strip_theme_entries(path)
+	print("✓ 4 peer .tres saved + stripped (Slate, Bubble, Daybreak, Burst).")
 
 
 ## Plan 04-06 add-on: generate pulse_neocade_theme.tres via ResourceSaver.save(),

@@ -1,0 +1,15 @@
+[gd_resource type="Theme" script_class="NeoCadeTheme" format=3]
+
+[ext_resource type="Script" uid="uid://d3ldbrvt75ldq" path="res://addons/neocade_theme/neocade_theme.gd" id="1_daybreak"]
+
+[resource]
+script = ExtResource("1_daybreak")
+base_color = Color(0.0431373, 0.141176, 0.12549, 1)
+accent_color = Color(0.462745, 0.94902, 0.819608, 1)
+raised = false
+platform = 2
+corner_radius = 8
+spacing = 24
+raised_strength = 3
+focus_thickness = 2
+outline_width = 1

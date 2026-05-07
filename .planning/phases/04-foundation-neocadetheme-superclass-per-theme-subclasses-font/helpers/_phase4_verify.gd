@@ -11,6 +11,7 @@ extends EditorScript
 
 func _run() -> void:
 	_verify_pulse()
+	_verify_peers()  # Cross-AI Cycle 2 M3 fix — peer .tres runtime validation
 
 func _verify_pulse() -> void:
 	var path := "res://addons/neocade_theme/pulse_neocade_theme.tres"
@@ -163,3 +164,29 @@ func _verify_pulse() -> void:
 			"F1 fix: direction %s disabled_opacity %f != expected %f (DESIGN_TOKENS §5)" % [hex_key, got.disabled_opacity, want.disabled_opacity])
 
 	print("✓ Phase 4 verification: pulse_neocade_theme.tres passes all gates.")
+
+
+## Cross-AI Cycle 2 M3 fix — peer .tres runtime validation.
+## Loads each of the 4 peer files via ResourceLoader, asserts is NeoCadeTheme,
+## asserts has_stylebox("normal", "Button") (proving _regenerate_theme ran),
+## and asserts the per-direction spread_factor matches DIRECTION_PRESETS.
+func _verify_peers() -> void:
+	var peers := [
+		{"file": "slate_neocade_theme.tres",    "expected_spread": 0.7, "base": Color("#111820")},
+		{"file": "bubble_neocade_theme.tres",   "expected_spread": 1.0, "base": Color("#241326")},
+		{"file": "daybreak_neocade_theme.tres", "expected_spread": 1.0, "base": Color("#0B2420")},
+		{"file": "burst_neocade_theme.tres",    "expected_spread": 1.3, "base": Color("#20112E")},
+	]
+	for d in peers:
+		var path := "res://addons/neocade_theme/" + d.file
+		var loaded: Resource = ResourceLoader.load(path)
+		assert(loaded != null, "peer load null: %s" % d.file)
+		assert(loaded is NeoCadeTheme, "peer not NeoCadeTheme: %s" % d.file)
+		var t: NeoCadeTheme = loaded
+		assert(t.has_stylebox("normal", "Button"), "peer %s missing Button.normal stylebox" % d.file)
+		assert(t.base_color == d.base, "peer %s base_color mismatch" % d.file)
+		var presets: Dictionary = t._resolve_direction_presets()
+		assert(abs(presets.spread_factor - d.expected_spread) < 0.001,
+			"peer %s spread_factor %f != expected %f (hex-key lookup falling to DEFAULT?)"
+				% [d.file, presets.spread_factor, d.expected_spread])
+	print("✓ Phase 4 peer verification: 4 peer .tres files load + differentiate correctly.")

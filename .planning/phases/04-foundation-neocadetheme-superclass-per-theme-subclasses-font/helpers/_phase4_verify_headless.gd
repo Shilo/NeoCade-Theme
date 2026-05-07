@@ -124,6 +124,33 @@ func _init() -> void:
 		if abs(got.disabled_opacity - want.disabled_opacity) > 0.001:
 			failures.append("F1 fix: direction %s disabled_opacity %f != expected %f (DESIGN_TOKENS §5)" % [hex_key, got.disabled_opacity, want.disabled_opacity])
 
+	# Cross-AI Cycle 2 M3 fix — peer .tres runtime validation (4 files).
+	# Loads each of the 4 peer files via ResourceLoader, asserts is NeoCadeTheme,
+	# asserts has_stylebox("normal", "Button"), asserts spread_factor differentiates.
+	var peers := [
+		{"file": "slate_neocade_theme.tres",    "expected_spread": 0.7, "base": Color("#111820")},
+		{"file": "bubble_neocade_theme.tres",   "expected_spread": 1.0, "base": Color("#241326")},
+		{"file": "daybreak_neocade_theme.tres", "expected_spread": 1.0, "base": Color("#0B2420")},
+		{"file": "burst_neocade_theme.tres",    "expected_spread": 1.3, "base": Color("#20112E")},
+	]
+	for d in peers:
+		var peer_path := "res://addons/neocade_theme/" + d.file
+		var peer_loaded: Resource = ResourceLoader.load(peer_path)
+		if peer_loaded == null:
+			failures.append("peer load null: %s" % d.file)
+			continue
+		if not (peer_loaded is NeoCadeTheme):
+			failures.append("peer not NeoCadeTheme: %s" % d.file)
+			continue
+		var pt: NeoCadeTheme = peer_loaded
+		if not pt.has_stylebox("normal", "Button"):
+			failures.append("peer %s missing Button.normal stylebox" % d.file)
+		if pt.base_color != d.base:
+			failures.append("peer %s base_color mismatch" % d.file)
+		var pp: Dictionary = pt._resolve_direction_presets()
+		if abs(pp.spread_factor - d.expected_spread) > 0.001:
+			failures.append("peer %s spread_factor %f != %f" % [d.file, pp.spread_factor, d.expected_spread])
+
 	if failures.size() > 0:
 		print("FAIL — Phase 4 headless verify failures:")
 		for f in failures:
