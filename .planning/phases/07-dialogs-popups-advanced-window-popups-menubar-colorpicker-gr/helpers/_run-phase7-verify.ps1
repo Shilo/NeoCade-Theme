@@ -12,6 +12,13 @@ $Resolver = Join-Path $ScriptDir 'Resolve-Godot46.ps1'
 $PathFile = Join-Path $ScriptDir 'godot-cli-path.txt'
 $Verifier = Join-Path $ScriptDir '_phase7_verify_headless.gd'
 
+if (-not (Test-Path -LiteralPath $Resolver -PathType Leaf)) {
+    throw "Phase 7 Godot resolver missing: $Resolver"
+}
+if (-not (Test-Path -LiteralPath $Verifier -PathType Leaf)) {
+    throw "Phase 7 verifier missing: $Verifier"
+}
+
 if (-not (Test-Path -LiteralPath $PathFile -PathType Leaf)) {
     powershell -NoProfile -ExecutionPolicy Bypass -File $Resolver -VerifyOnly
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
