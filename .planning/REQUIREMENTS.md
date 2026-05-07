@@ -103,9 +103,9 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [ ] **COV-03**: 5 text input/display classes themed: Label, RichTextLabel, LineEdit, TextEdit, CodeEdit. Caret + selection + placeholder colors configured. CodeEdit gutter (line numbers, breakpoint glyph, fold arrow) styled; syntax highlighting NOT in scope (per FEATURES AF-7).
 - [x] **COV-04**: All range controls themed: HSlider, VSlider, ProgressBar, HScrollBar, VScrollBar, SpinBox.
 - [x] **COV-05**: All list/tree controls themed: ItemList, Tree (16 styleboxes + 12 icons + ~26 constants — half-day work alone), TabBar, TabContainer, FoldableContainer.
-- [ ] **COV-06**: All popup-class controls themed as separate first-class types (per PITFALLS 1.7 — popups are separate Windows that don't inherit overrides): PopupPanel, PopupMenu, AcceptDialog, ConfirmationDialog, FileDialog, TooltipPanel, TooltipLabel, Window.
+- [x] **COV-06**: All popup-class controls themed as separate first-class types (per PITFALLS 1.7 — popups are separate Windows that don't inherit overrides): PopupPanel, PopupMenu, AcceptDialog, ConfirmationDialog, FileDialog, TooltipPanel, TooltipLabel, Window.
 - [x] **COV-07**: Container-level controls themed (where chrome applies): Panel, PanelContainer, ScrollContainer, SplitContainer, MarginContainer constants. Layout-only Containers (HBox/VBox/Flow/Grid/Center) get separation constants only (per FEATURES AF-11).
-- [ ] **COV-08**: Advanced controls themed (basic v1 level): MenuBar, ColorPicker (16 bespoke icons), GraphEdit + GraphNode + GraphFrame.
+- [x] **COV-08**: Advanced controls themed (basic v1 level): MenuBar, ColorPicker (16 bespoke icons), GraphEdit + GraphNode + GraphFrame.
 - [x] **COV-09**: Visible focus indicator on every focusable Control (WCAG 2.1 SC 1.4.11): 2px outer ring in `role.primary`, drawn outside corner radius bounds, NOT replaceable by hover/pressed/checked styleboxes (per PITFALLS 1.1 focus-overlay-not-state behavior).
 - [ ] **COV-10**: Zero theme entries left default (engine fallback) for any Control class enumerated in COV-01..08; verified against `godot-minimal-theme` `.tres` enumeration produced in RES-01.
 
