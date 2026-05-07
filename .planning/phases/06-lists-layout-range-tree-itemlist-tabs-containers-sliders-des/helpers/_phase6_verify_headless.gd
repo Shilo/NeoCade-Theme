@@ -10,7 +10,7 @@ extends SceneTree
 ##   slot-freeze        Strict foundation gate for Plan 06-01.
 ##   tree               Tree gate from Plan 06-02.
 ##   itemlist-foldable  ItemList and FoldableContainer gate from Plan 06-03.
-##   tabs               Future Plan 06-04 group placeholder.
+##   tabs               Strict TabBar/TabContainer gate from Plan 06-04.
 ##   range-containers   Future Plan 06-05 group placeholder.
 ##   full               Fails while any future group is pending.
 
@@ -174,6 +174,26 @@ const EXPECTED_FOLDABLE_ICON_RECIPES := {
 	"folded_arrow_mirrored": "disclosure_collapsed_mirrored",
 }
 
+const EXPECTED_TAB_ICON_RECIPES := {
+	"TabBar": {
+		"close": "close",
+		"increment": "tab_increment",
+		"increment_highlight": "tab_increment",
+		"decrement": "tab_decrement",
+		"decrement_highlight": "tab_decrement",
+		"drop_mark": "tab_drop_mark",
+	},
+	"TabContainer": {
+		"increment": "tab_increment",
+		"increment_highlight": "tab_increment",
+		"decrement": "tab_decrement",
+		"decrement_highlight": "tab_decrement",
+		"drop_mark": "tab_drop_mark",
+		"menu": "tab_menu",
+		"menu_highlight": "tab_menu",
+	},
+}
+
 var _stage := "slot-freeze"
 var _failures: Array[String] = []
 var _pending: Array[String] = []
@@ -214,7 +234,7 @@ func _run() -> void:
 	if ["itemlist-foldable", "tabs", "range-containers", "full"].has(_stage):
 		assert_itemlist_foldable_stage()
 	if ["tabs", "range-containers", "full"].has(_stage):
-		assert_tabs_stage_pending()
+		assert_tabs_stage()
 	if ["range-containers", "full"].has(_stage):
 		assert_range_containers_stage_pending()
 
@@ -400,8 +420,24 @@ func assert_itemlist_foldable_stage() -> void:
 		print("PHASE6_CARRY_FORWARD:TYPEVAR-06 ItemList density and Foldable disclosure behavior to document in Phase 8 final variation/mobile spec")
 
 
-func assert_tabs_stage_pending() -> void:
-	_group_pending("assert_tabs_stage", "TabBar and TabContainer polish/icon groups are owned by Plan 06-04")
+func assert_tabs_stage() -> void:
+	var group := "assert_tabs_stage"
+	var loaded := ResourceLoader.load(PULSE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE)
+	if loaded == null or not (loaded is NeoCadeTheme):
+		_group_fail(group, "Pulse direction did not load as NeoCadeTheme")
+		return
+	var theme: NeoCadeTheme = loaded
+	var problems: Array[String] = []
+	_assert_tab_slots_present(theme, problems)
+	_assert_tab_shared_style_recipes(problems)
+	_assert_tab_shape_recipes(theme, problems)
+	_assert_tab_focus_discipline(theme, problems)
+	_assert_tab_stale_slots_absent(theme, problems)
+	_assert_tab_icon_recipes(problems)
+	if problems.is_empty():
+		_group_ok(group, "TabBar and TabContainer official slots, shared recipes, focus, constants, fonts, and icons are covered")
+	else:
+		_group_fail(group, "; ".join(problems))
 
 
 func assert_range_containers_stage_pending() -> void:
@@ -691,6 +727,116 @@ func _assert_foldable_icon_recipes(problems: Array[String]) -> void:
 		var actual_icon: String = recipe.get("icon", "")
 		if actual_icon != expected_icon:
 			problems.append("FoldableContainer.icon recipe %s expected %s got %s" % [slot, expected_icon, actual_icon])
+
+
+func _assert_tab_slots_present(theme: Theme, problems: Array[String]) -> void:
+	for type_name in ["TabBar", "TabContainer"]:
+		var expected: Dictionary = EXPECTED_SLOT_FREEZE[type_name]
+		for slot in expected.stylebox:
+			if not theme.has_stylebox(slot, type_name):
+				problems.append("%s.stylebox missing %s" % [type_name, slot])
+		for slot in expected.color:
+			if not theme.has_color(slot, type_name):
+				problems.append("%s.color missing %s" % [type_name, slot])
+		for slot in expected.constant:
+			if not theme.has_constant(slot, type_name):
+				problems.append("%s.constant missing %s" % [type_name, slot])
+		for slot in expected.font:
+			if not theme.has_font(slot, type_name):
+				problems.append("%s.font missing %s" % [type_name, slot])
+		for slot in expected.font_size:
+			if not theme.has_font_size(slot, type_name):
+				problems.append("%s.font_size missing %s" % [type_name, slot])
+		for slot in expected.icon:
+			if not theme.has_icon(slot, type_name):
+				problems.append("%s.icon missing %s" % [type_name, slot])
+
+
+func _assert_tab_shared_style_recipes(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	var tabbar_style: Dictionary = binding.get("TabBar", {}).get("stylebox", {})
+	var tabcontainer_style: Dictionary = binding.get("TabContainer", {}).get("stylebox", {})
+	for slot in ["tab_selected", "tab_unselected", "tab_hovered", "tab_disabled", "tab_focus"]:
+		var bar_recipe: Dictionary = tabbar_style.get(slot, {})
+		var container_recipe: Dictionary = tabcontainer_style.get(slot, {})
+		if bar_recipe.is_empty():
+			problems.append("TabBar.stylebox missing shared slot %s" % slot)
+		if container_recipe.is_empty():
+			problems.append("TabContainer.stylebox missing shared slot %s" % slot)
+		if not bar_recipe.is_empty() and not container_recipe.is_empty() and bar_recipe != container_recipe:
+			problems.append("TabBar/TabContainer %s recipes diverge" % slot)
+	for overflow_slot in ["button_highlight", "button_pressed"]:
+		if not tabbar_style.has(overflow_slot):
+			problems.append("TabBar.stylebox missing overflow button slot %s" % overflow_slot)
+
+
+func _assert_tab_shape_recipes(theme: Theme, problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	for type_name in ["TabBar", "TabContainer"]:
+		var style: Dictionary = binding.get(type_name, {}).get("stylebox", {})
+		var selected_recipe: Dictionary = style.get("tab_selected", {})
+		if str(selected_recipe.get("radius", "")) != "shape.tab_radius":
+			problems.append("%s.tab_selected does not read shape.tab_radius" % type_name)
+		if str(selected_recipe.get("raised_intensity", "")) != "shape.raised_lifts.selected_tab":
+			problems.append("%s.tab_selected does not read shape.raised_lifts.selected_tab" % type_name)
+		if str(selected_recipe.get("corner_profile", "")) != "tab_connected":
+			problems.append("%s.tab_selected is not marked as attached to the content panel" % type_name)
+		var unselected_recipe: Dictionary = style.get("tab_unselected", {})
+		if str(unselected_recipe.get("radius", "")) != "shape.tab_radius":
+			problems.append("%s.tab_unselected does not read shape.tab_radius" % type_name)
+		if str(unselected_recipe.get("raised_intensity", "")) != "shape.raised_lifts.unselected_tab":
+			problems.append("%s.tab_unselected does not read shape.raised_lifts.unselected_tab" % type_name)
+		var selected_sb := theme.get_stylebox("tab_selected", type_name) as StyleBoxFlat
+		if selected_sb == null:
+			problems.append("%s.tab_selected is not a StyleBoxFlat" % type_name)
+		else:
+			if selected_sb.corner_radius_top_left <= 0 and int(theme.corner_radius) > 0:
+				problems.append("%s.tab_selected did not resolve top tab radius" % type_name)
+			if selected_sb.corner_radius_bottom_left != 0 or selected_sb.corner_radius_bottom_right != 0:
+				problems.append("%s.tab_selected bottom corners should be zero to read attached" % type_name)
+	var container_panel := theme.get_stylebox("panel", "TabContainer") as StyleBoxFlat
+	var container_selected := theme.get_stylebox("tab_selected", "TabContainer") as StyleBoxFlat
+	if container_panel != null and container_selected != null:
+		if not _color_close(container_panel.bg_color, container_selected.bg_color):
+			problems.append("TabContainer.tab_selected bg does not match TabContainer.panel bg")
+
+
+func _assert_tab_focus_discipline(theme: Theme, problems: Array[String]) -> void:
+	for type_name in ["TabBar", "TabContainer"]:
+		var focus := theme.get_stylebox("tab_focus", type_name) as StyleBoxFlat
+		if focus == null:
+			problems.append("%s.tab_focus is not a StyleBoxFlat" % type_name)
+		else:
+			if focus.bg_color.a != 0.0:
+				problems.append("%s.tab_focus background is not transparent" % type_name)
+			if focus.border_width_left <= 0 or focus.border_width_top <= 0:
+				problems.append("%s.tab_focus has no outer border ring" % type_name)
+		var style: Dictionary = _script_constants().get("BINDING_TABLE", {}).get(type_name, {}).get("stylebox", {})
+		for invalid in ["pressed_focus", "checked_focus", "hover_pressed", "tab_selected_focus", "tab_hovered_focus"]:
+			if style.has(invalid):
+				problems.append("%s.stylebox has invented tab focus slot %s" % [type_name, invalid])
+
+
+func _assert_tab_stale_slots_absent(theme: Theme, problems: Array[String]) -> void:
+	for type_name in ["TabBar", "TabContainer"]:
+		if theme.has_constant("tab_separation", type_name):
+			problems.append("%s stale constant tab_separation is present" % type_name)
+		var constants_block: Dictionary = _script_constants().get("BINDING_TABLE", {}).get(type_name, {}).get("constant", {})
+		if constants_block.has("tab_separation"):
+			problems.append("%s.constant recipe still binds tab_separation" % type_name)
+
+
+func _assert_tab_icon_recipes(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	for type_name in EXPECTED_TAB_ICON_RECIPES.keys():
+		var icon_block: Dictionary = binding.get(type_name, {}).get("icon", {})
+		var expected: Dictionary = EXPECTED_TAB_ICON_RECIPES[type_name]
+		for slot in expected.keys():
+			var expected_icon: String = expected[slot]
+			var recipe: Dictionary = icon_block.get(slot, {})
+			var actual_icon: String = recipe.get("icon", "")
+			if actual_icon != expected_icon:
+				problems.append("%s.icon recipe %s expected %s got %s" % [type_name, slot, expected_icon, actual_icon])
 
 
 func _direction_presets_for_theme(theme: NeoCadeTheme) -> Dictionary:
