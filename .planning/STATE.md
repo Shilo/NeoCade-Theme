@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-06)
 
 **Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships **5 approved data-only direction `.tres` files** (Pulse, Slate, Bubble, Daybreak, Burst) of type `NeoCadeTheme`, plus one concrete `addons/neocade_theme/neocade_theme.gd` class. Consumer toggles `raised` / `platform` / `base_color` / `accent_color` exports for flat/raised × desktop/mobile/AUTO variations — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect). **Dynamic-theme architecture** feasibility-validated 2026-05-06 (Phase 3.2 strict gate 6/6 PASS in Godot 4.6.2), then simplified 2026-05-06e/f: single concrete `@tool class_name NeoCadeTheme extends Theme`, 9 exports, luminance-derived `is_light`, no subclasses, no `_dev/`, no `themes/`, no root `.tres`, no `neocade_mobile_theme.tres`.
-**Current focus:** Phase 5 — core-controls-buttons-inputs-labels-panels-desktop
+**Current focus:** Phase 5 — core-controls-buttons-inputs-labels-panels-desktop — VERIFIED. Next: Phase 6 (heavy Controls — Tree, ItemList, TabBar/TabContainer, sliders/scrollbars, FoldableContainer).
 
 ## Current Position
 
-Phase: 5 — COMPLETE
-Plan: 1 of 7
-Next: `/gsd-execute-phase 5`
-Status: Phase 5 complete
-Last activity: 2026-05-07 -- Phase 5 marked complete
+Phase: 5 — VERIFIED-WITH-DEFERRED-ITEMS (verdict from 05-VERIFICATION.md @ fea06b0)
+Plan: 7 of 7 complete; SUMMARY + UAT + VERIFICATION all committed
+Next: `/clear` → `/gsd-discuss-phase 6` (per CLAUDE.md — `/clear` allowed only at phase boundaries)
+Status: Phase 5 closed; Phase 6 ready to start
+Last activity: 2026-05-07 -- Phase 5 verified, sanctioned to advance
 
 Progress: [████████░░] 80%
 
@@ -135,8 +135,8 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-05-07T01:45:04.459Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-core-controls-buttons-inputs-labels-panels-desktop/05-CONTEXT.md
+Stopped at: Phase 5 verified — ready to advance to Phase 6
+Resume file: .planning/phases/05-core-controls-buttons-inputs-labels-panels-desktop/05-VERIFICATION.md
 
 ## Phase 3.4 Plan 02 redirect (2026-05-06b)
 
