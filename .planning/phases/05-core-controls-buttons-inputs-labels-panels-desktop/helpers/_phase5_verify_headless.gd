@@ -29,6 +29,16 @@ extends SceneTree
 ##            assert_kicker_chrome, assert_text_label_variation_chrome,
 ##            assert_panel_variation_chrome, assert_no_letter_spacing_claim,
 ##            assert_no_theme_clear, assert_no_invented_focus_combos.
+##   text-final  Plan 05-05 staged enforcement. Treats text-class chrome
+##            completeness + CodeEdit gutter chrome + the no-syntax-highlighting
+##            scope guard as strict, while leaving SpinBox icons in
+##            tooling/PENDING mode (Plan 05-06). All Plan 05-04 text-panels
+##            strict groups carry forward strict in the text-final stage so a
+##            text-final regression also catches text-panels regressions.
+##            Strict-only-in-text-final additions:
+##              - assert_codeedit_gutter_slots
+##              - assert_text_class_chrome_complete
+##              - assert_codeedit_no_syntax_highlighting
 ##   strict   Future stage (Plans 05-03..05-07). Treats every PENDING marker as a
 ##            failure and exits non-zero. Wired now so later plans only need to
 ##            change the --stage argument; they do not need to re-author the
@@ -241,8 +251,8 @@ func _parse_args() -> void:
 			i += 1
 		if found:
 			break
-	if _stage != "tooling" and _stage != "strict" and _stage != "shape" and _stage != "buttons" and _stage != "text-panels":
-		push_error("PHASE5_VERIFY FAIL: unknown --stage '%s' (expected tooling|shape|buttons|text-panels|strict)" % _stage)
+	if _stage != "tooling" and _stage != "strict" and _stage != "shape" and _stage != "buttons" and _stage != "text-panels" and _stage != "text-final":
+		push_error("PHASE5_VERIFY FAIL: unknown --stage '%s' (expected tooling|shape|buttons|text-panels|text-final|strict)" % _stage)
 		_stage = "tooling"
 	print("PHASE5_VERIFY: stage=%s" % _stage)
 
@@ -284,6 +294,12 @@ func _run_verifier() -> void:
 	assert_kicker_chrome()
 	assert_text_label_variation_chrome()
 	assert_panel_variation_chrome()
+	# Plan 05-05 groups (text-class chrome completeness + CodeEdit no-syntax-
+	# highlighting scope guard). Strict in the `text-final` stage; tooling
+	# elsewhere. The existing assert_codeedit_gutter_slots flips strict in
+	# text-final too via the strict list below.
+	assert_text_class_chrome_complete()
+	assert_codeedit_no_syntax_highlighting()
 
 
 func _verify_helper_wiring() -> bool:
@@ -374,22 +390,30 @@ func assert_inf_text_normal_font_size() -> void:
 ## Phase 5 SC#2 + Plan 05-05: CodeEdit gutter chrome (gutter colors named in
 ## DESIGN_TOKENS) plus the `folded` icon slot. line_number_color is the baseline
 ## gutter color name asserted explicitly per CONTEXT.md.
+##
+## Plan 05-05 Rule 1 fix (carry-forward of Wave 4 fix on assert_inf_text_*):
+## theme.has_color walks the inheritance chain and reports built-in CodeEdit
+## class slot signatures (line_number_color is exposed by Godot's CodeEdit
+## class even when our generator never authored it). The correct probe for
+## "explicitly authored vs inherited/default" is get_color_list("CodeEdit"),
+## which returns ONLY slots the generator AUTHORED via set_color().
 func assert_codeedit_gutter_slots() -> void:
 	var group := "assert_codeedit_gutter_slots"
 	var theme := _load_pulse_for_group(group)
 	if theme == null: return
+	var color_list: PackedStringArray = theme.get_color_list("CodeEdit")
 	var missing_colors: Array[String] = []
 	for slot in PHASE5_CODEEDIT_GUTTER_COLORS:
-		if not theme.has_color(slot, "CodeEdit"):
+		if color_list.find(slot) == -1:
 			missing_colors.append(slot)
 	var icon_list: PackedStringArray = theme.get_icon_list("CodeEdit")
 	var has_folded: bool = (icon_list.find(PHASE5_CODEEDIT_FOLDED_ICON) != -1)
 	if missing_colors.is_empty() and has_folded:
-		_group_ok(group, "CodeEdit gutter colors all populated and `folded` icon present")
+		_group_ok(group, "CodeEdit gutter colors all AUTHORED and `folded` icon present")
 	else:
 		var details := PackedStringArray()
 		if not missing_colors.is_empty():
-			details.append("missing gutter colors: " + ", ".join(missing_colors))
+			details.append("missing AUTHORED gutter colors: " + ", ".join(missing_colors))
 		if not has_folded:
 			details.append("missing `folded` icon (Plan 05-05)")
 		_group_pending(group, "; ".join(details))
@@ -1640,6 +1664,138 @@ func assert_panel_variation_chrome() -> void:
 		_group_pending(group, "; ".join(problems))
 
 
+# ----- assertion group: text-class chrome completeness (Plan 05-05 Task 1) -----
+##
+## Per COV-03 + DESIGN_TOKENS §5/§7: the five Phase 5 text classes (Label,
+## RichTextLabel, LineEdit, TextEdit, CodeEdit) must have their AUTHORED
+## desktop chrome slots populated. "Authored" = set_color/set_stylebox emitted
+## via the BINDING_TABLE walk. We probe via get_*_list("type").find != -1 to
+## avoid Godot's has_*() reporting Control-class default signatures (Wave 4
+## BL-02 fix, carried forward).
+##
+## Required AUTHORED slots per type (Phase 5 desktop, no syntax highlighting):
+##   Label          -> color: font_color
+##                     stylebox: normal
+##   RichTextLabel  -> color: default_color, selection_color, font_selected_color
+##                     stylebox: normal, focus
+##   LineEdit       -> color: font_color, font_placeholder_color,
+##                            font_uneditable_color, font_selected_color,
+##                            caret_color, selection_color
+##                     stylebox: normal, focus, read_only
+##   TextEdit       -> color: font_color, font_placeholder_color,
+##                            font_readonly_color, font_selected_color,
+##                            caret_color, selection_color, current_line_color
+##                     stylebox: normal, focus, read_only
+##   CodeEdit       -> color: font_color, font_placeholder_color,
+##                            font_readonly_color, font_selected_color,
+##                            caret_color, selection_color, current_line_color
+##                     stylebox: normal, focus, read_only
+##
+## CodeEdit gutter colors + folded icon are owned by assert_codeedit_gutter_slots
+## so this group does NOT duplicate them — it only asserts the *text chrome*
+## CodeEdit shares with TextEdit.
+const PHASE5_TEXT_CLASS_CHROME_REQUIREMENTS := {
+	"Label": {
+		"color": ["font_color"],
+		"stylebox": ["normal"],
+	},
+	"RichTextLabel": {
+		"color": ["default_color", "selection_color", "font_selected_color"],
+		"stylebox": ["normal", "focus"],
+	},
+	"LineEdit": {
+		"color": [
+			"font_color", "font_placeholder_color", "font_uneditable_color",
+			"font_selected_color", "caret_color", "selection_color",
+		],
+		"stylebox": ["normal", "focus", "read_only"],
+	},
+	"TextEdit": {
+		"color": [
+			"font_color", "font_placeholder_color", "font_readonly_color",
+			"font_selected_color", "caret_color", "selection_color",
+			"current_line_color",
+		],
+		"stylebox": ["normal", "focus", "read_only"],
+	},
+	"CodeEdit": {
+		"color": [
+			"font_color", "font_placeholder_color", "font_readonly_color",
+			"font_selected_color", "caret_color", "selection_color",
+			"current_line_color",
+		],
+		"stylebox": ["normal", "focus", "read_only"],
+	},
+}
+
+func assert_text_class_chrome_complete() -> void:
+	var group := "assert_text_class_chrome_complete"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var problems: Array[String] = []
+	for type_name in PHASE5_TEXT_CLASS_CHROME_REQUIREMENTS.keys():
+		var requirements: Dictionary = PHASE5_TEXT_CLASS_CHROME_REQUIREMENTS[type_name]
+		var color_list: PackedStringArray = theme.get_color_list(type_name)
+		for slot in requirements.get("color", []):
+			if color_list.find(slot) == -1:
+				problems.append("%s missing AUTHORED color slot `%s`" % [type_name, slot])
+		var stylebox_list: PackedStringArray = theme.get_stylebox_list(type_name)
+		for slot in requirements.get("stylebox", []):
+			if stylebox_list.find(slot) == -1:
+				problems.append("%s missing AUTHORED stylebox slot `%s`" % [type_name, slot])
+	if problems.is_empty():
+		_group_ok(group, "Label / RichTextLabel / LineEdit / TextEdit / CodeEdit text chrome AUTHORED across font/caret/selection/placeholder/read_only/focus slots")
+	else:
+		_group_pending(group, "; ".join(problems))
+
+
+# ----- assertion group: CodeEdit no syntax highlighting scope creep (Plan 05-05 Task 1) -----
+##
+## Per FEATURES AF-7 + 05-RESEARCH.md + plan: CodeEdit syntax highlighting is
+## NOT in Phase 5 scope. The Theme should NOT author any color slot in the
+## syntax-highlighting family. Phase 5 only owns chrome around the text:
+## fonts, caret, selection, placeholder/read-only, focus, and the gutter
+## colors/icons handled by assert_codeedit_gutter_slots.
+##
+## Forbidden slots (verified against Godot 4.6 CodeEdit/CodeHighlighter API):
+##   keyword_color, function_color, number_color, member_variable_color,
+##   symbol_color, control_flow_keyword_color, brace_mismatch_color,
+##   string_color, base_type_color, engine_type_color, user_type_color,
+##   comment_color, doc_comment_color
+##
+## If any of these are AUTHORED on the live theme via the BINDING_TABLE walk,
+## Phase 5 has accidentally creeped into Plan 06+ scope. Fail loud.
+const PHASE5_CODEEDIT_FORBIDDEN_SYNTAX_COLORS := [
+	"keyword_color",
+	"function_color",
+	"number_color",
+	"member_variable_color",
+	"symbol_color",
+	"control_flow_keyword_color",
+	"brace_mismatch_color",
+	"string_color",
+	"base_type_color",
+	"engine_type_color",
+	"user_type_color",
+	"comment_color",
+	"doc_comment_color",
+]
+
+func assert_codeedit_no_syntax_highlighting() -> void:
+	var group := "assert_codeedit_no_syntax_highlighting"
+	var theme := _load_pulse_for_group(group)
+	if theme == null: return
+	var color_list: PackedStringArray = theme.get_color_list("CodeEdit")
+	var found: Array[String] = []
+	for slot in PHASE5_CODEEDIT_FORBIDDEN_SYNTAX_COLORS:
+		if color_list.find(slot) != -1:
+			found.append(slot)
+	if found.is_empty():
+		_group_ok(group, "CodeEdit has no AUTHORED syntax-highlighting color slots (AF-7 honored)")
+	else:
+		_group_fail(group, "AF-7 violation: CodeEdit has AUTHORED syntax-highlighting slots (out of Phase 5 scope): " + ", ".join(found))
+
+
 # ----- helpers -----
 
 func _load_pulse_for_group(group: String) -> NeoCadeTheme:
@@ -1716,6 +1872,25 @@ func _group_pending(group: String, detail: String) -> void:
 		"assert_no_theme_clear",
 		"assert_no_invented_focus_combos",
 	]
+	# Plan 05-05 strict list: text-class chrome completeness + CodeEdit gutter
+	# slots + no-syntax-highlighting scope guard. Plan 05-04 text-panels groups
+	# carry forward strict (a text-final regression must also catch text-panels
+	# regressions). Shape/Theme.clear() invariants carry forward strict.
+	var text_final_stage_strict := [
+		"assert_codeedit_gutter_slots",
+		"assert_text_class_chrome_complete",
+		"assert_codeedit_no_syntax_highlighting",
+		# Plan 05-04 carry-forward.
+		"assert_variation_count_15",
+		"assert_inf_text_normal_font_size",
+		"assert_kicker_chrome",
+		"assert_text_label_variation_chrome",
+		"assert_panel_variation_chrome",
+		"assert_no_letter_spacing_claim",
+		# Carry-forward invariants.
+		"assert_no_theme_clear",
+		"assert_no_invented_focus_combos",
+	]
 	var fail: bool = false
 	if _stage == "strict":
 		fail = true
@@ -1724,6 +1899,8 @@ func _group_pending(group: String, detail: String) -> void:
 	elif _stage == "buttons" and group in buttons_stage_strict:
 		fail = true
 	elif _stage == "text-panels" and group in text_panels_stage_strict:
+		fail = true
+	elif _stage == "text-final" and group in text_final_stage_strict:
 		fail = true
 	if fail:
 		var label: String = _stage.to_upper()
@@ -1744,8 +1921,8 @@ func _group_fail(group: String, detail: String) -> void:
 func _emit_summary_and_quit() -> void:
 	print("----- PHASE5_VERIFY summary -----")
 	print("  stage:          %s" % _stage)
-	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 + Plan 05-04 added 4 = 23.
-	print("  groups OK:      %d / %d" % [_ok_markers.size(), 23])
+	# Plan 01 baseline 7 + Plan 05-02 added 4 + Plan 05-03 added 8 + Plan 05-04 added 4 + Plan 05-05 added 2 = 25.
+	print("  groups OK:      %d / %d" % [_ok_markers.size(), 25])
 	print("  groups PENDING: %d  %s" % [_pending.size(), str(_pending)])
 	print("  failures:       %d" % _failures.size())
 	for f in _failures:
