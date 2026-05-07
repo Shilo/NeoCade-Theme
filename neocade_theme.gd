@@ -193,14 +193,21 @@ func _regenerate_theme() -> void:
 	var header_medium_font := preload("res://addons/neocade_theme/fonts/Inter-HeaderMedium.tres") as FontVariation
 	var header_small_font  := preload("res://addons/neocade_theme/fonts/Inter-HeaderSmall.tres") as FontVariation
 	var caption_font       := preload("res://addons/neocade_theme/fonts/Inter-Caption.tres") as FontVariation
-	# 14 variations × set_font (Cross-AI Cycle 1 C4 fix: CodeLabel included)
+	# 15 variations × set_font (Cross-AI Cycle 1 C4 fix: CodeLabel included;
+	# Plan 05-04 D-09: Kicker is the 15th variation per DESIGN_TOKENS §8.6).
 	set_font("font", "HeaderLarge",  header_large_font)
 	set_font("font", "HeaderMedium", header_medium_font)
 	set_font("font", "HeaderSmall",  header_small_font)
 	set_font("font", "Caption",      caption_font)
 	set_font("font", "CodeLabel",    body_font)   # consumer can override to a mono per FONT-04 stricken
-	# BL-02 fix 2026-05-06: InfoText is a RichTextLabel variation; RTL reads `normal_font`,
+	# Kicker (D-09 / Plan 05-04): Inter Variable Roman body weight per UD-4 Option D / D-17.
+	# Per PITFALLS 1.2 type variations DO NOT inherit fonts from Label, so this
+	# explicit set_font is mandatory — without it Kicker falls back to default_font.
+	set_font("font", "Kicker",       body_font)
+	# BL-02 fix 2026-05-06 (D-16): InfoText is a RichTextLabel variation; RTL reads `normal_font`,
 	# not `font` — the `font` slot was silently ignored, falling back to default_font.
+	# The matching size slot is `normal_font_size` (set below); using `font_size`
+	# instead would similarly be silently ignored.
 	set_font("normal_font", "InfoText", body_font)
 	set_font("font", "PrimaryButton",   body_font)
 	set_font("font", "SecondaryButton", body_font)
@@ -217,7 +224,22 @@ func _regenerate_theme() -> void:
 	set_font_size("font_size", "HeaderSmall",  tokens.h2)
 	set_font_size("font_size", "Caption",      tokens.label_)
 	set_font_size("font_size", "CodeLabel",    tokens.label_)
-	set_font_size("font_size", "InfoText",     tokens.body)
+	# Kicker (D-09): tokens.kicker is 12 desktop / 13 mobile per DESIGN_TOKENS §10.1.
+	# Burst's "uppercase-bold-larger-scale" enum is owned by content/showcase since
+	# Theme can't re-tag tracking; the size delta (kicker+1) is held at the
+	# variation level via Burst-specific tres if needed in v1.x. Phase 5 ships the
+	# uniform tokens.kicker baseline; per-direction font_size override (Burst+1)
+	# is deliberately deferred to a future _apply_kicker_size dispatch when
+	# DESIGN_TOKENS §8.6 / FONT-09 is stable.
+	set_font_size("font_size", "Kicker",       tokens.kicker)
+	# BL-02 fix 2026-05-06 (D-16): InfoText is a RichTextLabel variation. The size
+	# slot for RichTextLabel is `normal_font_size`, NOT `font_size`. Using
+	# `font_size` here was a Phase 4-close oversight (the font-slot half was fixed,
+	# the size-slot half was not). Plan 05-04 Task 1 deletes the wrong `font_size`
+	# entry and replaces it with `normal_font_size` to match the `normal_font`
+	# slot name — Godot silently ignores the wrong slot and falls back to
+	# default_font_size.
+	set_font_size("normal_font_size", "InfoText", tokens.body)
 	set_font_size("font_size", "PrimaryButton",   tokens.body)
 	set_font_size("font_size", "SecondaryButton", tokens.body)
 	set_font_size("font_size", "GhostButton",     tokens.body)
@@ -615,11 +637,25 @@ func _resolve_direction_presets() -> Dictionary:
 
 
 # ─── Type variation registry (DESIGN_TOKENS §8.5; PITFALLS 1.2 mandate explicit fonts) ──────
-## 14 NeoCade type variations registered via Theme.set_type_variation() (Cross-AI Cycle 1 C4
-## fix: PICK 14 with CodeLabel INCLUDED — the correct enumeration of TYPEVAR-01..04+05).
+## 15 NeoCade type variations registered via Theme.set_type_variation():
+##   - Phase 4 shipped 14 (Cross-AI Cycle 1 C4 fix included CodeLabel).
+##   - Plan 05-04 (D-09) adds Kicker as the 15th, closing DESIGN_TOKENS §8.6's
+##     explicit Phase 5 todo. Per PITFALLS 1.2, the Kicker entry below is paired
+##     with explicit set_font + set_font_size calls (variations don't inherit
+##     fonts from base type).
 ## Each entry: variation_name → base_type. Phases 5/6/7 author per-direction personality
 ## styleboxes per variation in `.tres` Theme Editor overrides; Phase 4 only registers + sets
-## explicit fonts (Pitfall 1.2: variations don't inherit fonts from base type).
+## explicit fonts.
+##
+## Letter-spacing / case-transform note (research finding, Plan 05-04 Test 5):
+## official Godot 4.6 Label theme properties do NOT expose a Theme-level
+## letter-spacing slot, so the Kicker variation's "uppercase-tracked-accent" /
+## "small-caps-subtle" / "uppercase-bold-larger-scale" tracking + transform
+## semantics live in CONTENT (showcase / consumer-rendered text), NOT in the
+## Theme. Theme owns font / size / color only. Verifier
+## assert_no_letter_spacing_claim guards this contract; if a future Godot
+## release exposes such a constant, the wiring can be added with a documented
+## docs URL plus a precise has_constant assertion in the verifier.
 const TYPE_VARIATIONS: Dictionary = {
 	# Button family (TYPEVAR-01) — 6
 	"PrimaryButton":   "Button",
@@ -628,13 +664,15 @@ const TYPE_VARIATIONS: Dictionary = {
 	"DangerButton":    "Button",
 	"IconButton":      "Button",
 	"FlatButton":      "Button",
-	# Label / heading family (TYPEVAR-02 + TYPEVAR-03) — 5
+	# Label / heading family (TYPEVAR-02) — 5
 	"HeaderLarge":  "Label",
 	"HeaderMedium": "Label",
 	"HeaderSmall":  "Label",
 	"Caption":      "Label",
 	"CodeLabel":    "Label",     # Cross-AI Cycle 1 C4 fix: INCLUDED (was previously dropped)
-	# InfoText (TYPEVAR-05; rich-text small body) — 1
+	# Kicker (TYPEVAR-02 + D-09; Plan 05-04 closes DESIGN_TOKENS §8.6 todo) — 1
+	"Kicker":       "Label",
+	# InfoText (TYPEVAR-03; rich-text small body) — 1
 	"InfoText":     "RichTextLabel",
 	# Panel family (TYPEVAR-04) — 2
 	"CardPanel": "PanelContainer",
@@ -812,14 +850,25 @@ const BINDING_TABLE: Dictionary = {
 		},
 	},
 	# 2. Button — 6 styleboxes + font colors + h_separation (PITFALLS 10.3 clean states)
+	# Plan 05-03 Task 2 polish: pull per-direction shape via shape.secondary_radius +
+	# shape.primary_padding + shape.raised_lifts.secondary so base Button chrome reads
+	# the same per-direction language as the TYPEVAR-01 variations. The base Button
+	# uses the SECONDARY family (not primary) — primary chrome is reserved for the
+	# PrimaryButton variation per TYPEVAR-01 / DESIGN_TOKENS §5.
 	"Button": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": 1},  # Cycle 1 MEDIUM reconcile: was 0; lifts when raised=true
-			"hover":          {"role": "state_hover",   "raised_intensity": 1},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0},  # pressed sinks; never lifted
-			"focus":          {"role": "focus_ring"},
-			"disabled":       {"role": "surface_panel", "disabled": true, "raised_intensity": 0},  # Cycle 2 C2: per-direction alpha
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0},
+			"normal":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover":          {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"pressed":        {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},  # pressed sinks; never lifted
+			"focus":          {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":       {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},  # Cycle 2 C2: per-direction alpha
+			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -862,10 +911,15 @@ const BINDING_TABLE: Dictionary = {
 			"check_v_offset": {"value": 0},
 		},
 		"icon": {
-			"checked":         {"icon": "checkbox_checked"},
-			"unchecked":       {"icon": "checkbox_unchecked"},
-			"radio_checked":   {"icon": "radio_checked"},
-			"radio_unchecked": {"icon": "radio_unchecked"},
+			"checked":            {"icon": "checkbox_checked"},
+			"unchecked":          {"icon": "checkbox_unchecked"},
+			"radio_checked":      {"icon": "radio_checked"},
+			"radio_unchecked":    {"icon": "radio_unchecked"},
+			# Plan 05-03 Task 2 polish: REUSE the existing checked/unchecked
+			# SVGs for the disabled variants (Godot 4.6 exposes the slots; the
+			# font_disabled_color tints them through). No new artwork needed.
+			"checked_disabled":   {"icon": "checkbox_checked"},
+			"unchecked_disabled": {"icon": "checkbox_unchecked"},
 		},
 	},
 	# 4. CheckButton — 2 icon slots (Cycle 6 F4 fix: `checked`/`unchecked`, not `on`/`off`)
@@ -887,11 +941,34 @@ const BINDING_TABLE: Dictionary = {
 			"font_hover_pressed_color":{"role": "text_strong"},
 		},
 		"icon": {
-			"checked":   {"icon": "checkbutton_checked"},
-			"unchecked": {"icon": "checkbutton_unchecked"},
+			"checked":            {"icon": "checkbutton_checked"},
+			"unchecked":          {"icon": "checkbutton_unchecked"},
+			# Plan 05-03 Task 2 polish: REUSE existing SVGs for disabled
+			# variants per the Action item; *_mirrored variants stay deferred
+			# to v1.x per Phase 4 CHANGELOG.
+			"checked_disabled":   {"icon": "checkbutton_checked"},
+			"unchecked_disabled": {"icon": "checkbutton_unchecked"},
 		},
 	},
-	# 5. CodeEdit — inherits TextEdit; Phase 4 ships base stylebox set (no syntax highlighting per AF-7)
+	# 5. CodeEdit — inherits TextEdit; Phase 4 ships base stylebox set + Phase 5
+	# Plan 05-05 Task 1 finalizes text chrome (font_readonly_color,
+	# font_selected_color) + Task 2 wires gutter colors and the official Godot
+	# 4.6 `folded` icon slot. CodeEdit syntax highlighting remains OUT OF SCOPE
+	# per FEATURES AF-7 — `assert_codeedit_no_syntax_highlighting` fails if any
+	# keyword/function/number/symbol/string/comment slot is AUTHORED here.
+	#
+	# Gutter color recipe rationale (DESIGN_TOKENS roles):
+	#   breakpoint_color           -> role_danger   (red stop indicator)
+	#   code_folding_color         -> text_muted    (gutter chrome)
+	#   bookmark_color             -> role_warning  (yellow bookmark)
+	#   executing_line_color       -> role_primary  (active line = accent)
+	#   line_length_guideline_color-> outline_color (subtle column guide)
+	#   line_number_color          -> text_muted    (gutter chrome; baseline)
+	#
+	# Folded icon: CONTEXT D-12 + Godot 4.6 official slot name `folded`. The
+	# verifier introspects Theme.get_icon_list("CodeEdit") and asserts `folded`
+	# is the slot name; if Godot 4.6 disagreed, Task 2 would abort and replan
+	# rather than silently picking a different slot.
 	"CodeEdit": {
 		"stylebox": {
 			"normal":    {"role": "surface_low",   "raised_intensity": 0},
@@ -901,10 +978,25 @@ const BINDING_TABLE: Dictionary = {
 		"color": {
 			"font_color":            {"role": "text_default"},
 			"font_placeholder_color":{"role": "text_muted"},
+			"font_readonly_color":   {"role": "text_muted",  "disabled": true},
+			"font_selected_color":   {"role": "text_strong"},
 			"caret_color":           {"role": "role_primary"},
 			"selection_color":       {"role": "accent_offset"},
 			"current_line_color":    {"role": "surface_panel"},
 			"line_number_color":     {"role": "text_muted"},
+			# Plan 05-05 Task 2: gutter color slots (Godot 4.6 official names).
+			"breakpoint_color":            {"role": "role_danger"},
+			"code_folding_color":          {"role": "text_muted"},
+			"bookmark_color":              {"role": "role_warning"},
+			"executing_line_color":        {"role": "role_primary"},
+			"line_length_guideline_color": {"role": "outline_color"},
+		},
+		"icon": {
+			# Plan 05-05 Task 2: official Godot 4.6 CodeEdit `folded` icon slot.
+			# 32x32 monochrome white SVG per Phase 4 D-11 icon contract; `.import`
+			# sidecar uses svg/scale=2.0 + mipmaps/generate=true + compress/mode=0
+			# + process/fix_alpha_border=true.
+			"folded": {"icon": "code_folded"},
 		},
 	},
 	# 6. ColorPicker — minimal Phase 4 baseline (full coverage Phase 7)
@@ -913,14 +1005,20 @@ const BINDING_TABLE: Dictionary = {
 			"margin": {"value": "tokens.tapPadding"},
 		},
 	},
-	# 7. ColorPickerButton — inherits Button family; minimal Phase 4 baseline
+	# 7. ColorPickerButton — inherits Button family; Plan 05-03 Task 2 polish: shape.* lookups
+	# so the swatch button reads with per-direction radius/padding/lift like Button proper.
 	"ColorPickerButton": {
 		"stylebox": {
-			"normal":   {"role": "surface_panel", "raised_intensity": 1},
-			"hover":    {"role": "state_hover",   "raised_intensity": 1},
-			"pressed":  {"role": "state_pressed", "raised_intensity": 0},
-			"focus":    {"role": "focus_ring"},
-			"disabled": {"role": "surface_panel", "disabled": true},
+			"normal":   {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover":    {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"pressed":  {"role": "state_pressed", "raised_intensity": 0,
+							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"focus":    {"role": "focus_ring",
+							"radius": "shape.secondary_radius"},
+			"disabled": {"role": "surface_panel", "disabled": true,
+							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -1089,14 +1187,22 @@ const BINDING_TABLE: Dictionary = {
 		},
 	},
 	# 20. MenuButton — Button-family states
+	# Plan 05-03 Task 2 polish: shape.secondary_radius + shape.primary_padding +
+	# shape.raised_lifts.secondary so the per-direction shape language flows.
 	"MenuButton": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": 1},
-			"hover":          {"role": "state_hover",   "raised_intensity": 1},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0},
-			"focus":          {"role": "focus_ring"},
-			"disabled":       {"role": "surface_panel", "disabled": true},
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0},
+			"normal":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover":          {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"pressed":        {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"focus":          {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":       {"role": "surface_panel", "disabled": true,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -1110,14 +1216,22 @@ const BINDING_TABLE: Dictionary = {
 		},
 	},
 	# 21. OptionButton — 6 stylebox + arrow icon + arrow_margin constant
+	# Plan 05-03 Task 2 polish: shape.secondary_radius + shape.primary_padding +
+	# shape.raised_lifts.secondary so the per-direction shape language flows.
 	"OptionButton": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": 1},
-			"hover":          {"role": "state_hover",   "raised_intensity": 1},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0},
-			"focus":          {"role": "focus_ring"},
-			"disabled":       {"role": "surface_panel", "disabled": true},
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0},
+			"normal":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover":          {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"pressed":        {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"focus":          {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":       {"role": "surface_panel", "disabled": true,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -1196,12 +1310,24 @@ const BINDING_TABLE: Dictionary = {
 			"font_selected_color": {"role": "text_strong"},
 		},
 	},
-	# 27. SpinBox — inherits LineEdit; Phase 4 ships button separation constants
+	# 27. SpinBox — inherits LineEdit; Phase 4 ships button separation constants;
+	# Plan 05-06 Task 2 wires the four official Godot 4.6 icon slots
+	# (`up` / `up_disabled` / `down` / `down_disabled`). NOT `up_arrow` /
+	# `down_arrow` (legacy names from earlier Godot — verifier explicitly
+	# forbids those). Disabled variants REUSE the base SVG (Wave 3 CheckBox
+	# `disabled_icon` reuse pattern); Godot tints them through the
+	# disabled state at draw time so two SVGs cover all four slots.
 	"SpinBox": {
 		"constant": {
 			"buttons_vertical_separation": {"value": 2},
 			"buttons_width":                {"value": 16},
 			"field_and_buttons_separation":{"value": 4},
+		},
+		"icon": {
+			"up":           {"icon": "spinbox_up"},
+			"up_disabled":  {"icon": "spinbox_up"},
+			"down":         {"icon": "spinbox_down"},
+			"down_disabled":{"icon": "spinbox_down"},
 		},
 	},
 	# 28. TabBar — 5 stylebox + tab font/icon colors
@@ -1350,6 +1476,393 @@ const BINDING_TABLE: Dictionary = {
 		"constant": {
 			"close_h_offset": {"value": 8},
 			"title_height":   {"value": 28},
+		},
+	},
+	# ─── TYPEVAR-01 button variations (Plan 05-03 Task 1) ──────────────────────────────────────
+	# Variation chrome flows through BINDING_TABLE recipes per D-01 (additive iteration only),
+	# D-02 (per-direction shape via DIRECTION_PRESETS.shape), D-03 (recipe schema reads
+	# `shape.<key>` lookups via _lookup_shape), D-04 (closed-enum strategy dispatch via
+	# _apply_primary_strategy / _apply_ghost_strategy added by Plan 05-02 Task 2), and D-07
+	# (focus is the official `focus` overlay only — no pressed_focus / checked_focus / etc.).
+	#
+	# Each variation populates the canonical 6-state Button slot set
+	# (normal/hover/pressed/focus/disabled/hover_pressed) plus font_color slots so Godot's
+	# Button renderer reads them. Phase 4 already wires explicit set_font + set_font_size for
+	# these variations (see _regenerate_theme() lines 205-226) — Plan 05-03 only adds chrome.
+	# 38. PrimaryButton — primary brand action, accent fill via shape.primary_strategy.
+	#
+	# Per-direction recipe data wiring:
+	#   - radius:           shape.primary_radius     (Pulse 0 / Slate 14 / Bubble 999 pill /
+	#                                                 Daybreak 8 / Burst 28 oversized)
+	#   - padding:          shape.primary_padding    (Vector2i per FOUND-02; Pulse 14×10 /
+	#                                                 Slate 16×11 / Bubble 20×14 / Daybreak
+	#                                                 18×12 / Burst 20×14)
+	#   - raised_intensity: shape.raised_lifts.primary (Pulse 3 / Slate 2 / Bubble 6 /
+	#                                                   Daybreak 3 / Burst 5)
+	#   - strategy:         shape.primary_strategy   (5 closed-enum dispatchers in
+	#                                                 _apply_primary_strategy)
+	# `pressed` and `disabled` skip strategy dispatch (sink/disable states stay literal so
+	# the user's mental model of "pressed = darker" stays consistent across directions).
+	"PrimaryButton": {
+		"stylebox": {
+			"normal":        {"role": "role_primary",  "raised_intensity": "shape.raised_lifts.primary",
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"strategy": "shape.primary_strategy"},
+			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.primary",
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"strategy": "shape.primary_strategy"},
+			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+			"focus":         {"role": "focus_ring",
+								"radius": "shape.primary_radius"},
+			"disabled":      {"role": "role_primary",  "disabled": true, "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+		},
+		"color": {
+			"font_color":              {"role": "text_strong"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_strong", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_strong"},
+			"icon_hover_color":        {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_focus_color":        {"role": "text_strong"},
+			"icon_disabled_color":     {"role": "text_strong", "disabled": true},
+			"icon_hover_pressed_color":{"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	# 39. SecondaryButton — alternate action, surface_panel bg, no strategy override.
+	# Uses shape.secondary_radius (per-direction secondary chrome family) and shape.primary_padding
+	# for parity with primary content metrics. Lifts at shape.raised_lifts.secondary (smaller
+	# than primary so the visual hierarchy is preserved when raised=true).
+	"SecondaryButton": {
+		"stylebox": {
+			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"focus":         {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+		},
+		"color": {
+			"font_color":              {"role": "text_strong"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_strong", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_strong"},
+			"icon_hover_color":        {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_focus_color":        {"role": "text_strong"},
+			"icon_disabled_color":     {"role": "text_strong", "disabled": true},
+			"icon_hover_pressed_color":{"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	# 40. GhostButton — outlined / transparent bg via shape.ghost_strategy.
+	# Surface_panel as the recipe `role` provides a non-null bg_color to start from; the ghost
+	# strategy overrides bg_color = TRANSPARENT and applies the per-direction outline
+	# (Pulse 2px accent / Slate 1px accent / Bubble 2px accent + radius 999 / Daybreak 1px
+	# outline_color / Burst 2px accent). Padding mirrors PrimaryButton for visual rhythm.
+	"GhostButton": {
+		"stylebox": {
+			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"strategy": "shape.ghost_strategy"},
+			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.ghost",
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"strategy": "shape.ghost_strategy"},
+			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"focus":         {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"strategy": "shape.ghost_strategy"},
+			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+		},
+		"color": {
+			"font_color":              {"role": "role_primary"},
+			"font_hover_color":        {"role": "role_primary"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "role_primary"},
+			"font_disabled_color":     {"role": "role_primary", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "role_primary"},
+			"icon_hover_color":        {"role": "role_primary"},
+			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_focus_color":        {"role": "role_primary"},
+			"icon_disabled_color":     {"role": "role_primary", "disabled": true},
+			"icon_hover_pressed_color":{"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	# 41. DangerButton — destructive action; bg = role_danger (DESIGN_TOKENS §7.1 #FF6E6E
+	# default; per-direction overrides plug into DIRECTION_PRESETS.shape.* in v2 per
+	# Plan 05-02 Task 2 docstring). Plan 05-02 added role_danger to role_table so this
+	# binding does NOT silently fall back to surface_panel (review HIGH gate).
+	# DangerButton uses primary radius/padding (the danger CTA is a primary-grade action).
+	"DangerButton": {
+		"stylebox": {
+			"normal":        {"role": "role_danger",   "raised_intensity": "shape.raised_lifts.primary",
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+			"hover":         {"role": "role_danger",   "raised_intensity": "shape.raised_lifts.primary",
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"alpha": 0.92},
+			"pressed":       {"role": "role_danger",   "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"alpha": 0.78},
+			"focus":         {"role": "focus_ring",
+								"radius": "shape.primary_radius"},
+			"disabled":      {"role": "role_danger",   "disabled": true, "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+			"hover_pressed":{"role": "role_danger",   "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"alpha": 0.78},
+		},
+		"color": {
+			"font_color":              {"role": "text_strong"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_strong", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_strong"},
+			"icon_hover_color":        {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_focus_color":        {"role": "text_strong"},
+			"icon_disabled_color":     {"role": "text_strong", "disabled": true},
+			"icon_hover_pressed_color":{"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	# 42. IconButton — compact, borderless square chrome optimised for an icon glyph.
+	# Uses tokens.tapPadding directly (NOT shape.primary_padding) so the icon stays
+	# centered in a square hit area regardless of direction. Shape.secondary_radius
+	# provides the per-direction corner softness (Pulse 0 rectangular / Slate 14 / Bubble 26 /
+	# Daybreak 8 / Burst 18). Lifts at shape.raised_lifts.ghost so it reads as a "subtle"
+	# affordance compared to primary chrome.
+	"IconButton": {
+		"stylebox": {
+			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
+								"radius": "shape.secondary_radius"},
+			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.ghost",
+								"radius": "shape.secondary_radius"},
+			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius"},
+			"focus":         {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+								"radius": "shape.secondary_radius"},
+			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius"},
+		},
+		"color": {
+			"font_color":              {"role": "text_strong"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_strong", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_default"},
+			"icon_hover_color":        {"role": "role_primary"},
+			"icon_pressed_color":      {"role": "role_primary"},
+			"icon_focus_color":        {"role": "role_primary"},
+			"icon_disabled_color":     {"role": "text_muted",  "disabled": true},
+			"icon_hover_pressed_color":{"role": "role_primary"},
+		},
+		"constant": {
+			"h_separation": {"value": 0},
+		},
+	},
+	# 43. FlatButton — borderless / fully transparent normal state; visible only on hover/
+	# pressed/focus. Per CONTEXT.md TYPEVAR-01: this is the RUNTIME variation, NOT the
+	# editor-only `FlatButton` class. Surface_panel role keeps the slot populated; the
+	# alpha=0.0 zeroes the bg so users see only state-layer changes when interacting.
+	# Never lifts (raised_intensity=0 across all states) — flat by definition.
+	"FlatButton": {
+		"stylebox": {
+			"normal":        {"role": "surface_panel", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"alpha": 0.0},
+			"hover":         {"role": "state_hover",   "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"focus":         {"role": "focus_ring",
+								"radius": "shape.secondary_radius"},
+			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"alpha": 0.0},
+			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+		},
+		"color": {
+			"font_color":              {"role": "text_default"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_default", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_default"},
+			"icon_hover_color":        {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_focus_color":        {"role": "text_strong"},
+			"icon_disabled_color":     {"role": "text_default", "disabled": true},
+			"icon_hover_pressed_color":{"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	# ─── Phase 5 Plan 05-04: Type-variation rows (TYPEVAR-02..05 + Kicker D-09) ───
+	# These rows extend BINDING_TABLE with the 7 NeoCade text/label/RTL type
+	# variations whose chrome is owned by Plan 05-04 Task 2. The 6 button-family
+	# variations (PrimaryButton..FlatButton) are owned by Plan 05-03 (sibling
+	# wave) and live in the rows above. The 2 panel variations (CardPanel,
+	# HeroPanel) plus PanelContainer are owned by Plan 05-04 Task 3 and follow
+	# this section.
+	#
+	# D-04 invariant: variations not in BINDING_TABLE remain untouched at
+	# regenerate. This section is the variation-side parallel of the 37-row
+	# canonical scorecard above.
+	#
+	# 44. HeaderLarge — Label variation (TYPEVAR-02). Phase 4 set font + size;
+	#     Phase 5 adds explicit font_color via BINDING_TABLE so per-direction
+	#     palette refresh propagates to headings.
+	"HeaderLarge": {
+		"color": {
+			"font_color": {"role": "text_strong"},
+		},
+	},
+	# 45. HeaderMedium — Label variation (TYPEVAR-02).
+	"HeaderMedium": {
+		"color": {
+			"font_color": {"role": "text_strong"},
+		},
+	},
+	# 46. HeaderSmall — Label variation (TYPEVAR-02).
+	"HeaderSmall": {
+		"color": {
+			"font_color": {"role": "text_strong"},
+		},
+	},
+	# 47. Caption — Label variation (TYPEVAR-02). Caption is the small-body
+	#     supporting label; uses text_default (one tonal step softer than
+	#     text_strong) to read as secondary content.
+	"Caption": {
+		"color": {
+			"font_color": {"role": "text_default"},
+		},
+	},
+	# 48. CodeLabel — Label variation (TYPEVAR-02). CodeLabel ships in
+	#     Inter Body weight per FONT-04 stricken / FONT-09 (b); consumer can
+	#     swap a mono via the Theme Editor `font` slot. Color uses text_strong
+	#     (code reads as primary content even when small).
+	"CodeLabel": {
+		"color": {
+			"font_color": {"role": "text_strong"},
+		},
+	},
+	# 49. Kicker — Label variation (TYPEVAR-02 + D-09). The kicker_style
+	#     dispatch (D-04 closed enum sourced verbatim from DESIGN_TOKENS §8.6)
+	#     drives per-direction font_color via _apply_kicker_style():
+	#       Pulse / Bubble  ("uppercase-tracked-accent")    -> role_primary
+	#       Slate           ("small-caps-subtle")           -> text_muted
+	#       Daybreak        ("sentence-case-accent")        -> role_primary
+	#       Burst           ("uppercase-bold-larger-scale") -> role_primary
+	#     Tracking / case-transform / per-direction wght+1 size delta is
+	#     CONTENT-side per the research finding (no Theme-level letter_spacing
+	#     constant in Godot 4.6 Label). Phase 5 verifier
+	#     assert_no_letter_spacing_claim asserts this restraint at the source
+	#     level; assert_kicker_chrome asserts the resolved color matches the
+	#     direction's kicker_style enum end-to-end.
+	"Kicker": {
+		"color": {
+			"font_color": {"kicker_style": "shape.kicker_style"},
+		},
+	},
+	# 50. InfoText — RichTextLabel variation (TYPEVAR-03). Per D-16 / BL-02,
+	#     RTL reads `normal_font` and `normal_font_size` (set in
+	#     _regenerate_theme above), and `default_color` for body text +
+	#     `selection_color` for highlights. font_selected_color is the body
+	#     color when text is inside a user selection (text_strong for contrast
+	#     against the accent_offset highlight).
+	"InfoText": {
+		"color": {
+			"default_color":         {"role": "text_default"},
+			"selection_color":       {"role": "accent_offset"},
+			"font_selected_color":   {"role": "text_strong"},
+		},
+	},
+	# 51. PanelContainer — Phase 4 omitted this base class from BINDING_TABLE
+	#     (only Panel was wired); Phase 5 Plan 05-04 Task 3 adds it so
+	#     per-direction surface_alpha_panels and raised_lifts.panel propagate.
+	#     CardPanel and HeroPanel both extend PanelContainer.
+	"PanelContainer": {
+		"stylebox": {
+			"panel": {
+				"role":             "surface_panel",
+				"alpha":            "shape.surface_alpha_panels",
+				"raised_intensity": "shape.raised_lifts.panel",
+			},
+		},
+	},
+	# 52. CardPanel — PanelContainer variation (TYPEVAR-04). Uses
+	#     shape.card_radius for per-direction radius personality (Pulse 0,
+	#     Slate 14, Bubble 26, Daybreak 8, Burst 18) plus the panel
+	#     surface_alpha and raised lift.
+	"CardPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "surface_panel",
+				"radius":           "shape.card_radius",
+				"alpha":            "shape.surface_alpha_panels",
+				"raised_intensity": "shape.raised_lifts.panel",
+			},
+		},
+		"color": {
+			"font_color": {"role": "text_strong"},
+		},
+	},
+	# 53. HeroPanel — PanelContainer variation (TYPEVAR-04). Uses
+	#     shape.hero_radius (sibling to card_radius; v1 ships matching pairs
+	#     per direction, but the schema lets v2 differentiate hero from card
+	#     for any direction). Surface role is surface_high (one tonal step
+	#     above CardPanel) so a Hero stack reads above a Card in the
+	#     extruded-flat layer order.
+	"HeroPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "surface_high",
+				"radius":           "shape.hero_radius",
+				"alpha":            "shape.surface_alpha_panels",
+				"raised_intensity": "shape.raised_lifts.panel",
+			},
+		},
+		"color": {
+			"font_color": {"role": "text_strong"},
 		},
 	},
 }
