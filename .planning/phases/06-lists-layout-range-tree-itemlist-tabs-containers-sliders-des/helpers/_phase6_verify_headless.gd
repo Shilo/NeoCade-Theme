@@ -11,7 +11,7 @@ extends SceneTree
 ##   tree               Tree gate from Plan 06-02.
 ##   itemlist-foldable  ItemList and FoldableContainer gate from Plan 06-03.
 ##   tabs               Strict TabBar/TabContainer gate from Plan 06-04.
-##   range-containers   Future Plan 06-05 group placeholder.
+##   range-containers   Strict range/control/container gate from Plan 06-05.
 ##   full               Fails while any future group is pending.
 
 const PRODUCTION_GD := "res://addons/neocade_theme/neocade_theme.gd"
@@ -194,6 +194,61 @@ const EXPECTED_TAB_ICON_RECIPES := {
 	},
 }
 
+const EXPECTED_SLIDER_ICON_RECIPES := {
+	"HSlider": {
+		"grabber": "slider_grabber",
+		"grabber_disabled": "slider_grabber",
+		"grabber_highlight": "slider_grabber",
+		"tick": "slider_tick",
+	},
+	"VSlider": {
+		"grabber": "slider_grabber",
+		"grabber_disabled": "slider_grabber",
+		"grabber_highlight": "slider_grabber",
+		"tick": "slider_tick",
+	},
+}
+
+const EXPECTED_SCROLLBAR_ICON_RECIPES := {
+	"HScrollBar": {
+		"decrement": "scrollbar_left",
+		"decrement_highlight": "scrollbar_left",
+		"decrement_pressed": "scrollbar_left",
+		"increment": "scrollbar_right",
+		"increment_highlight": "scrollbar_right",
+		"increment_pressed": "scrollbar_right",
+	},
+	"VScrollBar": {
+		"decrement": "scrollbar_up",
+		"decrement_highlight": "scrollbar_up",
+		"decrement_pressed": "scrollbar_up",
+		"increment": "scrollbar_down",
+		"increment_highlight": "scrollbar_down",
+		"increment_pressed": "scrollbar_down",
+	},
+}
+
+const EXPECTED_CONTAINER_ICON_RECIPES := {
+	"ScrollContainer": {
+		"scroll_hint_horizontal": "scroll_hint_horizontal",
+		"scroll_hint_vertical": "scroll_hint_vertical",
+	},
+	"SplitContainer": {
+		"h_grabber": "split_grabber_h",
+		"h_touch_dragger": "split_touch_dragger_h",
+		"v_grabber": "split_grabber_v",
+		"v_touch_dragger": "split_touch_dragger_v",
+	},
+	"HSplitContainer": {
+		"grabber": "split_grabber_h",
+		"touch_dragger": "split_touch_dragger_h",
+	},
+	"VSplitContainer": {
+		"grabber": "split_grabber_v",
+		"touch_dragger": "split_touch_dragger_v",
+	},
+}
+
 var _stage := "slot-freeze"
 var _failures: Array[String] = []
 var _pending: Array[String] = []
@@ -236,7 +291,7 @@ func _run() -> void:
 	if ["tabs", "range-containers", "full"].has(_stage):
 		assert_tabs_stage()
 	if ["range-containers", "full"].has(_stage):
-		assert_range_containers_stage_pending()
+		assert_range_containers_stage()
 
 
 func _verify_helper_wiring() -> bool:
@@ -445,8 +500,34 @@ func assert_tabs_stage() -> void:
 		_group_fail(group, "; ".join(problems))
 
 
-func assert_range_containers_stage_pending() -> void:
-	_group_pending("assert_range_containers_stage", "Range and container polish groups are owned by Plan 06-05")
+func assert_range_containers_stage() -> void:
+	var group := "assert_range_containers_stage"
+	var loaded := ResourceLoader.load(PULSE_PATH, "", ResourceLoader.CACHE_MODE_IGNORE)
+	if loaded == null or not (loaded is NeoCadeTheme):
+		_group_fail(group, "Pulse direction did not load as NeoCadeTheme")
+		return
+	var theme: NeoCadeTheme = loaded
+	var problems: Array[String] = []
+	_assert_range_slots_present(theme, problems)
+	_assert_range_table_owns_official_slots(problems)
+	_assert_progressbar_chrome(theme, problems)
+	_assert_slider_mirroring(problems)
+	_assert_slider_icon_recipes(problems)
+	_assert_scrollbar_focus_discipline(theme, problems)
+	_assert_scrollbar_icon_recipes(problems)
+	_assert_container_slots_present(theme, problems)
+	_assert_container_table_owns_official_slots(problems)
+	_assert_container_focus_and_chrome(theme, problems)
+	_assert_container_icon_recipes(problems)
+	_assert_range_container_stale_slots_absent(problems)
+	if problems.is_empty():
+		print("PHASE6_COVERAGE_OK:COV-04 Range controls complete: HSlider/VSlider/ProgressBar/HScrollBar/VScrollBar plus Phase 5 SpinBox carry-forward")
+		print("PHASE6_COVERAGE_OK:COV-07 Scroll/Split/Margin/layout/separator container contribution enforced")
+		print("PHASE6_COVERAGE_OK:COV-01 Range and container controls contribute to cumulative 37-Control scorecard")
+		print("PHASE6_COVERAGE_OK:COV-09 Range/container focus uses official outer focus slots")
+		_group_ok(group, "Range controls, scrollbars, containers, separators, official icons, focus slots, and forbidden-slot guards are covered")
+	else:
+		_group_fail(group, "; ".join(problems))
 
 
 func _assert_tree_slots_present(theme: Theme, problems: Array[String]) -> void:
@@ -854,6 +935,220 @@ func _assert_tab_icon_recipes(problems: Array[String]) -> void:
 			var actual_icon: String = recipe.get("icon", "")
 			if actual_icon != expected_icon:
 				problems.append("%s.icon recipe %s expected %s got %s" % [type_name, slot, expected_icon, actual_icon])
+
+
+func _assert_range_slots_present(theme: Theme, problems: Array[String]) -> void:
+	for type_name in ["ProgressBar", "HSlider", "VSlider", "HScrollBar", "VScrollBar"]:
+		var expected: Dictionary = EXPECTED_SLOT_FREEZE[type_name]
+		for slot in expected.get("stylebox", []):
+			if not theme.has_stylebox(slot, type_name):
+				problems.append("%s.stylebox missing %s" % [type_name, slot])
+		for slot in expected.get("color", []):
+			if not theme.has_color(slot, type_name):
+				problems.append("%s.color missing %s" % [type_name, slot])
+		for slot in expected.get("constant", []):
+			if not theme.has_constant(slot, type_name):
+				problems.append("%s.constant missing %s" % [type_name, slot])
+		for slot in expected.get("font", []):
+			if not theme.has_font(slot, type_name):
+				problems.append("%s.font missing %s" % [type_name, slot])
+		for slot in expected.get("font_size", []):
+			if not theme.has_font_size(slot, type_name):
+				problems.append("%s.font_size missing %s" % [type_name, slot])
+		for slot in expected.get("icon", []):
+			if not theme.has_icon(slot, type_name):
+				problems.append("%s.icon missing %s" % [type_name, slot])
+	if not theme.has_icon("up", "SpinBox") or not theme.has_icon("down", "SpinBox"):
+		problems.append("SpinBox Phase 5 range-control carry-forward icons missing")
+
+
+func _assert_range_table_owns_official_slots(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	for type_name in ["ProgressBar", "HSlider", "VSlider", "HScrollBar", "VScrollBar"]:
+		var expected: Dictionary = EXPECTED_SLOT_FREEZE[type_name]
+		var type_block: Dictionary = binding.get(type_name, {})
+		for data_type in ["stylebox", "color", "constant", "font_size", "icon"]:
+			var slot_block: Dictionary = type_block.get(data_type, {})
+			for slot in expected.get(data_type, []):
+				if not slot_block.has(slot):
+					problems.append("BINDING_TABLE.%s.%s missing explicit recipe for %s" % [type_name, data_type, slot])
+
+
+func _assert_progressbar_chrome(theme: NeoCadeTheme, problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	var pb: Dictionary = binding.get("ProgressBar", {})
+	if pb.get("stylebox", {}).get("fill", {}).get("role", "") != "role_primary":
+		problems.append("ProgressBar.fill must use role_primary")
+	if pb.get("stylebox", {}).get("background", {}).get("role", "") != "surface_low":
+		problems.append("ProgressBar.background must use surface_low")
+	if not pb.get("color", {}).has("font_outline_color"):
+		problems.append("ProgressBar.color missing font_outline_color recipe")
+	if not pb.get("constant", {}).has("outline_size"):
+		problems.append("ProgressBar.constant missing outline_size recipe")
+	if not pb.get("font_size", {}).has("font_size"):
+		problems.append("ProgressBar.font_size missing font_size recipe")
+	if not theme.has_font("font", "ProgressBar"):
+		problems.append("ProgressBar.font not set explicitly")
+	var fill := theme.get_stylebox("fill", "ProgressBar") as StyleBoxFlat
+	if fill != null and not _color_close(fill.bg_color, theme.accent_color):
+		problems.append("ProgressBar.fill bg does not match role_primary/accent")
+	var background := theme.get_stylebox("background", "ProgressBar") as StyleBoxFlat
+	if background != null:
+		var presets := _direction_presets_for_theme(theme)
+		var spread_factor: float = float(presets.get("spread_factor", 1.0))
+		var expected_low := _mix_color(theme.base_color, Color.BLACK, 0.18 * spread_factor)
+		if not _color_close(background.bg_color, expected_low):
+			problems.append("ProgressBar.background bg does not match surface_low")
+
+
+func _assert_slider_mirroring(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	for data_type in ["stylebox", "constant", "icon"]:
+		var h_block: Dictionary = binding.get("HSlider", {}).get(data_type, {})
+		var v_block: Dictionary = binding.get("VSlider", {}).get(data_type, {})
+		if h_block != v_block:
+			problems.append("HSlider/VSlider %s recipes diverge" % data_type)
+	for data_type in ["stylebox", "icon"]:
+		var h_scroll: Dictionary = binding.get("HScrollBar", {}).get(data_type, {})
+		var v_scroll: Dictionary = binding.get("VScrollBar", {}).get(data_type, {})
+		if data_type == "stylebox" and h_scroll != v_scroll:
+			problems.append("HScrollBar/VScrollBar stylebox recipes diverge")
+		if data_type == "icon" and _sorted_strings(h_scroll.keys()) != _sorted_strings(v_scroll.keys()):
+			problems.append("HScrollBar/VScrollBar official icon slot sets diverge")
+
+
+func _assert_slider_icon_recipes(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	for type_name in EXPECTED_SLIDER_ICON_RECIPES.keys():
+		var icon_block: Dictionary = binding.get(type_name, {}).get("icon", {})
+		var expected: Dictionary = EXPECTED_SLIDER_ICON_RECIPES[type_name]
+		if _sorted_strings(icon_block.keys()) != _sorted_strings(expected.keys()):
+			problems.append("%s icon slots are not exactly official slider slots" % type_name)
+		for slot in expected.keys():
+			var actual_icon: String = icon_block.get(slot, {}).get("icon", "")
+			if actual_icon != expected[slot]:
+				problems.append("%s.icon recipe %s expected %s got %s" % [type_name, slot, expected[slot], actual_icon])
+
+
+func _assert_scrollbar_focus_discipline(theme: Theme, problems: Array[String]) -> void:
+	for type_name in ["HScrollBar", "VScrollBar"]:
+		var focus := theme.get_stylebox("scroll_focus", type_name) as StyleBoxFlat
+		if focus == null:
+			problems.append("%s.scroll_focus is not a StyleBoxFlat" % type_name)
+			continue
+		if focus.bg_color.a != 0.0:
+			problems.append("%s.scroll_focus background is not transparent" % type_name)
+		if focus.border_width_left <= 0 or focus.border_width_top <= 0:
+			problems.append("%s.scroll_focus has no outer border ring" % type_name)
+
+
+func _assert_scrollbar_icon_recipes(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	for type_name in EXPECTED_SCROLLBAR_ICON_RECIPES.keys():
+		var icon_block: Dictionary = binding.get(type_name, {}).get("icon", {})
+		var expected: Dictionary = EXPECTED_SCROLLBAR_ICON_RECIPES[type_name]
+		if _sorted_strings(icon_block.keys()) != _sorted_strings(expected.keys()):
+			problems.append("%s icon slots are not exactly the six official increment/decrement slots" % type_name)
+		for slot in icon_block.keys():
+			if String(slot).find("grabber") != -1:
+				problems.append("%s invented unsupported ScrollBar grabber icon slot %s" % [type_name, slot])
+		for slot in expected.keys():
+			var actual_icon: String = icon_block.get(slot, {}).get("icon", "")
+			if actual_icon != expected[slot]:
+				problems.append("%s.icon recipe %s expected %s got %s" % [type_name, slot, expected[slot], actual_icon])
+
+
+func _assert_container_slots_present(theme: Theme, problems: Array[String]) -> void:
+	for type_name in ["ScrollContainer", "SplitContainer", "HSplitContainer", "VSplitContainer",
+			"MarginContainer", "HBoxContainer", "VBoxContainer", "FlowContainer", "GridContainer",
+			"HSeparator", "VSeparator"]:
+		var expected: Dictionary = EXPECTED_SLOT_FREEZE[type_name]
+		for slot in expected.get("stylebox", []):
+			if not theme.has_stylebox(slot, type_name):
+				problems.append("%s.stylebox missing %s" % [type_name, slot])
+		for slot in expected.get("color", []):
+			if not theme.has_color(slot, type_name):
+				problems.append("%s.color missing %s" % [type_name, slot])
+		for slot in expected.get("constant", []):
+			if not theme.has_constant(slot, type_name):
+				problems.append("%s.constant missing %s" % [type_name, slot])
+		for slot in expected.get("icon", []):
+			if not theme.has_icon(slot, type_name):
+				problems.append("%s.icon missing %s" % [type_name, slot])
+
+
+func _assert_container_table_owns_official_slots(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	for type_name in ["ScrollContainer", "SplitContainer", "HSplitContainer", "VSplitContainer",
+			"MarginContainer", "HBoxContainer", "VBoxContainer", "FlowContainer", "GridContainer",
+			"HSeparator", "VSeparator"]:
+		var expected: Dictionary = EXPECTED_SLOT_FREEZE[type_name]
+		var type_block: Dictionary = binding.get(type_name, {})
+		for data_type in ["stylebox", "color", "constant", "icon"]:
+			var slot_block: Dictionary = type_block.get(data_type, {})
+			for slot in expected.get(data_type, []):
+				if not slot_block.has(slot):
+					problems.append("BINDING_TABLE.%s.%s missing explicit recipe for %s" % [type_name, data_type, slot])
+
+
+func _assert_container_focus_and_chrome(theme: Theme, problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	var focus := theme.get_stylebox("focus", "ScrollContainer") as StyleBoxFlat
+	if focus == null:
+		problems.append("ScrollContainer.focus is not a StyleBoxFlat")
+	else:
+		if focus.bg_color.a != 0.0:
+			problems.append("ScrollContainer.focus background is not transparent")
+		if focus.border_width_left <= 0 or focus.border_width_top <= 0:
+			problems.append("ScrollContainer.focus has no outer border ring")
+	var scroll_panel_recipe: Dictionary = binding.get("ScrollContainer", {}).get("stylebox", {}).get("panel", {})
+	if not ["surface_base", "surface_low"].has(scroll_panel_recipe.get("role", "")):
+		problems.append("ScrollContainer.panel should be quiet overflow chrome, got role %s" % scroll_panel_recipe.get("role", ""))
+	if int(scroll_panel_recipe.get("raised_intensity", 0)) != 0:
+		problems.append("ScrollContainer.panel must not turn nested scroll areas into raised cards")
+	for type_name in ["SplitContainer", "HSplitContainer", "VSplitContainer"]:
+		var recipe: Dictionary = binding.get(type_name, {}).get("stylebox", {}).get("split_bar_background", {})
+		if recipe.is_empty():
+			problems.append("%s.split_bar_background recipe missing" % type_name)
+			continue
+		if ["role_primary", "accent_offset", "state_pressed"].has(recipe.get("role", "")):
+			problems.append("%s.split_bar_background uses decorative/selected role %s" % [type_name, recipe.get("role", "")])
+	for type_name in ["HSeparator", "VSeparator"]:
+		var separator_recipe: Dictionary = binding.get(type_name, {}).get("stylebox", {}).get("separator", {})
+		if separator_recipe.get("role", "") != "outline_color":
+			problems.append("%s.separator should use outline_color role" % type_name)
+		if int(separator_recipe.get("raised_intensity", 0)) != 0:
+			problems.append("%s.separator must not be raised" % type_name)
+
+
+func _assert_container_icon_recipes(problems: Array[String]) -> void:
+	var binding: Dictionary = _script_constants().get("BINDING_TABLE", {})
+	for type_name in EXPECTED_CONTAINER_ICON_RECIPES.keys():
+		var icon_block: Dictionary = binding.get(type_name, {}).get("icon", {})
+		var expected: Dictionary = EXPECTED_CONTAINER_ICON_RECIPES[type_name]
+		if _sorted_strings(icon_block.keys()) != _sorted_strings(expected.keys()):
+			problems.append("%s icon slots do not match official container slots" % type_name)
+		for slot in expected.keys():
+			var actual_icon: String = icon_block.get(slot, {}).get("icon", "")
+			if actual_icon != expected[slot]:
+				problems.append("%s.icon recipe %s expected %s got %s" % [type_name, slot, expected[slot], actual_icon])
+
+
+func _assert_range_container_stale_slots_absent(problems: Array[String]) -> void:
+	var constants := _script_constants()
+	var binding: Dictionary = constants.get("BINDING_TABLE", {})
+	var canonical: Dictionary = constants.get("CANONICAL_SLOT_NAMES", {})
+	if binding.has("CenterContainer") or canonical.has("CenterContainer"):
+		problems.append("CenterContainer must remain unbound because local Godot 4.6.2 reports no theme slots")
+	var scroll_constants: Dictionary = binding.get("ScrollContainer", {}).get("constant", {})
+	for bad in ["scrollbar_h_separation", "scrollbar_v_separation"]:
+		if scroll_constants.has(bad):
+			problems.append("ScrollContainer.constant invents unsupported %s" % bad)
+	for type_name in ["HScrollBar", "VScrollBar"]:
+		var icon_block: Dictionary = binding.get(type_name, {}).get("icon", {})
+		for bad in ["grabber", "grabber_highlight", "grabber_pressed", "grabber_disabled"]:
+			if icon_block.has(bad):
+				problems.append("%s.icon invents unsupported ScrollBar grabber icon slot %s" % [type_name, bad])
 
 
 func _direction_presets_for_theme(theme: NeoCadeTheme) -> Dictionary:
