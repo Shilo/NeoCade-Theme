@@ -367,7 +367,7 @@ Baseline principle: MD3 flat treatment is the default; raised treatment is optio
 
 | Date | Plan | Check | Result |
 |---|---|---|---|
-| 2026-05-05 | 03.1-01 | Skeleton created with source roles, source-access status labels, citation contract, hard filter, Inter Variable Roman note, provenance table, and reserved headings. | Pending command verification. |
+| 2026-05-05 | 03.1-01 | Skeleton created with source roles, source-access status labels, citation contract, hard filter, Inter Variable Roman note, provenance table, and reserved headings. | PASS via final 03.1 rerun audit. |
 | 2026-05-05 | 03.1-02 | MD3 foundations/mapping/recipes verified with URL count, numeric state-layer values, source-access labels, source agreement, mapping terms, and StyleBoxFlat recipe checks. | PASS |
 | 2026-05-05 | 03.1-03 | MD3 Expressive source facts, adopt/reject/open synthesis, post-launch check, and drift audit verified. | PASS |
 | 2026-05-05 | 03.1-06 | Final cross-document audit checked Flat vs Raised matrix, numeric state values, source agreement, source-access status, and populated anti-filter audit. | PASS |

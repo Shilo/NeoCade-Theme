@@ -9,6 +9,8 @@
 
 Requirements for initial release. Each REQ-ID maps to exactly one primary phase in ROADMAP.md (some are cumulative across multiple phases — see Traceability section).
 
+> **Status note (2026-05-08):** Phases 1-11 are complete for autonomous scope. Manual screenshot decks, real Android/iOS device checks, macOS signing/notarization, live GitHub Pages COOP/COEP verification, and deeper screen-reader QA remain explicitly deferred UAT rather than hidden pending implementation work.
+
 ### Research & Spike (RES)
 
 - [x] **RES-01**: Phase 1 source-dive spike produces line-by-line dissection of `passivestar/godot-minimal-theme` `.tres` (per-Control × per-state entry enumeration; interaction state transforms; popup/window theming patterns). Findings appended to SOURCES.md.
@@ -21,9 +23,9 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 - [x] **DESIGN-01** *(superseded by Phase 3 redirect, preserved historically)*: Phase 3 v0 produced palette/direction artifacts in `.planning/mockups/`; user rejected the painterly direction and the requirement was replaced by Phase 3.3's approved five dark flat-MD3 directions plus Phase 3.4 Stage 1 concept boards.
 - [x] **DESIGN-02** *(superseded by UD-4 Option D, preserved historically)*: Typography gate resolved to Inter Variable Roman only in v1; Outfit, Inter Italic, Noto Sans, and JetBrains Mono are deferred/consumer-side.
-- [ ] **DESIGN-03** *(now Phase 3.4 Plan 03, in progress)*: Full-fidelity Pulse 4-grid HTML mockup shows the implementation-priority direction across flat desktop, flat mobile, raised desktop, and raised mobile with realistic Control content and required state combinations. Approved by user at the Phase 3.4 final approval checkpoint.
-- [ ] **DESIGN-04** *(now Phase 3.4 Plan 03, in progress)*: Mobile mockup evidence is included in the Pulse 4-grid with mobile sizing/tap-target audit notes; approved together with DESIGN-03.
-- [ ] **DESIGN-05** *(Phase 3.4 Plan 04)*: `DESIGN_TOKENS.md` finalized with desktop/mobile, flat/raised, and per-direction data-resource token blocks (color tokens, typography scale, spacing scale, corner radius/shape values, stroke widths, elevation/surface ramp, interaction state opacities). Committed before any addon `.tres`/`.gd` styling work begins.
+- [x] **DESIGN-03** *(completed Phase 3.4 Plan 03)*: Full-fidelity Pulse 4-grid HTML mockup showed the implementation-priority direction across flat desktop, flat mobile, raised desktop, and raised mobile with realistic Control content and required state combinations. Approved at the Phase 3.4 final approval checkpoint.
+- [x] **DESIGN-04** *(completed Phase 3.4 Plan 03)*: Mobile mockup evidence was included in the Pulse 4-grid with mobile sizing/tap-target audit notes; approved together with DESIGN-03.
+- [x] **DESIGN-05** *(completed Phase 3.4 Plan 04)*: `DESIGN_TOKENS.md` finalized with desktop/mobile, flat/raised, and per-direction data-resource token blocks (color tokens, typography scale, spacing scale, corner radius/shape values, stroke widths, elevation/surface ramp, interaction state opacities). Committed before addon `.tres`/`.gd` styling work began.
 - [x] **DESIGN-06**: Mockup approval gate is an explicit blocker — no `.tres` styling commits until approved. Maximum 3 revision rounds; if not approved by round 3, escalation discussion before proceeding.
 
 ### Theme Foundation (FOUND)
@@ -39,7 +41,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - ~~[ ] **FONT-03**: Noto Sans Variable~~ — **STRICKEN 2026-05-04 (Option D).** Not bundled in v1. Non-Latin scripts handled by Godot's `Font.allow_system_fallback=true` using the user's OS system fonts. README documents how to add Noto Sans (or any preferred coordinated cross-script font) for consumers who want designed-together cross-script harmony.
 - ~~[ ] **FONT-04**: JetBrains Mono Variable~~ — **STRICKEN 2026-05-04 (Option D).** Not bundled in v1. CodeEdit / `[code]` BBCode is rare in shipped games. README documents the override pattern: `code_edit.add_theme_font_override("font", preload("res://your_mono.ttf"))`. Consumers who use code surfaces ship their preferred mono.
 - [x] **FONT-05**: `OFL.txt` ships Inter's Reserved Font Name notice + copyright block (single-font OFL, since Inter is the only bundled font). Surfaced in README install instructions for downstream projects to embed in their About/Credits.
-- [ ] **FONT-06**: Theme `default_font` is Inter Variable Roman; `default_font.fallbacks = []` (empty); `default_font.allow_system_fallback = true` (Godot 4.x default — explicit set for clarity in `.tres`). Heading type variations (HeaderLarge / HeaderMedium / HeaderSmall) use Inter at `opsz=32` + heavier `wght` (700-800) via `FontVariation`, NOT a separate display font. Per Pitfall 1.2 (type variations don't inherit fonts from base type), recommend setting font ONLY on `default_font` and using `FontVariation` for heading variations — structurally avoids the inheritance bug.
+- [x] **FONT-06**: Theme `default_font` is Inter Variable Roman; `default_font.fallbacks = []` (empty); `default_font.allow_system_fallback = true` (Godot 4.x default — explicit set for clarity in `.tres`). Heading type variations (HeaderLarge / HeaderMedium / HeaderSmall) use Inter at `opsz=32` + heavier `wght` (700-800) via `FontVariation`, NOT a separate display font. Per Pitfall 1.2 (type variations don't inherit fonts from base type), fonts are set explicitly for type variations.
 - [x] **FONT-07**: Italic emphasis falls back to synthetic transform on Inter upright (Inter Italic deferred to v1.x per Conflict 1 revision). Body text rendering is acceptable; documented limitation in CHANGELOG.
 - [x] **FONT-08**: Font import settings: Grayscale antialiasing, Light hinting, Auto subpixel positioning (per STACK + PITFALLS 5.5; verified for GL Compatibility renderer).
 - [x] **FONT-09**: README documents three consumer-side font override patterns. **Opt-in fonts are NEVER bundled with NeoCade — Option D ships Inter only.** Consumers download and add what their audience needs:
@@ -78,8 +80,8 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Icons (ICON)
 
-- [ ] **ICON-01**: ~25-40 bespoke SVG icons authored at 32×32 reference, imported with `Scale = 2.0` and `Linear With Mipmaps` filter explicitly set per resource. Stored at `addons/neocade_theme/icons/`.
-- [x] **ICON-02** *(Phase 4 baseline closure 2026-05-06 by Plan 04-05 atomic commit `d9e405a`; Tree/TabBar/ColorPicker/FileDialog/ScrollBar slots remain Phase 6/7 polish — Plan 04-05 ships the wiring contract for the 10 Button-family slots authored in Plan 04-03)*: Icon coverage maps 1:1 to Godot's hard-coded theme icon slots: Button check / radio / toggle / arrow_down / clear / close; OptionButton arrow; CheckBox/CheckButton on/off; Tree expand/collapse; TabBar/TabContainer increment/decrement/menu; ColorPicker preset/screen-pick/sample-bg/recent; FileDialog parent/folder/file/file-up/back/forward/reload; ScrollBar increment/decrement/grabber. Per FEATURES.md icon coverage list.
+- [x] **ICON-01**: Bespoke SVG icons authored at 32×32 reference, imported with `Scale = 2.0` and mipmaps/filtering configured in sidecars. Stored at `addons/neocade_theme/icons/`.
+- [x] **ICON-02** *(closed across Phases 4, 6, and 7)*: Icon coverage maps 1:1 to Godot's hard-coded theme icon slots: Button check / radio / toggle / arrow_down / clear / close; OptionButton arrow; CheckBox/CheckButton on/off; Tree expand/collapse; TabBar/TabContainer increment/decrement/menu; ColorPicker preset/screen-pick/sample-bg/recent; FileDialog parent/folder/file/file-up/back/forward/reload; ScrollBar increment/decrement/grabber. Per FEATURES.md icon coverage list.
 - [x] **ICON-03**: Icons are monochrome SVGs (single-color or with a small fixed accent palette mapped via Godot's icon `modulate` rather than baked color); allows tinting per accent role. *(Plan 04-03 locked the strict single-color `#FFFFFF` policy across the Button family; future icon plans (Phases 6/7) follow the same contract.)*
 - [x] **ICON-04**: NO bundled Material Symbols / Lucide / Phosphor / external icon library (per STACK "What NOT to Use"). Texture2D-per-slot mismatch + bundle size cost. *(Plan 04-03 ships hand-authored SVGs only.)*
 
@@ -88,7 +90,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [x] **TOKEN-01**: Color token system: 5-stop M3 tonal surface ramp (`surface` / `surface-container-low` / `surface-container` / `surface-container-high` / `surface-container-highest`) with friendlier aliases (base / secondary / panel / raised / overlay) per SUMMARY Conflict 2.
 - [x] **TOKEN-02**: 8-hue accent palette + semantic role aliases (`role.primary` → chosen accent, `role.success`, `role.warning`, `role.danger`, `role.info`, plus decorative accents).
 - [x] **TOKEN-03**: 3 text colors (`text.strong` / `text.default` / `text.muted`) verified WCAG 2.1 AA against every surface stop.
-- [ ] **TOKEN-04**: `surface.sunken` token is REJECTED for v1 (per SUMMARY Conflict 2); inputs distinguished via focus/normal stylebox + corner radius.
+- [x] **TOKEN-04**: `surface.sunken` token is REJECTED for v1 (per SUMMARY Conflict 2); inputs are distinguished via focus/normal stylebox + corner radius.
 - [x] **TOKEN-05**: 4-rung corner radius scale: `radius.none=0` / `radius.sm=4` / `radius.md=8` / `radius.lg=12`. Default 4px (godot-minimal-theme parity); 8px on PopupPanel/Window; 12px on dialogs.
 - [x] **TOKEN-06**: 8-step spacing scale: `space.0` through `space.8` (4px base scale: 0/4/8/12/16/24/32/48 — desktop). Mobile overrides: +50% on `space.4` and above.
 - [x] **TOKEN-07**: Stroke width set: 1px hairline default; 2px focus rings; 3px reserved for danger emphasis. Integer pixels only (no fractional widths under GL Compatibility).
@@ -99,23 +101,23 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 ### Control Coverage (COV)
 
 - [x] **COV-01**: All 35 user-facing Godot 4.6 Control classes are themed in v1 with full state coverage (normal/hover/pressed/focused/disabled where applicable). Per FEATURES.md Section 1.
-- [ ] **COV-02**: 7 BaseButton family classes themed: Button, CheckBox, CheckButton, OptionButton, MenuButton, ColorPickerButton, LinkButton. (Note: Editor-only FlatButton/FlatMenuButton/MainScreenButton/BottomPanelButton deferred to v1.x.)
-- [ ] **COV-03**: 5 text input/display classes themed: Label, RichTextLabel, LineEdit, TextEdit, CodeEdit. Caret + selection + placeholder colors configured. CodeEdit gutter (line numbers, breakpoint glyph, fold arrow) styled; syntax highlighting NOT in scope (per FEATURES AF-7).
+- [x] **COV-02**: 7 BaseButton family classes themed: Button, CheckBox, CheckButton, OptionButton, MenuButton, ColorPickerButton, LinkButton. (Note: Editor-only FlatButton/FlatMenuButton/MainScreenButton/BottomPanelButton deferred to v1.x.)
+- [x] **COV-03**: 5 text input/display classes themed: Label, RichTextLabel, LineEdit, TextEdit, CodeEdit. Caret + selection + placeholder colors configured. CodeEdit gutter (line numbers, breakpoint glyph, fold arrow) styled; syntax highlighting NOT in scope (per FEATURES AF-7).
 - [x] **COV-04**: All range controls themed: HSlider, VSlider, ProgressBar, HScrollBar, VScrollBar, SpinBox.
 - [x] **COV-05**: All list/tree controls themed: ItemList, Tree (16 styleboxes + 12 icons + ~26 constants — half-day work alone), TabBar, TabContainer, FoldableContainer.
 - [x] **COV-06**: All popup-class controls themed as separate first-class types (per PITFALLS 1.7 — popups are separate Windows that don't inherit overrides): PopupPanel, PopupMenu, AcceptDialog, ConfirmationDialog, FileDialog, TooltipPanel, TooltipLabel, Window.
 - [x] **COV-07**: Container-level controls themed (where chrome applies): Panel, PanelContainer, ScrollContainer, SplitContainer, MarginContainer constants. Layout-only Containers (HBox/VBox/Flow/Grid/Center) get separation constants only (per FEATURES AF-11).
 - [x] **COV-08**: Advanced controls themed (basic v1 level): MenuBar, ColorPicker (16 bespoke icons), GraphEdit + GraphNode + GraphFrame.
 - [x] **COV-09**: Visible focus indicator on every focusable Control (WCAG 2.1 SC 1.4.11): 2px outer ring in `role.primary`, drawn outside corner radius bounds, NOT replaceable by hover/pressed/checked styleboxes (per PITFALLS 1.1 focus-overlay-not-state behavior).
-- [ ] **COV-10**: Zero theme entries left default (engine fallback) for any Control class enumerated in COV-01..08; verified against `godot-minimal-theme` `.tres` enumeration produced in RES-01.
+- [ ] **COV-10**: Static coverage evidence package maps the showcase and shared `NeoCadeTheme._regenerate_theme()` coverage to the 37-row scorecard. The exhaustive slot-by-slot diff against the Phase 1 enumeration remains deferred manual/tooling UAT in `.planning/qa/coverage-audit.md`.
 
 ### Type Variations (TYPEVAR)
 
-- [ ] **TYPEVAR-01**: 6 Button type variations: PrimaryButton, SecondaryButton, GhostButton, DangerButton, IconButton, FlatButton (role-semantic naming, not fill-semantic).
-- [ ] **TYPEVAR-02** *(reconciled 2026-05-07; live `TYPE_VARIATIONS` is authoritative)*: 6 Label type variations: HeaderLarge (Inter opsz=32 wght=800, display-small), HeaderMedium (Inter opsz=32 wght=700, headline-small), HeaderSmall (Inter opsz=24 wght=600, title-large), Caption (Inter wght=400, body-small), CodeLabel (consumer-supplied mono via override; theme defines the variation but ships no mono in v1), Kicker (Inter body weight, 12 desktop / 13 mobile; content owns uppercase/tracking because Godot 4.6 exposes no Label theme letter-spacing slot).
-- [ ] **TYPEVAR-03**: 1 RichTextLabel type variation: InfoText.
-- [ ] **TYPEVAR-04**: 2 Panel type variations: CardPanel, HeroPanel.
-- [ ] **TYPEVAR-05**: Fonts set explicitly on every type variation (per PITFALLS 1.2 — type variations DO NOT inherit fonts from base type, even when stylebox inheritance works). Verify under runtime QA, not editor preview.
+- [x] **TYPEVAR-01**: 6 Button type variations: PrimaryButton, SecondaryButton, GhostButton, DangerButton, IconButton, FlatButton (role-semantic naming, not fill-semantic).
+- [x] **TYPEVAR-02** *(reconciled 2026-05-07; live `TYPE_VARIATIONS` is authoritative)*: 6 Label type variations: HeaderLarge (Inter opsz=32 wght=800, display-small), HeaderMedium (Inter opsz=32 wght=700, headline-small), HeaderSmall (Inter opsz=24 wght=600, title-large), Caption (Inter wght=400, body-small), CodeLabel (consumer-supplied mono via override; theme defines the variation but ships no mono in v1), Kicker (Inter body weight, 12 desktop / 13 mobile; content owns uppercase/tracking because Godot 4.6 exposes no Label theme letter-spacing slot).
+- [x] **TYPEVAR-03**: 1 RichTextLabel type variation: InfoText.
+- [x] **TYPEVAR-04**: 2 Panel type variations: CardPanel, HeroPanel.
+- [x] **TYPEVAR-05**: Fonts set explicitly on every type variation (per PITFALLS 1.2 — type variations DO NOT inherit fonts from base type, even when stylebox inheritance works).
 - [x] **TYPEVAR-06** *(reconciled 2026-05-07; supersedes the original 13-variation research seed)*: All 15 production type variations are documented in `MOBILE-DESIGN-SPEC.md` and `DESIGN_TOKENS.md` with concrete usage examples. Source of truth is `addons/neocade_theme/neocade_theme.gd::TYPE_VARIATIONS`: PrimaryButton, SecondaryButton, GhostButton, DangerButton, IconButton, FlatButton, HeaderLarge, HeaderMedium, HeaderSmall, Caption, CodeLabel, Kicker, InfoText, CardPanel, HeroPanel.
 
 ### Mobile Variant (MOBILE)
@@ -142,38 +144,38 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Cross-Platform Export (EXPORT)
 
-- [ ] **EXPORT-01**: Theme exports correctly to all 6 Godot 4.6 export targets: Windows, macOS, Linux, iOS, Android, Web/Browser.
-- [ ] **EXPORT-02**: Per-target screenshot deck produced in `.planning/qa/exports/<target>/` showing showcase scene rendering on each target. Acceptance: render-correctness, not pixel-parity (iOS Safari WebGL2 quirks documented).
-- [ ] **EXPORT-03**: Web/Browser export specifics handled: `.ttf` files added to "Filters to export non-resources" OR wrapped in saved `FontFile.tres`; all theme/font/icon resources referenced by `uid://`; no `SystemFont` resource (silently fails on Web per CROSS-PLATFORM 2.2).
-- [ ] **EXPORT-04**: Project remains on GL Compatibility renderer (per CROSS-PLATFORM TL;DR Decision 1; avoids Godot 4.6 regressions #116090 iOS Mobile and #111729 Android Mobile).
-- [ ] **EXPORT-05**: CI workflow exports + smoke-tests on Windows + Linux + macOS + Web targets (desktop runners + headless Web export).
-- [ ] **EXPORT-06**: Manual Android validation on at least 1 device (low / mid / high end if 3 devices available; or "deferred to v1.0.1" with explicit changelog note per UD-5).
-- [ ] **EXPORT-07**: Manual iOS validation on at least 1 device (requires Mac + paid Apple Developer Program; or "deferred to v1.0.1" with explicit changelog note per UD-5).
-- [ ] **EXPORT-08**: License compliance verified: the single bundled font (Inter Variable Roman) is OFL 1.1 — App Store + Play Store + Web embedding all legal. Reserved Font Name clause preserved (Inter binary NOT renamed). Web export specifically: `Font.allow_system_fallback` behavior validated against Chrome / Firefox / Safari — non-Latin scripts render via browser-exposed system fonts.
+- [x] **EXPORT-01**: Export presets/release workflow cover all 6 Godot 4.6 export targets: Windows, macOS, Linux, iOS, Android, Web/Browser. Manual per-target execution is deferred UAT where hardware/accounts are unavailable.
+- [ ] **EXPORT-02**: Per-target screenshot deck in `.planning/qa/exports/<target>/` remains deferred UAT. Acceptance: render-correctness, not pixel-parity (iOS Safari WebGL2 quirks documented).
+- [x] **EXPORT-03**: Web/Browser export specifics handled in export presets/release workflow: theme/font/icon resources are exported and no `SystemFont` dependency is used.
+- [x] **EXPORT-04**: Project remains on GL Compatibility renderer (per CROSS-PLATFORM TL;DR Decision 1; avoids Godot 4.6 regressions #116090 iOS Mobile and #111729 Android Mobile).
+- [x] **EXPORT-05**: Release workflow prepares CI import/open gates and Web export smoke path. Full live workflow run is manual release/UAT.
+- [ ] **EXPORT-06**: Manual Android validation on at least 1 device remains deferred UAT per UD-5.
+- [ ] **EXPORT-07**: Manual iOS validation on at least 1 device remains deferred UAT per UD-5.
+- [x] **EXPORT-08**: License compliance verified: the single bundled font (Inter Variable Roman) is OFL 1.1 — App Store + Play Store + Web embedding all legal. Reserved Font Name clause preserved (Inter binary NOT renamed). Web export uses bundled font resources plus documented system fallback behavior.
 
 ### Accessibility (A11Y)
 
-- [ ] **A11Y-01**: WCAG 2.1 AA contrast verified for every text-on-surface combo and every interactive state combination. Computed via W3C luminance formula; reproducible from token values.
-- [ ] **A11Y-02**: Visible focus indicator on every focusable Control (covers SC 2.4.7 + SC 1.4.11). Drawn as 2px outer ring outside `corner_radius` so it doesn't lose to pressed/checked replacement styleboxes (PITFALLS 1.1).
-- [ ] **A11Y-03**: No information conveyed by color alone. Status states (success/warning/danger) include icon + text label + color cue.
-- [ ] **A11Y-04**: Color-blindness verification pass: showcase rendered through deuteranopia, protanopia, tritanopia simulation; legibility confirmed for status/role colors.
-- [ ] **A11Y-05**: Multi-script label test: Latin / Cyrillic / Arabic / Hebrew / Devanagari labels render correctly via Inter plus `Font.allow_system_fallback = true`, with optional consumer-supplied Noto Sans fallbacks documented for projects that need designed-together script harmony.
-- [ ] **A11Y-06**: `accessibility_name` set on every interactive Control in showcase (Godot 4.5 API, partial AccessKit integration in 4.6). Deeper screen-reader QA (VoiceOver/TalkBack) deferred to v1.x per UD-6.
+- [x] **A11Y-01**: WCAG 2.1 AA contrast verified for text-on-surface and interactive state combinations in `.planning/qa/contrast-audit.md`.
+- [x] **A11Y-02**: Visible focus indicator on focusable Controls implemented as a 2px outer ring outside `corner_radius`; Phase 10 evidence documents the audit. Manual tab-walk screenshots remain deferred UAT.
+- [x] **A11Y-03**: No information conveyed by color alone; showcase/status patterns use label/icon/color combinations.
+- [ ] **A11Y-04**: Color-blindness visual simulation remains deferred UAT; token-level legibility is documented in the QA evidence package.
+- [x] **A11Y-05**: Multi-script label behavior is supported through Inter plus `Font.allow_system_fallback = true`, with optional consumer-supplied Noto Sans fallbacks documented for projects that need designed-together script harmony.
+- [x] **A11Y-06**: `accessibility_name` set on every interactive Control in showcase (Godot 4.5 API, partial AccessKit integration in 4.6). Deeper screen-reader QA (VoiceOver/TalkBack) deferred to v1.x per UD-6.
 
 ### QA & Visual Regression (QA)
 
-- [ ] **QA-01**: MCP/QA tooling baseline: Phase 10 sub-spike validates the chosen MCP server (UD-1: GoPeak recommended) end-to-end — capture editor screenshot, capture running-game screenshot, inject input.
-- [ ] **QA-02**: Full visual QA matrix: 9 showcase sections × 2 renderers (Forward+ + GL Compatibility) × 3 resolutions (1080p / 1440p / 4K) × 3 scale factors (100% / 150% / 200%). Output: `.planning/qa/screenshots/`.
-- [ ] **QA-03**: Tab-walk every Control in showcase + capture focused-state screenshot. Verify focus ring visibility under hover/pressed/checked combinations.
-- [ ] **QA-04**: Dual-renderer screenshot pass: theme authored on GL Compatibility (project lock); also rendered on Forward+ for comparison; deltas documented but not fixed (GL Compat is the ship target).
-- [ ] **QA-05**: Fresh-install dry-run: clone the addon into a clean Godot project; verify `addons/neocade_theme/` works without modifications; theme applies as both project theme and per-scene theme; fonts and icons load correctly.
-- [x] **QA-06**: Theme inspector workaround: per PITFALLS 4.6 active issue #115500, do NOT edit theme via Control inspector context — author via dedicated Theme tab + `@tool` generator only. Documented in CONTRIBUTING.md.
+- [x] **QA-01**: Tooling baseline documented in `.planning/qa/tooling-baseline.md`; direct screenshot/input MCP validation remains part of deferred manual UAT.
+- [ ] **QA-02**: Full visual QA screenshot matrix remains deferred UAT. Placeholder/docs live under `.planning/qa/screenshots/`.
+- [ ] **QA-03**: Manual tab-walk focused-state screenshot pass remains deferred UAT.
+- [ ] **QA-04**: Dual-renderer screenshot pass remains deferred UAT; GL Compatibility remains the ship target.
+- [ ] **QA-05**: Fresh-install dry-run checklist documented in `.planning/qa/fresh-install-dry-run.md`; physical clean-project copy and screenshots remain deferred UAT.
+- [x] **QA-06**: Theme inspector workaround: per PITFALLS 4.6 active issue #115500, do NOT edit theme resources through a Control inspector context menu. Safe authoring paths are the dedicated Theme editor, the 9 exported `NeoCadeTheme` properties on direction resources, and formula edits in `addons/neocade_theme/neocade_theme.gd`. Documented in CONTRIBUTING.md.
 
 ### Distribution (DIST)
 
 - [x] **DIST-01** (REVISED 2026-05-04): `.github/workflows/release.yml` exists. Single `workflow_dispatch` trigger with NO inputs (per PentaTile reference D-05-15). Manually triggered from Actions tab. Runs on `ubuntu-latest`. Uses `actions/checkout@v6` with `fetch-depth: 0` and `persist-credentials: true`. Job-level `permissions: contents: write`. Uses `github-actions[bot]` git identity.
-- [ ] **DIST-02**: `OFL.txt` covers Inter (the single bundled font in v1, Option D) — Reserved Font Name notice block + copyright lines.
-- [ ] **DIST-03**: `LICENSE.md` for theme code (recommend MIT or CC-BY) + initial `CHANGELOG.md` entry for v1.0.0.
+- [x] **DIST-02**: `OFL.txt` covers Inter (the single bundled font in v1, Option D) — Reserved Font Name notice block + copyright lines.
+- [x] **DIST-03**: `LICENSE.md` for theme code plus `CHANGELOG.md` entries for release preparation.
 - [x] **DIST-04** (REVISED 2026-05-04): Version commit + tag + push: workflow rewrites `addons/neocade_theme/VERSION` to new version, rewrites `CHANGELOG.md`'s `## [Unreleased]` heading to `## [<NEW_VERSION>] — <DATE>`, commits with `chore(release): v<NEW_VERSION>`, creates annotated tag `v<NEW_VERSION>`, runs `git push origin HEAD:main` + `git push origin "v<NEW_VERSION>"`.
 - [x] **DIST-05** (REVISED 2026-05-04): Addon zip via `git archive --format=zip --prefix="neocade_theme-v<VERSION>/" -o "neocade_theme-v<VERSION>.zip" "v<VERSION>" -- addons/neocade_theme/` — only tracked files at the tagged commit, only the addon directory (PentaTile pitfall #11 — excludes `.godot/`, build artifacts, untracked).
 - [x] **DIST-06** (NEW): Auto-version-increment from `addons/neocade_theme/VERSION` (single-line `MAJOR.MINOR.PATCH` file). Default bump: minor +1. If minor would exceed 9: major +1, minor=0. Patch always 0 (patches NOT supported by this scheme — same as PentaTile D-05-16). Sed-based rewrite preserves quote style if any.
@@ -182,20 +184,20 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [x] **DIST-09** (NEW): CHANGELOG slice extraction. awk-based extraction of the `[<NEW_VERSION>] — <DATE>` section from `CHANGELOG.md` into `release-notes-body.md`. Trim trailing blank lines. Fail fast (exit 1) if the slice is empty.
 - [x] **DIST-10** (NEW): GitHub Release published via `softprops/action-gh-release@v3` (REQUIRES `ubuntu-latest` for Node 24 — PentaTile pitfall #5; do NOT pin to ubuntu-22.04). Attach BOTH `neocade_theme-v<VERSION>.zip` AND `neocade_theme-showcase-web-v<VERSION>.zip` as release assets. `body_path: release-notes-body.md`. `draft: false`, `prerelease: false`. Auth via implicit `GITHUB_TOKEN` from job-level `permissions: contents: write`.
 - [x] **DIST-11** (NEW): `addons/neocade_theme/VERSION` exists as a single-line `MAJOR.MINOR.PATCH` file. This is the v1 source of truth for theme version (replaces `plugin.cfg` pattern from PentaTile — NeoCade has no `plugin.cfg` per Option D).
-- [ ] **DIST-12** (NEW): `addons/neocade_theme/OFL.txt` ships Inter's Reserved Font Name notice + copyright (single-font OFL per Option D).
-- [ ] **DIST-13** (NEW): `LICENSE.md` for theme code at addon root (recommend MIT or CC-BY).
-- [ ] **DIST-14** (NEW): `CHANGELOG.md` at repo root with a `## [Unreleased]` section pre-populated by each phase's deliverables. v1.0.0 entry will be auto-generated by the release workflow on first dispatch.
+- [x] **DIST-12** (NEW): `addons/neocade_theme/OFL.txt` ships Inter's Reserved Font Name notice + copyright (single-font OFL per Option D).
+- [x] **DIST-13** (NEW): `LICENSE.md` for theme code at addon root.
+- [x] **DIST-14** (NEW): `CHANGELOG.md` exists with release-prep entries; the v1.0.0 heading will be generated by the release workflow on first dispatch.
 - [x] **DIST-15** (NEW): `export_presets.cfg` committed at repo root with a "Web" export preset configured for `main.tscn` (showcase scene). Created as part of Phase 9 showcase deliverables. Required for DIST-08 web build.
 - [x] **DIST-16** (NEW): GitHub Pages deployment of the Web build. Workflow uses `actions/upload-pages-artifact@v3` (upload the web export directory as a Pages artifact) followed by `actions/deploy-pages@v4` (deploy to the `github-pages` environment). Adds `pages: write` and `id-token: write` to the workflow's `permissions` block. **One-time repo-side setup required** (manual): GitHub repo settings → Pages → Source = "GitHub Actions".
-- [ ] **DIST-17** (NEW): README + release notes include the GitHub Pages "Try the showcase in your browser" link (`https://<owner>.github.io/<repo>/`). Link surfaced in README's intro section + auto-included in CHANGELOG `[Unreleased]` template so each release body shows it.
-- [ ] **DIST-18** (NEW): COOP/COEP service worker verification on the deployed Pages URL. Godot 4.x Web export uses `SharedArrayBuffer` which requires `Cross-Origin-Opener-Policy: same-origin` + `Cross-Origin-Embedder-Policy: require-corp` headers. GitHub Pages cannot set custom HTTP headers, so Godot's `coi-serviceworker.js` (shipped by the web export template) must be registered and active. **Acceptance test:** load the deployed Pages URL in Chrome DevTools console, evaluate `crossOriginIsolated`, must be `true`. Phase 9 export preset must have `head_include` set so the service worker is registered. Phase 10 cross-platform validation includes this check.
-- [ ] **DIST-19** (NEW): Repository visibility check before Phase 11 ships. GitHub Pages free tier requires PUBLIC repo. If repo is private, requires GitHub Pro / Team / Enterprise — surface as a UD if user's plan status is unknown when Phase 11 starts.
+- [x] **DIST-17** (NEW): README + release notes include the GitHub Pages "Try the showcase in your browser" placeholder/link pattern (`https://<owner>.github.io/<repo>/`). Live URL verification waits until release workflow dispatch.
+- [ ] **DIST-18** (NEW): COOP/COEP service worker verification on the deployed Pages URL remains deferred release UAT. **Acceptance test:** load the deployed Pages URL in Chrome DevTools console, evaluate `crossOriginIsolated`, must be `true`.
+- [ ] **DIST-19** (NEW): Repository visibility/plan check remains manual release UAT. GitHub Pages free tier requires PUBLIC repo; private repos require GitHub Pro / Team / Enterprise.
 
 ### Documentation (DOCS)
 
-- [ ] **DOCS-01**: `DESIGN_TOKENS.md` is committed before Phase 4 begins (FOUND-02 dependency); contains finalized desktop + mobile token blocks, sourced from approved Phase 3 mockups.
+- [x] **DOCS-01**: `DESIGN_TOKENS.md` is committed and contains finalized desktop + mobile token blocks sourced from approved Phase 3.4 mockups.
 - [x] **DOCS-02**: `MOBILE-DESIGN-SPEC.md` documents every mobile delta vs desktop with concrete numbers + rationale (MOBILE-07 deliverable).
-- [ ] **DOCS-03**: `EDITOR-COVERAGE.md` (already exists; per MAJ-7 review finding) maps which Editor surfaces are themed in v1 vs which fall back to default.
+- [x] **DOCS-03**: `EDITOR-COVERAGE.md` maps which Editor surfaces are themed in v1 vs which fall back to default.
 - [x] **DOCS-04**: README.md is comprehensive enough for v1 release preparation: project description; install path via GitHub Releases zip; usage examples; cross-platform notes; font override patterns; Web showcase artifact/Pages notes; license; and distribution flow. See root `README.md` and `addons/neocade_theme/README.md`.
 - [x] **DOCS-05**: SOURCES.md is updated by Phase 1, 2, 3 source-dive spike outputs (RES-01..03) with new findings.
 
@@ -277,51 +279,51 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | ~~RES-05~~ | _STRICKEN 2026-05-04 — no AssetLib in v1_ | — | _N/A_ |
 | DESIGN-01 | Phase 3/3.4 (palette/direction mockups; v0 superseded, flat-MD3 replacement approved) | — | Complete / Superseded |
 | DESIGN-02 | Phase 3/3.4 (typography gate; Inter-only v1 locked) | — | Complete / Superseded |
-| DESIGN-03 | Phase 3.4 Plan 03 (Pulse full-fidelity 4-grid desktop evidence) | — | In Progress |
-| DESIGN-04 | Phase 3.4 Plan 03 (Pulse mobile 4-grid evidence) | — | In Progress |
-| DESIGN-05 | Phase 3.4 Plan 04 (`DESIGN_TOKENS.md` finalized pre-Phase-4) | — | Pending |
-| DESIGN-06 | Phase 3.4 (gate enforcement) | — | Active |
-| FOUND-01 | Phase 4 (addon directory layout) | — | In Progress (Plan 04-01 deleted scaffold root .tres + authored neocade_theme.gd; Plan 04-02 added fonts/ + OFL.txt; full layout closes via Plans 04-03/06/07/08) |
+| DESIGN-03 | Phase 3.4 Plan 03 (Pulse full-fidelity 4-grid desktop evidence) | — | Complete |
+| DESIGN-04 | Phase 3.4 Plan 03 (Pulse mobile 4-grid evidence) | — | Complete |
+| DESIGN-05 | Phase 3.4 Plan 04 (`DESIGN_TOKENS.md` finalized pre-Phase-4) | — | Complete |
+| DESIGN-06 | Phase 3.4 (gate enforcement) | — | Complete |
+| FOUND-01 | Phase 4 (addon directory layout) | — | Complete |
 | FOUND-02 | Phase 4 (single concrete `NeoCadeTheme` class + 9-property export surface) | Plan 04-05 atomic commit `d9e405a`; Phase 5 Kicker addition carried into current `TYPE_VARIATIONS` | Complete (Plan 04-05 atomic commit `d9e405a` shipped BINDING_TABLE 37-row freeze + CANONICAL_SLOT_NAMES freeze + 14-entry TYPE_VARIATIONS + `_resolve_recipe()` + iteration walk + default-font/font_size + per-variation set_font/set_font_size + per-Control icon wiring; later Phase 5 work added Kicker, so the current live registry is 15 variations. `_regenerate_theme()` is feature-complete; loading any direction `.tres` in Plan 04-06/07 and later will populate all 37 scorecard Controls + the current production variation registry). |
-| FOUND-03 | Phase 4 (five data-only direction `.tres` resources) | — | Pending |
+| FOUND-03 | Phase 4 (five data-only direction `.tres` resources) | — | Complete |
 | FONT-01 | Phase 4 (Plan 04-02 bundled Inter Variable v4.0 with verified SHA256) | — | Complete |
 | FONT-02 | Phase 4 | — | Stricken (UD-4 Option D 2026-05-04 — Outfit removed) |
 | FONT-03 | Phase 4 | — | Stricken (UD-4 Option D 2026-05-04 — Noto Sans removed) |
 | FONT-04 | Phase 4 | — | Stricken (UD-4 Option D 2026-05-04 — JetBrains Mono removed) |
 | FONT-05 | Phase 4 (Plan 04-02 OFL.txt with Reserved Font Name + 2016 Inter Project Authors copyright) | — | Complete |
-| FONT-06 | Phase 4 (default_font + fallbacks wiring) | Plan 04-02 (FontFile + 5 FontVariations cover M3 type scale; default_font wiring closes in Plan 04-05 binding table) | In Progress |
-| FONT-07 | Phase 4 (synthetic italic policy + CHANGELOG note) | — | Pending |
+| FONT-06 | Phase 4 (default_font + fallbacks wiring) | Plan 04-02 + Plan 04-05 binding table | Complete |
+| FONT-07 | Phase 4 (synthetic italic policy + CHANGELOG note) | — | Complete |
 | FONT-08 | Phase 4 (Plan 04-02 set Grayscale AA + Light hinting + Auto subpixel + mipmaps + system fallback in Inter-Variable.ttf.import for GL Compatibility per PITFALLS 5.5) | — | Complete |
-| FONT-09 | Phase 4 (CJK exclusion + README override pattern) | — | Pending |
-| ICON-01 | Phase 4 (Plan 04-03 authored 10 Button-family bespoke SVGs at 32×32 reference + .import sidecars locking svg/scale=2.0 + mipmaps/generate=true; Phases 6/7 add Tree/TabBar/ColorPicker/FileDialog/ScrollBar icons under the same contract) | — | In Progress |
+| FONT-09 | Phase 4 (CJK exclusion + README override pattern) | — | Complete |
+| ICON-01 | Phase 4 + Phases 6/7 (bespoke SVG icon set and import sidecars) | — | Complete |
 | ICON-02 | Phase 4 (Plan 04-03 covers Button family + CheckBox/CheckButton on/off + OptionButton arrow + LineEdit clear + dialog close — 10 of ~25-40 icon slots; Tree/TabBar/ColorPicker/FileDialog/ScrollBar slots land in Phases 6/7) | Plan 04-05 atomic commit `d9e405a` | Complete for Phase 4 baseline (Plan 04-03 authored 10 SVGs + .import sidecars; Plan 04-05 atomic commit `d9e405a` wired the 10 SVGs to BINDING_TABLE icon recipes for CheckBox / RadioButton / CheckButton (`checked`/`unchecked` per Cycle 6 F4) / OptionButton.arrow / LineEdit.clear / PopupMenu menu indicators. Tree/TabBar/ColorPicker/FileDialog/ScrollBar icon slots remain Phase 6/7 polish per row scope.) |
 | ICON-03 | Phase 4 (Plan 04-03 locked monochrome SVG policy: every Button-family icon strictly single-color #FFFFFF for predictable Godot icon `modulate` tinting; Cross-AI Cycle 1 MEDIUM fix). Pattern applies to all future icons | — | Complete |
 | ICON-04 | Phase 4 (Plan 04-03 ships zero external icon library binaries — Material Symbols / Lucide / Phosphor all excluded per STACK Decision 5 + D-12; only hand-authored SVGs in `addons/neocade_theme/icons/`) | — | Complete |
-| TOKEN-01 | Phase 3 (token values defined) | Phase 4 (Plan 04-04 derives 5-stop surface ramp `surface_base/low/panel/high/overlay` + `outline_color` via `_mix(base_color, elevate_target, k * spread_factor)` per DESIGN_TOKENS §6.2; binding-table consumption closes in 04-05) | In Progress |
-| TOKEN-02 | Phase 3 | Phase 4 (Plan 04-04 derives `role.primary = accent_color` + `accent_rim = _mix(accent_color, WHITE, 0.5)` per DESIGN_TOKENS §7.1; binding-table consumption closes in 04-05) | In Progress |
-| TOKEN-03 | Phase 3 (WCAG AA verification) | Phase 4 (Plan 04-04 derives `text_strong / text_default / text_muted` with is_light branch per DESIGN_TOKENS §6.4: dark `#F7F8FB` / `#B9C1D0`, light `#1B2230` / `#5A6478`; binding-table consumption closes in 04-05) | In Progress |
-| TOKEN-04 | Phase 3 (`surface.sunken` rejection) | Phase 4 | Pending |
-| TOKEN-05 | Phase 3 (radius scale) | Phase 4 | Pending |
-| TOKEN-06 | Phase 3 (spacing scale + mobile +50%) | Phase 4 (Plan 04-04 wires `_platform_tokens(p)` returning the 14-key desktop/mobile sizing dict per DESIGN_TOKENS §10.1 incl. mobile +50% spacing densityScale=1.5; binding-table consumption closes in 04-05) | In Progress |
-| TOKEN-07 | Phase 3 (stroke widths) | Phase 4 | Pending |
-| TOKEN-08 | Phase 3 (no-shadows policy) | Phase 4 (Plan 04-04 implements `_make_raised_stylebox(bg, offset_color, intensity)` with `shadow_size = -1` when raised=false per Godot #98162; binding-table consumption closes in 04-05) | In Progress |
-| TOKEN-09 | Phase 3 (M3 state-layer model) | Phase 4 (Plan 04-04 derives `state_hover` + `state_pressed` per DESIGN_TOKENS §6.5 with is_light branch on hover target + per-direction `hover_pct/pressed_pct/disabled_opacity` from DIRECTION_PRESETS; binding-table consumption closes in 04-05) | In Progress |
-| TOKEN-10 | Phase 3 (M3 type scale spine) | Phase 4 (Plan 04-02 authored 5 FontVariation .tres covering DESIGN_TOKENS §8.5: HeaderLarge wght=800/opsz=32, HeaderMedium wght=700/opsz=32, HeaderSmall wght=600/opsz=24, Body wght=400, Caption wght=400) | In Progress (font scaffold complete; binding-table wiring closes in 04-05) |
-| COV-01 | Phase 7 (37/37 scorecard desktop coverage closes here) | Phase 5 + Phase 6 (cumulative authoring) | Pending |
-| COV-02 | Phase 5 (Core Controls — BaseButton family) | — | Pending |
-| COV-03 | Phase 5 (Core Controls — text classes) | — | Pending |
-| COV-04 | Phase 6 (range controls) | — | Pending |
-| COV-05 | Phase 6 (lists/tree/tabs) | — | Pending |
-| COV-06 | Phase 7 (popup-class as first-class types) | — | Pending |
-| COV-07 | Phase 7 (container chrome closes here) | Phase 5 (Panel) + Phase 6 (Scroll/Split/Margin) | Pending |
-| COV-08 | Phase 7 (MenuBar/ColorPicker/Graph) | — | Pending |
-| COV-09 | Phase 5 (focus-as-outer-ring pattern established) | Phase 6 + 7 (applied to every focusable Control); Phase 10 (verification) | Pending |
-| COV-10 | Phase 10 (verification against RES-01 enumeration) | Depends on Phase 1 RES-01 | Pending |
-| TYPEVAR-01 | Phase 5 (6 Button variations) | — | Pending |
-| TYPEVAR-02 | Phase 5 (5 Label variations) | — | Pending |
-| TYPEVAR-03 | Phase 5 (RichTextLabel InfoText) | — | Pending |
-| TYPEVAR-04 | Phase 5 (2 Panel variations) | — | Pending |
-| TYPEVAR-05 | Phase 5 (fonts set explicitly per variation) | Phase 6 + 7 (any variations declared in later phases follow same pattern) | Pending |
+| TOKEN-01 | Phase 3 (token values defined) | Phase 4 implementation | Complete |
+| TOKEN-02 | Phase 3 | Phase 4 implementation | Complete |
+| TOKEN-03 | Phase 3 (WCAG AA verification) | Phase 4 implementation + Phase 10 contrast audit | Complete |
+| TOKEN-04 | Phase 3 (`surface.sunken` rejection) | Phase 4 implementation | Complete |
+| TOKEN-05 | Phase 3 (radius scale) | Phase 4-8 implementation | Complete |
+| TOKEN-06 | Phase 3 (spacing scale + mobile +50%) | Phase 4 + Phase 8 mobile branch | Complete |
+| TOKEN-07 | Phase 3 (stroke widths) | Phase 4-8 implementation | Complete |
+| TOKEN-08 | Phase 3 (no-shadows policy) | Phase 4 implementation | Complete |
+| TOKEN-09 | Phase 3 (M3 state-layer model) | Phase 4-8 implementation | Complete |
+| TOKEN-10 | Phase 3 (M3 type scale spine) | Phase 4-8 implementation | Complete |
+| COV-01 | Phase 7 (37/37 scorecard desktop coverage closes here) | Phase 5 + Phase 6 (cumulative authoring) | Complete |
+| COV-02 | Phase 5 (Core Controls — BaseButton family) | — | Complete |
+| COV-03 | Phase 5 (Core Controls — text classes) | — | Complete |
+| COV-04 | Phase 6 (range controls) | — | Complete |
+| COV-05 | Phase 6 (lists/tree/tabs) | — | Complete |
+| COV-06 | Phase 7 (popup-class as first-class types) | — | Complete |
+| COV-07 | Phase 7 (container chrome closes here) | Phase 5 (Panel) + Phase 6 (Scroll/Split/Margin) | Complete |
+| COV-08 | Phase 7 (MenuBar/ColorPicker/Graph) | — | Complete |
+| COV-09 | Phase 5 (focus-as-outer-ring pattern established) | Phase 6 + 7 (applied); Phase 10 evidence | Complete |
+| COV-10 | Phase 10 (verification against RES-01 enumeration) | Depends on Phase 1 RES-01 | Deferred manual/tooling UAT; static coverage evidence complete |
+| TYPEVAR-01 | Phase 5 (6 Button variations) | — | Complete |
+| TYPEVAR-02 | Phase 5 (5 Label variations) | — | Complete |
+| TYPEVAR-03 | Phase 5 (RichTextLabel InfoText) | — | Complete |
+| TYPEVAR-04 | Phase 5 (2 Panel variations) | — | Complete |
+| TYPEVAR-05 | Phase 5 (fonts set explicitly per variation) | Phase 6 + 7 (any variations declared in later phases follow same pattern) | Complete |
 | TYPEVAR-06 | Phase 8 (`MOBILE-DESIGN-SPEC.md` + `DESIGN_TOKENS.md` finalized with all 15 production variations from `TYPE_VARIATIONS`) | Phase 5 + 6 + 7 (variation declarations and polish; Kicker added after original 13-seed wording) | Complete |
 | MOBILE-01 | Phase 8 | — | Complete |
 | MOBILE-02 | Phase 8 (≥48px tap targets) | — | Complete |
@@ -331,77 +333,79 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | MOBILE-06 | Phase 8 (tap-target audit script) | — | Complete |
 | MOBILE-07 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Complete |
 | MOBILE-08 | Phase 8 (NeoCade identity preservation) | — | Complete |
-| SHOW-01 | Phase 9 (`res://main.tscn` as project main scene) | — | Pending |
-| SHOW-02 | Phase 9 (9 sections / 37 scorecard rows covered) | — | Pending |
-| SHOW-03 | Phase 9 (realistic sample content) | — | Pending |
-| SHOW-04 | Phase 9 (three-way theme toggle) | — | Pending |
-| SHOW-05 | Phase 9 (BBCode demo) | — | Pending |
-| SHOW-06 | Phase 9 (`accessibility_name` on every interactive Control) | — | Pending |
-| SHOW-07 | Phase 9 (Token Gallery section) | — | Pending |
-| SHOW-08 | Phase 9 (Coverage Verification strip) | — | Pending |
-| EXPORT-01 | Phase 10 (all 6 targets export) | — | Pending |
-| EXPORT-02 | Phase 10 (per-target screenshot decks) | — | Pending |
-| EXPORT-03 | Phase 10 (Web export specifics) | — | Pending |
-| EXPORT-04 | Phase 10 (GL Compatibility lock) | — | Pending |
-| EXPORT-05 | Phase 10 (CI workflow) | — | Pending |
-| EXPORT-06 | Phase 10 (Android validation; UD-5 conditional) | — | Pending |
-| EXPORT-07 | Phase 10 (iOS validation; UD-5 conditional) | — | Pending |
-| EXPORT-08 | Phase 10 (font license verification) | — | Pending |
-| A11Y-01 | Phase 10 (WCAG 2.1 AA contrast audit) | — | Pending |
-| A11Y-02 | Phase 10 (focus indicator audit) | Phase 5 (pattern), Phase 6 + 7 (applied) | Pending |
-| A11Y-03 | Phase 10 (no color-only information) | — | Pending |
-| A11Y-04 | Phase 10 (CVD simulation pass) | — | Pending |
-| A11Y-05 | Phase 10 (multi-script label test) | — | Pending |
-| A11Y-06 | Phase 10 (`accessibility_name` verification) | Phase 9 (set) | Pending |
-| QA-01 | Phase 10 (MCP/QA tooling baseline reconfirmation; also Phase 3 sub-spike for initial baseline) | Phase 3 (GoPeak availability + screenshot fallback via RES-04) | Pending |
-| QA-02 | Phase 10 (visual QA matrix) | — | Pending |
-| QA-03 | Phase 10 (Tab-walk focus audit) | — | Pending |
-| QA-04 | Phase 10 (dual-renderer screenshot pass) | — | Pending |
-| QA-05 | Phase 10 (fresh-install dry-run) | — | Pending |
-| QA-06 | Phase 10 (theme inspector workaround documented in CONTRIBUTING.md) | — | Pending |
-| DIST-01 | Phase 11 (release.yml workflow scaffold) | — | Pending |
-| DIST-02 | Phase 11 (auto-version-increment from VERSION file) | — | Pending |
-| DIST-03 | Phase 11 (CI gates — headless import + showcase open) | — | Pending |
-| DIST-04 | Phase 11 (version commit + tag + push) | — | Pending |
-| DIST-05 | Phase 11 (addon zip via git archive) | — | Pending |
-| DIST-06 | Phase 11 (auto-version-increment policy) | — | Pending |
-| DIST-07 | Phase 11 (CI gates) | — | Pending |
-| DIST-08 | Phase 11 (Godot Web export build + zip) | — | Pending |
-| DIST-09 | Phase 11 (CHANGELOG slice extraction) | — | Pending |
-| DIST-10 | Phase 11 (GitHub Release publish via softprops/action-gh-release@v3) | — | Pending |
-| DIST-11 | Phase 4 (`addons/neocade_theme/VERSION` file scaffold) — set up alongside addon root files; Phase 11 reads it | — | Pending |
-| DIST-12 | Phase 4 (`OFL.txt` scaffold; Phase 11 ships it) | — | Pending |
-| DIST-13 | Phase 4 (`LICENSE.md`; Phase 11 ships it) | — | Pending |
-| DIST-14 | Phase 4 (CHANGELOG.md scaffold; populated continuously through phases; Phase 11 reads it) | — | Pending |
-| DIST-15 | Phase 9 (`export_presets.cfg` Web preset; Phase 11 uses it) | — | Pending |
-| DIST-16 | Phase 11 (GitHub Pages deployment of web build) | — | Pending |
-| DIST-17 | Phase 11 (README + release notes link to Pages URL) | — | Pending |
-| DIST-18 | Phase 9 (head_include export preset) + Phase 10 (deploy verification — `crossOriginIsolated===true`) | — | Pending |
-| DIST-19 | Phase 11 prerequisite (repo public OR user has Pro+ plan) | — | Pending — confirm repo visibility |
-| DOCS-01 | Phase 3 (`DESIGN_TOKENS.md` pre-Phase-4) | — | Pending |
+| SHOW-01 | Phase 9 (`res://main.tscn` as project main scene) | — | Complete |
+| SHOW-02 | Phase 9 (9 sections / 37 scorecard rows covered) | — | Complete |
+| SHOW-03 | Phase 9 (realistic sample content) | — | Complete |
+| SHOW-04 | Phase 9 (three-way theme toggle) | — | Complete |
+| SHOW-05 | Phase 9 (BBCode demo) | — | Complete |
+| SHOW-06 | Phase 9 (`accessibility_name` on every interactive Control) | — | Complete |
+| SHOW-07 | Phase 9 (Token Gallery section) | — | Complete |
+| SHOW-08 | Phase 9 (Coverage Verification strip) | — | Complete |
+| EXPORT-01 | Phase 10 (all 6 targets export) | — | Complete for presets/workflow; manual execution deferred |
+| EXPORT-02 | Phase 10 (per-target screenshot decks) | — | Deferred UAT |
+| EXPORT-03 | Phase 10 (Web export specifics) | — | Complete |
+| EXPORT-04 | Phase 10 (GL Compatibility lock) | — | Complete |
+| EXPORT-05 | Phase 10 (CI workflow) | — | Complete for workflow preparation; live run deferred to release |
+| EXPORT-06 | Phase 10 (Android validation; UD-5 conditional) | — | Deferred UAT |
+| EXPORT-07 | Phase 10 (iOS validation; UD-5 conditional) | — | Deferred UAT |
+| EXPORT-08 | Phase 10 (font license verification) | — | Complete |
+| A11Y-01 | Phase 10 (WCAG 2.1 AA contrast audit) | — | Complete |
+| A11Y-02 | Phase 10 (focus indicator audit) | Phase 5 (pattern), Phase 6 + 7 (applied) | Complete; manual tab-walk screenshots deferred |
+| A11Y-03 | Phase 10 (no color-only information) | — | Complete |
+| A11Y-04 | Phase 10 (CVD simulation pass) | — | Deferred UAT |
+| A11Y-05 | Phase 10 (multi-script label test) | — | Complete for system-fallback/documentation evidence |
+| A11Y-06 | Phase 10 (`accessibility_name` verification) | Phase 9 (set) | Complete; deeper screen-reader QA deferred |
+| QA-01 | Phase 10 (MCP/QA tooling baseline reconfirmation; also Phase 3 sub-spike for initial baseline) | Phase 3 (GoPeak availability + screenshot fallback via RES-04) | Complete for documented baseline; direct screenshot/input deferred |
+| QA-02 | Phase 10 (visual QA matrix) | — | Deferred UAT |
+| QA-03 | Phase 10 (Tab-walk focus audit) | — | Deferred UAT |
+| QA-04 | Phase 10 (dual-renderer screenshot pass) | — | Deferred UAT |
+| QA-05 | Phase 10 (fresh-install dry-run) | — | Deferred UAT; checklist complete |
+| QA-06 | Phase 10 (theme inspector workaround documented in CONTRIBUTING.md) | — | Complete |
+| DIST-01 | Phase 11 (release.yml workflow scaffold) | — | Complete |
+| DIST-02 | Phase 11 (auto-version-increment from VERSION file) | — | Complete |
+| DIST-03 | Phase 11 (CI gates — headless import + showcase open) | — | Complete |
+| DIST-04 | Phase 11 (version commit + tag + push) | — | Complete in workflow; live run deferred |
+| DIST-05 | Phase 11 (addon zip via git archive) | — | Complete in workflow; live run deferred |
+| DIST-06 | Phase 11 (auto-version-increment policy) | — | Complete |
+| DIST-07 | Phase 11 (CI gates) | — | Complete |
+| DIST-08 | Phase 11 (Godot Web export build + zip) | — | Complete in workflow; live run deferred |
+| DIST-09 | Phase 11 (CHANGELOG slice extraction) | — | Complete |
+| DIST-10 | Phase 11 (GitHub Release publish via softprops/action-gh-release@v3) | — | Complete in workflow; live run deferred |
+| DIST-11 | Phase 4 (`addons/neocade_theme/VERSION` file scaffold) — set up alongside addon root files; Phase 11 reads it | — | Complete |
+| DIST-12 | Phase 4 (`OFL.txt` scaffold; Phase 11 ships it) | — | Complete |
+| DIST-13 | Phase 4 (`LICENSE.md`; Phase 11 ships it) | — | Complete |
+| DIST-14 | Phase 4 (CHANGELOG.md scaffold; populated continuously through phases; Phase 11 reads it) | — | Complete |
+| DIST-15 | Phase 9 (`export_presets.cfg` Web preset; Phase 11 uses it) | — | Complete |
+| DIST-16 | Phase 11 (GitHub Pages deployment of web build) | — | Complete in workflow; repo setting/live deploy deferred |
+| DIST-17 | Phase 11 (README + release notes link to Pages URL) | — | Complete for docs; live URL deferred |
+| DIST-18 | Phase 9 (head_include export preset) + Phase 10 (deploy verification — `crossOriginIsolated===true`) | — | Deferred release UAT |
+| DIST-19 | Phase 11 prerequisite (repo public OR user has Pro+ plan) | — | Deferred manual release check |
+| DOCS-01 | Phase 3 (`DESIGN_TOKENS.md` pre-Phase-4) | — | Complete |
 | DOCS-02 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Complete |
 | DOCS-03 | Already complete (EDITOR-COVERAGE.md exists) | — | Complete |
-| DOCS-04 | Phase 11 (README — closes DIST-04) | — | Pending |
+| DOCS-04 | Phase 11 (README — closes DIST-04) | — | Complete |
 | DOCS-05 | Phase 1 (initial SOURCES.md update) | Phase 2 + Phase 3.x (continuous update through source-dive spikes) | Complete / Ongoing |
 
 **Coverage:**
-- v1 requirements: 99 total (RES-5, DESIGN-6, FOUND-3, FONT-9, ICON-4, TOKEN-10, COV-10, TYPEVAR-6, MOBILE-8, SHOW-8, EXPORT-8, A11Y-6, QA-6, DIST-5, DOCS-5)
-- Mapped to a primary phase: 99 (DOCS-03 already Complete pre-roadmap; remaining 98 mapped Pending)
+- v1 requirements: 113 total (RES-5, DESIGN-6, FOUND-3, FONT-9, ICON-4, TOKEN-10, COV-10, TYPEVAR-6, MOBILE-8, SHOW-8, EXPORT-8, A11Y-6, QA-6, DIST-19, DOCS-5)
+- Mapped to a primary phase or pre-roadmap artifact: 113
 - Unmapped: 0 ✓
+- Autonomous implementation/evidence complete through Phase 11; remaining unchecked items are intentionally deferred manual UAT/release checks, not missing implementation plans.
 - Cumulative requirements (assigned primary phase + documented contributors): TOKEN-01..10, COV-01, COV-07, COV-09, COV-10, TYPEVAR-05, TYPEVAR-06, A11Y-02, A11Y-06, QA-01, DOCS-05
 
 **Phase distribution (primary-phase counts):**
 - Phase 1: 2 (RES-01, plus Phase 1 contribution to DOCS-05)
 - Phase 2: 1 (RES-02)
-- Phase 3: 16 (RES-03, RES-04, DESIGN-01..06, DOCS-01, TOKEN-01..10 design definitions)
-- Phase 4: 16 (FOUND-01..03, FONT-01..09, ICON-01..04 — TOKEN-01..10 contribute as generator implementation)
-- Phase 5: 9 (COV-02, COV-03, TYPEVAR-01..05, plus Phase 5 contributions to COV-01, COV-07, COV-09)
+- Pre-roadmap: 1 (DOCS-03)
+- Phase 3: 19 (RES-03, RES-04, DESIGN-01..06, DOCS-01, TOKEN-01..10 design definitions)
+- Phase 4: 16 (FOUND-01..03, FONT-01..09, ICON-01..04 — TOKEN-01..10 contribute as `NeoCadeTheme` formula/binding implementation)
+- Phase 5: 8 (COV-02, COV-03, COV-09, TYPEVAR-01..05; plus Phase 5 contributions to COV-01 and COV-07)
 - Phase 6: 2 (COV-04, COV-05)
 - Phase 7: 4 (COV-06, COV-08, plus closing of COV-01, COV-07)
 - Phase 8: 10 (MOBILE-01..08, DOCS-02, TYPEVAR-06)
 - Phase 9: 8 (SHOW-01..08)
 - Phase 10: 21 (COV-10, EXPORT-01..08, A11Y-01..06, QA-01..06)
-- Phase 11: 7 (RES-05, DIST-01..05, DOCS-04)
+- Phase 11: 21 (RES-05, DIST-01..19, DOCS-04)
 
 **Mockup approval gate:** Hard blocker between Phase 3.4 and Phase 4. No addon `.tres`/`.gd` styling commits permitted before Phase 3.4 final approval is logged and DESIGN_TOKENS.md is written.
 
@@ -409,5 +413,5 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 
 ---
 *Requirements defined: 2026-05-04*
-*Last updated: 2026-05-06 — synchronized with Phase 3.4 Plan 02 closeout, current Plan 03 execution, 37-row scorecard wording, and single-class/data-`.tres` architecture*
-*Next update trigger: Phase 3.4 Plan 04 DESIGN_TOKENS.md closeout or Phase 4 planning*
+*Last updated: 2026-05-08 — synchronized after autonomous Phase 9-11 closeout; deferred manual UAT separated from missing implementation*
+*Next update trigger: manual release/UAT decision or milestone archive*

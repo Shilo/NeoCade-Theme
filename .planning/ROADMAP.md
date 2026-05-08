@@ -73,7 +73,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Phase 3: Visual Direction Mockup + Approval Gate
 **Goal**: Produce the user-approved visual direction — palette + typography + full-fidelity desktop and mobile Control gallery mockups — before any `.tres` styling work begins. Hard gate.
 **Depends on**: Phase 1, Phase 2 (their findings inform the mockups)
-**Requirements**: RES-03, RES-04, DESIGN-01, DESIGN-02, DESIGN-03, DESIGN-04, DESIGN-05, DESIGN-06, DOCS-01, DOCS-05 (continuous update); also covers TOKEN-01..10 design definition (token values finalized here, generator implementation in Phase 4)
+**Requirements**: RES-03, RES-04, DESIGN-01, DESIGN-02, DESIGN-03, DESIGN-04, DESIGN-05, DESIGN-06, DOCS-01, DOCS-05 (continuous update); also covers TOKEN-01..10 design definition (token values finalized here, `NeoCadeTheme` formula/binding implementation in Phase 4)
 **Success Criteria** (what must be TRUE):
   1. **Step 0 — Mood-board + tooling baseline:** `.planning/research/mood-board/` contains 20-30 tagged real-arcade / cabinet / prize-counter / minority future-venue references with extraction captions, licensing status, and anti-cyberpunk notes. Coding-Solo MCP, GoPeak, screenshot fallback, and Codex image-generation availability are documented in `.planning/research/PHASE-3-TOOLING.md`; Phase 3 only requires screenshot smoke, while input injection remains Phase 10 QA work.
   2. **Step 1 — Five concept directions:** Five named art directions are produced: Midnight Marquee, Boardwalk Sunset, Cabinet Chrome, plus two research-derived directions. Each starts with an image-generated concept design, then a direction board varying layout, shape, density, accent rhythm, surfaces, control geometry, and color behavior, not just a palette recolor.
@@ -83,11 +83,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   6. **Token spec finalized:** `DESIGN_TOKENS.md` committed before Phase 4 starts, containing both desktop and mobile token blocks (color tokens with WCAG AA-verified contrast, M3 type scale with concrete sizes, 8-step spacing scale, 4-rung corner radius, integer stroke widths, color-only elevation per Conflict 3, M3 deterministic state-layer model per TOKEN-09).
   7. **Hard blocker enforcement:** No `.tres` styling commits exist on the branch when Phase 3 closes; Phase 4 cannot start until Step 3 user approval is logged in writing.
 **Plans**:
-- **Wave 1:** `07-01-PLAN.md` — Freeze official Phase 7 Godot 4.6.2 slots and add verifier/ResourceSaver helper foundation.
-- **Wave 2 *(blocked on Wave 1 completion)*:** `07-02-PLAN.md` — Theme Window, popup/dialog shells, tooltips, MenuBar, and PopupMenu.
-- **Wave 3 *(blocked on Wave 2 completion)*:** `07-03-PLAN.md` — Theme FileDialog and bind all official FileDialog icon slots.
-- **Wave 4 *(blocked on Wave 3 completion)*:** `07-04-PLAN.md` — Theme ColorPicker and ColorPickerButton with exact official icon/focus coverage.
-- **Wave 5 *(blocked on Wave 4 completion)*:** `07-05-PLAN.md` — Theme GraphEdit/GraphNode/GraphFrame and run full verification plus ResourceSaver round-trip.
+- **Wave 1:** `03-01-reference-and-tooling-baseline-PLAN.md` — Build the v0 visual-reference/tooling baseline.
+- **Wave 2:** `03-02-five-concept-directions-PLAN.md` — Produce the five v0 concept directions and direction boards.
+- **Wave 3:** `03-03-finalist-selection-gate-PLAN.md` — Obsolete after the 2026-05-04 redirect; preserved, not executed.
+- **Wave 4:** `03-04-finalist-desktop-mobile-mockups-PLAN.md` — Obsolete after the 2026-05-04 redirect; preserved, not executed.
+- **Wave 5:** `03-05-approval-tokens-and-gate-close-PLAN.md` — Obsolete after the 2026-05-04 redirect; preserved, not executed.
 **UI hint**: yes
 
 > **REDIRECTED 2026-05-04 — Phase 3 status:** First iteration reached Plan 03-03 (finalist selection gate checkpoint) before the user rejected the painterly arcade-venue direction. **All 5 direction concept images and direction boards are preserved** under `.planning/mockups/concepts/` and `.planning/mockups/03-direction-boards.*` as v0 historical reference. The user may revisit any historical direction later, but each must be re-rendered through the flat-MD3 filter before becoming a v1 candidate. **Boardwalk Sunset (the original recommended baseline) is explicitly rejected by the user.** Phase 3 will not be re-executed; its functionality is replaced by Phase 3.1 (visual research) + Phase 3.2 (architecture research) + Phase 3.3 (theme-direction research) + Phase 3.4 (flat/extruded-flat mockup approval gate).
@@ -118,7 +118,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. **Anti-cyberpunk filter audit applied** (per Phase 2 pattern). Confirms MD3 + Flat-3D-UI patterns satisfy the anti-cyberpunk hard constraint and the "no textures, no patterns" rule from the 2026-05-04 redirect.
   6. **SOURCES.md updated** with Section 11 (MD3 + MD3 Expressive) and Section 12 (Flat-3D Game UI references) — adopt/reject/open synthesis per existing dossier pattern.
   7. **No `.tres` styling commits, no mockup commits.** Phase 3.1 is pure research.
-**Plans**: TBD
+**Plans**:
+- **Wave 1:** `03.1-01-provenance-and-artifact-skeletons-PLAN.md` — Create MD3 and Flat-3D research skeletons with provenance.
+- **Wave 2:** `03.1-02-md3-foundations-and-godot-mapping-PLAN.md` — Map MD3 foundations to Godot Theme primitives.
+- **Wave 3:** `03.1-03-md3-expressive-synthesis-PLAN.md` — Synthesize MD3 Expressive guidance for NeoCade.
+- **Wave 4:** `03.1-04-flat-3d-source-survey-and-pattern-catalogue-PLAN.md` — Catalogue flat/extruded game-UI patterns.
+- **Wave 5:** `03.1-05-raised-matrix-and-stylebox-recipes-PLAN.md` — Produce raised-mode matrix and StyleBoxFlat recipes.
+- **Wave 6:** `03.1-06-sources-and-cross-doc-audit-PLAN.md` — Update SOURCES.md and audit cross-document consistency.
 **UI hint**: no
 
 ### Phase 3.2: Source-Dive — Godot Dynamic Theme Architecture Research (INSERTED 2026-05-04 architecture revision)
@@ -131,7 +137,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. **Editor theme reverse-engineering.** `editor/themes/editor_theme_manager.cpp`/`editor_color_map.cpp`/`scene/theme/theme.cpp`/`theme_db.cpp`/`scene/resources/style_box.cpp` enumerated for the patterns that drive dynamic theme entries from base/accent/contrast inputs.
   4. **Anti-pattern audit.** Confirms zero `EditorInterface` / `EditorSettings` / `EDSCALE` references in the proposed runtime-safe architecture (Phase 1 D-05 discipline re-applied).
   5. **SOURCES.md Section 13 added** with adopt/reject/open synthesis. Confidence raised to HIGH if feasibility passes; otherwise LOW with blockers documented.
-  6. **Fallback path documented.** If any strict feasibility check fails or is blocked, documents fallback options and recommends one strongest fallback for user approval (e.g., a hybrid `@tool` generator script that produces static `.tres` resources from the formula model). User is informed before Phase 3.3 + Phase 4 assume the fallback.
+  6. **Fallback path documented.** If any strict feasibility check fails or is blocked, documents fallback options and recommends one strongest fallback for user approval. Historical fallback examples included a hybrid `@tool` generator script that produced static `.tres` resources from the formula model; the chosen Phase 4 path is direct `NeoCadeTheme` export-driven regeneration instead.
   7. **No `.tres` styling commits** under `addons/neocade_theme/`. Spike `.tres` files live under `.planning/spikes/dynamic-theme/` (research-only, not v1 implementation).
 **Plans**:
 - **Wave 0:** `03.2-01-provenance-and-source-map-PLAN.md` — Create the Godot dynamic-theme research artifact skeleton, source map, strict-gate placeholders, and spike evidence table.
@@ -159,7 +165,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   9. **User-approval checkpoint.** After the 5 directions are documented, agent presents them via AskUserQuestion. User approves all 5 / revises specific directions (max 2 revision rounds) / rejects all 5 (escalation discussion). Approval is text-level only — no mockups exist yet at this phase.
   10. **SOURCES.md Section 14 added** with adopt/reject/open synthesis.
   11. **No mockup commits, no `.tres` commits.** Phase 3.3 is research-only.
-**Plans**: TBD
+**Plans**:
+- **Wave 1:** `03.3-01-survey-provenance-and-filter-contract-PLAN.md` — Establish direction-survey provenance and filter contract.
+- **Wave 2:** `03.3-02-direction-synthesis-and-filter-audit-PLAN.md` — Synthesize the five approved dark flat-MD3 directions.
+- **Wave 3:** `03.3-03-sources-closeout-and-approval-gate-PLAN.md` — Update SOURCES.md and close the text-level approval gate.
 **UI hint**: no
 **Parallel-eligible with**: Phase 3.2 (Phase 3.1 must complete first; Phase 3.3 + 3.2 can run in parallel after that)
 
@@ -175,10 +184,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. **Anti-cyberpunk + anti-texture filter pass at finalist gate** (Phase 3.3 already filtered the directions; this is a re-check at mockup level).
   6. **Hard blocker enforcement:** No `.tres` styling commits under `addons/neocade_theme/` exist on the branch when Phase 3.4 closes; Phase 4 cannot start until Step 3 user approval is logged in writing.
   7. **Historical preservation:** All Phase 3 (v0) artifacts remain in `.planning/mockups/concepts/` + `.planning/mockups/03-direction-boards.*`. Phase 3.4 outputs go to `.planning/mockups/3.4/` so iterations don't conflict.
-**Plans**: TBD
+**Plans**:
+- **Wave 1:** `03.4-01-mockup-foundation-and-data-contract-PLAN.md` — Build mockup foundation and direction data contract.
+- **Wave 2:** `03.4-02-stage-1-concept-boards-and-finalist-selection-PLAN.md` — Produce/revise concept boards and select Pulse as recommended starter.
+- **Wave 3:** `03.4-03-finalist-four-grid-mockups-and-approval-gate-PLAN.md` — Produce Pulse four-grid finalist mockups and close approval.
+- **Wave 4:** `03.4-04-design-tokens-closeout-and-phase-4-handoff-PLAN.md` — Finalize DESIGN_TOKENS.md and Phase 4 handoff.
 **UI hint**: yes
 
-### Phase 4: Foundation — `NeoCadeTheme` Superclass + Per-Theme Subclasses + Fonts + Icons (UPDATED for dynamic architecture 2026-05-04)
+### Phase 4: Foundation — Single `NeoCadeTheme` Class + Data-Only Direction `.tres` Files + Fonts + Icons (UPDATED 2026-05-06f)
 **Goal**: Build the structural foundation — addon directory layout, bundled OFL font, bespoke SVG icons, and the **single concrete `NeoCadeTheme` class** that dynamically regenerates theme entries from the finalized 9 `@export` properties. v1 ships 5 data-only direction `.tres` files at the addon root, one for each approved direction (Pulse, Slate, Bubble, Daybreak, Burst). At runtime, consumers load a direction `.tres`, optionally toggle `raised` / `platform` / `base_color` / `accent_color`, and the class regenerates all theme entries to match. `platform=AUTO` auto-detects via `OS.has_feature("mobile")`.
 **Depends on**: Phase 3.4 (mockup approval is a hard prerequisite) + Phase 3.3 (5 approved directions define the data resources Phase 4 implements) + Phase 3.2 (dynamic theme feasibility validation must have passed)
 **Requirements**: FOUND-01, FOUND-02, FOUND-03, FONT-01, FONT-02, FONT-03, FONT-04, FONT-05, FONT-06, FONT-07, FONT-08, FONT-09, ICON-01, ICON-02, ICON-03, ICON-04; also implements TOKEN-01..10 in code (token values were defined in Phase 3)
@@ -187,11 +200,19 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. **Fonts bundled correctly:** Inter Variable upright (`Inter-Variable.ttf` from v4.x) bundled as the ONLY font at `addons/neocade_theme/fonts/` per UD-4 / Option D (Inter Variable Roman ONLY in v1; no Outfit, no Noto Sans, no JetBrains Mono — all deferred per FONT-REVIEW.md 2026-05-04). Reserved Font Name preserved (no binary rename); imported as `FontFile.tres` referenced by `uid://`; `OFL.txt` carries Inter's Reserved Font Name notice + copyright block; import settings are Grayscale antialiasing + Light hinting + Auto subpixel positioning (per STACK + PITFALLS 5.5 for GL Compatibility).
   3. **Icons bundled correctly:** ~25-40 bespoke SVG icons authored at 32×32 reference at `addons/neocade_theme/icons/`; every icon has `Scale = 2.0` and `Linear With Mipmaps` filter explicitly set in its `.import` sidecar (per STACK + PITFALLS); icons are monochrome SVGs (no baked color) so Godot's icon `modulate` can tint per accent role; no Material Symbols/Lucide/Phosphor/external library bundled.
   4. **`NeoCadeTheme` class works (single concrete class, 9-property `@export` set, 2026-05-06f):** `addons/neocade_theme/neocade_theme.gd` declares `@tool class_name NeoCadeTheme extends Theme` with **9 `@export` properties total**. **Core (4):** `base_color: Color`, `accent_color: Color`, `raised: bool`, `platform: {DESKTOP, MOBILE, AUTO}`. **Shape (5, under `@export_group("Shape")`):** `corner_radius: int`, `spacing: int`, `raised_strength: int`, `focus_thickness: int`, `outline_width: int`. The `@export` set is intentionally minimal — limited to values that should be consistent across the entire theme (per Phase 4 architectural decision 2026-05-06f). Per-direction unique mood comes from Theme Editor entry overrides authored in each `.tres` (StyleBoxFlat per Control state with direction-specific bg/border/padding/etc.), NOT from a long list of exports. Setters on every `@export` trigger `_regenerate_theme()` which dynamically populates derived theme entry color/state values via `_get_base_color`-style formulas (ported from passivestar's pattern, driven by `@export` props instead of `EditorSettings`). `_regenerate_theme()` computes `var is_light: bool = base_color.get_luminance() >= 0.5` (dark default; `is_light` flags deviation) and branches all conditional formulas on `is_light` (godot-minimal-theme line-56 pattern with renamed/inverted variable). The class is **NOT abstract** — users can instantiate it directly to author custom themes. `platform=AUTO` resolves at runtime via `OS.has_feature("mobile")`. The class is feasibility-validated by the Phase 3.2 spike before Phase 4 implementation begins. Convention: any future paired x/y `@export` values use `Vector2i`.
-  5. **Per-direction `.tres` files work (data-only, 2026-05-06e):** **N `.tres` files** (one per approved direction from Phase 3.4) at `addons/neocade_theme/{name}_neocade_theme.tres`, each `[gd_resource type="NeoCadeTheme" format=3]` with its direction's specific `@export` values saved. **No per-direction `.gd` files** — each direction is purely data (different `@export` values on the same `NeoCadeTheme` class). For the v1 approved set: `pulse_neocade_theme.tres` (corner_radius_base=5, base_color=#151A2E, etc.), `slate_neocade_theme.tres` (corner_radius_base=11, base_color=#111820, etc.), `bubble_neocade_theme.tres`, `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`. Loading any of these into a Godot scene yields a `NeoCadeTheme` instance with that direction's `@export` values; `_regenerate_theme()` populates all theme entries from those exports. Optional per-`.tres` Theme Editor entry overrides are stored as additional sections in the `.tres` and survive `_regenerate_theme()` if Phase 4 designs the regenerate logic to preserve manual overrides.
+  5. **Per-direction `.tres` files work (data-only, 2026-05-06e):** **N `.tres` files** (one per approved direction from Phase 3.4) at `addons/neocade_theme/{name}_neocade_theme.tres`, each `[gd_resource type="NeoCadeTheme" format=3]` with its direction's specific `@export` values saved. **No per-direction `.gd` files** — each direction is purely data (different `@export` values on the same `NeoCadeTheme` class). For the v1 approved set: `pulse_neocade_theme.tres`, `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`, `daybreak_neocade_theme.tres`, and `burst_neocade_theme.tres`. Loading any of these into a Godot scene yields a `NeoCadeTheme` instance with that direction's current export values (`corner_radius`, `spacing`, `raised_strength`, etc.); `_regenerate_theme()` populates all theme entries from those exports. Optional per-`.tres` Theme Editor entry overrides are stored as additional sections in the `.tres` and survive regeneration according to the implemented override contract.
   6. **Saved `.tres` files stay data-oriented:** Each `addons/neocade_theme/{name}_neocade_theme.tres` saves the direction's `@export` values and any intentional Theme Editor entry overrides. Regenerated baseline entries are recomputed at load time. Per flat-layout 2026-05-06d, all direction `.tres` files live at the addon root (no `themes/` subfolder, no root `neocade_theme.tres`).
   7. **All theme entries declared via dynamic regeneration:** When any direction `.tres` is loaded, the resulting Theme has entries for ALL 37 scorecard Control rows + the current production `TYPE_VARIATIONS` registry populated. Phase 4 originally shipped 14 entries; Phase 5 added Kicker, so Phase 8 treats the live 15-entry registry as authoritative for TYPEVAR-06.
   8. **CJK is documented (UD-2 default):** README documents the override pattern for consumers who need CJK — append CJK font to a duplicated theme's `default_font.fallbacks` — explicitly NOT bundled in v1.
-**Plans**: TBD
+**Plans**:
+- **Wave 1:** `04-01-scaffold-deletion-and-class-shell-PLAN.md` — Delete stale scaffold resource and author the `NeoCadeTheme` class shell.
+- **Wave 2:** `04-02-fonts-and-OFL-PLAN.md` — Bundle Inter Variable Roman and OFL metadata.
+- **Wave 3:** `04-03-button-family-icons-PLAN.md` — Author the baseline button-family SVG icon set.
+- **Wave 4:** `04-04-color-formulas-and-role-tokens-PLAN.md` — Port dynamic color formulas and role token derivation.
+- **Wave 5:** `04-05-binding-table-and-iteration-engine-PLAN.md` — Implement BINDING_TABLE, type variations, and regeneration walk.
+- **Wave 6:** `04-06-pulse-tres-and-verification-PLAN.md` — Create Pulse `.tres` and verification helpers.
+- **Wave 7:** `04-07-peer-themes-and-main-tscn-PLAN.md` — Add Slate/Bubble/Daybreak/Burst `.tres` resources and starter scene wiring.
+- **Wave 8:** `04-08-addon-metadata-and-readme-PLAN.md` — Ship addon metadata, README, CHANGELOG, VERSION, and license files.
 
 ### Phase 5: Core Controls — Buttons, Inputs, Labels, Panels (desktop)
 **Goal**: Author the desktop theme entries for the keystone Controls — every BaseButton-family class, every text input/display class, every Label class, every Panel class — by populating `NeoCadeTheme._regenerate_theme()` formulas and data-resource override rules so the most-used surface area of the theme is feature-complete dynamically.
@@ -244,7 +265,14 @@ Plans:
   4. **Graph stack themed (basic v1 level):** GraphEdit grid + minimap + connection lines styled; GraphNode title + slot styling + selected state; GraphFrame theming if applicable. Acceptance is "renders cleanly with arcade identity" — GraphEdit is heavyweight, deeper polish deferred to v1.x if needed.
   5. **37/37 Control coverage achieved on desktop:** Every Control class enumerated in MINIMAL-THEME-COVERAGE-DELTA.md's 37-row scorecard has at least one custom theme entry produced by `NeoCadeTheme._regenerate_theme()` (no engine fallback for any of them); verifiable by loading any direction `.tres` with `platform=DESKTOP` and diffing entry count against the Phase 1 godot-minimal-theme enumeration (final verification happens in Phase 10's COV-10 check).
   6. **FileDialog parent/folder/file/file-up/back/forward/reload icons all load.**
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [x] `07-01-PLAN.md` — Freeze official Phase 7 Godot 4.6.2 slots and add verifier/ResourceSaver helper foundation.
+- [x] `07-02-PLAN.md` — Theme Window, popup/dialog shells, tooltips, MenuBar, and PopupMenu.
+- [x] `07-03-PLAN.md` — Theme FileDialog and bind official FileDialog icon slots.
+- [x] `07-04-PLAN.md` — Theme ColorPicker and ColorPickerButton with official icon/focus coverage.
+- [x] `07-05-PLAN.md` — Theme GraphEdit/GraphNode/GraphFrame and run full verification plus ResourceSaver round-trip.
 
 ### Phase 8: Mobile Variant Token Block + Tap-Target Audit (UPDATED for dynamic architecture)
 **Goal**: Fill in the **mobile branch** of `NeoCadeTheme._regenerate_theme()` so that any direction `.tres` with `platform=MOBILE` (or `platform=AUTO` on a mobile device) produces correctly sized, accessible mobile entries. Audit that every interactive Control satisfies the ≥48px tap-target rule (iOS HIG 44pt + Material 3 48dp). Document every desktop-vs-mobile delta. **Mobile is NOT a separate `.tres` file** — it's an `@export platform` toggle on the single concrete class.
@@ -281,22 +309,28 @@ Cross-cutting constraints:
   3. **Theme + variation toggles are prominent and obvious:** Floating control panel visibly larger than other Controls so its purpose is clear; provides: (a) **Theme picker** — cycle through the 5 approved direction `.tres` files (`pulse_neocade_theme.tres`, `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`, `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`) + Godot default; (b) **`raised` toggle** — flat ↔ raised; (c) **`platform` selector** — DESKTOP / MOBILE / AUTO. Cycling any of these mutates the active theme's `@export` props, triggering `_regenerate_theme()` (per PITFALLS 10.3 clean state switching); state-cycling produces no visual artifacts (no leftover styles from previous state). User can dynamically demonstrate that one direction `.tres` produces all 4 platform/depth variations at runtime. Per flat-layout 2026-05-06d, no root `neocade_theme.tres` is included in the theme picker.
   4. **BBCode demo + accessibility wiring:** RichTextLabel section showcases inline color/weight/italic via BBCode (verifies font-system handles italic transform per FONT-07); `accessibility_name` is set on every interactive Control in the scene (Godot 4.5 API per PITFALLS 2.5 + 4.4 — minimum bar for screen-reader sanity in v1; deeper VoiceOver/TalkBack QA deferred to v1.x per UD-6).
   5. **Token Gallery + Coverage Verification visible:** Token Gallery section displays each design token visually — color swatches with hex + role label, type-scale samples in actual fonts, spacing/radius scale visualizations; Coverage Verification strip displays "37/37 Controls themed ✓" (or accurate count if any deferred — verifiable against Phase 7 close).
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [x] `09-01-PLAN.md` — Implement the programmatic showcase scene with nine sections, direction/default theme picker, raised toggle, platform selector, token gallery, and coverage strip.
 **UI hint**: yes
 
 ### Phase 10: QA + Cross-Platform Export Validation
 **Goal**: Prove the theme is ship-ready — visually consistent across renderers and resolutions, accessibility-compliant, and rendering correctly across all 6 Godot 4.6 export targets (Windows, macOS, Linux, iOS, Android, Web/Browser).
 **Depends on**: Phase 9
 **Requirements**: COV-10, EXPORT-01, EXPORT-02, EXPORT-03, EXPORT-04, EXPORT-05, EXPORT-06, EXPORT-07, EXPORT-08, A11Y-01, A11Y-02, A11Y-03, A11Y-04, A11Y-05, A11Y-06, QA-01, QA-02, QA-03, QA-04, QA-05, QA-06; closes cumulative COV-09 (focus indicator verification)
-**Success Criteria** (what must be TRUE):
-  1. **MCP/QA tooling baseline reconfirmed (QA-01):** GoPeak (or chosen MCP server per UD-1 resolution) successfully captures editor + running-game screenshots and injects input on the current build; baseline test passes before any other QA work begins.
-  2. **Visual QA matrix complete (QA-02, QA-03, QA-04):** Screenshot pass covering 9 showcase sections × 2 renderers (Forward+ + GL Compatibility) × 3 resolutions (1080p / 1440p / 4K) × 3 scale factors (100% / 150% / 200%); per-scene-section deck saved to `.planning/qa/screenshots/`. Tab-walk every Control in showcase + capture focused-state screenshot under hover/pressed/checked combinations (Pitfall 1.1 audit). Dual-renderer pass documents deltas; GL Compat is the ship target.
-  3. **Coverage verification (COV-10):** Diff-check every theme entry on each direction `.tres` (e.g., `addons/neocade_theme/slate_neocade_theme.tres`, applied to a runtime instance so `_regenerate_theme()` has populated all entries) against Phase 1's `godot-minimal-theme` enumeration; zero theme entries left default for any Control class enumerated in COV-01..08; COV-10 verification report committed. Verifying against any one of the 5 direction resources is sufficient for shared generated entries, with a separate pass for direction-specific Theme Editor overrides.
-  4. **Accessibility QA pass (A11Y-01..06):** WCAG 2.1 AA contrast computed via W3C luminance formula for every text-on-surface combo and every interactive state combo, table reproducible from token values; visible focus indicator audit passes (covers SC 2.4.7 + SC 1.4.11); deuteranopia/protanopia/tritanopia CVD simulation pass — legibility confirmed for status/role colors, no information conveyed by color alone; multi-script label test renders Latin + Cyrillic + Arabic + Hebrew + Devanagari labels correctly via fallback chain through Inter + Noto Sans; `accessibility_name` set on every interactive showcase Control verified.
-  5. **Cross-platform export validation (EXPORT-01..08):** Per-target export builds exist for all 6 Godot targets (Windows, macOS, Linux, iOS, Android, Web/Browser); per-target screenshot deck saved to `.planning/qa/exports/<target>/` showing showcase scene rendering on each target (acceptance is render-correctness, not pixel-parity); Web export specifics handled — `.ttf` files in "Filters to export non-resources" OR wrapped in saved `FontFile.tres`, all theme/font/icon resources referenced by `uid://`, no `SystemFont` resource. Project remains on GL Compatibility renderer (avoids #116090 + #111729 4.6 regressions). CI workflow exports + smoke-tests on Windows + Linux + macOS + Web targets. Manual Android validation on ≥1 device (or noted-deferred per UD-5 with explicit changelog note); manual iOS validation on ≥1 device (or noted-deferred per UD-5 with explicit changelog note). License compliance verified for all 4 bundled fonts (Inter / Outfit / Noto Sans / JetBrains Mono — all OFL 1.1).
-  6. **Fresh-install dry-run (QA-05):** Cloning `addons/neocade_theme/` into a clean Godot 4.6 project — theme applies as both project theme and per-scene theme; fonts and icons load correctly without any editor action; documented for README.
-  7. **Theme inspector workaround documented (QA-06):** CONTRIBUTING.md notes the active issue #115500 — do NOT edit theme via Control inspector context; author via dedicated Theme tab + `@tool` generator only.
-**Plans**: TBD
+**Success Criteria** (what must be TRUE for the autonomous Phase 10 closeout):
+  1. **MCP/QA tooling baseline documented (QA-01):** `.planning/qa/tooling-baseline.md` records the available QA surface and explicitly defers direct screenshot/input-injection validation where Codex lacks the needed MCP/browser surface.
+  2. **Visual QA matrix scoped (QA-02, QA-03, QA-04):** Screenshot matrix, tab-walk focused-state pass, and dual-renderer pass are documented as deferred manual UAT with placeholder locations under `.planning/qa/`; GL Compatibility remains the ship target.
+  3. **Coverage evidence scoped (COV-10):** `.planning/qa/coverage-audit.md` maps showcase samples and shared `NeoCadeTheme._regenerate_theme()` coverage to the 37-row scorecard. The exhaustive slot-by-slot diff against Phase 1's `godot-minimal-theme` enumeration remains deferred manual/tooling UAT until a scriptable Theme inspector/export surface exists.
+  4. **Accessibility evidence scoped (A11Y-01..06):** Contrast, focus-indicator, color-not-alone, fallback-font, and `accessibility_name` evidence is documented where static/autonomous checks are available. CVD simulation, tab-walk screenshots, and deeper VoiceOver/TalkBack QA remain deferred UAT/v1.x scope.
+  5. **Cross-platform export validation scoped (EXPORT-01..08):** Export presets and release workflow cover all 6 Godot targets (Windows, macOS, Linux, iOS, Android, Web/Browser); manual screenshot decks and real-device Android/iOS validation remain deferred. Web export specifics handled — bundled font/theme/icon resources are exportable, no `SystemFont` dependency is used, and the project remains on GL Compatibility renderer (avoids #116090 + #111729 4.6 regressions). License compliance is for the single bundled font, Inter Variable Roman (OFL 1.1); Outfit, Noto Sans, and JetBrains Mono are not bundled in v1.
+  6. **Fresh-install dry-run scoped (QA-05):** `.planning/qa/fresh-install-dry-run.md` documents the clean install checklist and expected consumer smoke. Physical clean-project copy and screenshots remain deferred UAT.
+  7. **Theme inspector workaround documented (QA-06):** CONTRIBUTING.md notes the active issue #115500 — do NOT edit theme resources through a Control inspector context menu. Safe authoring paths are the dedicated Theme editor, the 9 exported `NeoCadeTheme` properties on direction resources, and formula edits in `addons/neocade_theme/neocade_theme.gd`.
+**Plans**: 1 plan
+
+Plans:
+- [x] `10-01-PLAN.md` — Create autonomous QA evidence package and document deferred manual screenshot/device UAT.
 
 ### Phase 11: Distribution — GitHub Actions Release
 **Goal**: Ship v1.0.0 via a single manually-triggered GitHub Actions workflow. The workflow runs CI checks, auto-bumps the version, builds the addon zip via `git archive`, builds a Godot Web export of the showcase scene, and publishes a GitHub Release containing both artifacts + the CHANGELOG slice as release body. **No Asset Library submission in v1** — distribution is GitHub-Releases-only.
@@ -315,7 +349,10 @@ Cross-cutting constraints:
   8. **GitHub Release published:** uses `softprops/action-gh-release@v3` (requires `ubuntu-latest` for Node 24 — pitfall #5 from PentaTile); attaches BOTH `neocade_theme-v<VERSION>.zip` AND `neocade_theme-showcase-web-v<VERSION>.zip`; release body is the CHANGELOG slice; `draft: false`, `prerelease: false`. Auth via job-level `permissions: contents: write`.
   9. **README + supporting docs in place (DOCS-04, DIST-04):** Project description, install path (download zip from GitHub Releases → extract `addons/neocade_theme/` into your Godot project's `addons/`), usage examples, cross-platform support summary, mobile variant usage, accessibility notes, font override patterns (Noto Sans for non-Latin harmony, mono for CodeEdit, Inter Italic), editor-coverage map link (EDITOR-COVERAGE.md), license, attributions. **Includes a "Try the showcase in your browser" link to the GitHub Pages URL (`https://<owner>.github.io/<repo>/`) — auto-deployed on every release.**
   10. **License + initial CHANGELOG (DIST-02, DIST-03):** `addons/neocade_theme/OFL.txt` covers Inter (single bundled font per Option D); `LICENSE.md` for theme code (MIT or CC-BY recommended); `CHANGELOG.md` has a `[Unreleased]` section with v1.0.0 entry pre-populated documenting every shipped feature + every documented limitation (Inter Italic deferred, no Noto Sans bundled, no JetBrains Mono bundled, real-device mobile QA status per UD-5, screen-reader QA status per UD-6).
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [x] `11-01-PLAN.md` — Prepare the manually triggered GitHub Actions release workflow, version/changelog release flow, addon zip, Web showcase export, Pages deployment, and release documentation.
 
 ## Progress
 
@@ -344,8 +381,8 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 
 ## Coverage Summary
 
-**Total v1 requirements:** 99 (across 15 categories: RES-5, DESIGN-6, FOUND-3, FONT-9, ICON-4, TOKEN-10, COV-10, TYPEVAR-6, MOBILE-8, SHOW-8, EXPORT-8, A11Y-6, QA-6, DIST-5, DOCS-5)
-**Mapped to phases:** 99 (DOCS-03 already complete pre-roadmap; all other 98 mapped to a primary phase with explicit cumulative reasoning where applicable)
+**Total v1 requirements:** 113 (across 15 categories: RES-5, DESIGN-6, FOUND-3, FONT-9, ICON-4, TOKEN-10, COV-10, TYPEVAR-6, MOBILE-8, SHOW-8, EXPORT-8, A11Y-6, QA-6, DIST-19, DOCS-5)
+**Mapped to phases or pre-roadmap artifacts:** 113 (DOCS-03 already complete pre-roadmap; all other 112 mapped to a primary phase with explicit cumulative reasoning where applicable)
 **Unmapped:** 0
 
 **Cumulative requirements (assigned to a primary phase, contributed to by others with documented reasoning):**
@@ -354,7 +391,7 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 - COV-09 (focus indicator on every focusable Control) — primary Phase 5 (pattern); contributed by Phase 6 + 7; verified Phase 10
 - COV-10 (zero engine-default entries) — primary Phase 10; depends on Phase 1 RES-01 enumeration
 - TYPEVAR-06 (all 15 production variations from `TYPE_VARIATIONS` documented) — primary Phase 8 (DOCS-02 finalization); contributed by Phase 5 + 6 + 7
-- TOKEN-01..10 — design definitions Phase 3; generator implementation Phase 4
+- TOKEN-01..10 — design definitions Phase 3; `NeoCadeTheme` formula/binding implementation Phase 4
 - DOCS-05 (SOURCES.md updates) — continuous Phase 1 + 2 + 3
 
 **Mockup approval gate enforcement:** Hard blocker between Phase 3.4 and Phase 4 — no addon `.tres`/`.gd` styling commits permitted before Phase 3.4 final approval is logged and DESIGN_TOKENS.md is written.
@@ -362,7 +399,7 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 **Open user decisions tracked in-phase (not roadmap blockers):**
 - UD-1 (MCP server swap to GoPeak) — addressed in Phase 3 sub-spike
 - UD-2 (CJK font bundling) — default decision (defer) confirmed in Phase 4 README
-- UD-3 (stylebox authoring tooling) — `@tool` generator primary, Theme Editor verification — established in Phase 4
+- UD-3 (stylebox authoring tooling) — direct `NeoCadeTheme` export-driven regeneration plus Theme Editor override verification — established in Phase 4
 - UD-4 (Inter Italic v1 vs v1.x) — FINAL: Option D locked 2026-05-04. v1 ships Inter Variable Roman ONLY (~810 KB, matches godot-minimal-theme exactly). Inter Italic, Noto Sans, JetBrains Mono, Outfit — all deferred to v1.x or to consumer-side override pattern. Non-Latin scripts handled via Godot's `Font.allow_system_fallback=true`. User can override at Phase 3 typography mockup gate.
 - UD-5 (real-device cross-platform testing matrix) — addressed in Phase 10 acceptance with `(if-real-device-available)` qualifier; ship-or-defer decision in Phase 10
 - UD-6 (AccessKit / VoiceOver / TalkBack screen-reader integration) — `accessibility_name` only in v1 (Phase 9 SHOW-06); deeper QA deferred to v1.x

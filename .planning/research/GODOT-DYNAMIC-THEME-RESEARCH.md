@@ -37,7 +37,7 @@ All claims in this file must use source labels. Source labels are stable shortha
 | `GODOT-THEME-RUNTIME` | `C:/Programming_Files/Godot/godot-master/scene/resources/theme.*`, `theme_db.cpp`, `theme_owner.cpp` | Runtime Theme APIs and fallback model | Read |
 | `GODOT-STYLEBOX` | `C:/Programming_Files/Godot/godot-master/scene/resources/style_box*.{h,cpp}` | `StyleBoxFlat` mutation and shadow constraints | Read |
 | `MINIMAL-DISSECTION` | `.planning/research/MINIMAL-THEME-DISSECTION.md` | `godot-minimal-theme` bar and formula anchors | Read |
-| `SPIKE-03.2` | `.planning/spikes/dynamic-theme/*` | Dynamic Theme evidence | Pending |
+| `SPIKE-03.2` | `.planning/spikes/dynamic-theme/*` | Dynamic Theme evidence | Read / PASS |
 
 **Citation contract:** final locked claims must include at least one source label. Spike-only claims must name `SPIKE-03.2` plus the evidence mode: `EXECUTED`, `STATIC-FALLBACK`, or `SIMULATED`.
 

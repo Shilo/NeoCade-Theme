@@ -59,11 +59,11 @@ Every survey entry records: source name, URL, access status, retrieved date, sou
 | Output structure | D-10 | Produce this artifact with provenance/scope, survey, v0 DNA mapping, five candidate directions, filter audit, user approval checkpoint, and verification log. |
 | Carried constraints | D-16 | Inter Variable Roman only; dynamic superclass exports; 35-Control coverage discipline; focus/popup pitfalls remain authoritative; no fallback-masked coverage claims. |
 
-Direction audit table structure for Plan 02:
+Direction audit table structure for Plan 02 (final audit rows are recorded in the Phase 3.3 filter audit below):
 
 | Direction | Anti-cyberpunk | Anti-texture | universal-axes-still-work | no base-direction preselection | no mockup or `.tres` output |
 |---|---|---|---|---|---|
-| Pending Plan 02 | Pending | Pending | Pending | Pending | Pending |
+| Pulse / Slate / Bubble / Daybreak / Burst | PASS | PASS | PASS | PASS | PASS |
 
 ## Commercial Example Survey
 

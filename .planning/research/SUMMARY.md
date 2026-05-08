@@ -1,26 +1,26 @@
 # NeoCade Theme — Project Research Summary
 
-**Project:** NeoCade Theme (Godot 4.6 dark UI Theme addon, dark v1, distributed as `res://addons/neocade_theme/neocade_theme.tres`)
+**Project:** NeoCade Theme (Godot 4.6 dark UI Theme addon, dark v1, distributed as five data-only direction resources backed by `addons/neocade_theme/neocade_theme.gd`)
 **Domain:** Godot 4.6 native Theme resource — visual design system + bundled fonts + bespoke icons + showcase scene
 **Researched:** 2026-05-04 (initial parallel pass complete)
 **Overall confidence:** HIGH on Godot Theme/Font API, table-stakes Control coverage, and table-stakes pitfalls. MEDIUM on real-arcade visual reference depth, Asset Library policy nuance, MCP screenshot tooling baseline. LOW on `godot-minimal-theme` `.tres` line-by-line entry enumeration and LDtk `src/electron.renderer/` UI mining — both flagged for dedicated source-dive spike phases.
 
 > **Update (2026-05-04, post-CROSS-PLATFORM):** The 5th research dimension landed after the initial synthesis. Key cross-platform findings have been folded in below:
-> - **No `.tres`-to-`.tres` inheritance in Godot Theme** — verified against Theme class API. Token-sharing strategy: `@tool` script (`addons/neocade_theme/_dev/generate_themes.gd`) generates BOTH desktop and mobile `.tres` from a single `TokenSet` constants block. Both `.tres` files are committed final artifacts, generated from one source of truth — drift is structurally impossible. ThemeGen (MIT) is a proven prior-art reference.
+> - **No `.tres`-to-`.tres` inheritance in Godot Theme** — verified against Theme class API. Final v1 token-sharing strategy is direct `NeoCadeTheme` export-driven regeneration: one concrete `addons/neocade_theme/neocade_theme.gd` class, five data-only direction `.tres` files at the addon root, and no `_dev` generator or separate static desktop/mobile sibling resources.
 > - **GL Compatibility renderer is the safest cross-platform choice** — already locked in project.godot. Avoids two new Godot 4.6 regressions: iOS Mobile-renderer Metal validation failure on iPhone SE 2nd gen (#116090, 4.7 release blocker) and Android Mobile-renderer reducing Play Store device coverage (#111729). **Stay on GL Compatibility — do NOT switch.**
 > - **Web export is highest-risk** — three failure modes: SystemFont resource silently fails (must use FontFile + bundled `.ttf`); `.ttf` files must be in "Filters to export non-resources" OR wrapped in saved FontFile.tres; iOS Safari has documented WebGL2 quirks (no pixel-parity required for v1). All `.tres` references must use `uid://` to survive PCK remap.
 > - **Mobile spec is concrete:** Button height 48px mobile vs 32px desktop (satisfies iOS HIG 44pt + Material 3 48dp); body 16px mobile vs 14px desktop; spacing scale +50% on space.4 and above; **corner radii STAY IDENTICAL** across desktop/mobile (brand identity, not platform-specific).
-> - **Density buckets — answered:** Ship ONE `neocade_mobile_theme.tres`, not four. Godot does not use Android density qualifiers for theme resources; density variation is handled at runtime via `content_scale_factor` + Godot stretch modes (`canvas_items` + `expand`). Authored values are dp-equivalent at base scale 1.0.
-> - **License compliance:** Inter, Noto Sans, Outfit, JetBrains Mono are all OFL 1.1 — App Store + Play Store + Web embedding legal per SIL OFL FAQ. Reserved-name clause: do NOT rename `Inter-VariableFont*.ttf`. Single combined `OFL.txt` covers all bundled fonts.
+> - **Density buckets — answered:** Ship one direction resource per approved theme, with `platform=AUTO` or `platform=MOBILE` selecting mobile values at runtime. Godot does not use Android density qualifiers for theme resources; density variation is handled at runtime via `content_scale_factor` + Godot stretch modes (`canvas_items` + `expand`). Authored values are dp-equivalent at base scale 1.0.
+> - **License compliance:** Inter Variable Roman is the only bundled v1 font and is OFL 1.1 — App Store + Play Store + Web embedding legal per SIL OFL FAQ. Reserved-name clause: do NOT rename the Inter binary. Noto Sans, Outfit, JetBrains Mono, and Inter Italic are consumer-side or v1.x options, not bundled v1 assets.
 > - **Two new phases required** in the roadmap: **Mobile Variant Authoring** (interleaved with desktop authoring after Foundation) and **Cross-Platform Export Validation** (post-desktop-QA, pre-v1-release). Optional Cross-Platform Hardening Spike buffer phase recommended.
 > - **FEATURES.md AF-5 must be stricken** — mobile-as-anti-feature is no longer correct; mobile variant is now v1 must-have.
-> - **Open questions surfaced (not blocking):** Whether 4.6.x has fixed iOS Safari/Chrome HTML5 audio crash (#107390) — informational only since theme has no audio; whether iOS Mobile-renderer regression (#116090) gets backported — informational only since we use GL Compat; real-device Android testing matrix (3 devices: low/mid/high-end) — user hardware unknown; iOS testing requires Mac + paid Apple Developer Program — user status unknown; whether to ship Inter Italic in v1 (~+0.85 MB) or defer; AccessKit/VoiceOver/TalkBack screen-reader integration is partial in 4.6 — full integration deferred to v1.x or v2; v1 sets `accessibility_name` on showcase Controls only.
+> - **Open questions surfaced (not blocking):** Whether 4.6.x has fixed iOS Safari/Chrome HTML5 audio crash (#107390) — informational only since theme has no audio; whether iOS Mobile-renderer regression (#116090) gets backported — informational only since we use GL Compat; real-device Android testing matrix (3 devices: low/mid/high-end) — user hardware unknown; iOS testing requires Mac + paid Apple Developer Program — user status unknown; AccessKit/VoiceOver/TalkBack screen-reader integration is partial in 4.6 — full integration deferred to v1.x or v2; v1 sets `accessibility_name` on showcase Controls only. Inter Italic was separately resolved as v1.x/consumer-side, not bundled in v1.
 
 ---
 
 ## Executive Summary
 
-NeoCade is a "feature-complete coverage" project, not a feature-velocity project. Its `.tres` ships when **every** built-in Godot 4.6 Control class is themed across all states, when a coherent design-token system underpins those entries, when bundled fonts + bespoke SVG icons are wired correctly through `addons/`, and when a showcase scene visually proves it on screen. Research converges on the same architectural shape: **single `.tres` Theme resource, no `plugin.cfg`, no `EditorPlugin` script, no custom shaders**, with `StyleBoxFlat` as the universal chrome primitive, two bundled variable fonts (Inter + Noto Sans, OFL), a small bespoke SVG icon set (~25-40 glyphs), and a Material-3-derived token system rendered through Godot's Theme Type Variations.
+NeoCade is a "feature-complete coverage" project, not a feature-velocity project. Its direction `.tres` resources ship when **every** built-in Godot 4.6 Control class in scope is themed across all states, when a coherent design-token system underpins those entries, when the bundled Inter font + bespoke SVG icons are wired correctly through `addons/`, and when a showcase scene visually proves it on screen. Research converges on the same architectural shape: **Theme-resource-only addon, no `plugin.cfg`, no `EditorPlugin` script, no custom shaders**, with `StyleBoxFlat` as the universal chrome primitive, one bundled variable font (Inter Variable Roman, OFL), a small bespoke SVG icon set, and a Material-3-derived token system rendered through Godot's Theme Type Variations.
 
 The hardest problems are **identity discipline** and **state-correctness**. The user's prior research report and prototype both drift toward synthwave/cyberpunk aesthetics that have been explicitly rejected; SUMMARY recommends **Boardwalk Sunset** (warm-neutral surface ramp + amber/coral/teal accents) as the visual direction that most cleanly lands "vibrant arcade hall by day," with **Cabinet Chrome** (LDtk-inspired neutral charcoal + signature orange) as the disciplined fallback. State-correctness is the second hardest problem: Godot's `focus` stylebox is an **overlay, not a state** (loses to `pressed`/`checked`), `PopupMenu`/`OptionButton` dropdowns are **separate Windows that don't inherit overrides or texture filter**, and **type variations don't inherit fonts** from their base type — three behaviors that silently produce a "looks correct in editor preview, broken at runtime" theme. The roadmap must front-load these in the design token spec and the QA harness.
 
@@ -32,16 +32,16 @@ The single biggest risk to v1 is **scope drift via tempting but project-forbidde
 
 ### Recommended Stack
 
-A **theme-resource-only addon** with two bundled variable fonts and a small bespoke icon set. No `plugin.cfg`, no editor plugin script, no shaders, no GDExtension, no scripted StyleBoxes. Total addon footprint ~2.3 MB before optional CJK fonts.
+A **theme-resource-only addon** with one bundled variable font and a small bespoke icon set. No `plugin.cfg`, no editor plugin script, no shaders, no GDExtension, no scripted StyleBoxes. Total addon footprint is kept small by bundling Inter Variable Roman only and leaving additional script/code/italic fonts to consumer overrides or v1.x.
 
 **Core technologies (full detail in `STACK.md`):**
 
 - **Godot 4.6** — locked target; introduces "Modern" editor theme (productized port of `godot-minimal-theme`), focus decoupling, `pivot_offset_ratio`, instant editor theme reload.
-- **`Theme` resource (`.tres`, text format)** — single deliverable at `res://addons/neocade_theme/neocade_theme.tres`. Diffable, hot-reloadable.
+- **`Theme` resources (`.tres`, text format)** — five data-only direction deliverables at `res://addons/neocade_theme/{direction}_neocade_theme.tres`, all backed by the single concrete `NeoCadeTheme` class. Diffable, hot-reloadable.
 - **`StyleBoxFlat` everywhere** — pure-vector, GPU-rendered, scales infinitely. AA requires `corner_radius >= 2` (Godot issue #87226). Reserve `StyleBoxLine` for separators; `StyleBoxEmpty` only in runtime contexts where editor leak is impossible (plugins assume `StyleBoxFlat` methods).
-- **`FontFile` + `FontVariation`** — one upright Inter VF + one italic Inter VF + one Noto Sans VF (Latin extended). Per-weight derivation via `variation_opentype["wght"]`.
-- **Inter Variable v4.x (OFL)** — primary UI typeface; `wght 100-900` and `opsz 14-32`. v4 split italic into a separate VF — bundle both. Inter Display is now the `opsz` axis at 32, not a separate family.
-- **Noto Sans Variable (OFL)** — fallback chain for non-Latin scripts. CJK is **not bundled** (~30 MB+); README documents the override path.
+- **`FontFile` + `FontVariation`** — one upright Inter VF bundled; per-weight/optical-size derivation via `variation_opentype["wght"]` and `variation_opentype["opsz"]`.
+- **Inter Variable v4.x Roman (OFL)** — primary and only bundled UI typeface; `wght 100-900` and `opsz 14-32`. Inter Italic is deferred to v1.x or consumer override.
+- **System fallback + documented consumer font overrides** — non-Latin scripts render via `Font.allow_system_fallback=true`; README documents optional Noto Sans / Noto Sans CJK / mono font override paths for consumers who need designed-together script or code typography.
 - **Bespoke SVG icon set, ~25-40 icons** — authored at 32×32 reference, imported with `Scale = 2.0` and **Linear With Mipmaps** filter explicitly per resource. Mapped 1:1 to Godot's hard-coded theme icon slots. Generic icon libraries (Material Symbols, Lucide, Phosphor) are explicitly rejected.
 - **GL Compatibility renderer** — locked by `project.godot`. Authoring AND screenshot-QA must run on Compatibility.
 
@@ -65,7 +65,7 @@ The "feature surface" is the **coverage matrix**: 35 user-facing Control classes
 - All list/tree controls (ItemList, Tree — 16 styleboxes, 12 icons —, TabBar, TabContainer).
 - All popup-class controls themed as **separate types** (PopupPanel, PopupMenu, AcceptDialog, ConfirmationDialog, FileDialog, TooltipPanel, TooltipLabel, Window).
 - Visible focus indicator on every focusable Control (WCAG 2.1 SC 1.4.11).
-- Bundled OFL fonts wired into `default_font.fallbacks`.
+- Bundled Inter OFL font wired as `default_font`, with system fallback left enabled and optional consumer fallback patterns documented.
 - HD rendering at 1080p/1440p/4K.
 - `res://main.tscn` showcase rendering every Control with realistic content + prominent NeoCade↔Godot toggle.
 
@@ -88,19 +88,20 @@ The "feature surface" is the **coverage matrix**: 35 user-facing Control classes
 The architecture **is** the visual design system encoded in the `.tres`. Six layers:
 
 1. **Color tokens** — Material-3 5-stop tonal surface ramp + outline + 3 text tones + 8-hue accent palette + semantic role aliases. WCAG 2.1 AA verified for all combinations.
-2. **Typography tokens** — Inter (body) + Noto Sans (fallback) + JetBrains Mono (code). Material 3 type scale (10 entries).
+2. **Typography tokens** — Inter Variable Roman for all bundled UI text; consumer-supplied fallback/mono fonts documented. Material 3 type scale (10 entries).
 3. **Spacing / radius / stroke / elevation scales** — 4px-base spacing (xs=4 → 3xl=48), 5-rung radius, 3 stroke widths (integer px). **Elevation is color-based, not shadow-based.**
 4. **Interaction state system** — M3 deterministic state-layer model: hover 8%, focus 12% + 2px ring, pressed 12%, dragged 16%, disabled 38%/12%.
 5. **Per-Control theme entries** — 35 Control classes × all states populated.
-6. **Type variations** — 13 in v1 (6 button, 5 label, 1 RichTextLabel, 2 panel).
+6. **Type variations** — 15 in v1 (6 button, 6 label, 1 RichTextLabel, 2 panel).
 
 **Major components:**
 
-1. `neocade_theme.tres` — single artifact; references fonts and icons by `uid://`.
-2. `addons/neocade_theme/fonts/` — Inter VF + Inter Italic VF + Noto Sans VF + `OFL.txt`.
-3. `addons/neocade_theme/icons/` — bespoke SVGs + `.import` sidecars.
-4. `res://main.tscn` — 9-section showcase + top bar with theme toggle.
-5. `README.md` + `LICENSE.md` + `CHANGELOG.md` + `addons/neocade_theme/VERSION` + `.github/workflows/release.yml` — GitHub Releases distribution (no Asset Library in v1).
+1. `addons/neocade_theme/neocade_theme.gd` — single concrete `@tool class_name NeoCadeTheme extends Theme`, with export-driven regeneration and formula/binding implementation.
+2. `addons/neocade_theme/{pulse,slate,bubble,daybreak,burst}_neocade_theme.tres` — five data-only direction artifacts; reference fonts and icons by `uid://`.
+3. `addons/neocade_theme/fonts/` — Inter Variable Roman + `OFL.txt`.
+4. `addons/neocade_theme/icons/` — bespoke SVGs + `.import` sidecars.
+5. `res://main.tscn` — 9-section showcase + direction/default theme picker, raised toggle, and platform selector.
+6. `README.md` + `LICENSE.md` + `CHANGELOG.md` + `addons/neocade_theme/VERSION` + `.github/workflows/release.yml` — GitHub Releases distribution (no Asset Library in v1).
 
 ### Critical Pitfalls
 
@@ -112,7 +113,7 @@ The five non-obvious pitfalls every phase plan must internalise (full detail in 
 4. **Dark + neon = synthwave by default** — both prior inputs drift this way. **Prevention:** explicit warm-hue mandate (orange/yellow/red), >60% lightness on accents, no grid/scanline/chrome typography, side-by-side mockup comparison against real-arcade reference photos at the gate.
 5. **GL Compatibility renderer divergence** — theme authored on Forward+ looks subtly different on Compatibility (shadow over-darkening, AA feathering, no 2D MSAA). **Prevention:** authoring AND QA must run on Compatibility; dual-renderer screenshot pass mandatory before v1 ships.
 
-Other high-severity flagged: StyleBoxFlat shadow alpha bug (over-renders ~2× on GL Compat) → **policy: no drop shadows in v1**; SVG icons rasterise at import (Scale=2.0 + Linear With Mipmaps explicit per icon); 4.6 inspector edit crash (#115500); OFL "reserved name" footgun (never rename Inter/Noto binaries); `addons/` font path break (use `uid://`); project theme leaks into editor (README must document); color-blind safety (state combos through deuteranopia/protanopia/tritanopia simulators).
+Other high-severity flagged: StyleBoxFlat shadow alpha bug (over-renders ~2× on GL Compat) → **policy: no drop shadows in v1**; SVG icons rasterise at import (Scale=2.0 + Linear With Mipmaps explicit per icon); 4.6 inspector edit crash (#115500); OFL "reserved name" footgun (never rename the bundled Inter binary); `addons/` font path break (use `uid://`); project theme leaks into editor (README must document); color-blind safety (state combos through deuteranopia/protanopia/tritanopia simulators).
 
 ---
 
@@ -170,20 +171,20 @@ History: Outfit added (Conflict 1 revision) → reversed to Option B (Inter+Noto
 
 ## Open User Decisions
 
-### UD-1: MCP server swap (decision before Phase 10 QA tooling baseline sub-spike)
-Currently wired Coding-Solo `godot-mcp` lacks screenshot capture; PROJECT.md mandates screenshot-driven QA. **Recommend: swap to GoPeak Godot MCP** (`npx gopeak`) before QA phases begin. Alternates: GDAI MCP, Godot MCP Pro.
+### UD-1: MCP server swap (resolved/deferred by Phase 10)
+Originally, Coding-Solo `godot-mcp` lacked screenshot capture and PROJECT.md expected screenshot-driven QA. Phase 10 closed autonomous QA with tooling evidence plus documented screenshot/input UAT deferral; no MCP swap is required before the prepared release workflow, unless the user chooses to resume manual screenshot/device QA.
 
 ### UD-2: CJK font bundling
 Default v1 ships without CJK (~30 MB+ doubles addon size); README documents override path. **Recommend: confirm default — defer CJK to v2 or optional bundle.** Decision must land before Phase 4 commits the font folder structure.
 
-### UD-3: Stylebox authoring tooling — UPDATED post-CROSS-PLATFORM
-PROJECT.md mandates Godot's Theme Editor as the authoring path. CROSS-PLATFORM introduced a `@tool` script generator (`addons/neocade_theme/_dev/generate_themes.gd`) producing both desktop and mobile `.tres` from a single TokenSet block. **Reconciled recommendation: the `@tool` generator is the PRIMARY authoring path for tokenized properties (colors, font sizes, paddings, radii) — TokenSet is the single source of truth. Godot's Theme Editor is the VERIFICATION surface (open the generated `.tres` to visually confirm) and the targeted-edit path for non-tokenized one-off properties.** Both paths are committed to v1; Phase 4 establishes the workflow.
+### UD-3: Stylebox authoring tooling — SUPERSEDED by 2026-05-06e/f architecture
+The TokenSet generator / `_dev/generate_themes.gd` recommendation was superseded before implementation. Current v1 architecture is one concrete `addons/neocade_theme/neocade_theme.gd` class plus five data-only direction `.tres` files at the addon root; no `_dev/` folder, no `themes/` folder, no static desktop/mobile sibling resources. Shared behavior is generated dynamically by `NeoCadeTheme._regenerate_theme()` and per-direction personality is persisted in data resources.
 
 ### UD-4: Inter Italic — v1 vs v1.x — RE-RESOLVED post-FONT-REVIEW
 **Resolution: defer Inter Italic to v1.x.** Original Conflict-1-revision rationale (swap Italic out, Outfit in) no longer applies — Outfit is dropped per consistency principle. Inter Italic deferral now driven purely by bundle-size economy (~+0.85 MB for a feature body text uses sparingly). Synthetic italic transform carries v1. User can override at Phase 3 typography mockup gate.
 
-### UD-5 (NEW): Real-device cross-platform testing matrix
-CROSS-PLATFORM requires per-target export validation. Real-device coverage needs: 3 Android devices (low/mid/high-end); iOS testing requires Mac + paid Apple Developer Program. **User hardware/account status is unknown.** Phase 10 acceptance criteria must be marked with `(if-real-device-available)` qualifier where applicable. **Decision needed before Phase 10 plan is authored:** confirm available test surfaces, identify gaps, decide whether v1 ships with "verified on Windows/macOS/Linux/Web; mobile-targets pending real-device QA in v1.0.1" or with full mobile coverage.
+### UD-5 (NEW): Real-device cross-platform testing matrix — resolved for autonomous closeout
+CROSS-PLATFORM requires per-target export validation. Real-device coverage needs Android hardware; iOS testing requires Mac + paid Apple Developer Program. Phase 10 closed with an autonomous QA evidence package and explicit manual/device UAT deferral per user instruction. The release can proceed when the user is comfortable with that deferral, or the deferred checks can be resumed before milestone archive.
 
 ### UD-6 (NEW): AccessKit / VoiceOver / TalkBack screen-reader integration
 Godot 4.6 has partial screen-reader integration via AccessKit. CROSS-PLATFORM flags full integration as v1.x or v2 work. **Recommend confirm:** v1 sets `accessibility_name` on every showcase Control (cheap win) but defers deeper screen-reader QA to v1.x. If user wants screen-reader QA in v1, Phase 10 needs additional acceptance criteria + estimated +4-8 hours.
@@ -217,12 +218,12 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 - Phase 2: Source-Dive Spike — LDtk source code UI mining
 - Phase 3: Visual Direction Mockup Phase (3-step approval gate, mockups must include desktop+mobile representations) **+ MCP/QA tooling baseline sub-spike (UD-1 GoPeak swap) + real-arcade reference photo collection**
 - **[GATE: User mockup approval. No `.tres` edits before this passes.]**
-- Phase 4: Foundation — Tokens, Fonts, Icons, Scaffold + **`@tool` theme generator script** (`addons/neocade_theme/_dev/generate_themes.gd`) producing BOTH desktop and mobile `.tres` from shared TokenSet
+- Phase 4: Foundation — Tokens, Fonts, Icons, Scaffold + single concrete **`NeoCadeTheme` class** with export-driven regeneration; five data-only direction `.tres` resources at the addon root
 - Phase 5: Core Controls — Buttons, Inputs, Labels, Panels (desktop authoring)
 - Phase 6: Lists, Layout, Range — Tree, ItemList, Tabs, Containers, Sliders (desktop authoring)
 - Phase 7: Dialogs, Popups, Advanced — Window, Popups, MenuBar, ColorPicker, Graph (desktop authoring)
-- **Phase 8 (NEW): Mobile Variant Authoring** — Mobile token overrides (tap targets 48px / body 16px / spacing +50%); generator outputs `neocade_mobile_theme.tres`; tap-target audit script; mobile showcase variant or toggle. Estimated 12-18 hours. Interleaved with phases 5-7 in practice (token overrides accrue as desktop entries land).
-- Phase 9: Showcase + Token Gallery + Theme Toggle — `res://main.tscn`; desktop+mobile theme toggle in addition to NeoCade↔Godot toggle.
+- **Phase 8 (NEW): Mobile Variant Authoring** — Mobile token overrides (tap targets 48px / body 16px / spacing +50%) via `platform=MOBILE` / `platform=AUTO`; tap-target audit script; mobile showcase platform selector. Estimated 12-18 hours. Interleaved with phases 5-7 in practice (mobile constants accrue as desktop entries land).
+- Phase 9: Showcase + Token Gallery + Theme Toggle — `res://main.tscn`; direction/default theme picker, raised toggle, and platform selector.
 - **Phase 10 (NEW/EXPANDED): QA + Cross-Platform Export Validation** — Dual-renderer screenshot pass (Forward+ vs GL Compat); per-target export builds (Windows/macOS/Linux/iOS/Android/Web) with screenshot decks; CI workflow for desktop + Web targets; manual Android+iOS validation; accessibility QA (WCAG, focus stylebox audit, CVD simulation); fresh-install dry-run. Estimated 8-12 hours plus device time.
 - Phase 11: Distribution — GitHub Actions release workflow (modeled on Shilo/PentaTile release.yml); auto-version-bump from `addons/neocade_theme/VERSION`; CI gates (headless import + showcase open); commit/tag/push; addon zip via `git archive`; Godot Web export of showcase scene; GitHub Release publishes both zips as assets; **web build auto-deployed to GitHub Pages for instant browser-playable showcase** (`https://<owner>.github.io/<repo>/`). NO Asset Library in v1.
 - **Optional buffer:** Cross-Platform Hardening Spike (4-8 hours) inserted before Phase 11 if real-device regressions surface.
@@ -248,13 +249,13 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 
 **[GATE: User mockup approval. No `.tres` edits before this passes.]**
 
-### Phase 4: Foundation — Tokens, Fonts, Icons, Scaffold + `@tool` Generator
-**Rationale:** Token system blocks every stylebox; fonts block per-Control text styling; icons block buttons/Tree/TabBar/ColorPicker/FileDialog/PopupMenu/ScrollBar. Per CROSS-PLATFORM, both desktop and mobile `.tres` are generated from a single `TokenSet` block via a `@tool` script — Foundation phase establishes that mechanism so subsequent phases populate one source of truth.
-**Delivers:** `addons/neocade_theme/fonts/` (Inter Variable + Outfit Variable + Noto Sans Variable + `OFL.txt`; per Conflict 1 revision, no Inter Italic in v1); `addons/neocade_theme/icons/` (~30 SVGs at 32×32, Scale=2.0 + Linear With Mipmaps); `addons/neocade_theme/_dev/generate_themes.gd` `@tool` script with `TokenSet` constants block; first-run output of empty-but-valid `neocade_theme.tres` and `neocade_mobile_theme.tres` scaffolds; `DESIGN_TOKENS.md` finalized.
+### Phase 4: Foundation — Tokens, Fonts, Icons, Scaffold + `NeoCadeTheme`
+**Rationale:** Token system blocks every stylebox; fonts block per-Control text styling; icons block buttons/Tree/TabBar/ColorPicker/FileDialog/PopupMenu/ScrollBar. Final architecture uses one concrete `NeoCadeTheme` class with 9 exported properties and `_regenerate_theme()` formulas; direction `.tres` files are data resources, and mobile is selected by the `platform` export rather than by a separate mobile resource.
+**Delivers:** `addons/neocade_theme/fonts/` (Inter Variable Roman + `OFL.txt`; no Outfit, Noto Sans, JetBrains Mono, or Inter Italic bundled in v1); `addons/neocade_theme/icons/` (~30 SVGs at 32×32, Scale=2.0 + Linear With Mipmaps); `addons/neocade_theme/neocade_theme.gd` with formula/binding implementation; five valid direction `.tres` scaffolds at the addon root; `DESIGN_TOKENS.md` finalized.
 **Implements:** Architecture layers 1-3 + token-sharing strategy.
 
 ### Phase 5: Core Controls — Buttons, Inputs, Labels, Panels (desktop authoring)
-**Rationale:** Button is keystone; Labels carry typography system; Panels carry elevation system. Desktop entries authored first; mobile overrides accrue in TokenSet.mobile alongside.
+**Rationale:** Button is keystone; Labels carry typography system; Panels carry elevation system. Desktop entries authored first; mobile constants accrue through the same `NeoCadeTheme` regeneration path.
 **Delivers:** Button + 6 button variations × 5 states; LineEdit + TextEdit + CodeEdit + SpinBox; Label + RichTextLabel + 5 label variations; Panel + PanelContainer + 2 panel variations; Checkbox/CheckButton/OptionButton/MenuButton/ColorPickerButton/LinkButton; bespoke button-state icons.
 **Avoids:** Pitfalls 1.1 (focus overlay), 1.2 (font inheritance fail), 1.4 (shadow alpha bug — disabled).
 
@@ -268,15 +269,15 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 **Avoids:** Pitfall 1.7 (popup theming); 4.3 (tooltip readability).
 
 ### Phase 8 (NEW post-CROSS-PLATFORM): Mobile Variant Authoring
-**Rationale:** PROJECT.md elevates mobile variant to v1 must-have. CROSS-PLATFORM specifies concrete mobile token deltas (button height 48px / body 16px / spacing +50% on space.4+; corner radii identical for brand identity). The `@tool` generator authored in Phase 4 produces the mobile `.tres` from a TokenSet.mobile override block — this phase fills that block, validates against tap-target audit, and confirms parity.
-**Delivers:** `addons/neocade_theme/_dev/generate_themes.gd` filled with TokenSet.mobile overrides; generated `neocade_mobile_theme.tres` committed; `MOBILE-DESIGN-SPEC.md` documenting deltas vs desktop; tap-target audit script (every interactive Control ≥48px in mobile theme); showcase variant toggle (NeoCade desktop ↔ NeoCade mobile ↔ Godot default) — three-way toggle.
-**Interleaving note:** In practice, mobile token overrides accrue in parallel with Phases 5-7 desktop authoring (each desktop entry surfaces its mobile delta). Phase 8 is the dedicated mobile-completeness checkpoint and audit.
-**Avoids:** Token drift between desktop and mobile (structurally impossible with `@tool` generator); manual sync errors.
+**Rationale:** PROJECT.md elevates mobile variant to v1 must-have. CROSS-PLATFORM specifies concrete mobile token deltas (button height 48px / body 16px / spacing +50% on space.4+; corner radii identical for brand identity). The single `NeoCadeTheme` class selects mobile values via `platform=MOBILE` or `platform=AUTO`; this phase fills and audits that branch.
+**Delivers:** Mobile branch constants in `addons/neocade_theme/neocade_theme.gd`; `MOBILE-DESIGN-SPEC.md` documenting deltas vs desktop; tap-target audit script (every interactive Control >=48px in mobile theme); showcase platform selector (DESKTOP / MOBILE / AUTO).
+**Interleaving note:** In practice, mobile constants accrue in parallel with Phases 5-7 desktop authoring (each desktop entry surfaces its mobile delta). Phase 8 is the dedicated mobile-completeness checkpoint and audit.
+**Avoids:** Token drift between desktop and mobile by keeping both branches in one regeneration path; manual sync errors.
 **Estimated:** 12-18 hours.
 
 ### Phase 9: Showcase + Token Gallery + Theme Toggle
-**Rationale:** PROJECT.md mandates showcase + prominent toggle. Showcase doubles as QA forcing function. With mobile variant in v1, the showcase scene also demonstrates the desktop ↔ mobile theme switch.
-**Delivers:** `res://main.tscn` with 9 sections (Buttons, Text Inputs, Numbers/Range, Selection/Lists, Containers/Layout, Dialogs/Popups, Advanced/Graph, Token Gallery, Coverage 35/35); three-way theme toggle button (NeoCade desktop ↔ NeoCade mobile ↔ Godot default) with inline overrides (Pitfall 10.3); BBCode demo; `accessibility_name` on every Control (Pitfall 2.5); realistic sample content per Control (Pitfall 10.1).
+**Rationale:** PROJECT.md mandates showcase + prominent toggle. Showcase doubles as QA forcing function. With mobile variant in v1, the showcase scene also demonstrates platform switching on the active duplicated theme.
+**Delivers:** `res://main.tscn` with 9 sections (Buttons, Text Inputs, Numbers/Range, Selection/Lists, Containers/Layout, Dialogs/Popups, Advanced/Graph, Token Gallery, Coverage 37/37); direction/default theme picker, raised toggle, and platform selector with inline overrides (Pitfall 10.3); BBCode demo; `accessibility_name` on every Control (Pitfall 2.5); realistic sample content per Control (Pitfall 10.1).
 
 ### Phase 10 (EXPANDED post-CROSS-PLATFORM): QA + Cross-Platform Export Validation
 **Rationale:** PITFALLS flags multiple QA gates pre-ship. CROSS-PLATFORM elevates per-target export validation to v1 must-have. This phase combines visual QA, accessibility QA, dual-renderer screenshot pass, and per-target export validation.
@@ -300,7 +301,7 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 
 ### Phase Ordering Rationale (post-CROSS-PLATFORM)
 - Research/spike (1-3) precedes implementation (4-9) per mandatory mockup gate.
-- Foundation (4) establishes the `@tool` generator and TokenSet structure — every later phase populates the one source of truth.
+- Foundation (4) establishes the `NeoCadeTheme` class, exports, binding table, font/icon assets, and direction resources — every later phase populates the one regeneration path.
 - Desktop core authoring (5-7) → Mobile variant authoring/audit (8) → Showcase (9): mobile overrides depend on desktop entries existing.
 - QA + Cross-Platform Validation (10) requires both themes complete and the showcase scene ready.
 - Distribution (11) is last — GitHub Actions release pipeline (CI checks → version bump → addon zip + web export → GitHub Release publish). No Asset Library in v1.
@@ -324,7 +325,7 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 
 | Area | Confidence | Notes |
 |---|---|---|
-| Stack | HIGH | Godot 4.6 Theme/Font/StyleBox API verified via WebFetch (Context7 had upstream MCP issues during research); Inter v4 / Noto Sans / OFL terms verified. MEDIUM on Asset Library policy nuance; LOW on hands-on Coding-Solo `godot-mcp` vs GoPeak comparison. |
+| Stack | HIGH | Godot 4.6 Theme/Font/StyleBox API verified via WebFetch (Context7 had upstream MCP issues during research); Inter v4 and OFL terms verified for bundled v1 use; Noto Sans remains an optional consumer fallback reference. MEDIUM on Asset Library policy nuance; LOW on hands-on Coding-Solo `godot-mcp` vs GoPeak comparison. |
 | Features | HIGH | Coverage matrix and per-Control theme entry enumeration cross-checked against official Godot 4.6 docs; godot-minimal-theme as completeness benchmark. MEDIUM on token taxonomy (synthesized from M3 + prototype critique). |
 | Architecture | HIGH | M3 type scale and state-layer opacities pulled from upstream `material-web` SCSS; LDtk palette from real `app.scss` with file path; godot-minimal-theme from upstream README; WCAG via W3C luminance formula. MEDIUM on real-arcade visual interpretation (D&B brand color is single-source). |
 | Pitfalls | HIGH | Most items backed by Godot issue numbers/PRs. MEDIUM on visual identity drift sections (7.x — synthesized from multiple aesthetic-wiki sources). |

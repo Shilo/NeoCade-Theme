@@ -18,27 +18,23 @@ If everything else fails, this single deliverable must work: a polished, feature
 
 ### Validated
 
-(None yet — ship to validate)
+- **Exhaustive research & spiking is a first-class deliverable**: completed through Phase 3.x research, Phase 4-8 implementation research, and Phase 10 QA evidence artifacts.
+- **Feature-complete Control coverage**: implemented across Phases 5-7 and surfaced in the Phase 9 showcase; Phase 10 coverage evidence package is committed.
+- **Dark theme v1**: five approved dark direction resources ship for v1; light mode remains v2 scope.
+- **Universal usage**: addon is designed for editor and runtime usage through pure Theme resources; Phase 10 fresh-install and documentation evidence are committed.
+- **HD resolution**: theme assets are HD/vector/font-based, not pixel-art UI.
+- **Mobile-aware theme behavior**: implemented as `@export platform` on the single `NeoCadeTheme` class and documented in `MOBILE-DESIGN-SPEC.md`.
+- **Bundled fonts**: Inter Variable Roman is the only bundled font; opt-in fallback/mono/italic patterns are documented.
+- **Strict design system documentation**: `DESIGN_TOKENS.md` and `MOBILE-DESIGN-SPEC.md` are committed.
+- **Mockup approval gate**: Phase 3.4 closed before Phase 4 implementation began; Pulse is the recommended starter and all five directions ship.
+- **Theme editor authoring**: shared behavior lives in `neocade_theme.gd`; per-direction resources persist their export values and intentional overrides as `.tres` files.
+- **Type variations**: the live `TYPE_VARIATIONS` registry contains 15 production variations and is documented.
+- **Showcase scene + theme toggles**: `main.tscn` and `scripts/showcase.gd` implement the nine-section showcase, Godot-default comparison, direction picker, raised toggle, and platform selector.
+- **MCP/QA and accessibility evidence**: autonomous QA evidence is committed for tooling, coverage, contrast, exports, and fresh-install dry-run. Manual screenshot/device/screen-reader UAT remains deferred by user instruction.
 
 ### Active
 
-- [ ] **Exhaustive research & spiking is a first-class deliverable**: produce committed, dated, written research artifacts that exhaustively investigate every domain area (Godot Theme API, Control coverage, font/icon strategy, palette/typography options, accessibility math, LDtk patterns, godot-minimal-theme dissection, Material 3, real arcade visual language, identity-drift risks, distribution). Research is **mandated to challenge** the user's existing NeoCade-Research-Report.md, the NeoCade-Theme-Prototype.png, AND any pending Key Decisions in this document — and may propose overturning them with evidence. Multiple dedicated research/spike phases in the roadmap (not just one upfront pass). Findings MUST be written down before they influence design or implementation; verbal-only conclusions don't count.
-- [ ] **Feature-complete Control coverage**: every built-in Godot Control has theme styling — match godot-minimal-theme's coverage bar
-- [ ] **Dark theme v1**: single polished dark color mode (light mode deferred to v2)
-- [ ] **Universal usage**: theme works correctly in both Godot Editor and game runtime
-- [ ] **HD resolution**: theme is high-resolution and non-pixelated (sharp at HD/4K), regardless of VirtuCade's pixel-art game content
-- [ ] **Cross-platform export support — all 6 Godot export targets**: Windows, macOS, Linux, iOS, Android, Web/Browser. Theme + every bundled asset (fonts, icons, .tres) must load and render correctly on each target. Web export is the highest-risk target (font loading, .tres path resolution, GL Compatibility quirks); iOS App Store requires font license compliance (OFL/Apache-only); Android density buckets must be tested. v1 verification includes a screenshot pass on every target before release.
-- [ ] **Mobile-aware theme behavior (v1 must-have, NOT a separate `.tres` file)**: mobile is an `@export platform=MOBILE` toggle on the single concrete `NeoCadeTheme` class — NOT a separate `neocade_mobile_theme.tres` file. Setting `platform=MOBILE` (or `platform=AUTO` on a mobile device) triggers regeneration with mobile sizing: minimum 44pt (iOS HIG) / 48dp (Android Material) tap targets, larger default text sizes (16px body vs 14px desktop), denser-content guards relaxed, simplified typography scale, mobile-appropriate spacing (+50% on space.4+). Visual identity (palette, typography, corner radii) stays unified across all platforms because all variations come from the same class + data-resource contract. References iOS Human Interface Guidelines + Material 3 mobile guidance loosely.
-- [ ] **Bundled fonts**: Inter Variable Roman is the only bundled font in v1 (OFL 1.1, ~810 KB). Non-Latin scripts rely on `Font.allow_system_fallback = true`, with README patterns for consumer-supplied script-specific Noto Sans variants. Inter Italic, Outfit, Noto Sans, and JetBrains Mono are deferred/consumer-side.
-- [ ] **Strict design system documentation**: written specs for color tokens, typography scale, spacing scale, corner radii, stroke widths, elevation/shadow, motion (if any) — committed before implementation
-- [ ] **Mockup approval gate**: design variation mockups produced and explicitly approved by user before any styling is committed to the .tres
-- [ ] **Theme editor authoring**: shared behavior is generated by `addons/neocade_theme/neocade_theme.gd`; per-direction personality is authored in Godot's Theme Editor and persisted to `res://addons/neocade_theme/{name}_neocade_theme.tres`
-- [ ] **Type variations**: use Godot theme type variations to provide semantic variants (e.g., primary/secondary/danger buttons, heading levels) where appropriate
-- [ ] **Showcase scene**: `res://main.tscn` displays every Godot Control (mirroring the godot-demo-projects control_gallery scope) for visual QA
-- [ ] **Theme toggle button**: showcase scene has a prominent floating toggle to switch between NeoCade theme and Godot default theme — bigger than other controls so its purpose is obvious
-- [ ] **MCP-driven QA**: heavy use of Godot MCP for editor automation + screenshot capture; subagents review implementation against design spec
-- [ ] **UX/UI styleguide adherence**: follow Material Design 3 loosely as a styleguide reference for spacing, contrast, accessibility (WCAG 2.1 AA minimum for text), and interaction states
-- [ ] **Accessibility**: meet or exceed WCAG 2.1 AA contrast for text and interactive elements; focus indicators visible on all focusable controls; no information conveyed by color alone
+- [ ] **Manual release/UAT before archive**: confirm GitHub Pages/source and release workflow permissions, manually trigger the release workflow when ready, and decide which deferred screenshot/device checks must be performed before `$gsd-complete-milestone`.
 
 ### Out of Scope (v1)
 
@@ -209,20 +205,20 @@ Concretely, "exhaustive" for this project includes (non-exhaustive list):
 | Dark color mode only for v1 | Matches arcade ambiance + Godot editor default; halves the design/test surface vs shipping light too; light deferred to v2. User explicitly delegated this call to my judgement on follow-up. | ✓ Good |
 | ~~Inter + Noto Sans as primary font stack~~ | Superseded by UD-4 Option D / FONT-REVIEW.md: v1 ships Inter Variable Roman only; Noto Sans is documented as consumer-side opt-in for script-specific harmony. | ⊘ Superseded |
 | ~~Single Theme resource at `res://addons/neocade_theme/neocade_theme.tres`~~ | Superseded 2026-05-06d/e/f by flat addon layout + single concrete class + 5 data `.tres` files at addon root. The existing scaffold `neocade_theme.tres` is deleted in Phase 4. | ⊘ Superseded |
-| godot-minimal-theme is the feature-completeness benchmark, NOT visual reference | It's the gold standard for "every Control styled" — visuals must be original NeoCade | — Pending |
-| LDtk is the quality/polish benchmark, NOT visual copy | Polished feel only — we build a distinct identity | — Pending |
-| Material Design 3 is a loose styleguide, NOT visual copy | Reference for spacing/contrast/accessibility patterns; visual language is arcade, not Material | — Pending |
-| Showcase scene mirrors godot-demo-projects/gui/control_gallery scope | Established reference for "every Control"; ensures coverage | — Pending |
-| Theme toggle in showcase: NeoCade ↔ Godot default (NOT light/dark) | Communicates "this is what NeoCade adds" to users | — Pending |
-| Mockup approval gate before implementation | User explicitly required this — must approve design variations before any .tres styling is committed | — Pending |
+| godot-minimal-theme is the feature-completeness benchmark, NOT visual reference | It remained the coverage bar through Phase 10; visuals stayed original NeoCade. | ✓ Good |
+| LDtk is the quality/polish benchmark, NOT visual copy | Phase 2 mined implementation patterns; NeoCade did not copy LDtk's visual identity. | ✓ Good |
+| Material Design 3 is a loose styleguide, NOT visual copy | Phase 3.1 produced MD3/MD3 Expressive research; implementation uses the accessibility/state/spacing vocabulary without becoming a Material clone. | ✓ Good |
+| Showcase scene mirrors godot-demo-projects/gui/control_gallery scope | Phase 9 built the nine-section showcase covering the 37-row scorecard. | ✓ Good |
+| Theme toggle in showcase: NeoCade ↔ Godot default (NOT light/dark) | Phase 9 implemented Godot default comparison plus direction, raised, and platform controls. | ✓ Good |
+| Mockup approval gate before implementation | Phase 3.4 closed before Phase 4 styling implementation began. | ✓ Good |
 | Mobile-aware theme behavior elevated to v1 must-have | User constraint update: support mobile sizing in v1 with mobile-tuned scale, iOS HIG + Material 3 mobile guidance. ~~Originally framed as a separate `neocade_mobile_theme.tres` file~~ — **architecture revision 2026-05-04 changed this to a `@export platform=MOBILE` toggle; 2026-05-06e/f places that toggle on the single concrete `NeoCadeTheme` class (no separate file).** Alternate palettes remain v2. | ✓ Good |
 | Cross-platform export support — all 6 Godot targets in v1 | User constraint: Windows, macOS, Linux, iOS, Android, Web/Browser. Web is highest-risk (font loading, path resolution); iOS requires OFL/Apache-only licensing. Screenshot QA on every target before v1 ships. | ✓ Good |
-| Two `.tres` files share one underlying token system | Desktop and mobile themes derive from the same color/typography tokens; mobile overrides scales/touch-targets/density. Avoids visual identity drift between the two. | — Pending |
-| Subagent research/review at every major step | User explicitly required exhaustive subagent-driven research and review | — Pending |
-| MCP-driven QA (Godot MCP screenshots, Context7 docs) | User explicitly required heavy MCP usage | — Pending |
+| ~~Two `.tres` files share one underlying token system~~ | Superseded by the single-class/data-resource architecture: desktop/mobile are `platform` export modes on each direction `.tres`, not separate sibling `.tres` files. | ⊘ Superseded |
+| Subagent research/review at every major step | Cross-AI review and phase-specific verification were used throughout planning/execution where the GSD workflow required them. | ✓ Good |
+| MCP-driven QA (Godot MCP screenshots, Context7 docs) | Godot MCP smoke/testing supported implementation; final screenshot/device work is documented as deferred UAT. | ✓ Good |
 | Cyberpunk aesthetic explicitly rejected | User specified "Neo/Neon/Modern, not Cyberpunk"; arcade-friendly, not dystopian | ✓ Good |
 | Research report and prototype are inspirational refs only — NOT source of truth | User explicitly required research to challenge them. Specific critiques to enforce: theme is **NeoCade** (not VirtuCade); no synthwave/vaporwave/scanlines/glow; no pixel fonts; arcade warmth must come through stronger than the prototype shows. | ✓ Good |
-| Theme aesthetic anchor: "vibrant arcade hall by day", not "neon noir alley by night" | Concrete mental image to keep researchers/designers oriented. Bright, inviting, energetic — like walking into Round1 or Dave & Buster's, not Blade Runner. | — Pending |
+| Theme aesthetic anchor: "vibrant arcade hall by day", not "neon noir alley by night" | Superseded/refined by the locked flat MD3 / MD3 Expressive + extruded-flat identity after the Phase 3 redirect. | ⊘ Superseded |
 | Exhaustive research/spiking is a first-class deliverable | Research is mandated to challenge ALL prior inputs (the report, the prototype, and any Pending decision in this doc). The roadmap will include dedicated research/spike phases beyond the initial parallel pass. See Research Charter section. | ✓ Good |
 | Research can override `Pending` Key Decisions; cannot override user's hard constraints | Hard constraints (theme name, anti-cyberpunk, HD-only, full Control coverage, addon distribution path, mockup gate, Inter-only v1 font bundle) require explicit user reconsideration to change. Pending decisions are defeasible by evidence. | ✓ Good |
 | Dynamic `NeoCadeTheme` architecture feasibility — PASS (Phase 3.2 outcome, 2026-05-06; production simplified 2026-05-06e/f) | Strict feasibility gate (export-driven regeneration, subclass positive/negative controls, runtime saved-`.tres` application, serialization roundtrip, AUTO platform matrix) PASSED 6/6 in Godot 4.6.2 headless against representative Control subset. The durable production lesson is export-driven dynamic Theme regeneration + saved `.tres` use are feasible; the subclass contract itself was superseded by the single concrete class + data-only `.tres` model. Hybrid `@tool` static `.tres` generator retained as the fallback if full-matrix dynamic implementation reveals a blocker. Full 37-row scorecard coverage + icons + fonts + real-device validation remain Phase 4-10 obligations. Evidence: `.planning/research/GODOT-DYNAMIC-THEME-RESEARCH.md`, `.planning/spikes/dynamic-theme/VERIFY-RESULTS.md`, and the 2026-05-06e/f architecture decision. | ✓ Good |
@@ -250,4 +246,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-06f — `@export` set finalized at 9 properties (Core 4 + Shape 5); naming cleaned (`corner_radius`, `spacing`, `raised_strength`); `is_light` variable replaces `dark_theme` (dark default); Theme Editor primary for personality*
+*Last updated: 2026-05-08 — synchronized after Phase 11 autonomous closeout; active work reduced to manual release/UAT and milestone archive*

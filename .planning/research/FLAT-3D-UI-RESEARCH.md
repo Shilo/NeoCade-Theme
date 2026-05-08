@@ -236,7 +236,7 @@ Final handoff: Phase 3.4 mockups must show both flat and raised versions for eac
 
 | Date | Plan | Check | Result |
 |---|---|---|---|
-| 2026-05-05 | 03.1-01 | Skeleton created with source roles, source-access status labels, citation contract, hard filter, solid top shape plus offset darker duplicate rule, raised-toggle semantics, and reserved headings. | Pending command verification. |
+| 2026-05-05 | 03.1-01 | Skeleton created with source roles, source-access status labels, citation contract, hard filter, solid top shape plus offset darker duplicate rule, raised-toggle semantics, and reserved headings. | PASS via final 03.1 rerun audit. |
 | 2026-05-05 | 03.1-04 | User exemplars, broad survey rows, visual-capture notes, rejection rows, and pattern catalogue verified. | PASS |
 | 2026-05-05 | 03.1-05 | Recipe A/B decision, wrapper/two-layer recommendation, Control-family matrix, and escape-hatch notes verified. | PASS |
 | 2026-05-05 | 03.1-06 | Final cross-document audit checked Flat vs Raised matrix, visual-capture fields, hard-filter audit, adopt/reject/open decisions, and forbidden implementation surface status. | PASS |

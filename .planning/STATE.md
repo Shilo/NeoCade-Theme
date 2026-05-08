@@ -4,8 +4,8 @@ milestone: v1.0.0
 milestone_name: milestone
 status: autonomous_complete
 stopped_at: Phase 11 verification complete; UAT/manual device checks deferred per user instruction
-last_updated: "2026-05-07T23:59:00.000Z"
-last_activity: 2026-05-07 -- Phases 09-11 completed autonomously; release workflow prepared
+last_updated: "2026-05-08T00:00:00.000Z"
+last_activity: 2026-05-08 -- Planning docs reviewed for stale Phase 9-11 status after autonomous closeout
 progress:
   total_phases: 15
   completed_phases: 14
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-06)
 
 **Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships **5 approved data-only direction `.tres` files** (Pulse, Slate, Bubble, Daybreak, Burst) of type `NeoCadeTheme`, plus one concrete `addons/neocade_theme/neocade_theme.gd` class. Consumer toggles `raised` / `platform` / `base_color` / `accent_color` exports for flat/raised × desktop/mobile/AUTO variations — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect). **Dynamic-theme architecture** feasibility-validated 2026-05-06 (Phase 3.2 strict gate 6/6 PASS in Godot 4.6.2), then simplified 2026-05-06e/f: single concrete `@tool class_name NeoCadeTheme extends Theme`, 9 exports, luminance-derived `is_light`, no subclasses, no `_dev/`, no `themes/`, no root `.tres`, no `neocade_mobile_theme.tres`.
-**Current focus:** Milestone implementation complete through Phase 11. Manual screenshot/device/UAT checks are deferred and documented.
+**Current focus:** Milestone implementation complete through Phase 11. Remaining work is manual release/UAT: confirm GitHub repo settings, run the release workflow, and perform any deferred screenshot/device checks the user wants before milestone archive.
 
 ## Current Position
 
 Phase: 11
 Plan: Complete
-Next: Manual release/UAT when ready
+Next: Manual release/UAT when ready; then `$gsd-complete-milestone`
 Status: Autonomous chain complete — Phases 09, 10, and 11 verified with deferred UAT
-Last activity: 2026-05-07 -- Phase 11 verification complete
+Last activity: 2026-05-08 -- Planning docs refreshed after Phase 11 closeout
 
 Progress: [███████████████████░] 64/67 plans (96%; redirected Phase 3 historical partial remains preserved)
 
@@ -158,8 +158,8 @@ None yet.
 
 [Issues that affect future work]
 
-- **UD-5 (real-device cross-platform testing matrix):** User hardware/account status for Android devices + Mac + Apple Developer Program is unknown. Decision needed before Phase 10 plan is authored: confirm available test surfaces, identify gaps, decide whether v1 ships with full mobile coverage or with "verified on Windows/macOS/Linux/Web; mobile-targets pending real-device QA in v1.0.1."
-- **UD-1 (MCP server swap):** Current Coding-Solo `godot-mcp` lacks screenshot capture; QA phases require it. Recommended swap to GoPeak (`npx gopeak`) addressed in Phase 3 sub-spike but should be confirmed before Phase 3 starts.
+- **Release repo settings:** Before running `.github/workflows/release.yml`, confirm GitHub Pages source is "GitHub Actions", release workflow permissions can push commits/tags, and branch protection allows the actions bot release commit.
+- **Deferred manual QA:** Manual screenshot review, tab-walk capture, real Android/iOS device validation, macOS signing/notarization, clean-project visual proof, and live GitHub Pages COOP/COEP verification are documented as deferred UAT items from Phases 10-11.
 
 ## Deferred Items
 
@@ -177,8 +177,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-07T12:41:42.473Z
-Stopped at: Phase 8 verified complete; Phase 9 is next after `/clear`
+Last session: 2026-05-08T00:00:00.000Z
+Stopped at: Phase 11 verified complete; manual release/UAT is next, then `$gsd-complete-milestone`
 Resume file: 
 
 None
@@ -187,7 +187,7 @@ The first execution of Phase 3.4 Plan 02 (by Codex) was rejected by the user. Th
 
 **Track 1 — Palette correction (closed):** Phase 3.3 Revision Round 2/2 retroactively approved Codex's dark migration of Bubble (#241326 + #FFB3E6) and Daybreak (#0B2420 + #76F2D1). All five v1 directions are now dark, complying with PROJECT.md "Out of Scope: Light color mode (v1)". Direction identity, naming, personality intent, and DNA inputs preserved. See `.planning/research/THEME-DIRECTIONS.md` Verification Log entry 2026-05-06b.
 
-**Track 2 — Shape-language correction (open, ready for re-execution):** New corrective addendum D-28/D-29/D-30 binds Plan 02 re-execution. The new authoritative spec is `.planning/mockups/3.4/image-prompts/direction-shape-language-spec.md` (replaces the deprecated `fixed-control-order-spec.md`). Each direction must commit specific values on ten shape-language axes (corner radius, button anatomy, chip/tab shape, brand mark, density, focus ring, type weights, surface ramp depth, state-layer behavior, raised offset depth) in addition to color tokens. Mockups must pass a greyscale sufficiency test (D-30): each direction must remain identifiable in greyscale by shape language alone.
+**Track 2 — Shape-language correction (closed, 2026-05-06):** Corrective addendum D-28/D-29/D-30 bound the Phase 3.4 Plan 02 re-execution. The authoritative spec was `.planning/mockups/3.4/image-prompts/direction-shape-language-spec.md` (replacing the deprecated `fixed-control-order-spec.md`). Phase 3.4 later closed with Pulse approved as the recommended starter and `DESIGN_TOKENS.md` finalized.
 
 **Track 3 — Subclass architecture refinement to `@abstract` (closed, 2026-05-06c):** D-31 rewritten. `NeoCadeTheme` is `@tool @abstract class_name NeoCadeTheme extends Theme` per [Godot 4.6 `@abstract` annotation](https://docs.godotengine.org/en/4.6/classes/class_%40gdscript.html#class-gdscript-annotation-abstract); cannot be instantiated directly. All 5 approved directions are concrete subclasses with real `_init()` bake-in (no empty alias). The Phase 3.4 user pick is reframed as the "recommended starter direction" (no longer "the base direction whose defaults are baked into NeoCadeTheme"). Architectural cleanup; does not affect Plan 02 mockup execution.
 
@@ -197,7 +197,7 @@ The first execution of Phase 3.4 Plan 02 (by Codex) was rejected by the user. Th
 
 **Re-execution executor:** Claude Code, per user direction 2026-05-06b ("i will use Claude Code from here as its clearly superior to UI design").
 
-**Disposition of first-execution outputs:** 15 PNGs in `.planning/mockups/3.4/concepts/` deleted; gallery shells (`concept-gallery.html`, `finalist-gallery.html`, `render.js`, `data/directions.json`, `wcag-palette-audit.md`) kept; the artboard CSS in `src/neocade-mockups.css` will be rewritten by Claude Code during re-execution (the hard-coded `--radius: 12px` artboard rule is the bug locus). The deprecated `fixed-control-order-spec.md` is preserved in-place with a deprecation header for audit trail.
+**Disposition of first-execution outputs:** 15 rejected PNGs in `.planning/mockups/3.4/concepts/` were deleted; gallery shells (`concept-gallery.html`, `finalist-gallery.html`, `render.js`, `data/directions.json`, `wcag-palette-audit.md`) were kept; the artboard CSS in `src/neocade-mockups.css` was rewritten during Phase 3.4 re-execution to support per-direction shape language. The deprecated `fixed-control-order-spec.md` remains preserved with a deprecation header for audit trail.
 
 ## Phase 3 → 3.1/3.2 Redirect Notes (2026-05-04)
 
