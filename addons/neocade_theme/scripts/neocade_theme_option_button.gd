@@ -3,6 +3,7 @@ class_name NeoCadeThemeOptionButton extends OptionButton
 
 const DEFAULT_THEME_DIRECTORY := "res://addons/neocade_theme"
 const NO_THEME_LABEL := "None"
+const SELECTED_PROPERTY := &"selected"
 const THEME_FILE_EXTENSION := ".tres"
 const THEME_NAME_SUFFIX := "_neocade_theme"
 
@@ -23,6 +24,14 @@ const THEME_NAME_SUFFIX := "_neocade_theme"
 
 var _theme_paths: PackedStringArray = PackedStringArray()
 var _is_ready := false
+var _selected_apply_queued := false
+
+
+func _set(property: StringName, _value: Variant) -> bool:
+	if property == SELECTED_PROPERTY:
+		_queue_selected_apply()
+
+	return false
 
 
 func _ready() -> void:
@@ -84,6 +93,9 @@ func _apply_theme(index: int) -> void:
 		return
 
 	var theme_path := _theme_paths[index]
+	if _target_has_theme_path(target, theme_path):
+		return
+
 	if theme_path.is_empty():
 		target.theme = null
 		return
@@ -163,6 +175,16 @@ func _index_for_theme_path(theme_path: String) -> int:
 	return -1
 
 
+func _target_has_theme_path(target: Control, theme_path: String) -> bool:
+	if theme_path.is_empty():
+		return target.theme == null
+
+	if target.theme == null:
+		return false
+
+	return target.theme.resource_path == theme_path
+
+
 func _theme_target() -> Control:
 	if theme_target_path != NodePath():
 		var explicit_target := get_node_or_null(theme_target_path)
@@ -192,3 +214,16 @@ func _queue_refresh() -> void:
 		return
 
 	call_deferred("refresh_theme_list")
+
+
+func _queue_selected_apply() -> void:
+	if not _is_ready or not is_inside_tree() or _selected_apply_queued:
+		return
+
+	_selected_apply_queued = true
+	call_deferred("_apply_selected_change")
+
+
+func _apply_selected_change() -> void:
+	_selected_apply_queued = false
+	_apply_theme(selected)

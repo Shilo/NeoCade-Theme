@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://beivemw6fcnld"]
 
-[ext_resource type="Theme" path="res://addons/neocade_theme/pulse_neocade_theme.tres" id="1_pulse_theme"]
+[ext_resource type="Theme" path="res://addons/neocade_theme/burst_neocade_theme.tres" id="1_lisp0"]
 [ext_resource type="Script" uid="uid://dky0m3dm07i6g" path="res://addons/neocade_theme/scripts/neocade_theme_option_button.gd" id="2_theme_option_button"]
 [ext_resource type="Script" uid="uid://dxu534volcw5j" path="res://showcase/showcase.gd" id="3_showcase"]
 
@@ -11,7 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_pulse_theme")
+theme = ExtResource("1_lisp0")
 script = ExtResource("3_showcase")
 
 [node name="RootMargin" type="MarginContainer" parent="." unique_id=2104122416]
@@ -64,7 +64,6 @@ custom_minimum_size = Vector2(190, 44)
 layout_mode = 2
 tooltip_text = "Theme picker"
 accessibility_name = "Theme picker"
-selected = -1
 item_count = 6
 popup/item_0/text = "None"
 popup/item_0/id = 0
@@ -1266,10 +1265,10 @@ filters = PackedStringArray("*.tres ; Godot Theme resource", "*.json ; Token sna
 accessibility_name = "Popup panel"
 
 [node name="PopupMargin" type="MarginContainer" parent="PopupPanel" unique_id=1756477724]
-offset_left = 26.0
-offset_top = 18.0
-offset_right = 182.0
-offset_bottom = 132.0
+offset_left = 30.0
+offset_top = 21.0
+offset_right = 262.0
+offset_bottom = 969.0
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
@@ -1304,14 +1303,18 @@ item_3/text = "Export preset"
 item_3/id = 3
 
 [node name="Window" type="Window" parent="." unique_id=168238927]
-visible = true
 oversampling_override = 1.0
 title = "Scoreboard Window"
-position = Vector2i(0, 32)
+position = Vector2i(619, 32)
 size = Vector2i(420, 220)
 accessibility_name = "Scoreboard window"
 
 [node name="WindowMargin" type="MarginContainer" parent="Window" unique_id=844849153]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/margin_left = 18
 theme_override_constants/margin_top = 18
 theme_override_constants/margin_right = 18
@@ -1321,13 +1324,7 @@ theme_override_constants/margin_bottom = 18
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="WindowLabel" type="Label" parent="Window/WindowMargin/WindowStack" unique_id=1259401524]
-layout_mode = 2
-theme_type_variation = &"HeaderSmall"
-text = "Top Players"
-
 [node name="ScoreScroll" type="ScrollContainer" parent="Window/WindowMargin/WindowStack" unique_id=545225778]
-custom_minimum_size = Vector2(0, 132)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -1337,6 +1334,11 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
+
+[node name="WindowLabel" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=1259401524]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "Top Players"
 
 [node name="Player01" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=864390896]
 layout_mode = 2
