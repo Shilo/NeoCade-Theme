@@ -1,6 +1,8 @@
 @tool
 class_name NeoCadeThemeOptionButton extends OptionButton
 
+signal theme_selected(index: int, theme_path: String, theme: Theme)
+
 const DEFAULT_THEME_DIRECTORY := "res://addons/neocade_theme"
 const NO_THEME_LABEL := "None"
 const SELECTED_PROPERTY := &"selected"
@@ -45,7 +47,11 @@ func _ready() -> void:
 func refresh_theme_list() -> void:
 	var target := _theme_target()
 	var current_target_path := _current_target_theme_path(target)
-	var requested_selected := selected
+	var selected_theme_path := _theme_path_for_index(selected)
+	var has_selected_theme_path := selected >= 0 and selected < _theme_paths.size()
+	if not has_selected_theme_path and not current_target_path.is_empty():
+		selected_theme_path = current_target_path
+		has_selected_theme_path = true
 
 	clear()
 	_theme_paths = PackedStringArray()
@@ -60,13 +66,16 @@ func refresh_theme_list() -> void:
 		select(-1)
 		return
 
-	if requested_selected >= 0:
-		if requested_selected < _theme_paths.size():
-			select(requested_selected)
-			_apply_theme(requested_selected)
-		else:
+	if has_selected_theme_path:
+		var selected_theme_index := _index_for_theme_path(selected_theme_path)
+		if selected_theme_index != -1:
+			select(selected_theme_index)
+			_apply_theme(selected_theme_index)
+			return
+
+		if selected_theme_path.is_empty():
 			select(-1)
-		return
+			return
 
 	if not current_target_path.is_empty():
 		var matching_index := _index_for_theme_path(current_target_path)
@@ -75,9 +84,9 @@ func refresh_theme_list() -> void:
 			return
 
 	if target != null and target.theme == null:
-		var default_index := _index_for_theme_path("")
-		if default_index != -1:
-			select(default_index)
+		var no_theme_index := _index_for_theme_path("")
+		if no_theme_index != -1:
+			select(no_theme_index)
 			return
 
 	select(-1)
@@ -98,11 +107,13 @@ func _apply_theme(index: int) -> void:
 
 	if theme_path.is_empty():
 		target.theme = null
+		theme_selected.emit(index, theme_path, null)
 		return
 
 	var next_theme := load(theme_path) as Theme
 	if next_theme != null:
 		target.theme = next_theme
+		theme_selected.emit(index, theme_path, next_theme)
 
 
 func _find_neocade_themes() -> Array[Dictionary]:

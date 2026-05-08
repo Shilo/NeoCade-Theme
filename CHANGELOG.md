@@ -32,7 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reusable `NeoCadeThemeOptionButton` dropdown-only script at
   `res://addons/neocade_theme/scripts/neocade_theme_option_button.gd`; it scans `addons/neocade_theme/` for
   `NeoCadeTheme` resources, keeps optional `None` first, sorts themes
-  alphabetically, and applies selection to an exported target or scene root.
+  alphabetically, preserves selection by resource path when rebuilt, applies
+  selection to an exported target or scene root, and emits
+  `theme_selected(index, theme_path, theme)` after applying a theme.
 - `res://showcase/showcase.gd` handles the scoreboard Window button and
   `close_requested` signal without constructing the showcase UI at runtime.
 - BBCode demo with bold/color/italic/code markup, multi-script label sample,

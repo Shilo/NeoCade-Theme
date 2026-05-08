@@ -173,10 +173,13 @@ with Pulse and includes:
 
 - a `NeoCadeThemeOptionButton` direction picker that scans `addons/neocade_theme/`,
   keeps `None` first when allowed, then sorts detected `NeoCadeTheme` resources alphabetically
+  and preserves the selected theme by resource path when the list rebuilds
 - an editor-authored Control tree previewable directly in the Godot editor
 - a reusable theme-picker script at `res://addons/neocade_theme/scripts/neocade_theme_option_button.gd`
   with exported target/allow-no-theme options, plus a small `res://showcase/showcase.gd`
   scene script for scoreboard window open/close behavior
+- a `theme_selected(index, theme_path, theme)` signal emitted after the picker applies
+  a theme; `None` emits an empty `theme_path` and `null` theme
 - 9 sections covering controls, dialogs, graph, token gallery, and coverage
 
 The Web export preset is named `Web`; the release workflow publishes the
