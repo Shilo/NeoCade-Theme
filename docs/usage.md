@@ -11,176 +11,158 @@ pattern.
 on chrome.** Solid colors + offset darker shape duplicates for depth on the
 raised variation only.
 
-## Recommended starter
+## Recommended Starter
 
-**Pulse** — `pulse_neocade_theme.tres` is the recommended starter direction
-for new consumers. Try this first.
+**Pulse** is the recommended starter preset for new consumers. Try this first:
 
 ```gdscript
-@export var theme: NeoCadeTheme = preload("res://addons/neocade_theme/pulse_neocade_theme.tres")
+@export var theme: NeoCadeTheme = preload("res://addons/neocade_theme/neocade_theme.tres")
 ```
 
-Or assign via the Editor's Inspector → `theme` slot on any `Control`.
+Or assign `res://addons/neocade_theme/neocade_theme.tres` via the Editor's
+Inspector `theme` slot on any `Control`.
 
-## Available directions
+## Presets
 
-v1 ships 5 approved directions, each as a data-only `.tres` file at the addon
-root. All 5 directions share the same `NeoCadeTheme` engine — they differ
-only in their 9 `@export` values and in optional Theme Editor authored entry
-overrides for personality.
+v1 ships one canonical `.tres` file with five built-in presets. All presets
+share the same `NeoCadeTheme` engine and the same exported controls.
 
-| Direction | File | Personality |
-|---|---|---|
-| **Pulse** ⭐ | `pulse_neocade_theme.tres` | Arcade-dense; cabinet-bezel rectangles; bold accent fill on primary |
-| **Slate** | `slate_neocade_theme.tres` | Spacious-premium-quiet; rounded-pill primary; iOS-style focus offset |
-| **Bubble** | `bubble_neocade_theme.tres` | Friendly-airy-generous; pillowy fully-rounded primary; pastel pink accent |
-| **Daybreak** | `daybreak_neocade_theme.tres` | Airy-breathing; gentle rounded; mint-halo focus ring |
-| **Burst** | `burst_neocade_theme.tres` | Event-spread-hierarchy-amplified; oversized statement primary; gold accent |
+| Preset | Personality |
+|---|---|
+| **Pulse** | Arcade-dense; cabinet-bezel rectangles; bold accent fill on primary |
+| **Slate** | Spacious-premium-quiet; rounded-pill primary; iOS-style focus offset |
+| **Bubble** | Friendly-airy-generous; pillowy fully-rounded primary; pastel pink accent |
+| **Daybreak** | Airy-breathing; gentle rounded; mint-halo focus ring |
+| **Burst** | Event-spread-hierarchy-amplified; oversized statement primary; gold accent |
 
-All 5 directions support both desktop and mobile via the `platform` `@export`
-property (default: `Platform.AUTO` — auto-detects via
-`OS.has_feature("mobile")`).
+Select a preset in the Inspector through the `preset` export, or in code:
 
-## Custom themes
+```gdscript
+var active_theme: NeoCadeTheme = preload("res://addons/neocade_theme/neocade_theme.tres").duplicate(true)
+active_theme.preset = NeoCadeTheme.Preset.SLATE
+theme = active_theme
+```
 
-`NeoCadeTheme` is **not abstract** — instantiate it directly to author your
-own theme:
+The `raised` and `platform` exports are universal variants. They work with
+every preset:
+
+```gdscript
+active_theme.raised = true
+active_theme.platform = NeoCadeTheme.Platform.MOBILE
+```
+
+`Platform.AUTO` is the default and auto-detects mobile targets with
+`OS.has_feature("mobile")`.
+
+Migration note: older per-preset files such as `pulse_neocade_theme.tres` have
+been replaced by `neocade_theme.tres` plus the `preset` export.
+
+## Custom Themes
+
+Set `preset = NeoCadeTheme.Preset.NONE` to make the direction exports manual.
+Changing direction-defining exports such as `base_color`, `accent_color`,
+`corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, or
+`outline_width` will update the preset back to a matching built-in preset when
+the values match one exactly; otherwise it falls back to `NONE`.
+`Preset.NONE` uses NeoCade's default hidden direction personality rather than
+inferring one from `base_color`.
 
 ```gdscript
 var custom_theme := NeoCadeTheme.new()
+custom_theme.preset = NeoCadeTheme.Preset.NONE
 custom_theme.base_color = Color("#080A1E")
 custom_theme.accent_color = Color("#FF66AA")
 custom_theme.corner_radius = 10
-# ... etc — see DESIGN_TOKENS.md for the 9 @export properties
-apply_theme(custom_theme)
+theme = custom_theme
 ```
 
-Or in the Godot FileSystem dock: right-click → New Resource → `NeoCadeTheme`,
-fill in the 9 `@export` values, save as `my_neocade_theme.tres` somewhere in
-your project, and use `preload("res://path/to/my_neocade_theme.tres")`.
+Or in the Godot FileSystem dock: right-click -> New Resource ->
+`NeoCadeTheme`, set `preset` to `NONE` or a built-in preset, then save the
+resource anywhere in your project.
 
-## Theme Editor authoring
+## Theme Editor Authoring
 
-The 9 `@export` properties drive ALL theme entries via the BINDING_TABLE
-iteration engine in `_regenerate_theme()`. **You can also author Theme Editor
-entries by hand** — Godot's standard Theme Editor workflow works directly on
-`NeoCadeTheme` resources. Slots not in BINDING_TABLE are LEFT UNTOUCHED by
-`_regenerate_theme()` (the escape hatch); slots IN BINDING_TABLE are
-formula-owned and will regenerate on `@export` mutations. This means custom
-per-theme personality (e.g., a one-off splash-screen panel style) survives
-`@export` changes.
+The exported properties drive generated theme entries through
+`_regenerate_theme()`. Godot's standard Theme Editor can still author extra
+entries by hand. Slots not owned by NeoCade's binding table are left untouched;
+slots owned by the binding table regenerate when exported values change.
 
-Avoid editing NeoCade theme resources through a Control inspector context
-menu. Use the dedicated Theme editor, the 9 exported `NeoCadeTheme`
-properties on direction resources, or formula edits in
-`addons/neocade_theme/scripts/neocade_theme.gd`.
+Do not edit a `NeoCadeTheme` resource through a Control inspector context menu.
+Use the dedicated Theme Editor, the exported properties on the
+`NeoCadeTheme` resource, or code/formula edits in
+`addons/neocade_theme/scripts/neocade_theme.gd`. This avoids Godot issue
+`#115500`.
 
-## CJK / non-Latin script support
+Godot may serialize generated Theme entries after you edit and save a
+`NeoCadeTheme` resource. That is expected Godot behavior for scripted `Theme`
+resources and does not require an editor plugin.
 
-NeoCade ships **only** Inter Variable Roman as its bundled font (UD-4 Option
-D); no CJK font is bundled. Consumers needing CJK script support append a
-CJK fallback to the theme's `default_font.fallbacks`:
+## CJK / Non-Latin Script Support
+
+NeoCade ships only Inter Variable Roman as its bundled font. Consumers needing
+CJK or other script-specific visual harmony can append a fallback to the
+theme's `default_font.fallbacks`:
 
 ```gdscript
 func _ready() -> void:
-    var theme: NeoCadeTheme = preload("res://addons/neocade_theme/pulse_neocade_theme.tres").duplicate()
-    # theme.default_font is the FontFile (inter_variable.ttf, imported by Godot)
-    # per FONT-06; the cast succeeds. Godot 4 imports .ttf as a FontFile resource
-    # via the .ttf.import sidecar, so we reference the .ttf directly.
-    var inter: FontFile = theme.default_font as FontFile
+    var active_theme: NeoCadeTheme = preload("res://addons/neocade_theme/neocade_theme.tres").duplicate(true)
+    var inter: FontFile = active_theme.default_font as FontFile
     var cjk_fallback: FontFile = preload("res://path/to/NotoSansCJK-Regular.ttf")
     inter.fallbacks = [cjk_fallback]
-    # Apply the modified theme to your Control / scene root
+    theme = active_theme
 ```
 
-Godot's `default_font.allow_system_fallback = true` is already set in the
-bundled `inter_variable.ttf.import` sidecar, so the OS-side font fallback
-kicks in for unsupported scripts when no explicit fallback is set.
+Godot's system font fallback remains available when no explicit fallback is
+set.
 
-## Code font (CodeEdit / `[code]` BBCode)
+## Code Font
 
-NeoCade does **not** bundle a monospaced font (FONT-04 stricken — JetBrains
-Mono Variable not bundled in v1). CodeEdit and `[code]` BBCode are rare in
-shipped games; consumers who use code surfaces ship their preferred mono.
-
-Override pattern:
+NeoCade does not bundle a monospaced font. Consumers who use CodeEdit or
+`[code]` BBCode should ship their preferred mono font:
 
 ```gdscript
-# On a specific CodeEdit instance:
 code_edit.add_theme_font_override("font", preload("res://your_mono.ttf"))
-```
-
-Or as a Theme entry override on a duplicated NeoCadeTheme:
-
-```gdscript
-var theme: NeoCadeTheme = preload("res://addons/neocade_theme/pulse_neocade_theme.tres").duplicate()
-theme.set_font("font", "CodeEdit", preload("res://your_mono.ttf"))
 ```
 
 Recommended monos: JetBrains Mono, Fira Code, IBM Plex Mono, Source Code Pro.
 
-## Italic emphasis (synthetic fallback)
+## Italic Emphasis
 
-Inter Italic Variable is **not bundled** in v1 (FONT-07 deferred per UD-4
-Option D). For italic emphasis on bundled Inter, use Godot's synthetic
-italic transform:
+Inter Italic Variable is not bundled in v1. For italic emphasis on bundled
+Inter, use Godot's synthetic italic transform:
 
 ```gdscript
-# Author a FontVariation with a synthetic skew transform:
 var italic := FontVariation.new()
 italic.base_font = preload("res://addons/neocade_theme/fonts/inter_variable.ttf")
 italic.transform = Transform2D(1.0, tan(deg_to_rad(12)), 0.0, 1.0, 0.0, 0.0)
 label.add_theme_font_override("font_italic", italic)
 ```
 
-Body text rendering with synthetic italics is acceptable; true Inter Italic
-is deferred to v1.x.
+## Architecture
 
-## Architecture (v1)
-
-- **Single concrete class:** `addons/neocade_theme/scripts/neocade_theme.gd` declares
-  `@tool class_name NeoCadeTheme extends Theme` with 9 `@export` properties.
-- **N data-only `.tres`:** v1 ships 5 (one per approved direction). No
-  per-direction `.gd` files; no class hierarchy.
-- **Dynamic regeneration:** Setters on every `@export` trigger
-  `_regenerate_theme()` which walks an internal BINDING_TABLE, computes
-  derived values (surface ramp, state layers, raised offsets, role tokens),
-  and populates Theme entries via `set_stylebox` / `set_color` / etc.
-- **Iteration is additive** — `_regenerate_theme()` does NOT call `clear()`.
-  Slots not in BINDING_TABLE are untouched (escape hatch for custom Theme
-  Editor authoring).
-
-> **Note on the binding mechanism:** the current implementation uses a
-> slot-name + property-name table compiled into `neocade_theme.gd`. This
-> internal mechanism is **revisable** — that is, the binding table itself
-> is REVISABLE in future v1.x — alternative approaches
-> (property-name convention, metadata-tagged Resource model) may replace it
-> without breaking the public `@export` surface or the `.tres` file format.
-
-## Bundled font (Inter Variable Roman)
-
-The `addons/neocade_theme/fonts/inter_variable.ttf` binary is licensed under
-the SIL Open Font License 1.1 (see
-`addons/neocade_theme/fonts/inter_ofl.txt`), separately from the addon code's
-MIT license (see `LICENSE.md`). The Reserved Font Name "Inter" is preserved
-per the OFL terms. The asset filename is snake_case for Godot; do not modify
-the font's internal name/metadata.
+- **Single concrete class:** `addons/neocade_theme/scripts/neocade_theme.gd`
+  declares `@tool class_name NeoCadeTheme extends Theme`.
+- **One canonical resource:** `addons/neocade_theme/neocade_theme.tres`
+  stores the reusable theme resource.
+- **Preset enum:** `NeoCadeTheme.Preset` switches Pulse, Slate, Bubble,
+  Daybreak, Burst, or `NONE`.
+- **Dynamic regeneration:** exported setters update Theme entries through
+  `set_stylebox`, `set_color`, `set_constant`, `set_font`, and related APIs.
+- **No plugin:** NeoCade does not require `plugin.cfg`, `EditorPlugin`, or a
+  custom resource saver.
 
 ## Showcase
 
-The repository-level `showcase/showcase.tscn` is a live showcase for this addon. It opens
-with Pulse and includes:
+The repository-level `showcase/showcase.tscn` opens with Pulse and includes:
 
-- a `NeoCadeThemeOptionButton` direction picker that scans `addons/neocade_theme/`,
-  sorts detected `NeoCadeTheme` resources alphabetically, and appends `None`
-  when allowed
-- an editor-authored Control tree previewable directly in the Godot editor
-- a reusable theme-picker script at `res://addons/neocade_theme/scripts/neocade_theme_option_button.gd`
-  with exported target/allow-no-theme options, plus a small `res://showcase/showcase.gd`
-  scene script for scoreboard window open/close behavior
-- a `theme_selected(theme, index)` signal emitted after the picker applies a theme;
-  `None` emits `null`
-- 9 sections covering controls, dialogs, graph, token gallery, and coverage
+- a `NeoCadeThemeOptionButton` preset picker that lists Bubble, Burst,
+  Daybreak, Pulse, Slate, and optional `None`;
+- an editor-authored Control tree previewable directly in the Godot editor;
+- a reusable picker script at
+  `res://addons/neocade_theme/scripts/neocade_theme_option_button.gd`;
+- a `theme_selected(theme, index)` signal emitted after the picker applies a
+  theme; `None` emits `null`;
+- 9 sections covering controls, dialogs, graph, token gallery, and coverage.
 
 The Web export preset is named `Web`; the release workflow publishes the
 showcase as both a zip asset and a GitHub Pages deployment.
@@ -188,15 +170,10 @@ showcase as both a zip asset and a GitHub Pages deployment.
 ## Distribution
 
 v1 is distributed through GitHub Releases, not the Godot Asset Library. Install
-by downloading `neocade_theme-v<VERSION>.zip` from the release and copying its
-`addons/neocade_theme/` directory into your project. Package docs, `VERSION`,
-and the MIT license ship outside the addon folder so the addon stays clean.
+by downloading `neocade_theme-v<VERSION>.zip` and copying its
+`addons/neocade_theme/` directory into your project.
 
-The matching Web showcase artifact is
-`neocade_theme-showcase-web-v<VERSION>.zip`. The latest release also deploys
-to GitHub Pages for an instant browser preview.
-
-## Cross-references
+## Cross-References
 
 - **CHANGELOG:** [CHANGELOG.md](../CHANGELOG.md)
 - **Font license:** [addons/neocade_theme/fonts/inter_ofl.txt](../addons/neocade_theme/fonts/inter_ofl.txt)
@@ -207,4 +184,4 @@ to GitHub Pages for an instant browser preview.
 
 ---
 
-_Updated through Phase 11 autonomous release preparation._
+_Updated through the one-resource preset architecture cleanup._

@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (preset architecture)
+
+- Replaced the five separate direction resources with one canonical
+  `res://addons/neocade_theme/neocade_theme.tres` resource.
+- Added `NeoCadeTheme.Preset` with `NONE`, `PULSE`, `SLATE`, `BUBBLE`,
+  `DAYBREAK`, and `BURST`. Selecting a built-in preset applies the matching
+  exported direction values and regenerates the theme once.
+- Direction personality now resolves from the explicit `preset` export instead
+  of an implicit `base_color` hex lookup.
+- `NeoCadeThemeOptionButton` now lists built-in presets from `NeoCadeTheme`
+  rather than scanning for multiple theme files. The optional `None` entry
+  still applies a null theme and `theme_selected(theme, index)` is preserved.
+- The showcase now applies `res://addons/neocade_theme/neocade_theme.tres`
+  and uses Pulse as its starter preset.
+
 ### Changed (cleanup)
 
 - Runtime addon folder now contains only Godot-consumed addon assets plus the
@@ -30,9 +45,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Text Inputs, Numbers & Range, Selection & Lists, Containers & Layout,
   Dialogs & Popups, Advanced & Graph, Token Gallery, and Coverage 37/37.
 - Reusable `NeoCadeThemeOptionButton` dropdown-only script at
-  `res://addons/neocade_theme/scripts/neocade_theme_option_button.gd`; it scans `addons/neocade_theme/` for
-  `NeoCadeTheme` resources, sorts themes alphabetically, appends optional
-  `None`, applies selection to an exported target or scene root, and emits
+  `res://addons/neocade_theme/scripts/neocade_theme_option_button.gd`; it lists
+  built-in NeoCade presets alphabetically, appends optional `None`, applies
+  selection to an exported target or scene root, and emits
   `theme_selected(theme, index)` after applying a theme.
 - `res://showcase/showcase.gd` handles the scoreboard Window button and
   `close_requested` signal without constructing the showcase UI at runtime.
@@ -56,13 +71,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added (Phase 4 — Foundation)
 
 - Single concrete `@tool class_name NeoCadeTheme extends Theme` class
-  (`addons/neocade_theme/scripts/neocade_theme.gd`) with 9 `@export` properties:
-  - Core: `base_color`, `accent_color`, `raised`, `platform`
+  (`addons/neocade_theme/scripts/neocade_theme.gd`) with 10 `@export` properties:
+  - Core: `preset`, `base_color`, `accent_color`, `raised`, `platform`
   - Shape: `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`,
     `outline_width`
-- 5 data-only direction `.tres` files at addon root: `pulse_neocade_theme.tres`
-  (recommended starter), `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`,
-  `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`.
+- One canonical direction/preset `.tres` file at addon root:
+  `neocade_theme.tres`.
 - Inter Variable Roman font (PINNED to Inter v4.0;
   SHA256: `746431E950FD28D29B0189D708D4A5852A8458EDB3184387EADCEE9E5E34676C`)
   bundled at `fonts/inter_variable.ttf` with Grayscale AA + Light hinting +
@@ -142,8 +156,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   append a CJK font (e.g., system Noto Sans CJK) to a duplicated theme's
   `default_font.fallbacks`. See README "CJK / non-Latin scripts" section.
   (FONT-09(a) override pattern; UD-2 default behavior.)
-- **No `plugin.cfg`.** This is NOT an editor plugin — consumers preload
-  `.tres` files directly via `preload("res://addons/neocade_theme/...")`.
+- **No `plugin.cfg`.** This is NOT an editor plugin — consumers preload the
+  canonical theme directly via
+  `preload("res://addons/neocade_theme/neocade_theme.tres")`.
   (STACK Decision 5; CONTEXT.md D-05.)
 - **No light mode in v1.** Light surface palettes are forward-compat-flagged
   via the `is_light` field but the v1 directions all ship with dark base
@@ -160,11 +175,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Out of scope (v1)
 
 - Light mode + alternate palettes (deferred to v2).
-- Per-direction Theme Editor variation styleboxes (PrimaryButton /
-  GhostButton personality per direction) — Phases 5/6/7 polish, not v1.0.0.
-- Bespoke SVG icons for Tree expand/collapse, ColorPicker, FileDialog,
-  ScrollBar, TabBar — Phases 6/7.
-- Mobile-branch tap-target audit + `.planning/MOBILE-DESIGN-SPEC.md` deliverable —
-  Phase 8.
 - Asset Library submission — REJECTED for v1 (DIST-05 stricken); v1 ships
   GitHub-Releases-only.
