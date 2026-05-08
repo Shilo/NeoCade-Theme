@@ -3,9 +3,9 @@ class_name NeoCadeTheme extends Theme
 
 ## NeoCade Theme — single concrete `@tool extends Theme` class for the NeoCade addon.
 ##
-## Architecture (locked 2026-05-06f, D-31): one concrete instantiable class + N data-only `.tres`
-## peers at `addons/neocade_theme/{name}_neocade_theme.tres`. Per-direction unique mood lives in
-## Theme Editor entry overrides per `.tres`, NOT in additional `@export` properties.
+## Architecture: one concrete instantiable class + one canonical
+## `addons/neocade_theme/neocade_theme.tres` resource. The `preset` export switches between
+## the approved NeoCade directions; `Preset.NONE` leaves the remaining exports fully manual.
 ##
 ## Setters on every `@export` property trigger `_regenerate_theme()`, which walks an internal
 ## BINDING_TABLE (Plan 04-05) to populate every formula-owned theme entry. Slots NOT in the
@@ -19,73 +19,165 @@ class_name NeoCadeTheme extends Theme
 ##
 ## See: .planning/DESIGN_TOKENS.md, .planning/phases/04-.../04-RESEARCH.md, .planning/phases/04-.../04-CONTEXT.md.
 
-enum Platform { DESKTOP, MOBILE, AUTO }
+enum Platform { DESKTOP = 0, MOBILE = 1, AUTO = 2 }
+enum Preset { NONE = 0, PULSE = 1, SLATE = 2, BUBBLE = 3, DAYBREAK = 4, BURST = 5 }
 
-# ─── Core exports (DESIGN_TOKENS §4.1 rows 1-4) ─────────────────────────────────────────────
-@export var base_color: Color = Color("#111820"):
+# ─── Core exports (DESIGN_TOKENS §4.1 rows 1-5) ─────────────────────────────────────────────
+@export var preset: Preset = Preset.PULSE:
+	set(value):
+		if preset == value: return
+		preset = value
+		if _syncing_preset_from_exports:
+			return
+		if preset == Preset.NONE:
+			_regenerate_theme()
+			return
+		_apply_preset_exports(preset)
+
+@export var base_color: Color = Color("#151A2E"):
 	set(value):
 		if base_color == value: return
 		base_color = value
-		_regenerate_theme()
+		_after_direction_export_changed()
 
-@export var accent_color: Color = Color("#8BD3FF"):
+@export var accent_color: Color = Color("#8BFF6A"):
 	set(value):
 		if accent_color == value: return
 		accent_color = value
-		_regenerate_theme()
+		_after_direction_export_changed()
 
 @export var raised: bool = false:
 	set(value):
 		if raised == value: return
 		raised = value
-		_regenerate_theme()
+		_after_variant_export_changed()
 
 @export var platform: Platform = Platform.AUTO:
 	set(value):
 		if platform == value: return
 		platform = value
-		_regenerate_theme()
+		_after_variant_export_changed()
 
 # ─── Shape exports (DESIGN_TOKENS §4.1 rows 5-9) ────────────────────────────────────────────
 @export_group("Shape")
 
-@export var corner_radius: int = 12:
+@export var corner_radius: int = 0:
 	set(value):
 		if corner_radius == value: return
 		corner_radius = value
-		_regenerate_theme()
+		_after_direction_export_changed()
 
-@export var spacing: int = 4:
+@export var spacing: int = 18:
 	set(value):
 		if spacing == value: return
 		spacing = value
-		_regenerate_theme()
+		_after_direction_export_changed()
 
 @export var raised_strength: int = 3:
 	set(value):
 		if raised_strength == value: return
 		raised_strength = value
-		_regenerate_theme()
+		_after_direction_export_changed()
 
 @export var focus_thickness: int = 2:
 	set(value):
 		if focus_thickness == value: return
 		focus_thickness = value
-		_regenerate_theme()
+		_after_direction_export_changed()
 
 @export var outline_width: int = 1:
 	set(value):
 		if outline_width == value: return
 		outline_width = value
-		_regenerate_theme()
+		_after_direction_export_changed()
 
 # ─── Internal state (NOT exported) ──────────────────────────────────────────────────────────
 var is_light: bool = false  # derived from base_color.get_luminance() at every regenerate
 var _regenerating: bool = false  # reentry guard (per RESEARCH.md §4)
 var _last_regeneration_usec: int = 0  # diagnostic; logged via Output in editor
+var _applying_preset_exports := false
+var _syncing_preset_from_exports := false
 
 func _init() -> void:
 	_regenerate_theme()
+
+
+static func selectable_presets() -> PackedInt32Array:
+	return PackedInt32Array([Preset.PULSE, Preset.SLATE, Preset.BUBBLE, Preset.DAYBREAK, Preset.BURST])
+
+
+static func preset_label(preset_value: int) -> String:
+	return String(PRESET_LABELS.get(preset_value, PRESET_LABELS[Preset.NONE]))
+
+
+func _apply_preset_exports(preset_value: int) -> void:
+	var values: Dictionary = PRESET_EXPORTS.get(preset_value, {})
+	if values.is_empty():
+		preset = Preset.NONE
+		_regenerate_theme()
+		return
+
+	_applying_preset_exports = true
+	base_color = values["base_color"]
+	accent_color = values["accent_color"]
+	raised = values["raised"]
+	platform = values["platform"]
+	corner_radius = values["corner_radius"]
+	spacing = values["spacing"]
+	raised_strength = values["raised_strength"]
+	focus_thickness = values["focus_thickness"]
+	outline_width = values["outline_width"]
+	_applying_preset_exports = false
+	_regenerate_theme()
+
+
+func _after_direction_export_changed() -> void:
+	if _applying_preset_exports:
+		return
+
+	_sync_preset_from_exports()
+	_regenerate_theme()
+
+
+func _after_variant_export_changed() -> void:
+	if _applying_preset_exports:
+		return
+
+	_regenerate_theme()
+
+
+func _sync_preset_from_exports() -> void:
+	var matching_preset := _matching_preset()
+	if preset == matching_preset:
+		return
+
+	_syncing_preset_from_exports = true
+	preset = matching_preset
+	_syncing_preset_from_exports = false
+
+
+func _matching_preset() -> Preset:
+	for preset_value in selectable_presets():
+		if _exports_match_preset(preset_value):
+			return preset_value
+
+	return Preset.NONE
+
+
+func _exports_match_preset(preset_value: int) -> bool:
+	var values: Dictionary = PRESET_EXPORTS.get(preset_value, {})
+	if values.is_empty():
+		return false
+
+	return (
+		base_color.is_equal_approx(values["base_color"])
+		and accent_color.is_equal_approx(values["accent_color"])
+		and corner_radius == values["corner_radius"]
+		and spacing == values["spacing"]
+		and raised_strength == values["raised_strength"]
+		and focus_thickness == values["focus_thickness"]
+		and outline_width == values["outline_width"]
+	)
 
 func _regenerate_theme() -> void:
 	if _regenerating: return
@@ -424,13 +516,13 @@ func _make_raised_stylebox(bg: Color, offset_color: Color, intensity: int) -> St
 
 
 # ─── Direction presets (DESIGN_TOKENS §5/§6, directions.json axis_8/axis_9) ─────────────────
-## Per-direction non-exported parameters that don't belong on the public 9-export surface but
+## Per-direction non-exported parameters that don't belong on the public 10-export surface but
 ## must differentiate Pulse (wide spread) from Slate (narrow spread) etc. Sourced from
 ## directions.json axis_8_surface_spread + axis_9_disabled_opacity + DESIGN_TOKENS §6.5
 ## state-layer pcts. Cross-AI Cycle 1 C2 fix.
 ##
-## Lookup is by base_color hex (uppercased, no alpha — matches `Color.to_html(false)`).
-## Fallback default is medium-spread / M3-baseline if no match.
+## Lookup is by `preset`. `Preset.NONE` uses the fallback default so users can customize the
+## visible exports without keeping hidden direction personality locked to a named preset.
 ##
 ## Phase 5 Plan 05-02 (D-02 / D-03 / D-04) adds the `shape` sub-Dictionary on every row.
 ## Shape values are sourced VERBATIM from DESIGN_TOKENS §5.1-§5.5 ("Theme Editor override
@@ -444,7 +536,7 @@ const DIRECTION_PRESETS: Dictionary = {
 	# Personality: arcade-cabinet rectangular; radius=0; tight-cabinet focus ring (offset=0).
 	# Buttons rectangular (radius 0), padding 14×10 desktop, primary strategy = bold-accent-fill.
 	# Surface alpha all 1.00 (cabinet hardware is solid).
-	"151A2E": {
+	Preset.PULSE: {
 		"spread_factor": 1.3, "hover_pct": 6.0, "pressed_pct": -10.0, "disabled_opacity": 0.42,
 		"shape": {
 			"primary_radius":        0,
@@ -480,7 +572,7 @@ const DIRECTION_PRESETS: Dictionary = {
 	# Personality: iOS-premium-quiet; radius=14 rounded-pill; ios-style-offset focus (offset=2).
 	# Buttons rounded (radius 14), padding 16×11 desktop, primary strategy = quiet-pill.
 	# Tabs/chips full pill (radius 999). Surface alpha popup 0.92 (iOS NavigationBar bleed).
-	"111820": {
+	Preset.SLATE: {
 		"spread_factor": 0.7, "hover_pct": 4.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
 		"shape": {
 			"primary_radius":        14,
@@ -516,7 +608,7 @@ const DIRECTION_PRESETS: Dictionary = {
 	# Personality: candy-pillowy; base radius 26 / primary radius 999 (pill on primary
 	# specifically per §5.3); cheerful-chunky focus (offset=2). Padding 20×14 desktop.
 	# Tabs/chips fully-rounded pill (radius 999). Surface alpha all 1.00 (candy is opaque).
-	"241326": {
+	Preset.BUBBLE: {
 		"spread_factor": 1.0, "hover_pct": 8.0, "pressed_pct": -10.0, "disabled_opacity": 0.45,
 		"shape": {
 			"primary_radius":        999,
@@ -552,7 +644,7 @@ const DIRECTION_PRESETS: Dictionary = {
 	# Personality: airy-welcoming-lobby; radius=8 gently rounded; airy-mint focus (offset=2).
 	# Buttons radius 8, padding 18×12 desktop, primary strategy = friendly-generous.
 	# Surface alpha popup 0.90 + panels 0.96 (airy bleed) but buttons 1.00 (tappability).
-	"0B2420": {
+	Preset.DAYBREAK: {
 		"spread_factor": 1.0, "hover_pct": 6.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
 		"shape": {
 			"primary_radius":        8,
@@ -588,7 +680,7 @@ const DIRECTION_PRESETS: Dictionary = {
 	# Personality: event-celebration-statement; base radius 18 / primary radius 28 (oversized
 	# per §5.5); dramatic-event focus (offset=1). Padding 20×14 desktop. Tabs radius 16.
 	# Surface alpha all 1.00 (celebration posters solid). Primary strategy = oversized-statement.
-	"20112E": {
+	Preset.BURST: {
 		"spread_factor": 1.3, "hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.45,
 		"shape": {
 			"primary_radius":        28,
@@ -622,7 +714,74 @@ const DIRECTION_PRESETS: Dictionary = {
 	},
 }
 
-## Default (when base_color doesn't match any of the 5 approved directions — custom themes).
+const PRESET_LABELS: Dictionary = {
+	Preset.NONE: "None",
+	Preset.PULSE: "Pulse",
+	Preset.SLATE: "Slate",
+	Preset.BUBBLE: "Bubble",
+	Preset.DAYBREAK: "Daybreak",
+	Preset.BURST: "Burst",
+}
+
+const PRESET_EXPORTS: Dictionary = {
+	Preset.PULSE: {
+		"base_color": Color("#151A2E"),
+		"accent_color": Color("#8BFF6A"),
+		"raised": false,
+		"platform": Platform.AUTO,
+		"corner_radius": 0,
+		"spacing": 18,
+		"raised_strength": 3,
+		"focus_thickness": 2,
+		"outline_width": 1,
+	},
+	Preset.SLATE: {
+		"base_color": Color("#111820"),
+		"accent_color": Color("#8BD3FF"),
+		"raised": false,
+		"platform": Platform.AUTO,
+		"corner_radius": 14,
+		"spacing": 22,
+		"raised_strength": 2,
+		"focus_thickness": 2,
+		"outline_width": 1,
+	},
+	Preset.BUBBLE: {
+		"base_color": Color("#241326"),
+		"accent_color": Color("#FFB3E6"),
+		"raised": false,
+		"platform": Platform.AUTO,
+		"corner_radius": 26,
+		"spacing": 22,
+		"raised_strength": 6,
+		"focus_thickness": 3,
+		"outline_width": 1,
+	},
+	Preset.DAYBREAK: {
+		"base_color": Color("#0B2420"),
+		"accent_color": Color("#76F2D1"),
+		"raised": false,
+		"platform": Platform.AUTO,
+		"corner_radius": 8,
+		"spacing": 24,
+		"raised_strength": 3,
+		"focus_thickness": 2,
+		"outline_width": 1,
+	},
+	Preset.BURST: {
+		"base_color": Color("#20112E"),
+		"accent_color": Color("#FFD166"),
+		"raised": false,
+		"platform": Platform.AUTO,
+		"corner_radius": 18,
+		"spacing": 22,
+		"raised_strength": 5,
+		"focus_thickness": 3,
+		"outline_width": 1,
+	},
+}
+
+## Default hidden direction personality for `Preset.NONE` custom themes.
 ##
 ## Per CONTEXT.md D-13: medium-spread / medium-radius defaults. shape.* values give
 ## NeoCadeTheme.new() consumers with non-approved hex a stable base — the chrome reads as
@@ -660,10 +819,9 @@ const DIRECTION_PRESET_DEFAULT: Dictionary = {
 	},
 }
 
-## Returns the per-direction sub-dict for `base_color`. Lookup is by uppercased hex without alpha.
+## Returns the per-direction sub-dict for the active `preset`.
 func _resolve_direction_presets() -> Dictionary:
-	var key := base_color.to_html(false).to_upper()
-	return DIRECTION_PRESETS.get(key, DIRECTION_PRESET_DEFAULT)
+	return DIRECTION_PRESETS.get(preset, DIRECTION_PRESET_DEFAULT)
 
 
 # ─── Type variation registry (DESIGN_TOKENS §8.5; PITFALLS 1.2 mandate explicit fonts) ──────

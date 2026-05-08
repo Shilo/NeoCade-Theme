@@ -3,15 +3,14 @@ class_name NeoCadeThemeOptionButton extends OptionButton
 
 signal theme_selected(theme: Theme, index: int)
 
-const DEFAULT_THEME_DIRECTORY := "res://addons/neocade_theme"
+const DEFAULT_THEME_RESOURCE_PATH := "res://addons/neocade_theme/neocade_theme.tres"
 const NO_THEME_LABEL := "None"
+const NO_THEME_PRESET := -1
 const SELECTED_PROPERTY := &"selected"
-const THEME_FILE_EXTENSION := ".tres"
-const THEME_NAME_SUFFIX := "_neocade_theme"
 
-@export_dir var theme_directory := DEFAULT_THEME_DIRECTORY:
+@export_file("*.tres") var theme_resource_path := DEFAULT_THEME_RESOURCE_PATH:
 	set(value):
-		theme_directory = value
+		theme_resource_path = value
 		if _is_ready:
 			_refresh_should_mirror_target = true
 		_queue_refresh()
@@ -31,7 +30,7 @@ const THEME_NAME_SUFFIX := "_neocade_theme"
 		allow_no_theme = value
 		_queue_refresh()
 
-var _theme_paths: PackedStringArray = PackedStringArray()
+var _item_presets: PackedInt32Array = PackedInt32Array()
 var _is_ready := false
 var _refresh_should_mirror_target := false
 var _selected_apply_queued := false
@@ -54,17 +53,16 @@ func _ready() -> void:
 
 func refresh_theme_list() -> void:
 	var target := _theme_target()
-	var current_target_path := _current_target_theme_path(target)
 	var requested_selected := selected
 
 	clear()
-	_theme_paths = PackedStringArray()
+	_item_presets = PackedInt32Array()
 
-	for entry in _find_neocade_themes():
-		_add_theme_item(String(entry["label"]), String(entry["path"]))
+	for preset_entry in _preset_entries():
+		_add_preset_item(String(preset_entry["label"]), int(preset_entry["preset"]))
 
 	if allow_no_theme:
-		_add_theme_item(NO_THEME_LABEL, "")
+		_add_preset_item(NO_THEME_LABEL, NO_THEME_PRESET)
 
 	if item_count == 0:
 		select(-1)
@@ -72,7 +70,7 @@ func refresh_theme_list() -> void:
 
 	if requested_selected == -1:
 		_refresh_should_mirror_target = false
-		if _should_sync_selected_from_target() and _select_current_target_theme(target, current_target_path):
+		if _should_sync_selected_from_target() and _select_current_target_preset(target):
 			return
 
 		select(-1)
@@ -80,18 +78,18 @@ func refresh_theme_list() -> void:
 
 	if _refresh_should_mirror_target:
 		_refresh_should_mirror_target = false
-		if _select_current_target_theme(target, current_target_path):
+		if _select_current_target_preset(target):
 			return
 
 		select(-1)
 		return
 
-	if requested_selected >= 0 and requested_selected < _theme_paths.size():
+	if requested_selected >= 0 and requested_selected < _item_presets.size():
 		select(requested_selected)
 		_apply_theme(requested_selected)
 		return
 
-	if not _select_current_target_theme(target, current_target_path):
+	if not _select_current_target_preset(target):
 		select(-1)
 
 
@@ -101,89 +99,67 @@ func _on_item_selected(index: int) -> void:
 
 func _apply_theme(index: int) -> void:
 	var target := _theme_target()
-	if target == null or index < 0 or index >= _theme_paths.size():
+	if target == null or index < 0 or index >= _item_presets.size():
 		return
 
-	var theme_path := _theme_paths[index]
-	if _target_has_theme_path(target, theme_path):
-		return
+	var selected_preset := _item_presets[index]
+	if selected_preset == NO_THEME_PRESET:
+		if target.theme == null:
+			return
 
-	if theme_path.is_empty():
 		target.theme = null
 		theme_selected.emit(null, index)
 		return
 
-	var next_theme := load(theme_path) as Theme
-	if next_theme != null:
-		target.theme = next_theme
-		theme_selected.emit(next_theme, index)
+	if _target_has_preset(target, selected_preset):
+		return
+
+	var next_theme := _theme_for_preset(selected_preset)
+	if next_theme == null:
+		return
+
+	target.theme = next_theme
+	theme_selected.emit(next_theme, index)
 
 
-func _find_neocade_themes() -> Array[Dictionary]:
-	var discovered: Array[Dictionary] = []
-	var directory := DirAccess.open(theme_directory)
-	if directory == null:
-		return discovered
+func _preset_entries() -> Array[Dictionary]:
+	var entries: Array[Dictionary] = []
+	for preset_value in NeoCadeTheme.selectable_presets():
+		entries.append({
+			"label": NeoCadeTheme.preset_label(preset_value),
+			"preset": preset_value,
+		})
 
-	directory.list_dir_begin()
-	var file_name := directory.get_next()
-	while not file_name.is_empty():
-		if not directory.current_is_dir() and file_name.ends_with(THEME_FILE_EXTENSION):
-			var theme_path := theme_directory.path_join(file_name)
-			var resource := load(theme_path)
-			if resource is NeoCadeTheme:
-				discovered.append({
-					"label": _theme_label_from_file_name(file_name),
-					"path": theme_path,
-				})
-		file_name = directory.get_next()
-	directory.list_dir_end()
-
-	discovered.sort_custom(_compare_theme_entries)
-	return discovered
+	entries.sort_custom(_compare_preset_entries)
+	return entries
 
 
-func _compare_theme_entries(a: Dictionary, b: Dictionary) -> bool:
-	var label_a := String(a["label"])
-	var label_b := String(b["label"])
-	var label_order := label_a.nocasecmp_to(label_b)
+func _compare_preset_entries(a: Dictionary, b: Dictionary) -> bool:
+	var label_order := String(a["label"]).nocasecmp_to(String(b["label"]))
 	if label_order != 0:
 		return label_order < 0
 
-	return String(a["path"]).nocasecmp_to(String(b["path"])) < 0
+	return int(a["preset"]) < int(b["preset"])
 
 
-func _theme_label_from_file_name(file_name: String) -> String:
-	var label := file_name.get_basename()
-	if label.ends_with(THEME_NAME_SUFFIX):
-		label = label.substr(0, label.length() - THEME_NAME_SUFFIX.length())
-
-	return label.replace("_", " ").capitalize()
-
-
-func _add_theme_item(label: String, theme_path: String) -> void:
+func _add_preset_item(label: String, preset_value: int) -> void:
 	add_item(label)
-	_theme_paths.append(theme_path)
-	set_item_metadata(item_count - 1, theme_path)
+	_item_presets.append(preset_value)
+	set_item_metadata(item_count - 1, preset_value)
 
 
-func _current_target_theme_path(target: Control) -> String:
-	if target == null or target.theme == null:
-		return ""
+func _theme_for_preset(preset_value: int) -> NeoCadeTheme:
+	var loaded_theme := load(theme_resource_path) as NeoCadeTheme
+	if loaded_theme == null:
+		return null
 
-	return target.theme.resource_path
-
-
-func _index_for_theme_path(theme_path: String) -> int:
-	for index in range(_theme_paths.size()):
-		if _theme_paths[index] == theme_path:
-			return index
-
-	return -1
+	var next_theme := loaded_theme.duplicate(true) as NeoCadeTheme
+	next_theme.preset = preset_value
+	return next_theme
 
 
-func _select_current_target_theme(target: Control, current_target_path: String) -> bool:
-	var matching_index := _index_for_target_theme(target, current_target_path)
+func _select_current_target_preset(target: Control) -> bool:
+	var matching_index := _index_for_target_theme(target)
 	if matching_index == -1:
 		return false
 
@@ -191,27 +167,31 @@ func _select_current_target_theme(target: Control, current_target_path: String) 
 	return true
 
 
-func _index_for_target_theme(target: Control, current_target_path: String) -> int:
+func _index_for_target_theme(target: Control) -> int:
 	if target == null:
 		return -1
 
 	if target.theme == null:
-		return _index_for_theme_path("")
+		return _index_for_preset(NO_THEME_PRESET)
 
-	if current_target_path.is_empty():
+	var neocade_theme := target.theme as NeoCadeTheme
+	if neocade_theme == null:
 		return -1
 
-	return _index_for_theme_path(current_target_path)
+	return _index_for_preset(neocade_theme.preset)
 
 
-func _target_has_theme_path(target: Control, theme_path: String) -> bool:
-	if theme_path.is_empty():
-		return target.theme == null
+func _index_for_preset(preset_value: int) -> int:
+	for index in range(_item_presets.size()):
+		if _item_presets[index] == preset_value:
+			return index
 
-	if target.theme == null:
-		return false
+	return -1
 
-	return target.theme.resource_path == theme_path
+
+func _target_has_preset(target: Control, preset_value: int) -> bool:
+	var neocade_theme := target.theme as NeoCadeTheme
+	return neocade_theme != null and neocade_theme.preset == preset_value
 
 
 func _theme_target() -> Control:
@@ -259,7 +239,7 @@ func _apply_selected_change() -> void:
 	if selected == -1:
 		if _should_sync_selected_from_target():
 			var target := _theme_target()
-			if not _select_current_target_theme(target, _current_target_theme_path(target)):
+			if not _select_current_target_preset(target):
 				select(-1)
 		return
 
