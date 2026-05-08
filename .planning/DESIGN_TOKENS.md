@@ -651,7 +651,7 @@ The anti-cyberpunk discipline is preserved (Phase 3 redirect 2026-05-04). The ea
 5. `addons/neocade_theme/daybreak_neocade_theme.tres` — §5.4 values + Daybreak overrides.
 6. `addons/neocade_theme/burst_neocade_theme.tres` — §5.5 values + Burst overrides.
 
-Plus addon metadata files (`OFL.txt`, `LICENSE.md`, `README.md`, `CHANGELOG.md`, `VERSION`) per FOUND-01.
+Plus root metadata files (`LICENSE.md`, `README.md`, `ADDON_USAGE.md`, `CHANGELOG.md`, `VERSION`) and bundled font license `addons/neocade_theme/fonts/inter_ofl.txt` per FOUND-01.
 
 ### 12.2 Files Phase 4 MUST delete
 
@@ -673,7 +673,7 @@ Plus addon metadata files (`OFL.txt`, `LICENSE.md`, `README.md`, `CHANGELOG.md`,
 4. **Author Pulse `.tres`** (recommended starter — implement first).
 5. **Verify Pulse** — load into a test scene, toggle `raised` / `platform`, confirm regeneration matches Phase 3.4 mockup output.
 6. **Author Slate, Bubble, Daybreak, Burst `.tres`** — apply §5.2-§5.5 values + Theme Editor overrides.
-7. **README + addon metadata** — document consumer pattern (`preload("res://addons/neocade_theme/{name}_neocade_theme.tres")`), recommended starter (Pulse), custom theme authoring (`NeoCadeTheme.new()`).
+7. **Root docs + clean addon packaging** — document consumer pattern (`preload("res://addons/neocade_theme/{name}_neocade_theme.tres")`), recommended starter (Pulse), custom theme authoring (`NeoCadeTheme.new()`), and keep non-runtime docs outside `addons/neocade_theme/` except the required bundled font OFL file.
 
 ### 12.5 Verification checkpoints
 

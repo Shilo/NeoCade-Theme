@@ -23,13 +23,10 @@ addons/neocade_theme/
   bubble_neocade_theme.tres
   daybreak_neocade_theme.tres
   burst_neocade_theme.tres
-  fonts/Inter-Variable.ttf
+  scripts/neocade_theme_option_button.gd
+  fonts/inter_variable.ttf
+  fonts/inter_ofl.txt
   icons/*.svg
-  README.md
-  CHANGELOG.md
-  LICENSE.md
-  OFL.txt
-  VERSION
 ```
 
 There is no `plugin.cfg`, no editor plugin, no root `neocade_theme.tres`, and
@@ -37,6 +34,9 @@ no separate `neocade_mobile_theme.tres`. Mobile is handled by the exported
 `platform` property on the same theme resources.
 
 ## Usage
+
+See `ADDON_USAGE.md` for direction details, custom theme authoring, and font
+fallback patterns.
 
 Apply a direction resource to a root `Control`:
 
@@ -63,7 +63,7 @@ theme = active_theme
 Open `main.tscn` in Godot 4.6.2 to inspect:
 
 - 9 sections covering controls, dialogs, graph, tokens, and coverage.
-- `NeoCadeThemeSwitcher` dropdown scans `addons/neocade_theme/` for
+- `NeoCadeThemeOptionButton` dropdown in `addons/neocade_theme/scripts/` scans `addons/neocade_theme/` for
   `NeoCadeTheme` resources, keeps `Default` first, then sorts themes alphabetically.
 - Editor-authored Control tree; only the theme picker is scripted.
 - BBCode sample, multi-script sample, token gallery, and coverage strip.
@@ -85,15 +85,17 @@ desktop/mobile target presets for QA.
 
 v1 distribution is GitHub Releases only. The release workflow builds:
 
-- `neocade_theme-v<VERSION>.zip` containing `addons/neocade_theme/`.
+- `neocade_theme-v<VERSION>.zip` containing the clean `addons/neocade_theme/`
+  folder plus root README/usage/changelog/license docs and `VERSION`.
 - `neocade_theme-showcase-web-v<VERSION>.zip` containing the Web showcase.
 - A GitHub Pages deployment of the latest Web showcase.
 
 ## License
 
-Theme code/content is MIT licensed via `addons/neocade_theme/LICENSE.md`.
+Theme code/content is MIT licensed via `LICENSE.md`.
 Inter Variable Roman is licensed under SIL OFL 1.1 via
-`addons/neocade_theme/OFL.txt`.
+`addons/neocade_theme/fonts/inter_ofl.txt`, which ships inside the addon zip
+because the font binary ships there too.
 
 ## Subtree Consumers
 

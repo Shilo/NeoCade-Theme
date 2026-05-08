@@ -22,7 +22,8 @@ THE SOFTWARE.
 
 ---
 
-**Note on Inter Variable Roman bundled at `fonts/Inter-Variable.ttf`:**
-The Inter font is licensed under the SIL Open Font License 1.1 (see `OFL.txt`),
-NOT MIT. The MIT license above covers only the NeoCade Theme code, resources,
-and bespoke icons — not the bundled font binary.
+**Note on Inter Variable Roman bundled at `addons/neocade_theme/fonts/inter_variable.ttf`:**
+The Inter font is licensed under the SIL Open Font License 1.1 (see
+`addons/neocade_theme/fonts/inter_ofl.txt`), NOT MIT. The MIT license above
+covers only the NeoCade Theme code, resources, and bespoke icons — not the
+bundled font binary.

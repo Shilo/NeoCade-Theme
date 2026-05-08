@@ -79,7 +79,7 @@ CJK fallback to the theme's `default_font.fallbacks`:
 ```gdscript
 func _ready() -> void:
     var theme: NeoCadeTheme = preload("res://addons/neocade_theme/pulse_neocade_theme.tres").duplicate()
-    # theme.default_font is the FontFile (Inter-Variable.ttf, imported by Godot)
+    # theme.default_font is the FontFile (inter_variable.ttf, imported by Godot)
     # per FONT-06; the cast succeeds. Godot 4 imports .ttf as a FontFile resource
     # via the .ttf.import sidecar, so we reference the .ttf directly.
     var inter: FontFile = theme.default_font as FontFile
@@ -89,7 +89,7 @@ func _ready() -> void:
 ```
 
 Godot's `default_font.allow_system_fallback = true` is already set in the
-bundled `Inter-Variable.ttf.import` sidecar, so the OS-side font fallback
+bundled `inter_variable.ttf.import` sidecar, so the OS-side font fallback
 kicks in for unsupported scripts when no explicit fallback is set.
 
 ## Code font (CodeEdit / `[code]` BBCode)
@@ -121,15 +121,11 @@ Option D). For italic emphasis on bundled Inter, use Godot's synthetic
 italic transform:
 
 ```gdscript
-# Option A — set the font_italic theme slot on a Label / RichTextLabel:
-label.add_theme_font_override("font_italic", preload("res://addons/neocade_theme/fonts/Inter-Body.tres"))
-# Then enable italic via BBCode [i]...[/i] in RichTextLabel; Godot applies
-# the synthetic skew transform to render the upright glyphs as italic.
-
-# Option B — author a FontVariation with a skew transform:
+# Author a FontVariation with a synthetic skew transform:
 var italic := FontVariation.new()
-italic.base_font = preload("res://addons/neocade_theme/fonts/Inter-Variable.ttf")
+italic.base_font = preload("res://addons/neocade_theme/fonts/inter_variable.ttf")
 italic.transform = Transform2D(1.0, tan(deg_to_rad(12)), 0.0, 1.0, 0.0, 0.0)
+label.add_theme_font_override("font_italic", italic)
 ```
 
 Body text rendering with synthetic italics is acceptable; true Inter Italic
@@ -158,20 +154,22 @@ is deferred to v1.x.
 
 ## Bundled font (Inter Variable Roman)
 
-The `fonts/Inter-Variable.ttf` binary is licensed under the SIL Open Font
-License 1.1 (see `OFL.txt`), separately from the addon code's MIT license
-(see `LICENSE.md`). The Reserved Font Name "Inter" is preserved per the
-OFL terms — do not rename the binary.
+The `addons/neocade_theme/fonts/inter_variable.ttf` binary is licensed under
+the SIL Open Font License 1.1 (see
+`addons/neocade_theme/fonts/inter_ofl.txt`), separately from the addon code's
+MIT license (see `LICENSE.md`). The Reserved Font Name "Inter" is preserved
+per the OFL terms. The asset filename is snake_case for Godot; do not modify
+the font's internal name/metadata.
 
 ## Showcase
 
 The repository-level `main.tscn` is a live showcase for this addon. It opens
 with Pulse and includes:
 
-- a `NeoCadeThemeSwitcher` direction picker that scans `addons/neocade_theme/`,
+- a `NeoCadeThemeOptionButton` direction picker that scans `addons/neocade_theme/`,
   keeps `Default` first, then sorts detected `NeoCadeTheme` resources alphabetically
 - an editor-authored Control tree previewable directly in the Godot editor
-- a dropdown-only script at `res://scripts/theme_switcher.gd` with exported
+- a dropdown-only script at `res://addons/neocade_theme/scripts/neocade_theme_option_button.gd` with exported
   target and default-theme options
 - 9 sections covering controls, dialogs, graph, token gallery, and coverage
 
@@ -182,7 +180,8 @@ showcase as both a zip asset and a GitHub Pages deployment.
 
 v1 is distributed through GitHub Releases, not the Godot Asset Library. Install
 by downloading `neocade_theme-v<VERSION>.zip` from the release and copying its
-`addons/neocade_theme/` directory into your project.
+`addons/neocade_theme/` directory into your project. Package docs, `VERSION`,
+and the MIT license sit at the zip root; they are not inside the addon folder.
 
 The matching Web showcase artifact is
 `neocade_theme-showcase-web-v<VERSION>.zip`. The latest release also deploys
@@ -192,7 +191,7 @@ to GitHub Pages for an instant browser preview.
 
 - **Design tokens (the canonical Phase 4 contract):** `.planning/DESIGN_TOKENS.md`
 - **CHANGELOG:** `CHANGELOG.md`
-- **Font license:** `OFL.txt`
+- **Font license:** `addons/neocade_theme/fonts/inter_ofl.txt`
 - **Code license:** `LICENSE.md`
 - **Version:** `VERSION`
 

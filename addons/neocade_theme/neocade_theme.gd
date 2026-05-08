@@ -170,18 +170,18 @@ func _regenerate_theme() -> void:
 	# ── Theme defaults (Cross-AI Cycle 1 C3 fix + Cycle 6 F6 fix; BL-01 fix 2026-05-06) ──
 	# Set the theme-level default_font + default_font_size BEFORE the BINDING_TABLE walk
 	# so any Control type without an explicit per-type font entry still renders in Inter.
-	# BL-01 fix: load Inter-Variable.ttf directly (Godot 4 imports .ttf as FontFile via
-	# the .import sidecar). Previously preloaded Inter-Variable.tres which round-tripped
+	# BL-01 fix: load inter_variable.ttf directly (Godot 4 imports .ttf as FontFile via
+	# the .import sidecar). Previously preloaded inter_variable.tres which round-tripped
 	# the binary as PackedByteArray, doubling the bundle size.
 	# FontVariation and FontFile both extend Font but are NOT cast-compatible — Plan 04-08
 	# README's `theme.default_font as FontFile` only works if default_font IS a FontFile.
 	# Per FONT-06: "Theme default_font is Inter Variable Roman; default_font.fallbacks = []"
-	# — implies FontFile. Inter-Body.tres (FontVariation wght=400) is used below for
-	# explicit set_font calls on body-weight Controls/variations.
-	var inter_file := preload("res://addons/neocade_theme/fonts/Inter-Variable.ttf") as FontFile
+	# — implies FontFile. Body-weight Controls/variations reuse this FontFile directly;
+	# only header weights need FontVariation resources.
+	var inter_file := preload("res://addons/neocade_theme/fonts/inter_variable.ttf") as FontFile
 	default_font = inter_file
 	default_font_size = tokens.body
-	var body_font := preload("res://addons/neocade_theme/fonts/Inter-Body.tres") as FontVariation
+	var body_font := inter_file
 
 	# ── Register type variations (DESIGN_TOKENS §8.5; PITFALLS 1.2) ──
 	for variation_name in TYPE_VARIATIONS.keys():
@@ -189,16 +189,15 @@ func _regenerate_theme() -> void:
 		set_type_variation(variation_name, base_type)
 
 	# ── Set explicit fonts on header variations (PITFALLS 1.2 mandate) ──
-	var header_large_font  := preload("res://addons/neocade_theme/fonts/Inter-HeaderLarge.tres") as FontVariation
-	var header_medium_font := preload("res://addons/neocade_theme/fonts/Inter-HeaderMedium.tres") as FontVariation
-	var header_small_font  := preload("res://addons/neocade_theme/fonts/Inter-HeaderSmall.tres") as FontVariation
-	var caption_font       := preload("res://addons/neocade_theme/fonts/Inter-Caption.tres") as FontVariation
+	var header_large_font  := preload("res://addons/neocade_theme/fonts/inter_header_large.tres") as FontVariation
+	var header_medium_font := preload("res://addons/neocade_theme/fonts/inter_header_medium.tres") as FontVariation
+	var header_small_font  := preload("res://addons/neocade_theme/fonts/inter_header_small.tres") as FontVariation
 	# 15 variations × set_font (Cross-AI Cycle 1 C4 fix: CodeLabel included;
 	# Plan 05-04 D-09: Kicker is the 15th variation per DESIGN_TOKENS §8.6).
 	set_font("font", "HeaderLarge",  header_large_font)
 	set_font("font", "HeaderMedium", header_medium_font)
 	set_font("font", "HeaderSmall",  header_small_font)
-	set_font("font", "Caption",      caption_font)
+	set_font("font", "Caption",      body_font)
 	set_font("font", "CodeLabel",    body_font)   # consumer can override to a mono per FONT-04 stricken
 	# Kicker (D-09 / Plan 05-04): Inter Variable Roman body weight per UD-4 Option D / D-17.
 	# Per PITFALLS 1.2 type variations DO NOT inherit fonts from Label, so this
@@ -326,7 +325,7 @@ func _regenerate_theme() -> void:
 	set_font("font", "MenuBar", body_font)
 	set_font_size("font_size", "MenuBar", tokens.body)
 	set_font("font", "PopupMenu", body_font)
-	set_font("font_separator", "PopupMenu", caption_font)
+	set_font("font_separator", "PopupMenu", body_font)
 	set_font_size("font_size", "PopupMenu", tokens.body)
 	set_font_size("font_separator_size", "PopupMenu", tokens.label_)
 	set_font("font", "ColorPickerButton", body_font)

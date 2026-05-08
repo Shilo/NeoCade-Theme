@@ -1,9 +1,0 @@
-[gd_resource type="FontVariation" format=3]
-
-[ext_resource type="FontFile" uid="uid://ch6arnby2fd4y" path="res://addons/neocade_theme/fonts/Inter-Variable.ttf" id="1_ov2j3"]
-
-[resource]
-base_font = ExtResource("1_ov2j3")
-variation_opentype = {
-"wght": 400
-}

@@ -1,27 +1,24 @@
 @tool
-class_name NeoCadeThemeSwitcher
-extends OptionButton
+class_name NeoCadeThemeOptionButton extends OptionButton
 
 const DEFAULT_THEME_DIRECTORY := "res://addons/neocade_theme"
 const DEFAULT_LABEL := "Default"
 const THEME_FILE_EXTENSION := ".tres"
 const THEME_NAME_SUFFIX := "_neocade_theme"
 
-@export_group("Theme Discovery")
 @export_dir var theme_directory := DEFAULT_THEME_DIRECTORY:
 	set(value):
 		theme_directory = value
 		_queue_refresh()
 
-@export var allow_default_theme := true:
-	set(value):
-		allow_default_theme = value
-		_queue_refresh()
-
-@export_group("Target")
 @export_node_path("Control") var theme_target_path: NodePath:
 	set(value):
 		theme_target_path = value
+		_queue_refresh()
+
+@export var allow_default_theme := true:
+	set(value):
+		allow_default_theme = value
 		_queue_refresh()
 
 var _theme_paths: PackedStringArray = PackedStringArray()
@@ -47,7 +44,7 @@ func refresh_theme_list() -> void:
 		_add_theme_item(DEFAULT_LABEL, "")
 
 	for entry in _find_neocade_themes():
-		_add_theme_item(entry["label"], entry["path"])
+		_add_theme_item(String(entry["label"]), String(entry["path"]))
 
 	if item_count == 0:
 		return
@@ -158,13 +155,20 @@ func _theme_target() -> Control:
 		if explicit_target is Control:
 			return explicit_target
 
-	var edited_root := get_tree().get("edited_scene_root") as Node
+	var tree := get_tree()
+	if tree == null:
+		return null
+
+	var edited_root := tree.get("edited_scene_root") as Node
 	if edited_root is Control:
 		return edited_root
 
-	var current_scene := get_tree().current_scene
+	var current_scene := tree.current_scene
 	if current_scene is Control:
 		return current_scene
+
+	if owner is Control:
+		return owner
 
 	return null
 

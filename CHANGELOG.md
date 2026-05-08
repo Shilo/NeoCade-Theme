@@ -7,13 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (cleanup)
+
+- Runtime addon folder now contains only Godot-consumed addon assets plus the
+  required bundled-font OFL file. Package docs moved to repo root:
+  `README.md`, `ADDON_USAGE.md`, `CHANGELOG.md`, `LICENSE.md`, and `VERSION`.
+- Inter OFL text moved beside the redistributed font as
+  `addons/neocade_theme/fonts/inter_ofl.txt`.
+- Duplicate Body and Caption FontVariation resources were removed; both now
+  reuse the imported Inter FontFile directly and differ by Theme font-size
+  entries.
+- Removed unused `check.svg` and its import sidecar from the icon set.
+
 ### Added (Phase 9 — Showcase)
 
 - Editor-authored `res://main.tscn` showcase implemented with nine sections: Buttons,
   Text Inputs, Numbers & Range, Selection & Lists, Containers & Layout,
   Dialogs & Popups, Advanced & Graph, Token Gallery, and Coverage 37/37.
-- Reusable `NeoCadeThemeSwitcher` dropdown-only script at
-  `res://scripts/theme_switcher.gd`; it scans `addons/neocade_theme/` for
+- Reusable `NeoCadeThemeOptionButton` dropdown-only script at
+  `res://addons/neocade_theme/scripts/neocade_theme_option_button.gd`; it scans `addons/neocade_theme/` for
   `NeoCadeTheme` resources, keeps optional `Default` first, sorts themes
   alphabetically, and applies selection to an exported target or scene root.
 - BBCode demo with bold/color/italic/code markup, multi-script label sample,
@@ -49,13 +61,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `daybreak_neocade_theme.tres`, `burst_neocade_theme.tres`.
 - Inter Variable Roman font (PINNED to Inter v4.0;
   SHA256: `746431E950FD28D29B0189D708D4A5852A8458EDB3184387EADCEE9E5E34676C`)
-  bundled at `fonts/Inter-Variable.ttf` with Grayscale AA + Light hinting +
+  bundled at `fonts/inter_variable.ttf` with Grayscale AA + Light hinting +
   Auto subpixel + Mipmaps import settings (per GL Compatibility renderer
   constraints).
-- 5 FontVariation `.tres` resources covering the M3 type scale: HeaderLarge
-  (wght=800, opsz=32), HeaderMedium (wght=700, opsz=32), HeaderSmall
-  (wght=600, opsz=24), Body (wght=400), Caption (wght=400).
-- 10 bespoke monochrome SVG Button-family icons at `icons/`: check,
+- 3 FontVariation `.tres` resources covering the weighted header scale:
+  HeaderLarge (wght=800, opsz=32), HeaderMedium (wght=700, opsz=32), and
+  HeaderSmall (wght=600, opsz=24). Body-weight and Caption entries reuse the
+  imported `inter_variable.ttf` FontFile directly; Caption differs by font size.
+- 9 bespoke monochrome SVG Button-family icons at `icons/`:
   checkbox_checked, checkbox_unchecked, radio_checked, radio_unchecked,
   checkbutton_checked, checkbutton_unchecked, arrow_down, clear, close —
   all 32×32 reference, Scale=2.0 + Linear With Mipmaps import.
@@ -64,7 +77,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   CheckButton's `checked`/`unchecked` icon slot names per
   class_checkbutton.md. 6 disabled/mirrored CheckButton variants deferred
   to v1.x.)
-- SIL OFL 1.1 license text + Inter Reserved Font Name notice in `OFL.txt`.
+- SIL OFL 1.1 license text + Inter Reserved Font Name notice in
+  `fonts/inter_ofl.txt`.
 - Dynamic `_regenerate_theme()` engine that walks BINDING_TABLE covering
   all 37 canonical scorecard Godot 4.6 Control types (Cross-AI Cycle 2 L3
   fix: list trimmed to the canonical 37 from
@@ -92,13 +106,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed (Phase 4 post-review, 2026-05-06)
 
-- **BL-01 (font bundle bloat)**: removed `fonts/Inter-Variable.tres` and
-  repointed the 5 FontVariation `.tres` files + the class's `default_font`
-  preload to `fonts/Inter-Variable.ttf` directly (Godot 4 imports `.ttf` as
+- **BL-01 (font bundle bloat)**: removed `fonts/inter_variable.tres` and
+  repointed the FontVariation `.tres` files + the class's `default_font`
+  preload to `fonts/inter_variable.ttf` directly (Godot 4 imports `.ttf` as
   a `FontFile` resource via the `.import` sidecar). Bundle size dropped
   from ~2.0 MB back to ~857 KB, matching the FONT-REVIEW.md ~810 KB pledge.
   The previous `.tres` round-trip was inlining the Inter binary as a
   `PackedByteArray`, shipping the font twice.
+- **Font resource cleanup**: removed duplicate Body and Caption FontVariation
+  resources (`wght=400` on both). Body-weight and Caption entries now reuse
+  the imported Inter FontFile directly, with size differences handled by
+  Theme font-size entries.
 - **BL-02 (RichTextLabel slot-name typo)**: changed
   `set_font("font", "InfoText", body_font)` to
   `set_font("normal_font", "InfoText", body_font)` at

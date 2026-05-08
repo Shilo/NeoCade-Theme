@@ -18,8 +18,8 @@ jobs:
       GODOT_VERSION_DIR: 4.6.2.stable
       GODOT_ZIP_NAME: Godot_v4.6.2-stable_linux.x86_64
       GODOT_TEMPLATES_NAME: Godot_v4.6.2-stable_export_templates.tpz
-      VERSION_FILE: addons/neocade_theme/VERSION
-      CHANGELOG_FILE: addons/neocade_theme/CHANGELOG.md
+      VERSION_FILE: VERSION
+      CHANGELOG_FILE: CHANGELOG.md
 
     steps:
       - name: Checkout
@@ -161,7 +161,13 @@ jobs:
           git archive --format=zip \
             --prefix="neocade_theme-v${NEW_VERSION}/" \
             -o "neocade_theme-v${NEW_VERSION}.zip" \
-            "v${NEW_VERSION}" -- addons/neocade_theme/
+            "v${NEW_VERSION}" -- \
+            addons/neocade_theme/ \
+            README.md \
+            ADDON_USAGE.md \
+            CHANGELOG.md \
+            LICENSE.md \
+            VERSION
           unzip -l "neocade_theme-v${NEW_VERSION}.zip" | head -30
 
       - name: Extract CHANGELOG slice
