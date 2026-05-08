@@ -3,21 +3,21 @@ class_name NeoCadeThemeOptionButton extends OptionButton
 
 signal theme_selected(theme: Theme, index: int)
 
-const DEFAULT_THEME_RESOURCE_PATH := "res://addons/neocade_theme/neocade_theme.tres"
+const THEME_RESOURCE_FILE_NAME := "neocade_theme.tres"
 const NO_THEME_LABEL := "None"
 const NO_THEME_PRESET := -1
 const SELECTED_PROPERTY := &"selected"
 
-@export_file("*.tres") var theme_resource_path := DEFAULT_THEME_RESOURCE_PATH:
+@export_node_path("Control") var theme_target_path: NodePath:
 	set(value):
-		theme_resource_path = value
+		theme_target_path = value
 		if _is_ready:
 			_refresh_should_mirror_target = true
 		_queue_refresh()
 
-@export_node_path("Control") var theme_target_path: NodePath:
+@export_file("*.tres") var theme_resource_path := "":
 	set(value):
-		theme_target_path = value
+		theme_resource_path = value
 		if _is_ready:
 			_refresh_should_mirror_target = true
 		_queue_refresh()
@@ -149,13 +149,25 @@ func _add_preset_item(label: String, preset_value: int) -> void:
 
 
 func _theme_for_preset(preset_value: int) -> NeoCadeTheme:
-	var loaded_theme := load(theme_resource_path) as NeoCadeTheme
+	var loaded_theme := load(_resolved_theme_resource_path()) as NeoCadeTheme
 	if loaded_theme == null:
 		return null
 
 	var next_theme := loaded_theme.duplicate(true) as NeoCadeTheme
 	next_theme.preset = preset_value
 	return next_theme
+
+
+func _resolved_theme_resource_path() -> String:
+	if not theme_resource_path.is_empty():
+		return theme_resource_path
+
+	var script := get_script() as Script
+	if script == null or script.resource_path.is_empty():
+		return THEME_RESOURCE_FILE_NAME
+
+	var addon_directory := script.resource_path.get_base_dir().path_join("..").simplify_path()
+	return addon_directory.path_join(THEME_RESOURCE_FILE_NAME)
 
 
 func _select_current_target_preset(target: Control) -> bool:
