@@ -70,6 +70,14 @@ func refresh_theme_list() -> void:
 		select(-1)
 		return
 
+	if requested_selected == -1:
+		_refresh_should_mirror_target = false
+		if _should_sync_selected_from_target() and _select_current_target_theme(target, current_target_path):
+			return
+
+		select(-1)
+		return
+
 	if _refresh_should_mirror_target:
 		_refresh_should_mirror_target = false
 		if _select_current_target_theme(target, current_target_path):
@@ -175,19 +183,25 @@ func _index_for_theme_path(theme_path: String) -> int:
 
 
 func _select_current_target_theme(target: Control, current_target_path: String) -> bool:
-	if not current_target_path.is_empty():
-		var matching_index := _index_for_theme_path(current_target_path)
-		if matching_index != -1:
-			select(matching_index)
-			return true
+	var matching_index := _index_for_target_theme(target, current_target_path)
+	if matching_index == -1:
+		return false
 
-	if target != null and target.theme == null:
-		var no_theme_index := _index_for_theme_path("")
-		if no_theme_index != -1:
-			select(no_theme_index)
-			return true
+	select(matching_index)
+	return true
 
-	return false
+
+func _index_for_target_theme(target: Control, current_target_path: String) -> int:
+	if target == null:
+		return -1
+
+	if target.theme == null:
+		return _index_for_theme_path("")
+
+	if current_target_path.is_empty():
+		return -1
+
+	return _index_for_theme_path(current_target_path)
 
 
 func _target_has_theme_path(target: Control, theme_path: String) -> bool:
@@ -242,4 +256,15 @@ func _queue_selected_apply() -> void:
 
 func _apply_selected_change() -> void:
 	_selected_apply_queued = false
+	if selected == -1:
+		if _should_sync_selected_from_target():
+			var target := _theme_target()
+			if not _select_current_target_theme(target, _current_target_theme_path(target)):
+				select(-1)
+		return
+
 	_apply_theme(selected)
+
+
+func _should_sync_selected_from_target() -> bool:
+	return not Engine.is_editor_hint()
