@@ -12,11 +12,15 @@ const THEME_NAME_SUFFIX := "_neocade_theme"
 @export_dir var theme_directory := DEFAULT_THEME_DIRECTORY:
 	set(value):
 		theme_directory = value
+		if _is_ready:
+			_refresh_should_mirror_target = true
 		_queue_refresh()
 
 @export_node_path("Control") var theme_target_path: NodePath:
 	set(value):
 		theme_target_path = value
+		if _is_ready:
+			_refresh_should_mirror_target = true
 		_queue_refresh()
 
 @export var allow_no_theme := true:
@@ -29,6 +33,7 @@ const THEME_NAME_SUFFIX := "_neocade_theme"
 
 var _theme_paths: PackedStringArray = PackedStringArray()
 var _is_ready := false
+var _refresh_should_mirror_target := false
 var _selected_apply_queued := false
 
 
@@ -65,24 +70,21 @@ func refresh_theme_list() -> void:
 		select(-1)
 		return
 
+	if _refresh_should_mirror_target:
+		_refresh_should_mirror_target = false
+		if _select_current_target_theme(target, current_target_path):
+			return
+
+		select(-1)
+		return
+
 	if requested_selected >= 0 and requested_selected < _theme_paths.size():
 		select(requested_selected)
 		_apply_theme(requested_selected)
 		return
 
-	if not current_target_path.is_empty():
-		var matching_index := _index_for_theme_path(current_target_path)
-		if matching_index != -1:
-			select(matching_index)
-			return
-
-	if target != null and target.theme == null:
-		var no_theme_index := _index_for_theme_path("")
-		if no_theme_index != -1:
-			select(no_theme_index)
-			return
-
-	select(-1)
+	if not _select_current_target_theme(target, current_target_path):
+		select(-1)
 
 
 func _on_item_selected(index: int) -> void:
@@ -164,19 +166,28 @@ func _current_target_theme_path(target: Control) -> String:
 	return target.theme.resource_path
 
 
-func _theme_path_for_index(index: int) -> String:
-	if index < 0 or index >= _theme_paths.size():
-		return ""
-
-	return _theme_paths[index]
-
-
 func _index_for_theme_path(theme_path: String) -> int:
 	for index in range(_theme_paths.size()):
 		if _theme_paths[index] == theme_path:
 			return index
 
 	return -1
+
+
+func _select_current_target_theme(target: Control, current_target_path: String) -> bool:
+	if not current_target_path.is_empty():
+		var matching_index := _index_for_theme_path(current_target_path)
+		if matching_index != -1:
+			select(matching_index)
+			return true
+
+	if target != null and target.theme == null:
+		var no_theme_index := _index_for_theme_path("")
+		if no_theme_index != -1:
+			select(no_theme_index)
+			return true
+
+	return false
 
 
 func _target_has_theme_path(target: Control, theme_path: String) -> bool:
