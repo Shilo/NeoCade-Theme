@@ -10,7 +10,7 @@ re_verification: false
 human_uat_status: complete (8 auto-pass, 6 deferred-by-design to Phase 9, 1 LSP recheck informational)
 gaps: []
 deferred:
-  - truth: "Visual UAT — Pulse opens cleanly in main.tscn; per-direction PrimaryButton renders bold-accent-fill with rectangular radius=0; no textures/patterns/shadows on flat chrome"
+  - truth: "Visual UAT — Pulse opens cleanly in showcase/showcase.tscn; per-direction PrimaryButton renders bold-accent-fill with rectangular radius=0; no textures/patterns/shadows on flat chrome"
     addressed_in: "Phase 9"
     evidence: "Phase 9 success criteria: showcase scene + theme picker + variation toggles is the explicit Phase 9 deliverable; UAT.md test 9 marked skipped with reason"
   - truth: "Visual UAT — direction distinctness via greyscale-sufficiency test (D-30) — Slate r=14 pill, Bubble r=26+999, Daybreak r=8 airy, Burst r=18+28 statement"
@@ -44,7 +44,7 @@ deferred:
     addressed_in: "Phase 7 (apply pattern) + Phase 10 (verify)"
     evidence: "REQUIREMENTS.md line 318: 'COV-09 | Phase 5 (focus-as-outer-ring pattern established) | Phase 6 + 7 (applied to every focusable Control); Phase 10 (verification)'"
 human_verification:
-  - test: "Open `main.tscn` in Godot 4.6.2 editor and confirm: (a) no Output panel errors, (b) Pulse theme renders the new Phase 5 variations correctly in the embedded preview if any are present, (c) round-tripped `.tres` files still open as `NeoCadeTheme` with the 9 @export properties visible, (d) toggling `raised` regenerates styleboxes without errors."
+  - test: "Open `showcase/showcase.tscn` in Godot 4.6.2 editor and confirm: (a) no Output panel errors, (b) Pulse theme renders the new Phase 5 variations correctly in the embedded preview if any are present, (c) round-tripped `.tres` files still open as `NeoCadeTheme` with the 9 @export properties visible, (d) toggling `raised` regenerates styleboxes without errors."
     expected: "Output panel clean. All 5 .tres files open as NeoCadeTheme resources. Editor regeneration responsive."
     why_human: "Headless verifier doesn't render pixels; Output-panel cleanliness on the live editor confirms the addon survived ResourceSaver round-trip without producing import warnings or runtime errors. Confirms Plan 05-07's data-only round-trip didn't corrupt any direction file. Cheapest editor smoke test possible."
     severity: informational
@@ -94,7 +94,7 @@ overrides: []
 | `.planning/phases/05-.../helpers/_phase5_verify.gd` + `_phase5_verify_headless.gd`                 | Dual EditorScript + headless verifier with 28 D-12 named assertion groups + 8 stages   | ✓ VERIFIED | Both files present. Live `--stage strict` run prints all 28 PHASE5_GROUP_OK markers, 0 PENDING, 0 failures, exit 0.                                                |
 | `.planning/phases/05-.../helpers/_phase5_focus_probe.gd`                                          | Structural focus probe: 5 directions × 10 controls = 50 slots; D-07 invariant guard    | ✓ VERIFIED | Live re-run confirms 50/50 focus slots OK; PHASE5_FOCUS_RENDER_SKIPPED for optional pixel sample.                                                                  |
 | `.planning/phases/05-.../helpers/_phase5_resource_saver.gd`                                       | ResourceSaver round-trip helper retiring Cycle 6 F7 hand-author fallback              | ✓ VERIFIED | Source-controlled; verbatim-copies Phase 4 strip helpers (`_strip_theme_entries`, `_strip_load_steps_attr`); Plan 05-07 commit `b6abd4f` lands the round-tripped .tres files. |
-| `main.tscn`                                                                                       | Theme override unchanged from Phase 4 (still references Pulse)                         | ✓ VERIFIED | Untouched by Phase 5 (per CONTEXT.md "no changes to main.tscn"; git diff confirms).                                                                                |
+| `showcase/showcase.tscn`                                                                                       | Theme override unchanged from Phase 4 (still references Pulse)                         | ✓ VERIFIED | Untouched by Phase 5 (per CONTEXT.md "no changes to showcase/showcase.tscn"; git diff confirms).                                                                                |
 | 7 plan SUMMARY.md files (05-01 .. 05-07)                                                          | Each documents commits + decisions + deviations                                        | ✓ VERIFIED | All 7 present and committed; orchestrator tracking commits also present (`d4ac7ad`).                                                                              |
 
 ### Key Link Verification
@@ -177,7 +177,7 @@ overrides: []
 | Production class line count                                    | `wc -l addons/neocade_theme/neocade_theme.gd`                                                                     | 2249 lines (+1032 vs Phase 4's 1217)                | ✓ PASS |
 | D-01 invariant (no Theme.clear)                                | `grep -nE '\.clear\(\)\|Theme\.clear\|set_theme\(null\|free\(\)' production source                                | 0 matches                                           | ✓ PASS |
 | D-07 invariant (no invented combo slots)                       | `grep -nE 'pressed_focus\|checked_focus\|hover_pressed_focus' production source                                   | 1 comment-only reference at line 1486 (policy doc); no theme wiring | ✓ PASS |
-| Out-of-scope file modifications                                | `git diff --name-only a53dd9f^..3c602bb` filtered to non-Phase-5 paths                                            | 2 minor LSP type-fixes to Phase 4 helpers (commit c3e0690); main.tscn untouched; no addon paths outside declared scope | ✓ PASS (acceptable) |
+| Out-of-scope file modifications                                | `git diff --name-only a53dd9f^..3c602bb` filtered to non-Phase-5 paths                                            | 2 minor LSP type-fixes to Phase 4 helpers (commit c3e0690); showcase/showcase.tscn untouched; no addon paths outside declared scope | ✓ PASS (acceptable) |
 | Out-of-scope addon files                                       | `git diff --stat a53dd9f^..3c602bb -- addons/`                                                                    | Only `*_neocade_theme.tres` (×5), `neocade_theme.gd`, and 3 new icon SVGs+.imports — exactly Plan 05-07 declared scope | ✓ PASS |
 
 ### Cross-Reference With UAT.md
@@ -220,7 +220,7 @@ Result: **1 comment-only reference at line 1486** documenting the policy ("focus
 
 Both modifications are commit `c3e0690` (`fix(04): typed path String to silence GDScript LSP type-inference error`) — a 2-line LSP fix to Phase 4 helpers triggered when the user opened the editor during Phase 5 verify-work. Runtime behavior unchanged. Acceptable as informational scope leak; not a Phase 5 closure blocker.
 
-`main.tscn` untouched (per CONTEXT.md "no changes to main.tscn"). Plan 05-07's ResourceSaver round-trip preserved the script linkage so main.tscn's `theme = ExtResource("1_pulse_theme")` continues to resolve correctly.
+`showcase/showcase.tscn` untouched (per CONTEXT.md "no changes to showcase/showcase.tscn"). Plan 05-07's ResourceSaver round-trip preserved the script linkage so showcase/showcase.tscn's `theme = ExtResource("1_pulse_theme")` continues to resolve correctly.
 
 ### Deferred Items (Out of Scope, Explicitly Tracked)
 
@@ -239,7 +239,7 @@ Items addressed in later phases — NOT actionable Phase 5 gaps. See `deferred:`
 
 See `human_verification:` array in frontmatter. Both items are **informational** (not gating Phase 5 closure):
 
-1. **Editor sanity check** — open `main.tscn` in Godot 4.6.2 editor; confirm Output panel clean, .tres files reload as NeoCadeTheme, raised-toggle regenerates styleboxes.
+1. **Editor sanity check** — open `showcase/showcase.tscn` in Godot 4.6.2 editor; confirm Output panel clean, .tres files reload as NeoCadeTheme, raised-toggle regenerates styleboxes.
 2. **Phase 4 LSP recheck** — confirm GDScript LSP errors on `path` variables in Phase 4 helpers cleared after commit `c3e0690`.
 
 Both are post-merge editor-smoke checks; structural verification is complete.
@@ -261,7 +261,7 @@ Both are post-merge editor-smoke checks; structural verification is complete.
 - 50/50 focus slots OK
 - All D-01..D-17 invariants hold
 - All anti-features upheld
-- No out-of-scope drift on addon production code or main.tscn
+- No out-of-scope drift on addon production code or showcase/showcase.tscn
 - 11 deferred items all map to documented later-phase scope (Phase 6/7/8/9/10) with ROADMAP / REQUIREMENTS.md / CONTEXT.md citations
 
 The phase passes the "feature-complete to godot-minimal-theme's bar" pledge for the Phase-5-in-scope Controls (BaseButton family + 5 text classes + Panel/PanelContainer + SpinBox + 14 base + 1 Kicker variation chrome) across all 5 approved directions (Pulse / Slate / Bubble / Daybreak / Burst). Visual aesthetic verification belongs to Phase 9 by user election; that deferral does not block Phase 6 from beginning Tree / ItemList / Tabs / Range work.

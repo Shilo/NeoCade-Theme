@@ -786,7 +786,7 @@ The synthesizer/roadmapper must add at least these two phases to the existing ro
 1. **`addons/neocade_theme/scripts/neocade_theme.gd`** — `@tool` Theme subclass regenerates entries when exported state changes.
 2. **Five direction `.tres` files** — each stores the shared exported `platform` state and regenerates desktop/mobile/AUTO values.
 3. **Mobile-specific tap-target audit script** — GDScript validates every interactive Control in mobile variant has minimum 48px hit area.
-4. **Updated showcase scene `main.tscn`** — exposes desktop/mobile/default theme comparison through the editor-authored interface.
+4. **Updated showcase scene `showcase/showcase.tscn`** — exposes desktop/mobile/default theme comparison through the editor-authored interface.
 5. **`.planning/MOBILE-DESIGN-SPEC.md`** — written specification of every mobile delta vs desktop, citing iOS HIG / Material 3 sources for each value.
 
 **Acceptance:**

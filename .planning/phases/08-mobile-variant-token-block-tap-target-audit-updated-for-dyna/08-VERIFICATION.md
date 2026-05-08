@@ -20,7 +20,7 @@ All five Phase 8 plans are summarized, the full Phase 8 verifier was re-run duri
 | Check | Result | Evidence |
 |---|---:|---|
 | `powershell -NoProfile -ExecutionPolicy Bypass -File .planning/phases/08-mobile-variant-token-block-tap-target-audit-updated-for-dyna/helpers/_run-phase8-verify.ps1 -Stage full` | PASS | `PHASE8_VERIFY OK (stage=full)`, 6 groups OK, 0 pending, 0 failures |
-| Resolved Godot scene smoke: `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path . main.tscn --quit` | PASS | Godot 4.6.2 launched and exited 0 |
+| Resolved Godot scene smoke: `Godot_v4.6.2-stable_mono_win64_console.exe --headless --path . showcase/showcase.tscn --quit` | PASS | Godot 4.6.2 launched and exited 0 |
 | `gsd-sdk query audit-open --json` | PASS | `has_open_items: false`, `total: 0` |
 
 Resolved Godot provenance: `.planning/phases/08-mobile-variant-token-block-tap-target-audit-updated-for-dyna/helpers/godot-cli-provenance.txt` records `4.6.2.stable.mono.official.71f334935`.
@@ -58,7 +58,7 @@ Resolved Godot provenance: `.planning/phases/08-mobile-variant-token-block-tap-t
 - All five directions forced mobile: Pulse, Slate, Bubble, Daybreak, and Burst are audited in forced `platform=MOBILE`.
 - Root `MOBILE-DESIGN-SPEC.md`: present at repository root and verified by the `docs` group.
 - Raised/platform orthogonality: verified by the `platform-tokens` group and documented in the root spec.
-- Scene toggle proof: `main.tscn` references `scripts/phase8_platform_toggle.gd`; `scene-toggle` group passes and headless scene smoke exits 0.
+- Scene toggle proof: `showcase/showcase.tscn` references `scripts/phase8_platform_toggle.gd`; `scene-toggle` group passes and headless scene smoke exits 0.
 - No mobile `.tres`: `neocade_mobile_theme.tres` remains forbidden and absent.
 - No subclasses/root fallback: addon root has one production `.gd`, no per-direction `.gd`, no root `neocade_theme.tres`.
 - No `Theme.clear`: architecture verifier rejects clear/reset patterns; full verifier passes.

@@ -168,14 +168,15 @@ the font's internal name/metadata.
 
 ## Showcase
 
-The repository-level `main.tscn` is a live showcase for this addon. It opens
+The repository-level `showcase/showcase.tscn` is a live showcase for this addon. It opens
 with Pulse and includes:
 
 - a `NeoCadeThemeOptionButton` direction picker that scans `addons/neocade_theme/`,
   keeps `Default` first, then sorts detected `NeoCadeTheme` resources alphabetically
 - an editor-authored Control tree previewable directly in the Godot editor
-- a dropdown-only script at `res://addons/neocade_theme/scripts/neocade_theme_option_button.gd` with exported
-  target and default-theme options
+- a reusable theme-picker script at `res://addons/neocade_theme/scripts/neocade_theme_option_button.gd`
+  with exported target/default-theme options, plus a small `res://showcase/showcase.gd`
+  scene script for scoreboard window open/close behavior
 - 9 sections covering controls, dialogs, graph, token gallery, and coverage
 
 The Web export preset is named `Web`; the release workflow publishes the

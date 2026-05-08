@@ -5,7 +5,7 @@
 
 ## Runtime Showcase Coverage
 
-`scripts/showcase.gd` creates visible or callable samples for:
+`showcase/showcase.tscn` serializes visible or callable samples for:
 
 - Button, CheckBox, CheckButton, OptionButton, MenuButton, ColorPickerButton, LinkButton
 - Label, RichTextLabel, LineEdit, TextEdit, CodeEdit

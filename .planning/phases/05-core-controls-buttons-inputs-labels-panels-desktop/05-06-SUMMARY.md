@@ -200,7 +200,7 @@ Verified post-write:
   - `text-final` carry-forward: 25/25 OK, 0 failures (PASS — Wave 5 not regressed)
   - `text-panels` carry-forward: 25/25 OK, 0 failures (PASS — Wave 4 not regressed)
   - `buttons` carry-forward: 25/25 OK, 0 failures (PASS — Wave 3 not regressed)
-- **Out-of-scope writes:** none. STATE.md, ROADMAP.md, addon `*_neocade_theme.tres` files, and `main.tscn` were not modified by this plan.
+- **Out-of-scope writes:** none. STATE.md, ROADMAP.md, addon `*_neocade_theme.tres` files, and `showcase/showcase.tscn` were not modified by this plan.
 - **Icon count:** addon now has **13 SVG icons** (Phase 4's 10 + Wave 5's `code_folded` + Wave 6's `spinbox_up` and `spinbox_down`) — matches the README CHANGELOG target.
 
 ## TDD Gate Compliance

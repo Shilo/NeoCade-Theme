@@ -91,7 +91,7 @@ This phase must author explicit desktop theme entries for these Controls inside 
 - `addons/neocade_theme/bubble_neocade_theme.tres` - Peer direction resource.
 - `addons/neocade_theme/daybreak_neocade_theme.tres` - Peer direction resource.
 - `addons/neocade_theme/burst_neocade_theme.tres` - Peer direction resource.
-- `main.tscn` - Showcase scene scaffold; visual coverage expansion is Phase 9 unless needed as a temporary verifier fixture.
+- `showcase/showcase.tscn` - Showcase scene scaffold; visual coverage expansion is Phase 9 unless needed as a temporary verifier fixture.
 
 </canonical_refs>
 
@@ -114,7 +114,7 @@ This phase must author explicit desktop theme entries for these Controls inside 
 - Phase 7 should add bindings and direct theme entries in `addons/neocade_theme/neocade_theme.gd`.
 - New icons belong in `addons/neocade_theme/icons/` with Godot-generated imports.
 - Phase-specific probes/verifiers belong under `.planning/phases/07-dialogs-popups-advanced-window-popups-menubar-colorpicker-gr/helpers/`.
-- Any temporary test scenes or introspection scripts should remain planning/helper artifacts unless a plan explicitly promotes showcase coverage to `main.tscn`.
+- Any temporary test scenes or introspection scripts should remain planning/helper artifacts unless a plan explicitly promotes showcase coverage to `showcase/showcase.tscn`.
 
 </code_context>
 

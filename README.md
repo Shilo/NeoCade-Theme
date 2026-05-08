@@ -11,7 +11,7 @@ this repository is only the reusable NeoCade theme addon.
 ## Status
 
 v1 implementation is in final QA/release preparation. The live showcase is
-`res://main.tscn` and uses Pulse as the recommended starter direction.
+`res://showcase/showcase.tscn` and uses Pulse as the recommended starter direction.
 
 ## What Ships
 
@@ -60,12 +60,13 @@ theme = active_theme
 
 ## Showcase
 
-Open `main.tscn` in Godot 4.6.2 to inspect:
+Open `showcase/showcase.tscn` in Godot 4.6.2 to inspect:
 
 - 9 sections covering controls, dialogs, graph, tokens, and coverage.
 - `NeoCadeThemeOptionButton` dropdown in `addons/neocade_theme/scripts/` scans `addons/neocade_theme/` for
   `NeoCadeTheme` resources, keeps `Default` first, then sorts themes alphabetically.
-- Editor-authored Control tree; only the theme picker is scripted.
+- Editor-authored Control tree; scripts are limited to the theme picker and
+  scoreboard window open/close behavior.
 - BBCode sample, multi-script sample, token gallery, and coverage strip.
 
 `export_presets.cfg` includes a Web preset for release builds and named

@@ -53,7 +53,7 @@ The gaps are not architectural invention gaps; they are enforcement gaps:
 - No helper checks all five directions in forced mobile mode.
 - No tap-target audit computes per-Control mobile hit-area proxies.
 - No root `MOBILE-DESIGN-SPEC.md` exists.
-- `main.tscn` is still a bare Control with the Pulse theme applied; it does not yet prove platform/raised toggling.
+- `showcase/showcase.tscn` is still a bare Control with the Pulse theme applied; it does not yet prove platform/raised toggling.
 
 ## Recommended Plan Shape
 
@@ -63,7 +63,7 @@ Use five sequential waves:
 2. Production mobile token hardening and forced platform verification.
 3. All-direction forced mobile pass plus strict 48px tap-target audit.
 4. Root `MOBILE-DESIGN-SPEC.md` with 37-row and type-variation documentation.
-5. Minimal `main.tscn` platform/raised toggle proof plus final full verification and data-only resource checks.
+5. Minimal `showcase/showcase.tscn` platform/raised toggle proof plus final full verification and data-only resource checks.
 
 This mirrors the successful Phase 6/7 pattern: helper foundation first, production contract hardening second, strict audit third, documentation handoff fourth, final scene/resource closure last.
 
@@ -108,7 +108,7 @@ The audit must fail for any enforceable interactive row under 48px on either axi
 - `.planning/phases/07-dialogs-popups-advanced-window-popups-menubar-colorpicker-gr/helpers/_phase7_resource_saver.gd`
 - `addons/neocade_theme/neocade_theme.gd`
 - `addons/neocade_theme/*_neocade_theme.tres`
-- `main.tscn`
+- `showcase/showcase.tscn`
 
 ## Metadata
 

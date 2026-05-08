@@ -36,5 +36,5 @@ Read these files when the topic is relevant. Do not duplicate or summarize their
 - Coverage, stack, cross-platform, editor, and pitfall research: `.planning/research/FEATURES.md`, `.planning/research/STACK.md`, `.planning/research/CROSS-PLATFORM.md`, `.planning/research/EDITOR-COVERAGE.md`, `.planning/research/PITFALLS.md`
 - Historical Phase 3 redirect notes and v0 feedback DNA: `.planning/phases/03-visual-direction-mockup-approval-gate/REDIRECTED.md`
 - User-supplied inputs, not sources of truth: `.planning/inputs/NeoCade-Research-Report.md`, `.planning/inputs/NeoCade-Theme-Prototype.png`
-- Godot project and showcase: `project.godot`, `main.tscn`
+- Godot project and showcase: `project.godot`, `showcase/showcase.tscn`
 - Current addon implementation: `addons/neocade_theme/scripts/neocade_theme.gd`, `addons/neocade_theme/scripts/neocade_theme_option_button.gd`, and the five root direction `.tres` files

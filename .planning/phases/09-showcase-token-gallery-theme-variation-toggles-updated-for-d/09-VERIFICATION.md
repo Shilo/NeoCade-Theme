@@ -16,9 +16,9 @@ project main scene, and loads cleanly in Godot 4.6.2 through the MCP runner.
 
 | Check | Result | Evidence |
 |---|---:|---|
-| `main.tscn` is project main scene | PASS | `project.godot` `run/main_scene="uid://beivemw6fcnld"` and `main.tscn` keeps that UID |
-| Pulse default | PASS | `main.tscn` preloads `res://addons/neocade_theme/pulse_neocade_theme.tres` |
-| 9 sections | PASS | `scripts/showcase.gd` adds Buttons, Text Inputs, Numbers & Range, Selection & Lists, Containers & Layout, Dialogs & Popups, Advanced & Graph, Token Gallery, Coverage 37/37 |
+| `showcase/showcase.tscn` is project main scene | PASS | `project.godot` `run/main_scene="uid://beivemw6fcnld"` and `showcase/showcase.tscn` keeps that UID |
+| Pulse default | PASS | `showcase/showcase.tscn` preloads `res://addons/neocade_theme/pulse_neocade_theme.tres` |
+| 9 sections | PASS | `showcase/showcase.tscn` serializes Buttons, Text Inputs, Numbers & Range, Selection & Lists, Containers & Layout, Dialogs & Popups, Advanced & Graph, Token Gallery, Coverage 37/37 |
 | Theme picker | PASS | Five direction `.tres` resources + Godot default option |
 | Raised/platform toggles | PASS | Mutates duplicated `NeoCadeTheme.raised` and `NeoCadeTheme.platform` |
 | BBCode demo | PASS | RichTextLabel sample uses bold, color, italic, and code BBCode |

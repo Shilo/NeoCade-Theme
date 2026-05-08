@@ -29,7 +29,7 @@ If everything else fails, this single deliverable must work: a polished, feature
 - **Mockup approval gate**: Phase 3.4 closed before Phase 4 implementation began; Pulse is the recommended starter and all five directions ship.
 - **Theme editor authoring**: shared behavior lives in `neocade_theme.gd`; per-direction resources persist their export values and intentional overrides as `.tres` files.
 - **Type variations**: the live `TYPE_VARIATIONS` registry contains 15 production variations and is documented.
-- **Showcase scene + theme picker**: `main.tscn` is an editor-authored Control tree for the nine-section showcase, Godot-default comparison, and direction picker. Only the dropdown is scripted, via reusable `class_name NeoCadeThemeOptionButton` at `addons/neocade_theme/scripts/neocade_theme_option_button.gd`; it dynamically scans `addons/neocade_theme/`, keeps optional `Default` first, sorts detected `NeoCadeTheme` resources alphabetically, and applies selection to an exported target or scene root. The showcase UI itself must not be created by a runtime builder script. Raised/platform variations remain `NeoCadeTheme` resource exports previewed through the inspector or consumer code, not showcase runtime controls.
+- **Showcase scene + theme picker**: `showcase/showcase.tscn` is an editor-authored Control tree for the nine-section showcase, Godot-default comparison, and direction picker. The reusable `class_name NeoCadeThemeOptionButton` at `addons/neocade_theme/scripts/neocade_theme_option_button.gd` dynamically scans `addons/neocade_theme/`, keeps optional `Default` first, sorts detected `NeoCadeTheme` resources alphabetically, and applies selection to an exported target or scene root. `showcase/showcase.gd` is limited to showcase behavior glue such as scoreboard Window open/close handling. The showcase UI itself must not be created by a runtime builder script. Raised/platform variations remain `NeoCadeTheme` resource exports previewed through the inspector or consumer code, not showcase runtime controls.
 - **MCP/QA and accessibility evidence**: autonomous QA evidence is committed for tooling, coverage, contrast, exports, and fresh-install dry-run. Manual screenshot/device/screen-reader UAT remains deferred by user instruction.
 
 ### Active
@@ -75,7 +75,7 @@ If everything else fails, this single deliverable must work: a polished, feature
 - `res://addons/neocade_theme/fonts/inter_variable.ttf` — single bundled font per UD-4 / Option D (Inter Variable Roman ONLY in v1)
 - `res://addons/neocade_theme/icons/` — bespoke SVG icon set (~25-40 icons, per STACK research)
 - `res://addons/neocade_theme/fonts/inter_ofl.txt` — OFL license file for bundled Inter; retained inside the addon because the font binary is redistributed there
-- `res://main.tscn` — showcase scene, applies theme to a fullscreen Control root
+- `res://showcase/showcase.tscn` — showcase scene, applies theme to a fullscreen Control root
 - `res://icon.svg` — Godot project icon (default, may be rebranded later)
 
 **Export targets (all required for v1):**

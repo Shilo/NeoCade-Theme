@@ -210,4 +210,4 @@ No Rule 2 (missing critical functionality), Rule 3 (blocking), or Rule 4 (archit
 - `5293e25` (Task 2 GREEN) — polished Button / OptionButton / MenuButton / ColorPickerButton + added disabled icon reuse to CheckBox / CheckButton; verifier passes.
 - `bd9643a` (Task 3) — extended focus probe to 5 directions × 10 controls with 5 mandatory structural assertions per slot.
 
-**No out-of-scope drift:** `git status` shows only this `05-03-SUMMARY.md` untracked at the moment of write; `git diff --name-only e0de3bd..HEAD` lists exactly the 4 files in scope per the plan's `files_modified` frontmatter. No `addons/*.tres` modifications, no `main.tscn` modifications, no `STATE.md` / `ROADMAP.md` modifications (the orchestrator owns those writes after the wave completes).
+**No out-of-scope drift:** `git status` shows only this `05-03-SUMMARY.md` untracked at the moment of write; `git diff --name-only e0de3bd..HEAD` lists exactly the 4 files in scope per the plan's `files_modified` frontmatter. No `addons/*.tres` modifications, no `showcase/showcase.tscn` modifications, no `STATE.md` / `ROADMAP.md` modifications (the orchestrator owns those writes after the wave completes).

@@ -186,7 +186,7 @@ None. All 7 text/label/RTL variations + 3 panel variations have authored chrome 
 - **Verifier gates:**
   - text-panels stage: 23/23 OK, 0 failures (PASS)
   - buttons stage carry-forward: 23/23 OK, 0 failures (PASS — Wave 3 not regressed)
-- **Out-of-scope writes:** none. STATE.md, ROADMAP.md, addon `*_neocade_theme.tres` files, and `main.tscn` were not modified.
+- **Out-of-scope writes:** none. STATE.md, ROADMAP.md, addon `*_neocade_theme.tres` files, and `showcase/showcase.tscn` were not modified.
 
 ## TDD Gate Compliance
 

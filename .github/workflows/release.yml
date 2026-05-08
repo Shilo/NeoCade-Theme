@@ -94,7 +94,7 @@ jobs:
       - name: Headless-open showcase scene
         run: |
           set +e
-          ./godot --headless --path . --quit-after 2 res://main.tscn 2> open_stderr.log
+          ./godot --headless --path . --quit-after 2 res://showcase/showcase.tscn 2> open_stderr.log
           echo "open exit code: $?"
           if grep -qE '^(ERROR|SCRIPT ERROR):' open_stderr.log; then
             echo "::error::Showcase scene open produced errors:"

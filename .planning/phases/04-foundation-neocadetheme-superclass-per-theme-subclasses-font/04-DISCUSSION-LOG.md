@@ -186,7 +186,7 @@ The following Phase 4 decisions are intentionally left to Claude per the discuss
 - SVG authoring approach (hand-written SVG XML vs parametric template generation — both are Claude's-authoring; choose based on icon style consistency).
 - Exact filename casing for FontVariation resources (`Inter-Variable.tres` is FONT-01; variation file naming convention TBD).
 - README structure beyond required content (consumer pattern + Pulse + UD-2 + custom authoring); polish to v1 scope happens in Phase 11.
-- Scaffold `.tres` deletion sequencing (delete-first vs swap-and-delete vs keep-as-safety-net) — DESIGN_TOKENS §12.2 says delete in the FIRST task; Claude picks the atomic-swap pattern that keeps `main.tscn` valid throughout.
+- Scaffold `.tres` deletion sequencing (delete-first vs swap-and-delete vs keep-as-safety-net) — DESIGN_TOKENS §12.2 says delete in the FIRST task; Claude picks the atomic-swap pattern that keeps `showcase/showcase.tscn` valid throughout.
 
 ## Deferred Ideas
 

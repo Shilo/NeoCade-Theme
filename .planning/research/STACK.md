@@ -74,7 +74,7 @@ These supersede every other recommendation below. Lock them at the end of design
 | **Context7 MCP** | Live docs for Godot, Material 3, font libraries | Per user's global rule: use it for any framework/library question even when training data feels confident. (Note: this agent had MCP tools stripped due to upstream bug — verified findings via WebFetch instead. Implementation phase agents should use Context7 directly.) |
 | **Godot's built-in Theme Generator** | One-click "fill in defaults for all Controls" button in the Theme editor | Use ONCE early to seed all Control types with default styleboxes, then overwrite with NeoCade values. Saves authoring time vs adding each item by hand. |
 | **WCAG contrast checker** (e.g., webaim.org/resources/contrastchecker) | Verify all token pairs hit 4.5:1 (text) / 3:1 (UI) | Required before mockup approval. Document the matrix in DESIGN.md. |
-| **Godot CLI** (`godot --headless --import`, `godot main.tscn`) | Reproducible re-import of font/icon resources, scripted screenshot runs | Pair with GoPeak MCP for QA. |
+| **Godot CLI** (`godot --headless --import`, `godot showcase/showcase.tscn`) | Reproducible re-import of font/icon resources, scripted screenshot runs | Pair with GoPeak MCP for QA. |
 | **Git LFS** | Optional — for the `.ttf` files (~500KB-2MB each) | Probably skip; total bundled font size is ~3-5 MB, not LFS-worthy. Repo will be ~5 MB which is fine. |
 
 ---
@@ -117,7 +117,7 @@ res://
 │   └── usage.md                              # public addon usage documentation
 ├── .planning/
 │   └── MOBILE-DESIGN-SPEC.md                 # internal mobile design contract
-├── main.tscn                                  # showcase scene (PROJECT mandate)
+├── showcase/showcase.tscn                                  # showcase scene (PROJECT mandate)
 ├── icon.svg                                   # project-level icon (existing)
 ├── project.godot                              # existing
 ├── README.md                                  # repo-level overview

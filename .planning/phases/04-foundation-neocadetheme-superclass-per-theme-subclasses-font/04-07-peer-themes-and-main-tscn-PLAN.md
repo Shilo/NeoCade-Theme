@@ -13,7 +13,7 @@ files_modified:
   - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd  # extended with _save_peer_tres() (Cycle 6 F3: helper relocated)
   - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd  # Cross-AI Cycle 2 M3: extended for peer-load checks (Cycle 6 F3 path)
   - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd  # Cross-AI Cycle 2 M3: same (Cycle 6 F3 path)
-  - main.tscn
+  - showcase/showcase.tscn
 autonomous: true
 requirements:
   - FOUND-03
@@ -28,14 +28,14 @@ must_haves:
     - "Loading any of the 4 peer `.tres` produces a `NeoCadeTheme` instance with `_regenerate_theme()` populating all 37 BINDING_TABLE Controls + 14 type variations (Cross-AI Cycle 1 C4: 14 with CodeLabel; same engine as Pulse, only `@export` values differ)."
     - "**Cross-AI Cycle 2 M1 fix:** `_phase4_import.gd._run()` body specifically contains a `_save_peer_tres()` call — verified by extracting the `_run()` body via regex and grepping for the substring INSIDE that body (not just in the file). Catches the regression where the function is defined but never invoked."
     - "**Cross-AI Cycle 2 M3 fix:** Plan 04-07 explicitly extends `_phase4_verify.gd` and `_phase4_verify_headless.gd` to load each of the 4 peer `.tres` files via `ResourceLoader.load(path)`, asserts `is NeoCadeTheme`, asserts `has_stylebox(\"normal\", \"Button\")`, and asserts each direction's `_resolve_direction_presets().spread_factor` matches its expected DIRECTION_PRESETS value (Slate=0.7, Bubble=1.0, Daybreak=1.0, Burst=1.3)."
-    - "`main.tscn` references `addons/neocade_theme/pulse_neocade_theme.tres` as its theme override (`theme = ExtResource(...)` on the root Control), restoring the theme that Plan 04-01 cleared."
+    - "`showcase/showcase.tscn` references `addons/neocade_theme/pulse_neocade_theme.tres` as its theme override (`theme = ExtResource(...)` on the root Control), restoring the theme that Plan 04-01 cleared."
     - "Spot-check distinct visual identity per direction: each direction's loaded theme has different `corner_radius` values (Slate=14, Bubble=26, Daybreak=8, Burst=18) reflected in `Button.normal` stylebox `corner_radius_top_left` after regenerate. (Pulse=0 already verified in Plan 04-06.)"
   artifacts:
     - addons/neocade_theme/slate_neocade_theme.tres
     - addons/neocade_theme/bubble_neocade_theme.tres
     - addons/neocade_theme/daybreak_neocade_theme.tres
     - addons/neocade_theme/burst_neocade_theme.tres
-    - main.tscn (Pulse theme reassigned)
+    - showcase/showcase.tscn (Pulse theme reassigned)
   key_links:
     - ".planning/DESIGN_TOKENS.md §5.2, §5.3, §5.4, §5.5"
     - ".planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-CONTEXT.md D-14 step 9"
@@ -43,10 +43,10 @@ must_haves:
 ---
 
 <objective>
-Author the 4 peer direction `.tres` files (Slate, Bubble, Daybreak, Burst) per DESIGN_TOKENS §5.2-§5.5, and reassign `main.tscn`'s theme override to the recommended starter `pulse_neocade_theme.tres` (Plan 04-01 cleared the override; Plan 04-06 produced Pulse; this plan reconnects).
+Author the 4 peer direction `.tres` files (Slate, Bubble, Daybreak, Burst) per DESIGN_TOKENS §5.2-§5.5, and reassign `showcase/showcase.tscn`'s theme override to the recommended starter `pulse_neocade_theme.tres` (Plan 04-01 cleared the override; Plan 04-06 produced Pulse; this plan reconnects).
 
 Purpose: complete the FOUND-03 5-direction set and restore the project showcase scene's theme reference. After this plan, all 5 directions ship as data-only `.tres` files; the engine + `.tres` data architecture is fully validated.
-Output: 4 new `.tres` files at the addon root + 1 modified `main.tscn`.
+Output: 4 new `.tres` files at the addon root + 1 modified `showcase/showcase.tscn`.
 </objective>
 
 <execution_context>
@@ -60,7 +60,7 @@ Output: 4 new `.tres` files at the addon root + 1 modified `main.tscn`.
 @.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-RESEARCH.md
 @addons/neocade_theme/neocade_theme.gd
 @addons/neocade_theme/pulse_neocade_theme.tres
-@main.tscn
+@showcase/showcase.tscn
 
 <interfaces>
 This plan is parallel-eligible with Plan 04-08 (metadata + README), since neither modifies the engine `.gd` file. Both depend on Plan 04-06 (Pulse exists as the engine's smoke-test exemplar).
@@ -287,19 +287,19 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
 </task>
 
 <task type="auto">
-  <name>Task 2: Reassign main.tscn theme override to pulse_neocade_theme.tres</name>
+  <name>Task 2: Reassign showcase/showcase.tscn theme override to pulse_neocade_theme.tres</name>
   <read_first>
-    - main.tscn (current state — Plan 04-01 cleared the theme override)
+    - showcase/showcase.tscn (current state — Plan 04-01 cleared the theme override)
     - addons/neocade_theme/pulse_neocade_theme.tres
   </read_first>
   <files>
-    - main.tscn (modify — re-add theme reference)
+    - showcase/showcase.tscn (modify — re-add theme reference)
   </files>
   <action>
-    Plan 04-01 (Cycle 6 F2 fix) removed the theme override line from `main.tscn` ENTIRELY (no placeholder comment — Godot 4.6 .tscn comments use `;` not `#` AND comments are discarded on save, making any placeholder strategy fragile). Plan 04-01 also removed the corresponding `[ext_resource ...]` declaration. This task restores the live reference and points it at `pulse_neocade_theme.tres` instead of the deleted scaffold.
+    Plan 04-01 (Cycle 6 F2 fix) removed the theme override line from `showcase/showcase.tscn` ENTIRELY (no placeholder comment — Godot 4.6 .tscn comments use `;` not `#` AND comments are discarded on save, making any placeholder strategy fragile). Plan 04-01 also removed the corresponding `[ext_resource ...]` declaration. This task restores the live reference and points it at `pulse_neocade_theme.tres` instead of the deleted scaffold.
 
     Steps:
-    1. Read current `main.tscn`.
+    1. Read current `showcase/showcase.tscn`.
     2. Add a new `[ext_resource]` line (typically near the top of the file, in the same block as any other ext_resource declarations) referencing the Pulse `.tres`:
        ```
        [ext_resource type="Theme" path="res://addons/neocade_theme/pulse_neocade_theme.tres" id="1_pulse_theme"]
@@ -307,43 +307,43 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
        (`uid` is optional in `[ext_resource]` and is auto-generated by Godot on first save; `path` + `type` + `id` are sufficient.)
        NOTE: depending on how Godot 4.6 serializes `NeoCadeTheme`-typed resources in `.tscn` files, the `type` may need to be `"NeoCadeTheme"` instead of `"Theme"`. Either form should resolve correctly because `NeoCadeTheme extends Theme`. Use `type="Theme"` for maximum compatibility (the resource will load as its actual subclass at runtime).
     3. Add `theme = ExtResource("1_pulse_theme")` to the root node block (the `[node ...]` block representing the scene's root Control). Plan 04-01 left no `theme = ...` line at all (no placeholder); add the live property line now.
-    4. Verify: `main.tscn` parses, opens in Godot Editor without errors, and the root node's theme override resolves to the Pulse `.tres`.
+    4. Verify: `showcase/showcase.tscn` parses, opens in Godot Editor without errors, and the root node's theme override resolves to the Pulse `.tres`.
 
-    Implementation note: the existing `main.tscn` may have a `load_steps` count that needs to be incremented when adding a new `[ext_resource]`. Godot 4.6 expects `load_steps = N+1` where N is the count of `[ext_resource]` and `[sub_resource]` blocks. The executor MUST update `load_steps` accordingly OR remove it entirely (Godot's parser tolerates a missing `load_steps`).
+    Implementation note: the existing `showcase/showcase.tscn` may have a `load_steps` count that needs to be incremented when adding a new `[ext_resource]`. Godot 4.6 expects `load_steps = N+1` where N is the count of `[ext_resource]` and `[sub_resource]` blocks. The executor MUST update `load_steps` accordingly OR remove it entirely (Godot's parser tolerates a missing `load_steps`).
 
     Use Edit / Write to update the file.
   </action>
   <acceptance_criteria>
-    - `main.tscn` contains an `[ext_resource]` line referencing `res://addons/neocade_theme/pulse_neocade_theme.tres`.
-    - `main.tscn` contains a LIVE `theme = ExtResource(` line on the root Control node (NOT a `# theme =` comment line — the placeholder from Plan 04-01 is replaced).
+    - `showcase/showcase.tscn` contains an `[ext_resource]` line referencing `res://addons/neocade_theme/pulse_neocade_theme.tres`.
+    - `showcase/showcase.tscn` contains a LIVE `theme = ExtResource(` line on the root Control node (NOT a `# theme =` comment line — the placeholder from Plan 04-01 is replaced).
     - The `[ext_resource]` and `theme = ExtResource("...")` lines reference the same id.
-    - `main.tscn` first line is still `[gd_scene` and the file parses as a valid scene.
-    - `main.tscn` does NOT contain any reference to the deleted `neocade_theme.tres` scaffold (sanity check: Plan 04-01's deletion stays intact).
-    - `main.tscn` does NOT contain any placeholder comment for the theme override (Plan 04-01 Cycle 6 F2 fix removed the line entirely; this task adds a live `theme = ExtResource(...)` property line, not a comment).
+    - `showcase/showcase.tscn` first line is still `[gd_scene` and the file parses as a valid scene.
+    - `showcase/showcase.tscn` does NOT contain any reference to the deleted `neocade_theme.tres` scaffold (sanity check: Plan 04-01's deletion stays intact).
+    - `showcase/showcase.tscn` does NOT contain any placeholder comment for the theme override (Plan 04-01 Cycle 6 F2 fix removed the line entirely; this task adds a live `theme = ExtResource(...)` property line, not a comment).
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$p='main.tscn'; $g=Get-Content -Raw $p; if ($g -notmatch '^\\[gd_scene') { throw 'main.tscn header broken' }; if ($g -notmatch 'res://addons/neocade_theme/pulse_neocade_theme\\.tres') { throw 'pulse_neocade_theme.tres ext_resource missing' }; if ($g -notmatch '(?m)^\\s*theme = ExtResource\\(') { throw 'live theme override line missing' }; if ($g -match 'neocade_theme/neocade_theme\\.tres') { throw 'main.tscn still references deleted scaffold' }; if ($g -match '(?m)^\\s*[#;]\\s*theme = ExtResource') { throw 'main.tscn contains a comment-form placeholder for theme override (Plan 04-01 Cycle 6 F2 fix removes line entirely; this task adds a live property line)' }; $ext_match = [regex]::Match($g, 'ext_resource type=\"(?:Theme|NeoCadeTheme)\"[^]]*?id=\"([^\"]+)\"[^]]*?path=\"res://addons/neocade_theme/pulse_neocade_theme\\.tres\"'); $theme_match = [regex]::Match($g, 'theme = ExtResource\\(\"([^\"]+)\"\\)'); if (-not $ext_match.Success) { $ext_match = [regex]::Match($g, 'ext_resource type=\"(?:Theme|NeoCadeTheme)\"[^]]*?path=\"res://addons/neocade_theme/pulse_neocade_theme\\.tres\"[^]]*?id=\"([^\"]+)\"') }; if ($ext_match.Success -and $theme_match.Success) { if ($ext_match.Groups[1].Value -ne $theme_match.Groups[1].Value) { throw \"ext_resource id $($ext_match.Groups[1].Value) does not match theme= id $($theme_match.Groups[1].Value)\" } }"
+      powershell -NoProfile -Command "$p='showcase/showcase.tscn'; $g=Get-Content -Raw $p; if ($g -notmatch '^\\[gd_scene') { throw 'showcase/showcase.tscn header broken' }; if ($g -notmatch 'res://addons/neocade_theme/pulse_neocade_theme\\.tres') { throw 'pulse_neocade_theme.tres ext_resource missing' }; if ($g -notmatch '(?m)^\\s*theme = ExtResource\\(') { throw 'live theme override line missing' }; if ($g -match 'neocade_theme/neocade_theme\\.tres') { throw 'showcase/showcase.tscn still references deleted scaffold' }; if ($g -match '(?m)^\\s*[#;]\\s*theme = ExtResource') { throw 'showcase/showcase.tscn contains a comment-form placeholder for theme override (Plan 04-01 Cycle 6 F2 fix removes line entirely; this task adds a live property line)' }; $ext_match = [regex]::Match($g, 'ext_resource type=\"(?:Theme|NeoCadeTheme)\"[^]]*?id=\"([^\"]+)\"[^]]*?path=\"res://addons/neocade_theme/pulse_neocade_theme\\.tres\"'); $theme_match = [regex]::Match($g, 'theme = ExtResource\\(\"([^\"]+)\"\\)'); if (-not $ext_match.Success) { $ext_match = [regex]::Match($g, 'ext_resource type=\"(?:Theme|NeoCadeTheme)\"[^]]*?path=\"res://addons/neocade_theme/pulse_neocade_theme\\.tres\"[^]]*?id=\"([^\"]+)\"') }; if ($ext_match.Success -and $theme_match.Success) { if ($ext_match.Groups[1].Value -ne $theme_match.Groups[1].Value) { throw \"ext_resource id $($ext_match.Groups[1].Value) does not match theme= id $($theme_match.Groups[1].Value)\" } }"
     </automated>
   </verify>
-  <done>main.tscn loads with Pulse as the recommended-starter theme, restoring the showcase scene's theme reference (Plan 04-01 cleared, Plan 04-07 reassigns).</done>
+  <done>showcase/showcase.tscn loads with Pulse as the recommended-starter theme, restoring the showcase scene's theme reference (Plan 04-01 cleared, Plan 04-07 reassigns).</done>
 </task>
 
 <task type="auto">
-  <name>Task 3: Atomic commit — peer themes + main.tscn reassignment</name>
+  <name>Task 3: Atomic commit — peer themes + showcase/showcase.tscn reassignment</name>
   <read_first>
     - addons/neocade_theme/slate_neocade_theme.tres
     - addons/neocade_theme/bubble_neocade_theme.tres
     - addons/neocade_theme/daybreak_neocade_theme.tres
     - addons/neocade_theme/burst_neocade_theme.tres
-    - main.tscn
+    - showcase/showcase.tscn
   </read_first>
   <files>(commit only)</files>
   <action>
-    Stage the 4 new `.tres` files + the modified `main.tscn` + the modified `_phase4_import.gd` + the 2 modified verify helpers (M3 fix) and commit:
+    Stage the 4 new `.tres` files + the modified `showcase/showcase.tscn` + the modified `_phase4_import.gd` + the 2 modified verify helpers (M3 fix) and commit:
 
     ```
-    feat(04-07): ship Slate/Bubble/Daybreak/Burst .tres + peer verify + main.tscn
+    feat(04-07): ship Slate/Bubble/Daybreak/Burst .tres + peer verify + showcase/showcase.tscn
 
     Plan 04-07 wave-4 (depends on Plan 04-06 Pulse; Cross-AI Cycle 1 C6 +
     Cycle 2 M1/M3 + Cycle 3 N4 fixes):
@@ -378,7 +378,7 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
       DIRECTION_PRESETS per direction)
     - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd — extended with peer
       load-checks in _init() body (Cycle 2 M3 — same)
-    - main.tscn — add ext_resource + live theme = ExtResource(...) line pointing
+    - showcase/showcase.tscn — add ext_resource + live theme = ExtResource(...) line pointing
       at pulse_neocade_theme.tres (recommended starter, per CONTEXT.md D-13).
       Plan 04-01 (Cycle 6 F2 fix) removed the original theme line entirely (no
       placeholder comment); this task reintroduces the live property line.
@@ -391,15 +391,15 @@ Each `.tres` is structurally identical to `pulse_neocade_theme.tres` — only th
   </action>
   <acceptance_criteria>
     - `git log -1 --pretty=%s` returns a subject line starting with `feat(04-07):`.
-    - `git log -1 --name-status` shows 4 `A` entries (the peer .tres files), `M main.tscn`, `M .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd`, `M .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd` (Cycle 2 M3 fix), and `M .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd` (Cycle 2 M3 fix).
+    - `git log -1 --name-status` shows 4 `A` entries (the peer .tres files), `M showcase/showcase.tscn`, `M .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd`, `M .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd` (Cycle 2 M3 fix), and `M .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd` (Cycle 2 M3 fix).
     - `git status --porcelain` is empty for all 8 paths.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$msg = git log -1 --pretty=%s; if ($msg -notmatch '^feat\\(04-07\\):') { throw \"commit subject wrong: $msg\" }; $ns = git log -1 --name-status; foreach($f in 'addons/neocade_theme/slate_neocade_theme\\.tres','addons/neocade_theme/bubble_neocade_theme\\.tres','addons/neocade_theme/daybreak_neocade_theme\\.tres','addons/neocade_theme/burst_neocade_theme\\.tres') { if ($ns -notmatch \"A\\s+$f\") { throw \"commit missing $f\" } }; if ($ns -notmatch 'M\\s+main\\.tscn') { throw 'commit missing main.tscn modification' }; if ($ns -notmatch 'M\\s+\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import\\.gd') { throw 'commit missing _phase4_import.gd modification (Cycle 6 F3: helper relocated)' }; if ($ns -notmatch 'M\\s+\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify\\.gd') { throw 'commit missing _phase4_verify.gd (Cycle 2 M3 fix; Cycle 6 F3 path)' }; if ($ns -notmatch 'M\\s+\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless\\.gd') { throw 'commit missing _phase4_verify_headless.gd (Cycle 2 M3 fix; Cycle 6 F3 path)' }; if ($ns -match 'A\\s+addons/neocade_theme/_phase4_(import|verify|verify_headless)\\.gd') { throw 'Cycle 6 F3 regression: helper .gd added at addons/neocade_theme/ — must live under .planning/phases/04-.../helpers/' }"
+      powershell -NoProfile -Command "$msg = git log -1 --pretty=%s; if ($msg -notmatch '^feat\\(04-07\\):') { throw \"commit subject wrong: $msg\" }; $ns = git log -1 --name-status; foreach($f in 'addons/neocade_theme/slate_neocade_theme\\.tres','addons/neocade_theme/bubble_neocade_theme\\.tres','addons/neocade_theme/daybreak_neocade_theme\\.tres','addons/neocade_theme/burst_neocade_theme\\.tres') { if ($ns -notmatch \"A\\s+$f\") { throw \"commit missing $f\" } }; if ($ns -notmatch 'M\\s+main\\.tscn') { throw 'commit missing showcase/showcase.tscn modification' }; if ($ns -notmatch 'M\\s+\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import\\.gd') { throw 'commit missing _phase4_import.gd modification (Cycle 6 F3: helper relocated)' }; if ($ns -notmatch 'M\\s+\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify\\.gd') { throw 'commit missing _phase4_verify.gd (Cycle 2 M3 fix; Cycle 6 F3 path)' }; if ($ns -notmatch 'M\\s+\\.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless\\.gd') { throw 'commit missing _phase4_verify_headless.gd (Cycle 2 M3 fix; Cycle 6 F3 path)' }; if ($ns -match 'A\\s+addons/neocade_theme/_phase4_(import|verify|verify_headless)\\.gd') { throw 'Cycle 6 F3 regression: helper .gd added at addons/neocade_theme/ — must live under .planning/phases/04-.../helpers/' }"
     </automated>
   </verify>
-  <done>4 peer themes + main.tscn reassignment land as a single atomic Wave 4 commit. The full 5-direction set ships.</done>
+  <done>4 peer themes + showcase/showcase.tscn reassignment land as a single atomic Wave 4 commit. The full 5-direction set ships.</done>
 </task>
 
 </tasks>

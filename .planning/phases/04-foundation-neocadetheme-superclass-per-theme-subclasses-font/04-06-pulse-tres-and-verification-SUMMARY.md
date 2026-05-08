@@ -129,7 +129,7 @@ None - no external service configuration required.
 
 - Pulse .tres ships in canonical form ready for Plan 04-07 (Slate/Bubble/Daybreak/Burst peers — copy this file's structure verbatim, swap the 9 @export values per DESIGN_TOKENS §5.2-§5.5).
 - Verification helpers are ready to run; first execution should happen on the user's Godot-equipped machine before Plan 04-07 finalizes (catches any form-1-vs-form-2 serialization surprises early).
-- Plan 04-08 (metadata + plugin.cfg + main.tscn theme assignment) can proceed — the Pulse .tres path it references now exists.
+- Plan 04-08 (metadata + plugin.cfg + showcase/showcase.tscn theme assignment) can proceed — the Pulse .tres path it references now exists.
 
 ## Known Stubs
 

@@ -73,7 +73,7 @@ Author the **per-direction personality** of the keystone Controls — every Base
 
 - **D-13:** **D-01 (additive iteration, no `clear()`) preserved.** Phase 5 BINDING_TABLE additions follow the same iteration contract; never call `Theme.clear()`.
 - **D-14:** **D-04 escape hatch preserved.** Variations not in BINDING_TABLE remain untouched at load — kept as the published architectural escape hatch for consumers who want to author one-off variations via `theme.set_stylebox(...)` calls outside `_regenerate_theme()`.
-- **D-15:** **D-13 class defaults stay Slate-ish neutral.** Phase 5 doesn't touch `@export` defaults. Pulse remains the recommended starter via `main.tscn` + README; class-default custom themes use `DIRECTION_PRESET_DEFAULT.shape`.
+- **D-15:** **D-13 class defaults stay Slate-ish neutral.** Phase 5 doesn't touch `@export` defaults. Pulse remains the recommended starter via `showcase/showcase.tscn` + README; class-default custom themes use `DIRECTION_PRESET_DEFAULT.shape`.
 - **D-16:** **BL-02 fix carries forward.** RichTextLabel variations use `normal_font` slot (Phase 4 close fix); Phase 5's InfoText polish + future RTL variations follow the same pattern. Documented in code comment near `set_font("normal_font", "InfoText", body_font)`.
 - **D-17:** **Inter Variable Roman ONLY (UD-4 Option D).** Phase 5 doesn't bundle additional fonts. Kicker variation uses Inter (no display font); CodeLabel uses Inter (consumer overrides per FONT-04 stricken / FONT-09 (b)).
 
@@ -182,7 +182,7 @@ Author the **per-direction personality** of the keystone Controls — every Base
 - **`addons/neocade_theme/neocade_theme.gd`** — single edit target for Phase 5 production code; all changes are extensions to existing structures (TYPE_VARIATIONS, DIRECTION_PRESETS, BINDING_TABLE, _resolve_recipe).
 - **`addons/neocade_theme/icons/`** — gains 3 new SVGs in Phase 5 (`code_folded.svg`, `spinbox_up.svg`, `spinbox_down.svg`) + their `.import` sidecars; brings icon count from 10 to 13.
 - **`addons/neocade_theme/{name}_neocade_theme.tres` ×5** — no new files; existing 5 round-trip through ResourceSaver once Godot 4.6 CLI lands per D-11.
-- **`main.tscn`** — no changes (still references `pulse_neocade_theme.tres`).
+- **`showcase/showcase.tscn`** — no changes (still references `pulse_neocade_theme.tres`).
 - **`.planning/phases/05-.../helpers/`** — new directory; mirrors Phase 4 helpers structure.
 - **REQUIREMENTS.md updates** — Phase 5 closes COV-02 (BaseButton 7 with full state coverage), COV-03 (5 text + CodeEdit gutter), TYPEVAR-01 (6 button variations chrome authored), TYPEVAR-02 (5 label + new Kicker), TYPEVAR-03 (InfoText polish), TYPEVAR-04 (CardPanel + HeroPanel chrome), TYPEVAR-05 (explicit fonts already done Phase 4; Phase 5 confirms Kicker complies). Marks COV-09 / COV-01 / COV-07 / TYPEVAR-06 as in-progress (cumulative across phases).
 

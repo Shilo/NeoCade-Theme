@@ -105,7 +105,7 @@ If the chain halts mid-phase (org usage limit, network failure, etc.):
 
 4. **Worktree base mismatch is fixed.** `workflow.use_worktrees: false` means executors run sequentially on main. This is slower than parallel worktrees but eliminates the Wave 4 base-mismatch class of bug.
 
-5. **Out-of-scope addon `.tres` drift.** Godot's `--headless --import` rewrites `addons/neocade_theme/*_neocade_theme.tres` and `main.tscn` (UID stabilization + serialized theme entries). The Phase 5 pattern is: only the final ResourceSaver-round-trip plan (e.g., 06-05, the equivalent in Phase 7, and Phase 8's mobile-emit plan) commits those changes; all earlier plans must `git checkout -- <path>` any drift before staging. The executor agent prompts already include this warning.
+5. **Out-of-scope addon `.tres` drift.** Godot's `--headless --import` rewrites `addons/neocade_theme/*_neocade_theme.tres` and `showcase/showcase.tscn` (UID stabilization + serialized theme entries). The Phase 5 pattern is: only the final ResourceSaver-round-trip plan (e.g., 06-05, the equivalent in Phase 7, and Phase 8's mobile-emit plan) commits those changes; all earlier plans must `git checkout -- <path>` any drift before staging. The executor agent prompts already include this warning.
 
 6. **STATE.md / ROADMAP.md are orchestrator-owned.** Executor subagents must NOT modify them — only the orchestrator does after each plan completes. This is enforced in the executor prompts.
 

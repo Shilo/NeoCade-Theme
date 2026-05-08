@@ -582,7 +582,7 @@ After all changes are applied:
 ## Hard rules
 
 - Do NOT modify direction names, palettes, or the locked architecture.
-- Do NOT touch production files (`addons/`, `main.tscn`, `project.godot`, any `.tres` or `.gd` outside `.planning/`).
+- Do NOT touch production files (`addons/`, `showcase/showcase.tscn`, `project.godot`, any `.tres` or `.gd` outside `.planning/`).
 - Do NOT touch v0 historical artifacts (`.planning/mockups/concepts/`, `.planning/mockups/03-direction-boards.*`, `.planning/research/mood-board/`).
 - Do NOT add textures, gradients, embossing, painterly chrome, or soft drop shadows. Hard offsets (sharp box-shadow) only. The user explicitly rejected anything "Neobrutalism" — but the cure is not "no shadows at all," it's "shadows in the same color family as the element, sharp edge."
 - Do NOT change Phase 3.4 governance docs (`CORRECTIVE-ADDENDUM.md` D-28/D-29/D-30/D-31, `direction-shape-language-spec.md`) — they're correct; only the implementation needs revision.

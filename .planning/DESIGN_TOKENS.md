@@ -71,7 +71,7 @@ CLAUDE.md "v1 ships N user-approved theme `.tres` files" resolves to **N = 5** f
 
 CONTEXT.md D-16/D-17 originally said the Phase 3.4 user pick "becomes `NeoCadeTheme`'s defaults" (so `NeoCadeTheme.new()` would produce the picked direction's style). Track 5 / D-31 (2026-05-06e) rewrote that. Under the locked single-concrete-class architecture, the recommended starter has only **two soft commitments**:
 
-1. **Showcase scene default** — Phase 9's `main.tscn` preloads `res://addons/neocade_theme/pulse_neocade_theme.tres` as the project/scene theme.
+1. **Showcase scene default** — Phase 9's `showcase/showcase.tscn` preloads `res://addons/neocade_theme/pulse_neocade_theme.tres` as the project/scene theme.
 2. **README "try this first" suggestion** — addon README names Pulse as the suggested starting direction for new consumers who don't have a preference.
 
 ### What "recommended starter" does NOT mean

@@ -257,7 +257,7 @@ Commits (`git log --oneline -3`):
 Out-of-scope writes: NONE.
   - .planning/STATE.md: untouched (orchestrator owns this).
   - .planning/ROADMAP.md: untouched (orchestrator owns this).
-  - main.tscn: untouched (its `theme = ExtResource(pulse_neocade_theme.tres)` reference still resolves correctly because the round-tripped Pulse `.tres` retains the same `script_class="NeoCadeTheme"` form-2 header + script linkage).
+  - showcase/showcase.tscn: untouched (its `theme = ExtResource(pulse_neocade_theme.tres)` reference still resolves correctly because the round-tripped Pulse `.tres` retains the same `script_class="NeoCadeTheme"` form-2 header + script linkage).
 
 Verifier gates (cumulative; all 8 stages):
   tooling      28/28 OK, 0 failures, exit 0

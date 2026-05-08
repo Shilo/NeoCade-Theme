@@ -210,4 +210,4 @@ No Rules 1, 2, or 4 deviations.
 - `c8d9224` (Task 2) — added by this re-spawn
 - `416b6c4` (Task 3) — added by this re-spawn
 
-**No out-of-scope drift:** `git status` shows only this SUMMARY.md untracked at the moment of write; no `addons/*.tres` or `main.tscn` modifications appear in any of the three commits.
+**No out-of-scope drift:** `git status` shows only this SUMMARY.md untracked at the moment of write; no `addons/*.tres` or `showcase/showcase.tscn` modifications appear in any of the three commits.

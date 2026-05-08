@@ -18,7 +18,7 @@ real devices are not available in this session.
 - `include_filter` includes `addons/neocade_theme/fonts/*.ttf` so the Inter
   font is exported even though it is a raw font resource.
 - The project uses GL Compatibility, matching the v1 ship target.
-- The release workflow opens `main.tscn` headlessly before exporting Web.
+- The release workflow opens `showcase/showcase.tscn` headlessly before exporting Web.
 
 ## Deferred
 

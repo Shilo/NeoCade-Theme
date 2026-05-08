@@ -178,7 +178,7 @@ Each image must:
 - Do not change direction names. They are locked at Pulse, Slate, Bubble, Daybreak, Burst.
 - Do not change palettes. They are locked in `THEME-DIRECTIONS.md` Revision Round 2/2 and `wcag-palette-audit.md`.
 - Do not introduce light themes. All five v1 directions are dark.
-- Do not modify production files: `addons/`, `main.tscn`, `project.godot`, any `.tres` or `.gd`. Phase 4+ owns those.
+- Do not modify production files: `addons/`, `showcase/showcase.tscn`, `project.godot`, any `.tres` or `.gd`. Phase 4+ owns those.
 - Do not modify v0 historical artifacts: `.planning/mockups/concepts/` (different folder from `.planning/mockups/3.4/concepts/` — note the absence of `3.4`), `.planning/mockups/03-direction-boards.*`, `.planning/research/mood-board/`. Those are preserved by the Phase 3 redirect.
 - Do not invent atmospheric venue artwork separate from the UI mockup. The mood is carried by the styling of the same screen, not by separate concept-art renders.
 - Do not start Plan 03 (finalist 4-grid) before the user has selected finalists at the Plan 02 gate.

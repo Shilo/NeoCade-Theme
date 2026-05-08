@@ -18,7 +18,7 @@ Build the structural foundation of the NeoCade addon: the single concrete `@tool
 - Color formulas (`_mix`, `_tint_toward_base`, 5-stop surface ramp with `is_light` flip on elevated tier, M3 state-layer overlays 8/12/12/16/38) ported from `.planning/mockups/3.4/src/neocade-mockups.js` per DESIGN_TOKENS §6.
 - Raised-mode StyleBoxFlat construction (`shadow_size = raised_strength`, `shadow_offset = (0, raised_strength)`, color = tinted offset; or `shadow_size = -1` when flat).
 - Platform branch (`platform=AUTO` resolution via `OS.has_feature("mobile")`; `platform=DESKTOP/MOBILE` forced).
-- Delete `addons/neocade_theme/neocade_theme.tres` (the empty scaffold from project init) and update `main.tscn` reference.
+- Delete `addons/neocade_theme/neocade_theme.tres` (the empty scaffold from project init) and update `showcase/showcase.tscn` reference.
 - Minimal Phase 4 README documenting consumer pattern (`preload("res://addons/neocade_theme/{name}_neocade_theme.tres")`), recommended starter (Pulse), custom theme authoring (`NeoCadeTheme.new()`), CJK override pattern (UD-2 / FONT-09).
 - Pulse implemented FIRST per DESIGN_TOKENS §12.4; then Slate / Bubble / Daybreak / Burst.
 
@@ -66,7 +66,7 @@ Build the structural foundation of the NeoCade addon: the single concrete `@tool
 
 ### Implementation Order
 
-- **D-14:** Phase 4 task ordering per DESIGN_TOKENS §12.4: (1) delete scaffold `addons/neocade_theme/neocade_theme.tres` AND swap `main.tscn` reference atomically in one task; (2) author `neocade_theme.gd` shell + 9 `@export` properties + setters + `_regenerate_theme()` skeleton + `is_light` derivation + iteration engine + binding table (per D-03); (3) bundle Inter Variable Roman + author FontFile.tres + heading FontVariation resources + import settings (Grayscale AA, Light hinting, Auto subpixel per FONT-08); (4) author Button-family icons + import contract (per D-10/D-11); (5) implement formulas — port DESIGN_TOKENS §6 surface ramp, §6.3 per-color offsets, §6.5 state layers, §7 role tokens, §8 typography binding, §9 raised stylebox construction, §10 platform branch; (6) full formula state coverage pass for all 37 base Controls + register 13 type variations; (7) author Pulse `.tres` (recommended starter — implement first); (8) verify Pulse — load into a test scene, toggle `raised` / `platform`, confirm regeneration matches Phase 3.4 mockup output; (9) author Slate / Bubble / Daybreak / Burst `.tres` per DESIGN_TOKENS §5.2-§5.5; (10) write Phase 4 README (consumer pattern + recommended starter + custom theme authoring + UD-2 CJK override); (11) addon metadata (`OFL.txt` with Inter Reserved Font Name notice + copyright; `LICENSE.md`; `CHANGELOG.md`; `VERSION` single-line file).
+- **D-14:** Phase 4 task ordering per DESIGN_TOKENS §12.4: (1) delete scaffold `addons/neocade_theme/neocade_theme.tres` AND swap `showcase/showcase.tscn` reference atomically in one task; (2) author `neocade_theme.gd` shell + 9 `@export` properties + setters + `_regenerate_theme()` skeleton + `is_light` derivation + iteration engine + binding table (per D-03); (3) bundle Inter Variable Roman + author FontFile.tres + heading FontVariation resources + import settings (Grayscale AA, Light hinting, Auto subpixel per FONT-08); (4) author Button-family icons + import contract (per D-10/D-11); (5) implement formulas — port DESIGN_TOKENS §6 surface ramp, §6.3 per-color offsets, §6.5 state layers, §7 role tokens, §8 typography binding, §9 raised stylebox construction, §10 platform branch; (6) full formula state coverage pass for all 37 base Controls + register 13 type variations; (7) author Pulse `.tres` (recommended starter — implement first); (8) verify Pulse — load into a test scene, toggle `raised` / `platform`, confirm regeneration matches Phase 3.4 mockup output; (9) author Slate / Bubble / Daybreak / Burst `.tres` per DESIGN_TOKENS §5.2-§5.5; (10) write Phase 4 README (consumer pattern + recommended starter + custom theme authoring + UD-2 CJK override); (11) addon metadata (`OFL.txt` with Inter Reserved Font Name notice + copyright; `LICENSE.md`; `CHANGELOG.md`; `VERSION` single-line file).
 
 ### Claude's Discretion
 
@@ -140,8 +140,8 @@ Build the structural foundation of the NeoCade addon: the single concrete `@tool
 
 - **Spike implementation** (`.planning/spikes/dynamic-theme/SpikeNeoCadeTheme.gd`) is a working pattern for the production class — Godot 4.6.2-validated. Use as structural template: `enum PlatformMode`, `_resolve_platform()` (lines 244-262 with full feature-flag handling for Web/Android/iOS), `_resolve_auto_platform()` heuristic, StyleBoxFlat helpers (`_make_box`, `_make_focus_box`, `_make_line`), color helpers (`_mix`, `_readable_on`, `_derive_surface`), reentry guard (`_regenerating`). Production must REWRITE the `_regenerate()` body — spike's `clear()` call is forbidden (per D-01); the iteration must be additive.
 - **Phase 3.4 mockup renderer formulas** (`.planning/mockups/3.4/src/neocade-mockups.js`) are the source of truth for color derivation. Phase 4 ports `deriveSurfaceRamp`, `deriveTokens`, `tintTowardBase`, `is_light` flip rules verbatim into GDScript per DESIGN_TOKENS §6.
-- **Existing scaffold** at `addons/neocade_theme/neocade_theme.tres` is the empty Theme scaffold from project init. Phase 4 DELETES this in the first task (per D-14 + DESIGN_TOKENS §12.2). `main.tscn` references it and must be updated atomically.
-- **Existing scaffold scene** `main.tscn` is a minimal Control root using the scaffold theme; full showcase implementation is Phase 9. Phase 4 only updates the theme reference.
+- **Existing scaffold** at `addons/neocade_theme/neocade_theme.tres` is the empty Theme scaffold from project init. Phase 4 DELETES this in the first task (per D-14 + DESIGN_TOKENS §12.2). `showcase/showcase.tscn` references it and must be updated atomically.
+- **Existing scaffold scene** `showcase/showcase.tscn` is a minimal Control root using the scaffold theme; full showcase implementation is Phase 9. Phase 4 only updates the theme reference.
 
 ### Established Patterns
 
@@ -155,7 +155,7 @@ Build the structural foundation of the NeoCade addon: the single concrete `@tool
 - **`addons/neocade_theme/{name}_neocade_theme.tres`** ×5 — direction `.tres` files; consumers `preload()` to apply.
 - **`addons/neocade_theme/fonts/`** — Inter-Variable.ttf + Inter-Variable.tres (FontFile) + ~3-5 FontVariation `.tres` for heading variations.
 - **`addons/neocade_theme/icons/`** — Button-family SVG icons + `.import` sidecars.
-- **`main.tscn`** — Phase 4 updates the theme reference from scaffold to recommended-starter `pulse_neocade_theme.tres` (Phase 9 polishes to a full showcase).
+- **`showcase/showcase.tscn`** — Phase 4 updates the theme reference from scaffold to recommended-starter `pulse_neocade_theme.tres` (Phase 9 polishes to a full showcase).
 - **`addons/neocade_theme/`** root metadata — `OFL.txt`, `LICENSE.md`, `README.md`, `CHANGELOG.md`, `VERSION` (no `plugin.cfg` per STACK Decision 5 + D-05).
 
 </code_context>

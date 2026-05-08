@@ -21,7 +21,7 @@ are deferred per the user's autonomous instruction.
 ## Implementation Decisions
 
 - **D-01:** Use Pulse as the default applied theme because Phase 3.4 selected it as the recommended starter.
-- **D-02:** Keep `main.tscn` lightweight and build the showcase programmatically in `scripts/showcase.gd`. This avoids fragile hand-authored scene churn for dozens of Controls.
+- **D-02:** Keep `showcase/showcase.tscn` lightweight and use `showcase/showcase.gd` only for behavior glue. This avoids fragile runtime UI construction for dozens of Controls.
 - **D-03:** Runtime toggles duplicate the selected `.tres` before mutating `raised` or `platform`, so shipped resources are not dirtied by the showcase.
 - **D-04:** Include all five approved direction resources plus Godot default comparison. Do not include a root `neocade_theme.tres` or `neocade_mobile_theme.tres`.
 - **D-05:** Set `accessibility_name`/tooltip metadata on every interactive sample control that the script creates.
@@ -32,7 +32,7 @@ are deferred per the user's autonomous instruction.
 ## Existing Code Insights
 
 - `addons/neocade_theme/neocade_theme.gd` already supports `raised` and `platform` setters, so the showcase can exercise the real dynamic architecture.
-- `main.tscn` already points at Pulse; only the support script needed to change.
+- `showcase/showcase.tscn` already points at Pulse; only the support script needed to change.
 - Godot 4.6.2 is available through the MCP server and can run the project for smoke validation.
 </code_context>
 

@@ -44,7 +44,7 @@
 | Fixed control inventory + order | PASS | Every artboard renders, in order: brand mark + nav tabs (top), action panel (header → primary/secondary/ghost row → input → toggle row), dialog stack (header → segmented → popup → progress → action row), list/tree (header → selected row → 2 normal rows → scrollbar), state strip (normal/hover/focus/pressed/disabled), palette swatches (low/panel/high/accent). |
 | Dark accessible palettes | PASS | `wcag-palette-audit.md` records all 5 base/accent pairs at 10.74:1 or higher. Unchanged by revision 2 (no palette changes). |
 | Finalist 4-grid readiness | PASS | `finalist-gallery.html` placeholder + renderer support intact. |
-| No production addon/theme files changed | PASS | git status: only `.planning/mockups/3.4/**` modified; no `addons/**`, `main.tscn`, `project.godot`, `*.tres`, `*.gd` touched. |
+| No production addon/theme files changed | PASS | git status: only `.planning/mockups/3.4/**` modified; no `addons/**`, `showcase/showcase.tscn`, `project.godot`, `*.tres`, `*.gd` touched. |
 | Historical v0 artifacts untouched | PASS | `.planning/mockups/concepts/`, `.planning/mockups/03-direction-boards.*`, `.planning/research/mood-board/` not edited. |
 
 ## Stage 1 Concept Matrix — per-direction audit (revision 2)
@@ -281,7 +281,7 @@ Allowed in Phase 3.4:
 
 Forbidden before Phase 4 — verified untouched in revision 2:
 - `addons/neocade_theme/**`
-- `main.tscn`
+- `showcase/showcase.tscn`
 - `project.godot`
 - production `.tres` (no .tres files modified)
 - production `.gd` (no .gd files modified)
@@ -372,7 +372,7 @@ Audit row: **PASS** — color override row is present and demonstrates dynamic `
 | Ghost button text + outline visible | PASS | `#1F4F8C` accent text + outline on cream base ≈ 9:1 (AAA). |
 | Popup surface keeps text legibility | PASS | Surface_overlay container (mid-grey at f=1.3 wide spread on cream) with `--ink` navy text — passes AA. |
 | Tabs / focus ring / state strip readable | PASS | Selected tab indicator + accent focus ring + all 5 state strip cells render with correct contrast against the cream base. |
-| Forbidden-surface audit (light demo) | PASS | No texture / pattern / embossing / gradient on chrome introduced by the light demo; no `addons/`, `*.tres`, `*.gd`, `main.tscn`, or `project.godot` modified. |
+| Forbidden-surface audit (light demo) | PASS | No texture / pattern / embossing / gradient on chrome introduced by the light demo; no `addons/`, `*.tres`, `*.gd`, `showcase/showcase.tscn`, or `project.godot` modified. |
 
 Visual evidence: `concepts/pulse-finalist-override-light.png`. Code locus: the renderer's `is_light` branch lives in `src/neocade-mockups.js` `deriveSurfaceRamp()` and `deriveTokens()`; Phase 4 carries the same branch into `addons/neocade_theme/neocade_theme.gd`.
 
@@ -439,7 +439,7 @@ Allowed in Plan 03:
 
 Forbidden before Phase 4 — verified untouched in Plan 03:
 - `addons/neocade_theme/**` (untouched)
-- `main.tscn` (untouched)
+- `showcase/showcase.tscn` (untouched)
 - `project.godot` (untouched)
 - production `.tres` (no `.tres` files modified)
 - production `.gd` (no `.gd` files modified)

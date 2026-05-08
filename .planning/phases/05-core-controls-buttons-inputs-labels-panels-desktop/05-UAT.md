@@ -71,7 +71,7 @@ expected: |
 result: pass
 note: "Auto-verified by `assert_spinbox_icons`. 4/4 official slots; 0 legacy names."
 
-### 9. Visual Review — Open Pulse in main.tscn
+### 9. Visual Review — Open Pulse in showcase/showcase.tscn
 expected: |
   Pulse direction's bold-accent-fill PrimaryButton with rectangular radius=0,
   Inter Variable Roman body type, no textures/patterns/shadows on chrome.

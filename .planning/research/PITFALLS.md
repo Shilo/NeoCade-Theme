@@ -250,7 +250,7 @@ You tweak buttons in the Theme editor at editor scale 1.0; runtime project at 10
 The Theme editor preview uses editor scale + editor texture filter (typically Linear). Runtime uses `Window.content_scale_*` settings + the project's default texture filter (which can differ).
 
 **Prevention checklist:**
-- [ ] Always validate via `main.tscn` running, never the Theme editor preview alone.
+- [ ] Always validate via `showcase/showcase.tscn` running, never the Theme editor preview alone.
 - [ ] Take MCP screenshots at 1080p, 1440p, 4K, and at content_scale_factor 1.0/1.25/1.5/2.0.
 - [ ] Set explicit `texture_filter` per icon entry where it matters (Linear With Mipmaps for SVG-rasterised PNG icons).
 - [ ] Document the project settings the theme expects (scale mode, default texture filter) in the addon README.

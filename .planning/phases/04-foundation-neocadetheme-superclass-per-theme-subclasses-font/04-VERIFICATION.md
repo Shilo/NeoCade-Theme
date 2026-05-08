@@ -15,7 +15,7 @@ human_verification:
   - test: "Decide BL-02: set_font(\"font\", \"InfoText\", body_font) writes to a slot RichTextLabel never reads (RTL uses normal_font/bold_font/italic_font, not 'font'). InfoText falls back to theme.default_font in practice."
     expected: "Either accept (InfoText still renders Inter via default_font fallback — visually OK, contract slightly wrong) OR fix the slot name to `normal_font` before Phase 5 starts authoring InfoText-using showcase scenes."
     why_human: "The PITFALLS 1.2 mandate ('type variations don't inherit fonts from base') is technically obeyed (a font WAS set), but on the wrong slot. Phase 4 SC#7 strict reading fails for InfoText specifically; fallback behavior masks it visually. A 1-line fix is trivial; verifier flagged this as BL-02 blocker. User must decide whether to fix in Phase 4 closure or open as v1.x bug."
-  - test: "Visual sanity check: open `main.tscn` in Godot 4.6 editor and confirm the Pulse theme renders without errors in the Output panel (no missing icon paths, no failed preload, no `set_*` errors). Then in FileSystem, double-click each of the 5 direction `.tres` files and confirm they each open as `NeoCadeTheme` resources with the 9 @export properties visible in the Inspector."
+  - test: "Visual sanity check: open `showcase/showcase.tscn` in Godot 4.6 editor and confirm the Pulse theme renders without errors in the Output panel (no missing icon paths, no failed preload, no `set_*` errors). Then in FileSystem, double-click each of the 5 direction `.tres` files and confirm they each open as `NeoCadeTheme` resources with the 9 @export properties visible in the Inspector."
     expected: "Output panel shows no errors. Each .tres opens to a Theme resource with `script = neocade_theme.gd`, base_color/accent_color/raised/platform/corner_radius/spacing/raised_strength/focus_thickness/outline_width all present and editable. Toggling `raised` on Pulse should regenerate styleboxes (visible in Theme Editor entry list)."
     why_human: "Headless verification helpers (`_phase4_verify.gd` + `_phase4_verify_headless.gd`) were authored but the SUMMARY documents 'Runtime peer-load validation deferred — requires Godot 4.6 to execute' (Plan 04-07 SUMMARY). The .tres files were hand-authored as the Cycle 6 F7 fallback because Godot CLI was unavailable to the executor. A 5-minute editor open is the cheapest way to confirm the regeneration actually fires on load and produces theme entries."
 overrides: []
@@ -59,7 +59,7 @@ overrides: []
 | `addons/neocade_theme/fonts/Inter-{HeaderLarge,HeaderMedium,HeaderSmall,Body,Caption}.tres`       | 5 FontVariation resources (M3 type scale)                                           | ✓ VERIFIED          | All 5 present; sizes 233-245 bytes (data-only FontVariation references to base_font)                                                                                |
 | `addons/neocade_theme/icons/*.svg` + `*.svg.import` (×10)                                         | 10 Button-family SVGs + import sidecars                                             | ✓ VERIFIED          | All 20 files present; SVG dimensions 32×32; #FFFFFF only; .import contracts match Plan 04-03 spec                                                                   |
 | `addons/neocade_theme/{OFL.txt,LICENSE.md,README.md,CHANGELOG.md,VERSION}`                        | Addon metadata                                                                      | ✓ VERIFIED          | All 5 present. OFL.txt: 100 lines with Inter copyright + RFN notice. LICENSE.md: MIT + OFL footnote. README.md: 7621 bytes. CHANGELOG.md: 5573 bytes. VERSION: `0.4.0-phase-4`. |
-| `main.tscn`                                                                                       | Theme override points at Pulse                                                      | ✓ VERIFIED          | `[ext_resource type="Theme" path="res://addons/neocade_theme/pulse_neocade_theme.tres" id="1_pulse_theme"]` + `theme = ExtResource("1_pulse_theme")` on root Control |
+| `showcase/showcase.tscn`                                                                                       | Theme override points at Pulse                                                      | ✓ VERIFIED          | `[ext_resource type="Theme" path="res://addons/neocade_theme/pulse_neocade_theme.tres" id="1_pulse_theme"]` + `theme = ExtResource("1_pulse_theme")` on root Control |
 
 ### Key Link Verification
 
@@ -71,7 +71,7 @@ overrides: []
 | Setter: `base_color`              | `_regenerate_theme()`                       | `set(value): ... _regenerate_theme()`                  | ✓ WIRED  | Same pattern on all 9 @exports (lines 27-81); reentry guard at line 92                                                           |
 | `BINDING_TABLE` icon recipes      | `addons/neocade_theme/icons/*.svg`          | `load("res://addons/neocade_theme/icons/" + icon_name + ".svg")` (line 1211) | ✓ WIRED  | Recipes reference `checkbox_checked`, `checkbox_unchecked`, `radio_checked`, `radio_unchecked`, `arrow_down`, `clear`, `checkbutton_checked`, `checkbutton_unchecked` — all 8 used names exist on disk |
 | `default_font` / `set_font(...)` calls | `Inter-Variable.tres` + 4 FontVariations    | `preload("res://addons/neocade_theme/fonts/Inter-*.tres")` (lines 164-178) | ⚠️ MIXED | Default font + 12 of 13 explicit set_font calls hit valid slots. Line 185 `set_font("font", "InfoText", body_font)` writes to a slot RichTextLabel does NOT read — BL-02; InfoText falls back to default_font (still Inter, just not the explicit body variation). |
-| `main.tscn` root Control          | Pulse theme                                 | `theme = ExtResource("1_pulse_theme")` ext_resource ref `pulse_neocade_theme.tres` | ✓ WIRED  | Verified line 12 of main.tscn                                                                                                    |
+| `showcase/showcase.tscn` root Control          | Pulse theme                                 | `theme = ExtResource("1_pulse_theme")` ext_resource ref `pulse_neocade_theme.tres` | ✓ WIRED  | Verified line 12 of showcase/showcase.tscn                                                                                                    |
 | Direction presets keyed by hex    | base_color hex lookup                       | `DIRECTION_PRESETS.get(base_color.to_html(false).to_upper(), DEFAULT)` | ✓ WIRED  | Lines 358-380; 5 hex keys (151A2E / 111820 / 241326 / 0B2420 / 20112E) match the 5 .tres base_color values exactly              |
 
 ### Requirements Coverage
@@ -133,7 +133,7 @@ overrides: []
 | Inter font import settings match FONT-08 spec (Grayscale/Light/Auto/mipmaps) | Inspection of `Inter-Variable.ttf.import`                                            | antialiasing=1, hinting=1, subpixel_positioning=2, generate_mipmaps=true | ✓ PASS     |
 | Icon import sidecars conform to ICON-01 contract                        | Inspection of 10 .svg.import files                                                    | All have svg/scale=2.0, mipmaps/generate=true, compress/mode=0          | ✓ PASS     |
 | OFL.txt carries Reserved Font Name "Inter" notice                       | Grep `Reserved Font Name "Inter"` in OFL.txt                                         | Present at line 101                                                     | ✓ PASS     |
-| `main.tscn` Control root binds Pulse theme                              | Inspect main.tscn ext_resource + theme assignment                                     | `[ext_resource ... pulse_neocade_theme.tres ...]` + `theme = ExtResource("1_pulse_theme")` | ✓ PASS     |
+| `showcase/showcase.tscn` Control root binds Pulse theme                              | Inspect showcase/showcase.tscn ext_resource + theme assignment                                     | `[ext_resource ... pulse_neocade_theme.tres ...]` + `theme = ExtResource("1_pulse_theme")` | ✓ PASS     |
 | Live load + regenerate produces non-empty BINDING_TABLE entries on the actual Theme instance | Requires Godot 4.6 editor to execute `_phase4_verify.gd` battery | Helpers wired and ready, but Godot CLI unavailable to executor (Cycle 6 F7 fallback used to materialize .tres files) | ? SKIP (routed to human verification item 3) |
 
 ### Code Review Blocker Assessment (BL-01, BL-02 Goal-Achievement Decision)
@@ -168,7 +168,7 @@ See the `human_verification:` array in this file's YAML frontmatter and the body
 
 1. **Decide BL-01** (font bundle 2× size — accept-or-fix-forward).
 2. **Decide BL-02** (InfoText slot typo — accept-or-fix-now).
-3. **Editor sanity check** (open main.tscn + each .tres in Godot 4.6 to confirm regeneration fires on load and no runtime errors).
+3. **Editor sanity check** (open showcase/showcase.tscn + each .tres in Godot 4.6 to confirm regeneration fires on load and no runtime errors).
 
 ### Gaps Summary
 

@@ -44,7 +44,7 @@ result: pass
 evidence: Phase 8 full verifier `docs` group PASS.
 
 ### 6. Runtime Scene Toggle Proof
-expected: `main.tscn` preserves Pulse as the initial theme, attaches a compact proof script outside the addon root, cycles `DESKTOP -> MOBILE -> AUTO`, toggles `raised`, and loads headlessly.
+expected: `showcase/showcase.tscn` preserves Pulse as the initial theme, attaches a compact proof script outside the addon root, cycles `DESKTOP -> MOBILE -> AUTO`, toggles `raised`, and loads headlessly.
 result: pass
 evidence: Phase 8 full verifier `scene-toggle` group PASS; resolved Godot 4.6.2 headless scene smoke exits 0.
 

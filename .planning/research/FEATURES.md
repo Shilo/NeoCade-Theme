@@ -659,7 +659,7 @@ This is conservative. PROJECT.md asks for "type variations where appropriate" �
 
 ## (5) Showcase Scene Scope
 
-`res://main.tscn` mirrors godot-demo-projects/gui/control_gallery layout but extended for full coverage. Layout: top-bar with theme toggle, left sidebar with section nav, central scrolling area with sections.
+`res://showcase/showcase.tscn` mirrors godot-demo-projects/gui/control_gallery layout but extended for full coverage. Layout: top-bar with theme toggle, left sidebar with section nav, central scrolling area with sections.
 
 ### 5.1 Top Bar (always visible)
 
@@ -752,7 +752,7 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 | **Accessibility** | Visible focus on every focusable Control, WCAG AA contrast (TS-12) |
 | **Fonts bundled** | Inter + Noto Sans, OFL, all weights (TS-13) |
 | **HD rendering** | StyleBoxFlat only, no raster, sharp at 4K (TS-14) |
-| **Showcase scene** | Renders every Control in `main.tscn` (TS-15) |
+| **Showcase scene** | Renders every Control in `showcase/showcase.tscn` (TS-15) |
 | **Theme toggle** | NeoCade ↔ Godot default, prominent (TS-16) |
 
 ### DIFFERENTIATORS (NeoCade Polish)
@@ -864,7 +864,7 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 - [ ] Showcase scene supports three-way theme toggle (NeoCade desktop ↔ NeoCade mobile ↔ Godot default)
 
 **Showcase deliverables**
-- [ ] `main.tscn` with all 9 sections rendered
+- [ ] `showcase/showcase.tscn` with all 9 sections rendered
 - [ ] Three-way theme toggle button functional (desktop ↔ mobile ↔ default)
 - [ ] Token gallery section
 - [ ] Coverage counter shows "35/35"

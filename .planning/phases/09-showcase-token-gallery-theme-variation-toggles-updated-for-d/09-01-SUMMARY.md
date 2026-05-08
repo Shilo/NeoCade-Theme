@@ -5,8 +5,8 @@
 
 ## Changes
 
-- Added `scripts/showcase.gd`, a programmatic fullscreen showcase scene builder.
-- Updated `main.tscn` to use the new showcase script while keeping Pulse as the default theme resource.
+- Added `showcase/showcase.gd`, a fullscreen showcase scene behavior script.
+- Updated `showcase/showcase.tscn` to use the new showcase script while keeping Pulse as the default theme resource.
 - Added runtime controls for:
   - Pulse, Slate, Bubble, Daybreak, Burst, and Godot default
   - flat/raised via `NeoCadeTheme.raised`

@@ -7,7 +7,7 @@ depends_on: []
 files_modified:
   - addons/neocade_theme/neocade_theme.tres
   - addons/neocade_theme/neocade_theme.gd
-  - main.tscn
+  - showcase/showcase.tscn
 autonomous: true
 requirements:
   - FOUND-01
@@ -22,11 +22,11 @@ must_haves:
     - "Every `@export` setter fires `_regenerate_theme()` and applies an equality short-circuit to avoid no-op regenerations."
     - "`_regenerate_theme()` exists with a skeleton body that sets `is_light = base_color.get_luminance() >= 0.5` and uses a reentry guard `_regenerating: bool`. NO `clear()` call anywhere in the regeneration path (D-01)."
     - "Class header docstring documents the binding-mechanism choice (slot-name + property-name table compiled into `.gd`) as REVISABLE per CONTEXT.md `<specifics>` and D-03."
-    - "`main.tscn` no longer references the deleted `neocade_theme.tres`; both the `[ext_resource ...]` line for the scaffold and the `theme = ExtResource(...)` property line on the root Control block are REMOVED entirely (Cycle 6 F2 fix 2026-05-06: no placeholder comment — Godot 4.6 .tscn comments use `;` not `#`, AND comments are discarded on save, so the placeholder strategy is fragile per `engine_details/file_formats/tscn.md`). The root `[node ...]` block parses cleanly without a `theme` line at all. Plan 04-07 reintroduces a live `theme = ExtResource(\"1_pulse_theme\")` property line pointing at Pulse. The scene loads without a missing-resource error during Plans 04-02..06."
+    - "`showcase/showcase.tscn` no longer references the deleted `neocade_theme.tres`; both the `[ext_resource ...]` line for the scaffold and the `theme = ExtResource(...)` property line on the root Control block are REMOVED entirely (Cycle 6 F2 fix 2026-05-06: no placeholder comment — Godot 4.6 .tscn comments use `;` not `#`, AND comments are discarded on save, so the placeholder strategy is fragile per `engine_details/file_formats/tscn.md`). The root `[node ...]` block parses cleanly without a `theme` line at all. Plan 04-07 reintroduces a live `theme = ExtResource(\"1_pulse_theme\")` property line pointing at Pulse. The scene loads without a missing-resource error during Plans 04-02..06."
     - "Class defaults match DESIGN_TOKENS §3 / CONTEXT.md D-13 sensible-neutral values (NOT Pulse-flavored): `base_color=#111820`, `accent_color=#8BD3FF`, `raised=false`, `platform=AUTO`, `corner_radius=12`, `spacing=4`, `raised_strength=3`, `focus_thickness=2`, `outline_width=1`."
   artifacts:
     - addons/neocade_theme/neocade_theme.gd
-    - main.tscn (theme override cleared)
+    - showcase/showcase.tscn (theme override cleared)
   key_links:
     - ".planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-CONTEXT.md D-01, D-13, D-14, <specifics>"
     - ".planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-RESEARCH.md §3, §4, §10.1"
@@ -35,7 +35,7 @@ must_haves:
 ---
 
 <objective>
-Delete the empty `addons/neocade_theme/neocade_theme.tres` scaffold; clear the broken theme reference from `main.tscn`; author the production `addons/neocade_theme/neocade_theme.gd` class shell with all 9 `@export` properties, the Platform enum, the `is_light` derivation, the reentry-guarded `_regenerate_theme()` skeleton, and the class-header docstring documenting the binding mechanism as revisable.
+Delete the empty `addons/neocade_theme/neocade_theme.tres` scaffold; clear the broken theme reference from `showcase/showcase.tscn`; author the production `addons/neocade_theme/neocade_theme.gd` class shell with all 9 `@export` properties, the Platform enum, the `is_light` derivation, the reentry-guarded `_regenerate_theme()` skeleton, and the class-header docstring documenting the binding mechanism as revisable.
 
 Purpose: unblock all subsequent Phase 4 work by establishing the file presence + class shape that Plans 04-04 / 04-05 / 04-06 / 04-07 build on.
 Output: 1 deleted file, 1 modified scene, 1 new GDScript class shell.
@@ -65,7 +65,7 @@ Files to delete:
 - `addons/neocade_theme/neocade_theme.tres` — empty scaffold from project init (per DESIGN_TOKENS §12.2 + CONTEXT.md D-14 step 1).
 
 Files to modify:
-- `main.tscn` — remove the broken `theme = ExtResource(...)` reference to the deleted scaffold. Plan 04-07 will reassign `pulse_neocade_theme.tres`.
+- `showcase/showcase.tscn` — remove the broken `theme = ExtResource(...)` reference to the deleted scaffold. Plan 04-07 will reassign `pulse_neocade_theme.tres`.
 
 The class shell is intentionally MINIMAL in this plan. The full `_regenerate_theme()` body lands in Plans 04-04 (formulas) + 04-05 (binding-table walk + variations + icons). This plan creates only the file presence + shape so Wave 1 parallel plans (04-02 fonts, 04-03 icons) can land without depending on engine code.
 </interfaces>
@@ -74,28 +74,28 @@ The class shell is intentionally MINIMAL in this plan. The full `_regenerate_the
 <tasks>
 
 <task type="auto">
-  <name>Task 1: Delete the empty scaffold root .tres and clear main.tscn theme reference</name>
+  <name>Task 1: Delete the empty scaffold root .tres and clear showcase/showcase.tscn theme reference</name>
   <read_first>
     - addons/neocade_theme/neocade_theme.tres
-    - main.tscn
+    - showcase/showcase.tscn
     - .planning/DESIGN_TOKENS.md  (§12.2 — Files Phase 4 MUST delete)
   </read_first>
   <files>
     - addons/neocade_theme/neocade_theme.tres (DELETE)
-    - main.tscn (modify — remove theme override + ext_resource line for the deleted scaffold)
+    - showcase/showcase.tscn (modify — remove theme override + ext_resource line for the deleted scaffold)
   </files>
   <action>
-    Step 1. Inspect `main.tscn` to find the `[ext_resource ...]` line referencing `neocade_theme.tres` and the `theme = ExtResource("...")` property line on the root Control. Capture both verbatim for the delete operation.
+    Step 1. Inspect `showcase/showcase.tscn` to find the `[ext_resource ...]` line referencing `neocade_theme.tres` and the `theme = ExtResource("...")` property line on the root Control. Capture both verbatim for the delete operation.
 
     Step 2. Delete the file at `addons/neocade_theme/neocade_theme.tres` from the working tree (using `git rm` so the deletion is staged).
 
-    Step 3. Edit `main.tscn` (Cycle 6 F2 fix 2026-05-06: no placeholder comment, just remove both lines cleanly):
+    Step 3. Edit `showcase/showcase.tscn` (Cycle 6 F2 fix 2026-05-06: no placeholder comment, just remove both lines cleanly):
       a) DELETE the `[ext_resource type="Theme" uid="..." path="res://addons/neocade_theme/neocade_theme.tres" id="..."]` line entirely (the dangling reference must go).
       b) DELETE the `theme = ExtResource("...")` property line from the root `[node ...]` Control block entirely. Do NOT replace with a placeholder comment.
 
        Rationale: Godot 4.6 `.tscn` files use `;` (semicolon), not `#` (hash), for single-line comments per `engine_details/file_formats/tscn.md` ("A TSCN file may contain single-line comments starting with a semicolon (;)"). Beyond syntax, comments are DISCARDED on save by Godot's parser — any placeholder comment vanishes the first time a user opens and saves the scene in the editor, which makes the placeholder strategy brittle. The cleanest contract is: remove the line entirely; the `[node ...]` block remains valid `.tscn` without a `theme` property; Plan 04-07 re-adds the live `theme = ExtResource("1_pulse_theme")` line pointing at Pulse. The scene parses and loads without missing-resource errors.
 
-       Result: `main.tscn` opens cleanly in Godot Editor without a "missing resource" error and without any reference to the deleted scaffold. No placeholder comment — Plan 04-07 reintroduces the line.
+       Result: `showcase/showcase.tscn` opens cleanly in Godot Editor without a "missing resource" error and without any reference to the deleted scaffold. No placeholder comment — Plan 04-07 reintroduces the line.
 
     Step 4. Verify both file states via PowerShell test commands.
 
@@ -103,18 +103,18 @@ The class shell is intentionally MINIMAL in this plan. The full `_regenerate_the
   </action>
   <acceptance_criteria>
     - `addons/neocade_theme/neocade_theme.tres` does not exist (PowerShell `Test-Path` returns `False`).
-    - `main.tscn` does not contain the literal substring `neocade_theme.tres` anywhere in the file.
-    - `main.tscn` does not contain ANY `theme = ExtResource(` line (Cycle 6 F2 fix: line removed entirely, no placeholder comment — Godot discards comments on save).
-    - `main.tscn` does not contain a placeholder `# theme = ExtResource` or `; theme = ExtResource` comment line referencing the removal (the line is gone, not commented).
-    - `main.tscn` parses as a valid `.tscn` (the file's first line is `[gd_scene ...]` and the root node block is intact).
-    - Git status shows `D addons/neocade_theme/neocade_theme.tres` and `M main.tscn`.
+    - `showcase/showcase.tscn` does not contain the literal substring `neocade_theme.tres` anywhere in the file.
+    - `showcase/showcase.tscn` does not contain ANY `theme = ExtResource(` line (Cycle 6 F2 fix: line removed entirely, no placeholder comment — Godot discards comments on save).
+    - `showcase/showcase.tscn` does not contain a placeholder `# theme = ExtResource` or `; theme = ExtResource` comment line referencing the removal (the line is gone, not commented).
+    - `showcase/showcase.tscn` parses as a valid `.tscn` (the file's first line is `[gd_scene ...]` and the root node block is intact).
+    - Git status shows `D addons/neocade_theme/neocade_theme.tres` and `M showcase/showcase.tscn`.
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "if (Test-Path 'addons/neocade_theme/neocade_theme.tres') { throw 'scaffold .tres still exists' }; $tscn = Get-Content -Raw 'main.tscn'; if ($tscn -match 'neocade_theme\.tres') { throw 'main.tscn still references deleted scaffold (Cycle 6 F2: line must be removed entirely, no placeholder)' }; if ($tscn -match 'theme = ExtResource\(') { throw 'main.tscn still has theme override line (Cycle 6 F2: line must be removed entirely, not commented)' }; if ($tscn -match '(?m)^\s*[#;]\s*theme = ExtResource') { throw 'main.tscn still has placeholder comment for theme override (Cycle 6 F2: must be removed, not commented — Godot discards comments on save)' }; if ($tscn -notmatch '^\[gd_scene') { throw 'main.tscn is not a valid scene file' }"
+      powershell -NoProfile -Command "if (Test-Path 'addons/neocade_theme/neocade_theme.tres') { throw 'scaffold .tres still exists' }; $tscn = Get-Content -Raw 'showcase/showcase.tscn'; if ($tscn -match 'neocade_theme\.tres') { throw 'showcase/showcase.tscn still references deleted scaffold (Cycle 6 F2: line must be removed entirely, no placeholder)' }; if ($tscn -match 'theme = ExtResource\(') { throw 'showcase/showcase.tscn still has theme override line (Cycle 6 F2: line must be removed entirely, not commented)' }; if ($tscn -match '(?m)^\s*[#;]\s*theme = ExtResource') { throw 'showcase/showcase.tscn still has placeholder comment for theme override (Cycle 6 F2: must be removed, not commented — Godot discards comments on save)' }; if ($tscn -notmatch '^\[gd_scene') { throw 'showcase/showcase.tscn is not a valid scene file' }"
     </automated>
   </verify>
-  <done>The scaffold `.tres` is deleted; `main.tscn` no longer references it; the scene file remains parseable.</done>
+  <done>The scaffold `.tres` is deleted; `showcase/showcase.tscn` no longer references it; the scene file remains parseable.</done>
 </task>
 
 <task type="auto">
@@ -271,7 +271,7 @@ The class shell is intentionally MINIMAL in this plan. The full `_regenerate_the
   <name>Task 3: Atomic commit — scaffold deletion + class shell</name>
   <read_first>
     - addons/neocade_theme/neocade_theme.gd
-    - main.tscn
+    - showcase/showcase.tscn
   </read_first>
   <files>(commit only — no file edits)</files>
   <action>
@@ -282,7 +282,7 @@ The class shell is intentionally MINIMAL in this plan. The full `_regenerate_the
 
     Plan 04-01 wave-1 foundation (Cycle 6 F2 fix incorporated 2026-05-06):
     - Deleted addons/neocade_theme/neocade_theme.tres (empty scaffold from project init)
-    - Removed main.tscn theme override + ext_resource lines entirely (no placeholder
+    - Removed showcase/showcase.tscn theme override + ext_resource lines entirely (no placeholder
       comment — Godot 4.6 .tscn comments use `;` not `#` AND comments are discarded
       on save per engine_details/file_formats/tscn.md). Plan 04-07 reassigns Pulse.
     - Authored addons/neocade_theme/neocade_theme.gd with @tool class_name NeoCadeTheme
@@ -298,12 +298,12 @@ The class shell is intentionally MINIMAL in this plan. The full `_regenerate_the
   </action>
   <acceptance_criteria>
     - `git log -1 --pretty=%s` returns a subject line starting with `feat(04-01):`.
-    - `git log -1 --name-status` shows the three expected entries: `D addons/neocade_theme/neocade_theme.tres`, `M main.tscn`, `A addons/neocade_theme/neocade_theme.gd`.
+    - `git log -1 --name-status` shows the three expected entries: `D addons/neocade_theme/neocade_theme.tres`, `M showcase/showcase.tscn`, `A addons/neocade_theme/neocade_theme.gd`.
     - `git status --porcelain` is empty for all three files (no leftover staged/unstaged changes).
   </acceptance_criteria>
   <verify>
     <automated>
-      powershell -NoProfile -Command "$msg = git log -1 --pretty=%s; if ($msg -notmatch '^feat\\(04-01\\):') { throw \"commit subject wrong: $msg\" }; $ns = git log -1 --name-status; if ($ns -notmatch 'D\\s+addons/neocade_theme/neocade_theme\\.tres') { throw 'commit missing scaffold deletion' }; if ($ns -notmatch 'M\\s+main\\.tscn') { throw 'commit missing main.tscn modification' }; if ($ns -notmatch 'A\\s+addons/neocade_theme/neocade_theme\\.gd') { throw 'commit missing new class shell' }; $st = git status --porcelain | Where-Object { $_ -match 'addons/neocade_theme/neocade_theme\\.(tres|gd)|main\\.tscn' }; if ($st) { throw \"unexpected leftover changes: $st\" }"
+      powershell -NoProfile -Command "$msg = git log -1 --pretty=%s; if ($msg -notmatch '^feat\\(04-01\\):') { throw \"commit subject wrong: $msg\" }; $ns = git log -1 --name-status; if ($ns -notmatch 'D\\s+addons/neocade_theme/neocade_theme\\.tres') { throw 'commit missing scaffold deletion' }; if ($ns -notmatch 'M\\s+main\\.tscn') { throw 'commit missing showcase/showcase.tscn modification' }; if ($ns -notmatch 'A\\s+addons/neocade_theme/neocade_theme\\.gd') { throw 'commit missing new class shell' }; $st = git status --porcelain | Where-Object { $_ -match 'addons/neocade_theme/neocade_theme\\.(tres|gd)|main\\.tscn' }; if ($st) { throw \"unexpected leftover changes: $st\" }"
     </automated>
   </verify>
   <done>The atomic commit lands; the working tree is clean for the three Plan 04-01 paths.</done>

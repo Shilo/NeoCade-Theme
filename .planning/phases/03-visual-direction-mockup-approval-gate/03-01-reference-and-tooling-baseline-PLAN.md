@@ -169,7 +169,7 @@ GoPeak candidate: `npx -y gopeak`.
   <name>Task 3: Smoke-test Godot / GoPeak screenshot and image-generation tooling</name>
   <read_first>
     - project.godot
-    - main.tscn
+    - showcase/showcase.tscn
     - .planning/phases/03-visual-direction-mockup-approval-gate/03-CONTEXT.md D-26..D-29
   </read_first>
   <files>.planning/research/PHASE-3-TOOLING.md</files>

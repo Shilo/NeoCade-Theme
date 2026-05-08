@@ -17,7 +17,7 @@ files_reviewed_list:
   - addons/neocade_theme/fonts/Inter-Body.tres
   - addons/neocade_theme/fonts/Inter-Caption.tres
   - addons/neocade_theme/fonts/Inter-Variable.ttf.import
-  - main.tscn
+  - showcase/showcase.tscn
   - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_import.gd
   - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify.gd
   - .planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/helpers/_phase4_verify_headless.gd
@@ -40,7 +40,7 @@ status: blocking
 
 Reviewed the Phase 4 foundation: the `NeoCadeTheme` class (1216 lines), the 5 direction
 `.tres` peers, the 6 font resources + Inter `.ttf.import` settings, the build/verify helpers,
-and `main.tscn`. The D-01 invariant (no `Theme.clear()` in `_regenerate_theme`) holds —
+and `showcase/showcase.tscn`. The D-01 invariant (no `Theme.clear()` in `_regenerate_theme`) holds —
 iteration is additive throughout. The reentry guard, the per-direction `DIRECTION_PRESETS`
 hex-key lookup, the additive 37-row `BINDING_TABLE` walk, and the `is_light` luminance branch
 all look structurally correct.

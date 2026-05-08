@@ -57,7 +57,7 @@ The 8-plan set is **sound in direction and architecture** but carries **several 
 
 4. **No `default_font` or `default_font_size` set anywhere in the plans (risk: Control types without explicit font entries fall back to engine default).** Plan 04-05 Task 3's `_regenerate_theme()` iteration walk populates per-Control `font` and `font_size` entries via BINDING_TABLE, and sets explicit fonts on type variations. But the THEME DEFAULTS — `theme.default_font = inter_variable` and `theme.default_font_size = 14` — are never set. Per Godot's Theme resolution: if a Control type has no `font` / `font_size` entry AND has no type variation, it falls back to `Theme.default_font` / `Theme.default_font_size`, and if that's null, falls to the engine's built-in default (likely a system font, not Inter). The RESEARCH.md §8 skeleton shows `default_font = fonts.body_inter_variable` and `default_font_size = sizes.body_medium` — but the actual Plan 04-05 Task 3 walk code does not include these lines. **Recommendation:** Add `default_font = preload("res://addons/neocade_theme/fonts/Inter-Body.tres")` and `default_font_size = tokens.body` (from platform tokens) to the `_regenerate_theme()` body in Plan 04-05 Task 3, before the BINDING_TABLE walk, so any Control type that happens to lack an explicit font entry still renders in Inter.
 
-5. **`main.tscn` theme reference cleared in Plan 04-01 but not reassigned until Plan 04-07 — 6 plans of broken scene (risk: editor usability mid-phase).** Plan 04-01 deletes the scaffold `.tres` and strips the theme reference from `main.tscn`. Plan 04-07 Task 2 reassigns Pulse. Between Plan 04-01 and Plan 04-07, the showcase scene has no theme override and may render with Godot's default appearance (or worse, with a dangling reference error). This is acceptable for autonomous execution but inconvenient for manual editor testing. **Recommendation:** In Plan 04-01 Task 1, instead of fully stripping the theme line, replace it with a placeholder comment (e.g., `# theme = ExtResource(...) - reassigned in Plan 04-07`) so the scene remains parseable. Or accept the transient broken state and note it in Plan 04-01's commit message.
+5. **`showcase/showcase.tscn` theme reference cleared in Plan 04-01 but not reassigned until Plan 04-07 — 6 plans of broken scene (risk: editor usability mid-phase).** Plan 04-01 deletes the scaffold `.tres` and strips the theme reference from `showcase/showcase.tscn`. Plan 04-07 Task 2 reassigns Pulse. Between Plan 04-01 and Plan 04-07, the showcase scene has no theme override and may render with Godot's default appearance (or worse, with a dangling reference error). This is acceptable for autonomous execution but inconvenient for manual editor testing. **Recommendation:** In Plan 04-01 Task 1, instead of fully stripping the theme line, replace it with a placeholder comment (e.g., `# theme = ExtResource(...) - reassigned in Plan 04-07`) so the scene remains parseable. Or accept the transient broken state and note it in Plan 04-01's commit message.
 
 6. **`_phase4_verify.gd` uses `EditorScript` which requires Godot Editor to run (risk: verification cannot run headless/autonomously).** The verification helper in Plan 04-06 Task 2 extends `EditorScript` and requires `godot --headless --script` or File→Run. On Windows where the executor may not have access to Godot Editor (the AGENTS.md environment is PowerShell + bash, and the project has `godot_launch_editor` tool), this verification may block Plan 04-06 close. The plan acknowledges this ("if neither works in the autonomous executor's environment, the executor manually loads the `.tres`") but this is a hand-wavy fallback. **Recommendation:** Also author a pure-GDScript `assert`-based test file that can be run via `godot --headless --script` (not requiring EditorScript) OR use the `godot_run_project` tool with a test scene that checks the Theme entries programmatically.
 
@@ -209,7 +209,7 @@ Sources checked: Godot Theme API (`set_*`, `has_*`, type variations), StyleBoxFl
 
 ### OpenCode-only Concerns (MEDIUM — addressed in next cycle)
 
-- **`main.tscn` theme is cleared in Plan 04-01 then dangles for 6 plans until Plan 04-07.** Transient broken-scene state during execution. Suggestion: leave a placeholder reference or accept and document the gap.
+- **`showcase/showcase.tscn` theme is cleared in Plan 04-01 then dangles for 6 plans until Plan 04-07.** Transient broken-scene state during execution. Suggestion: leave a placeholder reference or accept and document the gap.
 - **`_phase4_verify.gd` uses EditorScript** which requires Godot Editor to run — pure GDScript or `--headless --script` alternative needed for autonomous verification.
 - **`toggle_on.svg` / `toggle_off.svg` use dual-color (white track + black knob)** — modulate multiplies, so the black knob stays black after tinting. Verify the rendered result on accent-tinted backgrounds.
 
@@ -311,7 +311,7 @@ All 7 Cycle 1 HIGH concerns are **FULLY RESOLVED** with concrete, verifiable acc
 
 **Status: FULLY RESOLVED**
 
-- Plan 04-08 frontmatter: `depends_on: - "04-07"` with inline comment: `# Cross-AI Cycle 1 C7 fix: was [04-02]; Task 5 verifies files from 04-06 (Pulse) + 04-07 (peers + main.tscn). Depending only on 04-02 was wrong.`
+- Plan 04-08 frontmatter: `depends_on: - "04-07"` with inline comment: `# Cross-AI Cycle 1 C7 fix: was [04-02]; Task 5 verifies files from 04-06 (Pulse) + 04-07 (peers + showcase/showcase.tscn). Depending only on 04-02 was wrong.`
 - Plan 04-08 interfaces section explicitly explains the dependency change.
 - Plan 04-08 Task 5 layout verification now correctly runs after all prior plans have landed their files.
 
@@ -986,7 +986,7 @@ One LOW cleanup: [04-06 Plan](/C:/Programming_Files/Shilocity/Godot/NeoCade-Them
 - Applies the same shared strip helper to peer themes: [04-07 Plan](/C:/Programming_Files/Shilocity/Godot/NeoCade-Theme/.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-07-peer-themes-and-main-tscn-PLAN.md:163)
 - Runtime verifiers assert `loaded is NeoCadeTheme` for Pulse and peers: [04-06 Plan](/C:/Programming_Files/Shilocity/Godot/NeoCade-Theme/.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-06-pulse-tres-and-verification-PLAN.md:373), [04-07 Plan](/C:/Programming_Files/Shilocity/Godot/NeoCade-Theme/.planning/phases/04-foundation-neocadetheme-superclass-per-theme-subclasses-font/04-07-peer-themes-and-main-tscn-PLAN.md:219)
 
-The `load_steps` removal is acceptable. This repo already has valid Godot resources without `load_steps`, including `main.tscn` and the original scaffold `.tres`.
+The `load_steps` removal is acceptable. This repo already has valid Godot resources without `load_steps`, including `showcase/showcase.tscn` and the original scaffold `.tres`.
 
 **Regression Check**
 
@@ -1124,7 +1124,7 @@ Every instance of `presets.something` and `tokens.something` (without bracket no
 
 | # | Concern | Plan & Location | Detail |
 |---|---------|-----------------|--------|
-| **C3** | **`.tscn` comment syntax wrong — uses `#` instead of `;`** | 04-01 Task 1 | Godot `.tscn` / `.tres` files use a subset of ConfigFile format. Comments are introduced with `;` (semicolon), NOT `#` (hash). The plan says to insert `# theme = ExtResource(...) - reassigned in Plan 04-07` inside a node block. This may cause a parse error when opening the scene in Godot Editor. The verification command checks for the presence of the `# theme...` prefix but doesn't open the scene in the editor. The plan does include a fallback ("verify by opening `main.tscn` in the editor; the file MUST still parse") but doesn't enforce it before the commit. Fix: use `; theme = ...` for the comment line, or simply leave a blank line (no placeholder comment at all).
+| **C3** | **`.tscn` comment syntax wrong — uses `#` instead of `;`** | 04-01 Task 1 | Godot `.tscn` / `.tres` files use a subset of ConfigFile format. Comments are introduced with `;` (semicolon), NOT `#` (hash). The plan says to insert `# theme = ExtResource(...) - reassigned in Plan 04-07` inside a node block. This may cause a parse error when opening the scene in Godot Editor. The verification command checks for the presence of the `# theme...` prefix but doesn't open the scene in the editor. The plan does include a fallback ("verify by opening `showcase/showcase.tscn` in the editor; the file MUST still parse") but doesn't enforce it before the commit. Fix: use `; theme = ...` for the comment line, or simply leave a blank line (no placeholder comment at all).
 
 ---
 
@@ -1190,7 +1190,7 @@ All 16 requirements land in specific plans. FONT-02/03/04 are correctly stricken
 
 ## What's Missing
 
-1. **No plan verifies `main.tscn` actually opens in Godot Editor** after scaffold deletion + comment replacement. The verification is textual (grep) only. Plan 04-01 should include a manual verification step: "Open the project in Godot Editor and confirm `main.tscn` loads without missing-resource errors."
+1. **No plan verifies `showcase/showcase.tscn` actually opens in Godot Editor** after scaffold deletion + comment replacement. The verification is textual (grep) only. Plan 04-01 should include a manual verification step: "Open the project in Godot Editor and confirm `showcase/showcase.tscn` loads without missing-resource errors."
 
 2. **No plan verifies the `.tres` deserialization load order** (`_init()` before/after property restoration). The existing verification checks that the loaded Pulse `.tres` has correct `@export` values, which implicitly confirms the final state is correct regardless of order. Explicit documentation of the expected order (and why it's fine) would be valuable but isn't required for execution.
 
@@ -1334,7 +1334,7 @@ Plan 04-05 Task 2 line 274 says *"too long to inline verbatim here, but the exec
 
 **SR2 — `script_class="..."` no-spaces edge case (LOW).** The cycle-4 N5 strip preserves `begins_with("script_class =")` (with spaces). Both prior reviewers and the plan assumed Godot 4.6 always serializes with spaces. Likely fine; runtime `loaded is NeoCadeTheme` would catch regression. **Real LOW.**
 
-**SR3-SR7 — Cross-plan integration spot-checks all clean** (font path consistency, reentry guard correctness, build-helper deletion lineage, main.tscn handling sequence, plan total volume = 4299 lines). No new findings. ✓
+**SR3-SR7 — Cross-plan integration spot-checks all clean** (font path consistency, reentry guard correctness, build-helper deletion lineage, showcase/showcase.tscn handling sequence, plan total volume = 4299 lines). No new findings. ✓
 
 ### Cycle 6 Aggregate
 
@@ -1399,12 +1399,12 @@ Risk assessment: **HIGH** (Codex), **HIGH** (validated against Claude's spot-che
 
 ---
 
-## F2 — main.tscn placeholder → **FULLY RESOLVED**
+## F2 — showcase/showcase.tscn placeholder → **FULLY RESOLVED**
 
 **Evidence:**
 - `04-01` Task 1: Both the `[ext_resource ...]` line and `theme = ExtResource(...)` property line are **removed entirely** — no placeholder comment of any form (`#` or `;`).
 - Rationale documented: Godot 4.6 `.tscn` uses `;` for comments, AND comments are discarded on save — making any placeholder strategy fragile.
-- Acceptance criteria: `main.tscn does not contain ANY theme = ExtResource(` line; `main.tscn does not contain a placeholder ... comment line`.
+- Acceptance criteria: `showcase/showcase.tscn does not contain ANY theme = ExtResource(` line; `showcase/showcase.tscn does not contain a placeholder ... comment line`.
 - `04-07` Task 2 re-adds a **live** `theme = ExtResource("1_pulse_theme")` pointing at Pulse, not a comment.
 
 ---
@@ -1502,7 +1502,7 @@ Risk assessment: **HIGH** (Codex), **HIGH** (validated against Claude's spot-che
 | Finding | Verdict |
 |---|---|
 | F1 — DIRECTION_PRESETS values | **FULLY RESOLVED** |
-| F2 — main.tscn placeholder | **FULLY RESOLVED** |
+| F2 — showcase/showcase.tscn placeholder | **FULLY RESOLVED** |
 | F3 — Helper scripts at addon root | **FULLY RESOLVED** |
 | F4 — CheckButton slot binding | **FULLY RESOLVED** |
 | F5 — SVG `.import` placeholders | **FULLY RESOLVED** |
@@ -1520,7 +1520,7 @@ Risk assessment: **HIGH** (Codex), **HIGH** (validated against Claude's spot-che
 | Item | Verdict | Evidence |
 |---|---|---|
 | F1 — `DIRECTION_PRESETS` values | FULLY RESOLVED | `04-04...PLAN.md:293-301` has Pulse/Slate/Bubble/Daybreak/Burst values exactly as requested; `04-04...PLAN.md:411-413` consumes `hover_pct`, `pressed_pct`, `disabled_opacity` from presets; `04-06...PLAN.md:505-522` and `:640-656` add editor + headless verifier assertions for all five directions. |
-| F2 — `main.tscn` placeholder | FULLY RESOLVED | `04-01...PLAN.md:92-98` says delete both lines and do not replace with a placeholder; `:107-108` acceptance forbids live or commented placeholder `theme = ExtResource`; `:114` verifier rejects both `#` and `;` placeholder forms. `04-07...PLAN.md:299-322` later re-adds a live Pulse theme line. |
+| F2 — `showcase/showcase.tscn` placeholder | FULLY RESOLVED | `04-01...PLAN.md:92-98` says delete both lines and do not replace with a placeholder; `:107-108` acceptance forbids live or commented placeholder `theme = ExtResource`; `:114` verifier rejects both `#` and `;` placeholder forms. `04-07...PLAN.md:299-322` later re-adds a live Pulse theme line. |
 | F3 — helper scripts out of addon root | FULLY RESOLVED | `04-08...PLAN.md:549-560` required addon-root files exclude helpers; `:566-569` requires helpers under `.planning/.../helpers`; `:571-579` forbids `_phase4_import.gd`, `_phase4_verify.gd`, `_phase4_verify_headless.gd` at addon root; `:589-593` accepts exactly one addon-root `.gd`. |
 | F4 — CheckButton `checked`/`unchecked` | FULLY RESOLVED | `04-03...PLAN.md:36` renames assets to `checkbutton_checked` / `checkbutton_unchecked`; `04-05...PLAN.md:36` binds CheckButton `checked`/`unchecked`; `:556-563` freezes `CANONICAL_SLOT_NAMES.CheckButton.icon = ["checked", "unchecked"]`; `:673` verifies those slots. Godot stable 4.6 docs list CheckButton texture theme properties `checked` and `unchecked`, not `on`/`off`. |
 | F5 — SVG `.import` placeholder workflow | FULLY RESOLVED | `04-03...PLAN.md:279-289` defines Stage A placeholder, Stage B `godot --headless --import`, Stage C recommit normalized files; `:305-307` acceptance forbids `<`/`>` and requires normalized `.ctex` path + Godot UID; `:311` verifier enforces it. |
@@ -1547,7 +1547,7 @@ Source used for Godot slot confirmation: official Godot stable CheckButton docs 
 | Concern | OpenCode | Codex | Aggregate |
 |---|---|---|---|
 | **F1** DIRECTION_PRESETS values | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
-| **F2** main.tscn placeholder | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
+| **F2** showcase/showcase.tscn placeholder | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
 | **F3** Helper scripts at addon root | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
 | **F4** CheckButton checked/unchecked | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |
 | **F5** SVG .import workflow | FULLY RESOLVED | FULLY RESOLVED | **FULLY RESOLVED** |

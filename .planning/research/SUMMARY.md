@@ -67,7 +67,7 @@ The "feature surface" is the **coverage matrix**: 35 user-facing Control classes
 - Visible focus indicator on every focusable Control (WCAG 2.1 SC 1.4.11).
 - Bundled Inter OFL font wired as `default_font`, with system fallback left enabled and optional consumer fallback patterns documented.
 - HD rendering at 1080p/1440p/4K.
-- `res://main.tscn` showcase rendering every Control with realistic content + prominent NeoCade↔Godot toggle.
+- `res://showcase/showcase.tscn` showcase rendering every Control with realistic content + prominent NeoCade↔Godot toggle.
 
 **Should have (NeoCade differentiators):**
 
@@ -100,7 +100,7 @@ The architecture **is** the visual design system encoded in the `.tres`. Six lay
 2. `addons/neocade_theme/{pulse,slate,bubble,daybreak,burst}_neocade_theme.tres` — five data-only direction artifacts; reference fonts and icons by `uid://`.
 3. `addons/neocade_theme/fonts/` — Inter Variable Roman + `inter_ofl.txt`.
 4. `addons/neocade_theme/icons/` — bespoke SVGs + `.import` sidecars.
-5. `res://main.tscn` — 9-section showcase + direction/default theme picker, raised toggle, and platform selector.
+5. `res://showcase/showcase.tscn` — 9-section showcase + direction/default theme picker, raised toggle, and platform selector.
 6. `README.md` + `docs/usage.md` + `LICENSE.md` + `CHANGELOG.md` + `VERSION` + `.github/workflows/release.yml` — GitHub Releases distribution (no Asset Library in v1).
 
 ### Critical Pitfalls
@@ -223,7 +223,7 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 - Phase 6: Lists, Layout, Range — Tree, ItemList, Tabs, Containers, Sliders (desktop authoring)
 - Phase 7: Dialogs, Popups, Advanced — Window, Popups, MenuBar, ColorPicker, Graph (desktop authoring)
 - **Phase 8 (NEW): Mobile Variant Authoring** — Mobile token overrides (tap targets 48px / body 16px / spacing +50%) via `platform=MOBILE` / `platform=AUTO`; tap-target audit script; mobile showcase platform selector. Estimated 12-18 hours. Interleaved with phases 5-7 in practice (mobile constants accrue as desktop entries land).
-- Phase 9: Showcase + Token Gallery + Theme Toggle — `res://main.tscn`; direction/default theme picker, raised toggle, and platform selector.
+- Phase 9: Showcase + Token Gallery + Theme Toggle — `res://showcase/showcase.tscn`; direction/default theme picker, raised toggle, and platform selector.
 - **Phase 10 (NEW/EXPANDED): QA + Cross-Platform Export Validation** — Dual-renderer screenshot pass (Forward+ vs GL Compat); per-target export builds (Windows/macOS/Linux/iOS/Android/Web) with screenshot decks; CI workflow for desktop + Web targets; manual Android+iOS validation; accessibility QA (WCAG, focus stylebox audit, CVD simulation); fresh-install dry-run. Estimated 8-12 hours plus device time.
 - Phase 11: Distribution — GitHub Actions release workflow (modeled on Shilo/PentaTile release.yml); auto-version-bump from root `VERSION`; CI gates (headless import + showcase open); commit/tag/push; addon zip via `git archive`; Godot Web export of showcase scene; GitHub Release publishes both zips as assets; **web build auto-deployed to GitHub Pages for instant browser-playable showcase** (`https://<owner>.github.io/<repo>/`). NO Asset Library in v1.
 - **Optional buffer:** Cross-Platform Hardening Spike (4-8 hours) inserted before Phase 11 if real-device regressions surface.
@@ -277,7 +277,7 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 
 ### Phase 9: Showcase + Token Gallery + Theme Toggle
 **Rationale:** PROJECT.md mandates showcase + prominent toggle. Showcase doubles as QA forcing function. With mobile variant in v1, the showcase scene also demonstrates platform switching on the active duplicated theme.
-**Delivers:** `res://main.tscn` with 9 sections (Buttons, Text Inputs, Numbers/Range, Selection/Lists, Containers/Layout, Dialogs/Popups, Advanced/Graph, Token Gallery, Coverage 37/37); direction/default theme picker, raised toggle, and platform selector with inline overrides (Pitfall 10.3); BBCode demo; `accessibility_name` on every Control (Pitfall 2.5); realistic sample content per Control (Pitfall 10.1).
+**Delivers:** `res://showcase/showcase.tscn` with 9 sections (Buttons, Text Inputs, Numbers/Range, Selection/Lists, Containers/Layout, Dialogs/Popups, Advanced/Graph, Token Gallery, Coverage 37/37); direction/default theme picker, raised toggle, and platform selector with inline overrides (Pitfall 10.3); BBCode demo; `accessibility_name` on every Control (Pitfall 2.5); realistic sample content per Control (Pitfall 10.1).
 
 ### Phase 10 (EXPANDED post-CROSS-PLATFORM): QA + Cross-Platform Export Validation
 **Rationale:** PITFALLS flags multiple QA gates pre-ship. CROSS-PLATFORM elevates per-target export validation to v1 must-have. This phase combines visual QA, accessibility QA, dual-renderer screenshot pass, and per-target export validation.
@@ -291,7 +291,7 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 
 ### Phase 11: Distribution — GitHub Actions Release Workflow
 **Rationale (REVISED 2026-05-04):** Final pre-ship gate. Distribution is GitHub Releases via a single manually-triggered GitHub Actions workflow modeled on [Shilo/PentaTile release.yml](https://github.com/Shilo/PentaTile/blob/main/.github/workflows/release.yml). **No Asset Library submission in v1.**
-**Delivers:** `.github/workflows/release.yml` (workflow_dispatch, no inputs); root `VERSION` single-line version source; auto-version-increment policy; CI gates (headless import + showcase scene open); version commit + tag + push; addon zip via `git archive`; Godot Web export of `main.tscn` packaged as `neocade_theme-showcase-web-v<VERSION>.zip`; CHANGELOG slice extraction for release body; GitHub Release published via `softprops/action-gh-release@v3` attaching both zips. Plus `inter_ofl.txt` (Inter only per Option D), `LICENSE.md`, `CHANGELOG.md` with `[Unreleased]` section pre-populated.
+**Delivers:** `.github/workflows/release.yml` (workflow_dispatch, no inputs); root `VERSION` single-line version source; auto-version-increment policy; CI gates (headless import + showcase scene open); version commit + tag + push; addon zip via `git archive`; Godot Web export of `showcase/showcase.tscn` packaged as `neocade_theme-showcase-web-v<VERSION>.zip`; CHANGELOG slice extraction for release body; GitHub Release published via `softprops/action-gh-release@v3` attaching both zips. Plus `inter_ofl.txt` (Inter only per Option D), `LICENSE.md`, `CHANGELOG.md` with `[Unreleased]` section pre-populated.
 **Avoids:** Submission rejection (font license oversights, missing README sections, malformed icon).
 
 ### Optional Buffer: Cross-Platform Hardening Spike

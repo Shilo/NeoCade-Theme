@@ -108,8 +108,8 @@ Phase 3 delivers NeoCade's approved visual direction before any `.tres` styling 
 - `.planning/inputs/NeoCade-Theme-Prototype.png` — prior prototype, structural inspiration only; not visual source of truth.
 
 ### Current Godot Scaffold
-- `project.godot` — Godot 4.6, GL Compatibility renderer, .NET enabled, `main.tscn` set as main scene.
-- `main.tscn` — current showcase scaffold: fullscreen `Control` root applying `neocade_theme.tres`.
+- `project.godot` — Godot 4.6, GL Compatibility renderer, .NET enabled, `showcase/showcase.tscn` set as main scene.
+- `showcase/showcase.tscn` — current showcase scaffold: fullscreen `Control` root applying `neocade_theme.tres`.
 - `addons/neocade_theme/neocade_theme.tres` — empty desktop theme scaffold. Do not style in Phase 3.
 
 ### External Tooling References
@@ -122,7 +122,7 @@ Phase 3 delivers NeoCade's approved visual direction before any `.tres` styling 
 ## Existing Code Insights
 
 ### Reusable Assets
-- `main.tscn` — can remain the eventual in-Godot screenshot target, but Phase 3 mockups should be concept/image/HTML artifacts before `.tres` implementation.
+- `showcase/showcase.tscn` — can remain the eventual in-Godot screenshot target, but Phase 3 mockups should be concept/image/HTML artifacts before `.tres` implementation.
 - `addons/neocade_theme/neocade_theme.tres` — empty scaffold only; preserving it untouched is part of the Phase 3 gate.
 - `project.godot` — already locks GL Compatibility, which matches the visual QA target and Web export renderer.
 

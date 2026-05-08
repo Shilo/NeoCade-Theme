@@ -605,7 +605,7 @@ Per DESIGN_TOKENS §12.5 + CONTEXT.md `<specifics>`, Phase 4 must verify Pulse's
 5. **Type variation registration.** Assert `theme.get_type_variation_base("PrimaryButton") == "Button"` after regenerate.
 6. **Slot coverage smoke test.** Walk BINDING_TABLE; for each (type, stylebox_slot), assert `theme.has_stylebox(slot, type) == true`.
 7. **Theme Editor visual confirmation.** Open `pulse_neocade_theme.tres` in Theme Editor; visually confirm every type lists every expected slot with non-engine-default values. (Phase 4 SUMMARY captures a screenshot for evidence.)
-8. **Scene smoke test.** Phase 4 last task: assign `pulse_neocade_theme.tres` to `main.tscn`; manually launch Godot Editor; confirm controls render in Pulse-flavored colors without errors in Output.
+8. **Scene smoke test.** Phase 4 last task: assign `pulse_neocade_theme.tres` to `showcase/showcase.tscn`; manually launch Godot Editor; confirm controls render in Pulse-flavored colors without errors in Output.
 
 ### 7.2 Test scaffolding for Phase 4 (acceptable level)
 
@@ -718,7 +718,7 @@ Per `gsd-sdk` / Nyquist validation guidance, every phase needs a validation stra
 | Pulse mockup parity | Visual comparison of Pulse-rendered scene vs `.planning/mockups/3.4/finalist-gallery.html` (Pulse 4-grid) | Visual eyeball + spot-check 3 hex values | "looks recognizably the same"; spot-checked hexes within tolerance |
 | Font import settings | Inspect `Inter-Variable.ttf.import` for grayscale AA + light hinting + auto subpixel | One file | All three settings correct |
 | Icon import scale + filter | Inspect each `*.svg.import` for `svg/scale=2.0` + `mipmaps/generate=true` | All Phase 4 icons (~10) | Both correct on every file |
-| Scaffold deletion + scene update | `addons/neocade_theme/neocade_theme.tres` does not exist; `main.tscn` references `pulse_neocade_theme.tres` | 2 file states | Both true |
+| Scaffold deletion + scene update | `addons/neocade_theme/neocade_theme.tres` does not exist; `showcase/showcase.tscn` references `pulse_neocade_theme.tres` | 2 file states | Both true |
 | OFL + addon metadata | `OFL.txt` contains "Inter" + "Reserved Font Name" + OFL 1.1 license body; `LICENSE.md`, `CHANGELOG.md`, `VERSION`, `README.md` exist with required content | 5 files + 3 OFL substrings | All present |
 
 ### 9.2 Sample resolution
@@ -726,7 +726,7 @@ Per `gsd-sdk` / Nyquist validation guidance, every phase needs a validation stra
 Phase 4 validates against:
 - **Code-level:** static greps + GDScript helper script that loads each `.tres`, walks BINDING_TABLE + TYPE_VARIATIONS, asserts coverage + spot-checks 5-10 computed values per direction.
 - **Editor-level:** open each `.tres` in Theme Editor; visually confirm every type has every expected slot. Capture screenshots for SUMMARY evidence.
-- **Runtime-level:** manually launch `main.tscn` in Godot Editor; verify Controls render in Pulse colors without errors. Phase 4 doesn't need export-target QA (Phase 10 owns).
+- **Runtime-level:** manually launch `showcase/showcase.tscn` in Godot Editor; verify Controls render in Pulse colors without errors. Phase 4 doesn't need export-target QA (Phase 10 owns).
 
 ### 9.3 Regression baseline
 
@@ -783,7 +783,7 @@ These two tests confirm the binding-table boundary.
 
 Synthesizing CONTEXT.md decisions + DESIGN_TOKENS §12.5 + this research, the planner's PLAN.md `must_haves` for Phase 4 should include (verbatim or paraphrased — these are the goal-backward verification anchors):
 
-1. `addons/neocade_theme/neocade_theme.tres` is DELETED; `main.tscn` references `pulse_neocade_theme.tres`. (D-14 step 1, FOUND-01.)
+1. `addons/neocade_theme/neocade_theme.tres` is DELETED; `showcase/showcase.tscn` references `pulse_neocade_theme.tres`. (D-14 step 1, FOUND-01.)
 2. `addons/neocade_theme/neocade_theme.gd` declares `@tool class_name NeoCadeTheme extends Theme` with all 9 `@export` properties + `is_light` (non-export) + setters firing `_regenerate_theme()`. (FOUND-02.)
 3. `_regenerate_theme()` does NOT call `clear()`. (D-01.)
 4. `_regenerate_theme()` walks a BINDING_TABLE that covers all 37 scorecard Control types. (D-09, SC#7.)
@@ -811,7 +811,7 @@ The planner has wide latitude here, but a sensible 6-8 plan breakdown derived fr
 
 ### Plan 04-01 — Scaffold deletion + class shell (Wave 1)
 - Delete `addons/neocade_theme/neocade_theme.tres`.
-- Update `main.tscn` to reference (TBD pending Plan 04-07; in this plan, leave a temporary direct theme assignment or comment).
+- Update `showcase/showcase.tscn` to reference (TBD pending Plan 04-07; in this plan, leave a temporary direct theme assignment or comment).
 - Author `addons/neocade_theme/neocade_theme.gd` shell: `@tool class_name NeoCadeTheme extends Theme`, 9 `@export` properties (Core 4 + Shape 5 with `@export_group`), enum `Platform`, `is_light` var, `_regenerating` flag, setters with equality short-circuit, `_init()` calling `_regenerate_theme()`, empty `_regenerate_theme()` skeleton (just sets `is_light` for now; full body in Plan 04-04/05).
 - Document binding-mechanism choice as REVISABLE in class-level docstring.
 - Requirements: FOUND-02 (partial — class shape).
@@ -865,16 +865,16 @@ The planner has wide latitude here, but a sensible 6-8 plan breakdown derived fr
 - must_haves: 9 (Pulse), 11, 12 (smoke), 13, 16.
 - autonomous: true.
 
-### Plan 04-07 — Slate / Bubble / Daybreak / Burst `.tres` + main.tscn update (Wave 4)
+### Plan 04-07 — Slate / Bubble / Daybreak / Burst `.tres` + showcase/showcase.tscn update (Wave 4)
 - Author `addons/neocade_theme/slate_neocade_theme.tres` per DESIGN_TOKENS §5.2.
 - Author `bubble_neocade_theme.tres` per §5.3.
 - Author `daybreak_neocade_theme.tres` per §5.4.
 - Author `burst_neocade_theme.tres` per §5.5.
-- Update `main.tscn` to reference `pulse_neocade_theme.tres`.
+- Update `showcase/showcase.tscn` to reference `pulse_neocade_theme.tres`.
 - Verify each `.tres` loads without errors; spot-check distinct visual identity per direction.
 - Depends on: Plan 04-06.
 - Requirements: FOUND-03 (full set).
-- must_haves: 9 (full set), 1 (main.tscn).
+- must_haves: 9 (full set), 1 (showcase/showcase.tscn).
 - autonomous: true.
 
 ### Plan 04-08 — Addon metadata + Phase 4 README (Wave 4, parallel with 04-07)

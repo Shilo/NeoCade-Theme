@@ -311,7 +311,7 @@ Allowed changed surfaces during Phase 03.2 execution:
 Forbidden production surfaces checked and not changed:
 
 - `addons/neocade_theme/`
-- `main.tscn`
+- `showcase/showcase.tscn`
 - `project.godot`
 - production `.tres` theme resources
 - fonts, icons, and mockup images

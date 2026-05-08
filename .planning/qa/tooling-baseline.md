@@ -13,7 +13,7 @@
 
 ## Verified
 
-- `main.tscn` launches through the MCP runner.
+- `showcase/showcase.tscn` launches through the MCP runner.
 - Final Phase 9 smoke run produced no debug errors.
 - Project remains configured for GL Compatibility:
   - `renderer/rendering_method="gl_compatibility"`

@@ -8,7 +8,7 @@ requires:
   - phase: 08-mobile-variant-token-block-tap-target-audit-updated-for-dyna
     provides: Mobile verifier stages, audit log, and root mobile design spec
 provides:
-  - Minimal runtime platform and raised toggle proof in main.tscn
+  - Minimal runtime platform and raised toggle proof in showcase/showcase.tscn
   - Scene-toggle verifier stage
   - Final Phase 8 full verifier with zero pending groups
 affects: [phase-08, phase-09, phase-10, MOBILE-01, MOBILE-02, MOBILE-03, MOBILE-04, MOBILE-05, MOBILE-06, MOBILE-07, MOBILE-08, DOCS-02, TYPEVAR-06]
@@ -17,13 +17,13 @@ tech-stack:
   added: []
   patterns:
     - Runtime proof scripts live outside `addons/neocade_theme/`
-    - `main.tscn` keeps Pulse as initial theme while the support script duplicates and mutates one direction resource
+    - `showcase/showcase.tscn` keeps Pulse as initial theme while the support script duplicates and mutates one direction resource
 
 key-files:
   created:
     - scripts/phase8_platform_toggle.gd
   modified:
-    - main.tscn
+    - showcase/showcase.tscn
     - .planning/phases/08-mobile-variant-token-block-tap-target-audit-updated-for-dyna/helpers/_phase8_verify_headless.gd
 
 key-decisions:
@@ -55,7 +55,7 @@ completed: 2026-05-07
 ## Accomplishments
 
 - Added `scripts/phase8_platform_toggle.gd`, a compact proof fixture that duplicates Pulse, assigns it to the root Control, cycles `DESKTOP -> MOBILE -> AUTO`, toggles `raised`, and creates representative Button, LineEdit, CheckBox, OptionButton, and TabBar controls.
-- Updated `main.tscn` to attach the support script while preserving Pulse as the initial theme resource.
+- Updated `showcase/showcase.tscn` to attach the support script while preserving Pulse as the initial theme resource.
 - Replaced the `scene-toggle` pending group with strict wiring assertions.
 - Ran every Phase 8 stage and the final `full` stage; all passed with zero pending groups.
 
@@ -66,7 +66,7 @@ This plan was committed atomically as one plan-level commit per the Phase 8 exec
 ## Files Created/Modified
 
 - `scripts/phase8_platform_toggle.gd` - Minimal runtime platform/raised toggle proof.
-- `main.tscn` - References Pulse theme and attaches the support script.
+- `showcase/showcase.tscn` - References Pulse theme and attaches the support script.
 - `.planning/phases/08-mobile-variant-token-block-tap-target-audit-updated-for-dyna/helpers/_phase8_verify_headless.gd` - Scene-toggle verifier stage and full closure.
 
 ## Verification
@@ -83,9 +83,9 @@ This plan was committed atomically as one plan-level commit per the Phase 8 exec
   - Result: `PHASE8_VERIFY OK (stage=scene-toggle)`, 5 groups OK, 0 pending, 0 failures.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .planning/phases/08-mobile-variant-token-block-tap-target-audit-updated-for-dyna/helpers/_run-phase8-verify.ps1 -Stage full`: PASS.
   - Result: `PHASE8_VERIFY OK (stage=full)`, 6 groups OK, 0 pending, 0 failures.
-- `godot --headless --path . main.tscn --quit`: PASS.
+- `godot --headless --path . showcase/showcase.tscn --quit`: PASS.
   - Result: scene loaded headlessly with exit code 0.
-- `rg -n 'phase8_platform_toggle.gd|DESKTOP|MOBILE|AUTO|raised|pulse_neocade_theme|NeoCadeTheme' main.tscn scripts/phase8_platform_toggle.gd`: PASS.
+- `rg -n 'phase8_platform_toggle.gd|DESKTOP|MOBILE|AUTO|raised|pulse_neocade_theme|NeoCadeTheme' showcase/showcase.tscn scripts/phase8_platform_toggle.gd`: PASS.
 
 ## Limitations
 

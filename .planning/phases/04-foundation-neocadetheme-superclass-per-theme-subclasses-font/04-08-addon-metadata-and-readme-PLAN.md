@@ -4,7 +4,7 @@ plan: 08
 type: execute
 wave: 4
 depends_on:
-  - "04-07"  # Cross-AI Cycle 1 C7 fix: was [04-02]; Task 5 verifies files from 04-06 (Pulse) + 04-07 (peers + main.tscn). Depending only on 04-02 was wrong.
+  - "04-07"  # Cross-AI Cycle 1 C7 fix: was [04-02]; Task 5 verifies files from 04-06 (Pulse) + 04-07 (peers + showcase/showcase.tscn). Depending only on 04-02 was wrong.
 files_modified:
   - addons/neocade_theme/LICENSE.md
   - addons/neocade_theme/CHANGELOG.md
@@ -57,7 +57,7 @@ Output: 4 new metadata files at `addons/neocade_theme/` root.
 @addons/neocade_theme/OFL.txt
 
 <interfaces>
-**Cross-AI Cycle 1 C7 fix:** this plan now depends on Plan 04-07 (was 04-02). Task 5 verifies the addon root layout — including files from Plan 04-06 (Pulse `.tres`) and Plan 04-07 (peer `.tres` + main.tscn restoration). Sequencing 04-08 after 04-07 makes the dependency explicit.
+**Cross-AI Cycle 1 C7 fix:** this plan now depends on Plan 04-07 (was 04-02). Task 5 verifies the addon root layout — including files from Plan 04-06 (Pulse `.tres`) and Plan 04-07 (peer `.tres` + showcase/showcase.tscn restoration). Sequencing 04-08 after 04-07 makes the dependency explicit.
 
 Plan 04-08 still ships independently of the engine .gd file logic; only the structural verification in Task 5 needs the prior plans' outputs in place.
 

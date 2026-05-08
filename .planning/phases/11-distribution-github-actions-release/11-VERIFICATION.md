@@ -21,7 +21,7 @@ this phase.
 | Manual trigger, no inputs | PASS | `workflow_dispatch` only |
 | Version source | PASS | `addons/neocade_theme/VERSION` |
 | Version is semver | PASS | `0.9.0` |
-| Godot CI gates | PASS | workflow imports project and opens `main.tscn` |
+| Godot CI gates | PASS | workflow imports project and opens `showcase/showcase.tscn` |
 | Web showcase build | PASS | workflow exports preset `Web` |
 | Addon zip | PASS | workflow uses `git archive` restricted to `addons/neocade_theme/` |
 | Release notes | PASS | workflow extracts addon CHANGELOG slice |

@@ -22,16 +22,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reuse the imported Inter FontFile directly and differ by Theme font-size
   entries.
 - Removed unused `check.svg` and its import sidecar from the icon set.
+- Moved the live showcase into `res://showcase/showcase.tscn`.
 
 ### Added (Phase 9 — Showcase)
 
-- Editor-authored `res://main.tscn` showcase implemented with nine sections: Buttons,
+- Editor-authored `res://showcase/showcase.tscn` showcase implemented with nine sections: Buttons,
   Text Inputs, Numbers & Range, Selection & Lists, Containers & Layout,
   Dialogs & Popups, Advanced & Graph, Token Gallery, and Coverage 37/37.
 - Reusable `NeoCadeThemeOptionButton` dropdown-only script at
   `res://addons/neocade_theme/scripts/neocade_theme_option_button.gd`; it scans `addons/neocade_theme/` for
   `NeoCadeTheme` resources, keeps optional `Default` first, sorts themes
   alphabetically, and applies selection to an exported target or scene root.
+- `res://showcase/showcase.gd` handles the scoreboard Window button and
+  `close_requested` signal without constructing the showcase UI at runtime.
 - BBCode demo with bold/color/italic/code markup, multi-script label sample,
   token swatches, type samples, radius scale, and coverage verification strip.
 - `accessibility_name` metadata wiring on serialized interactive showcase

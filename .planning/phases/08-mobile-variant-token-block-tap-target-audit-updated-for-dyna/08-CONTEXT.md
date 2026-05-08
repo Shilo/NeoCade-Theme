@@ -41,7 +41,7 @@ This phase must make mobile entries measurably accessible: 48px minimum tap targ
 ### Documentation and Test Scene
 - **D-16:** Create `MOBILE-DESIGN-SPEC.md` at the repository root, matching the project instruction path. It must document concrete desktop-vs-mobile deltas for all 37 scorecard rows and every type variation affected by mobile sizing.
 - **D-17:** `MOBILE-DESIGN-SPEC.md` must explicitly state that mobile is an `@export platform` mode on the same direction resources, not a sibling `.tres` file, and that Android density buckets are handled by Godot project scaling/stretch configuration rather than per-density theme resources.
-- **D-18:** The test-scene toggle can be a minimal Phase 8 proof fixture in `main.tscn`/support script if needed. It should cycle one direction through DESKTOP/MOBILE/AUTO and independently toggle `raised`, proving clean regeneration. The full showcase composition remains Phase 9.
+- **D-18:** The test-scene toggle can be a minimal Phase 8 proof fixture in `showcase/showcase.tscn`/support script if needed. It should cycle one direction through DESKTOP/MOBILE/AUTO and independently toggle `raised`, proving clean regeneration. The full showcase composition remains Phase 9.
 - **D-19:** Do not add visible in-app explanatory prose beyond the controls needed to test the toggle. The scene should be a working test surface, not a marketing explainer.
 
 ### Verification
@@ -89,7 +89,7 @@ This phase must make mobile entries measurably accessible: 48px minimum tap targ
 - `addons/neocade_theme/bubble_neocade_theme.tres` - Peer direction resource.
 - `addons/neocade_theme/daybreak_neocade_theme.tres` - Peer direction resource.
 - `addons/neocade_theme/burst_neocade_theme.tres` - Peer direction resource.
-- `main.tscn` - Existing scene scaffold where minimal platform/raised toggle proof may be wired.
+- `showcase/showcase.tscn` - Existing scene scaffold where minimal platform/raised toggle proof may be wired.
 - `MOBILE-DESIGN-SPEC.md` - Phase 8 deliverable to create at repository root.
 
 </canonical_refs>
@@ -114,7 +114,7 @@ This phase must make mobile entries measurably accessible: 48px minimum tap targ
 - Production changes connect through `addons/neocade_theme/neocade_theme.gd`.
 - Phase 8 verification helpers belong under `.planning/phases/08-mobile-variant-token-block-tap-target-audit-updated-for-dyna/helpers/`.
 - Root `MOBILE-DESIGN-SPEC.md` becomes the handoff document for Phase 9/10.
-- Minimal platform/raised toggle proof can touch `main.tscn` and, if needed, a phase-appropriate support script, but should avoid prematurely building the full showcase.
+- Minimal platform/raised toggle proof can touch `showcase/showcase.tscn` and, if needed, a phase-appropriate support script, but should avoid prematurely building the full showcase.
 
 </code_context>
 

@@ -213,12 +213,12 @@ func assert_docs_stage() -> void:
 func assert_scene_toggle_stage() -> void:
 	var group := "scene-toggle"
 	var problems: Array[String] = []
-	var scene := _read_file("res://main.tscn")
+	var scene := _read_file("res://showcase/showcase.tscn")
 	var script := _read_file("res://scripts/phase8_platform_toggle.gd")
 	if scene.find("scripts/phase8_platform_toggle.gd") == -1:
-		problems.append("main.tscn does not reference scripts/phase8_platform_toggle.gd")
+		problems.append("showcase/showcase.tscn does not reference scripts/phase8_platform_toggle.gd")
 	if scene.find("pulse_neocade_theme.tres") == -1:
-		problems.append("main.tscn does not keep Pulse theme as initial theme")
+		problems.append("showcase/showcase.tscn does not keep Pulse theme as initial theme")
 	for token in [
 		"NeoCadeTheme.Platform.DESKTOP",
 		"NeoCadeTheme.Platform.MOBILE",
@@ -233,7 +233,7 @@ func assert_scene_toggle_stage() -> void:
 		if script.find(control_name) == -1:
 			problems.append("phase8_platform_toggle.gd missing representative control: %s" % control_name)
 	if problems.is_empty():
-		_group_ok(group, "main.tscn wires a minimal Pulse platform/raised toggle proof outside the addon root")
+		_group_ok(group, "showcase/showcase.tscn wires a minimal Pulse platform/raised toggle proof outside the addon root")
 	else:
 		_group_fail(group, "; ".join(problems))
 

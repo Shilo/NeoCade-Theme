@@ -242,7 +242,7 @@ This is not a hard-constraint violation (line 7 properly distinguishes theme vs 
 | Mockup approval gate | ARCHITECTURE.md Section 6; SUMMARY.md Phase 3 | YES | MAJ-6: mobile mockup step missing from Section 6 itself |
 | Theme editor authoring | STACK.md "Development Tools" section; PROJECT.md mandate | YES | UD-3 raises tooling question |
 | Type variations | FEATURES.md Section 4 (13 variations); PITFALLS.md 1.2 (font inheritance bug warning) | YES | — |
-| Showcase scene (`res://main.tscn`) | FEATURES.md Section 5 (9 sections) | YES | — |
+| Showcase scene (`res://showcase/showcase.tscn`) | FEATURES.md Section 5 (9 sections) | YES | — |
 | Theme toggle button (NeoCade ↔ Godot default) | FEATURES.md Section 5.1; PITFALLS.md 10.3 | YES | — |
 | MCP-driven QA | UD-1 in SUMMARY (GoPeak swap); STACK.md "Development Tools" | YES (with open decision) | UD-1 is open |
 | UX/UI styleguide adherence (Material 3) | ARCHITECTURE.md throughout (M3 type scale, state layers, spacing) | YES | — |

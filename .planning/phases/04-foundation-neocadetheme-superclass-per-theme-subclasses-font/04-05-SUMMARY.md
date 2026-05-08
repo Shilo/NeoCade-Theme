@@ -187,7 +187,7 @@ PowerShell> top-level keys = 37 exact, matching canonical scorecard
 
 ## Known Stubs
 
-- The 5 direction `.tres` files (Pulse + Slate + Bubble + Daybreak + Burst) and `main.tscn` re-wiring land in Plans 04-06/07. Until then, the class is feature-complete but no `.tres` consumes it (other than the scaffold removed by Plan 04-01).
+- The 5 direction `.tres` files (Pulse + Slate + Bubble + Daybreak + Burst) and `showcase/showcase.tscn` re-wiring land in Plans 04-06/07. Until then, the class is feature-complete but no `.tres` consumes it (other than the scaffold removed by Plan 04-01).
 - BINDING_TABLE_SEED.txt is a documented placeholder, not empirical output. Auto-replaced on first run of `helpers/_phase4_introspect.gd` in any Godot-equipped environment.
 
 ## Threat Flags

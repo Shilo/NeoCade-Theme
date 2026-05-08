@@ -183,6 +183,6 @@ Verified:
 - `helpers/_phase5_verify_headless.gd` and `helpers/_phase5_verify.gd` updated in lockstep.
 - All 4 commits FOUND in `git log`: a7d4591, 4c0108e, 2006885, 0b79b67.
 - `git status --short` clean (only the new SUMMARY.md will be uncommitted at this point).
-- No `*_neocade_theme.tres` or `main.tscn` modifications committed (per orchestrator constraint).
+- No `*_neocade_theme.tres` or `showcase/showcase.tscn` modifications committed (per orchestrator constraint).
 - `text-final` verifier passes 25/25 with 0 failures and 0 ERROR/SCRIPT ERROR lines in either the import log or the verifier log.
 - `buttons` and `text-panels` stages still pass with 0 failures (no regressions).
