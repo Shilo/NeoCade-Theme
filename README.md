@@ -163,6 +163,29 @@ License 1.1 (see `OFL.txt`), separately from the addon code's MIT license
 (see `LICENSE.md`). The Reserved Font Name "Inter" is preserved per the
 OFL terms — do not rename the binary.
 
+## Showcase
+
+The repository-level `main.tscn` is a live showcase for this addon. It opens
+with Pulse and includes:
+
+- a direction picker for Pulse / Slate / Bubble / Daybreak / Burst / Godot default
+- a flat/raised toggle
+- a desktop/mobile/auto platform selector
+- 9 sections covering controls, dialogs, graph, token gallery, and coverage
+
+The Web export preset is named `Web`; the release workflow publishes the
+showcase as both a zip asset and a GitHub Pages deployment.
+
+## Distribution
+
+v1 is distributed through GitHub Releases, not the Godot Asset Library. Install
+by downloading `neocade_theme-v<VERSION>.zip` from the release and copying its
+`addons/neocade_theme/` directory into your project.
+
+The matching Web showcase artifact is
+`neocade_theme-showcase-web-v<VERSION>.zip`. The latest release also deploys
+to GitHub Pages for an instant browser preview.
+
 ## Cross-references
 
 - **Design tokens (the canonical Phase 4 contract):** `.planning/DESIGN_TOKENS.md`
@@ -173,4 +196,4 @@ OFL terms — do not rename the binary.
 
 ---
 
-_Phase 4 minimal README. Phase 11 expands this for v1 distribution._
+_Updated through Phase 11 autonomous release preparation._
