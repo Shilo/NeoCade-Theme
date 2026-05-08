@@ -87,61 +87,63 @@ These supersede every other recommendation below. Lock them at the end of design
 res://
 ├── addons/
 │   └── neocade_theme/
-│       ├── neocade_theme.tres         # primary deliverable — Theme resource
-│       ├── neocade_theme.tres.import  # auto-generated, DO commit
-│       ├── README.md                  # "what this is, how to apply, license summary"
-│       ├── LICENSE.md                 # NeoCade theme license (e.g. MIT) + bundled-asset license attributions
-│       ├── CHANGELOG.md               # versioned changes (1.0.0, 1.0.1, 1.1.0...)
-│       ├── icon.svg                   # 128x128 addon icon for Asset Library listing
-│       ├── icon.svg.import            # auto-generated, DO commit
+│       ├── bubble_neocade_theme.tres
+│       ├── burst_neocade_theme.tres
+│       ├── daybreak_neocade_theme.tres
+│       ├── pulse_neocade_theme.tres
+│       ├── slate_neocade_theme.tres
+│       ├── scripts/
+│       │   ├── neocade_theme.gd       # @tool class_name NeoCadeTheme extends Theme
+│       │   └── neocade_theme_option_button.gd
 │       ├── fonts/
-│       │   ├── Inter-Variable.ttf            # ~800 KB, wght 100-900, opsz 14-32
-│       │   ├── Inter-Variable.ttf.import
-│       │   ├── Inter-Italic-Variable.ttf     # ~800 KB, italic counterpart
-│       │   ├── Inter-Italic-Variable.ttf.import
-│       │   ├── NotoSans-Variable.ttf         # ~600 KB, fallback for non-Latin Latin-extended scripts
-│       │   ├── NotoSans-Variable.ttf.import
-│       │   └── OFL.txt                       # SIL OFL 1.1 — covers Inter and Noto Sans
+│       │   ├── inter_variable.ttf
+│       │   ├── inter_variable.ttf.import
+│       │   ├── inter_header_large.tres
+│       │   ├── inter_header_medium.tres
+│       │   ├── inter_header_small.tres
+│       │   └── inter_ofl.txt                 # SIL OFL 1.1 — Inter license
 │       └── icons/
 │           ├── checkbox_checked.svg          # 32x32 reference, imported at scale 2.0
 │           ├── checkbox_unchecked.svg
-│           ├── checkbox_checked.svg.import
-│           ├── checkbox_unchecked.svg.import
 │           ├── radio_checked.svg
 │           ├── radio_unchecked.svg
 │           ├── arrow_down.svg                # OptionButton dropdown
-│           ├── arrow_right.svg               # Tree expand
-│           ├── arrow_down_filled.svg         # Tree expanded
 │           ├── close.svg                     # TabBar close, Window close
-│           ├── folder.svg                    # FileDialog
-│           ├── file.svg                      # FileDialog
-│           ├── reload.svg                    # FileDialog
-│           ├── ... (remaining ~20 icons)
-│           └── ATTRIBUTIONS.md               # if any icons derive from another set
+│           ├── filedialog_*.svg              # FileDialog controls
+│           ├── colorpicker_*.svg             # ColorPicker controls
+│           ├── graph_*.svg                   # GraphEdit controls
+│           └── *.svg.import                  # auto-generated, DO commit
+├── docs/
+│   └── usage.md                              # public addon usage documentation
+├── .planning/
+│   └── MOBILE-DESIGN-SPEC.md                 # internal mobile design contract
 ├── main.tscn                                  # showcase scene (PROJECT mandate)
 ├── icon.svg                                   # project-level icon (existing)
 ├── project.godot                              # existing
-└── README.md                                  # repo-level readme; can re-summarize addon README
+├── README.md                                  # repo-level overview
+├── CHANGELOG.md
+├── LICENSE.md
+└── VERSION
 ```
 
 ### Why this layout
 
-- **Single-folder root**: Asset Library expects the entire deliverable under `addons/<name>/`. The root has only `main.tscn` (showcase, not part of addon) and `icon.svg` (project icon). When users download via Asset Library, only `addons/neocade_theme/` gets copied.
+- **Clean addon folder**: The drop-in runtime addon lives under `addons/neocade_theme/`; package docs and release metadata live at the repo root or in `docs/` so the addon stays focused for the author's own game.
 - **`.import` files committed**: Godot 4.6 still uses the `.import` sidecar pattern. They must be in version control or imports re-run on every clone.
-- **Fonts and icons in subfolders**: Mirrors LDtk's `res/fonts/` and `res/atlas/` convention — keeps the .tres adjacent to its primary deliverable status.
+- **Scripts, fonts, and icons in subfolders**: Keeps reusable code (`NeoCadeTheme` and `NeoCadeThemeOptionButton`) separate from the data-only theme direction resources.
 - **No `plugin.cfg`**: Addons that aren't `EditorPlugin`s don't need it. Including one would make NeoCade appear (uselessly togglable) in Project Settings → Plugins.
-- **`OFL.txt` next to fonts**: SIL Open Font License 1.1 requires the license file be distributed alongside fonts. Single combined OFL.txt is fine since both Inter and Noto Sans are OFL.
+- **`inter_ofl.txt` next to fonts**: The Inter SIL OFL 1.1 text ships with the font in `addons/neocade_theme/fonts/`.
 
 ### Bundle Sizes (verified vs. estimated)
 
 | Asset | Size | Note |
 |-------|------|------|
-| `neocade_theme.tres` | ~30-80 KB (text format) or ~15-40 KB binary | Estimate; depends on how many type variations and theme items. Text format recommended (diffable). |
-| Inter-Variable.ttf | ~810 KB | v4.1 release file. |
-| Inter-Italic-Variable.ttf | ~810 KB | v4.1 italic VF. |
-| NotoSans-Variable.ttf (Latin extended only) | ~580 KB | If shipping reduced subset. Full Noto Sans is larger; we don't need full. |
-| 30 SVG icons @ ~1 KB each | ~30 KB | Plus `.import` sidecars. |
-| **Total addon footprint** | **~2.3-2.5 MB** | Well within Asset Library norms. |
+| Five direction `.tres` files | ~2 KB total | Data-only resources backed by `NeoCadeTheme`. |
+| `scripts/neocade_theme.gd` | ~140 KB | Formula/binding implementation. |
+| `scripts/neocade_theme_option_button.gd` | ~5 KB | Reusable editor/runtime theme picker. |
+| `inter_variable.ttf` | ~843 KB | Single bundled Inter Variable Roman font. |
+| 84 SVG icons + `.import` sidecars | ~125 KB | The generated Control coverage icon set. |
+| **Total addon footprint** | **~1.1 MB** | Current repository footprint for `addons/neocade_theme/`. |
 
 ### User Install Flow
 
@@ -153,11 +155,11 @@ res://
 #   git clone https://github.com/<user>/NeoCade-Theme
 #   Copy addons/neocade_theme/ into your project's addons/ folder
 
-# Apply project-wide:
-#   Project → Project Settings → GUI → Theme → Custom → res://addons/neocade_theme/neocade_theme.tres
+# Apply project-wide using one direction resource:
+#   Project → Project Settings → GUI → Theme → Custom → res://addons/neocade_theme/bubble_neocade_theme.tres
 
 # Apply per-scene:
-#   Inspector on root Control → Theme → load → res://addons/neocade_theme/neocade_theme.tres
+#   Inspector on root Control → Theme → load → res://addons/neocade_theme/bubble_neocade_theme.tres
 ```
 
 ---
@@ -166,9 +168,9 @@ res://
 
 | Recommended | Alternative | When to Use Alternative |
 |-------------|-------------|-------------------------|
-| **Inter Variable (one upright + one italic file)** | Static OTF set (Thin/Light/Regular/Medium/SemiBold/Bold/Black + 7 italics = 14 files, ~3 MB+) | If Godot's variable font axis support shows perf issues on low-end mobile. (Verified: Godot 4.6 has mature variable font support with `FontVariation.variation_opentype["wght"]` — no known issues. Stick with VF.) |
+| **Inter Variable Roman (one upright file)** | Static OTF set (Thin/Light/Regular/Medium/SemiBold/Bold/Black + italics = 14 files, ~3 MB+) | If Godot's variable font axis support shows perf issues on low-end mobile. (Verified: Godot 4.6 has mature variable font support with `FontVariation.variation_opentype["wght"]` — no known issues. Stick with VF.) |
 | **Inter** | Roboto Flex / Geist / Source Sans 3 | Roboto Flex: bigger file (~1.5 MB), more axes, but less arcade-friendly aesthetically. Geist (Vercel, OFL): newer, sharper, narrower — viable swap if user prefers tighter glyphs. Source Sans 3: warmer, less geometric — closer to "friendly arcade" but less iconic. **Inter is locked by user mandate.** |
-| **Bespoke SVG icon set (~30 icons)** | Material Symbols variable font + glyph-codepoint mapping in Theme | If Godot ever adds direct font-glyph-as-icon support for theme items (currently it doesn't — icons must be Texture2D). **Not viable today.** |
+| **Bespoke SVG icon set** | Material Symbols variable font + glyph-codepoint mapping in Theme | If Godot ever adds direct font-glyph-as-icon support for theme items (currently it doesn't — icons must be Texture2D). **Not viable today.** |
 | **Bespoke SVG icon set** | Bundle a slice of Lucide (15-30 icons, ISC license, attribution required) | Only if authoring time is the binding constraint and user agrees to ship "based on Lucide" attribution. Lucide's outline style fits a clean-arcade vibe. **Backup option** if bespoke authoring slips. |
 | **No CJK fonts bundled** | Bundle Noto Sans CJK SC subset (~10 MB compressed) | If consuming game targets Chinese/Japanese/Korean markets at launch. **v1 scope: skip; document the override path.** |
 | **No `plugin.cfg`** | Include `plugin.cfg` with no script | If user feedback shows confusion ("I don't see NeoCade in Plugins panel"). Then add a stub plugin.cfg that just identifies the addon for discovery — but no enable/disable script. v1: skip. |
@@ -197,18 +199,18 @@ res://
 
 ## Stack Patterns by Variant
 
-**If shipping for desktop only (current v1 scope):**
-- Use full Inter + Noto Sans bundle (~2.3 MB).
+**Base implementation:**
+- Use Inter Variable Roman only (~843 KB), with additional fallback fonts deferred until a consuming product needs them.
 - Enable StyleBoxFlat `anti_aliasing` on all rounded controls.
 - ~~Use `shadow_size = 4-6` on dialogs/popups for elevation.~~ **REVOKED 2026-05-04:** drop shadows are forbidden in v1 per `SUMMARY.md` Conflict 3 + `FEATURES.md` AF-13. Convey elevation through the tonal surface ramp (color stops). Optional 1px lighter top-bevel border allowed on raised buttons.
 
 **Mobile variant — v1 must-have (UPDATED 2026-05-04, was "v2 extension"):**
-Mobile is no longer deferred. Per CROSS-PLATFORM.md Section 3, `neocade_mobile_theme.tres` ships in v1 alongside the desktop primary, generated from the same `TokenSet` block via `@tool` script.
+Mobile is no longer deferred. Per the final Phase 8 architecture, mobile sizing is generated by the shared `NeoCadeTheme.platform` export rather than a separate `neocade_mobile_theme.tres`.
 - Keep Inter (still readable at small sizes thanks to `opsz` axis); body text 16px on mobile vs 14px desktop.
 - Tap targets ≥48px (Godot pixels) on mobile — covers iOS HIG 44pt + Material 3 48dp simultaneously.
 - Spacing scale +50% on `space.4` and above; corner radii STAY IDENTICAL across desktop/mobile (brand identity).
 - Drop shadows are forbidden on both desktop AND mobile (was previously framed as "drop on mobile only" — reconciled).
-- Mobile-specific Control overrides documented in `MOBILE-DESIGN-SPEC.md` (Phase 8 deliverable).
+- Mobile-specific Control overrides documented in `.planning/MOBILE-DESIGN-SPEC.md` (Phase 8 deliverable).
 
 **If extending to light mode in v2:**
 - Keep same StyleBox geometry; swap color tokens.

@@ -583,8 +583,8 @@ OFL allows redistribution but restricts certain modifications and use of reserve
 **Prevention checklist:**
 - [ ] **Keep all bundled font files at their original filenames** (`Inter-Regular.ttf`, `NotoSans-Regular.ttf`, etc.).
 - [ ] Do not rebrand or modify the font binaries.
-- [ ] Bundle each font's `OFL.txt` alongside the binary in the same folder.
-- [ ] Include a `LICENSE-FONTS.md` aggregating all font licenses with copyright holder names.
+- [ ] Bundle each font's OFL text alongside the binary in the same folder (current v1: `addons/neocade_theme/fonts/inter_ofl.txt`).
+- [ ] Include or link license attributions for all bundled fonts with copyright holder names.
 - [ ] In Asset Library description, list the bundled fonts explicitly with their licenses.
 
 **Warning signs:**
@@ -645,7 +645,7 @@ After import, Godot prints a warning that subpixel positioning is "auto-disabled
 
 **Prevention checklist:**
 - [ ] Set Inter's subpixel_positioning to **AUTO** explicitly in import settings.
-- [ ] Audit imports for warnings; document any spurious ones in CONTRIBUTING.md so contributors don't chase them.
+- [ ] Audit imports for warnings; document any spurious ones in `docs/usage.md` so maintainers don't chase them.
 
 **Phase:** implementation.
 
@@ -831,7 +831,7 @@ You assume `--headless` lets you capture screenshots in CI without a display. It
 **Prevention checklist:**
 - [ ] Run MCP screenshot QA against a **windowed** Godot session, not headless.
 - [ ] On CI, use a virtual display (e.g. Xvfb on Linux, headless mode is not equivalent).
-- [ ] Document the QA harness requirements in CONTRIBUTING.md.
+- [ ] Document the QA harness requirements in `.planning/qa/` or `docs/usage.md`.
 
 **Phase:** QA (infra).
 
@@ -1082,7 +1082,7 @@ Things that pass casual review but hide gaps:
 - [ ] **Asset Library install dry-run?** Fresh project, install via Asset Library, verify single-folder install at `addons/neocade_theme/`, no errors on showcase open.
 - [ ] **Theme-as-editor-theme cross-test?** Set NeoCade as editor theme, verify common plugins (Dialogue Manager, etc.) don't break.
 - [ ] **No StyleBoxEmpty breakage?** No editor console errors when used as project theme.
-- [ ] **Font license files bundled?** OFL.txt for Inter, OFL.txt for Noto, LICENSE-FONTS.md aggregated.
+- [ ] **Font license files bundled?** `addons/neocade_theme/fonts/inter_ofl.txt` for Inter; add equivalent notices if future fonts are bundled.
 - [ ] **README install paths documented?** Both per-scene and project-wide, with caveats.
 - [ ] **README explicitly says "not an editor plugin"?** Prevents Project Settings -> Plugins confusion.
 - [ ] **Toggle button works?** Showcase NeoCade<->Godot default toggle survives multiple toggles without state loss.

@@ -70,6 +70,11 @@ formula-owned and will regenerate on `@export` mutations. This means custom
 per-theme personality (e.g., a one-off splash-screen panel style) survives
 `@export` changes.
 
+Avoid editing NeoCade theme resources through a Control inspector context
+menu. Use the dedicated Theme editor, the 9 exported `NeoCadeTheme`
+properties on direction resources, or formula edits in
+`addons/neocade_theme/scripts/neocade_theme.gd`.
+
 ## CJK / non-Latin script support
 
 NeoCade ships **only** Inter Variable Roman as its bundled font (UD-4 Option
@@ -181,7 +186,7 @@ showcase as both a zip asset and a GitHub Pages deployment.
 v1 is distributed through GitHub Releases, not the Godot Asset Library. Install
 by downloading `neocade_theme-v<VERSION>.zip` from the release and copying its
 `addons/neocade_theme/` directory into your project. Package docs, `VERSION`,
-and the MIT license sit at the zip root; they are not inside the addon folder.
+and the MIT license ship outside the addon folder so the addon stays clean.
 
 The matching Web showcase artifact is
 `neocade_theme-showcase-web-v<VERSION>.zip`. The latest release also deploys
@@ -189,11 +194,12 @@ to GitHub Pages for an instant browser preview.
 
 ## Cross-references
 
-- **Design tokens (the canonical Phase 4 contract):** `.planning/DESIGN_TOKENS.md`
-- **CHANGELOG:** `CHANGELOG.md`
-- **Font license:** `addons/neocade_theme/fonts/inter_ofl.txt`
-- **Code license:** `LICENSE.md`
-- **Version:** `VERSION`
+- **CHANGELOG:** [CHANGELOG.md](../CHANGELOG.md)
+- **Font license:** [addons/neocade_theme/fonts/inter_ofl.txt](../addons/neocade_theme/fonts/inter_ofl.txt)
+- **Code license:** [LICENSE.md](../LICENSE.md)
+- **Version:** [VERSION](../VERSION)
+- **Internal design tokens:** `.planning/DESIGN_TOKENS.md`
+- **Internal mobile design spec:** `.planning/MOBILE-DESIGN-SPEC.md`
 
 ---
 

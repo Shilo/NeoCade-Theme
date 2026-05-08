@@ -489,25 +489,25 @@ Phase 2 checked LDtk-specific report claims in `.planning/research/LDTK-UI-MININ
 **What was read:** Godot Theme class API docs (verified `merge_with()` and `copy_from()` are runtime-only; no .tres-to-.tres inheritance exists); ThemeGen MIT (github.com/Inspiaaa/ThemeGen) — proven `@tool` script generator pattern.
 
 **What we adopted:**
-- **`@tool` script generator pattern** — `addons/neocade_theme/_dev/generate_themes.gd` builds BOTH `neocade_theme.tres` and `neocade_mobile_theme.tres` from a single `TokenSet` constants block. Both .tres files are committed final artifacts. Drift is structurally impossible.
-- **ThemeGen as prior-art reference** — verifies the pattern works and is shippable; we author our own minimal generator (no runtime dependency on ThemeGen for consumers).
+- **`@tool` Theme subclass pattern** — `addons/neocade_theme/scripts/neocade_theme.gd` backs five data-only direction resources and regenerates entries from exported state, including desktop/mobile/AUTO platform behavior.
+- **ThemeGen as prior-art reference only** — verifies code-generated theme entries are practical; NeoCade does not ship a `_dev/` generator in v1.
 
 **What we rejected:**
 - **`.tres`-to-`.tres` inheritance** — does not exist in Godot's Theme system (verified, not assumed).
-- **Runtime token computation** — both .tres files are committed pre-rendered; no consumer-side runtime work required.
-- **External tool dependency for consumers** — generator is `_dev/`-prefixed; consumers receive only the rendered .tres files + fonts + icons.
+- **Separate generated desktop/mobile `.tres` resources** — superseded by the `platform` export on the single concrete class.
+- **External tool dependency for consumers** — consumers receive direction `.tres` files, scripts, fonts, and icons with no generator dependency.
 
 **Confidence:** HIGH on Godot Theme limits; MEDIUM on generator implementation (well-precedented but custom code path).
 
-### 10e. Font license compliance — SIL OFL FAQ + Inter/Noto Sans/Outfit/JetBrains Mono LICENSE.txt
+### 10e. Font license compliance — SIL OFL FAQ + Inter OFL text
 
-**What was read:** openfontlicense.org/ofl-faq, Inter LICENSE.txt, Noto Sans Reserved Font Name notice, Outfit OFL terms, JetBrains Mono OFL terms.
+**What was read:** openfontlicense.org/ofl-faq, Inter OFL text, and candidate-font licenses for Noto Sans, Outfit, and JetBrains Mono.
 
 **What we adopted:**
-- **All 4 candidate fonts pass App Store + Play Store + Web embedding** under OFL 1.1.
-- **Single combined `OFL.txt`** covers all bundled fonts (each with its Reserved Font Name notice block).
-- **Reserved-name clause: do NOT rename `Inter-VariableFont*.ttf`** — keeps OFL compliance intact.
-- **Consuming apps surface `OFL.txt` content in About/Credits** — README documents this requirement for downstream developers.
+- **Inter passes App Store + Play Store + Web embedding** under OFL 1.1.
+- **`addons/neocade_theme/fonts/inter_ofl.txt`** covers the bundled Inter font.
+- **Reserved-name clause: do not modify font internals or rebrand derivative fonts** — keeps OFL compliance intact.
+- **Consuming apps surface `inter_ofl.txt` content in About/Credits** — README/docs document this requirement for downstream developers.
 
 **What we rejected:**
 - Renaming bundled font binaries (would violate OFL Reserved Font Name).

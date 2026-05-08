@@ -35,7 +35,7 @@ no separate `neocade_mobile_theme.tres`. Mobile is handled by the exported
 
 ## Usage
 
-See `ADDON_USAGE.md` for direction details, custom theme authoring, and font
+See [docs/usage.md](docs/usage.md) for direction details, custom theme authoring, and font
 fallback patterns.
 
 Apply a direction resource to a root `Control`:
@@ -86,7 +86,8 @@ desktop/mobile target presets for QA.
 v1 distribution is GitHub Releases only. The release workflow builds:
 
 - `neocade_theme-v<VERSION>.zip` containing the clean `addons/neocade_theme/`
-  folder plus root README/usage/changelog/license docs and `VERSION`.
+  folder plus `README.md`, `docs/usage.md`, `CHANGELOG.md`, `LICENSE.md`,
+  and `VERSION`.
 - `neocade_theme-showcase-web-v<VERSION>.zip` containing the Web showcase.
 - A GitHub Pages deployment of the latest Web showcase.
 

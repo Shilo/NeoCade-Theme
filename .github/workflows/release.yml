@@ -164,7 +164,7 @@ jobs:
             "v${NEW_VERSION}" -- \
             addons/neocade_theme/ \
             README.md \
-            ADDON_USAGE.md \
+            docs/usage.md \
             CHANGELOG.md \
             LICENSE.md \
             VERSION

@@ -1,8 +1,10 @@
 # Cross-Platform & Mobile-Variant Research — NeoCade Theme
 
-**Domain:** Godot 4.6 UI Theme addon — cross-platform export validation (Win / macOS / Linux / iOS / Android / Web) + mobile-variant authoring (`neocade_mobile_theme.tres` alongside `neocade_theme.tres`)
+**Domain:** Godot 4.6 UI Theme addon — cross-platform export validation (Win / macOS / Linux / iOS / Android / Web) + mobile-variant authoring through `NeoCadeTheme.platform`
 **Researched:** 2026-05-04
 **Overall confidence:** HIGH on per-target Godot behavior (cross-checked with Godot 4.6 release notes + official export docs + 5+ named GitHub issues); HIGH on iOS/Android tap-target/typography numerics (cited iOS HIG and Material 3); HIGH on font license compliance (cited SIL OFL FAQ + OFL official); MEDIUM on token-sharing strategy (Godot Theme has no `.tres`-to-`.tres` inheritance — verified, ThemeGen confirmed as the only mature pattern); MEDIUM on Web export font reliability under deployed hosting (multi-source community reports, no official Godot validation matrix).
+
+**Current implementation note (2026-05-08):** Later architecture work superseded the separate mobile `.tres` / `TokenSet` generator recommendation. Current v1 uses `addons/neocade_theme/scripts/neocade_theme.gd` (`class_name NeoCadeTheme extends Theme`) with exported `platform` and `raised` state, five data-only direction `.tres` files at the addon root, Inter Variable Roman only, `addons/neocade_theme/fonts/inter_ofl.txt`, and `.planning/MOBILE-DESIGN-SPEC.md`.
 
 ---
 
@@ -13,10 +15,10 @@ These are the cross-platform-specific decisions the synthesizer and roadmapper m
 | # | Decision | Recommendation | Confidence | Why |
 |---|---|---|---|---|
 | 1 | **Renderer for cross-platform breadth** | **GL Compatibility** on every target. Already locked in `project.godot` (`renderer/rendering_method=gl_compatibility`, `renderer/rendering_method.mobile=gl_compatibility`). DO NOT switch to Mobile renderer for Android — issue #111729 confirms Mobile renderer reduces Play Store device coverage; iOS Mobile renderer has Metal validation regression on iPhone SE 2nd gen in Godot 4.6 (issue #116090, release blocker for 4.7). | HIGH | Single-renderer discipline keeps the theme's stylebox AA/shadow behavior identical across all 6 targets. |
-| 2 | **Token-sharing strategy: `@tool` script generates BOTH `.tres` files from one `TokenSet.gd`** | Use a generator script (custom or ThemeGen) that authors `neocade_theme.tres` AND `neocade_mobile_theme.tres` from the same source-of-truth tokens. Godot's Theme class has NO `.tres`-to-`.tres` inheritance (verified — only `merge_with()` and `copy_from()` at runtime, neither persists at .tres-author time). Ship the two `.tres` files as final committed artifacts; ship the generator script in `addons/neocade_theme/_dev/` (NOT loaded at runtime). | HIGH | Confirmed via Godot 4.6 Theme class docs; ThemeGen (Inspiaaa, MIT, Asset Library 3299) is the proven implementation pattern. |
+| 2 | **Token-sharing strategy: one `@tool` `NeoCadeTheme` script regenerates each direction resource** | Use `addons/neocade_theme/scripts/neocade_theme.gd` as the shared source of behavior, with data-only direction `.tres` files storing exported colors/personality/platform/raised state. Godot's Theme class has NO `.tres`-to-`.tres` inheritance (verified — only `merge_with()` and `copy_from()` at runtime, neither persists at .tres-author time). | HIGH | Confirmed via Godot 4.6 Theme class docs; final implementation avoids static desktop/mobile sibling drift. |
 | 3 | **Mobile minimum tap target: `Button` minimum height = 48px (Godot pixels), 12px vertical / 16px horizontal padding** | This satisfies BOTH iOS HIG (44pt minimum, with 4pt of touch slop = effectively 48pt @1x) AND Material 3 (48dp Android minimum). Authoring in Godot pixels at base scale 1.0 with proper `content_scale_factor`/`content_scale_size` settings means 48px in the theme → 48dp on Android → 48pt on iOS @ recommended scale. Desktop primary stays at 32px button minimum. | HIGH | iOS HIG 44pt minimum + Material 3 48dp + 8dp button-to-button separation, all verified at developer.apple.com and m3.material.io |
 | 4 | **Mobile body font_size = 16px (vs desktop 14px)** | iOS HIG body = 17pt; Material 3 body-medium = 14sp but body-large = 16sp and recommends 16sp for primary content. 16px is the safe middle that meets both. Caption/hint stays 14px on mobile (vs 12px desktop) so accessibility minimum is honored. | HIGH | Apple HIG body size 17pt; Material 3 body-large 16sp; LearnUI Design + a11y consensus on 16sp/16pt as mobile body floor. |
-| 5 | **Bundle Inter Variable + Noto Sans Variable + Outfit Variable as committed `.ttf` files in `addons/neocade_theme/fonts/`. NO subsetting at v1.** | All three are OFL 1.1 — Inter v4.1 (rsms/inter), Noto Sans (notofonts), Outfit (Google Fonts). All explicitly redistributable embedded in App Store + Play Store apps per OFL FAQ + Apple licensing FAQs. License compliance: ship `OFL.txt` with copyright statements for all three fonts in the same folder as the `.ttf` files. Total bundle ~1.85 MB. CJK is NOT bundled in v1. | HIGH | OFL 1.1 + SIL FAQ explicit on App Store / Play Store legality; "reserved name" clause forbids renaming binaries — keep filenames intact (Inter-VariableFont*.ttf, etc.). |
+| 5 | **Bundle Inter Variable Roman as the only committed `.ttf` in `addons/neocade_theme/fonts/`. NO subsetting at v1.** | Inter is OFL 1.1 and redistributable embedded in App Store + Play Store apps per OFL FAQ + Apple licensing FAQs. License compliance: ship `inter_ofl.txt` with the Inter copyright and OFL text in the same folder as the `.ttf` file. CJK is NOT bundled in v1. | HIGH | OFL 1.1 + SIL FAQ explicit on App Store / Play Store legality; additional fonts are deferred until real product need appears. |
 | 6 | **Web export validation via project-level config flags, not platform detection in the theme** | Theme code has zero platform detection. Web export specifics (CORS headers, MIME types, font path resolution) are project config / hosting config, NOT theme concerns. The theme just needs to ensure: (a) all font and icon resources are referenced via `uid://` (not bare `res://`) so PCK remap survives, (b) all fonts use FontFile (NEVER SystemFont — verified breaks on Web), (c) all `.ttf` files have explicit `*.ttf` filter inclusion verified at Project → Export → Resources → "Filters to export non-resources". | HIGH | Multiple community reports converge: SystemFont silently breaks Web; explicit `*.ttf` export filter is required; FontFile-with-bundled-binary is the only reliable pattern. |
 | 7 | **Cross-platform validation order: Linux → Windows → macOS → Web → Android → iOS** | Linux/Windows/macOS are functionally identical (all GL Compatibility, native FontFile, no PCK weirdness — same theme `.tres` renders identically modulo system DPI). Web is highest-risk (font binding, CORS). Android needs density-bucket physical-device sweep. iOS is last because requires a Mac + Xcode + paid developer account, and has unresolved Mobile-renderer regression in 4.6 (we use GL Compat so unaffected, but still last). | MEDIUM | Pragmatic ordering — verify cheap targets first, push expensive iOS to end. v1 acceptance is "render parity within 5% pixel diff vs desktop reference" plus tap-area validation on touch targets. |
 
@@ -74,7 +76,7 @@ This is the master cross-platform table. Each row is a target × concern. Severi
 | Variable font `wght`/`opsz` axes | Supported. Inter Variable renders correctly across all targets. (Per Option D FINAL, only Inter is bundled in v1.) | LOW | Godot's FontVariation is engine-side — works wherever FontFile loads. |
 | App Store font licensing | **OFL 1.1 PASSES App Store review.** Per Option D (FINAL 2026-05-04), v1 bundles Inter Variable Roman ONLY — OFL 1.1, App Store + Play Store + Web embedding all legal. | LOW | [SIL OFL FAQ](https://openfontlicense.org/ofl-faq/), [Inter LICENSE.txt](https://github.com/rsms/inter/blob/master/LICENSE.txt). |
 | Non-Latin script rendering on all 6 targets | Per Option D, NeoCade ships only Inter (Latin/Cyrillic/Greek/Vietnamese). Non-Latin (Arabic/Hebrew/Indic/Thai/CJK) rendered via Godot's `Font.allow_system_fallback=true` (Godot 4.x default). Functional on Win/Mac/Linux/Android/iOS via OS system fonts. **Web export caveat:** browser/WASM system-font access is more limited; non-Latin glyph rendering depends on browser+OS combo. Phase 10 cross-platform validation must screenshot CJK/Arabic test labels on all 6 targets to confirm. | LOW for desktop+mobile; MED for Web | Godot Font docs; verify in Phase 1 RES-01 + Phase 10 EXPORT-02. |
-| App Store license-disclosure requirement | **Must include** the OFL.txt copyright + license notice in the app bundle — typically inside Settings → About → Acknowledgements, OR in an in-app Credits screen. NeoCade ships `OFL.txt` next to fonts; consuming app must surface it. NeoCade README must instruct this. | MED (consumer responsibility, not theme bug) | [openfontlicense.org/how-to-use-ofl-fonts/](https://openfontlicense.org/how-to-use-ofl-fonts/). |
+| App Store license-disclosure requirement | **Must include** the Inter OFL copyright + license notice in the app bundle — typically inside Settings → About → Acknowledgements, OR in an in-app Credits screen. NeoCade ships `inter_ofl.txt` next to fonts; consuming app must surface it. NeoCade README/docs must instruct this. | MED (consumer responsibility, not theme bug) | [openfontlicense.org/how-to-use-ofl-fonts/](https://openfontlicense.org/how-to-use-ofl-fonts/). |
 | iOS Simulator export | **NOT supported** in Godot 4.6 (issue [#102149](https://github.com/godotengine/godot/issues/102149)). Must test on real iOS device or Apple Silicon Mac running iOS app natively. | MED | Documented Godot 4.6 limitation. |
 | Bundle size constraints | App Store: 4 GB max IPA, 200 MB OTA download cap. Theme contributes ~2 MB — irrelevant. | LOW | Apple guidelines. |
 | Safe area / notch / Dynamic Island | Theme cannot solve this — it's per-scene layout via MarginContainer + `DisplayServer.get_display_safe_area()`. NeoCade's mobile showcase scene MUST demonstrate the pattern. | MED | [Godot forum: Safe area for notch/Dynamic Island](https://forum.godotengine.org/t/simple-way-to-manage-the-notch-on-ios-and-android-mobile-devices/86971). |
@@ -106,7 +108,7 @@ This is the master cross-platform table. Each row is a target × concern. Severi
 | Renderer | **Only WebGL 2.0 (GL Compatibility)** is supported on Web. Forward+ and Mobile renderers do NOT work on Web. NeoCade's renderer choice is FORCED for this target. | LOW (we already chose GL Compat) | [Web export docs](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_web.html) — "Godot 4 can only target WebGL 2.0 (using the Compatibility rendering method). Forward+/Mobile are not supported on the web platform." |
 | Asset path `res://addons/neocade_theme/...` | Works **inside the PCK** which is embedded next to the `.html` file as `<game>.pck` served via HTTP. **CRITICAL pitfall**: `.pck` is a single file — anything not packed into it is unreachable. The "Filters to export non-resources" in Project → Export must include `*.ttf` explicitly OR fonts must be referenced via FontFile resources (which package them automatically). | HIGH | [Custom fonts not in HTML5](https://forum.godotengine.org/t/why-do-custom-fonts-not-show-up-on-html5-export-but-work-when-testing-with-the-built-in-webserver/15456) — confirmed solution: `*.ttf` in export filter. |
 | Font loading: FontFile vs SystemFont | **SystemFont is BROKEN on Web.** No system fonts exist in browser sandbox; SystemFont silently falls back. **MUST use FontFile** with bundled `.ttf` referenced via `uid://` to survive PCK remap. NeoCade architecture already specifies this (STACK.md "no SystemFont"); reinforce. | HIGH | [Custom fonts replaced in web export](https://forum.godotengine.org/t/custom-fonts-are-replaced-in-web-export/59371) — "I was telling Godot to look for an installed font on my OS instead of looking for a font file in the game files." |
-| Unicode / non-Latin glyphs | Issue #78921 (open since 4.1, status as of 4.6 unclear): even with `allow_system_fonts` set, certain Unicode characters fail to render in Web. Workaround: bundle Noto Sans and chain it as FontFile fallback (`default_font.fallbacks`). | MED | [Godot issue #78921](https://github.com/godotengine/godot/issues/78921). NeoCade already does this. |
+| Unicode / non-Latin glyphs | Issue #78921 (open since 4.1, status as of 4.6 unclear): even with `allow_system_fonts` set, certain Unicode characters fail to render in Web. v1 bundles Inter only, so CJK/complex-script coverage is deferred unless a consuming project adds fallback fonts. | MED | [Godot issue #78921](https://github.com/godotengine/godot/issues/78921). |
 | Theme `.tres` loading on Web | Works. `.tres` is plain text inside the PCK. ResourceLoader resolves paths transparently. | LOW | Verified: theme resources load identically to other resource types on Web. |
 | Theme parity (visual diff vs desktop) | StyleBoxFlat AA / corner-radius / shadow render **the same** under WebGL 2.0 as desktop GL Compat — same shader path. Expect visual identity within ~1-2% pixel diff (subpixel font rasterization can vary slightly per browser font hinting). | LOW | GL Compat single-renderer property; the only divergence is browser font rasterization. |
 | Browser support — Chromium-based | Best support. Chrome/Edge/Brave/Opera all reliable. | LOW | [Web export docs](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_web.html). |
@@ -126,7 +128,7 @@ This is the master cross-platform table. Each row is a target × concern. Severi
 | iOS Mobile-renderer regression (#116090) | iOS only | HIGH if not on GL Compat | Already on GL Compat — neutralized |
 | Android Mobile-renderer reduces device support (#111729) | Android only | HIGH if not on GL Compat | Already on GL Compat — neutralized |
 | Web font loading via SystemFont silently fails | Web | HIGH | Use FontFile + bundle `.ttf` + add `*.ttf` to non-resource export filter |
-| Web Unicode/CJK gaps in HTML5 (#78921) | Web | MED | Noto Sans fallback chain bundled |
+| Web Unicode/CJK gaps in HTML5 (#78921) | Web | MED | Inter-only v1 documents the limitation; add consuming-game fallback fonts when needed |
 | iOS Safari WebGL 2 quirks | Web on iOS | HIGH | v1 acceptance: "no crash + no tofu"; pixel parity not required |
 | Cloudflare 25MB cap on PCK / WASM | Web hosting | MED (consumer concern) | Document in README; gzip recommendation |
 | Resource path break on PCK remap (`.tres.remap`) | iOS / Android / Web | HIGH if hand-coded paths | Use `uid://` in `.tres` ext_resource; never construct paths via string concatenation |
@@ -142,8 +144,8 @@ The user flagged Web as highest-risk. Here is concrete, opinionated guidance.
 
 ### 2.1 What works on Web
 
-- `res://addons/neocade_theme/neocade_theme.tres` loads via `ResourceLoader.load()` — same as desktop. The PCK abstracts the file system.
-- Bundled `.ttf` fonts (Inter Variable, Noto Sans, Outfit) load via FontFile + FontVariation chain.
+- `res://addons/neocade_theme/*_neocade_theme.tres` loads via `ResourceLoader.load()` — same as desktop. The PCK abstracts the file system.
+- Bundled `.ttf` fonts (Inter Variable Roman in v1) load via FontFile + FontVariation resources.
 - StyleBoxFlat AA, corner-radius, shadow, border render under WebGL 2.0 (GL Compat) **identically** to desktop GL Compat — pixel-for-pixel within 1-2% on identical browsers.
 - `.tres` text format (recommended) loads fine; binary-on-export setting is OFF (project default) — keep it OFF.
 
@@ -151,8 +153,8 @@ The user flagged Web as highest-risk. Here is concrete, opinionated guidance.
 
 | Failure | Why | Fix |
 |---|---|---|
-| Custom fonts replaced with system default | SystemFont resource was used instead of FontFile, OR `.ttf` not in PCK | (a) Always use FontFile pointing at bundled `.ttf`. (b) Add `*.ttf` to Project → Export → Resources → "Filters to export non-resources." (c) Alternatively, reference the .ttf via a saved FontFile `.tres` — Godot will pull the binary in automatically. NeoCade approach: **wrap each font in a FontFile `.tres` resource** under `addons/neocade_theme/fonts/` and reference those .tres files from `neocade_theme.tres` via `uid://`. |
-| Unicode glyphs missing | Inter doesn't cover; Web has no system font fallback; AccessibilityFontFile fallback chain not configured | Wire `default_font.fallbacks = [NotoSans-Variable, ...]` in `neocade_theme.tres`. Also bundle Noto Sans Arabic / Hebrew / Devanagari subsets if target audience needs them (NeoCade v1 ships only Latin/Cyrillic/Greek/Vietnamese via Noto Sans Variable). |
+| Custom fonts replaced with system default | SystemFont resource was used instead of FontFile, OR `.ttf` not in PCK | Always use bundled FontFile/FontVariation resources under `addons/neocade_theme/fonts/`. Add `*.ttf` to Project → Export → Resources → "Filters to export non-resources" if a consuming project references raw font files directly. |
+| Unicode glyphs missing | Inter doesn't cover every script; Web has no reliable system font fallback | Add explicit consuming-project fallback fonts for target languages. NeoCade v1 intentionally bundles Inter only. |
 | iOS Safari rendering anomalies | Safari WebGL 2 is the most-buggy browser per Godot docs | Document expected limitations in README. v1 acceptance criterion: "renders, all controls visible, all fonts load, no crash" — pixel parity not required for iOS Safari. |
 | `.pck` doesn't load (404 or wrong MIME) | Hosting misconfiguration | Document required hosting config in README: `application/wasm` MIME for `.wasm`, `application/octet-stream` for `.pck`, gzip recommended. |
 | Game freezes after a few minutes on iOS | Audio crash regression #107390 (4.5 dev5 → potentially 4.6) | Theme has zero audio. Showcase scene must also have zero audio. Re-verify on Godot 4.6.2+. |
@@ -198,7 +200,7 @@ Per browser × per device, validate:
 
 ---
 
-## (3) Mobile Variant Specifics — Concrete Numbers for `neocade_mobile_theme.tres`
+## (3) Mobile Variant Specifics — Concrete Numbers for `NeoCadeTheme.platform`
 
 Concrete authoring values for the mobile variant. Numbers that "Material 3 says" cite m3.material.io; numbers that "iOS HIG says" cite developer.apple.com; numbers chosen as a compromise are flagged.
 
@@ -277,9 +279,9 @@ Reasoning: corner radius is a **brand identity property**, not a touch-density p
 
 Exception: **`radius.full` (pill) buttons** look better on mobile at slightly larger radii in absolute terms because buttons are taller — but since `radius.full = 9999px` clamps to half the height, this is automatic.
 
-### 3.5 Density-buckets question — answered: ONE mobile theme, NOT four
+### 3.5 Density-buckets question — answered: ONE platform state, NOT four resources
 
-**Recommendation: ship ONE `neocade_mobile_theme.tres`.**
+**Recommendation: ship one mobile platform branch through `NeoCadeTheme.platform`, not per-density theme files.**
 
 Rationale:
 
@@ -291,9 +293,9 @@ Rationale:
 What the consuming game must do:
 - Set `Display → Window → Stretch → Mode = canvas_items` and `Aspect = expand` in `project.godot`.
 - Set `Display → Window → Size → Override` (Window Width/Height Override) to a base resolution that matches design intent (1280×720 typical mobile landscape; 720×1280 portrait; 1920×1080 if targeting flagship-only).
-- Apply `neocade_mobile_theme.tres` instead of `neocade_theme.tres` on mobile builds.
+- Use `platform=AUTO` for normal consumers, or force `platform=MOBILE` for explicit mobile previews/tests.
 
-NeoCade README must clearly document this stretch-mode requirement.
+NeoCade docs must clearly document this stretch-mode requirement.
 
 ### 3.6 Mobile-specific Control overrides (deltas from desktop primary)
 
@@ -344,18 +346,18 @@ Beyond raw constants/font sizes, certain Controls need different stylistic treat
 
 ---
 
-## (4) Token-Sharing Strategy — `@tool` Generator from Single `TokenSet.gd`
+## (4) Token-Sharing Strategy — final `@tool` Theme subclass, historical generator notes below
 
 ### 4.1 The verified facts
 
 1. Godot's `Theme` class **does not support `.tres`-to-`.tres` inheritance**. There is no "extends" or "fallback_theme" property. Verified at [docs.godotengine.org/en/stable/classes/class_theme.html](https://docs.godotengine.org/en/stable/classes/class_theme.html).
 2. Runtime composition exists: `Theme.merge_with(other)` and `Theme.copy_from(other)`. Both modify a Theme **in memory only**; the `.tres` file is not changed unless re-saved.
 3. Theme **type variations** (`Theme.set_type_variation(name, base)`) provide pseudo-inheritance WITHIN a single theme — but cannot share across two `.tres` files at design time.
-4. The proven pattern for "two themes from one source of truth" is **a `@tool` generator script** that programmatically constructs both Theme resources and saves them to `.tres`. Either custom-written or via `ThemeGen` (Inspiaaa, MIT, Asset Library #3299).
+4. The final NeoCade pattern is **a `@tool` Theme subclass** (`NeoCadeTheme`) that regenerates one direction resource from exported state. The earlier generator pattern below is preserved as research history, not current implementation.
 
-### 4.2 Recommended pattern — custom `@tool` script (lowest dependency)
+### 4.2 Historical pattern — custom `@tool` generator (superseded)
 
-Ship the generator at `addons/neocade_theme/_dev/generate_themes.gd`. The leading underscore + `_dev/` folder signals "not loaded at runtime". The generator script is `@tool`-marked and runs on demand from the editor (Tools menu, or by attaching to a temporary Node).
+This was the pre-implementation generator option. It is preserved as research history; the shipped v1 uses `addons/neocade_theme/scripts/neocade_theme.gd` instead.
 
 Code-shape sketch:
 
@@ -484,7 +486,7 @@ func _run() -> void:
     NeoCadeThemeGenerator.new().generate_all()
 ```
 
-Both `neocade_theme.tres` and `neocade_mobile_theme.tres` are regenerated. Source of truth lives in the script. Drift is impossible because both `.tres` files are computed from the same constants — change a color in `COLOR_PRIMARY`, regenerate, both files update identically.
+Historical generator approach: both `neocade_theme.tres` and `neocade_mobile_theme.tres` would have been regenerated from one script. Current implementation instead keeps the source of truth in `addons/neocade_theme/scripts/neocade_theme.gd` and regenerates each direction resource in place from exported state.
 
 ### 4.3 Alternative: ThemeGen (Inspiaaa, Asset Library)
 
@@ -496,33 +498,33 @@ If we want a more feature-rich generator with built-in stylebox helpers, [ThemeG
 
 Trade-off: extra dependency (~200 lines of GDScript in the consumer's `addons/`); needs to be in NeoCade's `_dev/` folder, not bundled at runtime distribution. NeoCade's user pays no runtime cost because `_dev/` is not part of the shipped addon.
 
-**Recommendation:** Author NeoCade's generator from scratch (fewer transitive deps), but model the `setup_desktop()` / `setup_mobile()` / shared `define_theme()` separation on ThemeGen's pattern. ~600 lines of `@tool` GDScript, single file, MIT-licensable.
+**Final recommendation:** Keep NeoCade's concrete `@tool` Theme subclass and data-only direction resources. Do not add `_dev/` generator tooling unless a future refactor proves the dynamic subclass hard to maintain.
 
 ### 4.4 What gets committed
 
 ```
 addons/neocade_theme/
-├── neocade_theme.tres                  ← committed final artifact (generated)
-├── neocade_mobile_theme.tres           ← committed final artifact (generated)
+├── bubble_neocade_theme.tres           ← committed data-only direction resource
+├── burst_neocade_theme.tres
+├── daybreak_neocade_theme.tres
+├── pulse_neocade_theme.tres
+├── slate_neocade_theme.tres
+├── scripts/
+│   ├── neocade_theme.gd                ← @tool Theme subclass source of truth
+│   └── neocade_theme_option_button.gd
 ├── fonts/...                           ← committed static assets
-├── icons/...                           ← committed static assets
-├── _dev/
-│   ├── .gdignore                       ← Godot doesn't try to import contents
-│   ├── generate_themes.gd              ← @tool script — source of truth
-│   ├── generate_driver.gd              ← @tool EditorScript launcher
-│   └── README.md                       ← "Run Tools → Run Script with generate_driver.gd to regenerate"
-└── README.md                           ← user-facing
+└── icons/...                           ← committed static assets
 ```
 
-Why ship the generator alongside (in `_dev/`)?
-- Documentation: future contributors see how the `.tres` was authored.
-- Reproducibility: anyone proposing a token change can regenerate cleanly.
-- Diff hygiene: PR shows token change in `.gd` AND visible delta in `.tres` — trivially reviewable.
-- `.gdignore` ensures Godot doesn't index the folder in ResourceLoader (shipped users don't see it via res://).
+Why keep no `_dev/` generator in v1?
+- Documentation lives in root `README.md` and `docs/usage.md`.
+- Reproducibility lives in the exported properties and formula code.
+- Diff hygiene is cleaner: formula changes happen in `scripts/neocade_theme.gd`, data changes happen in direction `.tres` files.
+- The addon folder stays focused for direct reuse in the author's consuming game.
 
 ### 4.5 What about Godot's built-in pseudo-inheritance via `theme_type_variation`?
 
-Type variations work WITHIN a single Theme resource — they cannot share data across two `.tres` files. They are still useful for our PrimaryButton/DangerButton/GhostButton variations within `neocade_theme.tres` (and identically within `neocade_mobile_theme.tres`). The generator outputs both files with parallel type-variation registrations.
+Type variations work WITHIN a single Theme resource. They are useful for PrimaryButton/DangerButton/GhostButton variations within each direction `.tres`, and `NeoCadeTheme` registers the same variation names for desktop/mobile platform states.
 
 Pitfall (already documented in PITFALLS.md 1.2): Godot 4.6 type variations have known font-inheritance bugs (issue #80731). The generator must **explicitly set fonts on every type variation** rather than relying on inheritance. The script-based approach does this naturally — it's just code.
 
@@ -545,7 +547,7 @@ For every bundled OFL font, NeoCade MUST:
 
 1. **Include the copyright statement** for that font (e.g., "Copyright (c) 2016-2024 The Inter Project Authors").
 2. **Include the license notice** (the "License" sentence directing users to the OFL text).
-3. **Include the OFL license text** (1.1 official text). Single shared `OFL.txt` covers all OFL-licensed fonts as long as all four copyright holders are listed.
+3. **Include the OFL license text** (1.1 official text). Current v1 ships a single `inter_ofl.txt` because Inter is the only bundled OFL font.
 4. **NOT use reserved font names** in derivative works. Don't rename `Inter-VariableFont*.ttf` to `NeoCade-Variable.ttf`.
 5. **NOT modify** the binary in a way that retains the reserved name.
 
@@ -553,12 +555,12 @@ NeoCade compliance:
 
 ```
 addons/neocade_theme/fonts/
-├── Inter-VariableFont_opsz,wght.ttf
-├── Inter-Italic-VariableFont_opsz,wght.ttf
-├── NotoSans-VariableFont_wdth,wght.ttf
-├── Outfit-VariableFont_wght.ttf
-├── JetBrainsMono-VariableFont_wght.ttf  (optional v1.x)
-└── OFL.txt   ← combined: Inter copyright + Noto copyright + Outfit copyright + JetBrains Mono copyright + ONE shared OFL 1.1 text
+├── inter_variable.ttf
+├── inter_variable.ttf.import
+├── inter_header_large.tres
+├── inter_header_medium.tres
+├── inter_header_small.tres
+└── inter_ofl.txt   ← Inter copyright + SIL OFL 1.1 text
 ```
 
 ### 5.3 iOS App Store specifics
@@ -579,25 +581,16 @@ The OFL Reserved Name clause restricts *renaming the font name as presented to u
 
 When the `.pck` is fetched by a browser, the font binary is not "exposed as a downloadable font asset" — it's only consumed internally by Godot for rasterization. This is functionally equivalent to bundling Inter inside an iOS app or Android APK — the OFL allows it explicitly.
 
-**No additional Web-specific compliance steps beyond the standard OFL.txt + copyright bundling.**
+**No additional Web-specific compliance steps beyond the standard `inter_ofl.txt` + copyright bundling.**
 
-### 5.6 Combined `OFL.txt` template (for `addons/neocade_theme/fonts/OFL.txt`)
+### 5.6 Inter `inter_ofl.txt` template (for `addons/neocade_theme/fonts/inter_ofl.txt`)
 
 ```
-Bundled fonts in this directory are licensed under the SIL Open Font License,
-Version 1.1.
+Bundled Inter font files in this directory are licensed under the SIL Open Font
+License, Version 1.1.
 
 ----- Inter -----
 Copyright (c) 2016-2024 The Inter Project Authors (https://github.com/rsms/inter)
-
------ Noto Sans -----
-Copyright 2022 The Noto Project Authors (https://github.com/notofonts/latin-greek-cyrillic)
-
------ Outfit -----
-Copyright 2021 The Outfit Project Authors (https://github.com/Outfitio/Outfit-Fonts)
-
------ JetBrains Mono (if bundled) -----
-Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
@@ -606,7 +599,7 @@ http://scripts.sil.org/OFL
 [full SIL OFL 1.1 text follows — pasted from https://openfontlicense.org/open-font-license-official-text/]
 ```
 
-The README must direct consumers: "If you ship NeoCade Theme inside your iOS / Android / Web game, surface this OFL.txt content in your app's About / Credits / Acknowledgements section."
+The README/docs must direct consumers: "If you ship NeoCade Theme inside your iOS / Android / Web game, surface the `inter_ofl.txt` content in your app's About / Credits / Acknowledgements section."
 
 ---
 
@@ -711,7 +704,7 @@ These are NEW risks vs the original desktop-only scope. Each gets a mitigation p
 **Mitigation:**
 - **Both `.tres` files are GENERATED, not hand-edited.** PR review enforces: changes to `.tres` files alone (without a corresponding `_dev/generate_themes.gd` change) are rejected.
 - Add a CI check: regenerate the `.tres` files from the script; if the generated output differs from the committed `.tres`, fail the build. Forces the source-of-truth discipline.
-- README's CONTRIBUTING.md explicitly documents the "edit script, regenerate, commit both" workflow.
+- `docs/usage.md` documents the safe authoring workflow and the Theme inspector workaround.
 
 ### Risk 2: Web export silent font fallback to system default (HIGH)
 
@@ -783,28 +776,26 @@ The synthesizer/roadmapper must add at least these two phases to the existing ro
 
 **Estimated effort:** 8-12 hours including device testing.
 
-### Phase: "Mobile Variant Authoring" (NEW)
+### Phase: "Mobile Variant Authoring" (NEW; updated to current dynamic architecture)
 
-**Position in roadmap:** After Phase 1 (Foundation — tokens locked, fonts bundled, mockup approval gate passed). Concurrent with or interleaved with Phase 2-4 desktop authoring — but with explicit gate that mobile variant is regenerated whenever desktop variant changes.
+**Position in roadmap:** Implemented through the dynamic `NeoCadeTheme.platform` export rather than a separate generated mobile resource.
 
-**Goal:** Author the mobile variant alongside desktop, sharing tokens via `@tool` script, with concrete tap-target/typography/spacing deltas.
+**Goal:** Author the mobile variant alongside desktop, sharing formulas in `addons/neocade_theme/scripts/neocade_theme.gd`, with concrete tap-target/typography/spacing deltas.
 
 **Deliverables:**
-1. **`addons/neocade_theme/_dev/generate_themes.gd`** — `@tool` script with `generate_all()` → produces both `.tres` files from one source-of-truth.
-2. **`addons/neocade_theme/_dev/generate_driver.gd`** — `@tool` EditorScript launcher.
-3. **`addons/neocade_theme/_dev/README.md`** — explains the workflow: edit constants in `generate_themes.gd`, run via Tools menu, verify both `.tres` files updated, commit all three.
-4. **`neocade_mobile_theme.tres`** — generated final artifact, committed.
-5. **Mobile-specific tap-target audit script** — Python/GDScript that validates every interactive Control in mobile variant has minimum 48px hit area.
-6. **Updated showcase scene `main.tscn`** — adds a theme-variant toggle button (Desktop / Mobile, distinct from the NeoCade ↔ Godot toggle) so reviewers can see both side-by-side.
-7. **`MOBILE-DESIGN-SPEC.md`** in `.planning/` — written specification of every mobile delta vs desktop, citing iOS HIG / Material 3 sources for each value.
+1. **`addons/neocade_theme/scripts/neocade_theme.gd`** — `@tool` Theme subclass regenerates entries when exported state changes.
+2. **Five direction `.tres` files** — each stores the shared exported `platform` state and regenerates desktop/mobile/AUTO values.
+3. **Mobile-specific tap-target audit script** — GDScript validates every interactive Control in mobile variant has minimum 48px hit area.
+4. **Updated showcase scene `main.tscn`** — exposes desktop/mobile/default theme comparison through the editor-authored interface.
+5. **`.planning/MOBILE-DESIGN-SPEC.md`** — written specification of every mobile delta vs desktop, citing iOS HIG / Material 3 sources for each value.
 
 **Acceptance:**
-- Both `.tres` files build from script with zero hand-edits.
+- Direction `.tres` files regenerate from exported state with zero hand-edits to generated theme items.
 - Tap-target audit passes (every interactive Control ≥ 48px on mobile, ≥ 32px on desktop).
 - Mobile variant's body font renders at 16px in the showcase.
 - Visual side-by-side comparison of desktop vs mobile shows IDENTICAL color palette, IDENTICAL corner-radius scale, IDENTICAL accent usage — only sizing/spacing/density differs.
 
-**Estimated effort:** 12-18 hours (the variant doubles every Control's authoring scope, but the script-based approach amortizes most of that).
+**Estimated effort:** Completed by the current dynamic implementation; future effort is regression testing when formula blocks change.
 
 ### Phase: "Cross-Platform Hardening Spike" (OPTIONAL — recommended)
 
@@ -826,14 +817,14 @@ This research changes or clarifies prior findings:
 
 ### 9.1 Corrections to STACK.md
 
-- **TL;DR Decision 1 (font distribution):** STACK.md says ship Inter Variable + Inter Italic Variable + Noto Sans Variable. CROSS-PLATFORM concurs but adds: also bundle **Outfit Variable** for `H1`/`H2`/marquee headings (per ARCHITECTURE.md decision). Outfit is OFL 1.1 — same compliance posture as Inter/Noto.
-- **STACK.md says total bundled font size ~2.3-2.5 MB.** With Outfit added: ~1.85 MB if we drop Inter Italic in v1 (defer to v1.x), or ~2.7 MB if we keep both Inter Italic + Outfit. Recommend defer Inter Italic to v1.x and add Outfit in v1 — shipped size ~1.85 MB.
+- **TL;DR Decision 1 (font distribution):** Final v1 ships Inter Variable Roman only, plus `addons/neocade_theme/fonts/inter_ofl.txt`. Outfit, Noto Sans, JetBrains Mono, and Inter Italic are deferred until a concrete product need appears.
+- **STACK.md bundle size:** Current `addons/neocade_theme/` footprint is approximately 1.1 MB.
 - **STACK.md mentions `plugin.cfg` is unnecessary.** Concur. Cross-platform doesn't change this.
 
 ### 9.2 Corrections to FEATURES.md
 
 - **FEATURES.md AF-5: "Mobile-specific theme variant — deferred."** This is now SUPERSEDED by user constraint update — mobile variant is v1 must-have. Strike from anti-features. CROSS-PLATFORM section 3 provides the concrete authoring spec.
-- FEATURES.md "13 type variations" still accurate — both desktop and mobile share the same 13 type-variation NAMES (PrimaryButton, DangerButton, GhostButton, etc.); the values differ across the two `.tres` files but the variation REGISTRY is identical so consuming projects can swap themes without changing scene `theme_type_variation` strings.
+- FEATURES.md "13 type variations" still accurate — desktop and mobile share the same type-variation names; the values differ by exported platform state so consuming projects can change variants without changing scene `theme_type_variation` strings.
 
 ### 9.3 Corrections to ARCHITECTURE.md
 

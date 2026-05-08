@@ -92,7 +92,7 @@ If the chain halts mid-phase (org usage limit, network failure, etc.):
 **Requirements:** COV-06, COV-08; closes COV-01, COV-07, COV-09.
 
 ### Phase 8 — Mobile Variant Token Block + Tap-Target Audit (TBD plan count)
-**Goal:** Fill in `_resolve_platform()=MOBILE` branch in `_regenerate_theme()` so any direction `.tres` with `platform=MOBILE` produces correctly sized mobile entries (button heights → 48px floor, body text 16px, +50% spacing scale on `space.4`+, corner radii UNCHANGED across desktop/mobile per brand-identity rule). Tap-target audit script asserts ≥48px on every interactive Control. `MOBILE-DESIGN-SPEC.md` committed.
+**Goal:** Fill in `_resolve_platform()=MOBILE` branch in `_regenerate_theme()` so any direction `.tres` with `platform=MOBILE` produces correctly sized mobile entries (button heights → 48px floor, body text 16px, +50% spacing scale on `space.4`+, corner radii UNCHANGED across desktop/mobile per brand-identity rule). Tap-target audit script asserts ≥48px on every interactive Control. `.planning/MOBILE-DESIGN-SPEC.md` committed.
 **Requirements:** MOBILE-01..08, DOCS-02, TYPEVAR-06.
 
 ## Risk callouts

@@ -75,11 +75,11 @@ These look attractive but create problems for a v1 Godot theme. PROJECT.md alrea
 | AF-2 | Scanline overlays on panels | "Arcade CRT" reference | Same scaling problem; conflicts with PROJECT.md "no synthwave/scanlines" decision. | Solid surface tokens; arcade feel comes from accent palette and corner radii |
 | AF-3 | Animated/transitioning hover states beyond Godot's built-in | Modern web feel | Godot Theme has no animation primitives; would require GDScript on every Control. PROJECT.md forbids. | Distinct hover stylebox with brighter color — instant change reads as "responsive" |
 | AF-4 | Light mode | "Themes should support both" | Doubles design + QA surface; PROJECT.md defers to v2. | Single dark theme; v2 adds light mode |
-| ~~AF-5~~ | ~~Mobile-specific theme variant (`neocade_mobile_theme.tres`)~~ — **STRICKEN 2026-05-04** | _was: "Should work on mobile"_ | **No longer an anti-feature.** Per user constraint update, mobile variant is v1 must-have alongside desktop primary. See `.planning/research/CROSS-PLATFORM.md` for tap-target/type-scale/spacing specifics, token-sharing via `@tool` script generator, and dedicated Mobile Variant Authoring + Cross-Platform Export Validation roadmap phases. | _superseded — see CROSS-PLATFORM.md_ |
+| ~~AF-5~~ | ~~Mobile-specific theme variant~~ — **STRICKEN 2026-05-04** | _was: "Should work on mobile"_ | **No longer an anti-feature.** Per user constraint update, mobile behavior is v1 must-have through `NeoCadeTheme.platform`. See `.planning/research/CROSS-PLATFORM.md` and `.planning/MOBILE-DESIGN-SPEC.md` for tap-target/type-scale/spacing specifics. | _superseded — see CROSS-PLATFORM.md_ |
 | AF-6 | Editor-only types (FlatButton, FlatMenuButton, MainScreenButton, BottomPanelButton, EditorInspector*, etc.) | godot-minimal-theme styles them | These are not in the public Control class hierarchy; they affect Godot's editor chrome only. PROJECT.md scopes to "every built-in Control class". | Skip in v1; if applied as editor theme, the user's editor will fall back to default for these — acceptable for v1 |
 | AF-7 | Custom syntax-highlight color scheme for CodeEdit | "Code looks good" | Syntax highlighting is per-language and not a theme entry — it's set by individual nodes/scripts. CodeEdit theme entries (bookmark/breakpoint icons) are in scope; syntax colors are not. | Style CodeEdit's StyleBox + gutter colors only. Document that syntax colors are app-level |
 | AF-8 | TextureButton / NinePatchRect / VideoStreamPlayer styling | These are Controls | They have NO theme entries — they render textures provided by the consuming scene. Theme can't style them. | Document in README that these are content-driven, not theme-driven |
-| AF-9 | Per-platform fonts (system font on macOS, Segoe UI on Windows) | Native feel | Defeats "bundled fonts" requirement; produces inconsistent screenshots; one of the documented values is unified visual identity. | Inter + Noto Sans bundled, used everywhere |
+| AF-9 | Per-platform fonts (system font on macOS, Segoe UI on Windows) | Native feel | Defeats "bundled fonts" requirement; produces inconsistent screenshots; one of the documented values is unified visual identity. | Inter bundled, used everywhere |
 | AF-10 | Theme-bundled sound effects | Arcade has sound | PROJECT.md explicitly forbids; theme is visual only. | Out of scope, document in README |
 | AF-11 | Distinct theming per Container subclass (HBoxContainer ≠ VBoxContainer styling) | More granular control | Containers are invisible by default; only PanelContainer/MarginContainer/Split/Tab need styling. Theming HBox/VBox/FlowContainer/Grid/Center wastes effort. | Style only Containers that have visible chrome (Panel*, Split*, Margin, Tab*); leave layout-only containers untouched (separation constants only) |
 | AF-12 | StyleBoxTexture (raster 9-slice) anywhere | "Custom button shapes" | Doesn't scale to 4K; conflicts with HD constraint; harder to swap palettes in v2. | StyleBoxFlat exclusively; corner_radius and border_width handle all needs |
@@ -827,9 +827,9 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 
 **Foundation deliverables**
 - [ ] All 6.1 token resources defined (colors, types, spacings, radii, strokes, elevations)
-- [ ] Inter Variable + Outfit Variable + Noto Sans Variable bundled, font resources created (per Conflict 1 revision; Inter Italic deferred to v1.x)
-- [ ] `addons/neocade_theme/_dev/generate_themes.gd` `@tool` script with TokenSet (desktop) + TokenSet.mobile blocks
-- [ ] Generated `neocade_theme.tres` + `neocade_mobile_theme.tres` scaffolds with empty entries for every type
+- [ ] Inter Variable Roman bundled, font resources created, and `inter_ofl.txt` included
+- [ ] `addons/neocade_theme/scripts/neocade_theme.gd` `@tool` Theme subclass with exported desktop/mobile/AUTO platform state
+- [ ] Five data-only direction `.tres` files backed by `NeoCadeTheme`
 - [ ] Mockup approval gate passed for representative Controls (desktop + mobile mockups both required, per ARCHITECTURE Section 6 Step 5b)
 
 **Core Controls deliverables (desktop authoring; mobile overrides accrue alongside)**
@@ -858,9 +858,9 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 
 **Mobile Variant Authoring deliverables (NEW; CROSS-PLATFORM Section 3)**
 - [ ] TokenSet.mobile overrides filled (button height 48px, body 16px, spacing +50% on space.4+)
-- [ ] Generator outputs `neocade_mobile_theme.tres`
+- [ ] `NeoCadeTheme.platform` regenerates mobile values without a separate mobile `.tres`
 - [ ] Tap-target audit script confirms every interactive Control ≥48px in mobile theme
-- [ ] `MOBILE-DESIGN-SPEC.md` documents deltas vs desktop
+- [ ] `.planning/MOBILE-DESIGN-SPEC.md` documents deltas vs desktop
 - [ ] Showcase scene supports three-way theme toggle (NeoCade desktop ↔ NeoCade mobile ↔ Godot default)
 
 **Showcase deliverables**
@@ -881,7 +881,7 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 
 **Distribution deliverables**
 - [ ] Asset Library submission package (icon, README, license attributions, install paths)
-- [ ] `OFL.txt` covering all bundled fonts (Inter + Outfit + Noto Sans + JetBrains Mono)
+- [ ] `addons/neocade_theme/fonts/inter_ofl.txt` covering bundled Inter
 - [ ] `LICENSE.md` + initial `CHANGELOG.md`
 - [ ] Fresh-install dry-run on a clean Godot project
 - [ ] Asset Library current policy verified at submission time (not training data)
@@ -897,7 +897,7 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 
 ### Future Consideration (v2+)
 
-- [ ] ~~Mobile-tuned variant (`neocade_mobile_theme.tres`)~~ **MOVED TO v1 — see Mobile Variant Authoring deliverables above**
+- [ ] ~~Mobile-tuned variant as a separate `.tres`~~ **MOVED TO v1 through `NeoCadeTheme.platform` — see Mobile Variant Authoring deliverables above**
 - [ ] Alternate palette variants (e.g., `neocade_neon_magenta.tres`, `neocade_amber.tres`)
 - [ ] Light mode for both desktop AND mobile variants
 - [ ] Alternate palette variants (magenta-led, amber-led, etc.)

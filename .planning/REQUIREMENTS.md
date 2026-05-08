@@ -30,7 +30,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Theme Foundation (FOUND)
 
-- [x] **FOUND-01** *(rewritten 2026-05-06e for single-class data-driven architecture; supersedes prior versions)*: `addons/neocade_theme/` directory layout: `fonts/`, `icons/`, and `scripts/` subdirs; addon root contains runtime resources only: **N `.tres` files** (`{name}_neocade_theme.tres`, one per approved direction, each `[gd_resource type="NeoCadeTheme" format=3]` with its direction's `@export` values saved), runtime asset subfolders, and no README/CHANGELOG/LICENSE/VERSION metadata. `scripts/neocade_theme.gd` is the concrete, instantiable `@tool class_name NeoCadeTheme extends Theme`; `scripts/neocade_theme_option_button.gd` is the reusable picker Control. Required font license text stays beside the redistributed font at `fonts/inter_ofl.txt`. Repo docs live at root (`README.md`, `ADDON_USAGE.md`, `CHANGELOG.md`, `LICENSE.md`, `VERSION`). For the v1 approved set {Pulse, Slate, Bubble, Daybreak, Burst}: **1 theme-engine `.gd` + 1 reusable UI control `.gd` + 5 `.tres`**. **No per-direction `.gd` files** (each direction is purely data on the single class). **No `_dev/` subfolder.** **No `themes/` subfolder.** **No root `neocade_theme.tres`.** **No `neocade_mobile_theme.tres`** (mobile is a `@export platform=MOBILE` toggle on `NeoCadeTheme`). **No `plugin.cfg`** (per STACK Decision 5).
+- [x] **FOUND-01** *(rewritten 2026-05-06e for single-class data-driven architecture; supersedes prior versions)*: `addons/neocade_theme/` directory layout: `fonts/`, `icons/`, and `scripts/` subdirs; addon root contains runtime resources only: **N `.tres` files** (`{name}_neocade_theme.tres`, one per approved direction, each `[gd_resource type="NeoCadeTheme" format=3]` with its direction's `@export` values saved), runtime asset subfolders, and no README/CHANGELOG/LICENSE/VERSION metadata. `scripts/neocade_theme.gd` is the concrete, instantiable `@tool class_name NeoCadeTheme extends Theme`; `scripts/neocade_theme_option_button.gd` is the reusable picker Control. Required font license text stays beside the redistributed font at `fonts/inter_ofl.txt`. Package docs live outside the addon (`README.md`, `docs/usage.md`, `CHANGELOG.md`, `LICENSE.md`, `VERSION`). For the v1 approved set {Pulse, Slate, Bubble, Daybreak, Burst}: **1 theme-engine `.gd` + 1 reusable UI control `.gd` + 5 `.tres`**. **No per-direction `.gd` files** (each direction is purely data on the single class). **No `_dev/` subfolder.** **No `themes/` subfolder.** **No root `neocade_theme.tres`.** **No `neocade_mobile_theme.tres`** (mobile is a `@export platform=MOBILE` toggle on `NeoCadeTheme`). **No `plugin.cfg`** (per STACK Decision 5).
 - [x] **FOUND-02** *(rewritten 2026-05-06f for finalized 9-property `@export` set + `is_light` semantics; closed 2026-05-06 by Plan 04-05 atomic commit `d9e405a` — BINDING_TABLE 37-row freeze + iteration engine + 14 type variations + default font + per-Control font/icon binding all landed; Phase 5 later added Kicker, so the current live registry is 15 variations)*: `addons/neocade_theme/scripts/neocade_theme.gd` is `@tool class_name NeoCadeTheme extends Theme` — the **single, concrete, instantiable** class with **9 `@export` properties total**. **Core (4):** `base_color: Color`, `accent_color: Color`, `raised: bool`, `platform: {DESKTOP, MOBILE, AUTO}`. **Shape (5, under `@export_group("Shape")`)**: `corner_radius: int`, `spacing: int`, `raised_strength: int`, `focus_thickness: int`, `outline_width: int`. The `@export` set is intentionally minimal — limited to values that should be consistent across the entire theme. Per-direction unique mood lives in Theme Editor entry overrides per `.tres` (StyleBoxFlat per Control state with direction-specific bg/border/padding/content_margin/icons), NOT in a long list of exports. The `_regenerate_theme()` method dynamically populates derived theme entry color/state values from the `@export` values via formulas; computes `var is_light: bool = base_color.get_luminance() >= 0.5` internally (dark default; `is_light` flags deviation) and branches all conditional formulas on `is_light` (godot-minimal-theme line-56 pattern with renamed/inverted variable for project-default-dark clarity). Setters on every `@export` property trigger `_regenerate_theme()`. The class is **NOT abstract** — users can instance it directly (`NeoCadeTheme.new()`) or save custom `.tres` files of type `NeoCadeTheme` to author their own themes. Convention: any future paired x/y `@export` values use `Vector2i`.
 - [x] **FOUND-03** *(rewritten 2026-05-06e for single-class data-driven architecture; type-variation count reconciled 2026-05-07 during Phase 8 planning review)*: Each per-direction `.tres` at `addons/neocade_theme/{name}_neocade_theme.tres` is `[gd_resource type="NeoCadeTheme" format=3]` with its direction's `@export` values saved. Loading any of these into a Godot scene yields a `NeoCadeTheme` instance that automatically calls `_regenerate_theme()` to populate entries for ALL 37 scorecard Control rows + the current 15 type variations from `addons/neocade_theme/scripts/neocade_theme.gd::TYPE_VARIATIONS`. Optional per-`.tres` Theme Editor entry overrides are stored as additional sections in the `.tres` and survive `_regenerate_theme()` if Phase 4 designs the regenerate logic to preserve manual overrides on a flagged subset of entries.
 
@@ -118,7 +118,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [x] **TYPEVAR-03**: 1 RichTextLabel type variation: InfoText.
 - [x] **TYPEVAR-04**: 2 Panel type variations: CardPanel, HeroPanel.
 - [x] **TYPEVAR-05**: Fonts set explicitly on every type variation (per PITFALLS 1.2 — type variations DO NOT inherit fonts from base type, even when stylebox inheritance works).
-- [x] **TYPEVAR-06** *(reconciled 2026-05-07; supersedes the original 13-variation research seed)*: All 15 production type variations are documented in `MOBILE-DESIGN-SPEC.md` and `DESIGN_TOKENS.md` with concrete usage examples. Source of truth is `addons/neocade_theme/scripts/neocade_theme.gd::TYPE_VARIATIONS`: PrimaryButton, SecondaryButton, GhostButton, DangerButton, IconButton, FlatButton, HeaderLarge, HeaderMedium, HeaderSmall, Caption, CodeLabel, Kicker, InfoText, CardPanel, HeroPanel.
+- [x] **TYPEVAR-06** *(reconciled 2026-05-07; supersedes the original 13-variation research seed)*: All 15 production type variations are documented in `.planning/MOBILE-DESIGN-SPEC.md` and `DESIGN_TOKENS.md` with concrete usage examples. Source of truth is `addons/neocade_theme/scripts/neocade_theme.gd::TYPE_VARIATIONS`: PrimaryButton, SecondaryButton, GhostButton, DangerButton, IconButton, FlatButton, HeaderLarge, HeaderMedium, HeaderSmall, Caption, CodeLabel, Kicker, InfoText, CardPanel, HeroPanel.
 
 ### Mobile Variant (MOBILE)
 
@@ -128,7 +128,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [x] **MOBILE-04**: Spacing scale +50% on `space.4` and above on mobile. Corner radii STAY IDENTICAL across desktop/mobile (brand identity, not platform-specific).
 - [x] **MOBILE-05**: One mobile theme covers all Android density buckets (per CROSS-PLATFORM 3.5; Godot uses `content_scale_factor` + stretch modes, NOT density qualifiers). Authored values are dp-equivalent at base scale 1.0.
 - [x] **MOBILE-06**: Tap-target audit script confirms every interactive Control in mobile theme is ≥48px; runs as part of Phase 8 acceptance.
-- [x] **MOBILE-07**: `MOBILE-DESIGN-SPEC.md` documents every delta vs desktop with concrete numbers + rationale.
+- [x] **MOBILE-07**: `.planning/MOBILE-DESIGN-SPEC.md` documents every delta vs desktop with concrete numbers + rationale.
 - [x] **MOBILE-08**: Mobile theme follows iOS HIG + Material 3 mobile guidance loosely (touch targets, type scale, accessibility minima) but retains the NeoCade arcade visual identity. NOT making Godot UI look native iOS or Android.
 
 ### Showcase Scene (SHOW)
@@ -169,7 +169,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [ ] **QA-03**: Manual tab-walk focused-state screenshot pass remains deferred UAT.
 - [ ] **QA-04**: Dual-renderer screenshot pass remains deferred UAT; GL Compatibility remains the ship target.
 - [ ] **QA-05**: Fresh-install dry-run checklist documented in `.planning/qa/fresh-install-dry-run.md`; physical clean-project copy and screenshots remain deferred UAT.
-- [x] **QA-06**: Theme inspector workaround: per PITFALLS 4.6 active issue #115500, do NOT edit theme resources through a Control inspector context menu. Safe authoring paths are the dedicated Theme editor, the 9 exported `NeoCadeTheme` properties on direction resources, and formula edits in `addons/neocade_theme/scripts/neocade_theme.gd`. Documented in CONTRIBUTING.md.
+- [x] **QA-06**: Theme inspector workaround: per PITFALLS 4.6 active issue #115500, do NOT edit theme resources through a Control inspector context menu. Safe authoring paths are the dedicated Theme editor, the 9 exported `NeoCadeTheme` properties on direction resources, and formula edits in `addons/neocade_theme/scripts/neocade_theme.gd`. Documented in `docs/usage.md`.
 
 ### Distribution (DIST)
 
@@ -177,7 +177,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [x] **DIST-02**: `addons/neocade_theme/fonts/inter_ofl.txt` covers Inter (the single bundled font in v1, Option D) — Reserved Font Name notice block + copyright lines.
 - [x] **DIST-03**: Root `LICENSE.md` for theme code plus root `CHANGELOG.md` entries for release preparation.
 - [x] **DIST-04** (REVISED 2026-05-04): Version commit + tag + push: workflow rewrites root `VERSION` to new version, rewrites `CHANGELOG.md`'s `## [Unreleased]` heading to `## [<NEW_VERSION>] — <DATE>`, commits with `chore(release): v<NEW_VERSION>`, creates annotated tag `v<NEW_VERSION>`, runs `git push origin HEAD:main` + `git push origin "v<NEW_VERSION>"`.
-- [x] **DIST-05** (REVISED 2026-05-04): Addon zip via `git archive --format=zip --prefix="neocade_theme-v<VERSION>/" -o "neocade_theme-v<VERSION>.zip" "v<VERSION>" -- addons/neocade_theme/ README.md ADDON_USAGE.md CHANGELOG.md LICENSE.md VERSION` — only tracked files at the tagged commit, with runtime addon files under `addons/neocade_theme/` and docs/licenses at the zip root (PentaTile pitfall #11 — excludes `.godot/`, build artifacts, untracked).
+- [x] **DIST-05** (REVISED 2026-05-04): Addon zip via `git archive --format=zip --prefix="neocade_theme-v<VERSION>/" -o "neocade_theme-v<VERSION>.zip" "v<VERSION>" -- addons/neocade_theme/ README.md docs/usage.md CHANGELOG.md LICENSE.md VERSION` — only tracked files at the tagged commit, with runtime addon files under `addons/neocade_theme/` and docs/licenses outside the addon folder (PentaTile pitfall #11 — excludes `.godot/`, build artifacts, untracked).
 - [x] **DIST-06** (NEW): Auto-version-increment from root `VERSION` (single-line `MAJOR.MINOR.PATCH` file). Default bump: minor +1. If minor would exceed 9: major +1, minor=0. Patch always 0 (patches NOT supported by this scheme — same as PentaTile D-05-16). Sed-based rewrite preserves quote style if any.
 - [x] **DIST-07** (NEW): CI gates run before version bump. Workflow downloads pinned `Godot_v4.6.x-stable_linux.x86_64`; runs headless project import (`godot --headless --path . --import --quit-after 2`) checking stderr for `^(ERROR|SCRIPT ERROR):` markers (PentaTile pitfall #1); opens `res://main.tscn` headless to verify showcase loads cleanly. Failure aborts release before any commits/pushes.
 - [x] **DIST-08** (NEW): Godot Web export build. Workflow downloads matching Godot 4.6.x Web export templates (`Godot_v4.6.x-stable_export_templates.tpz`), installs them to `~/.local/share/godot/export_templates/4.6.x.stable/`, runs `godot --headless --export-release "Web" <output_dir>/index.html` against a committed `export_presets.cfg` "Web" preset (created as part of Phase 9 showcase work). Archives the resulting web build into `neocade_theme-showcase-web-v<VERSION>.zip`.
@@ -196,9 +196,9 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 ### Documentation (DOCS)
 
 - [x] **DOCS-01**: `DESIGN_TOKENS.md` is committed and contains finalized desktop + mobile token blocks sourced from approved Phase 3.4 mockups.
-- [x] **DOCS-02**: `MOBILE-DESIGN-SPEC.md` documents every mobile delta vs desktop with concrete numbers + rationale (MOBILE-07 deliverable).
+- [x] **DOCS-02**: `.planning/MOBILE-DESIGN-SPEC.md` documents every mobile delta vs desktop with concrete numbers + rationale (MOBILE-07 deliverable).
 - [x] **DOCS-03**: `EDITOR-COVERAGE.md` maps which Editor surfaces are themed in v1 vs which fall back to default.
-- [x] **DOCS-04**: Root `README.md` and `ADDON_USAGE.md` are comprehensive enough for v1 release preparation: project description; install path via GitHub Releases zip; usage examples; cross-platform notes; font override patterns; Web showcase artifact/Pages notes; license; and distribution flow.
+- [x] **DOCS-04**: `README.md` and `docs/usage.md` are comprehensive enough for v1 release preparation: project description; install path via GitHub Releases zip; usage examples; cross-platform notes; font override patterns; Web showcase artifact/Pages notes; license; and distribution flow.
 - [x] **DOCS-05**: SOURCES.md is updated by Phase 1, 2, 3 source-dive spike outputs (RES-01..03) with new findings.
 
 ## v2 Requirements
@@ -324,14 +324,14 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | TYPEVAR-03 | Phase 5 (RichTextLabel InfoText) | — | Complete |
 | TYPEVAR-04 | Phase 5 (2 Panel variations) | — | Complete |
 | TYPEVAR-05 | Phase 5 (fonts set explicitly per variation) | Phase 6 + 7 (any variations declared in later phases follow same pattern) | Complete |
-| TYPEVAR-06 | Phase 8 (`MOBILE-DESIGN-SPEC.md` + `DESIGN_TOKENS.md` finalized with all 15 production variations from `TYPE_VARIATIONS`) | Phase 5 + 6 + 7 (variation declarations and polish; Kicker added after original 13-seed wording) | Complete |
+| TYPEVAR-06 | Phase 8 (`.planning/MOBILE-DESIGN-SPEC.md` + `DESIGN_TOKENS.md` finalized with all 15 production variations from `TYPE_VARIATIONS`) | Phase 5 + 6 + 7 (variation declarations and polish; Kicker added after original 13-seed wording) | Complete |
 | MOBILE-01 | Phase 8 | — | Complete |
 | MOBILE-02 | Phase 8 (≥48px tap targets) | — | Complete |
 | MOBILE-03 | Phase 8 (16px body / heading parity) | — | Complete |
 | MOBILE-04 | Phase 8 (spacing +50% / radii unchanged) | — | Complete |
 | MOBILE-05 | Phase 8 (single mobile theme covers all density buckets) | — | Complete |
 | MOBILE-06 | Phase 8 (tap-target audit script) | — | Complete |
-| MOBILE-07 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Complete |
+| MOBILE-07 | Phase 8 (`.planning/MOBILE-DESIGN-SPEC.md`) | — | Complete |
 | MOBILE-08 | Phase 8 (NeoCade identity preservation) | — | Complete |
 | SHOW-01 | Phase 9 (`res://main.tscn` as project main scene) | — | Complete |
 | SHOW-02 | Phase 9 (9 sections / 37 scorecard rows covered) | — | Complete |
@@ -360,7 +360,7 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | QA-03 | Phase 10 (Tab-walk focus audit) | — | Deferred UAT |
 | QA-04 | Phase 10 (dual-renderer screenshot pass) | — | Deferred UAT |
 | QA-05 | Phase 10 (fresh-install dry-run) | — | Deferred UAT; checklist complete |
-| QA-06 | Phase 10 (theme inspector workaround documented in CONTRIBUTING.md) | — | Complete |
+| QA-06 | Phase 10 (theme inspector workaround documented in `docs/usage.md`) | — | Complete |
 | DIST-01 | Phase 11 (release.yml workflow scaffold) | — | Complete |
 | DIST-02 | Phase 11 (auto-version-increment from `VERSION` file) | — | Complete |
 | DIST-03 | Phase 11 (CI gates — headless import + showcase open) | — | Complete |
@@ -381,7 +381,7 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | DIST-18 | Phase 9 (head_include export preset) + Phase 10 (deploy verification — `crossOriginIsolated===true`) | — | Deferred release UAT |
 | DIST-19 | Phase 11 prerequisite (repo public OR user has Pro+ plan) | — | Deferred manual release check |
 | DOCS-01 | Phase 3 (`DESIGN_TOKENS.md` pre-Phase-4) | — | Complete |
-| DOCS-02 | Phase 8 (`MOBILE-DESIGN-SPEC.md`) | — | Complete |
+| DOCS-02 | Phase 8 (`.planning/MOBILE-DESIGN-SPEC.md`) | — | Complete |
 | DOCS-03 | Already complete (EDITOR-COVERAGE.md exists) | — | Complete |
 | DOCS-04 | Phase 11 (README — closes DIST-04) | — | Complete |
 | DOCS-05 | Phase 1 (initial SOURCES.md update) | Phase 2 + Phase 3.x (continuous update through source-dive spikes) | Complete / Ongoing |

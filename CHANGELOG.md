@@ -10,8 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed (cleanup)
 
 - Runtime addon folder now contains only Godot-consumed addon assets plus the
-  required bundled-font OFL file. Package docs moved to repo root:
-  `README.md`, `ADDON_USAGE.md`, `CHANGELOG.md`, `LICENSE.md`, and `VERSION`.
+  required bundled-font OFL file. Package docs now live outside the addon:
+  `README.md`, `docs/usage.md`, `CHANGELOG.md`, `LICENSE.md`, and `VERSION`.
+- Mobile implementation notes moved out of the root into
+  `.planning/MOBILE-DESIGN-SPEC.md`.
+- Removed `CONTRIBUTING.md`; this repo is not expecting external contribution
+  workflow yet.
 - Inter OFL text moved beside the redistributed font as
   `addons/neocade_theme/fonts/inter_ofl.txt`.
 - Duplicate Body and Caption FontVariation resources were removed; both now
@@ -39,10 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Static QA reports for contrast, focus, coverage, export readiness,
   fresh-install dry-run checklist, and deferred manual/device UAT matrix.
-- `CONTRIBUTING.md` documentation warning maintainers to avoid Control
-  inspector theme editing and to use the dedicated Theme editor or
-  `NeoCadeTheme` regeneration flow.
-
 ### Added (Phase 11 — Distribution)
 
 - GitHub Actions release workflow for one-click manual releases: CI import,
@@ -160,7 +160,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   GhostButton personality per direction) — Phases 5/6/7 polish, not v1.0.0.
 - Bespoke SVG icons for Tree expand/collapse, ColorPicker, FileDialog,
   ScrollBar, TabBar — Phases 6/7.
-- Mobile-branch tap-target audit + `MOBILE-DESIGN-SPEC.md` deliverable —
+- Mobile-branch tap-target audit + `.planning/MOBILE-DESIGN-SPEC.md` deliverable —
   Phase 8.
 - Asset Library submission — REJECTED for v1 (DIST-05 stricken); v1 ships
   GitHub-Releases-only.

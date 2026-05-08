@@ -651,7 +651,7 @@ The anti-cyberpunk discipline is preserved (Phase 3 redirect 2026-05-04). The ea
 5. `addons/neocade_theme/daybreak_neocade_theme.tres` — §5.4 values + Daybreak overrides.
 6. `addons/neocade_theme/burst_neocade_theme.tres` — §5.5 values + Burst overrides.
 
-Plus root metadata files (`LICENSE.md`, `README.md`, `ADDON_USAGE.md`, `CHANGELOG.md`, `VERSION`) and bundled font license `addons/neocade_theme/fonts/inter_ofl.txt` per FOUND-01.
+Plus package metadata files (`LICENSE.md`, `README.md`, `docs/usage.md`, `CHANGELOG.md`, `VERSION`) and bundled font license `addons/neocade_theme/fonts/inter_ofl.txt` per FOUND-01.
 
 ### 12.2 Files Phase 4 MUST delete
 

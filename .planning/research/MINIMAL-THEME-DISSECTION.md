@@ -50,7 +50,7 @@ Per-state suffixes used by the dissected upstream theme (catalogued exhaustively
 | 15 | `EditorInterface.get_editor_settings()` | Acquire EditorSettings handle | `@tool` token-generator script reads from a hand-authored TokenSet resource (no editor handle); design tokens come from Phase 3 mockup-approved values. |
 | 18 | `settings.get_setting('interface/theme/base_color')` | Editor base color | NeoCade has its own palette per ARCHITECTURE.md (3 candidate palettes — Phase 3 mockup-gate selects). |
 | 20 | `settings.get_setting('interface/theme/contrast')` | Editor contrast slider | NeoCade contrast is a fixed design choice from ARCHITECTURE.md state-layer model. |
-| 21 | `EditorInterface.get_editor_scale()` | EDSCALE multiplier (Pitfall 6.1 — DO NOT lift values that depend on this) | NeoCade is HD-only (PROJECT.md), no edscale; mobile variant has its own pixel constants from MOBILE-DESIGN-SPEC.md (Phase 8). |
+| 21 | `EditorInterface.get_editor_scale()` | EDSCALE multiplier (Pitfall 6.1 — DO NOT lift values that depend on this) | NeoCade is HD-only (PROJECT.md), no edscale; mobile variant has its own pixel constants from `.planning/MOBILE-DESIGN-SPEC.md` (Phase 8). |
 | 24 | `settings.get_setting('interface/theme/accent_color')` | Editor accent | NeoCade has 8 accent hues with semantic role aliases (FEATURES.md DF-4); palette is Phase 3 territory. |
 | 26 | `settings.get_setting('interface/theme/base_spacing')` | Editor spacing | NeoCade uses fixed `base_margin` token from Phase 3 design system. |
 | 28 | `settings.get_setting('interface/theme/additional_spacing')` | Editor extra spacing | Same as above; not user-configurable in NeoCade. |
@@ -58,7 +58,7 @@ Per-state suffixes used by the dissected upstream theme (catalogued exhaustively
 | 32 | `settings.get_setting('interface/theme/icon_and_font_color')` | Light/dark icon mode | NeoCade is dark-only in v1 (light deferred to v2 per STATE.md). |
 | 34 | `settings.get_setting('interface/theme/relationship_line_opacity')` | Inspector relationship lines | Editor-only; NeoCade does not theme inspector. |
 | 36 | `settings.get_setting('interface/theme/draw_extra_borders')` | Border drawing toggle | NeoCade borders are deterministic per stylebox role (no toggle). |
-| 38-44 | Engine-version-conditional touch-optimization read | Adjusts `increase_scrollbar_touch_area` for touchscreens | NeoCade has separate `neocade_mobile_theme.tres` (Phase 8-9) with its own touch sizing; no runtime toggle. |
+| 38-44 | Engine-version-conditional touch-optimization read | Adjusts `increase_scrollbar_touch_area` for touchscreens | NeoCade uses `NeoCadeTheme.platform` (Phase 8-9) for desktop/mobile sizing; no runtime touch toggle. |
 | (in helper) | `EDSCALE`-derived values throughout via `scale` variable | Per-resolution scaling | NeoCade uses Godot's `content_scale_factor` + Theme defaults; no EDSCALE multiplier in NeoCade values (Pitfall 6.1 hard rule). |
 
 > **Line-citation runtime validation (per cross-AI review 2026-05-04):** All 12 cited lines (15, 18, 20, 21, 24, 26, 28, 30, 32, 34, 36, 56) verified by `sed -n 'Np'` against the live snapshot. Stamp date: 2026-05-04.
@@ -792,7 +792,7 @@ These three are enumerated below as `### MenuBar`, `### Panel`, `### Window` sec
 | stylebox | scroll_focus | focus | same `empty_sb` as scroll | (same — focus = scroll visually; Pitfall 1.1) | 813, 807-810 |
 
 **Per-class notes:**
-- **Touch-optimization conditional:** Lines 38-44 (Globals section) read `increase_scrollbar_touch_area` based on engine-version-conditional `enable_touch_optimizations`. With touch enabled, scrollbar `scroll` stylebox margins double from 6 to 12 EDSCALE units, making the touch target larger. NeoCade has a separate mobile theme variant (`neocade_mobile_theme.tres`, Phase 8-9), so this runtime conditional is dropped in favor of fixed mobile-vs-desktop margins.
+- **Touch-optimization conditional:** Lines 38-44 (Globals section) read `increase_scrollbar_touch_area` based on engine-version-conditional `enable_touch_optimizations`. With touch enabled, scrollbar `scroll` stylebox margins double from 6 to 12 EDSCALE units, making the touch target larger. NeoCade uses `NeoCadeTheme.platform` for mobile sizing (Phase 8-9), so this runtime conditional is dropped in favor of explicit platform state.
 - Track (`scroll` / `scroll_focus`) is transparent; visual exists only via the grabber. Compare to NeoCade's likely design: explicit visible track for accessibility.
 - Grabber-pressed uses SAME stylebox as grabber-highlight (line 802 = line 804 source `sb`). Pressing doesn't visually distinguish from hovering — acceptable for scrollbar (most users grab + drag without noticing the press transition).
 - `decrement`, `increment`, `decrement_highlight`, `increment_highlight`, `decrement_pressed`, `increment_pressed` ICONS NOT set — engine-default arrows. Plan 03 D-12 omissions.
@@ -1684,4 +1684,4 @@ When a parent Control calls `parent.add_theme_stylebox_override('panel', sb)`, t
 
   Phase 6 / Phase 7 implementations CANNOT rely on `add_theme_*_override` calls on parent Controls — those don't reach popups. The token generator at Phase 4 must emit type-level Theme entries for every popup class, full stop.
 
-  Mobile variant (Phase 8-9) must duplicate this discipline into `neocade_mobile_theme.tres` per CROSS-PLATFORM.md token-sharing strategy — popup theming does not "inherit" between Theme resources any more than between Controls; the mobile theme's popup classes get their own type-level entries from the same TokenSet.
+  Mobile variant (Phase 8-9) must duplicate this discipline through `NeoCadeTheme.platform` regeneration — popup theming does not "inherit" between Controls; the mobile platform state gets its own type-level entries from the same formula source.

@@ -4,7 +4,7 @@ const PRODUCTION_GD := "res://addons/neocade_theme/scripts/neocade_theme.gd"
 const PULSE_PATH := "res://addons/neocade_theme/pulse_neocade_theme.tres"
 const ROOT_FALLBACK_PATH := "res://addons/neocade_theme/neocade_theme.tres"
 const MOBILE_FALLBACK_PATH := "res://addons/neocade_theme/neocade_mobile_theme.tres"
-const MOBILE_SPEC_PATH := "res://MOBILE-DESIGN-SPEC.md"
+const MOBILE_SPEC_PATH := "res://.planning/MOBILE-DESIGN-SPEC.md"
 const TAP_AUDIT_PATH := "res://.planning/phases/08-mobile-variant-token-block-tap-target-audit-updated-for-dyna/helpers/_phase8_tap_target_audit.gd"
 
 const APPROVED_DIRECTIONS := {
@@ -180,7 +180,7 @@ func assert_docs_stage() -> void:
 	var group := "docs"
 	var problems: Array[String] = []
 	if not FileAccess.file_exists(MOBILE_SPEC_PATH):
-		_group_fail(group, "MOBILE-DESIGN-SPEC.md missing at repository root")
+		_group_fail(group, ".planning/MOBILE-DESIGN-SPEC.md missing")
 		return
 	var text := _read_file(MOBILE_SPEC_PATH)
 	var required := [
@@ -193,18 +193,18 @@ func assert_docs_stage() -> void:
 	]
 	for token in required:
 		if text.find(token) == -1:
-			problems.append("MOBILE-DESIGN-SPEC.md missing token: %s" % token)
+			problems.append(".planning/MOBILE-DESIGN-SPEC.md missing token: %s" % token)
 	for type_name in SCORECARD_37_TYPES:
 		if text.find(type_name) == -1:
-			problems.append("MOBILE-DESIGN-SPEC.md missing scorecard row: %s" % type_name)
+			problems.append(".planning/MOBILE-DESIGN-SPEC.md missing scorecard row: %s" % type_name)
 	var variations := _type_variation_names()
 	if variations.size() != 15:
 		problems.append("TYPE_VARIATIONS expected 15 entries, got %d: %s" % [variations.size(), str(variations)])
 	for variation in variations:
 		if text.find(variation) == -1:
-			problems.append("MOBILE-DESIGN-SPEC.md missing type variation: %s" % variation)
+			problems.append(".planning/MOBILE-DESIGN-SPEC.md missing type variation: %s" % variation)
 	if text.find("all 13 type variations") != -1:
-		problems.append("MOBILE-DESIGN-SPEC.md contains stale all 13 type variations wording")
+		problems.append(".planning/MOBILE-DESIGN-SPEC.md contains stale all 13 type variations wording")
 	if problems.is_empty():
 		_group_ok(group, "root mobile design spec covers requirements, scorecard rows, directions, platforms, and 15 type variations")
 	else:
