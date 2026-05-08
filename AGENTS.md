@@ -6,16 +6,16 @@ The theme is built primarily to power the author's upcoming game, codename Virtu
 
 **Visual identity locked 2026-05-04:** flat MD3 / MD3 Expressive. Hard rules: no textures, no patterns, no embossing, no painterly/leather/wood/grunge chrome, no gradients on chrome, no synthwave/neon-noir/cyberpunk, and no pixel art in the theme itself. Raised depth uses solid colors plus offset darker flat shape duplicates only.
 
-**Current architecture, updated 2026-05-08:** one concrete `@tool class_name NeoCadeTheme extends Theme` script at `res://addons/neocade_theme/scripts/neocade_theme.gd` plus one canonical resource at `res://addons/neocade_theme/neocade_theme.tres`. There are no production subclasses, no per-direction `.gd` files, no per-preset `.tres` files, no `themes/` folder, no `_dev/` folder, and no separate mobile theme resource.
+**Current architecture, updated 2026-05-08:** one concrete `@tool class_name NeoCadeTheme extends Theme` script at `res://addons/neocade_theme/scripts/neocade_theme.gd` plus one canonical resource at `res://addons/neocade_theme/neocade_theme.tres`. There are no production subclasses, no per-direction `.gd` files, no per-style `.tres` files, no `themes/` folder, no `_dev/` folder, and no separate mobile theme resource.
 
 `NeoCadeTheme` has 10 exports:
 
-- Core: `preset`, `base_color`, `accent_color`, `raised`, `platform`
+- Core: `style`, `base_color`, `accent_color`, `raised`, `platform`
 - Shape: `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`
 
-`preset` selects the built-in direction (`NONE`, `PULSE`, `SLATE`, `BUBBLE`, `DAYBREAK`, `BURST`). Built-in presets apply the exported direction values and explicit direction personality; `NONE` is the custom/manual mode. Setters regenerate theme entries dynamically. `platform=AUTO` auto-detects mobile with `OS.has_feature("mobile")`; `DESKTOP` and `MOBILE` force sizing. Light/dark behavior is luminance-derived from `base_color`; v1 ships dark-first presets, while formal light variants are future work.
+`style` selects the built-in direction (`CUSTOM`, `PULSE`, `SLATE`, `BUBBLE`, `DAYBREAK`, `BURST`). Built-in styles apply the exported direction values and explicit direction personality; `CUSTOM` is the manual/custom mode. Setters regenerate theme entries dynamically. `platform=AUTO` auto-detects mobile with `OS.has_feature("mobile")`; `DESKTOP` and `MOBILE` force sizing. Light/dark behavior is luminance-derived from `base_color`; v1 ships dark-first styles, while formal light variants are future work.
 
-**Current v1 resource:** one canonical `NeoCadeTheme` resource at `res://addons/neocade_theme/neocade_theme.tres`. Pulse is the recommended starter and showcase default preset, but it has no architectural privilege.
+**Current v1 resource:** one canonical `NeoCadeTheme` resource at `res://addons/neocade_theme/neocade_theme.tres`. Pulse is the recommended starter and showcase default style, but it has no architectural privilege.
 
 **Current project state as of 2026-05-08:** autonomous implementation is complete through Phase 11 verification. Remaining work is manual release/UAT: confirm GitHub repo/release workflow settings, run release workflow when ready, perform any deferred screenshot/device checks the user wants, then archive the milestone with `$gsd-complete-milestone`.
 

@@ -7,20 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed (preset architecture)
+### Changed (style architecture)
 
 - Replaced the five separate direction resources with one canonical
   `res://addons/neocade_theme/neocade_theme.tres` resource.
-- Added `NeoCadeTheme.Preset` with `NONE`, `PULSE`, `SLATE`, `BUBBLE`,
-  `DAYBREAK`, and `BURST`. Selecting a built-in preset applies the matching
+- Added `NeoCadeTheme.Style` with `CUSTOM`, `PULSE`, `SLATE`, `BUBBLE`,
+  `DAYBREAK`, and `BURST`. Selecting a built-in style applies the matching
   exported direction values and regenerates the theme once.
-- Direction personality now resolves from the explicit `preset` export instead
+- Direction personality now resolves from the explicit `style` export instead
   of an implicit `base_color` hex lookup.
-- `NeoCadeThemeOptionButton` now lists built-in presets from `NeoCadeTheme`
+- `NeoCadeThemeOptionButton` now lists built-in styles from `NeoCadeTheme`
   rather than scanning for multiple theme files. The optional `None` entry
   still applies a null theme and `theme_selected(theme, index)` is preserved.
 - The showcase now applies `res://addons/neocade_theme/neocade_theme.tres`
-  and uses Pulse as its starter preset.
+  and uses Pulse as its starter style.
 
 ### Changed (cleanup)
 
@@ -46,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Dialogs & Popups, Advanced & Graph, Token Gallery, and Coverage 37/37.
 - Reusable `NeoCadeThemeOptionButton` dropdown-only script at
   `res://addons/neocade_theme/scripts/neocade_theme_option_button.gd`; it lists
-  built-in NeoCade presets alphabetically, appends optional `None`, applies
+  built-in NeoCade styles alphabetically, appends optional `None`, applies
   selection to an exported target or scene root, and emits
   `theme_selected(theme, index)` after applying a theme.
 - `res://showcase/showcase.gd` handles the scoreboard Window button and
@@ -72,10 +72,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Single concrete `@tool class_name NeoCadeTheme extends Theme` class
   (`addons/neocade_theme/scripts/neocade_theme.gd`) with 10 `@export` properties:
-  - Core: `preset`, `base_color`, `accent_color`, `raised`, `platform`
+  - Core: `style`, `base_color`, `accent_color`, `raised`, `platform`
   - Shape: `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`,
     `outline_width`
-- One canonical direction/preset `.tres` file at addon root:
+- One canonical direction/style `.tres` file at addon root:
   `neocade_theme.tres`.
 - Inter Variable Roman font (PINNED to Inter v4.0;
   SHA256: `746431E950FD28D29B0189D708D4A5852A8458EDB3184387EADCEE9E5E34676C`)

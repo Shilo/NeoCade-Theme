@@ -3,7 +3,7 @@
 NeoCade is a drop-in Godot 4.6 UI Theme addon for polished, accessible,
 flat-MD3 / MD3 Expressive Control styling. It ships as one concrete
 `NeoCadeTheme` class plus one canonical theme resource with five built-in
-presets: Pulse, Slate, Bubble, Daybreak, and Burst.
+styles: Pulse, Slate, Bubble, Daybreak, and Burst.
 
 The theme is built for the author's upcoming game, codename VirtuCade, but
 this repository is only the reusable NeoCade theme addon.
@@ -11,7 +11,7 @@ this repository is only the reusable NeoCade theme addon.
 ## Status
 
 v1 implementation is in final QA/release preparation. The live showcase is
-`res://showcase/showcase.tscn` and opens with the Pulse preset.
+`res://showcase/showcase.tscn` and opens with the Pulse style.
 
 ## What Ships
 
@@ -25,13 +25,13 @@ addons/neocade_theme/
   icons/*.svg
 ```
 
-There is no `plugin.cfg`, no editor plugin, no per-preset `.tres` files, and
+There is no `plugin.cfg`, no editor plugin, no per-style `.tres` files, and
 no separate `neocade_mobile_theme.tres`. Mobile is handled by the exported
 `platform` property on the same theme resource.
 
 ## Usage
 
-See [docs/usage.md](docs/usage.md) for preset details, custom theme authoring,
+See [docs/usage.md](docs/usage.md) for style details, custom theme authoring,
 and font fallback patterns.
 
 Apply NeoCade to a root `Control`:
@@ -45,22 +45,22 @@ func _ready() -> void:
     theme = NEOCADE_THEME
 ```
 
-For runtime preset or variant toggles, duplicate before mutating:
+For runtime style or variant toggles, duplicate before mutating:
 
 ```gdscript
 var active_theme: NeoCadeTheme = NEOCADE_THEME.duplicate(true)
-active_theme.preset = NeoCadeTheme.Preset.BUBBLE
+active_theme.style = NeoCadeTheme.Style.BUBBLE
 active_theme.raised = true
 active_theme.platform = NeoCadeTheme.Platform.MOBILE
 theme = active_theme
 ```
 
-Set `preset = NeoCadeTheme.Preset.NONE` to make all exported direction values
-manual. When the direction exports match a built-in preset again, NeoCade
-automatically reflects that preset in the inspector.
+Set `style = NeoCadeTheme.Style.CUSTOM` to make all exported direction values
+manual. When the direction exports match a built-in style again, NeoCade
+automatically reflects that style in the inspector.
 
-Migration note: older per-preset files such as `pulse_neocade_theme.tres` have
-been replaced by `neocade_theme.tres` plus the `preset` export.
+Migration note: older per-style files such as `pulse_neocade_theme.tres` have
+been replaced by `neocade_theme.tres` plus the `style` export.
 
 ## Showcase
 
@@ -68,7 +68,7 @@ Open `showcase/showcase.tscn` in Godot 4.6.2 to inspect:
 
 - 9 sections covering controls, dialogs, graph, tokens, and coverage.
 - `NeoCadeThemeOptionButton` dropdown in `addons/neocade_theme/scripts/`
-  lists NeoCade presets alphabetically and appends `None` when allowed.
+  lists NeoCade styles alphabetically and appends `None` when allowed.
   `None` applies a null theme. It emits `theme_selected(theme, index)` after
   a theme is applied.
 - Editor-authored Control tree; scripts are limited to the theme picker and

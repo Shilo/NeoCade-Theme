@@ -53,7 +53,7 @@ text = "NeoCade"
 [node name="Subtitle" type="Label" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack" unique_id=1124395495]
 layout_mode = 2
 theme_type_variation = &"Caption"
-text = "Pulse starter preset - Control coverage gallery"
+text = "Pulse starter style - Control coverage gallery"
 
 [node name="ControlsRow" type="HBoxContainer" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack" unique_id=976262454]
 layout_mode = 2

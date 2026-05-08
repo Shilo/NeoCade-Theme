@@ -13,7 +13,7 @@ raised variation only.
 
 ## Recommended Starter
 
-**Pulse** is the recommended starter preset for new consumers. Try this first:
+**Pulse** is the recommended starter style for new consumers. Try this first:
 
 ```gdscript
 @export var theme: NeoCadeTheme = preload("res://addons/neocade_theme/neocade_theme.tres")
@@ -22,12 +22,12 @@ raised variation only.
 Or assign `res://addons/neocade_theme/neocade_theme.tres` via the Editor's
 Inspector `theme` slot on any `Control`.
 
-## Presets
+## Styles
 
-v1 ships one canonical `.tres` file with five built-in presets. All presets
+v1 ships one canonical `.tres` file with five built-in styles. All styles
 share the same `NeoCadeTheme` engine and the same exported controls.
 
-| Preset | Personality |
+| Style | Personality |
 |---|---|
 | **Pulse** | Arcade-dense; cabinet-bezel rectangles; bold accent fill on primary |
 | **Slate** | Spacious-premium-quiet; rounded-pill primary; iOS-style focus offset |
@@ -35,16 +35,16 @@ share the same `NeoCadeTheme` engine and the same exported controls.
 | **Daybreak** | Airy-breathing; gentle rounded; mint-halo focus ring |
 | **Burst** | Event-spread-hierarchy-amplified; oversized statement primary; gold accent |
 
-Select a preset in the Inspector through the `preset` export, or in code:
+Select a style in the Inspector through the `style` export, or in code:
 
 ```gdscript
 var active_theme: NeoCadeTheme = preload("res://addons/neocade_theme/neocade_theme.tres").duplicate(true)
-active_theme.preset = NeoCadeTheme.Preset.SLATE
+active_theme.style = NeoCadeTheme.Style.SLATE
 theme = active_theme
 ```
 
 The `raised` and `platform` exports are universal variants. They work with
-every preset:
+every style:
 
 ```gdscript
 active_theme.raised = true
@@ -54,22 +54,22 @@ active_theme.platform = NeoCadeTheme.Platform.MOBILE
 `Platform.AUTO` is the default and auto-detects mobile targets with
 `OS.has_feature("mobile")`.
 
-Migration note: older per-preset files such as `pulse_neocade_theme.tres` have
-been replaced by `neocade_theme.tres` plus the `preset` export.
+Migration note: older per-style files such as `pulse_neocade_theme.tres` have
+been replaced by `neocade_theme.tres` plus the `style` export.
 
 ## Custom Themes
 
-Set `preset = NeoCadeTheme.Preset.NONE` to make the direction exports manual.
+Set `style = NeoCadeTheme.Style.CUSTOM` to make the direction exports manual.
 Changing direction-defining exports such as `base_color`, `accent_color`,
 `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, or
-`outline_width` will update the preset back to a matching built-in preset when
-the values match one exactly; otherwise it falls back to `NONE`.
-`Preset.NONE` uses NeoCade's default hidden direction personality rather than
+`outline_width` will update the style back to a matching built-in style when
+the values match one exactly; otherwise it falls back to `CUSTOM`.
+`Style.CUSTOM` uses NeoCade's neutral fallback personality rather than
 inferring one from `base_color`.
 
 ```gdscript
 var custom_theme := NeoCadeTheme.new()
-custom_theme.preset = NeoCadeTheme.Preset.NONE
+custom_theme.style = NeoCadeTheme.Style.CUSTOM
 custom_theme.base_color = Color("#080A1E")
 custom_theme.accent_color = Color("#FF66AA")
 custom_theme.corner_radius = 10
@@ -77,7 +77,7 @@ theme = custom_theme
 ```
 
 Or in the Godot FileSystem dock: right-click -> New Resource ->
-`NeoCadeTheme`, set `preset` to `NONE` or a built-in preset, then save the
+`NeoCadeTheme`, set `style` to `CUSTOM` or a built-in style, then save the
 resource anywhere in your project.
 
 ## Theme Editor Authoring
@@ -144,8 +144,8 @@ label.add_theme_font_override("font_italic", italic)
   declares `@tool class_name NeoCadeTheme extends Theme`.
 - **One canonical resource:** `addons/neocade_theme/neocade_theme.tres`
   stores the reusable theme resource.
-- **Preset enum:** `NeoCadeTheme.Preset` switches Pulse, Slate, Bubble,
-  Daybreak, Burst, or `NONE`.
+- **Style enum:** `NeoCadeTheme.Style` switches Pulse, Slate, Bubble,
+  Daybreak, Burst, or `CUSTOM`.
 - **Dynamic regeneration:** exported setters update Theme entries through
   `set_stylebox`, `set_color`, `set_constant`, `set_font`, and related APIs.
 - **No plugin:** NeoCade does not require `plugin.cfg`, `EditorPlugin`, or a
@@ -155,7 +155,7 @@ label.add_theme_font_override("font_italic", italic)
 
 The repository-level `showcase/showcase.tscn` opens with Pulse and includes:
 
-- a `NeoCadeThemeOptionButton` preset picker that lists Bubble, Burst,
+- a `NeoCadeThemeOptionButton` style picker that lists Bubble, Burst,
   Daybreak, Pulse, Slate, and optional `None`;
 - an editor-authored Control tree previewable directly in the Godot editor;
 - a reusable picker script at
@@ -184,4 +184,4 @@ by downloading `neocade_theme-v<VERSION>.zip` and copying its
 
 ---
 
-_Updated through the one-resource preset architecture cleanup._
+_Updated through the one-resource style architecture cleanup._

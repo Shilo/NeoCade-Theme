@@ -4,8 +4,8 @@ class_name NeoCadeTheme extends Theme
 ## NeoCade Theme — single concrete `@tool extends Theme` class for the NeoCade addon.
 ##
 ## Architecture: one concrete instantiable class + one canonical
-## `addons/neocade_theme/neocade_theme.tres` resource. The `preset` export switches between
-## the approved NeoCade directions; `Preset.NONE` leaves the remaining exports fully manual.
+## `addons/neocade_theme/neocade_theme.tres` resource. The `style` export switches between
+## the approved NeoCade directions; `Style.CUSTOM` leaves the remaining exports fully manual.
 ##
 ## Setters on every `@export` property trigger `_regenerate_theme()`, which walks an internal
 ## BINDING_TABLE (Plan 04-05) to populate every formula-owned theme entry. Slots NOT in the
@@ -20,19 +20,27 @@ class_name NeoCadeTheme extends Theme
 ## See: .planning/DESIGN_TOKENS.md, .planning/phases/04-.../04-RESEARCH.md, .planning/phases/04-.../04-CONTEXT.md.
 
 enum Platform { DESKTOP = 0, MOBILE = 1, AUTO = 2 }
-enum Preset { NONE = 0, PULSE = 1, SLATE = 2, BUBBLE = 3, DAYBREAK = 4, BURST = 5 }
+enum Style { CUSTOM = 0, PULSE = 1, SLATE = 2, BUBBLE = 3, DAYBREAK = 4, BURST = 5 }
 
 # ─── Core exports (DESIGN_TOKENS §4.1 rows 1-5) ─────────────────────────────────────────────
-@export var preset: Preset = Preset.PULSE:
+## Selects the built-in NeoCade visual style.
+##
+## Custom: manual style values using NeoCade's neutral fallback personality.
+## Pulse: arcade-dense cabinet rectangles with bold accent fills.
+## Slate: spacious, quiet, premium rounded chrome.
+## Bubble: playful, pillowy, generous controls with soft candy energy.
+## Daybreak: airy, welcoming, gently rounded mint-forward controls.
+## Burst: event-like, high-energy statement controls with amplified hierarchy.
+@export var style: Style = Style.PULSE:
 	set(value):
-		if preset == value: return
-		preset = value
-		if _syncing_preset_from_exports:
+		if style == value: return
+		style = value
+		if _syncing_style_from_exports:
 			return
-		if preset == Preset.NONE:
+		if style == Style.CUSTOM:
 			_regenerate_theme()
 			return
-		_apply_preset_exports(preset)
+		_apply_style_exports(style)
 
 @export var base_color: Color = Color("#151A2E"):
 	set(value):
@@ -95,77 +103,82 @@ enum Preset { NONE = 0, PULSE = 1, SLATE = 2, BUBBLE = 3, DAYBREAK = 4, BURST = 
 var is_light: bool = false  # derived from base_color.get_luminance() at every regenerate
 var _regenerating: bool = false  # reentry guard (per RESEARCH.md §4)
 var _last_regeneration_usec: int = 0  # diagnostic; logged via Output in editor
-var _applying_preset_exports := false
-var _syncing_preset_from_exports := false
+var _applying_style_exports := false
+var _syncing_style_from_exports := false
 
 func _init() -> void:
 	_regenerate_theme()
 
 
-static func selectable_presets() -> PackedInt32Array:
-	return PackedInt32Array([Preset.PULSE, Preset.SLATE, Preset.BUBBLE, Preset.DAYBREAK, Preset.BURST])
+static func selectable_styles() -> PackedInt32Array:
+	return PackedInt32Array([Style.PULSE, Style.SLATE, Style.BUBBLE, Style.DAYBREAK, Style.BURST])
 
 
-static func preset_label(preset_value: int) -> String:
-	return String(PRESET_LABELS.get(preset_value, PRESET_LABELS[Preset.NONE]))
+static func style_label(style_value: int) -> String:
+	var style_name: Variant = Style.find_key(style_value)
+	if style_name == null:
+		style_name = String(Style.find_key(Style.CUSTOM))
+	return String(style_name).capitalize()
 
 
-func _apply_preset_exports(preset_value: int) -> void:
-	var values: Dictionary = PRESET_EXPORTS.get(preset_value, {})
+static func style_description(style_value: int) -> String:
+	return String(STYLE_DESCRIPTIONS.get(style_value, STYLE_DESCRIPTIONS[Style.CUSTOM]))
+
+
+func _apply_style_exports(style_value: int) -> void:
+	var values: Dictionary = STYLE_EXPORTS.get(style_value, {})
 	if values.is_empty():
-		preset = Preset.NONE
+		style = Style.CUSTOM
 		_regenerate_theme()
 		return
 
-	_applying_preset_exports = true
+	_applying_style_exports = true
 	base_color = values["base_color"]
 	accent_color = values["accent_color"]
-	raised = values["raised"]
-	platform = values["platform"]
 	corner_radius = values["corner_radius"]
 	spacing = values["spacing"]
 	raised_strength = values["raised_strength"]
 	focus_thickness = values["focus_thickness"]
 	outline_width = values["outline_width"]
-	_applying_preset_exports = false
+	_applying_style_exports = false
 	_regenerate_theme()
 
 
 func _after_direction_export_changed() -> void:
-	if _applying_preset_exports:
+	if _applying_style_exports:
 		return
 
-	_sync_preset_from_exports()
+	_sync_style_from_exports()
 	_regenerate_theme()
 
 
 func _after_variant_export_changed() -> void:
-	if _applying_preset_exports:
+	if _applying_style_exports:
 		return
 
 	_regenerate_theme()
 
 
-func _sync_preset_from_exports() -> void:
-	var matching_preset := _matching_preset()
-	if preset == matching_preset:
+func _sync_style_from_exports() -> void:
+	var matching_style := _matching_style()
+	if style == matching_style:
 		return
 
-	_syncing_preset_from_exports = true
-	preset = matching_preset
-	_syncing_preset_from_exports = false
+	_syncing_style_from_exports = true
+	style = matching_style
+	_syncing_style_from_exports = false
 
 
-func _matching_preset() -> Preset:
-	for preset_value in selectable_presets():
-		if _exports_match_preset(preset_value):
-			return preset_value
+func _matching_style() -> Style:
+	for style_value in selectable_styles():
+		if _exports_match_style(style_value):
+			return style_value
 
-	return Preset.NONE
+	return Style.CUSTOM
 
 
-func _exports_match_preset(preset_value: int) -> bool:
-	var values: Dictionary = PRESET_EXPORTS.get(preset_value, {})
+func _exports_match_style(style_value: int) -> bool:
+	var values: Dictionary = STYLE_EXPORTS.get(style_value, {})
 	if values.is_empty():
 		return false
 
@@ -187,13 +200,13 @@ func _regenerate_theme() -> void:
 	is_light = base_color.get_luminance() >= 0.5
 	var p: Platform = _resolve_platform()
 	var tokens: Dictionary = _platform_tokens(p)
-	var presets: Dictionary = _resolve_direction_presets()  # Cross-AI Cycle 1 C2 fix
+	var style_personality: Dictionary = _resolve_style_personality()  # Cross-AI Cycle 1 C2 fix
 
 	# ── Surface ramp (DESIGN_TOKENS §6.2) ──
 	# spread_factor is the per-direction surface-ramp width control. Sourced from
-	# DIRECTION_PRESETS (Cross-AI Cycle 1 C2 fix): Pulse=1.3 wide, Slate=0.7 narrow,
+	# STYLE_PERSONALITY (Cross-AI Cycle 1 C2 fix): Pulse=1.3 wide, Slate=0.7 narrow,
 	# Bubble=1.0 medium, Daybreak=1.0 medium, Burst=1.3 wide; custom themes default to 1.0.
-	var spread_factor: float = presets.spread_factor
+	var spread_factor: float = style_personality.spread_factor
 	var elevate_target: Color = Color.BLACK if is_light else Color.WHITE
 
 	var surface_base: Color    = base_color
@@ -225,12 +238,12 @@ func _regenerate_theme() -> void:
 
 	# ── State-layer overlays (DESIGN_TOKENS §6.5) ──
 	# Per-direction hover_pct / pressed_pct / disabled_opacity sourced from
-	# DIRECTION_PRESETS (Cross-AI Cycle 1 C2 fix). pressed_pct stored as negative in the
-	# preset (per DESIGN_TOKENS §6.5 convention: hover lifts toward elevate_target,
+	# STYLE_PERSONALITY (Cross-AI Cycle 1 C2 fix). pressed_pct stored as negative in the
+	# style (per DESIGN_TOKENS §6.5 convention: hover lifts toward elevate_target,
 	# pressed sinks toward BLACK); the `abs()` extracts the magnitude.
-	var hover_pct: float = presets.hover_pct
-	var pressed_pct: float = abs(presets.pressed_pct)
-	var disabled_opacity: float = presets.disabled_opacity
+	var hover_pct: float = style_personality.hover_pct
+	var pressed_pct: float = abs(style_personality.pressed_pct)
+	var disabled_opacity: float = style_personality.disabled_opacity
 	var state_hover_target: Color = Color.BLACK if is_light else Color.WHITE
 	var state_hover: Color = _mix(base_color, state_hover_target, hover_pct / 100.0)
 	var state_pressed: Color = _mix(base_color, Color.BLACK, pressed_pct / 100.0)
@@ -248,7 +261,7 @@ func _regenerate_theme() -> void:
 	# `{"role": "role_danger"}` without silently falling back to surface_panel /
 	# text_strong (which would ship the wrong color and breach §7.1).
 	# Per DESIGN_TOKENS §7.1: "directions may override" — v1 ships the defaults;
-	# direction-specific overrides plug in via DIRECTION_PRESETS.shape.* in v2.
+	# direction-specific overrides plug in via STYLE_PERSONALITY.shape.* in v2.
 	var role_success: Color = Color("#5CC971")
 	var role_warning: Color = Color("#FFD166")
 	var role_danger:  Color = Color("#FF6E6E")
@@ -381,15 +394,15 @@ func _regenerate_theme() -> void:
 	# ── Walk BINDING_TABLE — additive iteration; entries not in table are LEFT UNTOUCHED (D-04) ──
 	# Cross-AI Cycle 2 N1 fix: only 5 setter branches — NO set_font branch. Per-Control
 	# fonts are handled by default_font + explicit set_font on the 14 type variations.
-	# Cross-AI Cycle 2 C2 fix: presets passed to _resolve_recipe so disabled alpha is
-	# sourced per-direction from DIRECTION_PRESETS.disabled_opacity.
+	# Cross-AI Cycle 2 C2 fix: style_personality passed to _resolve_recipe so disabled alpha is
+	# sourced per-direction from STYLE_PERSONALITY.disabled_opacity.
 	for theme_type in BINDING_TABLE.keys():
 		var type_block: Dictionary = BINDING_TABLE[theme_type]
 		for data_type in type_block.keys():
 			var slots: Dictionary = type_block[data_type]
 			for slot_name in slots.keys():
 				var recipe: Dictionary = slots[slot_name]
-				var value = _resolve_recipe(recipe, data_type, role_table, tokens, presets)
+				var value = _resolve_recipe(recipe, data_type, role_table, tokens, style_personality)
 				if value == null: continue  # D-04 escape hatch — recipe failed; leave slot alone
 				if data_type == "stylebox":
 					set_stylebox(slot_name, theme_type, value)
@@ -515,14 +528,14 @@ func _make_raised_stylebox(bg: Color, offset_color: Color, intensity: int) -> St
 	return sb
 
 
-# ─── Direction presets (DESIGN_TOKENS §5/§6, directions.json axis_8/axis_9) ─────────────────
-## Per-direction non-exported parameters that don't belong on the public 10-export surface but
+# ─── Style personality (DESIGN_TOKENS §5/§6, directions.json axis_8/axis_9) ─────────────────
+## Per-style non-exported parameters that don't belong on the public 10-export surface but
 ## must differentiate Pulse (wide spread) from Slate (narrow spread) etc. Sourced from
 ## directions.json axis_8_surface_spread + axis_9_disabled_opacity + DESIGN_TOKENS §6.5
 ## state-layer pcts. Cross-AI Cycle 1 C2 fix.
 ##
-## Lookup is by `preset`. `Preset.NONE` uses the fallback default so users can customize the
-## visible exports without keeping hidden direction personality locked to a named preset.
+## Lookup is by `style`. `Style.CUSTOM` uses the fallback default so users can customize the
+## visible exports without keeping hidden direction personality locked to a named style.
 ##
 ## Phase 5 Plan 05-02 (D-02 / D-03 / D-04) adds the `shape` sub-Dictionary on every row.
 ## Shape values are sourced VERBATIM from DESIGN_TOKENS §5.1-§5.5 ("Theme Editor override
@@ -531,12 +544,12 @@ func _make_raised_stylebox(bg: Color, offset_color: Color, intensity: int) -> St
 ## BINDING_TABLE recipes can reference `shape.<key>` paths via `_lookup_shape()`. Strategy
 ## names are first-class enums per D-04: adding a 6th direction in v2 = adding a strategy
 ## entry, not editing 14 recipes.
-const DIRECTION_PRESETS: Dictionary = {
+const STYLE_PERSONALITY: Dictionary = {
 	# ─── Pulse — base=#151A2E, accent=#8BFF6A (DESIGN_TOKENS §5.1) ───
 	# Personality: arcade-cabinet rectangular; radius=0; tight-cabinet focus ring (offset=0).
 	# Buttons rectangular (radius 0), padding 14×10 desktop, primary strategy = bold-accent-fill.
 	# Surface alpha all 1.00 (cabinet hardware is solid).
-	Preset.PULSE: {
+	Style.PULSE: {
 		"spread_factor": 1.3, "hover_pct": 6.0, "pressed_pct": -10.0, "disabled_opacity": 0.42,
 		"shape": {
 			"primary_radius":        0,
@@ -572,7 +585,7 @@ const DIRECTION_PRESETS: Dictionary = {
 	# Personality: iOS-premium-quiet; radius=14 rounded-pill; ios-style-offset focus (offset=2).
 	# Buttons rounded (radius 14), padding 16×11 desktop, primary strategy = quiet-pill.
 	# Tabs/chips full pill (radius 999). Surface alpha popup 0.92 (iOS NavigationBar bleed).
-	Preset.SLATE: {
+	Style.SLATE: {
 		"spread_factor": 0.7, "hover_pct": 4.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
 		"shape": {
 			"primary_radius":        14,
@@ -608,7 +621,7 @@ const DIRECTION_PRESETS: Dictionary = {
 	# Personality: candy-pillowy; base radius 26 / primary radius 999 (pill on primary
 	# specifically per §5.3); cheerful-chunky focus (offset=2). Padding 20×14 desktop.
 	# Tabs/chips fully-rounded pill (radius 999). Surface alpha all 1.00 (candy is opaque).
-	Preset.BUBBLE: {
+	Style.BUBBLE: {
 		"spread_factor": 1.0, "hover_pct": 8.0, "pressed_pct": -10.0, "disabled_opacity": 0.45,
 		"shape": {
 			"primary_radius":        999,
@@ -644,7 +657,7 @@ const DIRECTION_PRESETS: Dictionary = {
 	# Personality: airy-welcoming-lobby; radius=8 gently rounded; airy-mint focus (offset=2).
 	# Buttons radius 8, padding 18×12 desktop, primary strategy = friendly-generous.
 	# Surface alpha popup 0.90 + panels 0.96 (airy bleed) but buttons 1.00 (tappability).
-	Preset.DAYBREAK: {
+	Style.DAYBREAK: {
 		"spread_factor": 1.0, "hover_pct": 6.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
 		"shape": {
 			"primary_radius":        8,
@@ -680,7 +693,7 @@ const DIRECTION_PRESETS: Dictionary = {
 	# Personality: event-celebration-statement; base radius 18 / primary radius 28 (oversized
 	# per §5.5); dramatic-event focus (offset=1). Padding 20×14 desktop. Tabs radius 16.
 	# Surface alpha all 1.00 (celebration posters solid). Primary strategy = oversized-statement.
-	Preset.BURST: {
+	Style.BURST: {
 		"spread_factor": 1.3, "hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.45,
 		"shape": {
 			"primary_radius":        28,
@@ -714,65 +727,55 @@ const DIRECTION_PRESETS: Dictionary = {
 	},
 }
 
-const PRESET_LABELS: Dictionary = {
-	Preset.NONE: "None",
-	Preset.PULSE: "Pulse",
-	Preset.SLATE: "Slate",
-	Preset.BUBBLE: "Bubble",
-	Preset.DAYBREAK: "Daybreak",
-	Preset.BURST: "Burst",
+const STYLE_DESCRIPTIONS: Dictionary = {
+	Style.CUSTOM: "Manual style values using NeoCade's neutral fallback personality.",
+	Style.PULSE: "Arcade-dense cabinet rectangles with bold accent fills.",
+	Style.SLATE: "Spacious, quiet, premium rounded chrome.",
+	Style.BUBBLE: "Playful, pillowy, generous controls with soft candy energy.",
+	Style.DAYBREAK: "Airy, welcoming, gently rounded mint-forward controls.",
+	Style.BURST: "Event-like, high-energy statement controls with amplified hierarchy.",
 }
 
-const PRESET_EXPORTS: Dictionary = {
-	Preset.PULSE: {
+const STYLE_EXPORTS: Dictionary = {
+	Style.PULSE: {
 		"base_color": Color("#151A2E"),
 		"accent_color": Color("#8BFF6A"),
-		"raised": false,
-		"platform": Platform.AUTO,
 		"corner_radius": 0,
 		"spacing": 18,
 		"raised_strength": 3,
 		"focus_thickness": 2,
 		"outline_width": 1,
 	},
-	Preset.SLATE: {
+	Style.SLATE: {
 		"base_color": Color("#111820"),
 		"accent_color": Color("#8BD3FF"),
-		"raised": false,
-		"platform": Platform.AUTO,
 		"corner_radius": 14,
 		"spacing": 22,
 		"raised_strength": 2,
 		"focus_thickness": 2,
 		"outline_width": 1,
 	},
-	Preset.BUBBLE: {
+	Style.BUBBLE: {
 		"base_color": Color("#241326"),
 		"accent_color": Color("#FFB3E6"),
-		"raised": false,
-		"platform": Platform.AUTO,
 		"corner_radius": 26,
 		"spacing": 22,
 		"raised_strength": 6,
 		"focus_thickness": 3,
 		"outline_width": 1,
 	},
-	Preset.DAYBREAK: {
+	Style.DAYBREAK: {
 		"base_color": Color("#0B2420"),
 		"accent_color": Color("#76F2D1"),
-		"raised": false,
-		"platform": Platform.AUTO,
 		"corner_radius": 8,
 		"spacing": 24,
 		"raised_strength": 3,
 		"focus_thickness": 2,
 		"outline_width": 1,
 	},
-	Preset.BURST: {
+	Style.BURST: {
 		"base_color": Color("#20112E"),
 		"accent_color": Color("#FFD166"),
-		"raised": false,
-		"platform": Platform.AUTO,
 		"corner_radius": 18,
 		"spacing": 22,
 		"raised_strength": 5,
@@ -781,12 +784,12 @@ const PRESET_EXPORTS: Dictionary = {
 	},
 }
 
-## Default hidden direction personality for `Preset.NONE` custom themes.
+## Default hidden direction personality for `Style.CUSTOM` themes.
 ##
 ## Per CONTEXT.md D-13: medium-spread / medium-radius defaults. shape.* values give
 ## NeoCadeTheme.new() consumers with non-approved hex a stable base — the chrome reads as
 ## "friendly-generous" (Daybreak's strategy) at radius 8 / focus_offset 2 / surface alpha 1.00.
-const DIRECTION_PRESET_DEFAULT: Dictionary = {
+const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 	"spread_factor": 1.0, "hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.38,
 	"shape": {
 		"primary_radius":        8,
@@ -819,9 +822,9 @@ const DIRECTION_PRESET_DEFAULT: Dictionary = {
 	},
 }
 
-## Returns the per-direction sub-dict for the active `preset`.
-func _resolve_direction_presets() -> Dictionary:
-	return DIRECTION_PRESETS.get(preset, DIRECTION_PRESET_DEFAULT)
+## Returns the per-direction sub-dict for the active `style`.
+func _resolve_style_personality() -> Dictionary:
+	return STYLE_PERSONALITY.get(style, STYLE_PERSONALITY_DEFAULT)
 
 
 # ─── Type variation registry (DESIGN_TOKENS §8.5; PITFALLS 1.2 mandate explicit fonts) ──────
@@ -1248,7 +1251,7 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 ##   → slot_name → recipe Dictionary. Recipes:
 ##     {"role": "<role>"}              — pulls a derived color from role_table.
 ##     {"role": "...", "raised_intensity": int} — for stylebox; multiplier for raised lift.
-##     {"role": "...", "disabled": true}        — pulls per-direction alpha from presets.disabled_opacity (Cycle 2 C2).
+##     {"role": "...", "disabled": true}        — pulls per-direction alpha from style_personality.disabled_opacity (Cycle 2 C2).
 ##     {"role": "focus_ring"}                   — special: transparent bg + accent border + expand.
 ##     {"value": "tokens.<key>"}                — for constant/font_size.
 ##     {"icon": "<filename>"}                   — for icons (file under addons/neocade_theme/icons/).
@@ -2362,7 +2365,7 @@ const BINDING_TABLE: Dictionary = {
 	},
 	# ─── TYPEVAR-01 button variations (Plan 05-03 Task 1) ──────────────────────────────────────
 	# Variation chrome flows through BINDING_TABLE recipes per D-01 (additive iteration only),
-	# D-02 (per-direction shape via DIRECTION_PRESETS.shape), D-03 (recipe schema reads
+	# D-02 (per-direction shape via STYLE_PERSONALITY.shape), D-03 (recipe schema reads
 	# `shape.<key>` lookups via _lookup_shape), D-04 (closed-enum strategy dispatch via
 	# _apply_primary_strategy / _apply_ghost_strategy added by Plan 05-02 Task 2), and D-07
 	# (focus is the official `focus` overlay only — no pressed_focus / checked_focus / etc.).
@@ -2499,7 +2502,7 @@ const BINDING_TABLE: Dictionary = {
 		},
 	},
 	# 41. DangerButton — destructive action; bg = role_danger (DESIGN_TOKENS §7.1 #FF6E6E
-	# default; per-direction overrides plug into DIRECTION_PRESETS.shape.* in v2 per
+	# default; per-direction overrides plug into STYLE_PERSONALITY.shape.* in v2 per
 	# Plan 05-02 Task 2 docstring). Plan 05-02 added role_danger to role_table so this
 	# binding does NOT silently fall back to surface_panel (review HIGH gate).
 	# DangerButton uses primary radius/padding (the danger CTA is a primary-grade action).
@@ -2752,22 +2755,22 @@ const BINDING_TABLE: Dictionary = {
 
 # ─── Recipe resolution (Plan 04-05 iteration engine helper) ─────────────────────────────────
 
-## Walks `presets.shape.<dotted_path>` against the active direction's shape sub-block.
+## Walks `style_personality.shape.<dotted_path>` against the active style's shape sub-block.
 ##
 ## Plan 05-02 Task 2 (D-03). Recipes reference shape values as strings like
 ## `"shape.primary_radius"` or `"shape.raised_lifts.primary"`; this helper splits on `.`
 ## and walks the shape Dictionary one key at a time. Returns the leaf value (int / float /
 ## Vector2i / StringName / Dictionary) or `null` if any segment is missing.
 ##
-## For approved direction presets, missing shape keys are verifier failures (D-02 mandate);
-## the only acceptable null path is when `presets` lacks a `shape` block entirely (custom
-## NeoCadeTheme.new() consumers — those use DIRECTION_PRESET_DEFAULT.shape per D-13).
-func _lookup_shape(presets: Dictionary, dotted_path: String) -> Variant:
+## For approved style personality blocks, missing shape keys are verifier failures (D-02 mandate);
+## the only acceptable null path is when `style_personality` lacks a `shape` block entirely (custom
+## NeoCadeTheme.new() consumers — those use STYLE_PERSONALITY_DEFAULT.shape per D-13).
+func _lookup_shape(style_personality: Dictionary, dotted_path: String) -> Variant:
 	if not (dotted_path is String) or not dotted_path.begins_with("shape."):
 		return null
-	if not presets.has("shape"):
+	if not style_personality.has("shape"):
 		return null
-	var current: Variant = presets["shape"]
+	var current: Variant = style_personality["shape"]
 	var segments: PackedStringArray = dotted_path.substr(6).split(".")  # strip "shape."
 	for seg in segments:
 		if seg == "":
@@ -2827,8 +2830,8 @@ func _set_content_margin_from_padding(sb: StyleBoxFlat, padding: Vector2i) -> vo
 ## Strategies are CLOSED enums — adding a 6th approved direction in v2 = adding a strategy
 ## entry HERE, not editing 14 BINDING_TABLE recipe rows (D-04). Unknown strategy = no-op
 ## (verifier asserts the closed-enum invariant; typos surface as PHASE5_GROUP_FAIL).
-func _apply_primary_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_table: Dictionary, presets: Dictionary) -> void:
-	# Strategy values are the StringName literals from DIRECTION_PRESETS.shape.primary_strategy
+func _apply_primary_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_table: Dictionary, style_personality: Dictionary) -> void:
+	# Strategy values are the StringName literals from STYLE_PERSONALITY.shape.primary_strategy
 	# per direction (sourced verbatim from DESIGN_TOKENS §5.1-§5.5 "primary_strategy" rows).
 	match String(strategy_name):
 		"bold-accent-fill":
@@ -2871,7 +2874,7 @@ func _apply_primary_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_t
 ##   "rounded-ghost-thicker-outline" — Bubble: transparent bg + 2px accent border + radius 999.
 ##   "soft-outline"                  — Daybreak / DEFAULT: transparent bg + 1px outline_color.
 ##   "normal-accent-ghost"           — Burst: transparent bg + 2px accent border.
-func _apply_ghost_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_table: Dictionary, presets: Dictionary) -> void:
+func _apply_ghost_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_table: Dictionary, style_personality: Dictionary) -> void:
 	# Default to transparent bg; specific strategies override border color/thickness.
 	sb.bg_color = Color(0, 0, 0, 0)
 	match String(strategy_name):
@@ -2959,32 +2962,32 @@ func _apply_kicker_style(kicker_style: StringName, role_table: Dictionary) -> Co
 ##
 ## Returns null if the recipe references an unknown role or icon (caller skips silently — D-04).
 func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictionary,
-					  tokens: Dictionary, presets: Dictionary) -> Variant:
+					  tokens: Dictionary, style_personality: Dictionary) -> Variant:
 	if data_type == "stylebox":
 		var role: String = recipe.get("role", "surface_panel")
 		# raised_intensity may be either an int literal or a `shape.<key>` lookup string.
 		var raised_intensity_raw: Variant = recipe.get("raised_intensity", 0)
 		var raised_intensity: int = 0
 		if typeof(raised_intensity_raw) == TYPE_STRING and (raised_intensity_raw as String).begins_with("shape."):
-			var lifted: Variant = _lookup_shape(presets, raised_intensity_raw)
+			var lifted: Variant = _lookup_shape(style_personality, raised_intensity_raw)
 			if lifted != null and (typeof(lifted) == TYPE_INT or typeof(lifted) == TYPE_FLOAT):
 				raised_intensity = int(lifted)
 		else:
 			raised_intensity = int(raised_intensity_raw)
-		# Cross-AI Cycle 2 C2 fix: disabled flag pulls per-direction alpha from presets,
-		# NOT a hard-coded literal. Recipes carrying "disabled": true get presets.disabled_opacity.
+		# Cross-AI Cycle 2 C2 fix: disabled flag pulls per-direction alpha from style_personality,
+		# NOT a hard-coded literal. Recipes carrying "disabled": true get style_personality.disabled_opacity.
 		var is_disabled: bool = recipe.get("disabled", false)
 		# Plan 05-02 Task 2 (D-03): alpha may be a literal float or a `shape.<key>` lookup.
 		var alpha_raw: Variant = recipe.get("alpha", 1.0)
 		var alpha: float = 1.0
 		if typeof(alpha_raw) == TYPE_STRING and (alpha_raw as String).begins_with("shape."):
-			var alpha_lookup: Variant = _lookup_shape(presets, alpha_raw)
+			var alpha_lookup: Variant = _lookup_shape(style_personality, alpha_raw)
 			if alpha_lookup != null and (typeof(alpha_lookup) == TYPE_FLOAT or typeof(alpha_lookup) == TYPE_INT):
 				alpha = float(alpha_lookup)
 		else:
 			alpha = float(alpha_raw)
 		if is_disabled:
-			alpha = presets.disabled_opacity
+			alpha = style_personality.disabled_opacity
 		if role == "focus_ring":
 			# Focus ring is a special stylebox: transparent bg, accent border, expand outside corner.
 			# Plan 05-02 Task 2: focus_offset comes from shape per D-08 (per-direction gap).
@@ -3002,14 +3005,14 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			var fr_radius: int = corner_radius
 			var fr_radius_raw: Variant = recipe.get("radius", null)
 			if fr_radius_raw != null and typeof(fr_radius_raw) == TYPE_STRING and (fr_radius_raw as String).begins_with("shape."):
-				var fr_r_lookup: Variant = _lookup_shape(presets, fr_radius_raw)
+				var fr_r_lookup: Variant = _lookup_shape(style_personality, fr_radius_raw)
 				if fr_r_lookup != null and (typeof(fr_r_lookup) == TYPE_INT or typeof(fr_r_lookup) == TYPE_FLOAT):
 					fr_radius = int(fr_r_lookup)
 			elif fr_radius_raw != null and (typeof(fr_radius_raw) == TYPE_INT or typeof(fr_radius_raw) == TYPE_FLOAT):
 				fr_radius = int(fr_radius_raw)
 			_set_radius_all(focus_sb, fr_radius)
 			# Per-direction focus_offset (DESIGN_TOKENS §8.2): Pulse=0, Burst=1, others=2.
-			var focus_offset_v: Variant = _lookup_shape(presets, "shape.focus_offset")
+			var focus_offset_v: Variant = _lookup_shape(style_personality, "shape.focus_offset")
 			var focus_offset_int: int = 2
 			if focus_offset_v != null and (typeof(focus_offset_v) == TYPE_INT or typeof(focus_offset_v) == TYPE_FLOAT):
 				focus_offset_int = int(focus_offset_v)
@@ -3034,7 +3037,7 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		var resolved_radius: int = corner_radius
 		if radius_raw != null:
 			if typeof(radius_raw) == TYPE_STRING and (radius_raw as String).begins_with("shape."):
-				var r_lookup: Variant = _lookup_shape(presets, radius_raw)
+				var r_lookup: Variant = _lookup_shape(style_personality, radius_raw)
 				if r_lookup != null and (typeof(r_lookup) == TYPE_INT or typeof(r_lookup) == TYPE_FLOAT):
 					resolved_radius = int(r_lookup)
 			elif typeof(radius_raw) == TYPE_INT or typeof(radius_raw) == TYPE_FLOAT:
@@ -3053,7 +3056,7 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		var padding_raw: Variant = recipe.get("padding", null)
 		var applied_padding: bool = false
 		if padding_raw != null and typeof(padding_raw) == TYPE_STRING and (padding_raw as String).begins_with("shape."):
-			var pad_lookup: Variant = _lookup_shape(presets, padding_raw)
+			var pad_lookup: Variant = _lookup_shape(style_personality, padding_raw)
 			if pad_lookup != null and typeof(pad_lookup) == TYPE_VECTOR2I:
 				var density: float = tokens.get("densityScale", 1.0)
 				_set_content_margin_from_padding(sb, Vector2i(int(round(pad_lookup.x * density)), int(round(pad_lookup.y * density))))
@@ -3081,38 +3084,38 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		# mutate the StyleBoxFlat in place per the active direction's strategy enum.
 		var strategy_raw: Variant = recipe.get("strategy", null)
 		if strategy_raw != null and typeof(strategy_raw) == TYPE_STRING:
-			var strat_lookup: Variant = _lookup_shape(presets, strategy_raw)
+			var strat_lookup: Variant = _lookup_shape(style_personality, strategy_raw)
 			if strat_lookup != null:
 				var strat_name: StringName = strat_lookup if typeof(strat_lookup) == TYPE_STRING_NAME else StringName(String(strat_lookup))
 				# Dispatch via path: shape.primary_strategy → primary; shape.ghost_strategy → ghost.
 				if (strategy_raw as String).ends_with(".primary_strategy"):
-					_apply_primary_strategy(sb, strat_name, role_table, presets)
+					_apply_primary_strategy(sb, strat_name, role_table, style_personality)
 				elif (strategy_raw as String).ends_with(".ghost_strategy"):
-					_apply_ghost_strategy(sb, strat_name, role_table, presets)
+					_apply_ghost_strategy(sb, strat_name, role_table, style_personality)
 				# Other strategy paths (kicker_style etc.) are NOT dispatched on stylebox;
 				# they're color-recipe territory handled below.
 		return sb
 	elif data_type == "color":
 		var role: String = recipe.get("role", "text_strong")
-		# Cross-AI Cycle 2 C2 fix: disabled flag pulls per-direction alpha from presets.
+		# Cross-AI Cycle 2 C2 fix: disabled flag pulls per-direction alpha from style_personality.
 		var is_disabled: bool = recipe.get("disabled", false)
 		# Plan 05-02 Task 2 (D-03): alpha may be a literal or shape.<key> lookup here too.
 		var alpha_raw: Variant = recipe.get("alpha", 1.0)
 		var alpha: float = 1.0
 		if typeof(alpha_raw) == TYPE_STRING and (alpha_raw as String).begins_with("shape."):
-			var alpha_lookup: Variant = _lookup_shape(presets, alpha_raw)
+			var alpha_lookup: Variant = _lookup_shape(style_personality, alpha_raw)
 			if alpha_lookup != null and (typeof(alpha_lookup) == TYPE_FLOAT or typeof(alpha_lookup) == TYPE_INT):
 				alpha = float(alpha_lookup)
 		else:
 			alpha = float(alpha_raw)
 		if is_disabled:
-			alpha = presets.disabled_opacity
+			alpha = style_personality.disabled_opacity
 		# Plan 05-02 Task 2 (D-09 prep): recipes can reference `kicker_style: "shape.kicker_style"`
 		# to dispatch per-direction Kicker color. Plan 05-04 wires the actual Kicker
 		# variation entry; the helper is registered here.
 		var kicker_style_raw: Variant = recipe.get("kicker_style", null)
 		if kicker_style_raw != null and typeof(kicker_style_raw) == TYPE_STRING and (kicker_style_raw as String).begins_with("shape."):
-			var kstyle_lookup: Variant = _lookup_shape(presets, kicker_style_raw)
+			var kstyle_lookup: Variant = _lookup_shape(style_personality, kicker_style_raw)
 			if kstyle_lookup != null:
 				var kname: StringName = kstyle_lookup if typeof(kstyle_lookup) == TYPE_STRING_NAME else StringName(String(kstyle_lookup))
 				var kcolor: Color = _apply_kicker_style(kname, role_table)
@@ -3131,7 +3134,7 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		# Plan 05-02 Task 2 (D-03): constants/font_sizes can also pull from shape.* (e.g.,
 		# `value: "shape.focus_offset"` for outline widths or focus expand metadata).
 		if typeof(value_ref) == TYPE_STRING and (value_ref as String).begins_with("shape."):
-			var shape_v: Variant = _lookup_shape(presets, value_ref)
+			var shape_v: Variant = _lookup_shape(style_personality, value_ref)
 			if shape_v != null and (typeof(shape_v) == TYPE_INT or typeof(shape_v) == TYPE_FLOAT):
 				return int(shape_v)
 			return 0

@@ -1,7 +1,7 @@
 # Requirements: NeoCade Theme
 
 **Defined:** 2026-05-04
-**Core Value:** A drop-in Godot 4.6 flat-MD3/MD3-Expressive Theme system that styles every built-in user-facing Control to a `godot-minimal-theme` bar of feature-completeness, with a colorful, professional, accessible arcade identity and universal editor + runtime + all-6-export-target support. v1 ships one concrete `NeoCadeTheme` class at `res://addons/neocade_theme/scripts/neocade_theme.gd` plus one canonical `res://addons/neocade_theme/neocade_theme.tres` resource with built-in Pulse, Slate, Bubble, Daybreak, and Burst presets; mobile is an `@export platform=MOBILE` mode on the same resource, not a sibling `neocade_mobile_theme.tres`.
+**Core Value:** A drop-in Godot 4.6 flat-MD3/MD3-Expressive Theme system that styles every built-in user-facing Control to a `godot-minimal-theme` bar of feature-completeness, with a colorful, professional, accessible arcade identity and universal editor + runtime + all-6-export-target support. v1 ships one concrete `NeoCadeTheme` class at `res://addons/neocade_theme/scripts/neocade_theme.gd` plus one canonical `res://addons/neocade_theme/neocade_theme.tres` resource with built-in Pulse, Slate, Bubble, Daybreak, and Burst styles; mobile is an `@export platform=MOBILE` mode on the same resource, not a sibling `neocade_mobile_theme.tres`.
 
 > **Authoritative inputs:** PROJECT.md (constraints + hard rules), `.planning/ROADMAP.md` (15-phase redirected roadmap), `.planning/research/SUMMARY.md` (original synthesis + Conflict resolutions + UD-1..6; superseded where later Phase 3.x artifacts explicitly say so), `.planning/research/FEATURES.md` (35-class coverage matrix + original 13 type-variation seed + anti-features; type-variation count superseded by the live `TYPE_VARIATIONS` registry), `.planning/research/MINIMAL-THEME-COVERAGE-DELTA.md` (37-row scorecard reconciliation), `.planning/research/CROSS-PLATFORM.md` (mobile spec + per-target validation), `.planning/research/PITFALLS.md` (10 categories of gotchas + prevention), `.planning/research/EDITOR-COVERAGE.md` (themed-vs-default editor surfaces), `.planning/research/SOURCES.md` (per-source dossier).
 
@@ -30,9 +30,9 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Theme Foundation (FOUND)
 
-- [x] **FOUND-01** *(updated 2026-05-08 for single-resource preset architecture)*: `addons/neocade_theme/` directory layout: `fonts/`, `icons/`, and `scripts/` subdirs; addon root contains one canonical `neocade_theme.tres` runtime resource, runtime asset subfolders, and no README/CHANGELOG/LICENSE/VERSION metadata. `scripts/neocade_theme.gd` is the concrete, instantiable `@tool class_name NeoCadeTheme extends Theme`; `scripts/neocade_theme_option_button.gd` is the reusable preset picker Control. Required font license text stays beside the redistributed font at `fonts/inter_ofl.txt`. Package docs live outside the addon (`README.md`, `docs/usage.md`, `CHANGELOG.md`, `LICENSE.md`, `VERSION`). **No per-direction `.gd` files. No per-preset `.tres` files. No `_dev/` subfolder. No `themes/` subfolder. No `neocade_mobile_theme.tres`. No `plugin.cfg`.**
-- [x] **FOUND-02** *(updated 2026-05-08 for `preset` export)*: `addons/neocade_theme/scripts/neocade_theme.gd` is `@tool class_name NeoCadeTheme extends Theme` — the **single, concrete, instantiable** class with **10 `@export` properties total**. **Core (5):** `preset: {NONE, PULSE, SLATE, BUBBLE, DAYBREAK, BURST}`, `base_color: Color`, `accent_color: Color`, `raised: bool`, `platform: {DESKTOP, MOBILE, AUTO}`. **Shape (5, under `@export_group("Shape")`)**: `corner_radius: int`, `spacing: int`, `raised_strength: int`, `focus_thickness: int`, `outline_width: int`. The `_regenerate_theme()` method dynamically populates derived theme entry values from the exports via formulas and resolves direction personality from `preset`, not from a magic `base_color` lookup. `Preset.NONE` is custom/manual mode. Setters on exported properties trigger regeneration. The class is **NOT abstract**.
-- [x] **FOUND-03** *(updated 2026-05-08)*: `addons/neocade_theme/neocade_theme.tres` is the canonical `NeoCadeTheme` resource. Loading it into a Godot scene yields a `NeoCadeTheme` instance that automatically calls `_regenerate_theme()` to populate entries for ALL 37 scorecard Control rows + the current 15 type variations from `addons/neocade_theme/scripts/neocade_theme.gd::TYPE_VARIATIONS`. Built-in presets cover Pulse, Slate, Bubble, Daybreak, and Burst.
+- [x] **FOUND-01** *(updated 2026-05-08 for single-resource style architecture)*: `addons/neocade_theme/` directory layout: `fonts/`, `icons/`, and `scripts/` subdirs; addon root contains one canonical `neocade_theme.tres` runtime resource, runtime asset subfolders, and no README/CHANGELOG/LICENSE/VERSION metadata. `scripts/neocade_theme.gd` is the concrete, instantiable `@tool class_name NeoCadeTheme extends Theme`; `scripts/neocade_theme_option_button.gd` is the reusable style picker Control. Required font license text stays beside the redistributed font at `fonts/inter_ofl.txt`. Package docs live outside the addon (`README.md`, `docs/usage.md`, `CHANGELOG.md`, `LICENSE.md`, `VERSION`). **No per-direction `.gd` files. No per-style `.tres` files. No `_dev/` subfolder. No `themes/` subfolder. No `neocade_mobile_theme.tres`. No `plugin.cfg`.**
+- [x] **FOUND-02** *(updated 2026-05-08 for `style` export)*: `addons/neocade_theme/scripts/neocade_theme.gd` is `@tool class_name NeoCadeTheme extends Theme` — the **single, concrete, instantiable** class with **10 `@export` properties total**. **Core (5):** `style: {CUSTOM, PULSE, SLATE, BUBBLE, DAYBREAK, BURST}`, `base_color: Color`, `accent_color: Color`, `raised: bool`, `platform: {DESKTOP, MOBILE, AUTO}`. **Shape (5, under `@export_group("Shape")`)**: `corner_radius: int`, `spacing: int`, `raised_strength: int`, `focus_thickness: int`, `outline_width: int`. The `_regenerate_theme()` method dynamically populates derived theme entry values from the exports via formulas and resolves direction personality from `style`, not from a magic `base_color` lookup. `Style.CUSTOM` is manual/custom mode. Setters on exported properties trigger regeneration. The class is **NOT abstract**.
+- [x] **FOUND-03** *(updated 2026-05-08)*: `addons/neocade_theme/neocade_theme.tres` is the canonical `NeoCadeTheme` resource. Loading it into a Godot scene yields a `NeoCadeTheme` instance that automatically calls `_regenerate_theme()` to populate entries for ALL 37 scorecard Control rows + the current 15 type variations from `addons/neocade_theme/scripts/neocade_theme.gd::TYPE_VARIATIONS`. Built-in styles cover Pulse, Slate, Bubble, Daybreak, and Burst.
 
 ### Fonts (FONT)
 
@@ -61,7 +61,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
   Override pattern:
   ```gdscript
   var theme = preload("res://addons/neocade_theme/neocade_theme.tres").duplicate()
-  theme.preset = NeoCadeTheme.Preset.SLATE
+  theme.style = NeoCadeTheme.Style.SLATE
   theme.default_font.fallbacks.append(preload("res://your_noto_sans_sc.ttf"))
   # apply theme to scene root
   ```
@@ -123,7 +123,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Mobile Variant (MOBILE)
 
-- [x] **MOBILE-01** *(rewritten 2026-05-06d/f; updated 2026-05-08 for preset architecture)*: Mobile sizing is a `@export platform=MOBILE` toggle on the single concrete `NeoCadeTheme` class — NOT a separate `.tres` file. Setting `platform=MOBILE` (or `platform=AUTO` on a mobile target) triggers `_regenerate_theme()` to use mobile-tuned constants (44pt iOS / 48dp Android tap targets, 16px body vs 14px desktop, +50% spacing on `space.4+` per Phase 8 mobile-sizing branch). The canonical resource exposes `platform`; consumers can duplicate `neocade_theme.tres`, choose any preset, and switch platforms at instantiation or via `platform=AUTO` for runtime detection.
+- [x] **MOBILE-01** *(rewritten 2026-05-06d/f; updated 2026-05-08 for style architecture)*: Mobile sizing is a `@export platform=MOBILE` toggle on the single concrete `NeoCadeTheme` class — NOT a separate `.tres` file. Setting `platform=MOBILE` (or `platform=AUTO` on a mobile target) triggers `_regenerate_theme()` to use mobile-tuned constants (44pt iOS / 48dp Android tap targets, 16px body vs 14px desktop, +50% spacing on `space.4+` per Phase 8 mobile-sizing branch). The canonical resource exposes `platform`; consumers can duplicate `neocade_theme.tres`, choose any style, and switch platforms at instantiation or via `platform=AUTO` for runtime detection.
 - [x] **MOBILE-02**: Tap targets ≥48px (Godot pixels at base scale 1.0) on every interactive Control in the mobile theme. Satisfies iOS HIG 44pt minimum + Material 3 48dp minimum simultaneously.
 - [x] **MOBILE-03**: Body text 16px on mobile vs 14px desktop. Headings retain their desktop sizes (Inter at opsz=32 + wght=700-800; no scale change for headings).
 - [x] **MOBILE-04**: Spacing scale +50% on `space.4` and above on mobile. Corner radii STAY IDENTICAL across desktop/mobile (brand identity, not platform-specific).
@@ -137,7 +137,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [x] **SHOW-01**: `res://showcase/showcase.tscn` is the showcase scene; applied as project main scene. Uses NeoCade Theme as project theme (or per-scene `theme` override if leak avoidance preferred). Completed Phase 9.
 - [x] **SHOW-02**: Showcase scene contains 9 sections covering all 37 scorecard Control rows + Token Gallery + Coverage Verification: Buttons / Text Inputs / Numbers & Range / Selection & Lists / Containers & Layout / Dialogs & Popups / Advanced & Graph / Token Gallery / Coverage 37/37.
 - [x] **SHOW-03**: Realistic sample content per Control (Tree with multi-level items, ItemList with options, OptionButton with multiple options, etc.) per PITFALLS 10.1 — empty controls render invisibly.
-- [x] **SHOW-04**: `NeoCadeThemeOptionButton` dropdown switches built-in `NeoCadeTheme.Preset` values from the canonical resource, sorted alphabetically with optional `None` last; `None` applies `null` to the target theme. The picker emits `theme_selected(theme, index)` after applying a selection. Per 2026-05-08 correction, the showcase UI is editor-authored in `showcase/showcase.tscn`; scripts are limited to `addons/neocade_theme/scripts/neocade_theme_option_button.gd` for the dropdown and `showcase/showcase.gd` for scoreboard Window open/close behavior. Raised/platform variations remain `NeoCadeTheme` resource exports previewed through the inspector or consumer code, not showcase runtime controls.
+- [x] **SHOW-04**: `NeoCadeThemeOptionButton` dropdown switches built-in `NeoCadeTheme.Style` values from the canonical resource, sorted alphabetically with optional `None` last; `None` applies `null` to the target theme. The picker emits `theme_selected(theme, index)` after applying a selection. Per 2026-05-08 correction, the showcase UI is editor-authored in `showcase/showcase.tscn`; scripts are limited to `addons/neocade_theme/scripts/neocade_theme_option_button.gd` for the dropdown and `showcase/showcase.gd` for scoreboard Window open/close behavior. Raised/platform variations remain `NeoCadeTheme` resource exports previewed through the inspector or consumer code, not showcase runtime controls.
 - [x] **SHOW-05**: BBCode demo in RichTextLabel section showcasing inline color/weight/italic.
 - [x] **SHOW-06**: `accessibility_name` set on every interactive Control in showcase (per PITFALLS 2.5 + 4.4 — minimum bar for screen-reader sanity in v1).
 - [x] **SHOW-07**: Token Gallery section displays design tokens visually (color swatches with hex + role label, type scale samples, radius scale visualization).
@@ -209,7 +209,7 @@ Deferred to future release. Tracked but not in v1 roadmap.
 ### Light Mode
 
 - **LIGHT-01**: Light color mode for desktop theme (`neocade_theme_light.tres`)
-- **LIGHT-02**: Light color mode behavior for `platform=MOBILE` on future light presets or consumer custom resources — IF mobile-light is in v2 scope (per PROJECT.md note that mobile-light may stay deferred even in v2)
+- **LIGHT-02**: Light color mode behavior for `platform=MOBILE` on future light styles or consumer custom resources — IF mobile-light is in v2 scope (per PROJECT.md note that mobile-light may stay deferred even in v2)
 
 ### Alternate Palettes
 
@@ -230,12 +230,12 @@ Deferred to future release. Tracked but not in v1 roadmap.
 ### Accessibility v1.x
 
 - **A11YV1X-01**: Deeper VoiceOver/TalkBack/AccessKit screen-reader QA on showcase (currently `accessibility_name` only in v1)
-- **A11YV1X-02**: User-customizable contrast preset (high-contrast variant)
+- **A11YV1X-02**: User-customizable contrast style (high-contrast variant)
 
 ### Future Features
 
 - **FUTURE-01**: Theme animation system (would require GDScript on every Control — out of pure-Theme scope; explicit v2+ if pursued)
-- **FUTURE-02**: CodeEdit syntax-highlight color presets (orthogonal to theme; v2+ as separate addon)
+- **FUTURE-02**: CodeEdit syntax-highlight color styles (orthogonal to theme; v2+ as separate addon)
 
 ## Out of Scope
 
@@ -285,8 +285,8 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | DESIGN-05 | Phase 3.4 Plan 04 (`DESIGN_TOKENS.md` finalized pre-Phase-4) | — | Complete |
 | DESIGN-06 | Phase 3.4 (gate enforcement) | — | Complete |
 | FOUND-01 | Phase 4 (addon directory layout) | — | Complete |
-| FOUND-02 | Phase 4 + 2026-05-08 preset cleanup (single concrete `NeoCadeTheme` class + 10-property export surface) | Plan 04-05 atomic commit `d9e405a`; Phase 5 Kicker addition; 2026-05-08 `preset` export consolidation | Complete |
-| FOUND-03 | Phase 4 + 2026-05-08 preset cleanup (one canonical `neocade_theme.tres` with built-in presets) | — | Complete |
+| FOUND-02 | Phase 4 + 2026-05-08 style cleanup (single concrete `NeoCadeTheme` class + 10-property export surface) | Plan 04-05 atomic commit `d9e405a`; Phase 5 Kicker addition; 2026-05-08 `style` export consolidation | Complete |
+| FOUND-03 | Phase 4 + 2026-05-08 style cleanup (one canonical `neocade_theme.tres` with built-in styles) | — | Complete |
 | FONT-01 | Phase 4 (Plan 04-02 bundled Inter Variable v4.0 with verified SHA256) | — | Complete |
 | FONT-02 | Phase 4 | — | Stricken (UD-4 Option D 2026-05-04 — Outfit removed) |
 | FONT-03 | Phase 4 | — | Stricken (UD-4 Option D 2026-05-04 — Noto Sans removed) |
