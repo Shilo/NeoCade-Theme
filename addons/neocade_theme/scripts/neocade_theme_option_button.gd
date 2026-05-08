@@ -21,6 +21,9 @@ const THEME_NAME_SUFFIX := "_neocade_theme"
 
 @export var allow_no_theme := true:
 	set(value):
+		if allow_no_theme == value:
+			return
+
 		allow_no_theme = value
 		_queue_refresh()
 
