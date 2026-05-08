@@ -64,7 +64,7 @@ Open `showcase/showcase.tscn` in Godot 4.6.2 to inspect:
 
 - 9 sections covering controls, dialogs, graph, tokens, and coverage.
 - `NeoCadeThemeOptionButton` dropdown in `addons/neocade_theme/scripts/` scans `addons/neocade_theme/` for
-  `NeoCadeTheme` resources, keeps `Default` first, then sorts themes alphabetically.
+  `NeoCadeTheme` resources, keeps `None` first when allowed, then sorts themes alphabetically.
 - Editor-authored Control tree; scripts are limited to the theme picker and
   scoreboard window open/close behavior.
 - BBCode sample, multi-script sample, token gallery, and coverage strip.

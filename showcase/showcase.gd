@@ -1,7 +1,7 @@
 extends Control
 
 @onready var scoreboard_window: Window = $Window
-@onready var window_button: Button = $"RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/WindowButton"
+@onready var window_button: Button = %WindowButton
 
 
 func _ready() -> void:

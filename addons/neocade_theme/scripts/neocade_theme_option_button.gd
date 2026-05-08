@@ -2,7 +2,7 @@
 class_name NeoCadeThemeOptionButton extends OptionButton
 
 const DEFAULT_THEME_DIRECTORY := "res://addons/neocade_theme"
-const DEFAULT_LABEL := "Default"
+const NO_THEME_LABEL := "None"
 const THEME_FILE_EXTENSION := ".tres"
 const THEME_NAME_SUFFIX := "_neocade_theme"
 
@@ -16,9 +16,9 @@ const THEME_NAME_SUFFIX := "_neocade_theme"
 		theme_target_path = value
 		_queue_refresh()
 
-@export var allow_default_theme := true:
+@export var allow_no_theme := true:
 	set(value):
-		allow_default_theme = value
+		allow_no_theme = value
 		_queue_refresh()
 
 var _theme_paths: PackedStringArray = PackedStringArray()
@@ -34,29 +34,44 @@ func _ready() -> void:
 
 
 func refresh_theme_list() -> void:
-	var current_target_path := _current_target_theme_path()
-	var previous_selected_path := _theme_path_for_index(selected)
+	var target := _theme_target()
+	var current_target_path := _current_target_theme_path(target)
+	var requested_selected := selected
 
 	clear()
 	_theme_paths = PackedStringArray()
 
-	if allow_default_theme:
-		_add_theme_item(DEFAULT_LABEL, "")
+	if allow_no_theme:
+		_add_theme_item(NO_THEME_LABEL, "")
 
 	for entry in _find_neocade_themes():
 		_add_theme_item(String(entry["label"]), String(entry["path"]))
 
 	if item_count == 0:
+		select(-1)
 		return
 
-	var next_index := _index_for_theme_path(current_target_path)
-	if next_index == -1:
-		next_index = _index_for_theme_path(previous_selected_path)
-	if next_index == -1:
-		next_index = 0
+	if requested_selected >= 0:
+		if requested_selected < _theme_paths.size():
+			select(requested_selected)
+			_apply_theme(requested_selected)
+		else:
+			select(-1)
+		return
 
-	select(next_index)
-	_apply_theme(next_index)
+	if not current_target_path.is_empty():
+		var matching_index := _index_for_theme_path(current_target_path)
+		if matching_index != -1:
+			select(matching_index)
+			return
+
+	if target != null and target.theme == null:
+		var default_index := _index_for_theme_path("")
+		if default_index != -1:
+			select(default_index)
+			return
+
+	select(-1)
 
 
 func _on_item_selected(index: int) -> void:
@@ -126,8 +141,7 @@ func _add_theme_item(label: String, theme_path: String) -> void:
 	set_item_metadata(item_count - 1, theme_path)
 
 
-func _current_target_theme_path() -> String:
-	var target := _theme_target()
+func _current_target_theme_path(target: Control) -> String:
 	if target == null or target.theme == null:
 		return ""
 
