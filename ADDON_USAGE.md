@@ -133,7 +133,7 @@ is deferred to v1.x.
 
 ## Architecture (v1)
 
-- **Single concrete class:** `addons/neocade_theme/neocade_theme.gd` declares
+- **Single concrete class:** `addons/neocade_theme/scripts/neocade_theme.gd` declares
   `@tool class_name NeoCadeTheme extends Theme` with 9 `@export` properties.
 - **N data-only `.tres`:** v1 ships 5 (one per approved direction). No
   per-direction `.gd` files; no class hierarchy.

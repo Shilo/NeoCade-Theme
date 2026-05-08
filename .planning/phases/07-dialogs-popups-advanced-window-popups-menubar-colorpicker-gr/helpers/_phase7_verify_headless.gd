@@ -14,7 +14,7 @@ extends SceneTree
 ##   graph           GraphEdit, GraphNode, and GraphFrame gate from Plan 07-05.
 ##   full            Fails while any future group is pending.
 
-const PRODUCTION_GD := "res://addons/neocade_theme/neocade_theme.gd"
+const PRODUCTION_GD := "res://addons/neocade_theme/scripts/neocade_theme.gd"
 const PULSE_PATH := "res://addons/neocade_theme/pulse_neocade_theme.tres"
 const SLOT_FREEZE_PATH := "res://.planning/phases/07-dialogs-popups-advanced-window-popups-menubar-colorpicker-gr/helpers/phase7-slot-freeze.txt"
 const ROOT_FALLBACK_PATH := "res://addons/neocade_theme/neocade_theme.tres"
@@ -283,7 +283,7 @@ func _run() -> void:
 	assert_known_stale_phase7_slots_absent()
 	assert_phase7_icon_recipe_names()
 	assert_no_theme_clear()
-	assert_one_addon_root_gd()
+	assert_no_addon_root_gd()
 	assert_public_export_lock()
 	assert_slot_freeze_artifact()
 	if ["popups-menus", "filedialog", "colorpicker", "graph", "full"].has(_stage):
@@ -416,8 +416,8 @@ func assert_no_theme_clear() -> void:
 		_group_fail(group, "forbidden regeneration reset calls found: " + ", ".join(found))
 
 
-func assert_one_addon_root_gd() -> void:
-	var group := "assert_one_addon_root_gd"
+func assert_no_addon_root_gd() -> void:
+	var group := "assert_no_addon_root_gd"
 	var dir := DirAccess.open("res://addons/neocade_theme")
 	if dir == null:
 		_group_fail(group, "cannot open addon root")
@@ -431,10 +431,10 @@ func assert_one_addon_root_gd() -> void:
 		name = dir.get_next()
 	dir.list_dir_end()
 	files.sort()
-	if files == ["neocade_theme.gd"]:
-		_group_ok(group, "addon root contains exactly one production .gd")
+	if files.is_empty():
+		_group_ok(group, "addon root contains no .gd files")
 	else:
-		_group_fail(group, "addon root .gd files expected [neocade_theme.gd], got %s" % str(files))
+		_group_fail(group, "addon root .gd files expected [], got %s" % str(files))
 
 
 func assert_public_export_lock() -> void:

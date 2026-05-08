@@ -156,7 +156,7 @@ extends SceneTree
 ## addons/neocade_theme/ (Phase 4 F3 path discipline).
 
 const PULSE_PATH := "res://addons/neocade_theme/pulse_neocade_theme.tres"
-const PRODUCTION_GD := "res://addons/neocade_theme/neocade_theme.gd"
+const PRODUCTION_GD := "res://addons/neocade_theme/scripts/neocade_theme.gd"
 
 # Phase 5 expected slot sets / counts. The verifier asserts these against the live
 # Theme; in tooling stage, groups whose assertion fails log PENDING (not FAIL).

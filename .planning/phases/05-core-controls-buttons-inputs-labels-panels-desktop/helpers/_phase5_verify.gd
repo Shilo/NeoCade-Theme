@@ -49,7 +49,7 @@ extends EditorScript
 ## Per D-11 / Phase 4 F3: helpers live outside addons/neocade_theme/.
 
 const PULSE_PATH := "res://addons/neocade_theme/pulse_neocade_theme.tres"
-const PRODUCTION_GD := "res://addons/neocade_theme/neocade_theme.gd"
+const PRODUCTION_GD := "res://addons/neocade_theme/scripts/neocade_theme.gd"
 
 const PHASE5_VARIATION_COUNT := 15
 const PHASE5_SPINBOX_ICONS := ["up", "up_disabled", "down", "down_disabled"]

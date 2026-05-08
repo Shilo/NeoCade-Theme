@@ -11,12 +11,12 @@ Safe authoring paths:
 
 - edit the 9 exported `NeoCadeTheme` properties on a direction resource
 - use the dedicated Theme editor for intentional per-slot overrides
-- update `addons/neocade_theme/neocade_theme.gd` formulas and verify by
+- update `addons/neocade_theme/scripts/neocade_theme.gd` formulas and verify by
   loading `main.tscn`
 
-Keep the addon layout flat:
+Keep the addon layout compact:
 
-- one root script: `addons/neocade_theme/neocade_theme.gd`
+- core scripts under `addons/neocade_theme/scripts/`
 - five v1 direction `.tres` files at the addon root
 - no `plugin.cfg`
 - no root `neocade_theme.tres`

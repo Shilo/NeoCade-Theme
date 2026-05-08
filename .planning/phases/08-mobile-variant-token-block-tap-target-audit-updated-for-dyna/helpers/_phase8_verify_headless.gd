@@ -1,6 +1,6 @@
 extends SceneTree
 
-const PRODUCTION_GD := "res://addons/neocade_theme/neocade_theme.gd"
+const PRODUCTION_GD := "res://addons/neocade_theme/scripts/neocade_theme.gd"
 const PULSE_PATH := "res://addons/neocade_theme/pulse_neocade_theme.tres"
 const ROOT_FALLBACK_PATH := "res://addons/neocade_theme/neocade_theme.tres"
 const MOBILE_FALLBACK_PATH := "res://addons/neocade_theme/neocade_mobile_theme.tres"
@@ -75,7 +75,7 @@ func assert_architecture_stage() -> void:
 		problems.append("Pulse does not load as NeoCadeTheme")
 	if not FileAccess.file_exists(PRODUCTION_GD):
 		problems.append("production script missing")
-	_append_one_addon_root_gd(problems)
+	_append_no_addon_root_gd(problems)
 	_append_public_export_lock(problems)
 	_append_forbidden_source_tokens(problems)
 	_append_forbidden_resources(problems)
@@ -243,7 +243,7 @@ func assert_full_stage() -> void:
 	else:
 		_group_fail("full", "pending groups remain: %s" % str(_pending))
 
-func _append_one_addon_root_gd(problems: Array[String]) -> void:
+func _append_no_addon_root_gd(problems: Array[String]) -> void:
 	var dir := DirAccess.open("res://addons/neocade_theme")
 	if dir == null:
 		problems.append("cannot open addon root")
@@ -257,8 +257,8 @@ func _append_one_addon_root_gd(problems: Array[String]) -> void:
 		name = dir.get_next()
 	dir.list_dir_end()
 	files.sort()
-	if files != ["neocade_theme.gd"]:
-		problems.append("addon root .gd files expected [neocade_theme.gd], got %s" % str(files))
+	if not files.is_empty():
+		problems.append("addon root .gd files expected [], got %s" % str(files))
 
 func _append_public_export_lock(problems: Array[String]) -> void:
 	var found: Array[String] = []

@@ -52,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added (Phase 4 — Foundation)
 
 - Single concrete `@tool class_name NeoCadeTheme extends Theme` class
-  (`addons/neocade_theme/neocade_theme.gd`) with 9 `@export` properties:
+  (`addons/neocade_theme/scripts/neocade_theme.gd`) with 9 `@export` properties:
   - Core: `base_color`, `accent_color`, `raised`, `platform`
   - Shape: `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`,
     `outline_width`

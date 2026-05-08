@@ -1,6 +1,5 @@
 @tool
-class_name NeoCadeTheme
-extends Theme
+class_name NeoCadeTheme extends Theme
 
 ## NeoCade Theme — single concrete `@tool extends Theme` class for the NeoCade addon.
 ##

@@ -17,12 +17,12 @@ v1 implementation is in final QA/release preparation. The live showcase is
 
 ```text
 addons/neocade_theme/
-  neocade_theme.gd              # @tool class_name NeoCadeTheme extends Theme
   pulse_neocade_theme.tres      # recommended starter
   slate_neocade_theme.tres
   bubble_neocade_theme.tres
   daybreak_neocade_theme.tres
   burst_neocade_theme.tres
+  scripts/neocade_theme.gd      # @tool class_name NeoCadeTheme extends Theme
   scripts/neocade_theme_option_button.gd
   fonts/inter_variable.ttf
   fonts/inter_ofl.txt

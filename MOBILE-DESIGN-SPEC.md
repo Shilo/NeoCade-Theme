@@ -4,7 +4,7 @@ Phase 8 defines mobile as an export-driven platform mode on the same five NeoCad
 
 ## Architecture Summary
 
-- Production script: `addons/neocade_theme/neocade_theme.gd`.
+- Production script: `addons/neocade_theme/scripts/neocade_theme.gd`.
 - Direction resources: Pulse (`pulse_neocade_theme.tres`), Slate (`slate_neocade_theme.tres`), Bubble (`bubble_neocade_theme.tres`), Daybreak (`daybreak_neocade_theme.tres`), and Burst (`burst_neocade_theme.tres`).
 - Public exports remain the locked 9 names: `base_color`, `accent_color`, `raised`, `platform`, `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, and `outline_width`.
 - Mobile behavior is selected through `platform=MOBILE`; `platform=DESKTOP` and `platform=AUTO` remain available on the same resources.
@@ -107,7 +107,7 @@ The Phase 8 audit runs all five directions with `platform=MOBILE`, `raised=false
 
 ## 15 Type Variations
 
-The older 13-variation research wording is superseded by the live `TYPE_VARIATIONS` registry in `addons/neocade_theme/neocade_theme.gd`. Phase 8 documents exactly 15 type variations:
+The older 13-variation research wording is superseded by the live `TYPE_VARIATIONS` registry in `addons/neocade_theme/scripts/neocade_theme.gd`. Phase 8 documents exactly 15 type variations:
 
 | Variation | Base | Mobile behavior |
 |---|---|---|

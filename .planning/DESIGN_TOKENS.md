@@ -3,7 +3,7 @@
 **Status:** APPROVED — Phase 3.4 user-approval gate closed 2026-05-06.
 **Version:** 1.0 (Plan 04 closeout, 2026-05-06).
 **Architecture:** Single concrete `NeoCadeTheme` class + 5 data-only `.tres` peers (CORRECTIVE-ADDENDUM D-31, finalized 2026-05-06f).
-**Consumed by:** Phase 4 (`addons/neocade_theme/neocade_theme.gd` + 5 `.tres`), Phases 5-7 (Control coverage), Phase 8 (mobile branch), Phase 9 (showcase).
+**Consumed by:** Phase 4 (`addons/neocade_theme/scripts/neocade_theme.gd` + 5 `.tres`), Phases 5-7 (Control coverage), Phase 8 (mobile branch), Phase 9 (showcase).
 **Hard precondition:** Phase 4 may NOT begin until `/gsd-verify-work` of Phase 3.4 passes.
 
 This document is the **single source of truth** for token values, formulas, and the `NeoCadeTheme` class contract. It is implementation-ready: every `@export` value, every formula, every per-Control intent that Phase 4 needs is recorded here. No further visual-direction decisions are required — Phase 4 imports values, ports formulas, and authors per-direction Theme Editor overrides.
@@ -88,7 +88,7 @@ CONTEXT.md D-16/D-17 originally said the Phase 3.4 user pick "becomes `NeoCadeTh
 
 ## §4 Shared `NeoCadeTheme` class contract
 
-`addons/neocade_theme/neocade_theme.gd` is the **single, concrete, instantiable** `@tool class_name NeoCadeTheme extends Theme`. Users can `NeoCadeTheme.new()` directly to author custom themes. Each shipped direction is a `[gd_resource type="NeoCadeTheme" format=3]` `.tres` with that direction's `@export` values + Theme Editor entry overrides for personality. **No `@abstract`, no per-direction `.gd` subclasses, no class hierarchy.**
+`addons/neocade_theme/scripts/neocade_theme.gd` is the **single, concrete, instantiable** `@tool class_name NeoCadeTheme extends Theme`. Users can `NeoCadeTheme.new()` directly to author custom themes. Each shipped direction is a `[gd_resource type="NeoCadeTheme" format=3]` `.tres` with that direction's `@export` values + Theme Editor entry overrides for personality. **No `@abstract`, no per-direction `.gd` subclasses, no class hierarchy.**
 
 ### 4.1 The 9 `@export` properties (locked 2026-05-06f)
 
@@ -644,7 +644,7 @@ The anti-cyberpunk discipline is preserved (Phase 3 redirect 2026-05-04). The ea
 
 ### 12.1 Files Phase 4 MUST create
 
-1. `addons/neocade_theme/neocade_theme.gd` — `@tool class_name NeoCadeTheme extends Theme` with the 9 `@export` properties, setters → `_regenerate_theme()`, `is_light` derivation, full theme-entry population logic ported from godot-minimal-theme's `_get_base_color` + entry-population pattern (driven by `@export` reads, not `EditorSettings`).
+1. `addons/neocade_theme/scripts/neocade_theme.gd` — `@tool class_name NeoCadeTheme extends Theme` with the 9 `@export` properties, setters → `_regenerate_theme()`, `is_light` derivation, full theme-entry population logic ported from godot-minimal-theme's `_get_base_color` + entry-population pattern (driven by `@export` reads, not `EditorSettings`).
 2. `addons/neocade_theme/pulse_neocade_theme.tres` — `[gd_resource type="NeoCadeTheme" format=3]` with §5.1 values + Pulse Theme Editor entry overrides.
 3. `addons/neocade_theme/slate_neocade_theme.tres` — §5.2 values + Slate overrides.
 4. `addons/neocade_theme/bubble_neocade_theme.tres` — §5.3 values + Bubble overrides.
