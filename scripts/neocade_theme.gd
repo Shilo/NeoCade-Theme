@@ -93,6 +93,7 @@ enum Style {
 ## Base corner radius for generated chrome; individual controls may scale or override it by style.
 @export var corner_radius: int = 0:
 	set(value):
+		value = maxi(0, value)
 		if corner_radius == value: return
 		corner_radius = value
 		_after_direction_export_changed()
@@ -100,6 +101,7 @@ enum Style {
 ## Base spacing value used to derive margins, separations, and control padding.
 @export var spacing: int = 18:
 	set(value):
+		value = maxi(0, value)
 		if spacing == value: return
 		spacing = value
 		_after_direction_export_changed()
@@ -107,6 +109,7 @@ enum Style {
 ## Multiplier for raised offset depth when raised mode is enabled.
 @export var raised_strength: int = 3:
 	set(value):
+		value = maxi(0, value)
 		if raised_strength == value: return
 		raised_strength = value
 		_after_direction_export_changed()
@@ -114,6 +117,7 @@ enum Style {
 ## Thickness of generated focus rings on focusable controls.
 @export var focus_thickness: int = 2:
 	set(value):
+		value = maxi(0, value)
 		if focus_thickness == value: return
 		focus_thickness = value
 		_after_direction_export_changed()
@@ -121,6 +125,7 @@ enum Style {
 ## Width of generated outline strokes and hairline separators.
 @export var outline_width: int = 1:
 	set(value):
+		value = maxi(0, value)
 		if outline_width == value: return
 		outline_width = value
 		_after_direction_export_changed()
@@ -292,6 +297,14 @@ func _regenerate_theme() -> void:
 	var role_warning: Color = Color("#FFD166")
 	var role_danger:  Color = Color("#FF6E6E")
 	var role_info:    Color = Color("#5FE3FF")
+	var text_on_primary: Color = _readable_text_color(role_primary)
+	var text_on_accent_offset: Color = _readable_text_color(accent_offset)
+	var text_on_danger: Color = Color("#151922")
+	var text_on_success: Color = _readable_text_color(role_success)
+	var text_on_warning: Color = _readable_text_color(role_warning)
+	var text_on_info: Color = _readable_text_color(role_info)
+	var primary_strategy_value: Variant = _lookup_shape(style_personality, "shape.primary_strategy")
+	var text_on_primary_button: Color = text_strong if String(primary_strategy_value) == "quiet-pill" else text_on_primary
 
 	# ── BINDING_TABLE walk lands here (Plan 04-05). ──
 	# The locals above are the precomputed inputs every entry-population path consumes.
@@ -309,6 +322,7 @@ func _regenerate_theme() -> void:
 	# — implies FontFile. Body-weight Controls/variations reuse this FontFile directly;
 	# only header weights need FontVariation resources.
 	var inter_file := preload("res://addons/neocade_theme/fonts/inter_variable.ttf") as FontFile
+	default_base_scale = 1.0
 	default_font = inter_file
 	default_font_size = tokens.body
 	var body_font := inter_file
@@ -415,6 +429,13 @@ func _regenerate_theme() -> void:
 		"role_warning":           role_warning,
 		"role_danger":            role_danger,
 		"role_info":              role_info,
+		"text_on_primary":        text_on_primary,
+		"text_on_primary_button": text_on_primary_button,
+		"text_on_accent_offset":  text_on_accent_offset,
+		"text_on_danger":         text_on_danger,
+		"text_on_success":        text_on_success,
+		"text_on_warning":        text_on_warning,
+		"text_on_info":           text_on_info,
 	}
 
 	# ── Walk BINDING_TABLE — additive iteration; entries not in table are LEFT UNTOUCHED (D-04) ──
@@ -482,6 +503,32 @@ func _tint_toward_base(element: Color, base_c: Color, ratio: float = 0.40) -> Co
 	return _mix(element, base_c, ratio)
 
 
+func _readable_text_color(bg: Color) -> Color:
+	var dark_text := Color("#151922")
+	var light_text := Color("#F7F8FB")
+	return dark_text if bg.get_luminance() >= 0.20 else light_text
+
+
+func _contrast_ratio(a: Color, b: Color) -> float:
+	var a_lum := _relative_luminance(a)
+	var b_lum := _relative_luminance(b)
+	var lighter: float = maxf(a_lum, b_lum)
+	var darker: float = minf(a_lum, b_lum)
+	return (lighter + 0.05) / (darker + 0.05)
+
+
+func _relative_luminance(c: Color) -> float:
+	return (
+		0.2126 * _srgb_to_linear(c.r)
+		+ 0.7152 * _srgb_to_linear(c.g)
+		+ 0.0722 * _srgb_to_linear(c.b)
+	)
+
+
+func _srgb_to_linear(channel: float) -> float:
+	return channel / 12.92 if channel <= 0.03928 else pow((channel + 0.055) / 1.055, 2.4)
+
+
 # ─── Platform helpers (DESIGN_TOKENS §10.1, §10.2) ──────────────────────────────────────────
 
 ## Resolve `Platform.AUTO` to MOBILE or DESKTOP via Godot's feature flags.
@@ -533,24 +580,14 @@ func _platform_tokens(p: Platform) -> Dictionary:
 
 # ─── Raised stylebox helper (DESIGN_TOKENS §9) ──────────────────────────────────────────────
 
-## Construct a StyleBoxFlat configured for flat or raised mode based on `raised` + `intensity`.
-##
-## - `raised = false`: shadow_size = -1 (Godot's "no shadow" sentinel per #98162); shadow_offset = ZERO.
-## - `raised = true`: shadow_color = offset_color, shadow_size = intensity, shadow_offset = (0, intensity).
-##   Hard offset, no blur — the extruded-flat 3D primitive (per FLAT-3D-UI-RESEARCH.md).
-##
-## Caller is responsible for setting bg_color + corner_radius_* + border_width_* + content_margin_*
-## per the Control's slot semantics.
-func _make_raised_stylebox(bg: Color, offset_color: Color, intensity: int) -> StyleBoxFlat:
+## Construct a StyleBoxFlat base for flat or raised mode.
+## Raised depth is applied later as hard bottom/right borders, never StyleBoxFlat shadows.
+func _make_raised_stylebox(bg: Color, _offset_color: Color, _intensity: int) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = bg
-	if raised:
-		sb.shadow_color = offset_color
-		sb.shadow_size = intensity
-		sb.shadow_offset = Vector2(0, intensity)
-	else:
-		sb.shadow_size = -1
-		sb.shadow_offset = Vector2.ZERO
+	sb.shadow_color = Color(0, 0, 0, 0)
+	sb.shadow_size = 0
+	sb.shadow_offset = Vector2.ZERO
 	return sb
 
 
@@ -579,7 +616,7 @@ const STYLE_PERSONALITY: Dictionary = {
 		"spread_factor": 1.3, "hover_pct": 6.0, "pressed_pct": -10.0, "disabled_opacity": 0.42,
 		"shape": {
 			"primary_radius":        0,
-			"primary_padding":       Vector2i(14, 10),
+			"primary_padding":       Vector2i(12, 8),
 			"primary_strategy":      &"bold-accent-fill",
 			"ghost_strategy":        &"accent-outlined-accent-text",
 			"secondary_radius":      0,
@@ -591,17 +628,17 @@ const STYLE_PERSONALITY: Dictionary = {
 			"surface_alpha_popup":   1.00,
 			"surface_alpha_buttons": 1.00,
 			"raised_lifts": {
-				"primary":         3,
+				"primary":         2,
 				"secondary":       1,
 				"ghost":           1,
 				"selected_tab":    2,
 				"unselected_tab":  2,
-				"panel":           3,
-				"dialog":          3,
-				"list":            3,
-				"mark":            3,
+				"panel":           2,
+				"dialog":          2,
+				"list":            2,
+				"mark":            2,
 				"selected_row":    0,  # Pulse rows do NOT lift (§5.1 raised lifts line)
-				"chip":            3,
+				"chip":            2,
 			},
 			"focus_offset":  0,
 			"kicker_style":  &"uppercase-tracked-accent",
@@ -615,7 +652,7 @@ const STYLE_PERSONALITY: Dictionary = {
 		"spread_factor": 0.7, "hover_pct": 4.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
 		"shape": {
 			"primary_radius":        14,
-			"primary_padding":       Vector2i(16, 11),
+			"primary_padding":       Vector2i(14, 9),
 			"primary_strategy":      &"quiet-pill",
 			"ghost_strategy":        &"thin-accent-outline",
 			"secondary_radius":      14,
@@ -651,7 +688,7 @@ const STYLE_PERSONALITY: Dictionary = {
 		"spread_factor": 1.0, "hover_pct": 8.0, "pressed_pct": -10.0, "disabled_opacity": 0.45,
 		"shape": {
 			"primary_radius":        999,
-			"primary_padding":       Vector2i(20, 14),
+			"primary_padding":       Vector2i(16, 10),
 			"primary_strategy":      &"pillowy-fully-rounded",
 			"ghost_strategy":        &"rounded-ghost-thicker-outline",
 			"secondary_radius":      26,
@@ -663,17 +700,17 @@ const STYLE_PERSONALITY: Dictionary = {
 			"surface_alpha_popup":   1.00,
 			"surface_alpha_buttons": 1.00,
 			"raised_lifts": {
-				"primary":         6,
-				"secondary":       3,
-				"ghost":           3,
-				"selected_tab":    4,
-				"unselected_tab":  4,
-				"panel":           6,
-				"dialog":          6,
-				"list":            6,
-				"mark":            6,
-				"selected_row":    3,
-				"chip":            6,
+				"primary":         3,
+				"secondary":       2,
+				"ghost":           1,
+				"selected_tab":    2,
+				"unselected_tab":  2,
+				"panel":           3,
+				"dialog":          3,
+				"list":            3,
+				"mark":            2,
+				"selected_row":    1,
+				"chip":            2,
 			},
 			"focus_offset":  2,
 			"kicker_style":  &"uppercase-tracked-accent",
@@ -687,7 +724,7 @@ const STYLE_PERSONALITY: Dictionary = {
 		"spread_factor": 1.0, "hover_pct": 6.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
 		"shape": {
 			"primary_radius":        8,
-			"primary_padding":       Vector2i(18, 12),
+			"primary_padding":       Vector2i(15, 9),
 			"primary_strategy":      &"friendly-generous",
 			"ghost_strategy":        &"soft-outline",
 			"secondary_radius":      8,
@@ -723,7 +760,7 @@ const STYLE_PERSONALITY: Dictionary = {
 		"spread_factor": 1.3, "hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.45,
 		"shape": {
 			"primary_radius":        28,
-			"primary_padding":       Vector2i(20, 14),
+			"primary_padding":       Vector2i(16, 10),
 			"primary_strategy":      &"oversized-statement",
 			"ghost_strategy":        &"normal-accent-ghost",
 			"secondary_radius":      18,
@@ -735,17 +772,17 @@ const STYLE_PERSONALITY: Dictionary = {
 			"surface_alpha_popup":   1.00,
 			"surface_alpha_buttons": 1.00,
 			"raised_lifts": {
-				"primary":         5,
+				"primary":         3,
 				"secondary":       2,
 				"ghost":           2,
 				"selected_tab":    3,
 				"unselected_tab":  3,
-				"panel":           5,
-				"dialog":          5,
-				"list":            5,
-				"mark":            5,
+				"panel":           3,
+				"dialog":          3,
+				"list":            3,
+				"mark":            2,
 				"selected_row":    2,
-				"chip":            5,
+				"chip":            2,
 			},
 			"focus_offset":  1,
 			"kicker_style":  &"uppercase-bold-larger-scale",
@@ -767,8 +804,8 @@ const STYLE_EXPORTS: Dictionary = {
 		"base_color": Color("#241326"),
 		"accent_color": Color("#FFB3E6"),
 		"corner_radius": 26,
-		"spacing": 22,
-		"raised_strength": 6,
+		"spacing": 16,
+		"raised_strength": 3,
 		"focus_thickness": 3,
 		"outline_width": 1,
 	},
@@ -776,8 +813,8 @@ const STYLE_EXPORTS: Dictionary = {
 		"base_color": Color("#20112E"),
 		"accent_color": Color("#FFD166"),
 		"corner_radius": 18,
-		"spacing": 22,
-		"raised_strength": 5,
+		"spacing": 16,
+		"raised_strength": 3,
 		"focus_thickness": 3,
 		"outline_width": 1,
 	},
@@ -785,7 +822,7 @@ const STYLE_EXPORTS: Dictionary = {
 		"base_color": Color("#0B2420"),
 		"accent_color": Color("#76F2D1"),
 		"corner_radius": 8,
-		"spacing": 24,
+		"spacing": 16,
 		"raised_strength": 3,
 		"focus_thickness": 2,
 		"outline_width": 1,
@@ -794,8 +831,8 @@ const STYLE_EXPORTS: Dictionary = {
 		"base_color": Color("#151A2E"),
 		"accent_color": Color("#8BFF6A"),
 		"corner_radius": 0,
-		"spacing": 18,
-		"raised_strength": 3,
+		"spacing": 14,
+		"raised_strength": 2,
 		"focus_thickness": 2,
 		"outline_width": 1,
 	},
@@ -803,7 +840,7 @@ const STYLE_EXPORTS: Dictionary = {
 		"base_color": Color("#111820"),
 		"accent_color": Color("#8BD3FF"),
 		"corner_radius": 14,
-		"spacing": 22,
+		"spacing": 16,
 		"raised_strength": 2,
 		"focus_thickness": 2,
 		"outline_width": 1,
@@ -1292,7 +1329,8 @@ const BINDING_TABLE: Dictionary = {
 	"AcceptDialog": {
 		"stylebox": {
 			"panel": {"role": "surface_overlay", "raised_intensity": 0,
-					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
+					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
+					  "padding": Vector2i(12, 10)},
 		},
 		"constant": {
 			"buttons_separation": {"value": "tokens.tapPadding"},
@@ -1420,15 +1458,17 @@ const BINDING_TABLE: Dictionary = {
 	# rather than silently picking a different slot.
 	"CodeEdit": {
 		"stylebox": {
-			"normal":    {"role": "surface_low",   "raised_intensity": 0},
+			"normal":    {"role": "surface_low",   "raised_intensity": 0,
+						  "padding": Vector2i(10, 7)},
 			"focus":     {"role": "focus_ring"},
-			"read_only": {"role": "surface_low",   "disabled": true},
+			"read_only": {"role": "surface_low",   "disabled": true,
+						  "padding": Vector2i(10, 7)},
 		},
 		"color": {
 			"font_color":            {"role": "text_default"},
 			"font_placeholder_color":{"role": "text_muted"},
 			"font_readonly_color":   {"role": "text_muted",  "disabled": true},
-			"font_selected_color":   {"role": "text_strong"},
+			"font_selected_color":   {"role": "text_on_accent_offset"},
 			"caret_color":           {"role": "role_primary"},
 			"selection_color":       {"role": "accent_offset"},
 			"current_line_color":    {"role": "surface_panel"},
@@ -1443,7 +1483,7 @@ const BINDING_TABLE: Dictionary = {
 		"icon": {
 			# Plan 05-05 Task 2: official Godot 4.6 CodeEdit `folded` icon slot.
 			# 32x32 monochrome white SVG per Phase 4 D-11 icon contract; `.import`
-			# sidecar uses svg/scale=2.0 + mipmaps/generate=true + compress/mode=0
+			# sidecar uses svg/scale=0.5 + mipmaps/generate=true + compress/mode=0
 			# + process/fix_alpha_border=true.
 			"folded": {"icon": "code_folded"},
 		},
@@ -1524,7 +1564,8 @@ const BINDING_TABLE: Dictionary = {
 	"ConfirmationDialog": {
 		"stylebox": {
 			"panel": {"role": "surface_overlay", "raised_intensity": 0,
-					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
+					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
+					  "padding": Vector2i(12, 10)},
 		},
 		"constant": {
 			"buttons_separation": {"value": "tokens.tapPadding"},
@@ -1783,8 +1824,8 @@ const BINDING_TABLE: Dictionary = {
 		"color": {
 			"font_color":                  {"role": "text_default"},
 			"font_hovered_color":          {"role": "text_strong"},
-			"font_selected_color":         {"role": "text_strong"},
-			"font_hovered_selected_color": {"role": "text_strong"},
+			"font_selected_color":         {"role": "text_on_accent_offset"},
+			"font_hovered_selected_color": {"role": "text_on_accent_offset"},
 			"font_outline_color":          {"role": "outline_color"},
 			"guide_color":                 {"role": "outline_color"},
 			"scroll_hint_color":           {"role": "role_primary", "alpha": 0.82},
@@ -1815,15 +1856,17 @@ const BINDING_TABLE: Dictionary = {
 	# 17. LineEdit — 3 stylebox + caret + selection + clear icon
 	"LineEdit": {
 		"stylebox": {
-			"normal":    {"role": "surface_low",   "raised_intensity": 0},
+			"normal":    {"role": "surface_low",   "raised_intensity": 0,
+						  "padding": Vector2i(10, 6)},
 			"focus":     {"role": "focus_ring"},
-			"read_only": {"role": "surface_low",   "disabled": true},
+			"read_only": {"role": "surface_low",   "disabled": true,
+						  "padding": Vector2i(10, 6)},
 		},
 		"color": {
 			"font_color":            {"role": "text_default"},
 			"font_placeholder_color":{"role": "text_muted"},
 			"font_uneditable_color": {"role": "text_muted",  "disabled": true},
-			"font_selected_color":   {"role": "text_strong"},
+			"font_selected_color":   {"role": "text_on_accent_offset"},
 			"caret_color":           {"role": "role_primary"},
 			"selection_color":       {"role": "accent_offset"},
 			"clear_button_color":    {"role": "text_muted"},
@@ -1945,7 +1988,8 @@ const BINDING_TABLE: Dictionary = {
 	"PopupMenu": {
 		"stylebox": {
 			"panel":                 {"role": "surface_overlay", "raised_intensity": 0,
-									  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
+									  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
+									  "padding": Vector2i(8, 6)},
 			"hover":                 {"role": "state_hover",    "raised_intensity": 0, "alpha": 0.36},
 			"separator":             {"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
 									  "padding": Vector2i(0, 0)},
@@ -1991,7 +2035,8 @@ const BINDING_TABLE: Dictionary = {
 	"PopupPanel": {
 		"stylebox": {
 			"panel": {"role": "surface_overlay", "raised_intensity": 0,
-					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
+					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
+					  "padding": Vector2i(12, 10)},
 		},
 	},
 	# 25. ProgressBar — 2 styleboxes
@@ -2020,7 +2065,7 @@ const BINDING_TABLE: Dictionary = {
 		"color": {
 			"default_color":    {"role": "text_default"},
 			"selection_color":  {"role": "accent_offset"},
-			"font_selected_color": {"role": "text_strong"},
+			"font_selected_color": {"role": "text_on_accent_offset"},
 		},
 	},
 	# 27. SpinBox — inherits LineEdit; Phase 4 ships button separation constants;
@@ -2143,15 +2188,17 @@ const BINDING_TABLE: Dictionary = {
 	# 30. TextEdit — 3 stylebox set
 	"TextEdit": {
 		"stylebox": {
-			"normal":    {"role": "surface_low",   "raised_intensity": 0},
+			"normal":    {"role": "surface_low",   "raised_intensity": 0,
+						  "padding": Vector2i(10, 7)},
 			"focus":     {"role": "focus_ring"},
-			"read_only": {"role": "surface_low",   "disabled": true},
+			"read_only": {"role": "surface_low",   "disabled": true,
+						  "padding": Vector2i(10, 7)},
 		},
 		"color": {
 			"font_color":            {"role": "text_default"},
 			"font_placeholder_color":{"role": "text_muted"},
 			"font_readonly_color":   {"role": "text_muted",  "disabled": true},
-			"font_selected_color":   {"role": "text_strong"},
+			"font_selected_color":   {"role": "text_on_accent_offset"},
 			"caret_color":           {"role": "role_primary"},
 			"selection_color":       {"role": "accent_offset"},
 			"current_line_color":    {"role": "surface_panel"},
@@ -2208,9 +2255,9 @@ const BINDING_TABLE: Dictionary = {
 			"font_disabled_color":         {"role": "text_default", "disabled": true},
 			"font_hovered_color":          {"role": "text_strong"},
 			"font_hovered_dimmed_color":   {"role": "text_muted"},
-			"font_hovered_selected_color": {"role": "text_strong"},
+			"font_hovered_selected_color": {"role": "text_on_accent_offset"},
 			"font_outline_color":          {"role": "outline_color"},
-			"font_selected_color":         {"role": "text_strong"},
+			"font_selected_color":         {"role": "text_on_accent_offset"},
 			"guide_color":                 {"role": "outline_color"},
 			"parent_hl_line_color":        {"role": "outline_color"},
 			"relationship_line_color":     {"role": "outline_color"},
@@ -2369,19 +2416,21 @@ const BINDING_TABLE: Dictionary = {
 	"Window": {
 		"stylebox": {
 			"embedded_border":          {"role": "surface_overlay", "raised_intensity": 0,
-										 "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
+										 "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
+										 "padding": Vector2i(8, 6)},
 			"embedded_unfocused_border":{"role": "surface_high", "raised_intensity": 0,
-										 "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup"},
+										 "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
+										 "padding": Vector2i(8, 6)},
 		},
 		"color": {
 			"title_color":            {"role": "text_strong"},
 			"title_outline_modulate": {"role": "outline_color"},
 		},
 		"constant": {
-			"close_h_offset":    {"value": 8},
-			"close_v_offset":    {"value": 6},
+			"close_h_offset":    {"value": 6},
+			"close_v_offset":    {"value": 4},
 			"resize_margin":     {"value": 6},
-			"title_height":      {"value": 32},
+			"title_height":      {"value": 28},
 			"title_outline_size":{"value": 0},
 		},
 		"icon": {
@@ -2432,17 +2481,17 @@ const BINDING_TABLE: Dictionary = {
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
-			"font_color":              {"role": "text_strong"},
-			"font_hover_color":        {"role": "text_strong"},
+			"font_color":              {"role": "text_on_primary_button"},
+			"font_hover_color":        {"role": "text_on_primary_button"},
 			"font_pressed_color":      {"role": "text_strong"},
-			"font_focus_color":        {"role": "text_strong"},
-			"font_disabled_color":     {"role": "text_strong", "disabled": true},
+			"font_focus_color":        {"role": "text_on_primary_button"},
+			"font_disabled_color":     {"role": "text_on_primary_button", "disabled": true},
 			"font_hover_pressed_color":{"role": "text_strong"},
-			"icon_normal_color":       {"role": "text_strong"},
-			"icon_hover_color":        {"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_on_primary_button"},
+			"icon_hover_color":        {"role": "text_on_primary_button"},
 			"icon_pressed_color":      {"role": "text_strong"},
-			"icon_focus_color":        {"role": "text_strong"},
-			"icon_disabled_color":     {"role": "text_strong", "disabled": true},
+			"icon_focus_color":        {"role": "text_on_primary_button"},
+			"icon_disabled_color":     {"role": "text_on_primary_button", "disabled": true},
 			"icon_hover_pressed_color":{"role": "text_strong"},
 		},
 		"constant": {
@@ -2551,18 +2600,18 @@ const BINDING_TABLE: Dictionary = {
 								"alpha": 0.78},
 		},
 		"color": {
-			"font_color":              {"role": "text_strong"},
-			"font_hover_color":        {"role": "text_strong"},
-			"font_pressed_color":      {"role": "text_strong"},
-			"font_focus_color":        {"role": "text_strong"},
-			"font_disabled_color":     {"role": "text_strong", "disabled": true},
-			"font_hover_pressed_color":{"role": "text_strong"},
-			"icon_normal_color":       {"role": "text_strong"},
-			"icon_hover_color":        {"role": "text_strong"},
-			"icon_pressed_color":      {"role": "text_strong"},
-			"icon_focus_color":        {"role": "text_strong"},
-			"icon_disabled_color":     {"role": "text_strong", "disabled": true},
-			"icon_hover_pressed_color":{"role": "text_strong"},
+			"font_color":              {"role": "text_on_danger"},
+			"font_hover_color":        {"role": "text_on_danger"},
+			"font_pressed_color":      {"role": "text_on_danger"},
+			"font_focus_color":        {"role": "text_on_danger"},
+			"font_disabled_color":     {"role": "text_on_danger", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_on_danger"},
+			"icon_normal_color":       {"role": "text_on_danger"},
+			"icon_hover_color":        {"role": "text_on_danger"},
+			"icon_pressed_color":      {"role": "text_on_danger"},
+			"icon_focus_color":        {"role": "text_on_danger"},
+			"icon_disabled_color":     {"role": "text_on_danger", "disabled": true},
+			"icon_hover_pressed_color":{"role": "text_on_danger"},
 		},
 		"constant": {
 			"h_separation": {"value": "tokens.tapPadding"},
@@ -2577,17 +2626,17 @@ const BINDING_TABLE: Dictionary = {
 	"IconButton": {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
-								"radius": "shape.secondary_radius"},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
 			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.ghost",
-								"radius": "shape.secondary_radius"},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
 			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius"},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
 			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
-								"radius": "shape.secondary_radius"},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
 			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius"},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -2724,7 +2773,7 @@ const BINDING_TABLE: Dictionary = {
 		"color": {
 			"default_color":         {"role": "text_default"},
 			"selection_color":       {"role": "accent_offset"},
-			"font_selected_color":   {"role": "text_strong"},
+			"font_selected_color":   {"role": "text_on_accent_offset"},
 		},
 	},
 	# 51. PanelContainer — Phase 4 omitted this base class from BINDING_TABLE
@@ -2737,6 +2786,7 @@ const BINDING_TABLE: Dictionary = {
 				"role":             "surface_panel",
 				"alpha":            "shape.surface_alpha_panels",
 				"raised_intensity": "shape.raised_lifts.panel",
+				"padding":          Vector2i(10, 8),
 			},
 		},
 	},
@@ -2751,6 +2801,7 @@ const BINDING_TABLE: Dictionary = {
 				"radius":           "shape.card_radius",
 				"alpha":            "shape.surface_alpha_panels",
 				"raised_intensity": "shape.raised_lifts.panel",
+				"padding":          Vector2i(12, 10),
 			},
 		},
 		"color": {
@@ -2770,6 +2821,7 @@ const BINDING_TABLE: Dictionary = {
 				"radius":           "shape.hero_radius",
 				"alpha":            "shape.surface_alpha_panels",
 				"raised_intensity": "shape.raised_lifts.panel",
+				"padding":          Vector2i(14, 12),
 			},
 		},
 		"color": {
@@ -2838,6 +2890,23 @@ func _set_content_margin_from_padding(sb: StyleBoxFlat, padding: Vector2i) -> vo
 	sb.content_margin_right = padding.x
 	sb.content_margin_top = padding.y
 	sb.content_margin_bottom = padding.y
+
+
+func _apply_outline_border(sb: StyleBoxFlat, color: Color) -> void:
+	sb.border_color = color
+	sb.border_width_left = outline_width
+	sb.border_width_top = outline_width
+	sb.border_width_right = outline_width
+	sb.border_width_bottom = outline_width
+
+
+func _apply_raised_depth_border(sb: StyleBoxFlat, offset_color: Color, intensity: int) -> void:
+	var depth := maxi(1, intensity)
+	sb.border_color = offset_color
+	sb.border_width_left = 0
+	sb.border_width_top = 0
+	sb.border_width_right = depth
+	sb.border_width_bottom = depth
 
 
 ## Applies the per-direction primary_strategy mutation to a StyleBoxFlat representing
@@ -3046,7 +3115,7 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			focus_sb.expand_margin_top = focus_offset_int
 			focus_sb.expand_margin_right = focus_offset_int
 			focus_sb.expand_margin_bottom = focus_offset_int
-			focus_sb.shadow_size = -1
+			focus_sb.shadow_size = 0
 			return focus_sb
 		var bg_color: Color = role_table.get(role, role_table.surface_panel)
 		if alpha < 1.0:
@@ -3072,13 +3141,10 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		var corner_profile: String = str(recipe.get("corner_profile", ""))
 		if corner_profile == "tab_connected":
 			_set_tab_connected_radius(sb, resolved_radius)
-		sb.border_color = role_table.outline_color
-		sb.border_width_left = outline_width
-		sb.border_width_top = outline_width
-		sb.border_width_right = outline_width
-		sb.border_width_bottom = outline_width
+		_apply_outline_border(sb, role_table.outline_color)
 		# Plan 05-02 Task 2 (D-03): padding may be a `shape.<key>` Vector2i lookup
-		# OR (default) the platform-aware Phase 4 derivation.
+		# or an explicit Vector2i. Unspecified padding is zero; structural styleboxes must
+		# opt into content margins instead of inheriting giant global chrome.
 		var padding_raw: Variant = recipe.get("padding", null)
 		var applied_padding: bool = false
 		if padding_raw != null and typeof(padding_raw) == TYPE_STRING and (padding_raw as String).begins_with("shape."):
@@ -3092,18 +3158,7 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			_set_content_margin_from_padding(sb, Vector2i(int(round((padding_raw as Vector2i).x * density)), int(round((padding_raw as Vector2i).y * density))))
 			applied_padding = true
 		if not applied_padding:
-			# Cross-AI Cycle 2 M2 fix: platform-aware margins. DESKTOP (densityScale=1.0,
-			# tapPadding=8) yields the base spacing; MOBILE (densityScale=1.5, tapPadding=12)
-			# produces a visibly larger Button.normal content_margin_*. Plan 04-06's MOBILE
-			# toggle assertion observes this difference.
-			var density: float = tokens.get("densityScale", 1.0)
-			var tap_pad: int = tokens.get("tapPadding", 0)
-			var h_margin: int = int(spacing * density) + tap_pad
-			var v_margin: int = int(spacing * 0.6 * density) + tap_pad
-			sb.content_margin_left = h_margin
-			sb.content_margin_top = v_margin
-			sb.content_margin_right = h_margin
-			sb.content_margin_bottom = v_margin
+			_set_content_margin_from_padding(sb, Vector2i.ZERO)
 		# Plan 05-02 Task 2 (D-04): strategy dispatch (closed-enum, sourced VERBATIM
 		# from DESIGN_TOKENS §5.1-§5.5). Recipes opt-in via `strategy: "shape.primary_strategy"`
 		# (or `"shape.ghost_strategy"`); _apply_primary_strategy / _apply_ghost_strategy
@@ -3120,6 +3175,8 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 					_apply_ghost_strategy(sb, strat_name, role_table, style_personality)
 				# Other strategy paths (kicker_style etc.) are NOT dispatched on stylebox;
 				# they're color-recipe territory handled below.
+		if sb_intensity > 0:
+			_apply_raised_depth_border(sb, offset_color, sb_intensity)
 		return sb
 	elif data_type == "color":
 		var role: String = recipe.get("role", "text_strong")
