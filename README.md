@@ -17,7 +17,6 @@ v1 implementation is in final QA/release preparation. The live showcase is
 
 ```text
 addons/neocade_theme/
-  plugin.cfg                   # editor save registration
   pulse_neocade_theme.tres      # recommended starter
   slate_neocade_theme.tres
   bubble_neocade_theme.tres
@@ -25,18 +24,14 @@ addons/neocade_theme/
   burst_neocade_theme.tres
   scripts/neocade_theme.gd      # @tool class_name NeoCadeTheme extends Theme
   scripts/neocade_theme_option_button.gd
-  scripts/neocade_theme_plugin.gd
-  scripts/neocade_theme_resource_format_saver.gd
   fonts/inter_variable.ttf
   fonts/inter_ofl.txt
   icons/*.svg
 ```
 
-The editor plugin only registers NeoCadeTheme save support, so changing exported
-properties on direction resources keeps the `.tres` files data-only instead of
-serializing every generated Theme entry. There is still no root
-`neocade_theme.tres` and no separate `neocade_mobile_theme.tres`. Mobile is
-handled by the exported `platform` property on the same theme resources.
+There is no `plugin.cfg`, no editor plugin, no root `neocade_theme.tres`, and
+no separate `neocade_mobile_theme.tres`. Mobile is handled by the exported
+`platform` property on the same theme resources.
 
 ## Usage
 

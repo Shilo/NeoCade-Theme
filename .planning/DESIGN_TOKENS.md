@@ -663,9 +663,7 @@ Plus package metadata files (`LICENSE.md`, `README.md`, `docs/usage.md`, `CHANGE
 - No `themes/` subfolder. All 5 `.tres` files live at the addon root.
 - No `_dev/` subfolder. (Spike artifacts at `.planning/spikes/dynamic-theme/` stay in `.planning/`, not under `addons/`.)
 - No `neocade_mobile_theme.tres`. Mobile is a `platform=MOBILE` toggle.
-- `plugin.cfg` is allowed only for focused editor save registration so NeoCadeTheme
-  resources remain data-only after export edits; no custom inspector/dock authoring
-  UI in v1.
+- No `plugin.cfg` (per STACK Decision 5 — not an editor plugin).
 
 ### 12.4 Dependency order (Phase 4 task sequencing)
 

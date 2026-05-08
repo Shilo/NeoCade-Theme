@@ -75,12 +75,6 @@ menu. Use the dedicated Theme editor, the 9 exported `NeoCadeTheme`
 properties on direction resources, or formula edits in
 `addons/neocade_theme/scripts/neocade_theme.gd`.
 
-When authoring `.tres` direction resources, enable the bundled
-`addons/neocade_theme/plugin.cfg` editor plugin. It registers a
-`ResourceFormatSaver` that keeps NeoCadeTheme resource files data-only when
-exports are changed and saved in the editor. Runtime projects can still preload
-the `.tres` files normally; the plugin is only for editor save behavior.
-
 ## CJK / non-Latin script support
 
 NeoCade ships **only** Inter Variable Roman as its bundled font (UD-4 Option
@@ -152,9 +146,6 @@ is deferred to v1.x.
   `_regenerate_theme()` which walks an internal BINDING_TABLE, computes
   derived values (surface ramp, state layers, raised offsets, role tokens),
   and populates Theme entries via `set_stylebox` / `set_color` / etc.
-- **Editor save support:** `plugin.cfg` registers a NeoCadeTheme
-  `ResourceFormatSaver` in editor sessions so generated Theme entries stay
-  transient and direction `.tres` files remain export-data-first.
 - **Iteration is additive** — `_regenerate_theme()` does NOT call `clear()`.
   Slots not in BINDING_TABLE are untouched (escape hatch for custom Theme
   Editor authoring).
