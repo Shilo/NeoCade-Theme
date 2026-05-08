@@ -63,7 +63,8 @@ theme = active_theme
 Open `main.tscn` in Godot 4.6.2 to inspect:
 
 - 9 sections covering controls, dialogs, graph, tokens, and coverage.
-- Theme picker for Pulse, Slate, Bubble, Daybreak, Burst, and Godot default.
+- `NeoCadeThemeSwitcher` dropdown scans `addons/neocade_theme/` for
+  `NeoCadeTheme` resources, keeps `Default` first, then sorts themes alphabetically.
 - Editor-authored Control tree; only the theme picker is scripted.
 - BBCode sample, multi-script sample, token gallery, and coverage strip.
 

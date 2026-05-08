@@ -62,22 +62,7 @@ custom_minimum_size = Vector2(190, 44)
 layout_mode = 2
 tooltip_text = "Theme picker"
 accessibility_name = "Theme picker"
-item_count = 6
-selected = 0
-popup/item_0/text = "Pulse"
-popup/item_0/id = 0
-popup/item_1/text = "Slate"
-popup/item_1/id = 1
-popup/item_2/text = "Bubble"
-popup/item_2/id = 2
-popup/item_3/text = "Daybreak"
-popup/item_3/id = 3
-popup/item_4/text = "Burst"
-popup/item_4/id = 4
-popup/item_5/text = "Godot Default"
-popup/item_5/id = 5
 script = ExtResource("2_theme_switcher")
-theme_target_path = NodePath("../../../../../../..")
 
 [node name="ThemeHint" type="Label" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow"]
 layout_mode = 2

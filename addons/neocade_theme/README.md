@@ -168,9 +168,11 @@ OFL terms — do not rename the binary.
 The repository-level `main.tscn` is a live showcase for this addon. It opens
 with Pulse and includes:
 
-- a direction picker for Pulse / Slate / Bubble / Daybreak / Burst / Godot default
+- a `NeoCadeThemeSwitcher` direction picker that scans `addons/neocade_theme/`,
+  keeps `Default` first, then sorts detected `NeoCadeTheme` resources alphabetically
 - an editor-authored Control tree previewable directly in the Godot editor
-- a tiny dropdown-only script at `res://scripts/theme_switcher.gd`
+- a dropdown-only script at `res://scripts/theme_switcher.gd` with exported
+  target and default-theme options
 - 9 sections covering controls, dialogs, graph, token gallery, and coverage
 
 The Web export preset is named `Web`; the release workflow publishes the

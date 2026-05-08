@@ -12,9 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Editor-authored `res://main.tscn` showcase implemented with nine sections: Buttons,
   Text Inputs, Numbers & Range, Selection & Lists, Containers & Layout,
   Dialogs & Popups, Advanced & Graph, Token Gallery, and Coverage 37/37.
-- Dropdown-only theme switcher for Pulse / Slate / Bubble / Daybreak / Burst /
-  Godot default via `res://scripts/theme_switcher.gd`; all sample Controls are
-  serialized scene nodes for editor preview.
+- Reusable `NeoCadeThemeSwitcher` dropdown-only script at
+  `res://scripts/theme_switcher.gd`; it scans `addons/neocade_theme/` for
+  `NeoCadeTheme` resources, keeps optional `Default` first, sorts themes
+  alphabetically, and applies selection to an exported target or scene root.
 - BBCode demo with bold/color/italic/code markup, multi-script label sample,
   token swatches, type samples, radius scale, and coverage verification strip.
 - `accessibility_name` metadata wiring on serialized interactive showcase
