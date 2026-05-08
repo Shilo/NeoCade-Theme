@@ -64,7 +64,7 @@ Open `main.tscn` in Godot 4.6.2 to inspect:
 
 - 9 sections covering controls, dialogs, graph, tokens, and coverage.
 - Theme picker for Pulse, Slate, Bubble, Daybreak, Burst, and Godot default.
-- Flat/raised toggle and Desktop/Mobile/Auto platform selector.
+- Editor-authored Control tree; only the theme picker is scripted.
 - BBCode sample, multi-script sample, token gallery, and coverage strip.
 
 `export_presets.cfg` includes a Web preset for release builds and named

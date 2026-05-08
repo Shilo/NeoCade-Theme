@@ -9,16 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (Phase 9 — Showcase)
 
-- Live `res://main.tscn` showcase implemented with nine sections: Buttons,
+- Editor-authored `res://main.tscn` showcase implemented with nine sections: Buttons,
   Text Inputs, Numbers & Range, Selection & Lists, Containers & Layout,
   Dialogs & Popups, Advanced & Graph, Token Gallery, and Coverage 37/37.
-- Runtime showcase controls for Pulse / Slate / Bubble / Daybreak / Burst /
-  Godot default, `raised` flat/raised variation, and `platform`
-  Desktop/Mobile/Auto mode.
+- Dropdown-only theme switcher for Pulse / Slate / Bubble / Daybreak / Burst /
+  Godot default via `res://scripts/theme_switcher.gd`; all sample Controls are
+  serialized scene nodes for editor preview.
 - BBCode demo with bold/color/italic/code markup, multi-script label sample,
   token swatches, type samples, radius scale, and coverage verification strip.
-- `accessibility_name` metadata wiring on programmatically created interactive
-  showcase Controls.
+- `accessibility_name` metadata wiring on serialized interactive showcase
+  Controls.
 - `export_presets.cfg` with Web, Windows, Linux, macOS, Android, and iOS named
   presets for QA and release automation.
 

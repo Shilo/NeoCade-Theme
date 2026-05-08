@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://beivemw6fcnld"]
 
 [ext_resource type="Theme" path="res://addons/neocade_theme/pulse_neocade_theme.tres" id="1_pulse_theme"]
-[ext_resource type="Script" path="res://scripts/showcase.gd" id="2_showcase"]
+[ext_resource type="Script" path="res://scripts/theme_switcher.gd" id="2_theme_switcher"]
 
 [node name="Main" type="Control" unique_id=645311781]
 layout_mode = 3
@@ -11,4 +11,1217 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_pulse_theme")
-script = ExtResource("2_showcase")
+
+[node name="RootMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="RootStack" type="VBoxContainer" parent="RootMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderPanel" type="PanelContainer" parent="RootMargin/RootStack"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HeaderMargin" type="MarginContainer" parent="RootMargin/RootStack/HeaderPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="HeaderStack" type="VBoxContainer" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack"]
+layout_mode = 2
+theme_type_variation = "HeaderLarge"
+text = "NeoCade"
+
+[node name="Subtitle" type="Label" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "Pulse starter direction - Control coverage gallery"
+
+[node name="ControlsRow" type="HBoxContainer" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ThemePicker" type="OptionButton" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow"]
+custom_minimum_size = Vector2(190, 44)
+layout_mode = 2
+tooltip_text = "Theme picker"
+accessibility_name = "Theme picker"
+item_count = 6
+selected = 0
+popup/item_0/text = "Pulse"
+popup/item_0/id = 0
+popup/item_1/text = "Slate"
+popup/item_1/id = 1
+popup/item_2/text = "Bubble"
+popup/item_2/id = 2
+popup/item_3/text = "Daybreak"
+popup/item_3/id = 3
+popup/item_4/text = "Burst"
+popup/item_4/id = 4
+popup/item_5/text = "Godot Default"
+popup/item_5/id = 5
+script = ExtResource("2_theme_switcher")
+theme_target_path = NodePath("../../../../../../..")
+
+[node name="ThemeHint" type="Label" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "Pulse / Slate / Bubble / Daybreak / Burst"
+vertical_alignment = 1
+
+[node name="ShowcaseTabs" type="TabContainer" parent="RootMargin/RootStack"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Buttons" type="ScrollContainer" parent="RootMargin/RootStack/ShowcaseTabs"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 24
+
+[node name="Grid" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 3
+
+[node name="PrimaryPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PrimaryStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/PrimaryPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/PrimaryPanel/PrimaryStack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "PrimaryButton"
+
+[node name="Control" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/PrimaryPanel/PrimaryStack"]
+layout_mode = 2
+theme_type_variation = "PrimaryButton"
+tooltip_text = "Start match button"
+accessibility_name = "Start match button"
+text = "Start Match"
+
+[node name="SecondaryPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SecondaryStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/SecondaryPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/SecondaryPanel/SecondaryStack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "SecondaryButton"
+
+[node name="Control" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/SecondaryPanel/SecondaryStack"]
+layout_mode = 2
+theme_type_variation = "SecondaryButton"
+tooltip_text = "View prizes button"
+accessibility_name = "View prizes button"
+text = "View Prizes"
+
+[node name="GhostPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GhostStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/GhostPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/GhostPanel/GhostStack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "GhostButton"
+
+[node name="Control" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/GhostPanel/GhostStack"]
+layout_mode = 2
+theme_type_variation = "GhostButton"
+tooltip_text = "Queue later button"
+accessibility_name = "Queue later button"
+text = "Queue Later"
+
+[node name="DangerPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DangerStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/DangerPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/DangerPanel/DangerStack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "DangerButton"
+
+[node name="Control" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/DangerPanel/DangerStack"]
+layout_mode = 2
+theme_type_variation = "DangerButton"
+tooltip_text = "Forfeit run button"
+accessibility_name = "Forfeit run button"
+text = "Forfeit Run"
+
+[node name="CheckBoxPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CheckBoxStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/CheckBoxPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/CheckBoxPanel/CheckBoxStack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "CheckBox"
+
+[node name="Control" type="CheckBox" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/CheckBoxPanel/CheckBoxStack"]
+layout_mode = 2
+tooltip_text = "Prize locker checkbox"
+accessibility_name = "Prize locker checkbox"
+button_pressed = true
+text = "Prize locker synced"
+
+[node name="CheckButtonPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CheckButtonStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/CheckButtonPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/CheckButtonPanel/CheckButtonStack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "CheckButton"
+
+[node name="Control" type="CheckButton" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/CheckButtonPanel/CheckButtonStack"]
+layout_mode = 2
+tooltip_text = "Cabinet online toggle"
+accessibility_name = "Cabinet online toggle"
+button_pressed = true
+text = "Cabinet online"
+
+[node name="OptionPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="OptionStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/OptionPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/OptionPanel/OptionStack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "OptionButton"
+
+[node name="Control" type="OptionButton" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/OptionPanel/OptionStack"]
+layout_mode = 2
+tooltip_text = "Theme flavor option"
+accessibility_name = "Theme flavor option"
+item_count = 3
+selected = 0
+popup/item_0/text = "Prize Pop Plaza"
+popup/item_0/id = 0
+popup/item_1/text = "Orbital Playdeck"
+popup/item_1/id = 1
+popup/item_2/text = "Midnight Marquee"
+popup/item_2/id = 2
+
+[node name="MenuButtonPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MenuButtonStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/MenuButtonPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/MenuButtonPanel/MenuButtonStack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "MenuButton"
+
+[node name="Control" type="MenuButton" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/MenuButtonPanel/MenuButtonStack"]
+layout_mode = 2
+tooltip_text = "Cabinet menu button"
+accessibility_name = "Cabinet menu button"
+text = "Cabinet Menu"
+
+[node name="ColorPickerButtonPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorPickerButtonStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ColorPickerButtonPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ColorPickerButtonPanel/ColorPickerButtonStack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "ColorPickerButton"
+
+[node name="Control" type="ColorPickerButton" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ColorPickerButtonPanel/ColorPickerButtonStack"]
+layout_mode = 2
+tooltip_text = "Accent color picker button"
+accessibility_name = "Accent color picker button"
+color = Color(0.545098, 1, 0.415686, 1)
+
+[node name="LinkPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LinkStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/LinkPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/LinkPanel/LinkStack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "LinkButton"
+
+[node name="Control" type="LinkButton" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/LinkPanel/LinkStack"]
+layout_mode = 2
+tooltip_text = "Release notes link"
+accessibility_name = "Release notes link"
+text = "Open release notes"
+uri = "https://github.com/"
+
+[node name="Text Inputs" type="ScrollContainer" parent="RootMargin/RootStack/ShowcaseTabs"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 24
+
+[node name="Grid" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+[node name="LabelPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid"]
+layout_mode = 2
+
+[node name="Stack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/LabelPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Kicker" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/LabelPanel/Stack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "Label"
+
+[node name="Control" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/LabelPanel/Stack"]
+layout_mode = 2
+text = "Arcade booth status: operational"
+
+[node name="HeaderPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid"]
+layout_mode = 2
+
+[node name="Stack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/HeaderPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Kicker" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/HeaderPanel/Stack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "HeaderLarge"
+
+[node name="Control" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/HeaderPanel/Stack"]
+layout_mode = 2
+theme_type_variation = "HeaderLarge"
+text = "Token Rally"
+
+[node name="RichTextPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid"]
+layout_mode = 2
+
+[node name="Stack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/RichTextPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Kicker" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/RichTextPanel/Stack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "RichTextLabel"
+
+[node name="Control" type="RichTextLabel" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/RichTextPanel/Stack"]
+custom_minimum_size = Vector2(320, 110)
+layout_mode = 2
+bbcode_enabled = true
+text = "[b]BBCode sample[/b]\n[color=#8BFF6A]Accent text[/color], [i]synthetic italic[/i], and [code]score += combo[/code]."
+fit_content = true
+
+[node name="LineEditPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid"]
+layout_mode = 2
+
+[node name="Stack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/LineEditPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Kicker" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/LineEditPanel/Stack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "LineEdit"
+
+[node name="Control" type="LineEdit" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/LineEditPanel/Stack"]
+layout_mode = 2
+tooltip_text = "Booth name input"
+accessibility_name = "Booth name input"
+text = "Booth name: Meteor Match"
+placeholder_text = "Cabinet nickname"
+clear_button_enabled = true
+
+[node name="TextEditPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid"]
+layout_mode = 2
+
+[node name="Stack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/TextEditPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Kicker" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/TextEditPanel/Stack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "TextEdit"
+
+[node name="Control" type="TextEdit" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/TextEditPanel/Stack"]
+custom_minimum_size = Vector2(320, 116)
+layout_mode = 2
+tooltip_text = "Daily note text edit"
+accessibility_name = "Daily note text edit"
+text = "Daily note:\nRestock plush prizes before the evening rush."
+
+[node name="CodeEditPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid"]
+layout_mode = 2
+
+[node name="Stack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/CodeEditPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Kicker" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/CodeEditPanel/Stack"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "CodeEdit"
+
+[node name="Control" type="CodeEdit" parent="RootMargin/RootStack/ShowcaseTabs/Text Inputs/Margin/Grid/CodeEditPanel/Stack"]
+custom_minimum_size = Vector2(320, 116)
+layout_mode = 2
+tooltip_text = "Code edit sample"
+accessibility_name = "Code edit sample"
+text = "func award_tickets(combo: int) -> int:\n\treturn 25 + combo * 3"
+
+[node name="Numbers & Range" type="ScrollContainer" parent="RootMargin/RootStack/ShowcaseTabs"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Numbers & Range"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 24
+
+[node name="Grid" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Numbers & Range/Margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+[node name="SpinBox" type="SpinBox" parent="RootMargin/RootStack/ShowcaseTabs/Numbers & Range/Margin/Grid"]
+layout_mode = 2
+tooltip_text = "Ticket value spin box"
+accessibility_name = "Ticket value spin box"
+max_value = 999.0
+value = 125.0
+
+[node name="ProgressBar" type="ProgressBar" parent="RootMargin/RootStack/ShowcaseTabs/Numbers & Range/Margin/Grid"]
+custom_minimum_size = Vector2(300, 36)
+layout_mode = 2
+value = 72.0
+show_percentage = true
+
+[node name="HSlider" type="HSlider" parent="RootMargin/RootStack/ShowcaseTabs/Numbers & Range/Margin/Grid"]
+custom_minimum_size = Vector2(300, 36)
+layout_mode = 2
+tooltip_text = "Volume horizontal slider"
+accessibility_name = "Volume horizontal slider"
+value = 64.0
+
+[node name="VSlider" type="VSlider" parent="RootMargin/RootStack/ShowcaseTabs/Numbers & Range/Margin/Grid"]
+custom_minimum_size = Vector2(72, 170)
+layout_mode = 2
+tooltip_text = "Brightness vertical slider"
+accessibility_name = "Brightness vertical slider"
+value = 40.0
+
+[node name="HScrollBar" type="HScrollBar" parent="RootMargin/RootStack/ShowcaseTabs/Numbers & Range/Margin/Grid"]
+custom_minimum_size = Vector2(300, 36)
+layout_mode = 2
+tooltip_text = "Horizontal scroll bar"
+accessibility_name = "Horizontal scroll bar"
+page = 20.0
+value = 35.0
+
+[node name="VScrollBar" type="VScrollBar" parent="RootMargin/RootStack/ShowcaseTabs/Numbers & Range/Margin/Grid"]
+custom_minimum_size = Vector2(72, 170)
+layout_mode = 2
+tooltip_text = "Vertical scroll bar"
+accessibility_name = "Vertical scroll bar"
+page = 20.0
+value = 35.0
+
+[node name="Selection & Lists" type="ScrollContainer" parent="RootMargin/RootStack/ShowcaseTabs"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 24
+
+[node name="Grid" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+[node name="ItemList" type="ItemList" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin/Grid"]
+custom_minimum_size = Vector2(320, 190)
+layout_mode = 2
+tooltip_text = "Booth item list"
+accessibility_name = "Booth item list"
+item_count = 5
+item_0/text = "Meteor Match"
+item_1/text = "Prize Pop"
+item_2/text = "Stacker Alley"
+item_3/text = "Rhythm Rail"
+item_4/text = "Ticket Tornado"
+
+[node name="Tree" type="Tree" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin/Grid"]
+custom_minimum_size = Vector2(380, 230)
+layout_mode = 2
+tooltip_text = "Arcade floor tree"
+accessibility_name = "Arcade floor tree"
+columns = 3
+column_titles_visible = true
+
+[node name="TabBar" type="TabBar" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin/Grid"]
+layout_mode = 2
+tooltip_text = "Standalone tab bar"
+accessibility_name = "Standalone tab bar"
+tab_count = 3
+tab_0/title = "Open"
+tab_1/title = "Queued"
+tab_2/title = "Offline"
+
+[node name="NestedTabs" type="TabContainer" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin/Grid"]
+custom_minimum_size = Vector2(380, 160)
+layout_mode = 2
+tooltip_text = "Nested tab container"
+accessibility_name = "Nested tab container"
+
+[node name="Cabinets" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin/Grid/NestedTabs"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin/Grid/NestedTabs/Cabinets"]
+layout_mode = 2
+text = "Cabinet queue synced and ready."
+
+[node name="Prizes" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin/Grid/NestedTabs"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin/Grid/NestedTabs/Prizes"]
+layout_mode = 2
+text = "Prize counter restock planned."
+
+[node name="Staff" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin/Grid/NestedTabs"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin/Grid/NestedTabs/Staff"]
+layout_mode = 2
+text = "Staff handoff notes are clean."
+
+[node name="FoldableContainer" type="FoldableContainer" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin/Grid"]
+custom_minimum_size = Vector2(320, 110)
+layout_mode = 2
+tooltip_text = "Foldable settings container"
+accessibility_name = "Foldable settings container"
+title = "FoldableContainer"
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Selection & Lists/Margin/Grid/FoldableContainer"]
+layout_mode = 2
+text = "Hidden prizes, cabinet settings, and queue filters."
+
+[node name="Containers & Layout" type="ScrollContainer" parent="RootMargin/RootStack/ShowcaseTabs"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 24
+
+[node name="Grid" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+[node name="Panel" type="Panel" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid"]
+custom_minimum_size = Vector2(320, 110)
+layout_mode = 2
+
+[node name="PanelLabel" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Panel chrome"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PanelContainer" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid"]
+custom_minimum_size = Vector2(320, 110)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/PanelContainer/Margin"]
+layout_mode = 2
+text = "PanelContainer with margin"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SplitContainer" type="HSplitContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid"]
+custom_minimum_size = Vector2(380, 160)
+layout_mode = 2
+tooltip_text = "Split container"
+accessibility_name = "Split container"
+split_offset = 180
+
+[node name="LeftPane" type="TextEdit" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/SplitContainer"]
+layout_mode = 2
+tooltip_text = "Split container left pane"
+accessibility_name = "Split container left pane"
+text = "Left queue\nA-12\nB-08"
+
+[node name="RightPane" type="TextEdit" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/SplitContainer"]
+layout_mode = 2
+tooltip_text = "Split container right pane"
+accessibility_name = "Split container right pane"
+text = "Right queue\nC-02\nD-19"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid"]
+custom_minimum_size = Vector2(380, 160)
+layout_mode = 2
+tooltip_text = "Scroll container"
+accessibility_name = "Scroll container"
+
+[node name="Rows" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/ScrollContainer"]
+layout_mode = 2
+
+[node name="Row01" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/ScrollContainer/Rows"]
+layout_mode = 2
+text = "Scrollable ledger row 01"
+
+[node name="Row02" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/ScrollContainer/Rows"]
+layout_mode = 2
+text = "Scrollable ledger row 02"
+
+[node name="Row03" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/ScrollContainer/Rows"]
+layout_mode = 2
+text = "Scrollable ledger row 03"
+
+[node name="Row04" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/ScrollContainer/Rows"]
+layout_mode = 2
+text = "Scrollable ledger row 04"
+
+[node name="Row05" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/ScrollContainer/Rows"]
+layout_mode = 2
+text = "Scrollable ledger row 05"
+
+[node name="FlowContainer" type="HFlowContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid"]
+custom_minimum_size = Vector2(320, 120)
+layout_mode = 2
+
+[node name="Pulse" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/FlowContainer"]
+layout_mode = 2
+theme_type_variation = "GhostButton"
+text = "Pulse"
+
+[node name="Slate" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/FlowContainer"]
+layout_mode = 2
+theme_type_variation = "GhostButton"
+text = "Slate"
+
+[node name="Bubble" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/FlowContainer"]
+layout_mode = 2
+theme_type_variation = "GhostButton"
+text = "Bubble"
+
+[node name="Daybreak" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/FlowContainer"]
+layout_mode = 2
+theme_type_variation = "GhostButton"
+text = "Daybreak"
+
+[node name="Burst" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/FlowContainer"]
+layout_mode = 2
+theme_type_variation = "GhostButton"
+text = "Burst"
+
+[node name="GridContainer" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 3
+
+[node name="Pad1" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/GridContainer"]
+layout_mode = 2
+theme_type_variation = "SecondaryButton"
+text = "Pad 1"
+
+[node name="Pad2" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/GridContainer"]
+layout_mode = 2
+theme_type_variation = "SecondaryButton"
+text = "Pad 2"
+
+[node name="Pad3" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/GridContainer"]
+layout_mode = 2
+theme_type_variation = "SecondaryButton"
+text = "Pad 3"
+
+[node name="Pad4" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/GridContainer"]
+layout_mode = 2
+theme_type_variation = "SecondaryButton"
+text = "Pad 4"
+
+[node name="Pad5" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/GridContainer"]
+layout_mode = 2
+theme_type_variation = "SecondaryButton"
+text = "Pad 5"
+
+[node name="Pad6" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/GridContainer"]
+layout_mode = 2
+theme_type_variation = "SecondaryButton"
+text = "Pad 6"
+
+[node name="BoxAndCenter" type="HBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/BoxAndCenter"]
+layout_mode = 2
+
+[node name="RowA" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/BoxAndCenter/VBoxContainer"]
+layout_mode = 2
+text = "VBox row A"
+
+[node name="RowB" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/BoxAndCenter/VBoxContainer"]
+layout_mode = 2
+text = "VBox row B"
+
+[node name="CenterContainer" type="CenterContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/BoxAndCenter"]
+custom_minimum_size = Vector2(160, 80)
+layout_mode = 2
+
+[node name="CenteredButton" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/BoxAndCenter/CenterContainer"]
+layout_mode = 2
+theme_type_variation = "PrimaryButton"
+text = "Centered"
+
+[node name="Dialogs & Popups" type="ScrollContainer" parent="RootMargin/RootStack/ShowcaseTabs"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 24
+
+[node name="Grid" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 3
+
+[node name="AcceptDialogButton" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid"]
+layout_mode = 2
+theme_type_variation = "PrimaryButton"
+text = "AcceptDialog"
+
+[node name="ConfirmationDialogButton" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid"]
+layout_mode = 2
+theme_type_variation = "SecondaryButton"
+text = "ConfirmationDialog"
+
+[node name="FileDialogButton" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid"]
+layout_mode = 2
+theme_type_variation = "GhostButton"
+text = "FileDialog"
+
+[node name="PopupPanelButton" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid"]
+layout_mode = 2
+theme_type_variation = "SecondaryButton"
+text = "PopupPanel"
+
+[node name="PopupMenuButton" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid"]
+layout_mode = 2
+theme_type_variation = "SecondaryButton"
+text = "PopupMenu"
+
+[node name="WindowButton" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid"]
+layout_mode = 2
+theme_type_variation = "SecondaryButton"
+text = "Window"
+
+[node name="MenuBar" type="MenuBar" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid"]
+custom_minimum_size = Vector2(320, 44)
+layout_mode = 2
+tooltip_text = "Menu bar"
+accessibility_name = "Menu bar"
+
+[node name="File" type="PopupMenu" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/MenuBar"]
+item_count = 2
+item_0/text = "New snapshot"
+item_0/id = 0
+item_1/text = "Save snapshot"
+item_1/id = 1
+
+[node name="Cabinet" type="PopupMenu" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/MenuBar"]
+item_count = 2
+item_0/text = "Live updates"
+item_0/id = 0
+item_1/text = "Rebuild cache"
+item_1/id = 1
+
+[node name="TooltipPair" type="HBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HoverTarget" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/TooltipPair"]
+layout_mode = 2
+theme_type_variation = "PrimaryButton"
+tooltip_text = "TooltipPanel and TooltipLabel styled by NeoCade"
+accessibility_name = "Tooltip hover target"
+text = "Hover Target"
+
+[node name="TooltipLabel" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/TooltipPair"]
+layout_mode = 2
+text = "TooltipPanel / TooltipLabel"
+
+[node name="Advanced & Graph" type="ScrollContainer" parent="RootMargin/RootStack/ShowcaseTabs"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Advanced & Graph"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 24
+
+[node name="Grid" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Advanced & Graph/Margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+[node name="ColorPicker" type="ColorPicker" parent="RootMargin/RootStack/ShowcaseTabs/Advanced & Graph/Margin/Grid"]
+custom_minimum_size = Vector2(420, 360)
+layout_mode = 2
+tooltip_text = "Color picker"
+accessibility_name = "Color picker"
+color = Color(0.545098, 1, 0.415686, 1)
+
+[node name="GraphEdit" type="GraphEdit" parent="RootMargin/RootStack/ShowcaseTabs/Advanced & Graph/Margin/Grid"]
+custom_minimum_size = Vector2(560, 360)
+layout_mode = 2
+tooltip_text = "Graph edit"
+accessibility_name = "Graph edit"
+
+[node name="ArcadeFlow" type="GraphFrame" parent="RootMargin/RootStack/ShowcaseTabs/Advanced & Graph/Margin/Grid/GraphEdit"]
+position_offset = Vector2(24, 18)
+size = Vector2(500, 290)
+title = "Arcade Flow"
+
+[node name="EntryGate" type="GraphNode" parent="RootMargin/RootStack/ShowcaseTabs/Advanced & Graph/Margin/Grid/GraphEdit"]
+position_offset = Vector2(56, 56)
+size = Vector2(180, 116)
+title = "Entry Gate"
+
+[node name="ScanPass" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Advanced & Graph/Margin/Grid/GraphEdit/EntryGate"]
+layout_mode = 2
+text = "Scan pass"
+
+[node name="RoutePlayer" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Advanced & Graph/Margin/Grid/GraphEdit/EntryGate"]
+layout_mode = 2
+text = "Route player"
+
+[node name="TicketBooth" type="GraphNode" parent="RootMargin/RootStack/ShowcaseTabs/Advanced & Graph/Margin/Grid/GraphEdit"]
+position_offset = Vector2(300, 150)
+size = Vector2(180, 116)
+title = "Ticket Booth"
+
+[node name="Award" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Advanced & Graph/Margin/Grid/GraphEdit/TicketBooth"]
+layout_mode = 2
+text = "Award"
+
+[node name="Receipt" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Advanced & Graph/Margin/Grid/GraphEdit/TicketBooth"]
+layout_mode = 2
+text = "Receipt"
+
+[node name="Token Gallery" type="ScrollContainer" parent="RootMargin/RootStack/ShowcaseTabs"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 24
+
+[node name="Stack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PaletteGrid" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 3
+
+[node name="BaseSwatch" type="ColorRect" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack/PaletteGrid"]
+custom_minimum_size = Vector2(220, 92)
+layout_mode = 2
+color = Color(0.0823529, 0.101961, 0.180392, 1)
+
+[node name="AccentSwatch" type="ColorRect" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack/PaletteGrid"]
+custom_minimum_size = Vector2(220, 92)
+layout_mode = 2
+color = Color(0.545098, 1, 0.415686, 1)
+
+[node name="SuccessSwatch" type="ColorRect" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack/PaletteGrid"]
+custom_minimum_size = Vector2(220, 92)
+layout_mode = 2
+color = Color(0.360784, 0.788235, 0.443137, 1)
+
+[node name="WarningSwatch" type="ColorRect" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack/PaletteGrid"]
+custom_minimum_size = Vector2(220, 92)
+layout_mode = 2
+color = Color(1, 0.819608, 0.4, 1)
+
+[node name="DangerSwatch" type="ColorRect" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack/PaletteGrid"]
+custom_minimum_size = Vector2(220, 92)
+layout_mode = 2
+color = Color(1, 0.431373, 0.431373, 1)
+
+[node name="InfoSwatch" type="ColorRect" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack/PaletteGrid"]
+custom_minimum_size = Vector2(220, 92)
+layout_mode = 2
+color = Color(0.372549, 0.890196, 1, 1)
+
+[node name="TypeGrid" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+[node name="HeaderLarge" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack/TypeGrid"]
+layout_mode = 2
+theme_type_variation = "HeaderLarge"
+text = "HeaderLarge - The quick arcade lobby"
+
+[node name="HeaderMedium" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack/TypeGrid"]
+layout_mode = 2
+theme_type_variation = "HeaderMedium"
+text = "HeaderMedium - The quick arcade lobby"
+
+[node name="HeaderSmall" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack/TypeGrid"]
+layout_mode = 2
+theme_type_variation = "HeaderSmall"
+text = "HeaderSmall - The quick arcade lobby"
+
+[node name="Caption" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack/TypeGrid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "Caption - The quick arcade lobby"
+
+[node name="Kicker" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack/TypeGrid"]
+layout_mode = 2
+theme_type_variation = "Kicker"
+text = "Kicker - The quick arcade lobby"
+
+[node name="CodeLabel" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Token Gallery/Margin/Stack/TypeGrid"]
+layout_mode = 2
+theme_type_variation = "CodeLabel"
+text = "CodeLabel - score += combo"
+
+[node name="Coverage 37 of 37" type="ScrollContainer" parent="RootMargin/RootStack/ShowcaseTabs"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 24
+
+[node name="Stack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Banner" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack"]
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Banner"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="Title" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Banner/Margin"]
+layout_mode = 2
+theme_type_variation = "HeaderMedium"
+text = "37/37 Controls themed"
+
+[node name="Grid" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 8
+columns = 4
+
+[node name="Button" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "Button"
+
+[node name="CheckBox" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "CheckBox"
+
+[node name="CheckButton" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "CheckButton"
+
+[node name="OptionButton" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "OptionButton"
+
+[node name="MenuButton" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "MenuButton"
+
+[node name="ColorPickerButton" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "ColorPickerButton"
+
+[node name="LinkButton" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "LinkButton"
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "Label"
+
+[node name="RichTextLabel" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "RichTextLabel"
+
+[node name="LineEdit" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "LineEdit"
+
+[node name="TextEdit" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "TextEdit"
+
+[node name="CodeEdit" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "CodeEdit"
+
+[node name="SpinBox" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "SpinBox"
+
+[node name="Range" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "Slider/Progress/ScrollBar"
+
+[node name="Lists" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "ItemList/Tree"
+
+[node name="Tabs" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "TabBar/TabContainer"
+
+[node name="Containers" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "Panel/Containers"
+
+[node name="Dialogs" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "Dialogs/Popups/Window"
+
+[node name="Advanced" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Coverage 37 of 37/Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = "Caption"
+text = "MenuBar/ColorPicker/Graph"
+
+[node name="AcceptDialog" type="AcceptDialog" parent="."]
+title = "Prize Claim"
+dialog_text = "Ticket count confirmed. Reward ready for pickup."
+accessibility_name = "Accept dialog"
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+title = "Reset Cabinet"
+dialog_text = "Clear the selected cabinet profile and rebuild defaults?"
+accessibility_name = "Confirmation dialog"
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Import Theme Snapshot"
+filters = PackedStringArray("*.tres ; Godot Theme resource", "*.json ; Token snapshot")
+accessibility_name = "File dialog"
+
+[node name="PopupPanel" type="PopupPanel" parent="."]
+accessibility_name = "Popup panel"
+
+[node name="PopupMargin" type="MarginContainer" parent="PopupPanel"]
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="PopupStack" type="VBoxContainer" parent="PopupPanel/PopupMargin"]
+theme_override_constants/separation = 8
+
+[node name="PopupTitle" type="Label" parent="PopupPanel/PopupMargin/PopupStack"]
+theme_type_variation = "HeaderSmall"
+text = "Ticket Bonus"
+
+[node name="PopupBody" type="RichTextLabel" parent="PopupPanel/PopupMargin/PopupStack"]
+bbcode_enabled = true
+text = "[b]Combo streak:[/b] +25 tickets\n[color=#8BFF6A]Ready[/color] for the next round."
+fit_content = true
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+accessibility_name = "Popup menu"
+item_count = 4
+item_0/text = "Show inactive booths"
+item_0/id = 0
+item_1/text = "Sort by ticket value"
+item_1/id = 1
+item_2/text = "Duplicate cabinet"
+item_2/id = 2
+item_3/text = "Export preset"
+item_3/id = 3
+
+[node name="Window" type="Window" parent="."]
+title = "Detached Scoreboard"
+size = Vector2i(420, 220)
+accessibility_name = "Detached scoreboard window"
+
+[node name="WindowMargin" type="MarginContainer" parent="Window"]
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="WindowStack" type="VBoxContainer" parent="Window/WindowMargin"]
+theme_override_constants/separation = 10
+
+[node name="WindowLabel" type="Label" parent="Window/WindowMargin/WindowStack"]
+theme_type_variation = "HeaderSmall"
+text = "Player 1 - 18,240 tickets"
