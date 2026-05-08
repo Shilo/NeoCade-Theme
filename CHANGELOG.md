@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Added editor save support for `NeoCadeTheme` resources. The addon now
+  registers a custom `ResourceFormatSaver` through `plugin.cfg`, keeping
+  direction `.tres` files data-only when exported theme settings are changed
+  in the Godot editor instead of serializing generated Theme entries.
+- The NeoCadeTheme save whitelist now derives exported property names from
+  `NeoCadeTheme.get_property_list()` usage flags, avoiding hardcoded export
+  drift when the public theme surface changes.
+
 ### Changed (cleanup)
 
 - Runtime addon folder now contains only Godot-consumed addon assets plus the
@@ -142,9 +152,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   append a CJK font (e.g., system Noto Sans CJK) to a duplicated theme's
   `default_font.fallbacks`. See README "CJK / non-Latin scripts" section.
   (FONT-09(a) override pattern; UD-2 default behavior.)
-- **No `plugin.cfg`.** This is NOT an editor plugin — consumers preload
-  `.tres` files directly via `preload("res://addons/neocade_theme/...")`.
-  (STACK Decision 5; CONTEXT.md D-05.)
+- **Tiny editor plugin included.** `plugin.cfg` exists only to register
+  NeoCadeTheme save behavior in editor sessions; runtime consumers still
+  preload `.tres` files directly via
+  `preload("res://addons/neocade_theme/...")`.
 - **No light mode in v1.** Light surface palettes are forward-compat-flagged
   via the `is_light` field but the v1 directions all ship with dark base
   colors. (Deferred to v2.)
