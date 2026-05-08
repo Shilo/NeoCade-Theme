@@ -64,6 +64,19 @@ custom_minimum_size = Vector2(190, 44)
 layout_mode = 2
 tooltip_text = "Theme picker"
 accessibility_name = "Theme picker"
+item_count = 6
+popup/item_0/text = "Bubble"
+popup/item_0/id = 0
+popup/item_1/text = "Burst"
+popup/item_1/id = 1
+popup/item_2/text = "Daybreak"
+popup/item_2/id = 2
+popup/item_3/text = "Pulse"
+popup/item_3/id = 3
+popup/item_4/text = "Slate"
+popup/item_4/id = 4
+popup/item_5/text = "None"
+popup/item_5/id = 5
 script = ExtResource("2_theme_option_button")
 
 [node name="ThemeHint" type="Label" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow" unique_id=941285155]
@@ -1254,8 +1267,8 @@ accessibility_name = "Popup panel"
 [node name="PopupMargin" type="MarginContainer" parent="PopupPanel" unique_id=1756477724]
 offset_left = 26.0
 offset_top = 18.0
-offset_right = 74.0
-offset_bottom = 82.0
+offset_right = 246.0
+offset_bottom = 194.0
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
