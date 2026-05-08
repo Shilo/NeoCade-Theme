@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://beivemw6fcnld"]
 
-[ext_resource type="Theme" path="res://addons/neocade_theme/neocade_theme.tres" id="1_lisp0"]
+[ext_resource type="Theme" uid="uid://cgd7xydn3yu7t" path="res://addons/neocade_theme/neocade_theme.tres" id="1_lisp0"]
 [ext_resource type="Script" uid="uid://dky0m3dm07i6g" path="res://addons/neocade_theme/scripts/neocade_theme_option_button.gd" id="2_theme_option_button"]
 [ext_resource type="Script" uid="uid://dxu534volcw5j" path="res://showcase/showcase.gd" id="3_showcase"]
 
@@ -60,7 +60,7 @@ layout_mode = 2
 theme_override_constants/separation = 10
 
 [node name="NeoCadeThemeOptionButton" type="OptionButton" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow" unique_id=1590275645]
-custom_minimum_size = Vector2(190, 44)
+custom_minimum_size = Vector2(220, 40)
 layout_mode = 2
 tooltip_text = "Theme picker"
 accessibility_name = "Theme picker"
@@ -1265,10 +1265,10 @@ filters = PackedStringArray("*.tres ; Godot Theme resource", "*.json ; Token sna
 accessibility_name = "Popup panel"
 
 [node name="PopupMargin" type="MarginContainer" parent="PopupPanel" unique_id=1756477724]
-offset_left = 26.0
-offset_top = 18.0
-offset_right = 246.0
-offset_bottom = 194.0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 180.0
+offset_bottom = 114.0
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
@@ -1305,8 +1305,9 @@ item_3/id = 3
 [node name="Window" type="Window" parent="." unique_id=168238927]
 oversampling_override = 1.0
 title = "Scoreboard Window"
-position = Vector2i(576, 36)
-size = Vector2i(420, 220)
+position = Vector2i(519, 32)
+size = Vector2i(520, 260)
+visible = false
 accessibility_name = "Scoreboard window"
 
 [node name="WindowMargin" type="MarginContainer" parent="Window" unique_id=844849153]
@@ -1315,10 +1316,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 18
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
 
 [node name="WindowStack" type="VBoxContainer" parent="Window/WindowMargin" unique_id=675942343]
 layout_mode = 2

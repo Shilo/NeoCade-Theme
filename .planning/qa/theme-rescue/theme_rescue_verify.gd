@@ -1,0 +1,168 @@
+extends SceneTree
+
+const THEME_PATH := "res://addons/neocade_theme/neocade_theme.tres"
+const MIN_TEXT_CONTRAST := 4.5
+
+var _failures: PackedStringArray = []
+
+
+func _initialize() -> void:
+	call_deferred("_run")
+
+
+func _run() -> void:
+	_check_project_settings()
+
+	var canonical := load(THEME_PATH) as NeoCadeTheme
+	if canonical == null:
+		_fail("canonical theme did not load as NeoCadeTheme")
+		_finish()
+		return
+
+	for style_value in NeoCadeTheme.selectable_styles():
+		var desktop := _theme_variant(canonical, style_value, false, NeoCadeTheme.Platform.DESKTOP)
+		var raised := _theme_variant(canonical, style_value, true, NeoCadeTheme.Platform.DESKTOP)
+		var mobile := _theme_variant(canonical, style_value, false, NeoCadeTheme.Platform.MOBILE)
+
+		_check_theme(desktop, "desktop:%s" % NeoCadeTheme.style_label(style_value), false)
+		_check_theme(raised, "raised:%s" % NeoCadeTheme.style_label(style_value), true)
+		_check_theme(mobile, "mobile:%s" % NeoCadeTheme.style_label(style_value), false)
+		_check_mobile_is_larger(desktop, mobile, NeoCadeTheme.style_label(style_value))
+
+	_finish()
+
+
+func _check_project_settings() -> void:
+	_expect_equal(ProjectSettings.get_setting("display/window/size/viewport_width"), 1920, "viewport_width")
+	_expect_equal(ProjectSettings.get_setting("display/window/size/viewport_height"), 1080, "viewport_height")
+	_expect_equal(ProjectSettings.get_setting("display/window/subwindows/embed_subwindows"), true, "embed_subwindows")
+
+
+func _theme_variant(source: NeoCadeTheme, style_value: int, raised: bool, platform: int) -> NeoCadeTheme:
+	var theme := source.duplicate(true) as NeoCadeTheme
+	theme.style = style_value
+	theme.raised = raised
+	theme.platform = platform
+	return theme
+
+
+func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:
+	_expect_equal(theme.default_base_scale, 1.0, "%s default_base_scale" % label)
+	_expect_icon_max(theme, "Window", "close", 24, label)
+	_expect_icon_max(theme, "OptionButton", "arrow", 24, label)
+	_expect_icon_max(theme, "CheckBox", "checked", 24, label)
+	_expect_icon_max(theme, "CheckButton", "checked", 28, label)
+
+	var is_mobile := label.begins_with("mobile:")
+	_expect_margin_max(theme, "PrimaryButton", "normal", 28 if is_mobile else 18, 20 if is_mobile else 14, label)
+	_expect_margin_max(theme, "PanelContainer", "panel", 18 if is_mobile else 14, 14 if is_mobile else 12, label)
+	_expect_margin_max(theme, "Window", "embedded_border", 16 if is_mobile else 12, 12 if is_mobile else 10, label)
+
+	_expect_contrast(theme, "PrimaryButton", "normal", "font_color", MIN_TEXT_CONTRAST, label)
+	_expect_contrast(theme, "DangerButton", "normal", "font_color", MIN_TEXT_CONTRAST, label)
+	_expect_contrast(theme, "ItemList", "selected", "font_selected_color", MIN_TEXT_CONTRAST, label)
+
+	var primary := theme.get_stylebox("normal", "PrimaryButton") as StyleBoxFlat
+	if primary != null:
+		if primary.shadow_size != 0 or primary.shadow_offset != Vector2.ZERO:
+			_fail("%s PrimaryButton still uses StyleBoxFlat shadow" % label)
+		if expect_raised:
+			if primary.border_width_bottom <= primary.border_width_top:
+				_fail("%s raised PrimaryButton has no hard bottom depth" % label)
+			if primary.border_width_right <= primary.border_width_left:
+				_fail("%s raised PrimaryButton has no hard right depth" % label)
+
+	_check_no_positive_shadows(theme, label)
+
+
+func _check_mobile_is_larger(desktop: NeoCadeTheme, mobile: NeoCadeTheme, style_label: String) -> void:
+	var desktop_button := desktop.get_stylebox("normal", "PrimaryButton") as StyleBoxFlat
+	var mobile_button := mobile.get_stylebox("normal", "PrimaryButton") as StyleBoxFlat
+	if desktop_button == null or mobile_button == null:
+		return
+	if mobile_button.content_margin_top <= desktop_button.content_margin_top:
+		_fail("mobile:%s PrimaryButton top padding did not grow" % style_label)
+	if mobile_button.content_margin_left <= desktop_button.content_margin_left:
+		_fail("mobile:%s PrimaryButton side padding did not grow" % style_label)
+
+
+func _check_no_positive_shadows(theme: Theme, label: String) -> void:
+	for theme_type in theme.get_type_list():
+		for slot_name in theme.get_stylebox_list(theme_type):
+			var stylebox := theme.get_stylebox(slot_name, theme_type)
+			if stylebox is StyleBoxFlat:
+				var flat := stylebox as StyleBoxFlat
+				if flat.shadow_size > 0 or flat.shadow_offset != Vector2.ZERO:
+					_fail("%s %s.%s uses soft shadow_size=%s offset=%s" % [label, theme_type, slot_name, flat.shadow_size, flat.shadow_offset])
+
+
+func _expect_icon_max(theme: Theme, theme_type: StringName, slot_name: StringName, max_px: int, label: String) -> void:
+	if not theme.has_icon(slot_name, theme_type):
+		_fail("%s missing icon %s.%s" % [label, theme_type, slot_name])
+		return
+	var icon := theme.get_icon(slot_name, theme_type)
+	var size := icon.get_size()
+	if size.x > max_px or size.y > max_px:
+		_fail("%s icon %s.%s too large: %s" % [label, theme_type, slot_name, size])
+
+
+func _expect_margin_max(theme: Theme, theme_type: StringName, slot_name: StringName, max_h: int, max_v: int, label: String) -> void:
+	var stylebox := theme.get_stylebox(slot_name, theme_type) as StyleBoxFlat
+	if stylebox == null:
+		_fail("%s missing StyleBoxFlat %s.%s" % [label, theme_type, slot_name])
+		return
+	if stylebox.content_margin_left > max_h or stylebox.content_margin_right > max_h:
+		_fail("%s %s.%s horizontal margin too large: %s/%s" % [label, theme_type, slot_name, stylebox.content_margin_left, stylebox.content_margin_right])
+	if stylebox.content_margin_top > max_v or stylebox.content_margin_bottom > max_v:
+		_fail("%s %s.%s vertical margin too large: %s/%s" % [label, theme_type, slot_name, stylebox.content_margin_top, stylebox.content_margin_bottom])
+
+
+func _expect_contrast(theme: Theme, theme_type: StringName, stylebox_slot: StringName, color_slot: StringName, minimum: float, label: String) -> void:
+	var stylebox := theme.get_stylebox(stylebox_slot, theme_type) as StyleBoxFlat
+	if stylebox == null:
+		_fail("%s missing contrast stylebox %s.%s" % [label, theme_type, stylebox_slot])
+		return
+	if not theme.has_color(color_slot, theme_type):
+		_fail("%s missing contrast color %s.%s" % [label, theme_type, color_slot])
+		return
+	var text_color := theme.get_color(color_slot, theme_type)
+	var ratio := _contrast_ratio(stylebox.bg_color, text_color)
+	if ratio < minimum:
+		_fail("%s contrast %s.%s/%s is %.2f:1" % [label, theme_type, stylebox_slot, color_slot, ratio])
+
+
+func _expect_equal(actual: Variant, expected: Variant, label: String) -> void:
+	if actual != expected:
+		_fail("%s expected %s got %s" % [label, expected, actual])
+
+
+func _contrast_ratio(a: Color, b: Color) -> float:
+	var a_lum := _relative_luminance(a)
+	var b_lum := _relative_luminance(b)
+	var lighter: float = maxf(a_lum, b_lum)
+	var darker: float = minf(a_lum, b_lum)
+	return (lighter + 0.05) / (darker + 0.05)
+
+
+func _relative_luminance(c: Color) -> float:
+	return 0.2126 * _srgb_to_linear(c.r) + 0.7152 * _srgb_to_linear(c.g) + 0.0722 * _srgb_to_linear(c.b)
+
+
+func _srgb_to_linear(channel: float) -> float:
+	return channel / 12.92 if channel <= 0.03928 else pow((channel + 0.055) / 1.055, 2.4)
+
+
+func _fail(message: String) -> void:
+	_failures.append(message)
+
+
+func _finish() -> void:
+	if _failures.is_empty():
+		print("THEME_RESCUE_VERIFY: PASS")
+		quit(0)
+		return
+
+	printerr("THEME_RESCUE_VERIFY: FAIL")
+	for failure in _failures:
+		printerr("- " + failure)
+	quit(1)
