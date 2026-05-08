@@ -19,18 +19,34 @@ class_name NeoCadeTheme extends Theme
 ##
 ## See: .planning/DESIGN_TOKENS.md, .planning/phases/04-.../04-RESEARCH.md, .planning/phases/04-.../04-CONTEXT.md.
 
-enum Platform { DESKTOP = 0, MOBILE = 1, AUTO = 2 }
-enum Style { CUSTOM = 0, PULSE = 1, SLATE = 2, BUBBLE = 3, DAYBREAK = 4, BURST = 5 }
+## Sizing mode used when regenerating NeoCade theme entries.
+enum Platform {
+	## Uses desktop control density and spacing.
+	DESKTOP = 0,
+	## Uses mobile-friendly tap targets and spacing.
+	MOBILE = 1,
+	## Uses mobile sizing when the runtime reports a mobile OS feature; otherwise uses desktop sizing.
+	AUTO = 2,
+}
 
-# ─── Core exports (DESIGN_TOKENS §4.1 rows 1-5) ─────────────────────────────────────────────
-## Selects the built-in NeoCade visual style.
-##
-## Custom: manual style values using NeoCade's neutral fallback personality.
-## Pulse: arcade-dense cabinet rectangles with bold accent fills.
-## Slate: spacious, quiet, premium rounded chrome.
-## Bubble: playful, pillowy, generous controls with soft candy energy.
-## Daybreak: airy, welcoming, gently rounded mint-forward controls.
-## Burst: event-like, high-energy statement controls with amplified hierarchy.
+## Built-in NeoCade visual styles.
+enum Style {
+	## Playful, pillowy, generous controls with soft candy energy.
+	BUBBLE = 3,
+	## Event-like, high-energy statement controls with amplified hierarchy.
+	BURST = 5,
+	## Airy, welcoming, gently rounded mint-forward controls.
+	DAYBREAK = 4,
+	## Arcade-dense cabinet rectangles with bold accent fills.
+	PULSE = 1,
+	## Spacious, quiet, premium rounded chrome.
+	SLATE = 2,
+	## Manual style values using NeoCade's neutral fallback personality.
+	CUSTOM = 0,
+}
+
+# ─── Primary exports ────────────────────────────────────────────────────────────────────────
+## Selects the built-in NeoCade visual style, or Custom for manual style values.
 @export var style: Style = Style.PULSE:
 	set(value):
 		if style == value: return
@@ -42,57 +58,67 @@ enum Style { CUSTOM = 0, PULSE = 1, SLATE = 2, BUBBLE = 3, DAYBREAK = 4, BURST =
 			return
 		_apply_style_exports(style)
 
-@export var base_color: Color = Color("#151A2E"):
-	set(value):
-		if base_color == value: return
-		base_color = value
-		_after_direction_export_changed()
-
-@export var accent_color: Color = Color("#8BFF6A"):
-	set(value):
-		if accent_color == value: return
-		accent_color = value
-		_after_direction_export_changed()
-
+## Enables NeoCade's flat extruded depth treatment using solid offset shapes.
 @export var raised: bool = false:
 	set(value):
 		if raised == value: return
 		raised = value
 		_after_variant_export_changed()
 
+## Chooses desktop sizing, mobile sizing, or AUTO mobile detection via OS feature flags.
 @export var platform: Platform = Platform.AUTO:
 	set(value):
 		if platform == value: return
 		platform = value
 		_after_variant_export_changed()
 
-# ─── Shape exports (DESIGN_TOKENS §4.1 rows 5-9) ────────────────────────────────────────────
-@export_group("Shape")
+# ─── Style overrides ────────────────────────────────────────────────────────────────────────
+## Style values applied by built-in styles and editable as overrides when using Custom.
+@export_group("Style Overrides")
 
+## Main surface color for generated controls. Light/dark behavior is derived from this color's luminance.
+@export var base_color: Color = Color("#151A2E"):
+	set(value):
+		if base_color == value: return
+		base_color = value
+		_after_direction_export_changed()
+
+## Primary accent color used for selected, focused, and high-emphasis UI states.
+@export var accent_color: Color = Color("#8BFF6A"):
+	set(value):
+		if accent_color == value: return
+		accent_color = value
+		_after_direction_export_changed()
+
+## Base corner radius for generated chrome; individual controls may scale or override it by style.
 @export var corner_radius: int = 0:
 	set(value):
 		if corner_radius == value: return
 		corner_radius = value
 		_after_direction_export_changed()
 
+## Base spacing value used to derive margins, separations, and control padding.
 @export var spacing: int = 18:
 	set(value):
 		if spacing == value: return
 		spacing = value
 		_after_direction_export_changed()
 
+## Multiplier for raised offset depth when raised mode is enabled.
 @export var raised_strength: int = 3:
 	set(value):
 		if raised_strength == value: return
 		raised_strength = value
 		_after_direction_export_changed()
 
+## Thickness of generated focus rings on focusable controls.
 @export var focus_thickness: int = 2:
 	set(value):
 		if focus_thickness == value: return
 		focus_thickness = value
 		_after_direction_export_changed()
 
+## Width of generated outline strokes and hairline separators.
 @export var outline_width: int = 1:
 	set(value):
 		if outline_width == value: return
@@ -111,7 +137,7 @@ func _init() -> void:
 
 
 static func selectable_styles() -> PackedInt32Array:
-	return PackedInt32Array([Style.PULSE, Style.SLATE, Style.BUBBLE, Style.DAYBREAK, Style.BURST])
+	return PackedInt32Array([Style.BUBBLE, Style.BURST, Style.DAYBREAK, Style.PULSE, Style.SLATE])
 
 
 static func style_label(style_value: int) -> String:
@@ -728,15 +754,42 @@ const STYLE_PERSONALITY: Dictionary = {
 }
 
 const STYLE_DESCRIPTIONS: Dictionary = {
-	Style.CUSTOM: "Manual style values using NeoCade's neutral fallback personality.",
+	Style.BUBBLE: "Playful, pillowy, generous controls with soft candy energy.",
+	Style.BURST: "Event-like, high-energy statement controls with amplified hierarchy.",
+	Style.DAYBREAK: "Airy, welcoming, gently rounded mint-forward controls.",
 	Style.PULSE: "Arcade-dense cabinet rectangles with bold accent fills.",
 	Style.SLATE: "Spacious, quiet, premium rounded chrome.",
-	Style.BUBBLE: "Playful, pillowy, generous controls with soft candy energy.",
-	Style.DAYBREAK: "Airy, welcoming, gently rounded mint-forward controls.",
-	Style.BURST: "Event-like, high-energy statement controls with amplified hierarchy.",
+	Style.CUSTOM: "Manual style values using NeoCade's neutral fallback personality.",
 }
 
 const STYLE_EXPORTS: Dictionary = {
+	Style.BUBBLE: {
+		"base_color": Color("#241326"),
+		"accent_color": Color("#FFB3E6"),
+		"corner_radius": 26,
+		"spacing": 22,
+		"raised_strength": 6,
+		"focus_thickness": 3,
+		"outline_width": 1,
+	},
+	Style.BURST: {
+		"base_color": Color("#20112E"),
+		"accent_color": Color("#FFD166"),
+		"corner_radius": 18,
+		"spacing": 22,
+		"raised_strength": 5,
+		"focus_thickness": 3,
+		"outline_width": 1,
+	},
+	Style.DAYBREAK: {
+		"base_color": Color("#0B2420"),
+		"accent_color": Color("#76F2D1"),
+		"corner_radius": 8,
+		"spacing": 24,
+		"raised_strength": 3,
+		"focus_thickness": 2,
+		"outline_width": 1,
+	},
 	Style.PULSE: {
 		"base_color": Color("#151A2E"),
 		"accent_color": Color("#8BFF6A"),
@@ -753,33 +806,6 @@ const STYLE_EXPORTS: Dictionary = {
 		"spacing": 22,
 		"raised_strength": 2,
 		"focus_thickness": 2,
-		"outline_width": 1,
-	},
-	Style.BUBBLE: {
-		"base_color": Color("#241326"),
-		"accent_color": Color("#FFB3E6"),
-		"corner_radius": 26,
-		"spacing": 22,
-		"raised_strength": 6,
-		"focus_thickness": 3,
-		"outline_width": 1,
-	},
-	Style.DAYBREAK: {
-		"base_color": Color("#0B2420"),
-		"accent_color": Color("#76F2D1"),
-		"corner_radius": 8,
-		"spacing": 24,
-		"raised_strength": 3,
-		"focus_thickness": 2,
-		"outline_width": 1,
-	},
-	Style.BURST: {
-		"base_color": Color("#20112E"),
-		"accent_color": Color("#FFD166"),
-		"corner_radius": 18,
-		"spacing": 22,
-		"raised_strength": 5,
-		"focus_thickness": 3,
 		"outline_width": 1,
 	},
 }

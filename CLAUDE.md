@@ -10,10 +10,10 @@ The theme is built primarily to power the author's upcoming game, codename Virtu
 
 `NeoCadeTheme` has 10 exports:
 
-- Core: `style`, `base_color`, `accent_color`, `raised`, `platform`
-- Shape: `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`
+- Top level: `style`, `raised`, `platform`
+- Style Overrides group: `base_color`, `accent_color`, `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`
 
-`style` selects the built-in direction (`CUSTOM`, `PULSE`, `SLATE`, `BUBBLE`, `DAYBREAK`, `BURST`). Built-in styles apply the exported direction values and explicit direction personality; `CUSTOM` is the manual/custom mode. Setters regenerate theme entries dynamically. `platform=AUTO` auto-detects mobile with `OS.has_feature("mobile")`; `DESKTOP` and `MOBILE` force sizing. Light/dark behavior is luminance-derived from `base_color`; v1 ships dark-first styles, while formal light variants are future work.
+`style` selects the built-in direction (`BUBBLE`, `BURST`, `DAYBREAK`, `PULSE`, `SLATE`, `CUSTOM`). Built-in styles apply the exported direction values and explicit direction personality; `CUSTOM` is the manual/custom mode. Setters regenerate theme entries dynamically. `platform=AUTO` auto-detects mobile with `OS.has_feature("mobile")`; `DESKTOP` and `MOBILE` force sizing. Light/dark behavior is luminance-derived from `base_color`; v1 ships dark-first styles, while formal light variants are future work.
 
 **Current v1 resource:** one canonical `NeoCadeTheme` resource at `res://addons/neocade_theme/neocade_theme.tres`. Pulse is the recommended starter and showcase default style, but it has no architectural privilege.
 

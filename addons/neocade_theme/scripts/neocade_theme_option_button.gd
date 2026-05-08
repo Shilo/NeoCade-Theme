@@ -1,6 +1,12 @@
 @tool
 class_name NeoCadeThemeOptionButton extends OptionButton
 
+## Reusable OptionButton that lists NeoCade styles and applies the selected Theme to a target Control.
+##
+## The optional None entry applies a null theme so the target falls back to the project/default Godot theme.
+## The built-in styles are loaded from the canonical NeoCade theme resource.
+
+## Emitted after a user selection applies a Theme. The theme argument is null when the None entry is selected.
 signal theme_selected(theme: Theme, index: int)
 
 const NO_THEME_LABEL := "None"
@@ -8,6 +14,7 @@ const NO_THEME_TOOLTIP := "Applies no theme so the target uses the project/defau
 const NO_THEME_STYLE := -1
 const SELECTED_PROPERTY := &"selected"
 
+## Control that receives the selected theme. If empty, the scene root is used when available.
 @export_node_path("Control") var theme_target_path: NodePath:
 	set(value):
 		theme_target_path = value
@@ -15,6 +22,7 @@ const SELECTED_PROPERTY := &"selected"
 			_refresh_should_mirror_target = true
 		_queue_refresh()
 
+## Optional canonical NeoCade theme resource. Leave empty to load the .tres matching the addon folder name.
 @export_file("*.tres") var theme_resource_path := "":
 	set(value):
 		theme_resource_path = value
@@ -22,6 +30,7 @@ const SELECTED_PROPERTY := &"selected"
 			_refresh_should_mirror_target = true
 		_queue_refresh()
 
+## Adds a final "None" entry that applies a null theme to the target.
 @export var allow_no_theme := true:
 	set(value):
 		if allow_no_theme == value:

@@ -11,8 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Replaced the five separate direction resources with one canonical
   `res://addons/neocade_theme/neocade_theme.tres` resource.
-- Added `NeoCadeTheme.Style` with `CUSTOM`, `PULSE`, `SLATE`, `BUBBLE`,
-  `DAYBREAK`, and `BURST`. Selecting a built-in style applies the matching
+- Added `NeoCadeTheme.Style` with `BUBBLE`, `BURST`, `DAYBREAK`, `PULSE`,
+  `SLATE`, and `CUSTOM`. Selecting a built-in style applies the matching
   exported direction values and regenerates the theme once.
 - Direction personality now resolves from the explicit `style` export instead
   of an implicit `base_color` hex lookup.
@@ -72,9 +72,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Single concrete `@tool class_name NeoCadeTheme extends Theme` class
   (`addons/neocade_theme/scripts/neocade_theme.gd`) with 10 `@export` properties:
-  - Core: `style`, `base_color`, `accent_color`, `raised`, `platform`
-  - Shape: `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`,
-    `outline_width`
+  - Top level: `style`, `raised`, `platform`
+  - Style Overrides group: `base_color`, `accent_color`, `corner_radius`,
+    `spacing`, `raised_strength`, `focus_thickness`, `outline_width`
 - One canonical direction/style `.tres` file at addon root:
   `neocade_theme.tres`.
 - Inter Variable Roman font (PINNED to Inter v4.0;
