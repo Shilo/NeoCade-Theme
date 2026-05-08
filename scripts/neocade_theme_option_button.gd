@@ -1,8 +1,11 @@
 @tool
 class_name NeoCadeThemeOptionButton extends OptionButton
 
+signal theme_selected(index: int, theme_path: String, theme: Theme)
+
 const DEFAULT_THEME_DIRECTORY := "res://addons/neocade_theme"
-const DEFAULT_LABEL := "Default"
+const NO_THEME_LABEL := "None"
+const SELECTED_PROPERTY := &"selected"
 const THEME_FILE_EXTENSION := ".tres"
 const THEME_NAME_SUFFIX := "_neocade_theme"
 
@@ -16,13 +19,21 @@ const THEME_NAME_SUFFIX := "_neocade_theme"
 		theme_target_path = value
 		_queue_refresh()
 
-@export var allow_default_theme := true:
+@export var allow_no_theme := true:
 	set(value):
-		allow_default_theme = value
+		allow_no_theme = value
 		_queue_refresh()
 
 var _theme_paths: PackedStringArray = PackedStringArray()
 var _is_ready := false
+var _selected_apply_queued := false
+
+
+func _set(property: StringName, _value: Variant) -> bool:
+	if property == SELECTED_PROPERTY:
+		_queue_selected_apply()
+
+	return false
 
 
 func _ready() -> void:
@@ -34,29 +45,51 @@ func _ready() -> void:
 
 
 func refresh_theme_list() -> void:
-	var current_target_path := _current_target_theme_path()
-	var previous_selected_path := _theme_path_for_index(selected)
+	var target := _theme_target()
+	var current_target_path := _current_target_theme_path(target)
+	var selected_theme_path := _theme_path_for_index(selected)
+	var has_selected_theme_path := selected >= 0 and selected < _theme_paths.size()
+	if not has_selected_theme_path and not current_target_path.is_empty():
+		selected_theme_path = current_target_path
+		has_selected_theme_path = true
 
 	clear()
 	_theme_paths = PackedStringArray()
 
-	if allow_default_theme:
-		_add_theme_item(DEFAULT_LABEL, "")
+	if allow_no_theme:
+		_add_theme_item(NO_THEME_LABEL, "")
 
 	for entry in _find_neocade_themes():
 		_add_theme_item(String(entry["label"]), String(entry["path"]))
 
 	if item_count == 0:
+		select(-1)
 		return
 
-	var next_index := _index_for_theme_path(current_target_path)
-	if next_index == -1:
-		next_index = _index_for_theme_path(previous_selected_path)
-	if next_index == -1:
-		next_index = 0
+	if has_selected_theme_path:
+		var selected_theme_index := _index_for_theme_path(selected_theme_path)
+		if selected_theme_index != -1:
+			select(selected_theme_index)
+			_apply_theme(selected_theme_index)
+			return
 
-	select(next_index)
-	_apply_theme(next_index)
+		if selected_theme_path.is_empty():
+			select(-1)
+			return
+
+	if not current_target_path.is_empty():
+		var matching_index := _index_for_theme_path(current_target_path)
+		if matching_index != -1:
+			select(matching_index)
+			return
+
+	if target != null and target.theme == null:
+		var no_theme_index := _index_for_theme_path("")
+		if no_theme_index != -1:
+			select(no_theme_index)
+			return
+
+	select(-1)
 
 
 func _on_item_selected(index: int) -> void:
@@ -69,13 +102,18 @@ func _apply_theme(index: int) -> void:
 		return
 
 	var theme_path := _theme_paths[index]
+	if _target_has_theme_path(target, theme_path):
+		return
+
 	if theme_path.is_empty():
 		target.theme = null
+		theme_selected.emit(index, theme_path, null)
 		return
 
 	var next_theme := load(theme_path) as Theme
 	if next_theme != null:
 		target.theme = next_theme
+		theme_selected.emit(index, theme_path, next_theme)
 
 
 func _find_neocade_themes() -> Array[Dictionary]:
@@ -126,8 +164,7 @@ func _add_theme_item(label: String, theme_path: String) -> void:
 	set_item_metadata(item_count - 1, theme_path)
 
 
-func _current_target_theme_path() -> String:
-	var target := _theme_target()
+func _current_target_theme_path(target: Control) -> String:
 	if target == null or target.theme == null:
 		return ""
 
@@ -147,6 +184,16 @@ func _index_for_theme_path(theme_path: String) -> int:
 			return index
 
 	return -1
+
+
+func _target_has_theme_path(target: Control, theme_path: String) -> bool:
+	if theme_path.is_empty():
+		return target.theme == null
+
+	if target.theme == null:
+		return false
+
+	return target.theme.resource_path == theme_path
 
 
 func _theme_target() -> Control:
@@ -178,3 +225,16 @@ func _queue_refresh() -> void:
 		return
 
 	call_deferred("refresh_theme_list")
+
+
+func _queue_selected_apply() -> void:
+	if not _is_ready or not is_inside_tree() or _selected_apply_queued:
+		return
+
+	_selected_apply_queued = true
+	call_deferred("_apply_selected_change")
+
+
+func _apply_selected_change() -> void:
+	_selected_apply_queued = false
+	_apply_theme(selected)
