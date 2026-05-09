@@ -11,6 +11,7 @@ const PLATFORM_ITEMS := [
 @onready var theme_option_button: NeoCadeThemeOptionButton = $RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow/NeoCadeThemeOptionButton
 @onready var raised_check_box: CheckBox = $RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow/RaisedCheckBox
 @onready var platform_option_button: OptionButton = $RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow/PlatformOptionButton
+@onready var menu_button: MenuButton = $RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/MenuButtonPanel/MenuButtonStack/Control
 @onready var window_button: Button = %WindowButton
 
 var _syncing_theme_controls := false
@@ -18,6 +19,7 @@ var _syncing_theme_controls := false
 
 func _ready() -> void:
 	_populate_platform_options()
+	_populate_menu_button_popup()
 	window_button.pressed.connect(_on_window_button_pressed)
 	scoreboard_window.close_requested.connect(_on_scoreboard_window_close_requested)
 	theme_option_button.theme_selected.connect(_on_theme_selected)
@@ -47,6 +49,14 @@ func _populate_platform_options() -> void:
 	for platform_item in PLATFORM_ITEMS:
 		platform_option_button.add_item(String(platform_item["label"]))
 		platform_option_button.set_item_metadata(platform_option_button.item_count - 1, int(platform_item["value"]))
+
+
+func _populate_menu_button_popup() -> void:
+	var popup := menu_button.get_popup()
+	if popup.item_count > 0:
+		return
+	for label in ["Prize vault", "Cabinet settings", "Attract mode"]:
+		popup.add_item(label)
 
 
 func _sync_theme_controls_from_current_theme() -> void:

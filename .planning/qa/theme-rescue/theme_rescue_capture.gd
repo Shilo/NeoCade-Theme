@@ -38,6 +38,7 @@ func _run() -> void:
 		{"name": "08-pulse-mobile-raised", "theme": _theme_variant(canonical, NeoCadeTheme.Style.PULSE, true, NeoCadeTheme.Platform.MOBILE)},
 		{"name": "09-default-popups", "theme": null, "popups": true},
 		{"name": "10-pulse-popups", "theme": _theme_variant(canonical, NeoCadeTheme.Style.PULSE, false, NeoCadeTheme.Platform.DESKTOP), "popups": true},
+		{"name": "10a-pulse-menu-popup", "theme": _theme_variant(canonical, NeoCadeTheme.Style.PULSE, false, NeoCadeTheme.Platform.DESKTOP), "window": false, "menu_popup": true},
 	]
 
 	for capture_case in cases:
@@ -78,6 +79,8 @@ func _capture_case(capture_case: Dictionary) -> void:
 		await process_frame
 	if bool(capture_case.get("popups", false)):
 		await _open_popup_surfaces(scene)
+	if bool(capture_case.get("menu_popup", false)):
+		await _open_menu_button_popup(scene)
 
 	_log_layout(scene, String(capture_case["name"]))
 
@@ -161,6 +164,16 @@ func _open_popup_surfaces(scene: Control) -> void:
 	tooltip_label.text = "TooltipPanel / TooltipLabel"
 	tooltip_panel.add_child(tooltip_label)
 	scene.add_child(tooltip_panel)
+	await process_frame
+
+
+func _open_menu_button_popup(scene: Control) -> void:
+	var menu_button := scene.get_node_or_null("RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/MenuButtonPanel/MenuButtonStack/Control") as MenuButton
+	if menu_button == null:
+		_fail("menu popup capture missing MenuButton")
+		return
+	var popup := menu_button.get_popup()
+	popup.popup(Rect2i(Vector2i(560, 304), Vector2i(260, 128)))
 	await process_frame
 
 

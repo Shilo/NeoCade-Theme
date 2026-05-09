@@ -56,8 +56,10 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	var is_mobile := label.begins_with("mobile:")
 	_expect_margin_max(theme, "PrimaryButton", "normal", 28 if is_mobile else 18, 20 if is_mobile else 14, label)
 	_expect_margin_max(theme, "PanelContainer", "panel", 18 if is_mobile else 14, 14 if is_mobile else 12, label)
-	_expect_window_chrome(theme, label)
-	_expect_popup_chrome(theme, label)
+	_expect_window_chrome(theme, label, expect_raised)
+	_expect_popup_chrome(theme, label, expect_raised)
+	_expect_panel_surface_chrome(theme, label, expect_raised)
+	_expect_scrollbar_chrome(theme, label)
 	_expect_no_label_chrome(theme, label)
 	_expect_no_rich_text_label_chrome(theme, label)
 	_expect_tab_top_only_corners(theme, label)
@@ -118,38 +120,143 @@ func _expect_icon_between(theme: Theme, theme_type: StringName, slot_name: Strin
 		_fail("%s icon %s.%s too large: %s expected at most %s" % [label, theme_type, slot_name, size, max_size])
 
 
-func _expect_window_chrome(theme: Theme, label: String) -> void:
+func _expect_window_chrome(theme: Theme, label: String, expect_raised: bool) -> void:
 	var window_panel := theme.get_stylebox("embedded_border", "Window") as StyleBoxFlat
 	if window_panel == null:
 		_fail("%s missing Window.embedded_border" % label)
 		return
 	if window_panel.expand_margin_top < 30 or window_panel.content_margin_top < 26:
 		_fail("%s Window.embedded_border does not cover title bar/content margin: expand_top=%s content_top=%s" % [label, window_panel.expand_margin_top, window_panel.content_margin_top])
+	if not expect_raised and _max_border_width(window_panel) != 1:
+		_fail("%s Window.embedded_border flat border should be 1px, got %s/%s/%s/%s" % [
+			label,
+			window_panel.border_width_left,
+			window_panel.border_width_top,
+			window_panel.border_width_right,
+			window_panel.border_width_bottom,
+		])
+	if expect_raised and window_panel.border_width_bottom <= window_panel.border_width_top:
+		_fail("%s Window.embedded_border raised state has no bottom depth edge" % label)
+	var edge_contrast := _contrast_ratio(window_panel.bg_color, window_panel.border_color)
+	if edge_contrast > (1.80 if expect_raised else 1.45):
+		_fail("%s Window.embedded_border edge too contrasty: ratio=%.2f bg=%s border=%s" % [
+			label,
+			edge_contrast,
+			window_panel.bg_color.to_html(false),
+			window_panel.border_color.to_html(false),
+		])
 	_expect_equal(theme.get_constant("title_height", "Window"), 36, "%s Window.title_height" % label)
 	_expect_equal(theme.get_constant("close_h_offset", "Window"), 18, "%s Window.close_h_offset" % label)
 	_expect_equal(theme.get_constant("close_v_offset", "Window"), 24, "%s Window.close_v_offset" % label)
 
 
-func _expect_popup_chrome(theme: Theme, label: String) -> void:
-	var popup_panel := theme.get_stylebox("panel", "PopupMenu") as StyleBoxFlat
-	if popup_panel == null:
-		_fail("%s missing PopupMenu.panel" % label)
-	elif popup_panel.border_width_left < 2 or popup_panel.content_margin_left > 8:
-		_fail("%s PopupMenu.panel border/margins off: border=%s/%s/%s/%s margin=%s/%s/%s/%s" % [
-			label,
-			popup_panel.border_width_left, popup_panel.border_width_top, popup_panel.border_width_right, popup_panel.border_width_bottom,
-			popup_panel.content_margin_left, popup_panel.content_margin_top, popup_panel.content_margin_right, popup_panel.content_margin_bottom,
-		])
+func _expect_popup_chrome(theme: Theme, label: String, expect_raised: bool) -> void:
+	var max_popup_margin := 18 if label.begins_with("mobile:") else 12
+	for entry in [
+		{"type": &"PopupMenu", "slot": &"panel"},
+		{"type": &"PopupPanel", "slot": &"panel"},
+		{"type": &"TooltipPanel", "slot": &"panel"},
+	]:
+		var popup_panel := theme.get_stylebox(entry["slot"], entry["type"]) as StyleBoxFlat
+		if popup_panel == null:
+			_fail("%s missing %s.%s" % [label, entry["type"], entry["slot"]])
+			continue
+		if popup_panel.content_margin_left > max_popup_margin or popup_panel.content_margin_top > max_popup_margin:
+			_fail("%s %s.%s popup margins too large: %s/%s/%s/%s" % [
+				label,
+				entry["type"],
+				entry["slot"],
+				popup_panel.content_margin_left,
+				popup_panel.content_margin_top,
+				popup_panel.content_margin_right,
+				popup_panel.content_margin_bottom,
+			])
+		if not expect_raised and _max_border_width(popup_panel) != 1:
+			_fail("%s %s.%s flat popup border should be 1px, got %s/%s/%s/%s" % [
+				label,
+				entry["type"],
+				entry["slot"],
+				popup_panel.border_width_left,
+				popup_panel.border_width_top,
+				popup_panel.border_width_right,
+				popup_panel.border_width_bottom,
+			])
+		if expect_raised and popup_panel.border_width_bottom <= popup_panel.border_width_top:
+			_fail("%s raised %s.%s has no bottom popup depth" % [label, entry["type"], entry["slot"]])
+		var edge_contrast := _contrast_ratio(popup_panel.bg_color, popup_panel.border_color)
+		if edge_contrast > (1.80 if expect_raised else 1.45):
+			_fail("%s %s.%s popup edge too contrasty: ratio=%.2f bg=%s border=%s" % [
+				label,
+				entry["type"],
+				entry["slot"],
+				edge_contrast,
+				popup_panel.bg_color.to_html(false),
+				popup_panel.border_color.to_html(false),
+			])
 
-	var tooltip_panel := theme.get_stylebox("panel", "TooltipPanel") as StyleBoxFlat
-	if tooltip_panel == null:
-		_fail("%s missing TooltipPanel.panel" % label)
-	elif tooltip_panel.border_width_left != 0 or tooltip_panel.border_width_top != 0 or tooltip_panel.content_margin_top > 4:
-		_fail("%s TooltipPanel.panel border/margins off: border=%s/%s/%s/%s margin=%s/%s/%s/%s" % [
-			label,
-			tooltip_panel.border_width_left, tooltip_panel.border_width_top, tooltip_panel.border_width_right, tooltip_panel.border_width_bottom,
-			tooltip_panel.content_margin_left, tooltip_panel.content_margin_top, tooltip_panel.content_margin_right, tooltip_panel.content_margin_bottom,
-		])
+
+func _expect_panel_surface_chrome(theme: Theme, label: String, expect_raised: bool) -> void:
+	for entry in [
+		{"type": &"Panel", "slot": &"panel", "raises": true},
+		{"type": &"PanelContainer", "slot": &"panel", "raises": true},
+		{"type": &"CardPanel", "slot": &"panel", "raises": true},
+		{"type": &"HeroPanel", "slot": &"panel", "raises": true},
+		{"type": &"TabContainer", "slot": &"panel", "raises": true},
+		{"type": &"ScrollContainer", "slot": &"panel", "raises": false},
+		{"type": &"ItemList", "slot": &"panel", "raises": false},
+		{"type": &"Tree", "slot": &"panel", "raises": false},
+	]:
+		var panel := theme.get_stylebox(entry["slot"], entry["type"]) as StyleBoxFlat
+		if panel == null:
+			_fail("%s missing panel stylebox %s.%s" % [label, entry["type"], entry["slot"]])
+			continue
+		var edge_contrast := _contrast_ratio(panel.bg_color, panel.border_color)
+		if edge_contrast > (1.80 if expect_raised and bool(entry["raises"]) else 1.45):
+			_fail("%s %s.%s panel edge too contrasty: ratio=%.2f bg=%s border=%s" % [
+				label,
+				entry["type"],
+				entry["slot"],
+				edge_contrast,
+				panel.bg_color.to_html(false),
+				panel.border_color.to_html(false),
+			])
+		if expect_raised and bool(entry["raises"]):
+			if panel.border_width_bottom <= panel.border_width_top:
+				_fail("%s raised %s.%s has no bottom panel depth" % [label, entry["type"], entry["slot"]])
+			_expect_reserved_bottom_depth(panel, label, String(entry["type"]))
+		elif _max_border_width(panel) > 1:
+			_fail("%s %s.%s flat/passive panel border too thick: %s/%s/%s/%s" % [
+				label,
+				entry["type"],
+				entry["slot"],
+				panel.border_width_left,
+				panel.border_width_top,
+				panel.border_width_right,
+				panel.border_width_bottom,
+			])
+
+
+func _expect_scrollbar_chrome(theme: Theme, label: String) -> void:
+	for theme_type in [&"HScrollBar", &"VScrollBar"]:
+		for slot_name in [&"decrement", &"decrement_highlight", &"decrement_pressed", &"increment", &"increment_highlight", &"increment_pressed"]:
+			_expect_icon_max(theme, theme_type, slot_name, 1, label)
+		var scroll := theme.get_stylebox("scroll", theme_type) as StyleBoxFlat
+		var grabber := theme.get_stylebox("grabber", theme_type) as StyleBoxFlat
+		var hover := theme.get_stylebox("grabber_highlight", theme_type) as StyleBoxFlat
+		var pressed := theme.get_stylebox("grabber_pressed", theme_type) as StyleBoxFlat
+		if scroll == null or grabber == null or hover == null or pressed == null:
+			_fail("%s missing scrollbar styleboxes for %s" % [label, theme_type])
+			continue
+		var min_size := scroll.get_minimum_size()
+		var grabber_min_size := grabber.get_minimum_size()
+		if theme_type == &"HScrollBar":
+			if min_size.y < 8 or grabber_min_size.y < 8:
+				_fail("%s HScrollBar track/grabber too thin: track=%s grabber=%s" % [label, min_size, grabber_min_size])
+		else:
+			if min_size.x < 8 or grabber_min_size.x < 8:
+				_fail("%s VScrollBar track/grabber too thin: track=%s grabber=%s" % [label, min_size, grabber_min_size])
+		if _max_border_width(grabber) != 0 or _max_border_width(hover) != 0 or _max_border_width(pressed) != 0:
+			_fail("%s %s grabbers should be filled pills without outline borders" % [label, theme_type])
 
 
 func _expect_no_label_chrome(theme: Theme, label: String) -> void:

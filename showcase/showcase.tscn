@@ -164,20 +164,20 @@ accessibility_name = "View prizes button"
 theme_type_variation = &"SecondaryButton"
 text = "View Prizes"
 
-[node name="ButtonPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid"]
+[node name="ButtonPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid" unique_id=709197925]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ButtonStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ButtonPanel"]
+[node name="ButtonStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ButtonPanel" unique_id=270672998]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ButtonPanel/ButtonStack"]
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ButtonPanel/ButtonStack" unique_id=2064890042]
 layout_mode = 2
 theme_type_variation = &"Kicker"
 text = "Button"
 
-[node name="Control" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ButtonPanel/ButtonStack"]
+[node name="Control" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ButtonPanel/ButtonStack" unique_id=279239897]
 layout_mode = 2
 tooltip_text = "Default button"
 accessibility_name = "Default button"
@@ -322,6 +322,7 @@ theme_type_variation = &"Kicker"
 text = "ColorPickerButton"
 
 [node name="Control" type="ColorPickerButton" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ColorPickerButtonPanel/ColorPickerButtonStack" unique_id=806648958]
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 tooltip_text = "Accent color picker button"
 accessibility_name = "Accent color picker button"
@@ -512,7 +513,7 @@ value = 125.0
 [node name="ProgressBar" type="ProgressBar" parent="RootMargin/RootStack/ShowcaseTabs/Numbers & Range/Margin/Grid" unique_id=1473654398]
 custom_minimum_size = Vector2(300, 36)
 layout_mode = 2
-value = 72.0
+value = 36.97
 
 [node name="HSlider" type="HSlider" parent="RootMargin/RootStack/ShowcaseTabs/Numbers & Range/Margin/Grid" unique_id=874508467]
 custom_minimum_size = Vector2(300, 36)

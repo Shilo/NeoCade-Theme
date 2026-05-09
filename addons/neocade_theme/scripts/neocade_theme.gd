@@ -330,6 +330,10 @@ func _regenerate_theme() -> void:
 	var button_border: Color = _state_layer_color(button_normal, text_strong, button_edge_layer)
 	var button_border_hover: Color = _state_layer_color(button_hover, text_strong, button_edge_layer)
 	var button_border_pressed: Color = _state_layer_color(button_pressed, text_strong, button_edge_layer)
+	var surface_low_edge: Color = _state_layer_color(surface_low, text_strong, button_edge_layer)
+	var surface_panel_edge: Color = _state_layer_color(surface_panel, text_strong, button_edge_layer)
+	var surface_high_edge: Color = _state_layer_color(surface_high, text_strong, button_edge_layer)
+	var surface_overlay_edge: Color = _state_layer_color(surface_overlay, text_strong, button_edge_layer)
 
 	var primary_button_normal: Color = button_normal if String(primary_strategy_value) == "quiet-pill" else role_primary
 	text_on_primary_button = text_strong if String(primary_strategy_value) == "quiet-pill" else _readable_text_color(primary_button_normal)
@@ -474,6 +478,10 @@ func _regenerate_theme() -> void:
 		"button_border":          button_border,
 		"button_border_hover":    button_border_hover,
 		"button_border_pressed":  button_border_pressed,
+		"surface_low_edge":       surface_low_edge,
+		"surface_panel_edge":     surface_panel_edge,
+		"surface_high_edge":      surface_high_edge,
+		"surface_overlay_edge":   surface_overlay_edge,
 		"primary_button_normal":  primary_button_normal,
 		"primary_button_hover":   primary_button_hover,
 		"primary_button_pressed": primary_button_pressed,
@@ -1283,12 +1291,14 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 	# HScrollBar — official Godot 4.6.2 slot freeze
 	"HScrollBar": {
 		"stylebox": ["scroll", "scroll_focus", "grabber", "grabber_highlight", "grabber_pressed"],
+		"constant": ["padding_top", "padding_bottom"],
 		"icon": ["decrement", "decrement_highlight", "decrement_pressed",
 				 "increment", "increment_highlight", "increment_pressed"],
 	},
 	# VScrollBar — official Godot 4.6.2 slot freeze
 	"VScrollBar": {
 		"stylebox": ["scroll", "scroll_focus", "grabber", "grabber_highlight", "grabber_pressed"],
+		"constant": ["padding_left", "padding_right"],
 		"icon": ["decrement", "decrement_highlight", "decrement_pressed",
 				 "increment", "increment_highlight", "increment_pressed"],
 	},
@@ -1449,8 +1459,10 @@ const BINDING_TABLE: Dictionary = {
 	# 1. AcceptDialog — explicit popup shell plus official button-container spacing.
 	"AcceptDialog": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay", "raised_intensity": 0,
+			"panel": {"role": "surface_overlay",
 					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
+					  "border_role": "surface_overlay_edge", "raised_face_edge": true,
+					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
 		},
 		"constant": {
@@ -1660,17 +1672,17 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":   {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 							"raised_intensity": "shape.raised_lifts.secondary",
-							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+							"radius": "shape.secondary_radius", "padding": Vector2i(1, 1)},
 			"hover":    {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 							"raised_intensity": "shape.raised_lifts.secondary",
-							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+							"radius": "shape.secondary_radius", "padding": Vector2i(1, 1)},
 			"pressed":  {"role": "button_pressed", "border_role": "button_border_pressed",
 							"raised_intensity": 0,
-							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+							"radius": "shape.secondary_radius", "padding": Vector2i(1, 1)},
 			"focus":    {"role": "focus_ring",
 							"radius": "shape.secondary_radius"},
 			"disabled": {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
-							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+							"radius": "shape.secondary_radius", "padding": Vector2i(1, 1)},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -1692,8 +1704,10 @@ const BINDING_TABLE: Dictionary = {
 	# own slots in the local probe; runtime inheritance still reads this shell cleanly.
 	"ConfirmationDialog": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay", "raised_intensity": 0,
+			"panel": {"role": "surface_overlay",
 					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
+					  "border_role": "surface_overlay_edge", "raised_face_edge": true,
+					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
 		},
 		"constant": {
@@ -1852,21 +1866,27 @@ const BINDING_TABLE: Dictionary = {
 	# 12. HScrollBar — official styleboxes plus six increment/decrement icon slots.
 	"HScrollBar": {
 		"stylebox": {
-			"scroll":            {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"scroll":            {"role": "surface_low",   "raised_intensity": 0,
+								  "border_width": 0, "radius": 999, "padding": Vector2i(0, 4)},
 			"scroll_focus":      {"role": "focus_ring"},
-			"grabber":           {"role": "surface_high",  "raised_intensity": 1, "padding": Vector2i(2, 2)},
-			"grabber_highlight": {"role": "button_hover",   "raised_intensity": 1,
-								  "padding": Vector2i(2, 2), "border_width": 0},
+			"grabber":           {"role": "button_border", "raised_intensity": 0,
+								  "border_width": 0, "radius": 999, "padding": Vector2i(4, 4)},
+			"grabber_highlight": {"role": "button_hover",   "raised_intensity": 0,
+								  "radius": 999, "padding": Vector2i(4, 4), "border_width": 0},
 			"grabber_pressed":   {"role": "button_pressed", "raised_intensity": 0,
-								  "padding": Vector2i(2, 2), "border_width": 0},
+								  "radius": 999, "padding": Vector2i(4, 4), "border_width": 0},
+		},
+		"constant": {
+			"padding_top":    {"value": 0},
+			"padding_bottom": {"value": 0},
 		},
 		"icon": {
-			"decrement":           {"icon": "scrollbar_left"},
-			"decrement_highlight": {"icon": "scrollbar_left"},
-			"decrement_pressed":   {"icon": "scrollbar_left"},
-			"increment":           {"icon": "scrollbar_right"},
-			"increment_highlight": {"icon": "scrollbar_right"},
-			"increment_pressed":   {"icon": "scrollbar_right"},
+			"decrement":           {"icon": "empty"},
+			"decrement_highlight": {"icon": "empty"},
+			"decrement_pressed":   {"icon": "empty"},
+			"increment":           {"icon": "empty"},
+			"increment_highlight": {"icon": "empty"},
+			"increment_pressed":   {"icon": "empty"},
 		},
 	},
 	# 13. HSlider — visible calm track plus official grabber/tick icons.
@@ -1892,7 +1912,8 @@ const BINDING_TABLE: Dictionary = {
 	"ScrollContainer": {
 		"stylebox": {
 			"focus": {"role": "focus_ring"},
-			"panel": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"panel": {"role": "surface_low", "border_role": "surface_low_edge",
+					  "raised_intensity": 0, "padding": Vector2i(0, 0)},
 		},
 		"color": {
 			"scroll_hint_horizontal_color": {"role": "role_primary", "alpha": 0.72},
@@ -1944,7 +1965,8 @@ const BINDING_TABLE: Dictionary = {
 	# because Godot draws them above row content (Phase 6 D-04).
 	"ItemList": {
 		"stylebox": {
-			"panel":                  {"role": "surface_low",   "raised_intensity": 0},
+			"panel":                  {"role": "surface_low", "border_role": "surface_low_edge",
+									   "raised_intensity": 0},
 			"focus":                  {"role": "focus_ring"},
 			"cursor":                 {"role": "button_hover",  "raised_intensity": 0,
 										"alpha": 0.72, "border_width": 0},
@@ -2124,15 +2146,17 @@ const BINDING_TABLE: Dictionary = {
 	# 22. Panel — 1 stylebox (the bare-class)
 	"Panel": {
 		"stylebox": {
-			"panel": {"role": "surface_panel", "raised_intensity": 0},
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true},
 		},
 	},
 	# 23. PopupMenu — dense menu rows, structural separators, full icon coverage.
 	"PopupMenu": {
 		"stylebox": {
-			"panel":                 {"role": "surface_overlay", "raised_intensity": 0,
+			"panel":                 {"role": "surface_overlay", "border_role": "surface_overlay_edge",
+									  "raised_intensity": "shape.raised_lifts.dialog",
 									  "radius": 3, "alpha": "shape.surface_alpha_popup",
-									  "border_width": 2, "padding": Vector2i(4, 4)},
+									  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(4, 4)},
 			"hover":                 {"role": "button_hover",   "raised_intensity": 0,
 									  "radius": "shape.secondary_radius", "border_width": 0},
 			"separator":             {"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
@@ -2178,9 +2202,10 @@ const BINDING_TABLE: Dictionary = {
 	# 24. PopupPanel — first-class popup Window-boundary shell.
 	"PopupPanel": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay", "raised_intensity": 0,
+			"panel": {"role": "surface_overlay", "border_role": "surface_overlay_edge",
+					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-					  "padding": Vector2i(12, 10)},
+					  "raised_face_edge": true, "padding": Vector2i(12, 10)},
 		},
 	},
 	# 25. ProgressBar — 2 styleboxes
@@ -2315,7 +2340,8 @@ const BINDING_TABLE: Dictionary = {
 									"padding": Vector2i(12, 5)},
 			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
 									"corner_profile": "tab_connected"},
-			"panel":            {"role": "surface_panel", "raised_intensity": 0},
+			"panel":            {"role": "surface_panel", "border_role": "surface_panel_edge",
+								  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true},
 			"tabbar_background":{"role": "surface_base",  "raised_intensity": 0},
 		},
 		"color": {
@@ -2386,15 +2412,17 @@ const BINDING_TABLE: Dictionary = {
 	# 32. TooltipPanel — compact first-class tooltip structure.
 	"TooltipPanel": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay", "raised_intensity": 0,
+			"panel": {"role": "surface_overlay", "border_role": "surface_overlay_edge",
+					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "radius": 3, "alpha": "shape.surface_alpha_popup",
-					  "border_width": 0, "padding": Vector2i(8, 2)},
+					  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(8, 2)},
 		},
 	},
 	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
 	"Tree": {
 		"stylebox": {
-			"panel":                  {"role": "surface_low",   "raised_intensity": 0},
+			"panel":                  {"role": "surface_low", "border_role": "surface_low_edge",
+									   "raised_intensity": 0},
 			"focus":                  {"role": "focus_ring"},
 			"title_button_normal":    {"role": "surface_panel", "raised_intensity": 0},
 			"title_button_pressed":   {"role": "button_pressed", "raised_intensity": 0,
@@ -2491,21 +2519,27 @@ const BINDING_TABLE: Dictionary = {
 	# 34. VScrollBar — mirror of HScrollBar with vertical directional icons.
 	"VScrollBar": {
 		"stylebox": {
-			"scroll":            {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"scroll":            {"role": "surface_low",   "raised_intensity": 0,
+								  "border_width": 0, "radius": 999, "padding": Vector2i(4, 0)},
 			"scroll_focus":      {"role": "focus_ring"},
-			"grabber":           {"role": "surface_high",  "raised_intensity": 1, "padding": Vector2i(2, 2)},
-			"grabber_highlight": {"role": "button_hover",   "raised_intensity": 1,
-								  "padding": Vector2i(2, 2), "border_width": 0},
+			"grabber":           {"role": "button_border", "raised_intensity": 0,
+								  "border_width": 0, "radius": 999, "padding": Vector2i(4, 4)},
+			"grabber_highlight": {"role": "button_hover",   "raised_intensity": 0,
+								  "radius": 999, "padding": Vector2i(4, 4), "border_width": 0},
 			"grabber_pressed":   {"role": "button_pressed", "raised_intensity": 0,
-								  "padding": Vector2i(2, 2), "border_width": 0},
+								  "radius": 999, "padding": Vector2i(4, 4), "border_width": 0},
+		},
+		"constant": {
+			"padding_left":  {"value": 0},
+			"padding_right": {"value": 0},
 		},
 		"icon": {
-			"decrement":           {"icon": "scrollbar_up"},
-			"decrement_highlight": {"icon": "scrollbar_up"},
-			"decrement_pressed":   {"icon": "scrollbar_up"},
-			"increment":           {"icon": "scrollbar_down"},
-			"increment_highlight": {"icon": "scrollbar_down"},
-			"increment_pressed":   {"icon": "scrollbar_down"},
+			"decrement":           {"icon": "empty"},
+			"decrement_highlight": {"icon": "empty"},
+			"decrement_pressed":   {"icon": "empty"},
+			"increment":           {"icon": "empty"},
+			"increment_highlight": {"icon": "empty"},
+			"increment_pressed":   {"icon": "empty"},
 		},
 	},
 	# 35. VSlider — transposed mirror of HSlider.
@@ -2593,14 +2627,16 @@ const BINDING_TABLE: Dictionary = {
 	# 37. Window — embedded chrome complete, quiet, and popup-boundary safe.
 	"Window": {
 		"stylebox": {
-			"embedded_border":          {"role": "surface_overlay", "raised_intensity": 0,
+			"embedded_border":          {"role": "surface_panel", "border_role": "surface_panel_edge",
+										 "raised_intensity": "shape.raised_lifts.dialog",
 										 "radius": 3, "alpha": "shape.surface_alpha_popup",
-										 "border_width": 0,
+										 "border_width": 1, "raised_face_edge": true,
 										 "content_margins": Vector4i(10, 28, 10, 8),
 										 "expand_margins": Vector4i(8, 32, 8, 6)},
-			"embedded_unfocused_border":{"role": "surface_high", "raised_intensity": 0,
+			"embedded_unfocused_border":{"role": "surface_panel", "border_role": "surface_panel_edge",
+										 "raised_intensity": "shape.raised_lifts.dialog",
 										 "radius": 3, "alpha": "shape.surface_alpha_popup",
-										 "border_width": 0,
+										 "border_width": 1, "raised_face_edge": true,
 										 "content_margins": Vector4i(10, 28, 10, 8),
 										 "expand_margins": Vector4i(8, 32, 8, 6)},
 		},
@@ -2995,8 +3031,10 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"panel": {
 				"role":             "surface_panel",
+				"border_role":      "surface_panel_edge",
 				"alpha":            "shape.surface_alpha_panels",
 				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
 				"padding":          Vector2i(10, 8),
 			},
 		},
@@ -3009,9 +3047,11 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"panel": {
 				"role":             "surface_panel",
+				"border_role":      "surface_panel_edge",
 				"radius":           "shape.card_radius",
 				"alpha":            "shape.surface_alpha_panels",
 				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
 				"padding":          Vector2i(12, 10),
 			},
 		},
@@ -3029,9 +3069,11 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"panel": {
 				"role":             "surface_high",
+				"border_role":      "surface_high_edge",
 				"radius":           "shape.hero_radius",
 				"alpha":            "shape.surface_alpha_panels",
 				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
 				"padding":          Vector2i(14, 12),
 			},
 		},
@@ -3510,6 +3552,8 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		var icon_name: String = recipe.get("icon", "")
 		if icon_name == "":
 			return null
+		if icon_name == "empty":
+			return ImageTexture.new()
 		var path: String = "res://addons/neocade_theme/icons/" + icon_name + ".svg"
 		var icon: Texture2D = load(path) as Texture2D
 		return icon
