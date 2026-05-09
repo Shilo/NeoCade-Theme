@@ -10,6 +10,11 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	if not Engine.is_editor_hint():
+		print("THEME_CREATE_DIALOG_PROBE: SKIP Engine.is_editor_hint() is false; editor-only CreateDialog variations are gated in runtime")
+		quit(0)
+		return
+
 	var canonical := load(THEME_PATH) as NeoCadeTheme
 	if canonical == null:
 		_fail("theme_create_dialog_probe: canonical theme did not load as NeoCadeTheme")

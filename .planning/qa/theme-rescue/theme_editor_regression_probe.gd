@@ -36,6 +36,8 @@ func _run() -> void:
 		_expect_selection_control_colors(theme, label)
 		_expect_popup_selection_icons(theme, label)
 		_expect_top_bar_controls(theme, label)
+		_expect_editor_flat_button_spacing(theme, label)
+		_expect_popup_menu_spacing_and_separators(theme, label)
 
 	_finish()
 
@@ -149,6 +151,83 @@ func _expect_top_bar_controls(theme: Theme, label: String) -> void:
 			_fail("%s MovieWriterButtonNormal should stay transparent" % label)
 		if movie_pressed.bg_color.a < 0.40:
 			_fail("%s MovieWriterButtonPressed should keep a visible movie-mode accent surface" % label)
+
+
+func _expect_editor_flat_button_spacing(theme: Theme, label: String) -> void:
+	for theme_type in [&"FlatButton", &"FlatMenuButton"]:
+		for slot in [&"normal", &"hover", &"pressed", &"hover_pressed", &"disabled"]:
+			var stylebox := theme.get_stylebox(slot, theme_type) as StyleBoxFlat
+			if stylebox == null:
+				_fail("%s %s.%s missing StyleBoxFlat" % [label, theme_type, slot])
+				continue
+			if stylebox.content_margin_left < 6.0 or stylebox.content_margin_right < 6.0:
+				_fail("%s %s.%s should reserve wide flat-button side padding, got %.1f/%.1f" % [
+					label,
+					theme_type,
+					slot,
+					stylebox.content_margin_left,
+					stylebox.content_margin_right,
+				])
+			if stylebox.content_margin_top < 4.0 or stylebox.content_margin_bottom < 4.0:
+				_fail("%s %s.%s should reserve toolbar vertical padding, got %.1f/%.1f" % [
+					label,
+					theme_type,
+					slot,
+					stylebox.content_margin_top,
+					stylebox.content_margin_bottom,
+				])
+
+
+func _expect_popup_menu_spacing_and_separators(theme: Theme, label: String) -> void:
+	var popup_menu_panel := theme.get_stylebox(&"panel", &"PopupMenu") as StyleBoxFlat
+	if popup_menu_panel == null:
+		_fail("%s PopupMenu.panel missing StyleBoxFlat" % label)
+	else:
+		if popup_menu_panel.content_margin_left != 0.0 or popup_menu_panel.content_margin_top != 0.0 or popup_menu_panel.content_margin_right != 0.0:
+			_fail("%s PopupMenu.panel should stay dense for normal menu lists, got %.1f/%.1f/%.1f/%.1f" % [
+				label,
+				popup_menu_panel.content_margin_left,
+				popup_menu_panel.content_margin_top,
+				popup_menu_panel.content_margin_right,
+				popup_menu_panel.content_margin_bottom,
+			])
+
+	var popup_panel := theme.get_stylebox(&"panel", &"PopupPanel") as StyleBoxFlat
+	if popup_panel == null:
+		_fail("%s PopupPanel.panel missing StyleBoxFlat" % label)
+	else:
+		if popup_panel.content_margin_left < 8.0 or popup_panel.content_margin_right < 8.0:
+			_fail("%s PopupPanel.panel should keep horizontal edge padding, got %.1f/%.1f" % [
+				label,
+				popup_panel.content_margin_left,
+				popup_panel.content_margin_right,
+			])
+		if popup_panel.content_margin_top < 6.0 or popup_panel.content_margin_bottom < 6.0:
+			_fail("%s PopupPanel.panel should keep vertical edge padding, got %.1f/%.1f" % [
+				label,
+				popup_panel.content_margin_top,
+				popup_panel.content_margin_bottom,
+			])
+
+	for entry in [
+		{"type": &"HSeparator", "slot": &"separator", "vertical": false},
+		{"type": &"VSeparator", "slot": &"separator", "vertical": true},
+		{"type": &"PopupMenu", "slot": &"separator", "vertical": false},
+		{"type": &"PopupMenu", "slot": &"labeled_separator_left", "vertical": false},
+		{"type": &"PopupMenu", "slot": &"labeled_separator_right", "vertical": false},
+	]:
+		var line := theme.get_stylebox(entry["slot"], entry["type"]) as StyleBoxLine
+		if line == null:
+			_fail("%s %s.%s should use StyleBoxLine for visible editor dividers" % [
+				label,
+				entry["type"],
+				entry["slot"],
+			])
+			continue
+		if line.vertical != bool(entry["vertical"]):
+			_fail("%s %s.%s vertical flag mismatch" % [label, entry["type"], entry["slot"]])
+		if line.thickness < 1 or line.color.a <= 0.01:
+			_fail("%s %s.%s should draw a visible 1px divider" % [label, entry["type"], entry["slot"]])
 
 
 func _expect_selection_control_colors(theme: Theme, label: String) -> void:

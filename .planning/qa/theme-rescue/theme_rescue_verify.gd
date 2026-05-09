@@ -58,6 +58,7 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_margin_max(theme, "PanelContainer", "panel", 18 if is_mobile else 14, 14 if is_mobile else 12, label)
 	_expect_window_chrome(theme, label, expect_raised)
 	_expect_popup_chrome(theme, label, expect_raised)
+	_expect_separator_chrome(theme, label)
 	_expect_panel_surface_chrome(theme, label, expect_raised)
 	_expect_scrollbar_chrome(theme, label)
 	_expect_scroll_hint_chrome(theme, label)
@@ -211,18 +212,36 @@ func _expect_popup_chrome(theme: Theme, label: String, expect_raised: bool) -> v
 		_fail("%s missing OptionButton/PopupMenu state styleboxes for dropdown comparison" % label)
 		return
 	for entry in [
-		{"type": &"PopupMenu", "slot": &"panel", "max_margin": 2, "source": option_panel},
-		{"type": &"PopupPanel", "slot": &"panel", "max_margin": 2, "source": button_panel},
-		{"type": &"TooltipPanel", "slot": &"panel", "max_margin": 8, "source": button_panel},
+		{"type": &"PopupMenu", "slot": &"panel", "max_h": 0, "max_v": 0, "min_h": 0, "min_v": 0, "source": option_panel},
+		{"type": &"PopupPanel", "slot": &"panel", "max_h": 8, "max_v": 6, "min_h": 8, "min_v": 6, "source": button_panel},
+		{"type": &"TooltipPanel", "slot": &"panel", "max_h": 8, "max_v": 8, "min_h": 0, "min_v": 0, "source": button_panel},
 	]:
 		var popup_panel := theme.get_stylebox(entry["slot"], entry["type"]) as StyleBoxFlat
 		if popup_panel == null:
 			_fail("%s missing %s.%s" % [label, entry["type"], entry["slot"]])
 			continue
 		var source_panel := entry["source"] as StyleBoxFlat
-		var max_popup_margin := int(entry["max_margin"])
-		if popup_panel.content_margin_left > max_popup_margin or popup_panel.content_margin_top > max_popup_margin:
-			_fail("%s %s.%s popup margins too large: %s/%s/%s/%s" % [
+		var max_h := int(entry["max_h"])
+		var max_v := int(entry["max_v"])
+		var min_h := int(entry["min_h"])
+		var min_v := int(entry["min_v"])
+		if label.begins_with("mobile:"):
+			max_h = int(ceili(float(max_h) * 1.5))
+			max_v = int(ceili(float(max_v) * 1.5))
+			min_h = int(ceili(float(min_h) * 1.5))
+			min_v = int(ceili(float(min_v) * 1.5))
+		var max_bottom := max_v + (10 if expect_raised else 0)
+		if (
+			popup_panel.content_margin_left > max_h
+			or popup_panel.content_margin_right > max_h
+			or popup_panel.content_margin_top > max_v
+			or popup_panel.content_margin_bottom > max_bottom
+			or popup_panel.content_margin_left < min_h
+			or popup_panel.content_margin_right < min_h
+			or popup_panel.content_margin_top < min_v
+			or popup_panel.content_margin_bottom < min_v
+		):
+			_fail("%s %s.%s popup margins outside expected range: %s/%s/%s/%s" % [
 				label,
 				entry["type"],
 				entry["slot"],
@@ -267,6 +286,31 @@ func _expect_popup_chrome(theme: Theme, label: String, expect_raised: bool) -> v
 			popup_hover.bg_color.to_html(false),
 			option_hover.bg_color.to_html(false),
 		])
+
+
+func _expect_separator_chrome(theme: Theme, label: String) -> void:
+	for entry in [
+		{"type": &"HSeparator", "slot": &"separator", "vertical": false},
+		{"type": &"VSeparator", "slot": &"separator", "vertical": true},
+		{"type": &"PopupMenu", "slot": &"separator", "vertical": false},
+		{"type": &"PopupMenu", "slot": &"labeled_separator_left", "vertical": false},
+		{"type": &"PopupMenu", "slot": &"labeled_separator_right", "vertical": false},
+	]:
+		var stylebox := theme.get_stylebox(entry["slot"], entry["type"])
+		var line := stylebox as StyleBoxLine
+		if line == null:
+			_fail("%s %s.%s should use StyleBoxLine like Godot editor/minimal separators" % [
+				label,
+				entry["type"],
+				entry["slot"],
+			])
+			continue
+		if line.vertical != bool(entry["vertical"]):
+			_fail("%s %s.%s vertical flag mismatch" % [label, entry["type"], entry["slot"]])
+		if line.thickness < 1:
+			_fail("%s %s.%s separator thickness too small: %s" % [label, entry["type"], entry["slot"], line.thickness])
+		if line.color.a <= 0.01:
+			_fail("%s %s.%s separator is invisible" % [label, entry["type"], entry["slot"]])
 
 
 func _expect_panel_surface_chrome(theme: Theme, label: String, expect_raised: bool) -> void:
@@ -608,12 +652,15 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 		var normal := theme.get_stylebox("normal", theme_type) as StyleBoxFlat
 		var hover := theme.get_stylebox("hover", theme_type) as StyleBoxFlat
 		if normal == null or hover == null:
-			_fail("%s missing compact editor styleboxes for %s" % [label, theme_type])
+			_fail("%s missing shared flat-button styleboxes for %s" % [label, theme_type])
 			continue
+		var flat_scale := 1.5 if label.begins_with("mobile:") else 1.0
+		var expected_h := 6.0 * flat_scale
+		var expected_v := 4.0 * flat_scale
 		if normal.bg_color.a > 0.01 or _max_border_width(normal) != 0:
 			_fail("%s %s.normal should be transparent and borderless" % [label, theme_type])
-		if normal.content_margin_left > 6 or normal.content_margin_top > 5:
-			_fail("%s %s.normal margins should be compact, got %s/%s/%s/%s" % [
+		if normal.content_margin_left > expected_h or normal.content_margin_top > expected_v + 1.0:
+			_fail("%s %s.normal margins should stay default-like wide-flat, got %s/%s/%s/%s" % [
 				label,
 				theme_type,
 				normal.content_margin_left,
@@ -621,11 +668,13 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 				normal.content_margin_right,
 				normal.content_margin_bottom,
 			])
-		if normal.content_margin_top < 3 or normal.content_margin_bottom < 2:
-			_fail("%s %s.normal margins should keep visible toolbar inset, got top/bottom=%s/%s" % [
+		if normal.content_margin_left < expected_h or normal.content_margin_right < expected_h or normal.content_margin_top < expected_v or normal.content_margin_bottom < expected_v:
+			_fail("%s %s.normal margins should keep visible toolbar inset, got left/top/right/bottom=%s/%s/%s/%s" % [
 				label,
 				theme_type,
+				normal.content_margin_left,
 				normal.content_margin_top,
+				normal.content_margin_right,
 				normal.content_margin_bottom,
 			])
 		if _max_border_width(hover) != 0:
@@ -799,6 +848,13 @@ func _expect_editor_integration_chrome(theme: Theme, label: String) -> void:
 		_fail("%s BottomPanel.tab_selected should not draw an outline" % label)
 	if odd_tab == null:
 		_fail("%s TabContainerOdd.tab_selected missing for Editor Settings tabs" % label)
+
+	var contextual_toolbar := theme.get_stylebox(&"ContextualToolbar", &"EditorStyles") as StyleBoxFlat
+	var editor_content := theme.get_stylebox(&"Content", &"EditorStyles") as StyleBoxFlat
+	if contextual_toolbar == null:
+		_fail("%s EditorStyles.ContextualToolbar missing for viewport toolbar background" % label)
+	elif editor_content != null and contextual_toolbar.bg_color.is_equal_approx(editor_content.bg_color):
+		_fail("%s EditorStyles.ContextualToolbar should stand off from the viewport/editor content surface" % label)
 
 	var code_style := theme.get_stylebox(&"normal", &"CodeEdit") as StyleBoxFlat
 	var text_style := theme.get_stylebox(&"normal", &"TextEdit") as StyleBoxFlat
@@ -1022,6 +1078,33 @@ func _expect_tree_view_chrome(theme: Theme, label: String) -> void:
 				stylebox.border_width_bottom,
 			])
 
+	var tree_button_h := 9.0 if label.begins_with("mobile:") else 6.0
+	for slot_name in [
+		&"button_hover",
+		&"button_pressed",
+		&"custom_button",
+		&"custom_button_hover",
+		&"custom_button_pressed",
+	]:
+		var button_style := theme.get_stylebox(slot_name, "Tree") as StyleBoxFlat
+		if button_style == null:
+			_fail("%s missing Tree.%s icon-button stylebox" % [label, slot_name])
+			continue
+		if button_style.content_margin_left < tree_button_h or button_style.content_margin_right < tree_button_h:
+			_fail("%s Tree.%s should reserve side padding for editor item icons, got %.1f/%.1f" % [
+				label,
+				slot_name,
+				button_style.content_margin_left,
+				button_style.content_margin_right,
+			])
+		if button_style.content_margin_top > 1.0 or button_style.content_margin_bottom > 1.0:
+			_fail("%s Tree.%s should not inflate row height, got top/bottom %.1f/%.1f" % [
+				label,
+				slot_name,
+				button_style.content_margin_top,
+				button_style.content_margin_bottom,
+			])
+
 
 func _expect_list_view_chrome(theme: Theme, label: String) -> void:
 	var accent := theme.get_color("drop_position_color", "Tree")
@@ -1136,10 +1219,10 @@ func _expect_split_grabber_icon(theme: Theme, theme_type: StringName, slot_name:
 		return
 	var size := theme.get_icon(slot_name, theme_type).get_size()
 	if vertical_indicator:
-		if size.x != 6 or size.y < 32:
+		if size.x != 6 or size.y < 48:
 			_fail("%s %s.%s should be a 6px-thick long vertical indicator, got %s" % [label, theme_type, slot_name, size])
 	else:
-		if size.y != 6 or size.x < 32:
+		if size.y != 6 or size.x < 48:
 			_fail("%s %s.%s should be a 6px-thick long horizontal indicator, got %s" % [label, theme_type, slot_name, size])
 
 

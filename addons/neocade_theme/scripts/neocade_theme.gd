@@ -645,6 +645,7 @@ func _regenerate_theme() -> void:
 
 	if editor_hint:
 		_apply_editor_theme_runtime_settings(role_table)
+	_apply_separator_styleboxes(role_table)
 
 	# Phase 7 popup/menu font slots must stay outside BINDING_TABLE. Godot exposes these
 	# as real Theme font/font_size entries, but the binding iterator intentionally has no
@@ -717,6 +718,24 @@ func _apply_editor_theme_runtime_settings(role_table: Dictionary) -> void:
 		editor_rich_text_panel.set_content_margin_all(8)
 		set_stylebox("normal", "RichTextLabel", editor_rich_text_panel)
 		set_stylebox("focus", "RichTextLabel", StyleBoxEmpty.new())
+
+
+func _apply_separator_styleboxes(role_table: Dictionary) -> void:
+	var separator_color: Color = role_table.get("outline_color", Color.WHITE)
+	separator_color = Color(separator_color.r, separator_color.g, separator_color.b, separator_color.a * 0.62)
+	var h_line := StyleBoxLine.new()
+	h_line.color = separator_color
+	h_line.grow_begin = -2.0
+	h_line.grow_end = -2.0
+	h_line.thickness = 1
+	set_stylebox("separator", "HSeparator", h_line)
+	set_stylebox("separator", "PopupMenu", h_line)
+	set_stylebox("labeled_separator_left", "PopupMenu", h_line)
+	set_stylebox("labeled_separator_right", "PopupMenu", h_line)
+
+	var v_line := h_line.duplicate() as StyleBoxLine
+	v_line.vertical = true
+	set_stylebox("separator", "VSeparator", v_line)
 
 
 # ─── Color helpers (DESIGN_TOKENS §6.1) ─────────────────────────────────────────────────────
@@ -2356,34 +2375,34 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal": {"role": "surface_panel", "raised_intensity": 0,
 					  "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-					  "content_margins": Vector4i(4, 3, 4, 2)},
+					  "content_margins": Vector4i(6, 4, 6, 4)},
 			"normal_mirrored": {"role": "surface_panel", "raised_intensity": 0,
 								"alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-								"content_margins": Vector4i(4, 3, 4, 2)},
+								"content_margins": Vector4i(6, 4, 6, 4)},
 			"hover": {"role": "button_hover", "border_role": "button_hover",
 					  "raised_intensity": 0, "border_width": 0, "alpha": 0.10,
-					  "radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2)},
+					  "radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4)},
 			"hover_mirrored": {"role": "button_hover", "border_role": "button_hover",
 							   "raised_intensity": 0, "border_width": 0, "alpha": 0.10,
-							   "radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2)},
+							   "radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4)},
 			"pressed": {"role": "surface_panel", "raised_intensity": 0,
 						"alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-						"content_margins": Vector4i(4, 3, 4, 2)},
+						"content_margins": Vector4i(6, 4, 6, 4)},
 			"pressed_mirrored": {"role": "surface_panel", "raised_intensity": 0,
 								 "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-								 "content_margins": Vector4i(4, 3, 4, 2)},
+								 "content_margins": Vector4i(6, 4, 6, 4)},
 			"hover_pressed": {"role": "surface_panel", "raised_intensity": 0,
 							  "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-							  "content_margins": Vector4i(4, 3, 4, 2)},
+							  "content_margins": Vector4i(6, 4, 6, 4)},
 			"hover_pressed_mirrored": {"role": "surface_panel", "raised_intensity": 0,
 									   "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-									   "content_margins": Vector4i(4, 3, 4, 2)},
+									   "content_margins": Vector4i(6, 4, 6, 4)},
 			"disabled": {"role": "surface_panel", "raised_intensity": 0,
 						 "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-						 "content_margins": Vector4i(4, 3, 4, 2)},
+						 "content_margins": Vector4i(6, 4, 6, 4)},
 			"disabled_mirrored": {"role": "surface_panel", "raised_intensity": 0,
 								  "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-								  "content_margins": Vector4i(4, 3, 4, 2)},
+								  "content_margins": Vector4i(6, 4, 6, 4)},
 		},
 		"color": {
 			"font_color": {"role": "text_default"},
@@ -2418,28 +2437,28 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal": {"role": "surface_panel", "raised_intensity": 0,
 					   "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-					   "content_margins": Vector4i(4, 3, 4, 2)},
+					   "content_margins": Vector4i(6, 4, 6, 4)},
 			"normal_mirrored": {"role": "surface_panel", "raised_intensity": 0,
 								"alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-								"content_margins": Vector4i(4, 3, 4, 2)},
+								"content_margins": Vector4i(6, 4, 6, 4)},
 			"hover": {"role": "button_hover", "raised_intensity": 0,
 					  "alpha": 0.10, "border_width": 0, "radius": "shape.secondary_radius",
-					  "content_margins": Vector4i(4, 3, 4, 2)},
+					  "content_margins": Vector4i(6, 4, 6, 4)},
 			"hover_mirrored": {"role": "button_hover", "raised_intensity": 0,
 							   "alpha": 0.10, "border_width": 0, "radius": "shape.secondary_radius",
-							   "content_margins": Vector4i(4, 3, 4, 2)},
+							   "content_margins": Vector4i(6, 4, 6, 4)},
 			"pressed": {"role": "surface_panel", "raised_intensity": 0,
 						"alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-						"content_margins": Vector4i(4, 3, 4, 2)},
+						"content_margins": Vector4i(6, 4, 6, 4)},
 			"pressed_mirrored": {"role": "surface_panel", "raised_intensity": 0,
 								 "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-								 "content_margins": Vector4i(4, 3, 4, 2)},
+								 "content_margins": Vector4i(6, 4, 6, 4)},
 			"hover_pressed": {"role": "surface_panel", "raised_intensity": 0,
 							  "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-							  "content_margins": Vector4i(4, 3, 4, 2)},
+							  "content_margins": Vector4i(6, 4, 6, 4)},
 			"hover_pressed_mirrored": {"role": "surface_panel", "raised_intensity": 0,
 									   "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
-									   "content_margins": Vector4i(4, 3, 4, 2)},
+									   "content_margins": Vector4i(6, 4, 6, 4)},
 		},
 	},
 	"AnimationBezierTrackEdit": {
@@ -3197,7 +3216,7 @@ const BINDING_TABLE: Dictionary = {
 					  "offset_role": "button_normal_offset",
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "radius": "shape.secondary_radius",
-					  "raised_face_edge": true, "padding": Vector2i(0, 0)},
+					  "raised_face_edge": true, "padding": Vector2i(8, 6)},
 		},
 	},
 	# 25. ProgressBar — 2 styleboxes
@@ -3592,7 +3611,7 @@ const BINDING_TABLE: Dictionary = {
 							"raised_face_edge": true, "content_margins": Vector4i(6, 5, 6, 5)},
 			"Content": {"role": "surface_base", "border_role": "surface_base",
 						"raised_intensity": 0, "border_width": 0},
-			"ContextualToolbar": {"role": "surface_panel", "border_role": "surface_panel",
+			"ContextualToolbar": {"role": "surface_high", "border_role": "surface_high",
 								  "raised_intensity": 0, "border_width": 0},
 			"DebuggerPanel": {"role": "surface_panel", "border_role": "surface_panel_edge",
 							  "raised_intensity": 0, "border_width": 1,
@@ -3777,13 +3796,13 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"hover": {"role": "button_hover", "raised_intensity": 0,
 					  "radius": "shape.secondary_radius",
-					  "content_margins": Vector4i(4, 3, 4, 2), "border_width": 0},
+					  "content_margins": Vector4i(6, 4, 6, 4), "border_width": 0},
 			"pressed": {"role": "button_pressed", "raised_intensity": 0,
 						"radius": "shape.secondary_radius",
-						"content_margins": Vector4i(4, 3, 4, 2), "border_width": 0},
+						"content_margins": Vector4i(6, 4, 6, 4), "border_width": 0},
 			"hover_pressed": {"role": "button_pressed", "raised_intensity": 0,
 							  "radius": "shape.secondary_radius",
-							  "content_margins": Vector4i(4, 3, 4, 2), "border_width": 0},
+							  "content_margins": Vector4i(6, 4, 6, 4), "border_width": 0},
 		},
 	},
 	"EditorValidationPanel": {
@@ -3906,11 +3925,14 @@ const BINDING_TABLE: Dictionary = {
 			"title_button_hover":     {"role": "button_hover",   "raised_intensity": 0,
 										"border_role": "button_hover", "border_width": 0},
 			"button_hover":           {"role": "button_hover",   "raised_intensity": 0,
-										"border_role": "button_hover", "border_width": 0},
+										"border_role": "button_hover", "border_width": 0,
+										"content_margins": Vector4i(6, 0, 6, 0)},
 			"button_pressed":         {"role": "button_pressed", "raised_intensity": 0,
-										"border_role": "button_pressed", "border_width": 0},
+										"border_role": "button_pressed", "border_width": 0,
+										"content_margins": Vector4i(6, 0, 6, 0)},
 			"custom_button":          {"role": "button_normal", "border_role": "button_normal",
-										"raised_intensity": 0, "border_width": 0},
+										"raised_intensity": 0, "border_width": 0,
+										"content_margins": Vector4i(6, 0, 6, 0)},
 			"hovered":                {"role": "button_hover",  "raised_intensity": 0,
 										"border_role": "button_hover", "border_width": 0},
 			"hovered_dimmed":         {"role": "button_hover",  "raised_intensity": 0,
@@ -3924,9 +3946,11 @@ const BINDING_TABLE: Dictionary = {
 			"hovered_selected_focus": {"role": "button_pressed", "raised_intensity": 0,
 										"border_role": "button_pressed", "border_width": 0},
 			"custom_button_hover":    {"role": "button_hover",  "raised_intensity": 0,
-										"border_role": "button_hover", "border_width": 0},
+										"border_role": "button_hover", "border_width": 0,
+										"content_margins": Vector4i(6, 0, 6, 0)},
 			"custom_button_pressed":  {"role": "button_pressed", "raised_intensity": 0,
-										"border_role": "button_pressed", "border_width": 0},
+										"border_role": "button_pressed", "border_width": 0,
+										"content_margins": Vector4i(6, 0, 6, 0)},
 			"cursor":                 {"role": "button_hover",  "raised_intensity": 0,
 										"border_role": "button_hover", "alpha": 0.72, "border_width": 0},
 			"cursor_unfocused":       {"role": "button_hover",  "raised_intensity": 0,
@@ -4457,43 +4481,44 @@ const BINDING_TABLE: Dictionary = {
 		},
 	},
 	# 43. FlatButton — borderless / fully transparent normal state; visible only on hover/
-	# pressed/focus. Per CONTEXT.md TYPEVAR-01: this is the RUNTIME variation, NOT the
-	# editor-only `FlatButton` class. Surface_panel role keeps the slot populated; the
-	# alpha=0.0 zeroes the bg so users see only state-layer changes when interacting.
+	# pressed/focus. Godot's editor and Minimal Theme both keep these "flat" controls
+	# visually empty but still reserve wider side padding, so the shared variation uses
+	# that spacing in both runtime and editor. Compact icon buttons should use a separate
+	# explicit variation instead of making editor/runtime disagree.
 	# Never lifts (raised_intensity=0 across all states) — flat by definition.
 	"FlatButton": {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"alpha": 0.0, "border_width": 0},
 			"normal_mirrored":{"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"alpha": 0.0, "border_width": 0},
 			"hover":         {"role": "button_hover", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"border_width": 0},
 			"hover_mirrored":{"role": "button_hover", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"border_width": 0},
 			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"border_width": 0},
 			"pressed_mirrored":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"border_width": 0},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
 			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"alpha": 0.0, "border_width": 0},
 			"disabled_mirrored":{"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"alpha": 0.0, "border_width": 0},
 			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"border_width": 0},
 			"hover_pressed_mirrored":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"border_width": 0},
 		},
 		"color": {
@@ -4514,43 +4539,43 @@ const BINDING_TABLE: Dictionary = {
 			"h_separation": {"value": 4},
 		},
 	},
-	# 43a. FlatMenuButton — Godot editor toolbars use this variation for compact icon
-	# menus. Keep normal/focus states visually empty and make hover/press compact so
-	# editor docks do not inherit full game-button padding.
+	# 43a. FlatMenuButton — menu-capable sibling of FlatButton. It keeps the same
+	# transparent-at-rest wide spacing so menu buttons, toolbar buttons, and runtime
+	# flat icon buttons align consistently unless a consumer opts into a compact variant.
 	"FlatMenuButton": {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"alpha": 0.0, "border_width": 0},
 			"normal_mirrored":{"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"alpha": 0.0, "border_width": 0},
 			"hover":         {"role": "button_hover", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"border_width": 0},
 			"hover_mirrored":{"role": "button_hover", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"border_width": 0},
 			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"border_width": 0},
 			"pressed_mirrored":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"border_width": 0},
 			"focus":         {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"alpha": 0.0, "border_width": 0},
 			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"alpha": 0.0, "border_width": 0},
 			"disabled_mirrored":{"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"alpha": 0.0, "border_width": 0},
 			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"border_width": 0},
 			"hover_pressed_mirrored":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"border_width": 0},
 		},
 		"color": {
@@ -5373,7 +5398,7 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 
 func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, style_personality: Dictionary) -> Texture2D:
 	const THICKNESS := 6
-	const LENGTH := 32
+	const LENGTH := 48
 	var width := THICKNESS if vertical_indicator else LENGTH
 	var height := LENGTH if vertical_indicator else THICKNESS
 	var shape_radius: int = corner_radius

@@ -57,6 +57,16 @@ func _run() -> void:
 	if not theme.has_stylebox(&"panel", &"Tree"):
 		_fail("runtime theme lost Tree.panel while gating editor-only slots")
 
+	for theme_type in [&"FlatButton", &"FlatMenuButton"]:
+		var normal := theme.get_stylebox(&"normal", theme_type) as StyleBoxFlat
+		if normal == null:
+			_fail("runtime theme lost %s.normal" % theme_type)
+			continue
+		if normal.content_margin_left < 6.0 or normal.content_margin_right < 6.0:
+			_fail("runtime %s.normal should share default-like wide flat-button side padding" % theme_type)
+		if normal.content_margin_top < 4.0 or normal.content_margin_bottom < 4.0:
+			_fail("runtime %s.normal should share default-like wide flat-button vertical padding" % theme_type)
+
 	_finish()
 
 
