@@ -1195,7 +1195,11 @@ const TYPE_VARIATIONS: Dictionary = {
 	"EditorHelpBitTooltipTitle": "EditorHelpBitTitle",
 	"EditorHelpBitTooltipContent": "EditorHelpBitContent",
 	"TabContainerOdd": "TabContainer",
+	"TabContainerInner": "TabContainer",
+	"TabBarInner": "TabBar",
 	"BottomPanel": "TabContainer",
+	"PanelForeground": "Panel",
+	"TreeLineEdit": "LineEdit",
 	# Editor dock scroll-body wrappers used after toolbar stacks.
 	"NoBorderHorizontal":       "MarginContainer",
 	"NoBorderHorizontalBottom": "NoBorderHorizontal",
@@ -2458,8 +2462,16 @@ const BINDING_TABLE: Dictionary = {
 		},
 	},
 	"GraphStateMachine": {
+		"stylebox": {
+			"node_frame_selected": {"role": "surface_high", "border_role": "role_primary",
+									"raised_intensity": 0, "border_width": 1,
+									"radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+		},
 		"color": {
+			"focus_color": {"role": "role_primary", "alpha": 0.80},
 			"guideline_color": {"role": "text_muted", "alpha": 0.22},
+			"highlight_color": {"role": "role_primary"},
+			"highlight_disabled_color": {"role": "role_primary", "disabled": true},
 			"node_title_font_color": {"role": "text_default"},
 			"playback_background_color": {"role": "surface_high", "alpha": 0.22},
 			"playback_color": {"role": "text_default"},
@@ -2741,8 +2753,11 @@ const BINDING_TABLE: Dictionary = {
 			"scroll_hint": {"icon": "tree_scroll_hint"},
 		},
 	},
-	# 16. Label — color only; labels must not own a background or border.
+	# 16. Label — text-only chrome; focus is an outline overlay, never a filled panel.
 	"Label": {
+		"stylebox": {
+			"focus": {"role": "focus_ring"},
+		},
 		"color": {
 			"font_color": {"role": "text_strong"},
 		},
@@ -3219,6 +3234,54 @@ const BINDING_TABLE: Dictionary = {
 			"menu_highlight":      {"icon": "tab_menu"},
 		},
 	},
+	"TabContainerInner": {
+		"stylebox": {
+			"tab_selected":     {"role": "button_pressed", "border_role": "button_pressed",
+								 "raised_intensity": 0, "border_width": 0,
+								 "radius": "shape.tab_radius", "corner_profile": "tab_connected",
+								 "padding": Vector2i(10, 5)},
+			"tab_unselected":   {"role": "surface_base", "border_role": "surface_base",
+								 "raised_intensity": 0, "border_width": 0,
+								 "radius": "shape.tab_radius", "corner_profile": "tab_connected",
+								 "padding": Vector2i(10, 4)},
+			"tab_hovered":      {"role": "button_hover", "border_role": "button_hover",
+								 "raised_intensity": 0, "border_width": 0,
+								 "radius": "shape.tab_radius", "corner_profile": "tab_connected",
+								 "padding": Vector2i(10, 4)},
+			"tab_disabled":     {"role": "button_disabled", "disabled": true,
+								 "raised_intensity": 0, "border_width": 0,
+								 "radius": "shape.tab_radius", "corner_profile": "tab_connected",
+								 "padding": Vector2i(10, 4)},
+			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
+								 "corner_profile": "tab_connected"},
+			"panel":            {"role": "surface_base", "border_role": "surface_base",
+								  "raised_intensity": 0, "border_width": 0},
+			"tabbar_background":{"role": "surface_base", "raised_intensity": 0,
+								  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
+		},
+	},
+	"TabBarInner": {
+		"stylebox": {
+			"tab_selected":   {"role": "button_pressed", "border_role": "button_pressed",
+							   "raised_intensity": 0, "border_width": 0,
+							   "radius": "shape.tab_radius", "corner_profile": "tab_connected",
+							   "padding": Vector2i(10, 5)},
+			"tab_unselected": {"role": "surface_base", "border_role": "surface_base",
+							   "raised_intensity": 0, "border_width": 0,
+							   "radius": "shape.tab_radius", "corner_profile": "tab_connected",
+							   "padding": Vector2i(10, 4)},
+			"tab_hovered":    {"role": "button_hover", "border_role": "button_hover",
+							   "raised_intensity": 0, "border_width": 0,
+							   "radius": "shape.tab_radius", "corner_profile": "tab_connected",
+							   "padding": Vector2i(10, 4)},
+			"tab_disabled":   {"role": "button_disabled", "disabled": true,
+							   "raised_intensity": 0, "border_width": 0,
+							   "radius": "shape.tab_radius", "corner_profile": "tab_connected",
+							   "padding": Vector2i(10, 4)},
+			"tab_focus":      {"role": "focus_ring", "radius": "shape.tab_radius",
+							   "corner_profile": "tab_connected"},
+		},
+	},
 	"BottomPanel": {
 		"stylebox": {
 			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
@@ -3259,13 +3322,99 @@ const BINDING_TABLE: Dictionary = {
 			"BottomPanel": {"role": "surface_panel", "border_role": "surface_panel_edge",
 							"raised_intensity": "shape.raised_lifts.panel",
 							"raised_face_edge": true, "content_margins": Vector4i(6, 5, 6, 5)},
+			"Content": {"role": "surface_base", "border_role": "surface_base",
+						"raised_intensity": 0, "border_width": 0},
+			"DebuggerPanel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+							  "raised_intensity": 0, "border_width": 1,
+							  "content_margins": Vector4i(6, 5, 6, 5)},
+			"Focus": {"role": "focus_ring"},
 			"FocusViewport": {"role": "focus_ring", "radius": 0},
+			"Information3dViewport": {"role": "surface_panel", "border_role": "surface_panel_edge",
+									  "raised_intensity": 0, "border_width": 1,
+									  "alpha": 0.88, "padding": Vector2i(6, 4)},
+			"LaunchPadMovieMode": {"role": "role_primary", "border_role": "role_primary",
+								   "raised_intensity": 0, "alpha": 0.20,
+								   "border_alpha": 0.70, "border_width": 1},
+			"LaunchPadRecoveryMode": {"role": "role_warning", "border_role": "role_warning",
+									  "raised_intensity": 0, "alpha": 0.16,
+									  "border_alpha": 0.70, "border_width": 1},
+			"MovieWriterButtonPressed": {"role": "button_pressed", "border_role": "button_border_pressed",
+										 "raised_intensity": 0, "border_width": 0,
+										 "radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
 			"ObjectDBContentWrapper": {"role": "surface_low", "border_role": "surface_low_edge",
 									   "raised_intensity": 0, "border_width": 0,
 									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 6)},
+			"PanelForeground": {"role": "surface_panel", "border_role": "surface_panel_edge",
+								"raised_intensity": 0, "border_width": 0},
+			"ThemeEditorPreviewFG": {"role": "surface_panel", "border_role": "surface_panel_edge",
+									 "raised_intensity": 0, "border_width": 0},
 		},
 		"color": {
 			"sub_inspector_property_color": {"role": "text_default"},
+		},
+	},
+	"PanelForeground": {
+		"stylebox": {
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": 0, "border_width": 0},
+		},
+	},
+	"EditorInspectorForeground": {
+		"stylebox": {
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": 0, "border_width": 0},
+		},
+	},
+	"ProjectManager": {
+		"stylebox": {
+			"panel_container": {"role": "surface_panel", "border_role": "surface_panel_edge",
+								"raised_intensity": 0, "border_width": 0},
+		},
+	},
+	"AssetLib": {
+		"stylebox": {
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": 0, "border_width": 0},
+		},
+	},
+	"ThemeEditor": {
+		"stylebox": {
+			"preview_picker_overlay": {"role": "surface_overlay", "border_role": "role_primary",
+									   "raised_intensity": 0, "alpha": 0.26,
+									   "border_alpha": 0.70, "border_width": 1},
+		},
+	},
+	"TileSetEditor": {
+		"stylebox": {
+			"expand_panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+							 "raised_intensity": 0, "border_width": 0},
+		},
+	},
+	"EditorInspectorArray": {
+		"color": {
+			"bg": {"role": "surface_base"},
+		},
+	},
+	"AnimationTrackEdit": {
+		"stylebox": {
+			"focus": {"role": "focus_ring"},
+			"odd": {"role": "surface_base", "border_role": "surface_base",
+					"raised_intensity": 0, "border_width": 0},
+		},
+	},
+	"AnimationTrackEditGroup": {
+		"color": {
+			"bg_color": {"role": "surface_base"},
+		},
+	},
+	"EditorAudioBus": {
+		"stylebox": {
+			"focus": {"role": "focus_ring"},
+		},
+	},
+	"TreeLineEdit": {
+		"stylebox": {
+			"focus": {"role": "focus_ring"},
 		},
 	},
 	# 29a. Editor dock tab containers — FileSystem/Scene/Inspector docks are DockTabContainer
