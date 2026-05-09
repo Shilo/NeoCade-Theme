@@ -91,7 +91,7 @@ INTENTIONAL_AUTHORED CheckBox.stylebox.hover_pressed default=StyleBoxEmpty neoca
 INTENTIONAL_AUTHORED CheckBox.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/2.0/6.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.color.checkbox_checked_color default=#ffffffff neocade=#8bff6aff
-INTENTIONAL_AUTHORED CheckBox.color.checkbox_unchecked_color default=#ffffffff neocade=#272d48ff
+INTENTIONAL_AUTHORED CheckBox.color.checkbox_unchecked_color default=#ffffffff neocade=#434b6cff
 INTENTIONAL_AUTHORED CheckBox.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckBox.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED CheckBox.color.font_focus_color default=#f2f2f2ff neocade=#f7f8fbff
@@ -121,7 +121,7 @@ INTENTIONAL_AUTHORED CheckButton.stylebox.hover_pressed default=StyleBoxEmpty ne
 INTENTIONAL_AUTHORED CheckButton.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/2.0/6.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.color.button_checked_color default=#ffffffff neocade=#8bff6aff
-INTENTIONAL_AUTHORED CheckButton.color.button_unchecked_color default=#ffffffff neocade=#272d48ff
+INTENTIONAL_AUTHORED CheckButton.color.button_unchecked_color default=#ffffffff neocade=#434b6cff
 INTENTIONAL_AUTHORED CheckButton.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckButton.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED CheckButton.color.font_focus_color default=#f2f2f2ff neocade=#f7f8fbff
@@ -1362,7 +1362,7 @@ INTENTIONAL_AUTHORED CheckBox.stylebox.hover_pressed default=StyleBoxEmpty neoca
 INTENTIONAL_AUTHORED CheckBox.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/2.0/6.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.color.checkbox_checked_color default=#ffffffff neocade=#8bff6aff
-INTENTIONAL_AUTHORED CheckBox.color.checkbox_unchecked_color default=#ffffffff neocade=#272d48ff
+INTENTIONAL_AUTHORED CheckBox.color.checkbox_unchecked_color default=#ffffffff neocade=#434b6cff
 INTENTIONAL_AUTHORED CheckBox.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckBox.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED CheckBox.color.font_focus_color default=#f2f2f2ff neocade=#f7f8fbff
@@ -1392,7 +1392,7 @@ INTENTIONAL_AUTHORED CheckButton.stylebox.hover_pressed default=StyleBoxEmpty ne
 INTENTIONAL_AUTHORED CheckButton.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/2.0/6.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.color.button_checked_color default=#ffffffff neocade=#8bff6aff
-INTENTIONAL_AUTHORED CheckButton.color.button_unchecked_color default=#ffffffff neocade=#272d48ff
+INTENTIONAL_AUTHORED CheckButton.color.button_unchecked_color default=#ffffffff neocade=#434b6cff
 INTENTIONAL_AUTHORED CheckButton.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckButton.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED CheckButton.color.font_focus_color default=#f2f2f2ff neocade=#f7f8fbff
@@ -2631,7 +2631,7 @@ INTENTIONAL_AUTHORED CheckBox.stylebox.hover_pressed default=StyleBoxEmpty neoca
 INTENTIONAL_AUTHORED CheckBox.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=9.0/3.0/9.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.color.checkbox_checked_color default=#ffffffff neocade=#8bff6aff
-INTENTIONAL_AUTHORED CheckBox.color.checkbox_unchecked_color default=#ffffffff neocade=#272d48ff
+INTENTIONAL_AUTHORED CheckBox.color.checkbox_unchecked_color default=#ffffffff neocade=#434b6cff
 INTENTIONAL_AUTHORED CheckBox.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckBox.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED CheckBox.color.font_focus_color default=#f2f2f2ff neocade=#f7f8fbff
@@ -2660,7 +2660,7 @@ INTENTIONAL_AUTHORED CheckButton.stylebox.hover_pressed default=StyleBoxEmpty ne
 INTENTIONAL_AUTHORED CheckButton.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=9.0/3.0/9.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.color.button_checked_color default=#ffffffff neocade=#8bff6aff
-INTENTIONAL_AUTHORED CheckButton.color.button_unchecked_color default=#ffffffff neocade=#272d48ff
+INTENTIONAL_AUTHORED CheckButton.color.button_unchecked_color default=#ffffffff neocade=#434b6cff
 INTENTIONAL_AUTHORED CheckButton.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckButton.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED CheckButton.color.font_focus_color default=#f2f2f2ff neocade=#f7f8fbff

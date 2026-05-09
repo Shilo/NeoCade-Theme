@@ -722,8 +722,12 @@ func _expect_editor_integration_chrome(theme: Theme, label: String) -> void:
 		{"type": &"CheckBox", "slot": &"checkbox_unchecked_color"},
 		{"type": &"CheckButton", "slot": &"button_unchecked_color"},
 	]:
-		if not theme.get_color(entry["slot"], entry["type"]).is_equal_approx(button_normal):
-			_fail("%s %s.%s should use solid inactive control fill, matching Button.normal" % [label, entry["type"], entry["slot"]])
+		var inactive_color := theme.get_color(entry["slot"], entry["type"])
+		if inactive_color.get_luminance() <= button_normal.get_luminance() + 0.03:
+			_fail("%s %s.%s should be a lighter base-derived inactive fill than Button.normal" % [label, entry["type"], entry["slot"]])
+		var accent_distance := absf(inactive_color.r - accent.r) + absf(inactive_color.g - accent.g) + absf(inactive_color.b - accent.b) + absf(inactive_color.a - accent.a)
+		if accent_distance < 0.08:
+			_fail("%s %s.%s inactive fill should not collapse into accent checked fill" % [label, entry["type"], entry["slot"]])
 
 	for icon_name in [&"FileBigThumb", &"FileDeadBigThumb", &"FolderBigThumb", &"FileMediumThumb", &"FileDeadMediumThumb", &"FolderMediumThumb"]:
 		var icon := theme.get_icon(icon_name, &"EditorIcons")

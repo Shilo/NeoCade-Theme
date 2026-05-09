@@ -254,6 +254,7 @@ func _regenerate_theme() -> void:
 	# separate from surface_panel/outline_color so buttons do not render as outlined boxes.
 	var button_normal: Color = _button_tonal_color(base_color, 0.35, 0.85)
 	var button_disabled: Color = _button_tonal_color(base_color, 0.20, 0.75)
+	var selection_control_off: Color = _button_tonal_color(base_color, 0.85, 0.70)
 
 	# ── Per-color tinted offsets for raised mode (DESIGN_TOKENS §6.3) ──
 	var accent_offset: Color          = _tint_toward_base(accent_color, base_color)
@@ -511,6 +512,7 @@ func _regenerate_theme() -> void:
 		"code_current_line":      code_current_line,
 		"outline_color":          outline_color,
 		"button_normal":          button_normal,
+		"selection_control_off":  selection_control_off,
 		"button_hover":           button_hover,
 		"button_pressed":         button_pressed,
 		"button_disabled":        button_disabled,
@@ -1946,7 +1948,7 @@ const BINDING_TABLE: Dictionary = {
 			"font_disabled_color":     {"role": "text_strong", "disabled": true},
 			"font_hover_pressed_color":{"role": "text_strong"},
 			"checkbox_checked_color":  {"role": "role_primary"},
-			"checkbox_unchecked_color":{"role": "button_normal"},
+			"checkbox_unchecked_color":{"role": "selection_control_off"},
 		},
 		"constant": {
 			"h_separation": {"value": "tokens.tapPadding"},
@@ -1986,7 +1988,7 @@ const BINDING_TABLE: Dictionary = {
 			"font_disabled_color":     {"role": "text_strong", "disabled": true},
 			"font_hover_pressed_color":{"role": "text_strong"},
 			"button_checked_color":    {"role": "role_primary"},
-			"button_unchecked_color":  {"role": "button_normal"},
+			"button_unchecked_color":  {"role": "selection_control_off"},
 		},
 		"icon": {
 			"checked":            {"icon": "checkbutton_checked"},

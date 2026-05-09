@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://dxu534volcw5j" path="res://showcase/showcase.gd" id="3_showcase"]
 
 [node name="Showcase" type="Control" unique_id=645311781]
+clip_contents = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

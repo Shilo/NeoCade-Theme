@@ -28,6 +28,7 @@ func _run() -> void:
 		_expect_resource_picker_surface_matches_value_cell(theme, label)
 		_expect_editor_fonts_authored(theme, label)
 		_expect_checkbutton_checkbox_scale(theme, label)
+		_expect_selection_control_colors(theme, label)
 
 	_finish()
 
@@ -97,6 +98,22 @@ func _expect_checkbutton_checkbox_scale(theme: Theme, label: String) -> void:
 			label,
 			checkbutton.get_size(),
 		])
+
+
+func _expect_selection_control_colors(theme: Theme, label: String) -> void:
+	var accent := theme.get_color(&"checkbox_checked_color", &"CheckBox")
+	var checkbox_off := theme.get_color(&"checkbox_unchecked_color", &"CheckBox")
+	var checkbutton_on := theme.get_color(&"button_checked_color", &"CheckButton")
+	var checkbutton_off := theme.get_color(&"button_unchecked_color", &"CheckButton")
+	var button_normal := (theme.get_stylebox(&"normal", &"Button") as StyleBoxFlat).bg_color
+	if not checkbutton_on.is_equal_approx(accent):
+		_fail("%s CheckBox and CheckButton checked fills should match accent" % label)
+	if checkbox_off.get_luminance() <= button_normal.get_luminance() + 0.03:
+		_fail("%s CheckBox unchecked fill should be visibly lighter than Button.normal" % label)
+	if checkbutton_off.get_luminance() <= button_normal.get_luminance() + 0.03:
+		_fail("%s CheckButton unchecked fill should be visibly lighter than Button.normal" % label)
+	if _color_distance(checkbox_off, checkbutton_off) > 0.01:
+		_fail("%s CheckBox and CheckButton unchecked fills should match" % label)
 
 
 func _color_distance(a: Color, b: Color) -> float:
