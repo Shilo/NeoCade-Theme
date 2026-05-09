@@ -30,6 +30,7 @@ func _run() -> void:
 		_expect_checkbutton_checkbox_scale(theme, label)
 		_expect_selection_control_colors(theme, label)
 		_expect_popup_selection_icons(theme, label)
+		_expect_top_bar_controls(theme, label)
 
 	_finish()
 
@@ -94,11 +95,55 @@ func _expect_checkbutton_checkbox_scale(theme: Theme, label: String) -> void:
 	if checkbox == null or checkbutton == null:
 		_fail("%s checkbox/checkbutton icon missing" % label)
 		return
-	if checkbutton.get_height() < 20.0 or checkbutton.get_width() < 34.0:
+	if checkbutton.get_height() < 20.0 or checkbutton.get_width() < 38.0:
 		_fail("%s CheckButton icon should use the enlarged compact switch footprint, got %s" % [
 			label,
 			checkbutton.get_size(),
 		])
+
+
+func _expect_top_bar_controls(theme: Theme, label: String) -> void:
+	if theme.get_type_variation_base(&"RunBarButton") != &"FlatMenuButton":
+		_fail("%s RunBarButton should inherit FlatMenuButton for editor top bar semantics" % label)
+	if theme.get_type_variation_base(&"RunBarButtonMovieMakerDisabled") != &"RunBarButton":
+		_fail("%s RunBarButtonMovieMakerDisabled should inherit RunBarButton" % label)
+	if theme.get_type_variation_base(&"TopBarOptionButton") != &"OptionButton":
+		_fail("%s TopBarOptionButton should inherit OptionButton" % label)
+
+	for slot in [&"pressed", &"hover_pressed"]:
+		var pressed := theme.get_stylebox(slot, &"RunBarButton") as StyleBoxFlat
+		if pressed == null:
+			_fail("%s RunBarButton.%s missing StyleBoxFlat" % [label, slot])
+		elif pressed.bg_color.a > 0.01:
+			_fail("%s RunBarButton.%s should not paint a toggled background, bg=%s" % [
+				label,
+				slot,
+				pressed.bg_color.to_html(true),
+			])
+
+	var run_icon_pressed := theme.get_color(&"icon_pressed_color", &"RunBarButton")
+	var accent := theme.get_color(&"accent_color", &"Editor")
+	if _color_distance(run_icon_pressed, accent) > 0.01:
+		_fail("%s RunBarButton icon_pressed_color should match editor accent" % label)
+
+	var renderer_compat := theme.get_color(&"gl_compatibility_color", &"Editor")
+	if _color_distance(renderer_compat, Color("#5586A4")) > 0.01:
+		_fail("%s Editor.gl_compatibility_color should stay renderer-semantic, got %s" % [
+			label,
+			renderer_compat.to_html(false),
+		])
+	if _color_distance(renderer_compat, accent) < 0.08:
+		_fail("%s Renderer compatibility color should not be collapsed into accent" % label)
+
+	var movie_normal := theme.get_stylebox(&"MovieWriterButtonNormal", &"EditorStyles") as StyleBoxFlat
+	var movie_pressed := theme.get_stylebox(&"MovieWriterButtonPressed", &"EditorStyles") as StyleBoxFlat
+	if movie_normal == null or movie_pressed == null:
+		_fail("%s MovieWriterButtonNormal/Pressed editor styles missing" % label)
+	else:
+		if movie_normal.bg_color.a > 0.01:
+			_fail("%s MovieWriterButtonNormal should stay transparent" % label)
+		if movie_pressed.bg_color.a < 0.40:
+			_fail("%s MovieWriterButtonPressed should keep a visible movie-mode accent surface" % label)
 
 
 func _expect_selection_control_colors(theme: Theme, label: String) -> void:

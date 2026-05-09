@@ -51,7 +51,7 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_icon_max(theme, "Window", "close", 24, label)
 	_expect_icon_max(theme, "OptionButton", "arrow", 24, label)
 	_expect_icon_between(theme, "CheckBox", "checked", Vector2(20, 20), Vector2(26, 26), label)
-	_expect_icon_between(theme, "CheckButton", "checked", Vector2(28, 14), Vector2(34, 20), label)
+	_expect_icon_between(theme, "CheckButton", "checked", Vector2(34, 14), Vector2(38, 20), label)
 
 	var is_mobile := label.begins_with("mobile:")
 	_expect_margin_max(theme, "PrimaryButton", "normal", 28 if is_mobile else 18, 20 if is_mobile else 14, label)
@@ -712,6 +712,10 @@ func _expect_editor_integration_chrome(theme: Theme, label: String) -> void:
 		{"variation": &"EditorLogFilterButton", "base": &"Button"},
 		{"variation": &"TabContainerOdd", "base": &"TabContainer"},
 		{"variation": &"TreeTable", "base": &"Tree"},
+		{"variation": &"RunBarButton", "base": &"FlatMenuButton"},
+		{"variation": &"RunBarButtonMovieMakerEnabled", "base": &"RunBarButton"},
+		{"variation": &"RunBarButtonMovieMakerDisabled", "base": &"RunBarButton"},
+		{"variation": &"TopBarOptionButton", "base": &"OptionButton"},
 	]:
 		if theme.get_type_variation_base(entry["variation"]) != entry["base"]:
 			_fail("%s %s should inherit %s" % [label, entry["variation"], entry["base"]])
