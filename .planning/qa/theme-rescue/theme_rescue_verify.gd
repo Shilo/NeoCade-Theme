@@ -396,8 +396,15 @@ func _expect_scroll_hint_chrome(theme: Theme, label: String) -> void:
 
 
 func _expect_no_label_chrome(theme: Theme, label: String) -> void:
-	if theme.has_stylebox("normal", "Label"):
-		_fail("%s Label.normal stylebox should not be authored" % label)
+	if not theme.has_stylebox("normal", "Label"):
+		return
+	var stylebox := theme.get_stylebox("normal", "Label")
+	if stylebox is StyleBoxEmpty:
+		return
+	var flat := stylebox as StyleBoxFlat
+	if flat != null and flat.bg_color.a == 0.0 and _max_border_width(flat) == 0:
+		return
+	_fail("%s Label.normal may be authored only as empty/transparent chrome to block editor fallback" % label)
 
 
 func _expect_no_rich_text_label_chrome(theme: Theme, label: String) -> void:

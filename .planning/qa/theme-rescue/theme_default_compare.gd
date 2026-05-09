@@ -157,6 +157,18 @@ func _compare_slot(default_theme: Theme, neocade_theme: NeoCadeTheme, theme_type
 
 func _classify(theme_type: StringName, data_type: String, slot: StringName, default_has: bool, neo_has: bool, same: bool, _default_value: Variant, neo_value: Variant, is_raised: bool) -> String:
 	if _is_label_stylebox(theme_type, data_type, slot) and neo_has:
+		if neo_value is StyleBoxEmpty:
+			return "INTENTIONAL_AUTHORED" if _is_authored(theme_type, data_type, slot) else "SAME"
+		if neo_value is StyleBoxFlat:
+			var label_flat := neo_value as StyleBoxFlat
+			var has_no_border := (
+				label_flat.border_width_left == 0 and
+				label_flat.border_width_top == 0 and
+				label_flat.border_width_right == 0 and
+				label_flat.border_width_bottom == 0
+			)
+			if label_flat.bg_color.a == 0.0 and has_no_border:
+				return "INTENTIONAL_AUTHORED" if _is_authored(theme_type, data_type, slot) else "SAME"
 		return "UNINTENTIONAL_STYLE"
 
 	if same:
