@@ -1475,6 +1475,7 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 ## Structure: theme_type → data_type ("stylebox"/"color"/"constant"/"font_size"/"icon")
 ##   → slot_name → recipe Dictionary. Recipes:
 ##     {"role": "<role>"}              — pulls a derived color from role_table.
+##     {"empty": true}                 — emits StyleBoxEmpty for contextual chrome gaps.
 ##     {"role": "...", "raised_intensity": int} — for stylebox; multiplier for raised lift.
 ##     {"role": "...", "disabled": true}        — pulls per-direction alpha from style_personality.disabled_opacity (Cycle 2 C2).
 ##     {"role": "focus_ring"}                   — special: transparent bg + accent border + expand.
@@ -2003,8 +2004,7 @@ const BINDING_TABLE: Dictionary = {
 	# 13b. SplitContainer — base class owns h/v grabbers and touch-dragger colors.
 	"SplitContainer": {
 		"stylebox": {
-			"split_bar_background": {"role": "surface_low", "border_role": "surface_low", "raised_intensity": 0,
-									  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
+			"split_bar_background": {"empty": true},
 		},
 		"color": {
 			"touch_dragger_color":         {"role": "text_muted"},
@@ -2026,8 +2026,7 @@ const BINDING_TABLE: Dictionary = {
 	# 14. HSplitContainer — split-bar chrome plus official grabber/touch-dragger icons.
 	"HSplitContainer": {
 		"stylebox": {
-			"split_bar_background": {"role": "surface_low", "border_role": "surface_low", "raised_intensity": 0,
-									  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
+			"split_bar_background": {"empty": true},
 		},
 		"constant": {
 			"autohide":               {"value": 1},
@@ -2043,8 +2042,8 @@ const BINDING_TABLE: Dictionary = {
 	# because Godot draws them above row content (Phase 6 D-04).
 	"ItemList": {
 		"stylebox": {
-			"panel":                  {"role": "surface_low", "border_role": "surface_low_edge",
-									   "raised_intensity": 0},
+			"panel":                  {"role": "surface_low", "border_role": "surface_low",
+									   "raised_intensity": 0, "border_width": 0},
 			"focus":                  {"role": "focus_ring"},
 			"cursor":                 {"role": "button_hover",  "raised_intensity": 0,
 										"alpha": 0.72, "border_width": 0},
@@ -2052,18 +2051,22 @@ const BINDING_TABLE: Dictionary = {
 										"alpha": 0.46, "border_width": 0},
 			"hovered":                {"role": "button_hover",  "raised_intensity": 0,
 										"border_width": 0},
-			"selected":               {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
-			"selected_focus":         {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
-			"hovered_selected":       {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
-			"hovered_selected_focus": {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
+			"selected":               {"role": "button_pressed", "border_role": "button_pressed",
+										"raised_intensity": 0, "border_width": 0},
+			"selected_focus":         {"role": "button_pressed", "border_role": "button_pressed",
+										"raised_intensity": 0, "border_width": 0},
+			"hovered_selected":       {"role": "button_pressed", "border_role": "button_pressed",
+										"raised_intensity": 0, "border_width": 0},
+			"hovered_selected_focus": {"role": "button_pressed", "border_role": "button_pressed",
+										"raised_intensity": 0, "border_width": 0},
 		},
 		"color": {
 			"font_color":                  {"role": "text_default"},
 			"font_hovered_color":          {"role": "text_strong"},
-			"font_selected_color":         {"role": "text_on_accent_offset"},
-			"font_hovered_selected_color": {"role": "text_on_accent_offset"},
-			"font_outline_color":          {"role": "outline_color"},
-			"guide_color":                 {"role": "outline_color"},
+			"font_selected_color":         {"role": "role_primary"},
+			"font_hovered_selected_color": {"role": "role_primary"},
+			"font_outline_color":          {"role": "surface_low", "alpha": 0.0},
+			"guide_color":                 {"role": "surface_low", "alpha": 0.0},
 			"scroll_hint_color":           {"role": "scroll_shadow"},
 		},
 		"constant": {
@@ -2082,8 +2085,42 @@ const BINDING_TABLE: Dictionary = {
 	},
 	"ItemListSecondary": {
 		"stylebox": {
-			"panel": {"role": "surface_low", "border_role": "surface_low_edge",
-					  "raised_intensity": 0},
+			"panel": {"role": "surface_low", "border_role": "surface_low",
+					  "raised_intensity": 0, "border_width": 0},
+			"focus": {"role": "focus_ring"},
+			"cursor": {"role": "button_hover", "raised_intensity": 0,
+					   "alpha": 0.72, "border_width": 0},
+			"cursor_unfocused": {"role": "button_hover", "raised_intensity": 0,
+								  "alpha": 0.46, "border_width": 0},
+			"hovered": {"role": "button_hover", "raised_intensity": 0,
+						"border_width": 0},
+			"selected": {"role": "button_pressed", "border_role": "button_pressed",
+						 "raised_intensity": 0, "border_width": 0},
+			"selected_focus": {"role": "button_pressed", "border_role": "button_pressed",
+							   "raised_intensity": 0, "border_width": 0},
+			"hovered_selected": {"role": "button_pressed", "border_role": "button_pressed",
+								 "raised_intensity": 0, "border_width": 0},
+			"hovered_selected_focus": {"role": "button_pressed", "border_role": "button_pressed",
+									   "raised_intensity": 0, "border_width": 0},
+		},
+		"color": {
+			"font_color":                  {"role": "text_default"},
+			"font_hovered_color":          {"role": "text_strong"},
+			"font_selected_color":         {"role": "role_primary"},
+			"font_hovered_selected_color": {"role": "role_primary"},
+			"font_outline_color":          {"role": "surface_low", "alpha": 0.0},
+			"guide_color":                 {"role": "surface_low", "alpha": 0.0},
+			"scroll_hint_color":           {"role": "scroll_shadow"},
+		},
+		"constant": {
+			"v_separation":    {"value": "tokens.tapPadding"},
+			"h_separation":    {"value": "tokens.tapPadding"},
+			"icon_margin":     {"value": 6},
+			"line_separation": {"value": 2},
+			"outline_size":    {"value": 0},
+		},
+		"icon": {
+			"scroll_hint": {"icon": "tree_scroll_hint"},
 		},
 	},
 	# 16. Label — color only; labels must not own a background or border.
@@ -2734,8 +2771,7 @@ const BINDING_TABLE: Dictionary = {
 	# 36. VSplitContainer — mirror of HSplitContainer with vertical affordance icons.
 	"VSplitContainer": {
 		"stylebox": {
-			"split_bar_background": {"role": "surface_low", "border_role": "surface_low", "raised_intensity": 0,
-									  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
+			"split_bar_background": {"empty": true},
 		},
 		"constant": {
 			"autohide":               {"value": 1},
@@ -3591,8 +3627,9 @@ func _apply_kicker_style(kicker_style: StringName, role_table: Dictionary) -> Co
 ##   (Cross-AI Cycle 2 N1 fix: NO "font" branch — per-Control fonts are handled by
 ##   theme.default_font + the 14 explicit set_font calls on type variations in Task 1.)
 ##
-## Plan 05-02 Task 2 (D-03): stylebox branch supports `radius: "shape.<key>"`,
-## `padding: "shape.<key>"`, `alpha: "shape.<key>"`, `raised_intensity: "shape.<key>"`,
+## Plan 05-02 Task 2 (D-03): stylebox branch supports `empty: true`,
+## `radius: "shape.<key>"`, `padding: "shape.<key>"`,
+## `alpha: "shape.<key>"`, `raised_intensity: "shape.<key>"`,
 ## and `strategy: "shape.<strategy_key>"` — values are dereferenced through `_lookup_shape()`
 ## against the active direction's `shape` sub-block. The `disabled: true` carry-over is
 ## preserved (Cycle 2 C2). Strategy dispatch is closed-enum per D-04: unknown strategies
@@ -3602,6 +3639,8 @@ func _apply_kicker_style(kicker_style: StringName, role_table: Dictionary) -> Co
 func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictionary,
 					  tokens: Dictionary, style_personality: Dictionary) -> Variant:
 	if data_type == "stylebox":
+		if bool(recipe.get("empty", false)):
+			return StyleBoxEmpty.new()
 		var role: String = recipe.get("role", "surface_panel")
 		# raised_intensity may be either an int literal or a `shape.<key>` lookup string.
 		var raised_intensity_raw: Variant = recipe.get("raised_intensity", 0)

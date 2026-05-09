@@ -69,6 +69,7 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_create_dialog_chrome(theme, label)
 	_expect_shared_interaction_chrome(theme, label)
 	_expect_tree_view_chrome(theme, label)
+	_expect_list_view_chrome(theme, label)
 	_expect_split_container_chrome(theme, label)
 	_expect_button_surface_chrome(theme, label, expect_raised)
 	_expect_colored_button_raised_chrome(theme, label, expect_raised)
@@ -692,6 +693,15 @@ func _expect_shared_interaction_chrome(theme: Theme, label: String) -> void:
 	for entry in [
 		{"type": &"PopupMenu", "slot": &"hover", "state": button_hover},
 		{"type": &"ItemList", "slot": &"hovered", "state": button_hover},
+		{"type": &"ItemList", "slot": &"selected", "state": button_pressed},
+		{"type": &"ItemList", "slot": &"selected_focus", "state": button_pressed},
+		{"type": &"ItemList", "slot": &"hovered_selected", "state": button_pressed},
+		{"type": &"ItemList", "slot": &"hovered_selected_focus", "state": button_pressed},
+		{"type": &"ItemListSecondary", "slot": &"hovered", "state": button_hover},
+		{"type": &"ItemListSecondary", "slot": &"selected", "state": button_pressed},
+		{"type": &"ItemListSecondary", "slot": &"selected_focus", "state": button_pressed},
+		{"type": &"ItemListSecondary", "slot": &"hovered_selected", "state": button_pressed},
+		{"type": &"ItemListSecondary", "slot": &"hovered_selected_focus", "state": button_pressed},
 		{"type": &"MenuBar", "slot": &"hover", "state": button_hover},
 		{"type": &"MenuBar", "slot": &"pressed", "state": button_pressed},
 		{"type": &"Tree", "slot": &"hovered", "state": button_hover},
@@ -798,43 +808,90 @@ func _expect_tree_view_chrome(theme: Theme, label: String) -> void:
 			])
 
 
-func _expect_split_container_chrome(theme: Theme, label: String) -> void:
-	var reference_panel := theme.get_stylebox("panel", "Tree") as StyleBoxFlat
-	if reference_panel == null:
-		_fail("%s missing Tree.panel for split-bar background comparison" % label)
+func _expect_list_view_chrome(theme: Theme, label: String) -> void:
+	var accent := theme.get_color("drop_position_color", "Tree")
+	var button_pressed := theme.get_stylebox("pressed", "Button") as StyleBoxFlat
+	if button_pressed == null:
+		_fail("%s missing Button.pressed for ItemList selected comparison" % label)
 		return
 
+	for theme_type in [&"ItemList", &"ItemListSecondary"]:
+		var panel := theme.get_stylebox(&"panel", theme_type) as StyleBoxFlat
+		if panel == null:
+			_fail("%s missing %s.panel for list view chrome" % [label, theme_type])
+		elif _max_border_width(panel) != 0:
+			_fail("%s %s.panel should not draw a border/outline: %s/%s/%s/%s" % [
+				label,
+				theme_type,
+				panel.border_width_left,
+				panel.border_width_top,
+				panel.border_width_right,
+				panel.border_width_bottom,
+			])
+
+		for color_name in [&"font_selected_color", &"font_hovered_selected_color"]:
+			var selected_font := theme.get_color(color_name, theme_type)
+			if not selected_font.is_equal_approx(accent):
+				_fail("%s %s.%s should use accent color for selected item text: expected=%s got=%s" % [
+					label,
+					theme_type,
+					color_name,
+					accent.to_html(false),
+					selected_font.to_html(false),
+				])
+
+		if theme.get_color(&"guide_color", theme_type).a > 0.01:
+			_fail("%s %s.guide_color should be transparent so ItemList separators are hidden" % [label, theme_type])
+		if theme.get_color(&"font_outline_color", theme_type).a > 0.01:
+			_fail("%s %s.font_outline_color should be transparent because outline_size is 0" % [label, theme_type])
+		_expect_equal(theme.get_constant(&"outline_size", theme_type), 0, "%s %s.outline_size" % [label, theme_type])
+
+		for slot_name in [&"selected", &"selected_focus", &"hovered_selected", &"hovered_selected_focus"]:
+			var selected_style := theme.get_stylebox(slot_name, theme_type) as StyleBoxFlat
+			if selected_style == null:
+				_fail("%s missing %s.%s selected list style" % [label, theme_type, slot_name])
+				continue
+			if not selected_style.bg_color.is_equal_approx(button_pressed.bg_color):
+				_fail("%s %s.%s should share Button.pressed background: expected=%s got=%s" % [
+					label,
+					theme_type,
+					slot_name,
+					button_pressed.bg_color.to_html(false),
+					selected_style.bg_color.to_html(false),
+				])
+			if _max_border_width(selected_style) != 0:
+				_fail("%s %s.%s should not draw a selected border/outline: %s/%s/%s/%s" % [
+					label,
+					theme_type,
+					slot_name,
+					selected_style.border_width_left,
+					selected_style.border_width_top,
+					selected_style.border_width_right,
+					selected_style.border_width_bottom,
+				])
+
+
+func _expect_split_container_chrome(theme: Theme, label: String) -> void:
 	for theme_type in [&"SplitContainer", &"HSplitContainer", &"VSplitContainer"]:
-		var split_bar := theme.get_stylebox("split_bar_background", theme_type) as StyleBoxFlat
+		var split_bar := theme.get_stylebox("split_bar_background", theme_type)
 		if split_bar == null:
 			_fail("%s missing %s.split_bar_background" % [label, theme_type])
 			continue
-		if not split_bar.bg_color.is_equal_approx(reference_panel.bg_color):
-			_fail("%s %s.split_bar_background should match darkest rendered surface: split=%s reference=%s" % [
+		if not (split_bar is StyleBoxEmpty):
+			_fail("%s %s.split_bar_background should be StyleBoxEmpty so the gap inherits its parent surface, got %s" % [
 				label,
 				theme_type,
-				split_bar.bg_color.to_html(false),
-				reference_panel.bg_color.to_html(false),
+				split_bar.get_class(),
 			])
-		if _max_border_width(split_bar) != 0:
-			_fail("%s %s.split_bar_background should not draw an outline: %s/%s/%s/%s" % [
+			continue
+		if split_bar.get_margin(SIDE_LEFT) != 0.0 or split_bar.get_margin(SIDE_TOP) != 0.0 or split_bar.get_margin(SIDE_RIGHT) != 0.0 or split_bar.get_margin(SIDE_BOTTOM) != 0.0:
+			_fail("%s %s.split_bar_background should have zero empty margins: %s/%s/%s/%s" % [
 				label,
 				theme_type,
-				split_bar.border_width_left,
-				split_bar.border_width_top,
-				split_bar.border_width_right,
-				split_bar.border_width_bottom,
-			])
-		if split_bar.corner_radius_top_left != 0 or split_bar.corner_radius_top_right != 0 or split_bar.corner_radius_bottom_left != 0 or split_bar.corner_radius_bottom_right != 0:
-			_fail("%s %s.split_bar_background should have no corner radius" % [label, theme_type])
-		if split_bar.content_margin_left != 0.0 or split_bar.content_margin_top != 0.0 or split_bar.content_margin_right != 0.0 or split_bar.content_margin_bottom != 0.0:
-			_fail("%s %s.split_bar_background should have zero padding: %s/%s/%s/%s" % [
-				label,
-				theme_type,
-				split_bar.content_margin_left,
-				split_bar.content_margin_top,
-				split_bar.content_margin_right,
-				split_bar.content_margin_bottom,
+				split_bar.get_margin(SIDE_LEFT),
+				split_bar.get_margin(SIDE_TOP),
+				split_bar.get_margin(SIDE_RIGHT),
+				split_bar.get_margin(SIDE_BOTTOM),
 			])
 		_expect_equal(theme.get_constant("autohide", theme_type), 1, "%s %s.autohide" % [label, theme_type])
 		_expect_equal(theme.get_constant("separation", theme_type), 6, "%s %s.separation" % [label, theme_type])

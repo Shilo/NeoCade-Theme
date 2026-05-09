@@ -62,6 +62,38 @@ func _check_theme(theme: NeoCadeTheme, label: String) -> void:
 		_fail("%s missing ItemList/ItemListSecondary panel" % label)
 	elif not item_panel.bg_color.is_equal_approx(item_secondary_panel.bg_color):
 		_fail("%s ItemListSecondary.panel should match ItemList.panel" % label)
+	elif _max_border_width(item_secondary_panel) != 0:
+		_fail("%s ItemListSecondary.panel should not draw a border/outline" % label)
+
+	var accent := theme.get_color(&"drop_position_color", &"Tree")
+	var button_pressed := theme.get_stylebox(&"pressed", &"Button") as StyleBoxFlat
+	for item_type in [&"ItemList", &"ItemListSecondary"]:
+		for color_name in [&"font_selected_color", &"font_hovered_selected_color"]:
+			var selected_font := theme.get_color(color_name, item_type)
+			if not selected_font.is_equal_approx(accent):
+				_fail("%s %s.%s should use accent color for selected item text" % [label, item_type, color_name])
+		if theme.get_color(&"guide_color", item_type).a > 0.01:
+			_fail("%s %s.guide_color should be transparent" % [label, item_type])
+		if button_pressed != null:
+			for slot_name in [&"selected", &"selected_focus", &"hovered_selected", &"hovered_selected_focus"]:
+				var selected_style := theme.get_stylebox(slot_name, item_type) as StyleBoxFlat
+				if selected_style == null:
+					_fail("%s missing %s.%s" % [label, item_type, slot_name])
+				elif not selected_style.bg_color.is_equal_approx(button_pressed.bg_color):
+					_fail("%s %s.%s should match Button.pressed background" % [label, item_type, slot_name])
+				elif _max_border_width(selected_style) != 0:
+					_fail("%s %s.%s should not draw a selected border/outline" % [label, item_type, slot_name])
+
+	for split_type in [&"SplitContainer", &"HSplitContainer", &"VSplitContainer"]:
+		var split_bar := theme.get_stylebox(&"split_bar_background", split_type)
+		if split_bar == null:
+			_fail("%s missing %s.split_bar_background" % [label, split_type])
+		elif not (split_bar is StyleBoxEmpty):
+			_fail("%s %s.split_bar_background should be StyleBoxEmpty for contextual dialog spacing, got %s" % [
+				label,
+				split_type,
+				split_bar.get_class(),
+			])
 
 	for help_type in [&"EditorHelpBitTitle", &"EditorHelpBitContent"]:
 		var help_style := theme.get_stylebox(&"normal", help_type) as StyleBoxFlat
@@ -84,6 +116,10 @@ func _check_theme(theme: NeoCadeTheme, label: String) -> void:
 func _expect_equal(actual: Variant, expected: Variant, message: String) -> void:
 	if actual != expected:
 		_fail("%s expected=%s got=%s" % [message, expected, actual])
+
+
+func _max_border_width(stylebox: StyleBoxFlat) -> int:
+	return maxi(stylebox.border_width_left, maxi(stylebox.border_width_top, maxi(stylebox.border_width_right, stylebox.border_width_bottom)))
 
 
 func _fail(message: String) -> void:
