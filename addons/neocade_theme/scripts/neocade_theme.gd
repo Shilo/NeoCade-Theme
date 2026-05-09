@@ -2372,7 +2372,7 @@ const BINDING_TABLE: Dictionary = {
 			"panel":            {"role": "surface_panel", "border_role": "surface_panel_edge",
 								  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true},
 			"tabbar_background":{"role": "surface_base",  "raised_intensity": 0,
-								  "border_width": 0, "radius": 0, "content_margins": Vector4i(4, 3, 4, 2)},
+								  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
 		},
 		"color": {
 			"font_selected_color":   {"role": "text_strong"},
@@ -2404,6 +2404,37 @@ const BINDING_TABLE: Dictionary = {
 			"drop_mark":           {"icon": "tab_drop_mark"},
 			"menu":                {"icon": "tab_menu"},
 			"menu_highlight":      {"icon": "tab_menu"},
+		},
+	},
+	# 29a. Editor dock tab containers — FileSystem/Scene/Inspector docks are DockTabContainer
+	# subclasses, not authored scenes with themeable toolbar panels. Godot's FileSystemDock
+	# builds a VBoxContainer with HBoxContainer toolbar rows; those containers cannot draw a
+	# stylebox, so the dock panel must own the inset while painting the background underneath.
+	"DockTabContainer": {
+		"stylebox": {
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true,
+					  "content_margins": Vector4i(6, 5, 6, 5)},
+			"tabbar_background": {"role": "surface_base", "raised_intensity": 0,
+					  "border_width": 0, "radius": 0, "content_margins": Vector4i(4, 2, 4, 0)},
+		},
+	},
+	"SideDockTabContainer": {
+		"stylebox": {
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true,
+					  "content_margins": Vector4i(6, 5, 6, 5)},
+			"tabbar_background": {"role": "surface_base", "raised_intensity": 0,
+					  "border_width": 0, "radius": 0, "content_margins": Vector4i(4, 2, 4, 0)},
+		},
+	},
+	"BottomSideDockTabContainer": {
+		"stylebox": {
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true,
+					  "content_margins": Vector4i(6, 5, 6, 5)},
+			"tabbar_background": {"role": "surface_base", "raised_intensity": 0,
+					  "border_width": 0, "radius": 0, "content_margins": Vector4i(4, 2, 4, 0)},
 		},
 	},
 	# 30. TextEdit — 3 stylebox set
@@ -2625,14 +2656,22 @@ const BINDING_TABLE: Dictionary = {
 			"margin_top":    {"value": 0},
 		},
 	},
+	"EditorDock": {
+		"constant": {
+			"margin_bottom": {"value": 6},
+			"margin_left":   {"value": 6},
+			"margin_right":  {"value": 6},
+			"margin_top":    {"value": 6},
+		},
+	},
 	"HBoxContainer": {
 		"constant": {
-			"separation": {"value": 4},
+			"separation": {"value": 2},
 		},
 	},
 	"VBoxContainer": {
 		"constant": {
-			"separation": {"value": 4},
+			"separation": {"value": 2},
 		},
 	},
 	"FlowContainer": {

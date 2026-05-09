@@ -461,8 +461,17 @@ func _expect_tab_state_chrome(theme: Theme, label: String) -> void:
 func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 	for margin_name in [&"margin_top", &"margin_bottom", &"margin_left", &"margin_right"]:
 		_expect_equal(theme.get_constant(margin_name, "MarginContainer"), 0, "%s MarginContainer.%s" % [label, margin_name])
-	_expect_equal(theme.get_constant("separation", "HBoxContainer"), 4, "%s HBoxContainer.separation" % label)
-	_expect_equal(theme.get_constant("separation", "VBoxContainer"), 4, "%s VBoxContainer.separation" % label)
+		_expect_equal(theme.get_constant(margin_name, "EditorDock"), 6, "%s EditorDock.%s" % [label, margin_name])
+	if ClassDB.class_exists("InspectorDock") and not ClassDB.is_parent_class("InspectorDock", "EditorDock"):
+		_fail("%s InspectorDock should inherit EditorDock for dock margin theming" % label)
+	if ClassDB.class_exists("FileSystemDock") and not ClassDB.is_parent_class("FileSystemDock", "EditorDock"):
+		_fail("%s FileSystemDock should inherit EditorDock for dock margin theming" % label)
+	# Godot editor docks such as FileSystemDock build toolbar rows from plain
+	# HBoxContainer/VBoxContainer nodes inside EditorDock, which is a MarginContainer.
+	# Keep generic layout spacing minimal and use EditorDock margins for visible dock
+	# padding around the toolbar rows.
+	_expect_equal(theme.get_constant("separation", "HBoxContainer"), 2, "%s HBoxContainer.separation" % label)
+	_expect_equal(theme.get_constant("separation", "VBoxContainer"), 2, "%s VBoxContainer.separation" % label)
 	_expect_equal(theme.get_constant("h_separation", "FlowContainer"), 4, "%s FlowContainer.h_separation" % label)
 	_expect_equal(theme.get_constant("v_separation", "FlowContainer"), 4, "%s FlowContainer.v_separation" % label)
 	_expect_equal(theme.get_constant("h_separation", "GridContainer"), 4, "%s GridContainer.h_separation" % label)
@@ -478,18 +487,63 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 	else:
 		if _max_border_width(tabbar_background) != 0:
 			_fail("%s TabContainer.tabbar_background should not draw an outline border" % label)
-		if tabbar_background.content_margin_left < 4 or tabbar_background.content_margin_right < 4:
-			_fail("%s TabContainer.tabbar_background should own left/right tab strip inset, got %s/%s" % [
+		if tabbar_background.content_margin_left != 0 or tabbar_background.content_margin_right != 0:
+			_fail("%s TabContainer.tabbar_background should not add fake left/right toolbar margins, got %s/%s" % [
 				label,
 				tabbar_background.content_margin_left,
 				tabbar_background.content_margin_right,
 			])
-		if tabbar_background.content_margin_top < 3 or tabbar_background.content_margin_bottom < 2:
-			_fail("%s TabContainer.tabbar_background should keep compact top/bottom inset, got %s/%s" % [
+		if tabbar_background.content_margin_top != 0 or tabbar_background.content_margin_bottom != 0:
+			_fail("%s TabContainer.tabbar_background should not own toolbar vertical inset, got %s/%s" % [
 				label,
 				tabbar_background.content_margin_top,
 				tabbar_background.content_margin_bottom,
 			])
+
+	for dock_type in [&"DockTabContainer", &"SideDockTabContainer", &"BottomSideDockTabContainer"]:
+		var dock_panel := theme.get_stylebox("panel", dock_type) as StyleBoxFlat
+		if dock_panel == null:
+			_fail("%s missing %s.panel for editor dock toolbar background inset" % [label, dock_type])
+		else:
+			if dock_panel.bg_color.a < 0.99:
+				_fail("%s %s.panel should paint the dock toolbar background" % [label, dock_type])
+			if dock_panel.content_margin_left < 6 or dock_panel.content_margin_right < 6:
+				_fail("%s %s.panel should own left/right dock inset, got %s/%s" % [
+					label,
+					dock_type,
+					dock_panel.content_margin_left,
+					dock_panel.content_margin_right,
+				])
+			if dock_panel.content_margin_top < 5 or dock_panel.content_margin_bottom < 5:
+				_fail("%s %s.panel should keep toolbar padding inside the painted dock background, got top/bottom=%s/%s" % [
+					label,
+					dock_type,
+					dock_panel.content_margin_top,
+					dock_panel.content_margin_bottom,
+				])
+
+		var dock_tabbar := theme.get_stylebox("tabbar_background", dock_type) as StyleBoxFlat
+		if dock_tabbar == null:
+			_fail("%s missing %s.tabbar_background for editor dock tab header inset" % [label, dock_type])
+		else:
+			if _max_border_width(dock_tabbar) != 0:
+				_fail("%s %s.tabbar_background should not draw an outline border" % [label, dock_type])
+			if dock_tabbar.bg_color.a < 0.99:
+				_fail("%s %s.tabbar_background should paint the full editor dock tab header" % [label, dock_type])
+			if dock_tabbar.content_margin_left < 4 or dock_tabbar.content_margin_right < 4:
+				_fail("%s %s.tabbar_background should keep tab header side inset inside the painted background, got %s/%s" % [
+					label,
+					dock_type,
+					dock_tabbar.content_margin_left,
+					dock_tabbar.content_margin_right,
+				])
+			if dock_tabbar.content_margin_top < 2 or dock_tabbar.content_margin_bottom != 0:
+				_fail("%s %s.tabbar_background should add compact top inset without detaching tabs, got top/bottom=%s/%s" % [
+					label,
+					dock_type,
+					dock_tabbar.content_margin_top,
+					dock_tabbar.content_margin_bottom,
+				])
 
 	var option_normal := theme.get_stylebox("normal", "OptionButton") as StyleBoxFlat
 	if option_normal == null:
