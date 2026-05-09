@@ -548,6 +548,7 @@ INTENTIONAL_AUTHORED MenuButton.constant.h_separation default=4 neocade=8
 DEFAULT_ONLY MenuButton.constant.outline_size default=0 neocade=<missing>
 INTENTIONAL_AUTHORED MenuButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED MenuButton.font_size.font_size default=16 neocade=14
+INTENTIONAL_AUTHORED NoBorderHorizontalBottom.constant.margin_top default=<missing> neocade=4
 INTENTIONAL_AUTHORED OptionButton.stylebox.disabled default=StyleBoxFlat(bg=#1a1a1a4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#24293dff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 DEFAULT_ONLY OptionButton.stylebox.disabled_mirrored default=StyleBoxFlat(bg=#1a1a1a4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
 INTENTIONAL_AUTHORED OptionButton.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -1467,6 +1468,7 @@ INTENTIONAL_AUTHORED MenuButton.constant.h_separation default=4 neocade=8
 DEFAULT_ONLY MenuButton.constant.outline_size default=0 neocade=<missing>
 INTENTIONAL_AUTHORED MenuButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED MenuButton.font_size.font_size default=16 neocade=14
+INTENTIONAL_AUTHORED NoBorderHorizontalBottom.constant.margin_top default=<missing> neocade=4
 INTENTIONAL_AUTHORED OptionButton.stylebox.disabled default=StyleBoxFlat(bg=#1a1a1a4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#24293dff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 DEFAULT_ONLY OptionButton.stylebox.disabled_mirrored default=StyleBoxFlat(bg=#1a1a1a4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
 INTENTIONAL_AUTHORED OptionButton.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2367,6 +2369,7 @@ INTENTIONAL_AUTHORED MenuButton.color.font_pressed_color default=#ffffffff neoca
 INTENTIONAL_AUTHORED MenuButton.constant.h_separation default=4 neocade=12
 DEFAULT_ONLY MenuButton.constant.outline_size default=0 neocade=<missing>
 INTENTIONAL_AUTHORED MenuButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED NoBorderHorizontalBottom.constant.margin_top default=<missing> neocade=4
 INTENTIONAL_AUTHORED OptionButton.stylebox.disabled default=StyleBoxFlat(bg=#1a1a1a4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#24293dff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=12.0/6.0/12.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 DEFAULT_ONLY OptionButton.stylebox.disabled_mirrored default=StyleBoxFlat(bg=#1a1a1a4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
 INTENTIONAL_AUTHORED OptionButton.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2728,7 +2731,7 @@ INTENTIONAL_AUTHORED WindowContentPanel.stylebox.panel default=<missing> neocade
 Summary:
 - SAME=239
 - FALLS_BACK=0
-- INTENTIONAL_AUTHORED=2227
+- INTENTIONAL_AUTHORED=2230
 - UNINTENTIONAL_EXTRA=0
 - UNINTENTIONAL_STYLE=0
 - NEOCADE_ONLY=0

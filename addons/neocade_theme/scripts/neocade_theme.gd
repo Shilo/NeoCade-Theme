@@ -1025,7 +1025,7 @@ func _resolve_style_personality() -> Dictionary:
 
 
 # ─── Type variation registry (DESIGN_TOKENS §8.5; PITFALLS 1.2 mandate explicit fonts) ──────
-## 17 NeoCade type variations registered via Theme.set_type_variation():
+## 19 NeoCade type variations registered via Theme.set_type_variation():
 ##   - Phase 4 shipped 14 (Cross-AI Cycle 1 C4 fix included CodeLabel).
 ##   - Plan 05-04 (D-09) adds Kicker as the 15th, closing DESIGN_TOKENS §8.6's
 ##     explicit Phase 5 todo. Per PITFALLS 1.2, the Kicker entry below is paired
@@ -1069,6 +1069,9 @@ const TYPE_VARIATIONS: Dictionary = {
 	"CardPanel": "PanelContainer",
 	"HeroPanel": "PanelContainer",
 	"WindowContentPanel": "PanelContainer",
+	# Editor dock scroll-body wrappers used after toolbar stacks.
+	"NoBorderHorizontal":       "MarginContainer",
+	"NoBorderHorizontalBottom": "NoBorderHorizontal",
 }
 
 
@@ -2662,6 +2665,11 @@ const BINDING_TABLE: Dictionary = {
 			"margin_left":   {"value": 6},
 			"margin_right":  {"value": 6},
 			"margin_top":    {"value": 6},
+		},
+	},
+	"NoBorderHorizontalBottom": {
+		"constant": {
+			"margin_top": {"value": 4},
 		},
 	},
 	"HBoxContainer": {

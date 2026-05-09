@@ -466,6 +466,14 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 		_fail("%s InspectorDock should inherit EditorDock for dock margin theming" % label)
 	if ClassDB.class_exists("FileSystemDock") and not ClassDB.is_parent_class("FileSystemDock", "EditorDock"):
 		_fail("%s FileSystemDock should inherit EditorDock for dock margin theming" % label)
+	if theme.get_type_variation_base(&"NoBorderHorizontal") != &"MarginContainer":
+		_fail("%s NoBorderHorizontal should inherit MarginContainer for editor scroll-body wrappers" % label)
+	if theme.get_type_variation_base(&"NoBorderHorizontalBottom") != &"NoBorderHorizontal":
+		_fail("%s NoBorderHorizontalBottom should inherit NoBorderHorizontal" % label)
+	_expect_equal(theme.get_constant(&"margin_top", &"NoBorderHorizontalBottom"), 4, "%s NoBorderHorizontalBottom.margin_top" % label)
+	_expect_equal(theme.get_constant(&"margin_left", &"NoBorderHorizontalBottom"), 0, "%s NoBorderHorizontalBottom.margin_left" % label)
+	_expect_equal(theme.get_constant(&"margin_right", &"NoBorderHorizontalBottom"), 0, "%s NoBorderHorizontalBottom.margin_right" % label)
+	_expect_equal(theme.get_constant(&"margin_bottom", &"NoBorderHorizontalBottom"), 0, "%s NoBorderHorizontalBottom.margin_bottom" % label)
 	# Godot editor docks such as FileSystemDock build toolbar rows from plain
 	# HBoxContainer/VBoxContainer nodes inside EditorDock, which is a MarginContainer.
 	# Keep generic layout spacing minimal and use EditorDock margins for visible dock

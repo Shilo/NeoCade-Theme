@@ -27,6 +27,18 @@ func _run() -> void:
 		printerr("THEME_EDITOR_DOCK_PROBE: EditorDock is not a MarginContainer")
 		quit(1)
 		return
+	if theme.get_type_variation_base(&"NoBorderHorizontal") != &"MarginContainer":
+		printerr("THEME_EDITOR_DOCK_PROBE: NoBorderHorizontal should inherit MarginContainer")
+		quit(1)
+		return
+	if theme.get_type_variation_base(&"NoBorderHorizontalBottom") != &"NoBorderHorizontal":
+		printerr("THEME_EDITOR_DOCK_PROBE: NoBorderHorizontalBottom should inherit NoBorderHorizontal")
+		quit(1)
+		return
+	if theme.get_constant(&"margin_top", &"NoBorderHorizontalBottom") != 4:
+		printerr("THEME_EDITOR_DOCK_PROBE: expected NoBorderHorizontalBottom.margin_top=4")
+		quit(1)
+		return
 	if not ClassDB.can_instantiate(&"EditorDock"):
 		_expect_theme_margins(theme)
 		print("THEME_EDITOR_DOCK_PROBE: PASS EditorDock registered as MarginContainer; headless ClassDB cannot instantiate it")
