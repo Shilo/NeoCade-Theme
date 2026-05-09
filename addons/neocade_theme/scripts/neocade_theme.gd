@@ -247,12 +247,27 @@ func _regenerate_theme() -> void:
 	var surface_overlay: Color = _mix(base_color, elevate_target, 0.20 * spread_factor)
 	var outline_color: Color   = _mix(base_color, elevate_target, 0.24 * spread_factor)
 
+	# Button chrome follows Godot editor/minimal theme behavior: a filled tonal surface
+	# derived from the base color, with a same-family edge. This is intentionally
+	# separate from surface_panel/outline_color so buttons do not render as outlined boxes.
+	var button_normal: Color = _button_tonal_color(base_color, 0.35, 0.85)
+	var button_hover: Color = _button_tonal_color(base_color, 0.55, 0.75)
+	var button_pressed: Color = _button_tonal_color(base_color, 0.75, 0.75)
+	var button_disabled: Color = _button_tonal_color(base_color, 0.20, 0.75)
+	var button_border: Color = _button_tonal_color(base_color, 0.45, 0.75)
+	var button_border_hover: Color = _button_tonal_color(base_color, 0.65, 0.75)
+	var button_border_pressed: Color = _button_tonal_color(base_color, 0.85, 0.75)
+
 	# ── Per-color tinted offsets for raised mode (DESIGN_TOKENS §6.3) ──
 	var accent_offset: Color          = _tint_toward_base(accent_color, base_color)
 	var surface_high_offset: Color    = _tint_toward_base(surface_high, base_color)
 	var surface_panel_offset: Color   = _tint_toward_base(surface_panel, base_color)
 	var surface_overlay_offset: Color = _tint_toward_base(surface_overlay, base_color)
 	var surface_low_offset: Color     = _tint_toward_base(surface_low, base_color)
+	var button_normal_offset: Color = _tint_toward_base(button_normal, base_color)
+	var button_hover_offset: Color = _tint_toward_base(button_hover, base_color)
+	var button_pressed_offset: Color = _tint_toward_base(button_pressed, base_color)
+	var button_disabled_offset: Color = _tint_toward_base(button_disabled, base_color)
 
 	# ── Text colors with is_light flip (DESIGN_TOKENS §6.4) ──
 	var text_strong: Color
@@ -412,11 +427,22 @@ func _regenerate_theme() -> void:
 		"surface_high":           surface_high,
 		"surface_overlay":        surface_overlay,
 		"outline_color":          outline_color,
+		"button_normal":          button_normal,
+		"button_hover":           button_hover,
+		"button_pressed":         button_pressed,
+		"button_disabled":        button_disabled,
+		"button_border":          button_border,
+		"button_border_hover":    button_border_hover,
+		"button_border_pressed":  button_border_pressed,
 		"accent_offset":          accent_offset,
 		"surface_high_offset":    surface_high_offset,
 		"surface_panel_offset":   surface_panel_offset,
 		"surface_overlay_offset": surface_overlay_offset,
 		"surface_low_offset":     surface_low_offset,
+		"button_normal_offset":   button_normal_offset,
+		"button_hover_offset":    button_hover_offset,
+		"button_pressed_offset":  button_pressed_offset,
+		"button_disabled_offset": button_disabled_offset,
 		"text_strong":            text_strong,
 		"text_default":           text_default,
 		"text_muted":             text_muted,
@@ -501,6 +527,19 @@ func _mix(a: Color, b: Color, amount: float) -> Color:
 ## HSL-darken-floored-at-0 antipattern. Default ratio 0.40 per MOCKUP-REVISION-3-HANDOFF.md.
 func _tint_toward_base(element: Color, base_c: Color, ratio: float = 0.40) -> Color:
 	return _mix(element, base_c, ratio)
+
+
+func _button_tonal_color(source: Color, brightness_offset: float, saturation_multiplier: float) -> Color:
+	var result := Color(source)
+	var amount := clampf(0.35 * absf(brightness_offset), 0.0, 1.0)
+	var dark_theme := not is_light
+	if dark_theme == (brightness_offset > 0.0):
+		result.v = lerpf(result.v, 1.0, amount)
+	else:
+		result.v = lerpf(result.v, 0.0, amount)
+	result.s = clampf(result.s * saturation_multiplier, 0.0, 1.0)
+	result.a = source.a
+	return result
 
 
 func _readable_text_color(bg: Color) -> Color:
@@ -1344,17 +1383,21 @@ const BINDING_TABLE: Dictionary = {
 	# PrimaryButton variation per TYPEVAR-01 / DESIGN_TOKENS §5.
 	"Button": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+			"normal":         {"role": "button_normal", "border_role": "button_border",
+								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":          {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover",
+								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0,
+			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},  # pressed sinks; never lifted
 			"focus":          {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
-			"disabled":       {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+			"disabled":       {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},  # Cycle 2 C2: per-direction alpha
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0,
+			"hover_pressed":  {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
@@ -1531,16 +1574,18 @@ const BINDING_TABLE: Dictionary = {
 	# so the swatch button reads with per-direction radius/padding/lift like Button proper.
 	"ColorPickerButton": {
 		"stylebox": {
-			"normal":   {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+			"normal":   {"role": "button_normal", "border_role": "button_border",
+							"raised_intensity": "shape.raised_lifts.secondary",
 							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":    {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+			"hover":    {"role": "button_hover", "border_role": "button_border_hover",
+							"raised_intensity": "shape.raised_lifts.secondary",
 							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":  {"role": "state_pressed", "raised_intensity": 0,
+			"pressed":  {"role": "button_pressed", "border_role": "button_border_pressed",
+							"raised_intensity": 0,
 							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 			"focus":    {"role": "focus_ring",
 							"radius": "shape.secondary_radius"},
-			"disabled": {"role": "surface_panel", "disabled": true,
-							"raised_intensity": 0,
+			"disabled": {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
 							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
@@ -1918,17 +1963,20 @@ const BINDING_TABLE: Dictionary = {
 	# shape.raised_lifts.secondary so the per-direction shape language flows.
 	"MenuButton": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+			"normal":         {"role": "button_normal", "border_role": "button_border",
+								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":          {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover",
+								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0,
+			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 			"focus":          {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
-			"disabled":       {"role": "surface_panel", "disabled": true,
+			"disabled":       {"role": "button_disabled", "border_width": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0,
+			"hover_pressed":  {"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
@@ -1947,17 +1995,20 @@ const BINDING_TABLE: Dictionary = {
 	# shape.raised_lifts.secondary so the per-direction shape language flows.
 	"OptionButton": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+			"normal":         {"role": "button_normal", "border_role": "button_border",
+								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":          {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover",
+								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0,
+			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 			"focus":          {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
-			"disabled":       {"role": "surface_panel", "disabled": true,
+			"disabled":       {"role": "button_disabled", "border_width": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0,
+			"hover_pressed":  {"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
@@ -2476,18 +2527,21 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":        {"role": "role_primary",  "raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"strategy": "shape.primary_strategy"},
+								"strategy": "shape.primary_strategy", "border_width": 0},
 			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"strategy": "shape.primary_strategy"},
+								"strategy": "shape.primary_strategy", "border_width": 0},
 			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"border_width": 0},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.primary_radius"},
 			"disabled":      {"role": "role_primary",  "disabled": true, "raised_intensity": 0,
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"border_width": 0},
 			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"border_width": 0},
 		},
 		"color": {
 			"font_color":              {"role": "text_on_primary_button"},
@@ -2513,17 +2567,20 @@ const BINDING_TABLE: Dictionary = {
 	# than primary so the visual hierarchy is preserved when raised=true).
 	"SecondaryButton": {
 		"stylebox": {
-			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+			"normal":        {"role": "button_normal", "border_role": "button_border",
+								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+			"hover":         {"role": "button_hover", "border_role": "button_border_hover",
+								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+			"pressed":       {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
-			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+			"disabled":      {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+			"hover_pressed":{"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
@@ -2593,20 +2650,22 @@ const BINDING_TABLE: Dictionary = {
 	"DangerButton": {
 		"stylebox": {
 			"normal":        {"role": "role_danger",   "raised_intensity": "shape.raised_lifts.primary",
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"border_width": 0},
 			"hover":         {"role": "role_danger",   "raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"alpha": 0.92},
+								"alpha": 0.92, "border_width": 0},
 			"pressed":       {"role": "role_danger",   "raised_intensity": 0,
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"alpha": 0.78},
+								"alpha": 0.78, "border_width": 0},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.primary_radius"},
 			"disabled":      {"role": "role_danger",   "disabled": true, "raised_intensity": 0,
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"border_width": 0},
 			"hover_pressed":{"role": "role_danger",   "raised_intensity": 0,
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"alpha": 0.78},
+								"alpha": 0.78, "border_width": 0},
 		},
 		"color": {
 			"font_color":              {"role": "text_on_danger"},
@@ -2634,17 +2693,20 @@ const BINDING_TABLE: Dictionary = {
 	# affordance compared to primary chrome.
 	"IconButton": {
 		"stylebox": {
-			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
+			"normal":        {"role": "button_normal", "border_role": "button_border",
+								"raised_intensity": "shape.raised_lifts.ghost",
 								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
-			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.ghost",
+			"hover":         {"role": "button_hover", "border_role": "button_border_hover",
+								"raised_intensity": "shape.raised_lifts.ghost",
 								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
-			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+			"pressed":       {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
-			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+			"disabled":      {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
-			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+			"hover_pressed":{"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
 		},
 		"color": {
@@ -2674,18 +2736,21 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"alpha": 0.0},
-			"hover":         {"role": "state_hover",   "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+								"alpha": 0.0, "border_width": 0},
+			"hover":         {"role": "button_hover", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"border_width": 0},
+			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"border_width": 0},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
-			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"alpha": 0.0},
-			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+								"alpha": 0.0, "border_width": 0},
+			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"border_width": 0},
 		},
 		"color": {
 			"font_color":              {"role": "text_default"},
@@ -3170,7 +3235,12 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		if corner_profile == "tab_connected":
 			_set_tab_connected_radius(sb, resolved_radius)
 		var border_width: int = int(recipe.get("border_width", outline_width))
-		_apply_outline_border(sb, role_table.outline_color, maxi(0, border_width))
+		var border_role: String = recipe.get("border_role", "outline_color")
+		var border_color: Color = role_table.get(border_role, role_table.outline_color)
+		var border_alpha: float = float(recipe.get("border_alpha", 1.0))
+		if border_alpha < 1.0:
+			border_color = Color(border_color.r, border_color.g, border_color.b, border_color.a * border_alpha)
+		_apply_outline_border(sb, border_color, maxi(0, border_width))
 		# Plan 05-02 Task 2 (D-03): padding may be a `shape.<key>` Vector2i lookup
 		# or an explicit Vector2i. Unspecified padding is zero; structural styleboxes must
 		# opt into content margins instead of inheriting giant global chrome.

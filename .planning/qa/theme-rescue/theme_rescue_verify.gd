@@ -60,6 +60,7 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_popup_chrome(theme, label)
 	_expect_no_label_chrome(theme, label)
 	_expect_tab_top_only_corners(theme, label)
+	_expect_button_surface_chrome(theme, label, expect_raised)
 
 	_expect_contrast(theme, "PrimaryButton", "normal", "font_color", MIN_TEXT_CONTRAST, label)
 	_expect_contrast(theme, "DangerButton", "normal", "font_color", MIN_TEXT_CONTRAST, label)
@@ -178,6 +179,53 @@ func _expect_tab_top_only_corners(theme: Theme, label: String) -> void:
 				])
 
 
+func _expect_button_surface_chrome(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:
+	for theme_type in [&"Button", &"SecondaryButton", &"OptionButton", &"MenuButton", &"ColorPickerButton", &"IconButton"]:
+		var normal := theme.get_stylebox("normal", theme_type) as StyleBoxFlat
+		var hover := theme.get_stylebox("hover", theme_type) as StyleBoxFlat
+		var pressed := theme.get_stylebox("pressed", theme_type) as StyleBoxFlat
+		var disabled := theme.get_stylebox("disabled", theme_type) as StyleBoxFlat
+		if normal == null or hover == null or pressed == null or disabled == null:
+			_fail("%s missing button-family styleboxes for %s" % [label, theme_type])
+			continue
+		if normal.bg_color.a < 0.95:
+			_fail("%s %s.normal is not a filled button surface: alpha=%.2f" % [label, theme_type, normal.bg_color.a])
+		if not expect_raised and _max_border_width(normal) > 1:
+			_fail("%s %s.normal flat border too thick: %s/%s/%s/%s" % [
+				label,
+				theme_type,
+				normal.border_width_left,
+				normal.border_width_top,
+				normal.border_width_right,
+				normal.border_width_bottom,
+			])
+		if _max_border_width(normal) > 0 and _contrast_ratio(normal.bg_color, normal.border_color) > 1.45:
+			_fail("%s %s.normal border is too contrasty for editor-like button chrome: bg=%s border=%s ratio=%.2f" % [
+				label,
+				theme_type,
+				normal.bg_color.to_html(false),
+				normal.border_color.to_html(false),
+				_contrast_ratio(normal.bg_color, normal.border_color),
+			])
+		if expect_raised:
+			if normal.border_width_bottom <= normal.border_width_top:
+				_fail("%s raised %s.normal has no bottom depth edge" % [label, theme_type])
+			if normal.border_width_right > normal.border_width_left:
+				_fail("%s raised %s.normal still has a right-side raised edge" % [label, theme_type])
+		if not expect_raised and _max_border_width(disabled) != 0:
+			_fail("%s %s.disabled should not keep an outline border" % [label, theme_type])
+
+		var normal_lum := _relative_luminance(normal.bg_color)
+		var hover_lum := _relative_luminance(hover.bg_color)
+		var pressed_lum := _relative_luminance(pressed.bg_color)
+		if theme.is_light:
+			if hover_lum >= normal_lum or pressed_lum >= hover_lum:
+				_fail("%s %s button ramp does not darken on hover/press for light base" % [label, theme_type])
+		else:
+			if hover_lum <= normal_lum or pressed_lum <= hover_lum:
+				_fail("%s %s button ramp does not brighten on hover/press for dark base" % [label, theme_type])
+
+
 func _expect_margin_max(theme: Theme, theme_type: StringName, slot_name: StringName, max_h: int, max_v: int, label: String) -> void:
 	var stylebox := theme.get_stylebox(slot_name, theme_type) as StyleBoxFlat
 	if stylebox == null:
@@ -206,6 +254,13 @@ func _expect_contrast(theme: Theme, theme_type: StringName, stylebox_slot: Strin
 func _expect_equal(actual: Variant, expected: Variant, label: String) -> void:
 	if actual != expected:
 		_fail("%s expected %s got %s" % [label, expected, actual])
+
+
+func _max_border_width(stylebox: StyleBoxFlat) -> int:
+	return maxi(
+		maxi(stylebox.border_width_left, stylebox.border_width_top),
+		maxi(stylebox.border_width_right, stylebox.border_width_bottom)
+	)
 
 
 func _contrast_ratio(a: Color, b: Color) -> float:
