@@ -397,8 +397,8 @@ func _regenerate_theme() -> void:
 	var header_large_font  := preload("res://addons/neocade_theme/fonts/inter_header_large.tres") as FontVariation
 	var header_medium_font := preload("res://addons/neocade_theme/fonts/inter_header_medium.tres") as FontVariation
 	var header_small_font  := preload("res://addons/neocade_theme/fonts/inter_header_small.tres") as FontVariation
-	# 15 variations × set_font (Cross-AI Cycle 1 C4 fix: CodeLabel included;
-	# Plan 05-04 D-09: Kicker is the 15th variation per DESIGN_TOKENS §8.6).
+	# Text-bearing variations get explicit set_font calls (Cross-AI Cycle 1 C4 fix:
+	# CodeLabel included; WindowContentPanel is structural and owns no font slots).
 	set_font("font", "HeaderLarge",  header_large_font)
 	set_font("font", "HeaderMedium", header_medium_font)
 	set_font("font", "HeaderSmall",  header_small_font)
@@ -521,6 +521,7 @@ func _regenerate_theme() -> void:
 		"role_primary":           role_primary,
 		"role_primary_offset":    role_primary_offset,
 		"accent_rim":             accent_rim,
+		"scroll_shadow":          Color.BLACK,
 		# Semantic roles (Plan 05-02 Task 2; DESIGN_TOKENS §7.1).
 		"role_success":           role_success,
 		"role_warning":           role_warning,
@@ -1022,12 +1023,13 @@ func _resolve_style_personality() -> Dictionary:
 
 
 # ─── Type variation registry (DESIGN_TOKENS §8.5; PITFALLS 1.2 mandate explicit fonts) ──────
-## 15 NeoCade type variations registered via Theme.set_type_variation():
+## 16 NeoCade type variations registered via Theme.set_type_variation():
 ##   - Phase 4 shipped 14 (Cross-AI Cycle 1 C4 fix included CodeLabel).
 ##   - Plan 05-04 (D-09) adds Kicker as the 15th, closing DESIGN_TOKENS §8.6's
 ##     explicit Phase 5 todo. Per PITFALLS 1.2, the Kicker entry below is paired
 ##     with explicit set_font + set_font_size calls (variations don't inherit
 ##     fonts from base type).
+##   - WindowContentPanel is a structural PanelContainer variation for embedded Window content.
 ## Each entry: variation_name → base_type. Phases 5/6/7 author per-direction personality
 ## styleboxes per variation in `.tres` Theme Editor overrides; Phase 4 only registers + sets
 ## explicit fonts.
@@ -1059,9 +1061,10 @@ const TYPE_VARIATIONS: Dictionary = {
 	"Kicker":       "Label",
 	# InfoText (TYPEVAR-03; rich-text small body) — 1
 	"InfoText":     "RichTextLabel",
-	# Panel family (TYPEVAR-04) — 2
+	# Panel family (TYPEVAR-04) plus embedded Window content surface — 3
 	"CardPanel": "PanelContainer",
 	"HeroPanel": "PanelContainer",
+	"WindowContentPanel": "PanelContainer",
 }
 
 
@@ -1920,8 +1923,8 @@ const BINDING_TABLE: Dictionary = {
 					  "raised_intensity": 0, "padding": Vector2i(0, 0)},
 		},
 		"color": {
-			"scroll_hint_horizontal_color": {"role": "role_primary", "alpha": 0.72},
-			"scroll_hint_vertical_color":   {"role": "role_primary", "alpha": 0.72},
+			"scroll_hint_horizontal_color": {"role": "scroll_shadow"},
+			"scroll_hint_vertical_color":   {"role": "scroll_shadow"},
 		},
 		"icon": {
 			"scroll_hint_horizontal": {"icon": "scroll_hint_horizontal"},
@@ -1931,7 +1934,8 @@ const BINDING_TABLE: Dictionary = {
 	# 13b. SplitContainer — base class owns h/v grabbers and touch-dragger colors.
 	"SplitContainer": {
 		"stylebox": {
-			"split_bar_background": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"split_bar_background": {"role": "surface_low", "border_role": "surface_low", "raised_intensity": 0,
+									  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
 		},
 		"color": {
 			"touch_dragger_color":         {"role": "text_muted"},
@@ -1939,9 +1943,9 @@ const BINDING_TABLE: Dictionary = {
 			"touch_dragger_pressed_color": {"role": "role_primary"},
 		},
 		"constant": {
-			"autohide":               {"value": 0},
-			"minimum_grab_thickness": {"value": "tokens.tapPadding"},
-			"separation":             {"value": "tokens.tapPadding"},
+			"autohide":               {"value": 1},
+			"minimum_grab_thickness": {"value": 6},
+			"separation":             {"value": 6},
 		},
 		"icon": {
 			"h_grabber":       {"icon": "split_grabber_h"},
@@ -1953,12 +1957,13 @@ const BINDING_TABLE: Dictionary = {
 	# 14. HSplitContainer — split-bar chrome plus official grabber/touch-dragger icons.
 	"HSplitContainer": {
 		"stylebox": {
-			"split_bar_background": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"split_bar_background": {"role": "surface_low", "border_role": "surface_low", "raised_intensity": 0,
+									  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
 		},
 		"constant": {
-			"autohide":               {"value": 0},
-			"separation":             {"value": "tokens.tapPadding"},
-			"minimum_grab_thickness": {"value": "tokens.tapPadding"},
+			"autohide":               {"value": 1},
+			"separation":             {"value": 6},
+			"minimum_grab_thickness": {"value": 6},
 		},
 		"icon": {
 			"grabber":       {"icon": "split_grabber_h"},
@@ -1990,7 +1995,7 @@ const BINDING_TABLE: Dictionary = {
 			"font_hovered_selected_color": {"role": "text_on_accent_offset"},
 			"font_outline_color":          {"role": "outline_color"},
 			"guide_color":                 {"role": "outline_color"},
-			"scroll_hint_color":           {"role": "role_primary", "alpha": 0.82},
+			"scroll_hint_color":           {"role": "scroll_shadow"},
 		},
 		"constant": {
 			"v_separation":    {"value": "tokens.tapPadding"},
@@ -2429,60 +2434,66 @@ const BINDING_TABLE: Dictionary = {
 	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
 	"Tree": {
 		"stylebox": {
-			"panel":                  {"role": "surface_low", "border_role": "surface_low_edge",
-									   "raised_intensity": 0},
+			"panel":                  {"role": "surface_low", "border_role": "surface_low",
+									   "raised_intensity": 0, "border_width": 0},
 			"focus":                  {"role": "focus_ring"},
-			"title_button_normal":    {"role": "surface_panel", "raised_intensity": 0},
+			"title_button_normal":    {"role": "button_normal", "border_role": "button_normal",
+										"raised_intensity": 0, "border_width": 0},
 			"title_button_pressed":   {"role": "button_pressed", "raised_intensity": 0,
-										"border_width": 0},
+										"border_role": "button_pressed", "border_width": 0},
 			"title_button_hover":     {"role": "button_hover",   "raised_intensity": 0,
-										"border_width": 0},
+										"border_role": "button_hover", "border_width": 0},
 			"button_hover":           {"role": "button_hover",   "raised_intensity": 0,
-										"border_width": 0},
+										"border_role": "button_hover", "border_width": 0},
 			"button_pressed":         {"role": "button_pressed", "raised_intensity": 0,
-										"border_width": 0},
-			"custom_button":          {"role": "surface_panel", "raised_intensity": 0},
+										"border_role": "button_pressed", "border_width": 0},
+			"custom_button":          {"role": "button_normal", "border_role": "button_normal",
+										"raised_intensity": 0, "border_width": 0},
 			"hovered":                {"role": "button_hover",  "raised_intensity": 0,
-										"border_width": 0},
+										"border_role": "button_hover", "border_width": 0},
 			"hovered_dimmed":         {"role": "button_hover",  "raised_intensity": 0,
-										"alpha": 0.55, "border_width": 0},
-			"selected":               {"role": "accent_offset", "raised_intensity": 0},
-			"selected_focus":         {"role": "accent_offset", "raised_intensity": 0},
-			"hovered_selected":       {"role": "accent_offset", "raised_intensity": 0},
-			"hovered_selected_focus": {"role": "accent_offset", "raised_intensity": 0},
+										"border_role": "button_hover", "alpha": 0.55, "border_width": 0},
+			"selected":               {"role": "button_pressed", "raised_intensity": 0,
+										"border_role": "button_pressed", "border_width": 0},
+			"selected_focus":         {"role": "button_pressed", "raised_intensity": 0,
+										"border_role": "button_pressed", "border_width": 0},
+			"hovered_selected":       {"role": "button_pressed", "raised_intensity": 0,
+										"border_role": "button_pressed", "border_width": 0},
+			"hovered_selected_focus": {"role": "button_pressed", "raised_intensity": 0,
+										"border_role": "button_pressed", "border_width": 0},
 			"custom_button_hover":    {"role": "button_hover",  "raised_intensity": 0,
-										"border_width": 0},
+										"border_role": "button_hover", "border_width": 0},
 			"custom_button_pressed":  {"role": "button_pressed", "raised_intensity": 0,
-										"border_width": 0},
+										"border_role": "button_pressed", "border_width": 0},
 			"cursor":                 {"role": "button_hover",  "raised_intensity": 0,
-										"alpha": 0.72, "border_width": 0},
+										"border_role": "button_hover", "alpha": 0.72, "border_width": 0},
 			"cursor_unfocused":       {"role": "button_hover",  "raised_intensity": 0,
-										"alpha": 0.46, "border_width": 0},
+										"border_role": "button_hover", "alpha": 0.46, "border_width": 0},
 		},
 		"color": {
-			"children_hl_line_color":      {"role": "outline_color"},
+			"children_hl_line_color":      {"role": "surface_low", "alpha": 0.0},
 			"custom_button_font_highlight":{"role": "role_primary"},
 			"drop_position_color":         {"role": "role_primary"},
 			"font_color":                  {"role": "text_default"},
 			"font_disabled_color":         {"role": "text_default", "disabled": true},
 			"font_hovered_color":          {"role": "text_strong"},
 			"font_hovered_dimmed_color":   {"role": "text_muted"},
-			"font_hovered_selected_color": {"role": "text_on_accent_offset"},
+			"font_hovered_selected_color": {"role": "role_primary"},
 			"font_outline_color":          {"role": "outline_color"},
-			"font_selected_color":         {"role": "text_on_accent_offset"},
-			"guide_color":                 {"role": "outline_color"},
-			"parent_hl_line_color":        {"role": "outline_color"},
-			"relationship_line_color":     {"role": "outline_color"},
-			"scroll_hint_color":           {"role": "role_primary", "alpha": 0.82},
+			"font_selected_color":         {"role": "role_primary"},
+			"guide_color":                 {"role": "surface_low", "alpha": 0.0},
+			"parent_hl_line_color":        {"role": "surface_low", "alpha": 0.0},
+			"relationship_line_color":     {"role": "surface_low", "alpha": 0.0},
+			"scroll_hint_color":           {"role": "scroll_shadow"},
 			"title_button_color":          {"role": "text_strong"},
 		},
 		"constant": {
 			"button_margin":             {"value": 4},
 			"check_h_separation":        {"value": 6},
-			"children_hl_line_width":    {"value": 1},
+			"children_hl_line_width":    {"value": 0},
 			"dragging_unfold_wait_msec": {"value": 1000},
-			"draw_guides":               {"value": 1},
-			"draw_relationship_lines":   {"value": 1},
+			"draw_guides":               {"value": 0},
+			"draw_relationship_lines":   {"value": 0},
 			"h_separation":              {"value": 8},
 			"icon_h_separation":         {"value": 6},
 			"icon_max_width":            {"value": 0},
@@ -2490,11 +2501,11 @@ const BINDING_TABLE: Dictionary = {
 			"inner_item_margin_left":    {"value": 4},
 			"inner_item_margin_right":   {"value": 4},
 			"inner_item_margin_top":     {"value": 2},
-			"item_margin":               {"value": 4},
+			"item_margin":               {"value": 18},
 			"outline_size":              {"value": 0},
-			"parent_hl_line_margin":     {"value": 4},
-			"parent_hl_line_width":      {"value": 1},
-			"relationship_line_width":   {"value": 1},
+			"parent_hl_line_margin":     {"value": 0},
+			"parent_hl_line_width":      {"value": 0},
+			"relationship_line_width":   {"value": 0},
 			"scroll_border":             {"value": 18},
 			"scroll_speed":              {"value": 12},
 			"scrollbar_h_separation":    {"value": 4},
@@ -2572,12 +2583,13 @@ const BINDING_TABLE: Dictionary = {
 	# 36. VSplitContainer — mirror of HSplitContainer with vertical affordance icons.
 	"VSplitContainer": {
 		"stylebox": {
-			"split_bar_background": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"split_bar_background": {"role": "surface_low", "border_role": "surface_low", "raised_intensity": 0,
+									  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
 		},
 		"constant": {
-			"autohide":               {"value": 0},
-			"separation":             {"value": "tokens.tapPadding"},
-			"minimum_grab_thickness": {"value": "tokens.tapPadding"},
+			"autohide":               {"value": 1},
+			"separation":             {"value": 6},
+			"minimum_grab_thickness": {"value": 6},
 		},
 		"icon": {
 			"grabber":       {"icon": "split_grabber_v"},
@@ -3049,7 +3061,21 @@ const BINDING_TABLE: Dictionary = {
 			},
 		},
 	},
-	# 52. CardPanel — PanelContainer variation (TYPEVAR-04). Uses
+	# 52. WindowContentPanel — full-rect content surface inside embedded Window.
+	#     No border or padding; Window.embedded_border owns the chrome, and the
+	#     wrapped MarginContainer owns content spacing.
+	"WindowContentPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "surface_low",
+				"raised_intensity": 0,
+				"border_width":     0,
+				"radius":           0,
+				"padding":          Vector2i(0, 0),
+			},
+		},
+	},
+	# 53. CardPanel — PanelContainer variation (TYPEVAR-04). Uses
 	#     shape.card_radius for per-direction radius personality (Pulse 0,
 	#     Slate 14, Bubble 26, Daybreak 8, Burst 18) plus the panel
 	#     surface_alpha and raised lift.
@@ -3069,7 +3095,7 @@ const BINDING_TABLE: Dictionary = {
 			"font_color": {"role": "text_strong"},
 		},
 	},
-	# 53. HeroPanel — PanelContainer variation (TYPEVAR-04). Uses
+	# 54. HeroPanel — PanelContainer variation (TYPEVAR-04). Uses
 	#     shape.hero_radius (sibling to card_radius; v1 ships matching pairs
 	#     per direction, but the schema lets v2 differentiate hero from card
 	#     for any direction). Surface role is surface_high (one tonal step

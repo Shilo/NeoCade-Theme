@@ -60,11 +60,14 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_popup_chrome(theme, label, expect_raised)
 	_expect_panel_surface_chrome(theme, label, expect_raised)
 	_expect_scrollbar_chrome(theme, label)
+	_expect_scroll_hint_chrome(theme, label)
 	_expect_no_label_chrome(theme, label)
 	_expect_no_rich_text_label_chrome(theme, label)
 	_expect_tab_top_only_corners(theme, label)
 	_expect_tab_state_chrome(theme, label)
 	_expect_shared_interaction_chrome(theme, label)
+	_expect_tree_view_chrome(theme, label)
+	_expect_split_container_chrome(theme, label)
 	_expect_button_surface_chrome(theme, label, expect_raised)
 	_expect_colored_button_raised_chrome(theme, label, expect_raised)
 	_expect_ghost_button_raised_chrome(theme, label, expect_raised)
@@ -336,6 +339,21 @@ func _expect_scrollbar_chrome(theme: Theme, label: String) -> void:
 					])
 
 
+func _expect_scroll_hint_chrome(theme: Theme, label: String) -> void:
+	var vertical_hint := theme.get_icon("scroll_hint_vertical", "ScrollContainer")
+	var horizontal_hint := theme.get_icon("scroll_hint_horizontal", "ScrollContainer")
+	var vertical_size := vertical_hint.get_size()
+	var horizontal_size := horizontal_hint.get_size()
+	if vertical_size.x <= vertical_size.y:
+		_fail("%s ScrollContainer.scroll_hint_vertical should be a horizontal top/bottom fade texture, got %s" % [label, vertical_size])
+	if horizontal_size.y <= horizontal_size.x:
+		_fail("%s ScrollContainer.scroll_hint_horizontal should be a vertical left/right fade texture, got %s" % [label, horizontal_size])
+	if not theme.get_color("scroll_hint_vertical_color", "ScrollContainer").is_equal_approx(Color.BLACK):
+		_fail("%s ScrollContainer.scroll_hint_vertical_color should be neutral black like Godot's default fade modulate" % label)
+	if not theme.get_color("scroll_hint_horizontal_color", "ScrollContainer").is_equal_approx(Color.BLACK):
+		_fail("%s ScrollContainer.scroll_hint_horizontal_color should be neutral black like Godot's default fade modulate" % label)
+
+
 func _expect_no_label_chrome(theme: Theme, label: String) -> void:
 	if theme.has_stylebox("normal", "Label"):
 		_fail("%s Label.normal stylebox should not be authored" % label)
@@ -434,6 +452,10 @@ func _expect_shared_interaction_chrome(theme: Theme, label: String) -> void:
 		{"type": &"MenuBar", "slot": &"hover", "state": button_hover},
 		{"type": &"MenuBar", "slot": &"pressed", "state": button_pressed},
 		{"type": &"Tree", "slot": &"hovered", "state": button_hover},
+		{"type": &"Tree", "slot": &"selected", "state": button_pressed},
+		{"type": &"Tree", "slot": &"selected_focus", "state": button_pressed},
+		{"type": &"Tree", "slot": &"hovered_selected", "state": button_pressed},
+		{"type": &"Tree", "slot": &"hovered_selected_focus", "state": button_pressed},
 		{"type": &"Tree", "slot": &"button_hover", "state": button_hover},
 		{"type": &"Tree", "slot": &"button_pressed", "state": button_pressed},
 		{"type": &"Tree", "slot": &"custom_button_hover", "state": button_hover},
@@ -452,6 +474,154 @@ func _expect_shared_interaction_chrome(theme: Theme, label: String) -> void:
 				expected.bg_color.to_html(false),
 				stylebox.bg_color.to_html(false),
 			])
+
+
+func _expect_tree_view_chrome(theme: Theme, label: String) -> void:
+	var arrow := theme.get_icon("arrow", "Tree")
+	var arrow_collapsed := theme.get_icon("arrow_collapsed", "Tree")
+	var item_margin := theme.get_constant("item_margin", "Tree")
+	var min_arrow_width := int(maxf(arrow.get_size().x, arrow_collapsed.get_size().x))
+	if item_margin < min_arrow_width:
+		_fail("%s Tree.item_margin is too small for fold arrow gutter: margin=%s arrow_width=%s" % [label, item_margin, min_arrow_width])
+
+	var accent := theme.get_color("drop_position_color", "Tree")
+	for color_name in [&"font_selected_color", &"font_hovered_selected_color"]:
+		var selected_font := theme.get_color(color_name, "Tree")
+		if not selected_font.is_equal_approx(accent):
+			_fail("%s Tree.%s should use accent color for selected item text: expected=%s got=%s" % [
+				label,
+				color_name,
+				accent.to_html(false),
+				selected_font.to_html(false),
+			])
+
+	var tree_scroll_hint := theme.get_icon("scroll_hint", "Tree")
+	var tree_hint_size := tree_scroll_hint.get_size()
+	if tree_hint_size.x <= tree_hint_size.y:
+		_fail("%s Tree.scroll_hint should be a horizontal fade texture, not a square glyph: size=%s" % [label, tree_hint_size])
+	if not theme.get_color("scroll_hint_color", "Tree").is_equal_approx(Color.BLACK):
+		_fail("%s Tree.scroll_hint_color should be neutral black like Godot's default fade modulate" % label)
+
+	var item_scroll_hint := theme.get_icon("scroll_hint", "ItemList")
+	var item_hint_size := item_scroll_hint.get_size()
+	if item_hint_size.x <= item_hint_size.y:
+		_fail("%s ItemList.scroll_hint should be a horizontal fade texture, not a square glyph: size=%s" % [label, item_hint_size])
+	if not theme.get_color("scroll_hint_color", "ItemList").is_equal_approx(Color.BLACK):
+		_fail("%s ItemList.scroll_hint_color should be neutral black like Godot's default fade modulate" % label)
+
+	for constant_name in [
+		&"draw_guides",
+		&"draw_relationship_lines",
+		&"relationship_line_width",
+		&"parent_hl_line_width",
+		&"children_hl_line_width",
+	]:
+		if theme.get_constant(constant_name, "Tree") != 0:
+			_fail("%s Tree.%s should be 0 so TreeViews do not draw guide/separator lines" % [label, constant_name])
+
+	for color_name in [
+		&"guide_color",
+		&"relationship_line_color",
+		&"parent_hl_line_color",
+		&"children_hl_line_color",
+	]:
+		if theme.get_color(color_name, "Tree").a > 0.01:
+			_fail("%s Tree.%s should be transparent" % [label, color_name])
+
+	for slot_name in [
+		&"panel",
+		&"title_button_normal",
+		&"title_button_hover",
+		&"title_button_pressed",
+		&"custom_button",
+		&"hovered",
+		&"selected",
+		&"selected_focus",
+		&"hovered_selected",
+		&"hovered_selected_focus",
+	]:
+		var stylebox := theme.get_stylebox(slot_name, "Tree") as StyleBoxFlat
+		if stylebox == null:
+			_fail("%s missing Tree.%s stylebox" % [label, slot_name])
+			continue
+		if _max_border_width(stylebox) != 0:
+			_fail("%s Tree.%s should not draw borders: %s/%s/%s/%s" % [
+				label,
+				slot_name,
+				stylebox.border_width_left,
+				stylebox.border_width_top,
+				stylebox.border_width_right,
+				stylebox.border_width_bottom,
+			])
+
+
+func _expect_split_container_chrome(theme: Theme, label: String) -> void:
+	var reference_panel := theme.get_stylebox("panel", "Tree") as StyleBoxFlat
+	if reference_panel == null:
+		_fail("%s missing Tree.panel for split-bar background comparison" % label)
+		return
+
+	for theme_type in [&"SplitContainer", &"HSplitContainer", &"VSplitContainer"]:
+		var split_bar := theme.get_stylebox("split_bar_background", theme_type) as StyleBoxFlat
+		if split_bar == null:
+			_fail("%s missing %s.split_bar_background" % [label, theme_type])
+			continue
+		if not split_bar.bg_color.is_equal_approx(reference_panel.bg_color):
+			_fail("%s %s.split_bar_background should match darkest rendered surface: split=%s reference=%s" % [
+				label,
+				theme_type,
+				split_bar.bg_color.to_html(false),
+				reference_panel.bg_color.to_html(false),
+			])
+		if _max_border_width(split_bar) != 0:
+			_fail("%s %s.split_bar_background should not draw an outline: %s/%s/%s/%s" % [
+				label,
+				theme_type,
+				split_bar.border_width_left,
+				split_bar.border_width_top,
+				split_bar.border_width_right,
+				split_bar.border_width_bottom,
+			])
+		if split_bar.corner_radius_top_left != 0 or split_bar.corner_radius_top_right != 0 or split_bar.corner_radius_bottom_left != 0 or split_bar.corner_radius_bottom_right != 0:
+			_fail("%s %s.split_bar_background should have no corner radius" % [label, theme_type])
+		if split_bar.content_margin_left != 0.0 or split_bar.content_margin_top != 0.0 or split_bar.content_margin_right != 0.0 or split_bar.content_margin_bottom != 0.0:
+			_fail("%s %s.split_bar_background should have zero padding: %s/%s/%s/%s" % [
+				label,
+				theme_type,
+				split_bar.content_margin_left,
+				split_bar.content_margin_top,
+				split_bar.content_margin_right,
+				split_bar.content_margin_bottom,
+			])
+		_expect_equal(theme.get_constant("autohide", theme_type), 1, "%s %s.autohide" % [label, theme_type])
+		_expect_equal(theme.get_constant("separation", theme_type), 6, "%s %s.separation" % [label, theme_type])
+		_expect_equal(theme.get_constant("minimum_grab_thickness", theme_type), 6, "%s %s.minimum_grab_thickness" % [label, theme_type])
+
+	_expect_split_grabber_icon(theme, "SplitContainer", "h_grabber", true, label)
+	_expect_split_grabber_icon(theme, "SplitContainer", "v_grabber", false, label)
+	_expect_split_grabber_icon(theme, "HSplitContainer", "grabber", true, label)
+	_expect_split_grabber_icon(theme, "VSplitContainer", "grabber", false, label)
+
+	var dragger_normal := theme.get_color("touch_dragger_color", "SplitContainer")
+	var dragger_hover := theme.get_color("touch_dragger_hover_color", "SplitContainer")
+	var dragger_pressed := theme.get_color("touch_dragger_pressed_color", "SplitContainer")
+	if _contrast_ratio(dragger_normal, dragger_hover) < 1.10:
+		_fail("%s SplitContainer touch dragger hover color is too close to normal" % label)
+	if dragger_hover.is_equal_approx(dragger_pressed):
+		_fail("%s SplitContainer touch dragger pressed color is too close to hover" % label)
+
+
+func _expect_split_grabber_icon(theme: Theme, theme_type: StringName, slot_name: StringName, vertical_indicator: bool, label: String) -> void:
+	if not theme.has_icon(slot_name, theme_type):
+		_fail("%s missing split grabber icon %s.%s" % [label, theme_type, slot_name])
+		return
+	var size := theme.get_icon(slot_name, theme_type).get_size()
+	if vertical_indicator:
+		if size.x > 6 or size.y < 32:
+			_fail("%s %s.%s should be a narrow long vertical indicator, got %s" % [label, theme_type, slot_name, size])
+	else:
+		if size.y > 6 or size.x < 32:
+			_fail("%s %s.%s should be a narrow long horizontal indicator, got %s" % [label, theme_type, slot_name, size])
 
 
 func _expect_button_surface_chrome(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:

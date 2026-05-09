@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://beivemw6fcnld"]
 
-[ext_resource type="Theme" uid="uid://cgd7xydn3yu7t" path="res://addons/neocade_theme/neocade_theme.tres" id="1_lisp0"]
 [ext_resource type="Script" uid="uid://dky0m3dm07i6g" path="res://addons/neocade_theme/scripts/neocade_theme_option_button.gd" id="2_theme_option_button"]
 [ext_resource type="Script" uid="uid://dxu534volcw5j" path="res://showcase/showcase.gd" id="3_showcase"]
 
@@ -11,7 +10,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_lisp0")
 script = ExtResource("3_showcase")
 
 [node name="RootMargin" type="MarginContainer" parent="." unique_id=2104122416]
@@ -1298,10 +1296,10 @@ filters = PackedStringArray("*.tres ; Godot Theme resource", "*.json ; Token sna
 accessibility_name = "Popup panel"
 
 [node name="PopupMargin" type="MarginContainer" parent="PopupPanel" unique_id=1756477724]
-offset_left = 12.0
-offset_top = 10.0
-offset_right = 88.0
-offset_bottom = 90.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 172.0
+offset_bottom = 108.0
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
@@ -1343,83 +1341,87 @@ size = Vector2i(520, 260)
 visible = false
 accessibility_name = "Scoreboard window"
 
-[node name="WindowMargin" type="MarginContainer" parent="Window" unique_id=844849153]
+[node name="WindowContentPanel" type="PanelContainer" parent="Window" unique_id=1053812443]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"WindowContentPanel"
+
+[node name="WindowMargin" type="MarginContainer" parent="Window/WindowContentPanel" unique_id=844849153]
+layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="WindowStack" type="VBoxContainer" parent="Window/WindowMargin" unique_id=675942343]
+[node name="WindowStack" type="VBoxContainer" parent="Window/WindowContentPanel/WindowMargin" unique_id=675942343]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="ScoreScroll" type="ScrollContainer" parent="Window/WindowMargin/WindowStack" unique_id=545225778]
+[node name="ScoreScroll" type="ScrollContainer" parent="Window/WindowContentPanel/WindowMargin/WindowStack" unique_id=545225778]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="ScoreRows" type="VBoxContainer" parent="Window/WindowMargin/WindowStack/ScoreScroll" unique_id=515621723]
+[node name="ScoreRows" type="VBoxContainer" parent="Window/WindowContentPanel/WindowMargin/WindowStack/ScoreScroll" unique_id=515621723]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="WindowLabel" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=1259401524]
+[node name="WindowLabel" type="Label" parent="Window/WindowContentPanel/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=1259401524]
 layout_mode = 2
 theme_type_variation = &"HeaderSmall"
 text = "Top Players"
 
-[node name="Player01" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=864390896]
+[node name="Player01" type="Label" parent="Window/WindowContentPanel/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=864390896]
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "01  Nova Byte        18,240 tickets"
 
-[node name="Player02" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=771047015]
+[node name="Player02" type="Label" parent="Window/WindowContentPanel/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=771047015]
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "02  Pixel Jun        16,980 tickets"
 
-[node name="Player03" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=1256395532]
+[node name="Player03" type="Label" parent="Window/WindowContentPanel/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=1256395532]
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "03  Sunny Tilt       15,410 tickets"
 
-[node name="Player04" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=1833092320]
+[node name="Player04" type="Label" parent="Window/WindowContentPanel/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=1833092320]
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "04  Orbit Max        14,860 tickets"
 
-[node name="Player05" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=196859437]
+[node name="Player05" type="Label" parent="Window/WindowContentPanel/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=196859437]
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "05  Kicker Kai       13,775 tickets"
 
-[node name="Player06" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=1408549131]
+[node name="Player06" type="Label" parent="Window/WindowContentPanel/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=1408549131]
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "06  Button Mae       12,640 tickets"
 
-[node name="Player07" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=369142442]
+[node name="Player07" type="Label" parent="Window/WindowContentPanel/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=369142442]
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "07  Token Ray        11,950 tickets"
 
-[node name="Player08" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=2038655742]
+[node name="Player08" type="Label" parent="Window/WindowContentPanel/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=2038655742]
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "08  Cabinet Lux      10,825 tickets"
 
-[node name="Player09" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=1800561906]
+[node name="Player09" type="Label" parent="Window/WindowContentPanel/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=1800561906]
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "09  Marquee Sol       9,740 tickets"
 
-[node name="Player10" type="Label" parent="Window/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=361221227]
+[node name="Player10" type="Label" parent="Window/WindowContentPanel/WindowMargin/WindowStack/ScoreScroll/ScoreRows" unique_id=361221227]
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "10  Slider Nia        8,690 tickets"
