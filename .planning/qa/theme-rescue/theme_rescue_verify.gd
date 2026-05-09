@@ -61,20 +61,13 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_no_label_chrome(theme, label)
 	_expect_tab_top_only_corners(theme, label)
 	_expect_button_surface_chrome(theme, label, expect_raised)
+	_expect_colored_button_raised_chrome(theme, label, expect_raised)
+	_expect_ghost_button_raised_chrome(theme, label, expect_raised)
+	_expect_input_surface_chrome(theme, label)
 
 	_expect_contrast(theme, "PrimaryButton", "normal", "font_color", MIN_TEXT_CONTRAST, label)
 	_expect_contrast(theme, "DangerButton", "normal", "font_color", MIN_TEXT_CONTRAST, label)
 	_expect_contrast(theme, "ItemList", "selected", "font_selected_color", MIN_TEXT_CONTRAST, label)
-
-	var primary := theme.get_stylebox("normal", "PrimaryButton") as StyleBoxFlat
-	if primary != null:
-		if primary.shadow_size != 0 or primary.shadow_offset != Vector2.ZERO:
-			_fail("%s PrimaryButton still uses StyleBoxFlat shadow" % label)
-		if expect_raised:
-			if primary.border_width_bottom <= primary.border_width_top:
-				_fail("%s raised PrimaryButton has no hard bottom depth" % label)
-			if primary.border_width_right > primary.border_width_left:
-				_fail("%s raised PrimaryButton still has a right-side raised edge" % label)
 
 	_check_no_positive_shadows(theme, label)
 
@@ -199,19 +192,30 @@ func _expect_button_surface_chrome(theme: NeoCadeTheme, label: String, expect_ra
 				normal.border_width_right,
 				normal.border_width_bottom,
 			])
-		if _max_border_width(normal) > 0 and _contrast_ratio(normal.bg_color, normal.border_color) > 1.45:
+		var edge_contrast := _contrast_ratio(normal.bg_color, normal.border_color)
+		if not expect_raised and _max_border_width(normal) > 0 and edge_contrast > 1.45:
 			_fail("%s %s.normal border is too contrasty for editor-like button chrome: bg=%s border=%s ratio=%.2f" % [
 				label,
 				theme_type,
 				normal.bg_color.to_html(false),
 				normal.border_color.to_html(false),
-				_contrast_ratio(normal.bg_color, normal.border_color),
+				edge_contrast,
 			])
 		if expect_raised:
 			if normal.border_width_bottom <= normal.border_width_top:
 				_fail("%s raised %s.normal has no bottom depth edge" % [label, theme_type])
-			if normal.border_width_right > normal.border_width_left:
-				_fail("%s raised %s.normal still has a right-side raised edge" % [label, theme_type])
+			if normal.border_width_left < 1 or normal.border_width_top < 1 or normal.border_width_right < 1:
+				_fail("%s raised %s.normal lost the subtle face edge: %s/%s/%s/%s" % [
+					label,
+					theme_type,
+					normal.border_width_left,
+					normal.border_width_top,
+					normal.border_width_right,
+					normal.border_width_bottom,
+				])
+			if edge_contrast < 1.06 or edge_contrast > 1.80:
+				_fail("%s raised %s.normal face edge is not subtle/visible enough: ratio=%.2f" % [label, theme_type, edge_contrast])
+			_expect_reserved_bottom_depth(normal, label, theme_type)
 		if not expect_raised and _max_border_width(disabled) != 0:
 			_fail("%s %s.disabled should not keep an outline border" % [label, theme_type])
 
@@ -226,6 +230,105 @@ func _expect_button_surface_chrome(theme: NeoCadeTheme, label: String, expect_ra
 				_fail("%s %s button ramp does not brighten on hover/press for dark base" % [label, theme_type])
 
 
+func _expect_colored_button_raised_chrome(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:
+	for theme_type in [&"PrimaryButton", &"DangerButton"]:
+		var normal := theme.get_stylebox("normal", theme_type) as StyleBoxFlat
+		if normal == null:
+			_fail("%s missing colored button stylebox for %s" % [label, theme_type])
+			continue
+		if normal.shadow_size != 0 or normal.shadow_offset != Vector2.ZERO:
+			_fail("%s %s still uses StyleBoxFlat shadow" % [label, theme_type])
+		if not expect_raised:
+			continue
+		if normal.border_width_bottom <= normal.border_width_top:
+			_fail("%s raised %s has no hard bottom depth" % [label, theme_type])
+		if normal.border_width_left < 1 or normal.border_width_top < 1 or normal.border_width_right < 1:
+			_fail("%s raised %s lost the colored face rim: %s/%s/%s/%s" % [
+				label,
+				theme_type,
+				normal.border_width_left,
+				normal.border_width_top,
+				normal.border_width_right,
+				normal.border_width_bottom,
+			])
+		var edge_contrast := _contrast_ratio(normal.bg_color, normal.border_color)
+		if edge_contrast < 1.30:
+			_fail("%s raised %s colored rim is too subtle: ratio=%.2f" % [label, theme_type, edge_contrast])
+		_expect_reserved_bottom_depth(normal, label, theme_type)
+
+
+func _expect_ghost_button_raised_chrome(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:
+	var normal := theme.get_stylebox("normal", "GhostButton") as StyleBoxFlat
+	if normal == null:
+		_fail("%s missing GhostButton.normal" % label)
+		return
+	if normal.shadow_size != 0 or normal.shadow_offset != Vector2.ZERO:
+		_fail("%s GhostButton still uses StyleBoxFlat shadow" % label)
+	if not expect_raised:
+		return
+	if normal.border_width_bottom <= normal.border_width_top:
+		_fail("%s raised GhostButton has no hard bottom depth: %s/%s/%s/%s" % [
+			label,
+			normal.border_width_left,
+			normal.border_width_top,
+			normal.border_width_right,
+			normal.border_width_bottom,
+		])
+	if normal.border_width_left < 1 or normal.border_width_top < 1 or normal.border_width_right < 1:
+		_fail("%s raised GhostButton lost the face rim: %s/%s/%s/%s" % [
+			label,
+			normal.border_width_left,
+			normal.border_width_top,
+			normal.border_width_right,
+			normal.border_width_bottom,
+		])
+	_expect_reserved_bottom_depth(normal, label, "GhostButton")
+
+
+func _expect_input_surface_chrome(theme: NeoCadeTheme, label: String) -> void:
+	for theme_type in [&"LineEdit", &"TextEdit", &"CodeEdit"]:
+		var normal := theme.get_stylebox("normal", theme_type) as StyleBoxFlat
+		var read_only := theme.get_stylebox("read_only", theme_type) as StyleBoxFlat
+		if normal == null or read_only == null:
+			_fail("%s missing input styleboxes for %s" % [label, theme_type])
+			continue
+		if normal.bg_color.a < 0.95:
+			_fail("%s %s.normal is not a filled input surface: alpha=%.2f" % [label, theme_type, normal.bg_color.a])
+		if _max_border_width(normal) > 1:
+			_fail("%s %s.normal input edge too thick: %s/%s/%s/%s" % [
+				label,
+				theme_type,
+				normal.border_width_left,
+				normal.border_width_top,
+				normal.border_width_right,
+				normal.border_width_bottom,
+			])
+		var edge_contrast := _contrast_ratio(normal.bg_color, normal.border_color)
+		if edge_contrast > 1.45:
+			_fail("%s %s.normal input edge is too contrasty: bg=%s border=%s ratio=%.2f" % [
+				label,
+				theme_type,
+				normal.bg_color.to_html(false),
+				normal.border_color.to_html(false),
+				edge_contrast,
+			])
+		if _max_border_width(read_only) != 0:
+			_fail("%s %s.read_only should not keep an outline border" % [label, theme_type])
+
+
+func _expect_reserved_bottom_depth(stylebox: StyleBoxFlat, label: String, theme_type: String) -> void:
+	var face_width: int = maxi(stylebox.border_width_left, maxi(stylebox.border_width_top, stylebox.border_width_right))
+	var border_extra: int = maxi(0, stylebox.border_width_bottom - face_width)
+	var margin_extra: int = int(round(stylebox.content_margin_bottom - stylebox.content_margin_top))
+	if margin_extra != border_extra:
+		_fail("%s raised %s does not reserve bottom depth height: border_extra=%s margin_extra=%s" % [
+			label,
+			theme_type,
+			border_extra,
+			margin_extra,
+		])
+
+
 func _expect_margin_max(theme: Theme, theme_type: StringName, slot_name: StringName, max_h: int, max_v: int, label: String) -> void:
 	var stylebox := theme.get_stylebox(slot_name, theme_type) as StyleBoxFlat
 	if stylebox == null:
@@ -233,7 +336,9 @@ func _expect_margin_max(theme: Theme, theme_type: StringName, slot_name: StringN
 		return
 	if stylebox.content_margin_left > max_h or stylebox.content_margin_right > max_h:
 		_fail("%s %s.%s horizontal margin too large: %s/%s" % [label, theme_type, slot_name, stylebox.content_margin_left, stylebox.content_margin_right])
-	if stylebox.content_margin_top > max_v or stylebox.content_margin_bottom > max_v:
+	var face_width: int = maxi(stylebox.border_width_left, maxi(stylebox.border_width_top, stylebox.border_width_right))
+	var allowed_bottom_extra: int = maxi(0, stylebox.border_width_bottom - face_width)
+	if stylebox.content_margin_top > max_v or stylebox.content_margin_bottom > max_v + allowed_bottom_extra:
 		_fail("%s %s.%s vertical margin too large: %s/%s" % [label, theme_type, slot_name, stylebox.content_margin_top, stylebox.content_margin_bottom])
 
 

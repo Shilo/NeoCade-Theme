@@ -25,9 +25,14 @@ func _run() -> void:
 		{"name": "00-default-null", "theme": null},
 		{"name": "01-pulse-desktop", "theme": _theme_variant(canonical, NeoCadeTheme.Style.PULSE, false, NeoCadeTheme.Platform.DESKTOP)},
 		{"name": "02-pulse-raised", "theme": _theme_variant(canonical, NeoCadeTheme.Style.PULSE, true, NeoCadeTheme.Platform.DESKTOP)},
+		{"name": "02a-pulse-raised-buttons", "theme": _theme_variant(canonical, NeoCadeTheme.Style.PULSE, true, NeoCadeTheme.Platform.DESKTOP), "window": false},
 		{"name": "03-pulse-mobile", "theme": _theme_variant(canonical, NeoCadeTheme.Style.PULSE, false, NeoCadeTheme.Platform.MOBILE)},
 		{"name": "04-bubble-desktop", "theme": _theme_variant(canonical, NeoCadeTheme.Style.BUBBLE, false, NeoCadeTheme.Platform.DESKTOP)},
+		{"name": "04a-bubble-raised-buttons", "theme": _theme_variant(canonical, NeoCadeTheme.Style.BUBBLE, true, NeoCadeTheme.Platform.DESKTOP), "window": false},
+		{"name": "04b-bubble-inputs", "theme": _theme_variant(canonical, NeoCadeTheme.Style.BUBBLE, false, NeoCadeTheme.Platform.DESKTOP), "window": false, "tab": 1},
 		{"name": "05-burst-desktop", "theme": _theme_variant(canonical, NeoCadeTheme.Style.BURST, false, NeoCadeTheme.Platform.DESKTOP)},
+		{"name": "05a-burst-raised-buttons", "theme": _theme_variant(canonical, NeoCadeTheme.Style.BURST, true, NeoCadeTheme.Platform.DESKTOP), "window": false},
+		{"name": "05b-burst-inputs", "theme": _theme_variant(canonical, NeoCadeTheme.Style.BURST, false, NeoCadeTheme.Platform.DESKTOP), "window": false, "tab": 1},
 		{"name": "06-daybreak-desktop", "theme": _theme_variant(canonical, NeoCadeTheme.Style.DAYBREAK, false, NeoCadeTheme.Platform.DESKTOP)},
 		{"name": "07-slate-desktop", "theme": _theme_variant(canonical, NeoCadeTheme.Style.SLATE, false, NeoCadeTheme.Platform.DESKTOP)},
 		{"name": "08-pulse-mobile-raised", "theme": _theme_variant(canonical, NeoCadeTheme.Style.PULSE, true, NeoCadeTheme.Platform.MOBILE)},
@@ -61,13 +66,16 @@ func _capture_case(capture_case: Dictionary) -> void:
 	var scene := (load(SHOWCASE_PATH) as PackedScene).instantiate() as Control
 	scene.theme = capture_case["theme"]
 	root.add_child(scene)
+	if capture_case.has("tab"):
+		_select_showcase_tab(scene, int(capture_case["tab"]))
 
 	await process_frame
 	await process_frame
 	await process_frame
-	_show_scoreboard_window(scene)
-	await process_frame
-	await process_frame
+	if bool(capture_case.get("window", true)):
+		_show_scoreboard_window(scene)
+		await process_frame
+		await process_frame
 	if bool(capture_case.get("popups", false)):
 		await _open_popup_surfaces(scene)
 
@@ -92,6 +100,13 @@ func _capture_case(capture_case: Dictionary) -> void:
 	root.remove_child(scene)
 	scene.queue_free()
 	await process_frame
+
+
+func _select_showcase_tab(scene: Control, tab_index: int) -> void:
+	var tabs := scene.get_node_or_null("RootMargin/RootStack/ShowcaseTabs") as TabContainer
+	if tabs == null:
+		return
+	tabs.current_tab = clampi(tab_index, 0, tabs.get_tab_count() - 1)
 
 
 func _log_layout(scene: Control, label: String) -> void:

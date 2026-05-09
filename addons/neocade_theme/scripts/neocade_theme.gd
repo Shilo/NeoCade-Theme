@@ -264,10 +264,10 @@ func _regenerate_theme() -> void:
 	var surface_panel_offset: Color   = _tint_toward_base(surface_panel, base_color)
 	var surface_overlay_offset: Color = _tint_toward_base(surface_overlay, base_color)
 	var surface_low_offset: Color     = _tint_toward_base(surface_low, base_color)
-	var button_normal_offset: Color = _tint_toward_base(button_normal, base_color)
-	var button_hover_offset: Color = _tint_toward_base(button_hover, base_color)
-	var button_pressed_offset: Color = _tint_toward_base(button_pressed, base_color)
-	var button_disabled_offset: Color = _tint_toward_base(button_disabled, base_color)
+	var button_normal_offset: Color = _raised_depth_color(button_normal, base_color)
+	var button_hover_offset: Color = _raised_depth_color(button_hover, base_color)
+	var button_pressed_offset: Color = _raised_depth_color(button_pressed, base_color)
+	var button_disabled_offset: Color = _raised_depth_color(button_disabled, base_color)
 
 	# ── Text colors with is_light flip (DESIGN_TOKENS §6.4) ──
 	var text_strong: Color
@@ -312,6 +312,11 @@ func _regenerate_theme() -> void:
 	var role_warning: Color = Color("#FFD166")
 	var role_danger:  Color = Color("#FF6E6E")
 	var role_info:    Color = Color("#5FE3FF")
+	var role_primary_offset: Color = _raised_depth_color(role_primary, base_color)
+	var role_success_offset: Color = _raised_depth_color(role_success, base_color)
+	var role_warning_offset: Color = _raised_depth_color(role_warning, base_color)
+	var role_danger_offset: Color = _raised_depth_color(role_danger, base_color)
+	var role_info_offset: Color = _raised_depth_color(role_info, base_color)
 	var text_on_primary: Color = _readable_text_color(role_primary)
 	var text_on_accent_offset: Color = _readable_text_color(accent_offset)
 	var text_on_danger: Color = Color("#151922")
@@ -449,12 +454,17 @@ func _regenerate_theme() -> void:
 		"state_hover":            state_hover,
 		"state_pressed":          state_pressed,
 		"role_primary":           role_primary,
+		"role_primary_offset":    role_primary_offset,
 		"accent_rim":             accent_rim,
 		# Semantic roles (Plan 05-02 Task 2; DESIGN_TOKENS §7.1).
 		"role_success":           role_success,
 		"role_warning":           role_warning,
 		"role_danger":            role_danger,
 		"role_info":              role_info,
+		"role_success_offset":    role_success_offset,
+		"role_warning_offset":    role_warning_offset,
+		"role_danger_offset":     role_danger_offset,
+		"role_info_offset":       role_info_offset,
 		"text_on_primary":        text_on_primary,
 		"text_on_primary_button": text_on_primary_button,
 		"text_on_accent_offset":  text_on_accent_offset,
@@ -542,6 +552,15 @@ func _button_tonal_color(source: Color, brightness_offset: float, saturation_mul
 	return result
 
 
+func _raised_depth_color(element: Color, base_c: Color) -> Color:
+	var base_pull := 0.16 if not is_light else 0.10
+	var depth_amount := 0.10 if not is_light else 0.12
+	var result := _mix(element, base_c, base_pull)
+	result = _mix(result, Color.BLACK, depth_amount)
+	result.a = element.a
+	return result
+
+
 func _readable_text_color(bg: Color) -> Color:
 	var dark_text := Color("#151922")
 	var light_text := Color("#F7F8FB")
@@ -620,7 +639,7 @@ func _platform_tokens(p: Platform) -> Dictionary:
 # ─── Raised stylebox helper (DESIGN_TOKENS §9) ──────────────────────────────────────────────
 
 ## Construct a StyleBoxFlat base for flat or raised mode.
-## Raised depth is applied later as hard bottom/right borders, never StyleBoxFlat shadows.
+## Raised depth is applied later as a hard bottom extrusion, never a StyleBoxFlat shadow.
 func _make_raised_stylebox(bg: Color, _offset_color: Color, _intensity: int) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = bg
@@ -668,7 +687,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"surface_alpha_buttons": 1.00,
 			"raised_lifts": {
 				"primary":         2,
-				"secondary":       1,
+				"secondary":       2,
 				"ghost":           1,
 				"selected_tab":    2,
 				"unselected_tab":  2,
@@ -1383,10 +1402,10 @@ const BINDING_TABLE: Dictionary = {
 	# PrimaryButton variation per TYPEVAR-01 / DESIGN_TOKENS §5.
 	"Button": {
 		"stylebox": {
-			"normal":         {"role": "button_normal", "border_role": "button_border",
+			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":          {"role": "button_hover", "border_role": "button_border_hover",
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
@@ -1501,10 +1520,12 @@ const BINDING_TABLE: Dictionary = {
 	# rather than silently picking a different slot.
 	"CodeEdit": {
 		"stylebox": {
-			"normal":    {"role": "surface_low",   "raised_intensity": 0,
+			"normal":    {"role": "button_normal", "border_role": "button_border",
+						  "radius": "shape.secondary_radius", "raised_intensity": 0,
 						  "padding": Vector2i(10, 7)},
 			"focus":     {"role": "focus_ring"},
-			"read_only": {"role": "surface_low",   "disabled": true,
+			"read_only": {"role": "button_disabled", "disabled": true,
+						  "radius": "shape.secondary_radius", "border_width": 0,
 						  "padding": Vector2i(10, 7)},
 		},
 		"color": {
@@ -1574,10 +1595,10 @@ const BINDING_TABLE: Dictionary = {
 	# so the swatch button reads with per-direction radius/padding/lift like Button proper.
 	"ColorPickerButton": {
 		"stylebox": {
-			"normal":   {"role": "button_normal", "border_role": "button_border",
+			"normal":   {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 							"raised_intensity": "shape.raised_lifts.secondary",
 							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":    {"role": "button_hover", "border_role": "button_border_hover",
+			"hover":    {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 							"raised_intensity": "shape.raised_lifts.secondary",
 							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 			"pressed":  {"role": "button_pressed", "border_role": "button_border_pressed",
@@ -1898,10 +1919,12 @@ const BINDING_TABLE: Dictionary = {
 	# 17. LineEdit — 3 stylebox + caret + selection + clear icon
 	"LineEdit": {
 		"stylebox": {
-			"normal":    {"role": "surface_low",   "raised_intensity": 0,
+			"normal":    {"role": "button_normal", "border_role": "button_border",
+						  "radius": "shape.secondary_radius", "raised_intensity": 0,
 						  "padding": Vector2i(10, 6)},
 			"focus":     {"role": "focus_ring"},
-			"read_only": {"role": "surface_low",   "disabled": true,
+			"read_only": {"role": "button_disabled", "disabled": true,
+						  "radius": "shape.secondary_radius", "border_width": 0,
 						  "padding": Vector2i(10, 6)},
 		},
 		"color": {
@@ -1963,10 +1986,10 @@ const BINDING_TABLE: Dictionary = {
 	# shape.raised_lifts.secondary so the per-direction shape language flows.
 	"MenuButton": {
 		"stylebox": {
-			"normal":         {"role": "button_normal", "border_role": "button_border",
+			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":          {"role": "button_hover", "border_role": "button_border_hover",
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
@@ -1995,10 +2018,10 @@ const BINDING_TABLE: Dictionary = {
 	# shape.raised_lifts.secondary so the per-direction shape language flows.
 	"OptionButton": {
 		"stylebox": {
-			"normal":         {"role": "button_normal", "border_role": "button_border",
+			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":          {"role": "button_hover", "border_role": "button_border_hover",
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
@@ -2244,10 +2267,12 @@ const BINDING_TABLE: Dictionary = {
 	# 30. TextEdit — 3 stylebox set
 	"TextEdit": {
 		"stylebox": {
-			"normal":    {"role": "surface_low",   "raised_intensity": 0,
+			"normal":    {"role": "button_normal", "border_role": "button_border",
+						  "radius": "shape.secondary_radius", "raised_intensity": 0,
 						  "padding": Vector2i(10, 7)},
 			"focus":     {"role": "focus_ring"},
-			"read_only": {"role": "surface_low",   "disabled": true,
+			"read_only": {"role": "button_disabled", "disabled": true,
+						  "radius": "shape.secondary_radius", "border_width": 0,
 						  "padding": Vector2i(10, 7)},
 		},
 		"color": {
@@ -2527,10 +2552,12 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":        {"role": "role_primary",  "raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"strategy": "shape.primary_strategy", "border_width": 0},
+								"strategy": "shape.primary_strategy", "border_width": 0,
+								"raised_face_edge": true},
 			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"strategy": "shape.primary_strategy", "border_width": 0},
+								"strategy": "shape.primary_strategy", "border_width": 0,
+								"offset_role": "role_primary_offset", "raised_face_edge": true},
 			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
 								"border_width": 0},
@@ -2567,10 +2594,10 @@ const BINDING_TABLE: Dictionary = {
 	# than primary so the visual hierarchy is preserved when raised=true).
 	"SecondaryButton": {
 		"stylebox": {
-			"normal":        {"role": "button_normal", "border_role": "button_border",
+			"normal":        {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":         {"role": "button_hover", "border_role": "button_border_hover",
+			"hover":         {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 			"pressed":       {"role": "button_pressed", "border_role": "button_border_pressed",
@@ -2610,10 +2637,12 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"strategy": "shape.ghost_strategy"},
+								"strategy": "shape.ghost_strategy",
+								"offset_role": "button_normal_offset", "raised_face_edge": true},
 			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.ghost",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"strategy": "shape.ghost_strategy"},
+								"strategy": "shape.ghost_strategy",
+								"offset_role": "button_hover_offset", "raised_face_edge": true},
 			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 			"focus":         {"role": "focus_ring",
@@ -2651,10 +2680,10 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":        {"role": "role_danger",   "raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"border_width": 0},
+								"border_width": 0, "raised_face_edge": true},
 			"hover":         {"role": "role_danger",   "raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"alpha": 0.92, "border_width": 0},
+								"alpha": 0.92, "border_width": 0, "raised_face_edge": true},
 			"pressed":       {"role": "role_danger",   "raised_intensity": 0,
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
 								"alpha": 0.78, "border_width": 0},
@@ -2693,10 +2722,10 @@ const BINDING_TABLE: Dictionary = {
 	# affordance compared to primary chrome.
 	"IconButton": {
 		"stylebox": {
-			"normal":        {"role": "button_normal", "border_role": "button_border",
+			"normal":        {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.ghost",
 								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
-			"hover":         {"role": "button_hover", "border_role": "button_border_hover",
+			"hover":         {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.ghost",
 								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
 			"pressed":       {"role": "button_pressed", "border_role": "button_border_pressed",
@@ -2989,13 +3018,32 @@ func _apply_outline_border(sb: StyleBoxFlat, color: Color, width: int = -1) -> v
 	sb.border_width_bottom = resolved_width
 
 
-func _apply_raised_depth_border(sb: StyleBoxFlat, offset_color: Color, intensity: int) -> void:
+func _reserve_bottom_depth_height(sb: StyleBoxFlat) -> void:
+	var face_width: int = maxi(sb.border_width_left, maxi(sb.border_width_top, sb.border_width_right))
+	var bottom_extra: int = maxi(0, sb.border_width_bottom - face_width)
+	sb.content_margin_bottom += bottom_extra
+
+
+func _apply_raised_depth_border(sb: StyleBoxFlat, offset_color: Color, intensity: int,
+								 keep_face_edge: bool = false, reserve_height: bool = false) -> void:
 	var depth := maxi(1, intensity)
+	if keep_face_edge:
+		sb.border_color = offset_color
+		var face_width: int = maxi(1, maxi(sb.border_width_left, maxi(sb.border_width_top, sb.border_width_right)))
+		sb.border_width_left = face_width
+		sb.border_width_top = face_width
+		sb.border_width_right = face_width
+		sb.border_width_bottom = maxi(depth, face_width + 1)
+		if reserve_height:
+			_reserve_bottom_depth_height(sb)
+		return
 	sb.border_color = offset_color
 	sb.border_width_left = 0
 	sb.border_width_top = 0
 	sb.border_width_right = 0
 	sb.border_width_bottom = depth
+	if reserve_height:
+		_reserve_bottom_depth_height(sb)
 
 
 ## Applies the per-direction primary_strategy mutation to a StyleBoxFlat representing
@@ -3214,7 +3262,8 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		if alpha < 1.0:
 			bg_color = Color(bg_color.r, bg_color.g, bg_color.b, alpha)
 		# Pick the matching offset color (per §6.3) for the bg's family.
-		var offset_color: Color = role_table.get(role + "_offset", role_table.surface_panel_offset)
+		var offset_role: String = recipe.get("offset_role", role + "_offset")
+		var offset_color: Color = role_table.get(offset_role, role_table.get(role + "_offset", role_table.surface_panel_offset))
 		var sb_intensity: int = (raised_strength * raised_intensity) if raised else 0
 		var sb := _make_raised_stylebox(bg_color, offset_color, sb_intensity)
 		# Plan 05-02 Task 2 (D-03): radius may be either the @export `corner_radius` baseline
@@ -3296,7 +3345,9 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 				# Other strategy paths (kicker_style etc.) are NOT dispatched on stylebox;
 				# they're color-recipe territory handled below.
 		if sb_intensity > 0:
-			_apply_raised_depth_border(sb, offset_color, sb_intensity)
+			var keep_face_edge: bool = bool(recipe.get("raised_face_edge", false))
+			var reserve_height: bool = bool(recipe.get("reserve_raised_depth", keep_face_edge))
+			_apply_raised_depth_border(sb, offset_color, sb_intensity, keep_face_edge, reserve_height)
 		return sb
 	elif data_type == "color":
 		var role: String = recipe.get("role", "text_strong")
