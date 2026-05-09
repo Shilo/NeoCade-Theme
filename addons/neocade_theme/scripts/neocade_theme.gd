@@ -7,9 +7,8 @@ class_name NeoCadeTheme extends Theme
 ## `addons/neocade_theme/neocade_theme.tres` resource. The `style` export switches between
 ## the approved NeoCade directions; `Style.CUSTOM` leaves the remaining exports fully manual.
 ##
-## Setters on every `@export` property trigger `_regenerate_theme()`, which walks an internal
-## BINDING_TABLE (Plan 04-05) to populate every formula-owned theme entry. Slots NOT in the
-## binding table are LEFT UNTOUCHED (D-04 escape hatch — Theme Editor authored content survives).
+## Setters on every `@export` property trigger `_regenerate_theme()`, which rebuilds the
+## generated theme entries from BINDING_TABLE so stale runtime values cannot survive a style change.
 ##
 ## Binding mechanism (D-03 TENTATIVE): the current implementation uses a slot-name + property-name
 ## table compiled into this file. The user has signaled this may be revised toward a property-name
@@ -227,6 +226,7 @@ func _regenerate_theme() -> void:
 	if _regenerating: return
 	_regenerating = true
 	var t0 := Time.get_ticks_usec()
+	clear()
 
 	is_light = base_color.get_luminance() >= 0.5
 	var p: Platform = _resolve_platform()
@@ -470,7 +470,7 @@ func _regenerate_theme() -> void:
 	# as real Theme font/font_size entries, but the binding iterator intentionally has no
 	# font branch and review convergence requires direct calls after the table walk.
 	set_font("title_font", "Window", header_small_font)
-	set_font_size("title_font_size", "Window", tokens.body)
+	set_font_size("title_font_size", "Window", maxi(tokens.body, 16))
 	set_font("font", "TooltipLabel", body_font)
 	set_font_size("font_size", "TooltipLabel", tokens.body)
 	set_font("font", "MenuBar", body_font)
@@ -1286,9 +1286,9 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 		"stylebox": ["separator"],
 		"constant": ["separation"],
 	},
-	# Label — 1 stylebox + 1 color
+	# Label — color only. Labels should not draw background chrome.
 	"Label": {
-		"stylebox": ["normal"],
+		"stylebox": [],
 		"color": ["font_color"],
 	},
 	# RichTextLabel — 1 stylebox
@@ -1378,12 +1378,12 @@ const BINDING_TABLE: Dictionary = {
 	# 3. CheckBox — 4 icon slots (CheckBox alternates as RadioButton in Godot)
 	"CheckBox": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": 0},
-			"hover":          {"role": "state_hover",   "raised_intensity": 0},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0},
+			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"hover":          {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"pressed":        {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 			"focus":          {"role": "focus_ring"},
-			"disabled":       {"role": "surface_panel", "disabled": true},
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0},
+			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -1412,12 +1412,12 @@ const BINDING_TABLE: Dictionary = {
 	# 4. CheckButton — 2 icon slots (Cycle 6 F4 fix: `checked`/`unchecked`, not `on`/`off`)
 	"CheckButton": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": 0},
-			"hover":          {"role": "state_hover",   "raised_intensity": 0},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0},
+			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"hover":          {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"pressed":        {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 			"focus":          {"role": "focus_ring"},
-			"disabled":       {"role": "surface_panel", "disabled": true},
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0},
+			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -1844,11 +1844,8 @@ const BINDING_TABLE: Dictionary = {
 			"scroll_hint": {"icon": "tree_scroll_hint"},
 		},
 	},
-	# 16. Label — 1 stylebox + 1 color
+	# 16. Label — color only; labels must not own a background or border.
 	"Label": {
-		"stylebox": {
-			"normal": {"role": "surface_base", "raised_intensity": 0},
-		},
 		"color": {
 			"font_color": {"role": "text_strong"},
 		},
@@ -1988,8 +1985,8 @@ const BINDING_TABLE: Dictionary = {
 	"PopupMenu": {
 		"stylebox": {
 			"panel":                 {"role": "surface_overlay", "raised_intensity": 0,
-									  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-									  "padding": Vector2i(8, 6)},
+									  "radius": 3, "alpha": "shape.surface_alpha_popup",
+									  "border_width": 2, "padding": Vector2i(4, 4)},
 			"hover":                 {"role": "state_hover",    "raised_intensity": 0, "alpha": 0.36},
 			"separator":             {"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
 									  "padding": Vector2i(0, 0)},
@@ -2101,12 +2098,16 @@ const BINDING_TABLE: Dictionary = {
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 6)},
 			"tab_unselected":   {"role": "surface_low",   "raised_intensity": "shape.raised_lifts.unselected_tab",
-									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
 			"tab_hovered":      {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.unselected_tab",
-									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
 			"tab_disabled":     {"role": "surface_low",   "disabled": true, "raised_intensity": 0,
-									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
-			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius"},
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
+			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
+									"corner_profile": "tab_connected"},
 		},
 		"color": {
 			"font_selected_color":   {"role": "text_strong"},
@@ -2145,12 +2146,16 @@ const BINDING_TABLE: Dictionary = {
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 6)},
 			"tab_unselected":   {"role": "surface_low",   "raised_intensity": "shape.raised_lifts.unselected_tab",
-									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
 			"tab_hovered":      {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.unselected_tab",
-									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
 			"tab_disabled":     {"role": "surface_low",   "disabled": true, "raised_intensity": 0,
-									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
-			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius"},
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
+			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
+									"corner_profile": "tab_connected"},
 			"panel":            {"role": "surface_panel", "raised_intensity": 0},
 			"tabbar_background":{"role": "surface_base",  "raised_intensity": 0},
 		},
@@ -2221,8 +2226,8 @@ const BINDING_TABLE: Dictionary = {
 	"TooltipPanel": {
 		"stylebox": {
 			"panel": {"role": "surface_overlay", "raised_intensity": 0,
-					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-					  "padding": Vector2i(8, 5)},
+					  "radius": 3, "alpha": "shape.surface_alpha_popup",
+					  "border_width": 0, "padding": Vector2i(8, 2)},
 		},
 	},
 	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
@@ -2416,21 +2421,25 @@ const BINDING_TABLE: Dictionary = {
 	"Window": {
 		"stylebox": {
 			"embedded_border":          {"role": "surface_overlay", "raised_intensity": 0,
-										 "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-										 "padding": Vector2i(8, 6)},
+										 "radius": 3, "alpha": "shape.surface_alpha_popup",
+										 "border_width": 0,
+										 "content_margins": Vector4i(10, 28, 10, 8),
+										 "expand_margins": Vector4i(8, 32, 8, 6)},
 			"embedded_unfocused_border":{"role": "surface_high", "raised_intensity": 0,
-										 "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-										 "padding": Vector2i(8, 6)},
+										 "radius": 3, "alpha": "shape.surface_alpha_popup",
+										 "border_width": 0,
+										 "content_margins": Vector4i(10, 28, 10, 8),
+										 "expand_margins": Vector4i(8, 32, 8, 6)},
 		},
 		"color": {
 			"title_color":            {"role": "text_strong"},
 			"title_outline_modulate": {"role": "outline_color"},
 		},
 		"constant": {
-			"close_h_offset":    {"value": 6},
-			"close_v_offset":    {"value": 4},
-			"resize_margin":     {"value": 6},
-			"title_height":      {"value": 28},
+			"close_h_offset":    {"value": 18},
+			"close_v_offset":    {"value": 24},
+			"resize_margin":     {"value": 4},
+			"title_height":      {"value": 36},
 			"title_outline_size":{"value": 0},
 		},
 		"icon": {
@@ -2892,12 +2901,27 @@ func _set_content_margin_from_padding(sb: StyleBoxFlat, padding: Vector2i) -> vo
 	sb.content_margin_bottom = padding.y
 
 
-func _apply_outline_border(sb: StyleBoxFlat, color: Color) -> void:
+func _set_content_margins(sb: StyleBoxFlat, margins: Vector4i) -> void:
+	sb.content_margin_left = margins.x
+	sb.content_margin_top = margins.y
+	sb.content_margin_right = margins.z
+	sb.content_margin_bottom = margins.w
+
+
+func _set_expand_margins(sb: StyleBoxFlat, margins: Vector4i) -> void:
+	sb.expand_margin_left = margins.x
+	sb.expand_margin_top = margins.y
+	sb.expand_margin_right = margins.z
+	sb.expand_margin_bottom = margins.w
+
+
+func _apply_outline_border(sb: StyleBoxFlat, color: Color, width: int = -1) -> void:
+	var resolved_width := outline_width if width < 0 else width
 	sb.border_color = color
-	sb.border_width_left = outline_width
-	sb.border_width_top = outline_width
-	sb.border_width_right = outline_width
-	sb.border_width_bottom = outline_width
+	sb.border_width_left = resolved_width
+	sb.border_width_top = resolved_width
+	sb.border_width_right = resolved_width
+	sb.border_width_bottom = resolved_width
 
 
 func _apply_raised_depth_border(sb: StyleBoxFlat, offset_color: Color, intensity: int) -> void:
@@ -2905,7 +2929,7 @@ func _apply_raised_depth_border(sb: StyleBoxFlat, offset_color: Color, intensity
 	sb.border_color = offset_color
 	sb.border_width_left = 0
 	sb.border_width_top = 0
-	sb.border_width_right = depth
+	sb.border_width_right = 0
 	sb.border_width_bottom = depth
 
 
@@ -3105,7 +3129,11 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 					fr_radius = int(fr_r_lookup)
 			elif fr_radius_raw != null and (typeof(fr_radius_raw) == TYPE_INT or typeof(fr_radius_raw) == TYPE_FLOAT):
 				fr_radius = int(fr_radius_raw)
-			_set_radius_all(focus_sb, fr_radius)
+			var focus_corner_profile: String = str(recipe.get("corner_profile", ""))
+			if focus_corner_profile == "tab_connected":
+				_set_tab_connected_radius(focus_sb, fr_radius)
+			else:
+				_set_radius_all(focus_sb, fr_radius)
 			# Per-direction focus_offset (DESIGN_TOKENS §8.2): Pulse=0, Burst=1, others=2.
 			var focus_offset_v: Variant = _lookup_shape(style_personality, "shape.focus_offset")
 			var focus_offset_int: int = 2
@@ -3141,13 +3169,25 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		var corner_profile: String = str(recipe.get("corner_profile", ""))
 		if corner_profile == "tab_connected":
 			_set_tab_connected_radius(sb, resolved_radius)
-		_apply_outline_border(sb, role_table.outline_color)
+		var border_width: int = int(recipe.get("border_width", outline_width))
+		_apply_outline_border(sb, role_table.outline_color, maxi(0, border_width))
 		# Plan 05-02 Task 2 (D-03): padding may be a `shape.<key>` Vector2i lookup
 		# or an explicit Vector2i. Unspecified padding is zero; structural styleboxes must
 		# opt into content margins instead of inheriting giant global chrome.
+		var content_margins_raw: Variant = recipe.get("content_margins", null)
 		var padding_raw: Variant = recipe.get("padding", null)
 		var applied_padding: bool = false
-		if padding_raw != null and typeof(padding_raw) == TYPE_STRING and (padding_raw as String).begins_with("shape."):
+		if content_margins_raw != null and typeof(content_margins_raw) == TYPE_VECTOR4I:
+			var density: float = tokens.get("densityScale", 1.0)
+			var margins := content_margins_raw as Vector4i
+			_set_content_margins(sb, Vector4i(
+				int(round(margins.x * density)),
+				int(round(margins.y * density)),
+				int(round(margins.z * density)),
+				int(round(margins.w * density))
+			))
+			applied_padding = true
+		elif padding_raw != null and typeof(padding_raw) == TYPE_STRING and (padding_raw as String).begins_with("shape."):
 			var pad_lookup: Variant = _lookup_shape(style_personality, padding_raw)
 			if pad_lookup != null and typeof(pad_lookup) == TYPE_VECTOR2I:
 				var density: float = tokens.get("densityScale", 1.0)
@@ -3159,6 +3199,16 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			applied_padding = true
 		if not applied_padding:
 			_set_content_margin_from_padding(sb, Vector2i.ZERO)
+		var expand_margins_raw: Variant = recipe.get("expand_margins", null)
+		if expand_margins_raw != null and typeof(expand_margins_raw) == TYPE_VECTOR4I:
+			var expand_density: float = tokens.get("densityScale", 1.0)
+			var expand := expand_margins_raw as Vector4i
+			_set_expand_margins(sb, Vector4i(
+				int(round(expand.x * expand_density)),
+				int(round(expand.y * expand_density)),
+				int(round(expand.z * expand_density)),
+				int(round(expand.w * expand_density))
+			))
 		# Plan 05-02 Task 2 (D-04): strategy dispatch (closed-enum, sourced VERBATIM
 		# from DESIGN_TOKENS §5.1-§5.5). Recipes opt-in via `strategy: "shape.primary_strategy"`
 		# (or `"shape.ghost_strategy"`); _apply_primary_strategy / _apply_ghost_strategy

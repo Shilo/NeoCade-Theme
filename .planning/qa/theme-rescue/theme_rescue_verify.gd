@@ -50,13 +50,16 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_equal(theme.default_base_scale, 1.0, "%s default_base_scale" % label)
 	_expect_icon_max(theme, "Window", "close", 24, label)
 	_expect_icon_max(theme, "OptionButton", "arrow", 24, label)
-	_expect_icon_max(theme, "CheckBox", "checked", 24, label)
-	_expect_icon_max(theme, "CheckButton", "checked", 28, label)
+	_expect_icon_between(theme, "CheckBox", "checked", Vector2(20, 20), Vector2(26, 26), label)
+	_expect_icon_between(theme, "CheckButton", "checked", Vector2(28, 14), Vector2(34, 20), label)
 
 	var is_mobile := label.begins_with("mobile:")
 	_expect_margin_max(theme, "PrimaryButton", "normal", 28 if is_mobile else 18, 20 if is_mobile else 14, label)
 	_expect_margin_max(theme, "PanelContainer", "panel", 18 if is_mobile else 14, 14 if is_mobile else 12, label)
-	_expect_margin_max(theme, "Window", "embedded_border", 16 if is_mobile else 12, 12 if is_mobile else 10, label)
+	_expect_window_chrome(theme, label)
+	_expect_popup_chrome(theme, label)
+	_expect_no_label_chrome(theme, label)
+	_expect_tab_top_only_corners(theme, label)
 
 	_expect_contrast(theme, "PrimaryButton", "normal", "font_color", MIN_TEXT_CONTRAST, label)
 	_expect_contrast(theme, "DangerButton", "normal", "font_color", MIN_TEXT_CONTRAST, label)
@@ -69,8 +72,8 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 		if expect_raised:
 			if primary.border_width_bottom <= primary.border_width_top:
 				_fail("%s raised PrimaryButton has no hard bottom depth" % label)
-			if primary.border_width_right <= primary.border_width_left:
-				_fail("%s raised PrimaryButton has no hard right depth" % label)
+			if primary.border_width_right > primary.border_width_left:
+				_fail("%s raised PrimaryButton still has a right-side raised edge" % label)
 
 	_check_no_positive_shadows(theme, label)
 
@@ -104,6 +107,75 @@ func _expect_icon_max(theme: Theme, theme_type: StringName, slot_name: StringNam
 	var size := icon.get_size()
 	if size.x > max_px or size.y > max_px:
 		_fail("%s icon %s.%s too large: %s" % [label, theme_type, slot_name, size])
+
+
+func _expect_icon_between(theme: Theme, theme_type: StringName, slot_name: StringName, min_size: Vector2, max_size: Vector2, label: String) -> void:
+	if not theme.has_icon(slot_name, theme_type):
+		_fail("%s missing icon %s.%s" % [label, theme_type, slot_name])
+		return
+	var icon := theme.get_icon(slot_name, theme_type)
+	var size := icon.get_size()
+	if size.x < min_size.x or size.y < min_size.y:
+		_fail("%s icon %s.%s too small: %s expected at least %s" % [label, theme_type, slot_name, size, min_size])
+	if size.x > max_size.x or size.y > max_size.y:
+		_fail("%s icon %s.%s too large: %s expected at most %s" % [label, theme_type, slot_name, size, max_size])
+
+
+func _expect_window_chrome(theme: Theme, label: String) -> void:
+	var window_panel := theme.get_stylebox("embedded_border", "Window") as StyleBoxFlat
+	if window_panel == null:
+		_fail("%s missing Window.embedded_border" % label)
+		return
+	if window_panel.expand_margin_top < 30 or window_panel.content_margin_top < 26:
+		_fail("%s Window.embedded_border does not cover title bar/content margin: expand_top=%s content_top=%s" % [label, window_panel.expand_margin_top, window_panel.content_margin_top])
+	_expect_equal(theme.get_constant("title_height", "Window"), 36, "%s Window.title_height" % label)
+	_expect_equal(theme.get_constant("close_h_offset", "Window"), 18, "%s Window.close_h_offset" % label)
+	_expect_equal(theme.get_constant("close_v_offset", "Window"), 24, "%s Window.close_v_offset" % label)
+
+
+func _expect_popup_chrome(theme: Theme, label: String) -> void:
+	var popup_panel := theme.get_stylebox("panel", "PopupMenu") as StyleBoxFlat
+	if popup_panel == null:
+		_fail("%s missing PopupMenu.panel" % label)
+	elif popup_panel.border_width_left < 2 or popup_panel.content_margin_left > 8:
+		_fail("%s PopupMenu.panel border/margins off: border=%s/%s/%s/%s margin=%s/%s/%s/%s" % [
+			label,
+			popup_panel.border_width_left, popup_panel.border_width_top, popup_panel.border_width_right, popup_panel.border_width_bottom,
+			popup_panel.content_margin_left, popup_panel.content_margin_top, popup_panel.content_margin_right, popup_panel.content_margin_bottom,
+		])
+
+	var tooltip_panel := theme.get_stylebox("panel", "TooltipPanel") as StyleBoxFlat
+	if tooltip_panel == null:
+		_fail("%s missing TooltipPanel.panel" % label)
+	elif tooltip_panel.border_width_left != 0 or tooltip_panel.border_width_top != 0 or tooltip_panel.content_margin_top > 4:
+		_fail("%s TooltipPanel.panel border/margins off: border=%s/%s/%s/%s margin=%s/%s/%s/%s" % [
+			label,
+			tooltip_panel.border_width_left, tooltip_panel.border_width_top, tooltip_panel.border_width_right, tooltip_panel.border_width_bottom,
+			tooltip_panel.content_margin_left, tooltip_panel.content_margin_top, tooltip_panel.content_margin_right, tooltip_panel.content_margin_bottom,
+		])
+
+
+func _expect_no_label_chrome(theme: Theme, label: String) -> void:
+	if theme.has_stylebox("normal", "Label"):
+		_fail("%s Label.normal stylebox should not be authored" % label)
+
+
+func _expect_tab_top_only_corners(theme: Theme, label: String) -> void:
+	for theme_type in [&"TabBar", &"TabContainer"]:
+		for slot_name in [&"tab_selected", &"tab_unselected", &"tab_hovered", &"tab_disabled", &"tab_focus"]:
+			if not theme.has_stylebox(slot_name, theme_type):
+				continue
+			var stylebox := theme.get_stylebox(slot_name, theme_type) as StyleBoxFlat
+			if stylebox == null:
+				continue
+			if stylebox.corner_radius_bottom_left != 0 or stylebox.corner_radius_bottom_right != 0:
+				_fail("%s %s.%s has bottom tab radius left/right=%s/%s" % [
+					label,
+					theme_type,
+					slot_name,
+					stylebox.corner_radius_bottom_left,
+					stylebox.corner_radius_bottom_right,
+				])
 
 
 func _expect_margin_max(theme: Theme, theme_type: StringName, slot_name: StringName, max_h: int, max_v: int, label: String) -> void:

@@ -79,6 +79,19 @@ popup/item_5/text = "None"
 popup/item_5/id = 5
 script = ExtResource("2_theme_option_button")
 
+[node name="RaisedCheckBox" type="CheckBox" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow"]
+custom_minimum_size = Vector2(116, 40)
+layout_mode = 2
+tooltip_text = "Raised mode"
+accessibility_name = "Raised mode"
+text = "Raised"
+
+[node name="PlatformOptionButton" type="OptionButton" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow"]
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+tooltip_text = "Platform sizing"
+accessibility_name = "Platform sizing"
+
 [node name="ThemeHint" type="Label" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow" unique_id=941285155]
 layout_mode = 2
 theme_type_variation = &"Caption"
