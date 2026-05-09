@@ -304,6 +304,8 @@ func _regenerate_theme() -> void:
 	var role_primary: Color = accent_color
 	var accent_rim: Color = _mix(accent_color, Color.WHITE, 0.5)
 
+	var editor_hint := Engine.is_editor_hint()
+
 	# ── Semantic role tokens (DESIGN_TOKENS §7.1; Plan 05-02 Task 2 — review HIGH gate) ──
 	# Defaults sourced verbatim from DESIGN_TOKENS §7.1 "Semantic role tokens" table:
 	#   role.success → #5CC971   role.warning → #FFD166
@@ -321,9 +323,6 @@ func _regenerate_theme() -> void:
 	var role_success_offset: Color = _raised_depth_color(role_success, base_color)
 	var role_warning_offset: Color = _raised_depth_color(role_warning, base_color)
 	var role_info_offset: Color = _raised_depth_color(role_info, base_color)
-	var renderer_forward_plus: Color = Color("#5D8C3F")
-	var renderer_mobile: Color = Color("#A5557D")
-	var renderer_compatibility: Color = Color("#5586A4")
 	var text_on_primary: Color = _readable_text_color(role_primary)
 	var text_on_accent_offset: Color = _readable_text_color(accent_offset)
 	var progress_text_color: Color = text_strong
@@ -408,6 +407,8 @@ func _regenerate_theme() -> void:
 
 	# ── Register type variations (DESIGN_TOKENS §8.5; PITFALLS 1.2) ──
 	for variation_name in TYPE_VARIATIONS.keys():
+		if not editor_hint and EDITOR_ONLY_THEME_TYPES.has(variation_name):
+			continue
 		var base_type: String = TYPE_VARIATIONS[variation_name]
 		set_type_variation(variation_name, base_type)
 
@@ -438,38 +439,41 @@ func _regenerate_theme() -> void:
 	set_font("font", "IconButton",      body_font)
 	set_font("font", "FlatButton",      body_font)
 	set_font("font", "FlatMenuButton",  body_font)
-	set_font("font", "EditorInspectorButton",     body_font)
-	set_font("font", "EditorInspectorFlatButton", body_font)
-	set_font("font", "BottomPanelButton", body_font)
-	set_font("font", "EditorLogFilterButton", body_font)
 	set_font("font", "CardPanel",       body_font)
 	set_font("font", "HeroPanel",       header_medium_font)
-	# Tree exposes explicit font slots outside the BINDING_TABLE schema. The body face
-	# keeps rows dense/readable; title buttons get a header-weight Inter variation.
+	# Tree exposes explicit font slots outside the BINDING_TABLE schema. Runtime Tree
+	# keeps body text dense/readable; editor-only Tree variations are populated below
+	# only when the theme is being generated for the editor.
 	set_font("font", "Tree",              body_font)
 	set_font("title_button_font", "Tree", header_small_font)
-	set_font("font", "TreeSecondary",              body_font)
-	set_font("title_button_font", "TreeSecondary", header_small_font)
-	set_font("font", "TreeTable",              body_font)
-	set_font("title_button_font", "TreeTable", header_small_font)
-	# Godot editor internals read inspector section/property fonts from EditorFonts,
-	# not always from Control font slots. Keep those aliases on the same family.
-	set_font("main", "EditorFonts", body_font)
-	set_font("bold", "EditorFonts", header_small_font)
-	set_font("title", "EditorFonts", header_small_font)
 	# ItemList exposes one official font slot. Keep it explicit because BINDING_TABLE
 	# intentionally has no font branch.
 	set_font("font", "ItemList", body_font)
-	set_font("font", "ItemListSecondary", body_font)
 	# FoldableContainer likewise exposes a single official title/body font slot.
 	set_font("font", "FoldableContainer", body_font)
 	# Tabs expose explicit font slots outside the BINDING_TABLE schema.
 	set_font("font", "TabBar", body_font)
 	set_font("font", "TabContainer", body_font)
-	set_font("font", "TabContainerOdd", body_font)
-	set_font("font", "BottomPanel", body_font)
 	# ProgressBar exposes an official font slot for optional percentage/text display.
 	set_font("font", "ProgressBar", body_font)
+
+	if editor_hint:
+		set_font("font", "EditorInspectorButton",     body_font)
+		set_font("font", "EditorInspectorFlatButton", body_font)
+		set_font("font", "BottomPanelButton", body_font)
+		set_font("font", "EditorLogFilterButton", body_font)
+		set_font("font", "TreeSecondary",              body_font)
+		set_font("title_button_font", "TreeSecondary", header_small_font)
+		set_font("font", "TreeTable",              body_font)
+		set_font("title_button_font", "TreeTable", header_small_font)
+		# Godot editor internals read inspector section/property fonts from EditorFonts,
+		# not always from Control font slots. Keep those aliases on the same family.
+		set_font("main", "EditorFonts", body_font)
+		set_font("bold", "EditorFonts", header_small_font)
+		set_font("title", "EditorFonts", header_small_font)
+		set_font("font", "ItemListSecondary", body_font)
+		set_font("font", "TabContainerOdd", body_font)
+		set_font("font", "BottomPanel", body_font)
 
 	# ── Set per-variation font sizes (DESIGN_TOKENS §8.5 + tokens) ──
 	set_font_size("font_size", "HeaderLarge",  tokens.h1)
@@ -503,18 +507,19 @@ func _regenerate_theme() -> void:
 	set_font_size("font_size", "IconButton",      tokens.body)
 	set_font_size("font_size", "FlatButton",      tokens.body)
 	set_font_size("font_size", "FlatMenuButton",  tokens.body)
-	set_font_size("font_size", "EditorInspectorButton",     tokens.body)
-	set_font_size("font_size", "EditorInspectorFlatButton", tokens.body)
-	set_font_size("font_size", "BottomPanelButton", tokens.body)
-	set_font_size("font_size", "EditorLogFilterButton", tokens.body)
-	set_font_size("font_size", "TreeSecondary", tokens.body)
-	set_font_size("title_button_font_size", "TreeSecondary", tokens.body)
-	set_font_size("font_size", "TreeTable", tokens.body)
-	set_font_size("title_button_font_size", "TreeTable", tokens.body)
-	set_font_size("main_size", "EditorFonts", tokens.body)
-	set_font_size("bold_size", "EditorFonts", tokens.body)
-	set_font_size("title_size", "EditorFonts", maxi(tokens.body, 16))
-	set_font_size("font_size", "ItemListSecondary", tokens.body)
+	if editor_hint:
+		set_font_size("font_size", "EditorInspectorButton",     tokens.body)
+		set_font_size("font_size", "EditorInspectorFlatButton", tokens.body)
+		set_font_size("font_size", "BottomPanelButton", tokens.body)
+		set_font_size("font_size", "EditorLogFilterButton", tokens.body)
+		set_font_size("font_size", "TreeSecondary", tokens.body)
+		set_font_size("title_button_font_size", "TreeSecondary", tokens.body)
+		set_font_size("font_size", "TreeTable", tokens.body)
+		set_font_size("title_button_font_size", "TreeTable", tokens.body)
+		set_font_size("main_size", "EditorFonts", tokens.body)
+		set_font_size("bold_size", "EditorFonts", tokens.body)
+		set_font_size("title_size", "EditorFonts", maxi(tokens.body, 16))
+		set_font_size("font_size", "ItemListSecondary", tokens.body)
 
 	# ── Build role lookup table from derivation locals (Plan 04-04) ──
 	var role_table: Dictionary = {
@@ -581,9 +586,6 @@ func _regenerate_theme() -> void:
 		"role_warning":           role_warning,
 		"role_danger":            role_danger,
 		"role_info":              role_info,
-		"renderer_forward_plus":  renderer_forward_plus,
-		"renderer_mobile":        renderer_mobile,
-		"renderer_compatibility": renderer_compatibility,
 		"role_success_offset":    role_success_offset,
 		"role_warning_offset":    role_warning_offset,
 		"role_danger_offset":     role_danger_offset,
@@ -597,12 +599,19 @@ func _regenerate_theme() -> void:
 		"text_on_success":        text_on_success,
 		"text_on_warning":        text_on_warning,
 		"text_on_info":           text_on_info,
-		"editor_property_x":      Color("#E16277") if not is_light else Color("#670A18"),
-		"editor_property_y":      Color("#C3EF65") if not is_light else Color("#455E10"),
-		"editor_property_z":      Color("#6AABF6") if not is_light else Color("#143862"),
-		"editor_property_w":      text_default,
-		"editor_prop_subsection": _mix(button_disabled, surface_base, 0.48),
 	}
+	if editor_hint:
+		# Godot EditorNode reads these renderer semantic colors directly from the
+		# Editor theme type; Minimal Theme and Godot's built-in themes author the
+		# same slots. They are deliberately editor-only.
+		role_table["renderer_forward_plus"] = Color("#5D8C3F")
+		role_table["renderer_mobile"] = Color("#A5557D")
+		role_table["renderer_compatibility"] = Color("#5586A4")
+		role_table["editor_property_x"] = Color("#E16277") if not is_light else Color("#670A18")
+		role_table["editor_property_y"] = Color("#C3EF65") if not is_light else Color("#455E10")
+		role_table["editor_property_z"] = Color("#6AABF6") if not is_light else Color("#143862")
+		role_table["editor_property_w"] = text_default
+		role_table["editor_prop_subsection"] = _mix(button_disabled, surface_base, 0.48)
 
 	# ── Walk BINDING_TABLE — additive iteration; entries not in table are LEFT UNTOUCHED (D-04) ──
 	# Cross-AI Cycle 2 N1 fix: only 5 setter branches — NO set_font branch. Per-Control
@@ -610,6 +619,8 @@ func _regenerate_theme() -> void:
 	# Cross-AI Cycle 2 C2 fix: style_personality passed to _resolve_recipe so disabled alpha is
 	# sourced per-direction from STYLE_PERSONALITY.disabled_opacity.
 	for theme_type in BINDING_TABLE.keys():
+		if not editor_hint and EDITOR_ONLY_THEME_TYPES.has(theme_type):
+			continue
 		var type_block: Dictionary = BINDING_TABLE[theme_type]
 		for data_type in type_block.keys():
 			var slots: Dictionary = type_block[data_type]
@@ -632,7 +643,8 @@ func _regenerate_theme() -> void:
 				# explicitly excludes "font". If they did, _resolve_recipe returns null
 				# (its switch has no font branch), and the value==null check above skips.
 
-	_apply_editor_theme_runtime_settings(role_table)
+	if editor_hint:
+		_apply_editor_theme_runtime_settings(role_table)
 
 	# Phase 7 popup/menu font slots must stay outside BINDING_TABLE. Godot exposes these
 	# as real Theme font/font_size entries, but the binding iterator intentionally has no
@@ -673,6 +685,9 @@ func _get_editor_setting_value(path: String, fallback: Variant) -> Variant:
 
 
 func _apply_editor_theme_runtime_settings(role_table: Dictionary) -> void:
+	if not Engine.is_editor_hint():
+		return
+
 	# Match Godot Modern's editor setting semantics:
 	# None=0, Selected Only=1, All=2. Selected Only keeps normal relationship
 	# width at 0 and draws only the highlighted selected parent/child path.
@@ -1219,6 +1234,77 @@ const TYPE_VARIATIONS: Dictionary = {
 	# Editor dock scroll-body wrappers used after toolbar stacks.
 	"NoBorderHorizontal":       "MarginContainer",
 	"NoBorderHorizontalBottom": "NoBorderHorizontal",
+}
+
+
+const EDITOR_ONLY_THEME_TYPES: Dictionary = {
+	"AnimationBezierTrackEdit": true,
+	"AnimationTimelineEdit": true,
+	"AnimationTrackEdit": true,
+	"AnimationTrackEditGroup": true,
+	"AssetLib": true,
+	"BottomPanel": true,
+	"BottomPanelButton": true,
+	"BottomSideDockTabContainer": true,
+	"DockTabContainer": true,
+	"Editor": true,
+	"EditorAbout": true,
+	"EditorAudioBus": true,
+	"EditorAudioBusEffectsTree": true,
+	"EditorDebuggerInspector": true,
+	"EditorDock": true,
+	"EditorHelp": true,
+	"EditorHelpBitContent": true,
+	"EditorHelpBitTitle": true,
+	"EditorHelpBitTooltipContent": true,
+	"EditorHelpBitTooltipTitle": true,
+	"EditorIcons": true,
+	"EditorInspector": true,
+	"EditorInspectorArray": true,
+	"EditorInspectorButton": true,
+	"EditorInspectorCategory": true,
+	"EditorInspectorFlatButton": true,
+	"EditorInspectorForeground": true,
+	"EditorInspectorSection": true,
+	"EditorLogFilterButton": true,
+	"EditorProperty": true,
+	"EditorSettingsDialog": true,
+	"EditorSpinSlider": true,
+	"EditorStyles": true,
+	"EditorValidationPanel": true,
+	"GamePanel": true,
+	"ItemListSecondary": true,
+	"MainMenuBar": true,
+	"MainScreenButton": true,
+	"NoBorderHorizontal": true,
+	"NoBorderHorizontalBottom": true,
+	"PanelBackgroundButton": true,
+	"PanelContainerTabbarInner": true,
+	"PanelForeground": true,
+	"PopupProgressBar": true,
+	"PreviewLightButton": true,
+	"ProjectExportDialog": true,
+	"ProjectList": true,
+	"ProjectManager": true,
+	"ProjectSettingsEditor": true,
+	"ProjectTagButton": true,
+	"RunBarButton": true,
+	"RunBarButtonMovieMakerDisabled": true,
+	"RunBarButtonMovieMakerEnabled": true,
+	"SceneImportSettingsDialog": true,
+	"ScrollContainerSecondary": true,
+	"SideDockTabContainer": true,
+	"TabBarInner": true,
+	"TabContainerInner": true,
+	"TabContainerOdd": true,
+	"ThemeEditor": true,
+	"ThemeItemEditorDialog": true,
+	"TileSetEditor": true,
+	"TopBarOptionButton": true,
+	"TreeLineEdit": true,
+	"TreeSecondary": true,
+	"TreeTable": true,
+	"VSRerouteNode": true,
 }
 
 

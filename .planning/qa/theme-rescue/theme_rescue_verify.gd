@@ -65,10 +65,11 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_no_rich_text_label_chrome(theme, label)
 	_expect_tab_top_only_corners(theme, label)
 	_expect_tab_state_chrome(theme, label)
-	_expect_editor_compact_chrome(theme, label)
-	_expect_editor_integration_chrome(theme, label)
-	_expect_editor_property_input_chrome(theme, label, expect_raised)
-	_expect_create_dialog_chrome(theme, label)
+	if Engine.is_editor_hint():
+		_expect_editor_compact_chrome(theme, label)
+		_expect_editor_integration_chrome(theme, label)
+		_expect_editor_property_input_chrome(theme, label, expect_raised)
+		_expect_create_dialog_chrome(theme, label)
 	_expect_shared_interaction_chrome(theme, label)
 	_expect_tree_view_chrome(theme, label)
 	_expect_list_view_chrome(theme, label)
@@ -899,18 +900,13 @@ func _expect_shared_interaction_chrome(theme: Theme, label: String) -> void:
 	if button_hover == null or button_pressed == null:
 		_fail("%s missing Button hover/pressed for shared interaction check" % label)
 		return
-	for entry in [
+	var entries := [
 		{"type": &"PopupMenu", "slot": &"hover", "state": button_hover},
 		{"type": &"ItemList", "slot": &"hovered", "state": button_hover},
 		{"type": &"ItemList", "slot": &"selected", "state": button_pressed},
 		{"type": &"ItemList", "slot": &"selected_focus", "state": button_pressed},
 		{"type": &"ItemList", "slot": &"hovered_selected", "state": button_pressed},
 		{"type": &"ItemList", "slot": &"hovered_selected_focus", "state": button_pressed},
-		{"type": &"ItemListSecondary", "slot": &"hovered", "state": button_hover},
-		{"type": &"ItemListSecondary", "slot": &"selected", "state": button_pressed},
-		{"type": &"ItemListSecondary", "slot": &"selected_focus", "state": button_pressed},
-		{"type": &"ItemListSecondary", "slot": &"hovered_selected", "state": button_pressed},
-		{"type": &"ItemListSecondary", "slot": &"hovered_selected_focus", "state": button_pressed},
 		{"type": &"MenuBar", "slot": &"hover", "state": button_hover},
 		{"type": &"MenuBar", "slot": &"pressed", "state": button_pressed},
 		{"type": &"Tree", "slot": &"hovered", "state": button_hover},
@@ -922,7 +918,17 @@ func _expect_shared_interaction_chrome(theme: Theme, label: String) -> void:
 		{"type": &"Tree", "slot": &"button_pressed", "state": button_pressed},
 		{"type": &"Tree", "slot": &"custom_button_hover", "state": button_hover},
 		{"type": &"Tree", "slot": &"custom_button_pressed", "state": button_pressed},
-	]:
+	]
+	if Engine.is_editor_hint():
+		entries.append_array([
+			{"type": &"ItemListSecondary", "slot": &"hovered", "state": button_hover},
+			{"type": &"ItemListSecondary", "slot": &"selected", "state": button_pressed},
+			{"type": &"ItemListSecondary", "slot": &"selected_focus", "state": button_pressed},
+			{"type": &"ItemListSecondary", "slot": &"hovered_selected", "state": button_pressed},
+			{"type": &"ItemListSecondary", "slot": &"hovered_selected_focus", "state": button_pressed},
+		])
+
+	for entry in entries:
 		var stylebox := theme.get_stylebox(entry["slot"], entry["type"]) as StyleBoxFlat
 		if stylebox == null:
 			_fail("%s missing shared interaction stylebox %s.%s" % [label, entry["type"], entry["slot"]])
@@ -1024,7 +1030,11 @@ func _expect_list_view_chrome(theme: Theme, label: String) -> void:
 		_fail("%s missing Button.pressed for ItemList selected comparison" % label)
 		return
 
-	for theme_type in [&"ItemList", &"ItemListSecondary"]:
+	var theme_types := [&"ItemList"]
+	if Engine.is_editor_hint():
+		theme_types.append(&"ItemListSecondary")
+
+	for theme_type in theme_types:
 		var panel := theme.get_stylebox(&"panel", theme_type) as StyleBoxFlat
 		if panel == null:
 			_fail("%s missing %s.panel for list view chrome" % [label, theme_type])

@@ -10,6 +10,11 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	if not Engine.is_editor_hint():
+		print("THEME_EDITOR_REGRESSION_PROBE: SKIP Engine.is_editor_hint() is false; run from an editor context")
+		quit(0)
+		return
+
 	var theme := load(THEME_PATH) as NeoCadeTheme
 	if theme == null:
 		_fail("Could not load %s as NeoCadeTheme" % THEME_PATH)
