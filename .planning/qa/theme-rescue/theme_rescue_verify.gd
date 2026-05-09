@@ -110,10 +110,9 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_equal(theme.default_base_scale, 1.0, "%s default_base_scale" % label)
 	_expect_icon_max(theme, "Window", "close", 24, label)
 	_expect_icon_max(theme, "OptionButton", "arrow", 24, label)
-	_expect_icon_between(theme, "CheckBox", "checked", Vector2(20, 20), Vector2(26, 26), label)
-	_expect_icon_between(theme, "CheckButton", "checked", Vector2(34, 14), Vector2(38, 20), label)
-
 	var is_mobile := label.begins_with("mobile:")
+	_expect_icon_between(theme, "CheckBox", "checked", Vector2(32, 32) if is_mobile else Vector2(20, 20), Vector2(34, 34) if is_mobile else Vector2(26, 26), label)
+	_expect_icon_between(theme, "CheckButton", "checked", Vector2(46, 24) if is_mobile else Vector2(34, 14), Vector2(50, 28) if is_mobile else Vector2(38, 20), label)
 	_expect_margin_max(theme, "PrimaryButton", "normal", 28 if is_mobile else 18, 20 if is_mobile else 14, label)
 	_expect_margin_max(theme, "PanelContainer", "panel", 18 if is_mobile else 14, 14 if is_mobile else 12, label)
 	_expect_window_chrome(theme, label, expect_raised)

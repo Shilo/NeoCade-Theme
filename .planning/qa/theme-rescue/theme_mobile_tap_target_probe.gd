@@ -28,7 +28,7 @@ func _run() -> void:
 		{"name": "CheckBox", "node": CheckBox.new(), "axis": "height", "text": "On"},
 		{"name": "CheckButton", "node": CheckButton.new(), "axis": "height", "text": "On"},
 		{"name": "RadioButton", "node": CheckBox.new(), "axis": "height", "text": "Auto", "radio": true},
-		{"name": "ColorPickerButton", "node": ColorPickerButton.new(), "axis": "limited_height"},
+		{"name": "ColorPickerButton", "node": ColorPickerButton.new(), "axis": "colorpicker_compatible", "custom_min": Vector2(48, 48)},
 		{"name": "MenuButton", "node": MenuButton.new(), "axis": "height", "text": "Menu"},
 		{"name": "OptionButton", "node": OptionButton.new(), "axis": "height"},
 		{"name": "LineEdit", "node": LineEdit.new(), "axis": "height"},
@@ -52,6 +52,8 @@ func _run() -> void:
 			node.set("text", check["text"])
 		if check.has("variation"):
 			(node as Control).theme_type_variation = check["variation"]
+		if check.has("custom_min"):
+			(node as Control).custom_minimum_size = check["custom_min"]
 		if check.get("icon", false):
 			(node as Button).icon = _make_probe_icon()
 		if check.get("radio", false):
@@ -65,6 +67,8 @@ func _run() -> void:
 			_log_and_check(check["name"], Vector2(0, item_height), check["axis"])
 		else:
 			_log_and_check(check["name"], (node as Control).get_combined_minimum_size(), check["axis"])
+
+	_check_mobile_icon_sizes(theme)
 
 	if _failures.is_empty():
 		print("THEME_MOBILE_TAP_TARGET_PROBE: PASS")
@@ -98,7 +102,33 @@ func _log_and_check(label: String, size: Vector2, axis: String) -> void:
 		_failures.append("%s width %.1f below %.1f" % [label, size.x, TARGET])
 	elif axis == "both" and (size.x < TARGET or size.y < TARGET):
 		_failures.append("%s size %s below %.1f on at least one axis" % [label, size, TARGET])
+	elif axis == "colorpicker_compatible":
+		if size.x < TARGET or size.y < TARGET:
+			_failures.append("%s custom minimum %s below %.1f on at least one axis" % [label, size, TARGET])
+		var panel := (load("res://addons/neocade_theme/neocade_theme.tres") as Theme).get_stylebox(&"normal", &"ColorPickerButton")
+		if panel != null and panel.get_minimum_size().x > 8.0:
+			_failures.append("%s chrome minimum %s would consume too much of a 48px swatch" % [label, panel.get_minimum_size()])
 	elif axis == "compact_height" and (size.y < 6.0 or size.y > 8.0):
 		_failures.append("%s mobile indicator height %.1f should stay compact in 6-8 logical px" % [label, size.y])
 	elif axis == "compact_width" and (size.x < 6.0 or size.x > 8.0):
 		_failures.append("%s mobile indicator width %.1f should stay compact in 6-8 logical px" % [label, size.x])
+
+
+func _check_mobile_icon_sizes(theme: Theme) -> void:
+	_expect_icon_at_least(theme, &"CheckBox", &"checked", Vector2(32, 32))
+	_expect_icon_at_least(theme, &"CheckBox", &"unchecked", Vector2(32, 32))
+	_expect_icon_at_least(theme, &"CheckBox", &"radio_checked", Vector2(32, 32))
+	_expect_icon_at_least(theme, &"CheckBox", &"radio_unchecked", Vector2(32, 32))
+	_expect_icon_at_least(theme, &"CheckButton", &"checked", Vector2(46, 24))
+	_expect_icon_at_least(theme, &"CheckButton", &"unchecked", Vector2(46, 24))
+	_expect_icon_at_least(theme, &"LineEdit", &"clear", Vector2(24, 24))
+	_expect_icon_at_least(theme, &"TabBar", &"increment", Vector2(24, 24))
+	_expect_icon_at_least(theme, &"TabBar", &"decrement", Vector2(24, 24))
+
+
+func _expect_icon_at_least(theme: Theme, theme_type: StringName, slot: StringName, minimum: Vector2) -> void:
+	var icon := theme.get_icon(slot, theme_type)
+	var size := icon.get_size()
+	print("MOBILE_ICON %-18s %-20s size=%s min=%s" % [theme_type, slot, size, minimum])
+	if size.x < minimum.x or size.y < minimum.y:
+		_failures.append("%s.%s icon %s below %s" % [theme_type, slot, size, minimum])

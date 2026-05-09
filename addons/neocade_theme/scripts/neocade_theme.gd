@@ -2162,17 +2162,17 @@ const BINDING_TABLE: Dictionary = {
 			"check_v_offset": {"value": 0},
 		},
 		"icon": {
-			"checked":            {"icon": "checkbox_checked"},
-			"unchecked":          {"icon": "checkbox_unchecked"},
-			"radio_checked":      {"icon": "radio_checked"},
-			"radio_unchecked":    {"icon": "radio_unchecked"},
+			"checked":            {"icon": "checkbox_checked", "mobile_svg_scale": 1.0},
+			"unchecked":          {"icon": "checkbox_unchecked", "mobile_svg_scale": 1.0},
+			"radio_checked":      {"icon": "radio_checked", "mobile_svg_scale": 1.0},
+			"radio_unchecked":    {"icon": "radio_unchecked", "mobile_svg_scale": 1.0},
 			# Plan 05-03 Task 2 polish: REUSE the existing checked/unchecked
 			# SVGs for the disabled variants (Godot 4.6 exposes the slots; the
 			# font_disabled_color tints them through). No new artwork needed.
-			"checked_disabled":   {"icon": "checkbox_checked"},
-			"unchecked_disabled": {"icon": "checkbox_unchecked"},
-			"radio_checked_disabled":   {"icon": "radio_checked"},
-			"radio_unchecked_disabled": {"icon": "radio_unchecked"},
+			"checked_disabled":   {"icon": "checkbox_checked", "mobile_svg_scale": 1.0},
+			"unchecked_disabled": {"icon": "checkbox_unchecked", "mobile_svg_scale": 1.0},
+			"radio_checked_disabled":   {"icon": "radio_checked", "mobile_svg_scale": 1.0},
+			"radio_unchecked_disabled": {"icon": "radio_unchecked", "mobile_svg_scale": 1.0},
 		},
 	},
 	# 4. CheckButton — 2 icon slots (Cycle 6 F4 fix: `checked`/`unchecked`, not `on`/`off`)
@@ -2211,17 +2211,17 @@ const BINDING_TABLE: Dictionary = {
 			"button_unchecked_color":  {"role": "selection_control_off"},
 		},
 		"icon": {
-			"checked":            {"icon": "checkbutton_checked"},
-			"unchecked":          {"icon": "checkbutton_unchecked"},
+			"checked":            {"icon": "checkbutton_checked", "mobile_svg_scale": 1.25},
+			"unchecked":          {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.25},
 			# Plan 05-03 Task 2 polish: REUSE existing SVGs for disabled
 			# variants per the Action item; *_mirrored variants stay deferred
 			# to v1.x per Phase 4 CHANGELOG.
-			"checked_disabled":   {"icon": "checkbutton_checked"},
-			"unchecked_disabled": {"icon": "checkbutton_unchecked"},
-			"checked_mirrored":            {"icon": "checkbutton_checked"},
-			"unchecked_mirrored":          {"icon": "checkbutton_unchecked"},
-			"checked_disabled_mirrored":   {"icon": "checkbutton_checked"},
-			"unchecked_disabled_mirrored": {"icon": "checkbutton_unchecked"},
+			"checked_disabled":   {"icon": "checkbutton_checked", "mobile_svg_scale": 1.25},
+			"unchecked_disabled": {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.25},
+			"checked_mirrored":            {"icon": "checkbutton_checked", "mobile_svg_scale": 1.25},
+			"unchecked_mirrored":          {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.25},
+			"checked_disabled_mirrored":   {"icon": "checkbutton_checked", "mobile_svg_scale": 1.25},
+			"unchecked_disabled_mirrored": {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.25},
 		},
 	},
 	# 5. CodeEdit — inherits TextEdit; Phase 4 ships base stylebox set + Phase 5
@@ -3087,7 +3087,7 @@ const BINDING_TABLE: Dictionary = {
 			"clear_button_color_pressed": {"role": "text_strong"},
 		},
 		"icon": {
-			"clear": {"icon": "clear"},
+			"clear": {"icon": "clear", "mobile_svg_scale": 0.75},
 		},
 	},
 	# 18. LinkButton — colors only; no styleboxes (TextButton variant)
@@ -3445,10 +3445,10 @@ const BINDING_TABLE: Dictionary = {
 		},
 		"icon": {
 			"close":               {"icon": "close"},
-			"increment":           {"icon": "tab_increment"},
-			"increment_highlight": {"icon": "tab_increment"},
-			"decrement":           {"icon": "tab_decrement"},
-			"decrement_highlight": {"icon": "tab_decrement"},
+			"increment":           {"icon": "tab_increment", "mobile_svg_scale": 0.75},
+			"increment_highlight": {"icon": "tab_increment", "mobile_svg_scale": 0.75},
+			"decrement":           {"icon": "tab_decrement", "mobile_svg_scale": 0.75},
+			"decrement_highlight": {"icon": "tab_decrement", "mobile_svg_scale": 0.75},
 			"drop_mark":           {"icon": "tab_drop_mark"},
 		},
 	},
@@ -3501,10 +3501,10 @@ const BINDING_TABLE: Dictionary = {
 			"font_size": {"value": "tokens.body"},
 		},
 		"icon": {
-			"increment":           {"icon": "tab_increment"},
-			"increment_highlight": {"icon": "tab_increment"},
-			"decrement":           {"icon": "tab_decrement"},
-			"decrement_highlight": {"icon": "tab_decrement"},
+			"increment":           {"icon": "tab_increment", "mobile_svg_scale": 0.75},
+			"increment_highlight": {"icon": "tab_increment", "mobile_svg_scale": 0.75},
+			"decrement":           {"icon": "tab_decrement", "mobile_svg_scale": 0.75},
+			"decrement_highlight": {"icon": "tab_decrement", "mobile_svg_scale": 0.75},
 			"drop_mark":           {"icon": "tab_drop_mark"},
 			"menu":                {"icon": "tab_menu"},
 			"menu_highlight":      {"icon": "tab_menu"},
@@ -3558,10 +3558,10 @@ const BINDING_TABLE: Dictionary = {
 			"font_size": {"value": "tokens.body"},
 		},
 		"icon": {
-			"increment":           {"icon": "tab_increment"},
-			"increment_highlight": {"icon": "tab_increment"},
-			"decrement":           {"icon": "tab_decrement"},
-			"decrement_highlight": {"icon": "tab_decrement"},
+			"increment":           {"icon": "tab_increment", "mobile_svg_scale": 0.75},
+			"increment_highlight": {"icon": "tab_increment", "mobile_svg_scale": 0.75},
+			"decrement":           {"icon": "tab_decrement", "mobile_svg_scale": 0.75},
+			"decrement_highlight": {"icon": "tab_decrement", "mobile_svg_scale": 0.75},
 			"drop_mark":           {"icon": "tab_drop_mark"},
 			"menu":                {"icon": "tab_menu"},
 			"menu_highlight":      {"icon": "tab_menu"},
@@ -5451,20 +5451,33 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			return null
 		if icon_name == "empty":
 			return _empty_icon()
-		return _load_icon(icon_name)
+		var mobile_svg_scale := 0.0
+		if tokens.get("densityScale", 1.0) > 1.0 and recipe.has("mobile_svg_scale"):
+			mobile_svg_scale = float(recipe.get("mobile_svg_scale", 0.0))
+		return _load_icon(icon_name, mobile_svg_scale)
 	# Cross-AI Cycle 2 N1 fix: any unrecognized data_type (including the now-removed "font")
 	# falls through to null — caller skips silently per D-04 escape hatch.
 	return null
 
 
-func _load_icon(icon_name: String) -> Texture2D:
-	var cached: Texture2D = _active_icon_cache.get(icon_name)
+func _load_icon(icon_name: String, svg_scale: float = 0.0) -> Texture2D:
+	var cache_key := "%s@%.3f" % [icon_name, svg_scale] if svg_scale > 0.0 else icon_name
+	var cached: Texture2D = _active_icon_cache.get(cache_key)
 	if cached != null:
 		return cached
 	var path := "res://addons/neocade_theme/icons/" + icon_name + ".svg"
+	if svg_scale > 0.0:
+		var svg := FileAccess.get_file_as_string(path)
+		if not svg.is_empty():
+			var image := Image.new()
+			var error := image.load_svg_from_string(svg, svg_scale)
+			if error == OK:
+				var texture := ImageTexture.create_from_image(image)
+				_active_icon_cache[cache_key] = texture
+				return texture
 	var icon := load(path) as Texture2D
 	if icon != null:
-		_active_icon_cache[icon_name] = icon
+		_active_icon_cache[cache_key] = icon
 	return icon
 
 
