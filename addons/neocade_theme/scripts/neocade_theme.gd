@@ -2916,14 +2916,14 @@ const BINDING_TABLE: Dictionary = {
 			"v_separation":           {"value": 4},
 		},
 		"icon": {
-			"checked":                  {"icon": "checkbox_checked"},
-			"checked_disabled":         {"icon": "checkbox_checked"},
-			"unchecked":                {"icon": "checkbox_unchecked"},
-			"unchecked_disabled":       {"icon": "checkbox_unchecked"},
-			"radio_checked":            {"icon": "radio_checked"},
-			"radio_checked_disabled":   {"icon": "radio_checked"},
-			"radio_unchecked":          {"icon": "radio_unchecked"},
-			"radio_unchecked_disabled": {"icon": "radio_unchecked"},
+			"checked":                  {"generated_icon": "popup_selection_checkbox", "checked": true},
+			"checked_disabled":         {"generated_icon": "popup_selection_checkbox", "checked": true},
+			"unchecked":                {"generated_icon": "popup_selection_checkbox", "checked": false},
+			"unchecked_disabled":       {"generated_icon": "popup_selection_checkbox", "checked": false},
+			"radio_checked":            {"generated_icon": "popup_selection_radio", "checked": true},
+			"radio_checked_disabled":   {"generated_icon": "popup_selection_radio", "checked": true},
+			"radio_unchecked":          {"generated_icon": "popup_selection_radio", "checked": false},
+			"radio_unchecked_disabled": {"generated_icon": "popup_selection_radio", "checked": false},
 			"submenu":                  {"icon": "popup_submenu"},
 			"submenu_mirrored":         {"icon": "popup_submenu_mirrored"},
 		},
@@ -4684,6 +4684,10 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			return _make_split_grabber_icon(recipe.get("orientation", "vertical") == "vertical", role_table, style_personality)
 		if recipe.get("generated_icon", "") == "slider_grabber":
 			return _make_slider_grabber_icon(bool(recipe.get("highlight", false)), role_table, style_personality)
+		if recipe.get("generated_icon", "") == "popup_selection_checkbox":
+			return _make_popup_selection_checkbox_icon(bool(recipe.get("checked", false)), role_table)
+		if recipe.get("generated_icon", "") == "popup_selection_radio":
+			return _make_popup_selection_radio_icon(bool(recipe.get("checked", false)), role_table)
 		var icon_name: String = recipe.get("icon", "")
 		if icon_name == "":
 			return null
@@ -4749,6 +4753,31 @@ func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_pe
 	return ImageTexture.create_from_image(image)
 
 
+func _popup_selection_fill(checked: bool, role_table: Dictionary) -> Color:
+	return role_table.get("role_primary", Color.WHITE) if checked else role_table.get("selection_control_off", Color(0.70, 0.74, 0.86))
+
+
+func _make_popup_selection_checkbox_icon(checked: bool, role_table: Dictionary) -> Texture2D:
+	const SIZE := 24
+	var image := Image.create(SIZE, SIZE, false, Image.FORMAT_RGBA8)
+	image.fill(Color(0, 0, 0, 0))
+	_fill_round_rect(image, Rect2i(3, 3, 18, 18), 3.0, _popup_selection_fill(checked, role_table))
+	if checked:
+		_stroke_line(image, Vector2(7.0, 12.2), Vector2(10.8, 16.0), 2.4, Color.BLACK)
+		_stroke_line(image, Vector2(10.8, 16.0), Vector2(17.4, 8.4), 2.4, Color.BLACK)
+	return ImageTexture.create_from_image(image)
+
+
+func _make_popup_selection_radio_icon(checked: bool, role_table: Dictionary) -> Texture2D:
+	const SIZE := 24
+	var image := Image.create(SIZE, SIZE, false, Image.FORMAT_RGBA8)
+	image.fill(Color(0, 0, 0, 0))
+	_fill_circle(image, Vector2(12.0, 12.0), 9.0, _popup_selection_fill(checked, role_table))
+	if checked:
+		_fill_circle(image, Vector2(12.0, 12.0), 4.0, Color.BLACK)
+	return ImageTexture.create_from_image(image)
+
+
 func _fill_round_rect(image: Image, rect: Rect2i, radius: float, color: Color) -> void:
 	for y in range(rect.position.y, rect.position.y + rect.size.y):
 		for x in range(rect.position.x, rect.position.x + rect.size.x):
@@ -4762,5 +4791,37 @@ func _fill_round_rect(image: Image, rect: Rect2i, radius: float, color: Color) -
 				var nearest_y := clampf(py, radius, max_y)
 				var dist := Vector2(px - nearest_x, py - nearest_y).length() - radius
 				coverage = clampf(1.0 - dist, 0.0, 1.0)
+			if coverage > 0.0:
+				image.set_pixel(x, y, Color(color.r, color.g, color.b, color.a * coverage))
+
+
+func _fill_circle(image: Image, center: Vector2, radius: float, color: Color) -> void:
+	var min_x := maxi(0, int(floor(center.x - radius - 1.0)))
+	var max_x := mini(image.get_width() - 1, int(ceil(center.x + radius + 1.0)))
+	var min_y := maxi(0, int(floor(center.y - radius - 1.0)))
+	var max_y := mini(image.get_height() - 1, int(ceil(center.y + radius + 1.0)))
+	for y in range(min_y, max_y + 1):
+		for x in range(min_x, max_x + 1):
+			var dist := (Vector2(float(x) + 0.5, float(y) + 0.5) - center).length()
+			var coverage := clampf(radius + 0.5 - dist, 0.0, 1.0)
+			if coverage > 0.0:
+				image.set_pixel(x, y, Color(color.r, color.g, color.b, color.a * coverage))
+
+
+func _stroke_line(image: Image, from: Vector2, to: Vector2, width: float, color: Color) -> void:
+	var min_x := maxi(0, int(floor(minf(from.x, to.x) - width)))
+	var max_x := mini(image.get_width() - 1, int(ceil(maxf(from.x, to.x) + width)))
+	var min_y := maxi(0, int(floor(minf(from.y, to.y) - width)))
+	var max_y := mini(image.get_height() - 1, int(ceil(maxf(from.y, to.y) + width)))
+	var segment := to - from
+	var length_squared := maxf(segment.length_squared(), 0.001)
+	var radius := width * 0.5
+	for y in range(min_y, max_y + 1):
+		for x in range(min_x, max_x + 1):
+			var p := Vector2(float(x) + 0.5, float(y) + 0.5)
+			var t := clampf((p - from).dot(segment) / length_squared, 0.0, 1.0)
+			var closest := from + segment * t
+			var dist := (p - closest).length()
+			var coverage := clampf(radius + 0.5 - dist, 0.0, 1.0)
 			if coverage > 0.0:
 				image.set_pixel(x, y, Color(color.r, color.g, color.b, color.a * coverage))

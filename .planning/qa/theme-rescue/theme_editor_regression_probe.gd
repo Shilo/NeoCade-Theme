@@ -29,6 +29,7 @@ func _run() -> void:
 		_expect_editor_fonts_authored(theme, label)
 		_expect_checkbutton_checkbox_scale(theme, label)
 		_expect_selection_control_colors(theme, label)
+		_expect_popup_selection_icons(theme, label)
 
 	_finish()
 
@@ -114,6 +115,35 @@ func _expect_selection_control_colors(theme: Theme, label: String) -> void:
 		_fail("%s CheckButton unchecked fill should be visibly lighter than Button.normal" % label)
 	if _color_distance(checkbox_off, checkbutton_off) > 0.01:
 		_fail("%s CheckBox and CheckButton unchecked fills should match" % label)
+
+
+func _expect_popup_selection_icons(theme: Theme, label: String) -> void:
+	var accent := theme.get_color(&"checkbox_checked_color", &"CheckBox")
+	var inactive := theme.get_color(&"checkbox_unchecked_color", &"CheckBox")
+	var popup_checked := _sample_icon(theme, &"PopupMenu", &"checked", Vector2i(6, 6))
+	var popup_unchecked := _sample_icon(theme, &"PopupMenu", &"unchecked", Vector2i(6, 6))
+	var popup_radio_checked := _sample_icon(theme, &"PopupMenu", &"radio_checked", Vector2i(12, 6))
+	var popup_radio_unchecked := _sample_icon(theme, &"PopupMenu", &"radio_unchecked", Vector2i(12, 12))
+	if _color_distance(popup_checked, accent) > 0.08:
+		_fail("%s PopupMenu checked icon should embed accent fill, got %s" % [label, popup_checked.to_html(true)])
+	if _color_distance(popup_unchecked, inactive) > 0.08:
+		_fail("%s PopupMenu unchecked icon should embed inactive fill, got %s" % [label, popup_unchecked.to_html(true)])
+	if _color_distance(popup_radio_checked, accent) > 0.08:
+		_fail("%s PopupMenu radio_checked icon should embed accent fill, got %s" % [label, popup_radio_checked.to_html(true)])
+	if _color_distance(popup_radio_unchecked, inactive) > 0.08:
+		_fail("%s PopupMenu radio_unchecked icon should embed inactive fill, got %s" % [label, popup_radio_unchecked.to_html(true)])
+
+
+func _sample_icon(theme: Theme, theme_type: StringName, slot: StringName, point: Vector2i) -> Color:
+	var icon := theme.get_icon(slot, theme_type)
+	if icon == null:
+		_fail("%s.%s icon missing" % [theme_type, slot])
+		return Color.TRANSPARENT
+	var image := icon.get_image()
+	if image == null:
+		_fail("%s.%s icon image unavailable" % [theme_type, slot])
+		return Color.TRANSPARENT
+	return image.get_pixelv(point)
 
 
 func _color_distance(a: Color, b: Color) -> float:
