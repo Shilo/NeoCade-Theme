@@ -2879,12 +2879,12 @@ const BINDING_TABLE: Dictionary = {
 			"tick":              {"icon": "slider_tick"},
 		},
 	},
-	# 13a. ScrollContainer — quiet overflow panel plus official focus and hint slots.
+	# 13a. ScrollContainer — visually empty overflow container plus official focus
+	# and hint slots, matching Godot's default and Minimal Theme behavior.
 	"ScrollContainer": {
 		"stylebox": {
 			"focus": {"role": "focus_ring"},
-			"panel": {"role": "surface_low", "border_role": "surface_low_edge",
-					  "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"panel": {"empty": true},
 		},
 		"color": {
 			"scroll_hint_horizontal_color": {"role": "scroll_shadow"},
