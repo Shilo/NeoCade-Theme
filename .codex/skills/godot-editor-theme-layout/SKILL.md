@@ -37,6 +37,21 @@ Read [references/editor-theme-debugging.md](references/editor-theme-debugging.md
 - Follow class inheritance. Example: `InspectorDock -> EditorDock -> MarginContainer`; this means `EditorDock.margin_*` can affect dock content even when `DockTabContainer.panel` appears relevant.
 - Check type variations. Godot editor often uses strings such as `FlatMenuButton`, `NoBorderHorizontalBottom`, `EditorInspectorContainer`, `EditorPropertyContainer`, `BottomPanel`, and `TabContainerInner`.
 - Theme internal editor class names when needed. It is valid to add rows such as `EditorDock`, `DockTabContainer`, or `NoBorderHorizontalBottom` when source shows those classes/variations own the layout.
+- Treat generic base classes as high blast radius. Do not patch base `TabContainer`, `MarginContainer`, `HBoxContainer`, `VBoxContainer`, `PanelContainer`, or `Button` behavior for an editor-only symptom until source proves the same hook owns the visible editor case and the runtime case.
+
+## Invisible Fix Recovery
+
+If a theme change verifies in logs but the user reports no visible change, stop tuning that same hook. Re-trace the editor node stack from source and find the wrapper that actually owns the visible spacing, background, or chrome.
+
+Recovery order:
+
+1. Confirm the changed theme item resolves at runtime.
+2. Check whether the visible control is wrapped by editor-only classes or theme variations.
+3. Trace parent and child containers in Godot source.
+4. Add a targeted probe for each suspected layer before accepting the fix.
+5. Prefer editor-specific hooks over generic Control hooks unless the issue is truly global.
+
+Session pattern to remember: `DockTabContainer.panel` did not visibly fix Inspector toolbar spacing; `EditorDock.margin_*` affected the dock content; `NoBorderHorizontalBottom.margin_top` controlled the remaining bottom gap.
 
 ## Verification Standard
 
@@ -46,12 +61,16 @@ Use scripts and logs as the main proof. Existing useful commands:
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --import
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_rescue_verify.gd
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_default_compare.gd
+& 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_editor_dock_probe.gd
+& 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_scene_structure_probe.gd
+& 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_tab_state_probe.gd
+& 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_popup_scrollbar_probe.gd
 git diff --check
 ```
 
 Prefer adding a small targeted GDScript probe when a bug depends on an editor class, theme variation, or inherited theme lookup. Keep probes in `.planning/qa/theme-rescue/`.
 
-When the user provides screenshots and asks to measure spacing, use the local image path and measure pixels with an image tool or script. Report measured values and what theme hook controls them.
+For spacing, padding, clipping, icon-size, or alignment complaints based on a user-provided screenshot, measure pixels before changing constants. Do not guess spacing by eye. User-provided screenshots may be measured even when new screenshots are forbidden. Report measured values and what theme hook controls them.
 
 ## What Helps Behind The Scenes
 
