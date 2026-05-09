@@ -12,7 +12,17 @@ const PLATFORM_ITEMS := [
 @onready var raised_check_box: CheckBox = $RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow/RaisedCheckBox
 @onready var platform_option_button: OptionButton = $RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow/PlatformOptionButton
 @onready var menu_button: MenuButton = $RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/MenuButtonPanel/MenuButtonStack/Control
+@onready var accept_dialog_button: Button = $"RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/AcceptDialogButton"
+@onready var confirmation_dialog_button: Button = $"RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/ConfirmationDialogButton"
+@onready var file_dialog_button: Button = $"RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/FileDialogButton"
+@onready var popup_panel_button: Button = $"RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/PopupPanelButton"
+@onready var popup_menu_button: Button = $"RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/PopupMenuButton"
 @onready var window_button: Button = %WindowButton
+@onready var accept_dialog: AcceptDialog = $AcceptDialog
+@onready var confirmation_dialog: ConfirmationDialog = $ConfirmationDialog
+@onready var file_dialog: FileDialog = $FileDialog
+@onready var popup_panel: PopupPanel = $PopupPanel
+@onready var popup_menu: PopupMenu = $PopupMenu
 
 var _syncing_theme_controls := false
 
@@ -20,6 +30,11 @@ var _syncing_theme_controls := false
 func _ready() -> void:
 	_populate_platform_options()
 	_populate_menu_button_popup()
+	accept_dialog_button.pressed.connect(_on_accept_dialog_button_pressed)
+	confirmation_dialog_button.pressed.connect(_on_confirmation_dialog_button_pressed)
+	file_dialog_button.pressed.connect(_on_file_dialog_button_pressed)
+	popup_panel_button.pressed.connect(_on_popup_panel_button_pressed)
+	popup_menu_button.pressed.connect(_on_popup_menu_button_pressed)
 	window_button.pressed.connect(_on_window_button_pressed)
 	scoreboard_window.close_requested.connect(_on_scoreboard_window_close_requested)
 	theme_option_button.theme_selected.connect(_on_theme_selected)
@@ -27,6 +42,27 @@ func _ready() -> void:
 	platform_option_button.item_selected.connect(_on_platform_option_button_item_selected)
 	_sync_theme_controls_from_current_theme()
 	_move_scoreboard_window_to_top_right()
+
+
+func _on_accept_dialog_button_pressed() -> void:
+	accept_dialog.popup_centered()
+
+
+func _on_confirmation_dialog_button_pressed() -> void:
+	confirmation_dialog.popup_centered()
+
+
+func _on_file_dialog_button_pressed() -> void:
+	file_dialog.popup_centered_ratio(0.72)
+
+
+func _on_popup_panel_button_pressed() -> void:
+	var popup_position := _popup_position_below(popup_panel_button, popup_panel.size)
+	popup_panel.popup(Rect2i(popup_position, popup_panel.size))
+
+
+func _on_popup_menu_button_pressed() -> void:
+	popup_menu.popup(Rect2i(_popup_position_below(popup_menu_button, Vector2i.ZERO), Vector2i.ZERO))
 
 
 func _on_window_button_pressed() -> void:
@@ -42,6 +78,16 @@ func _move_scoreboard_window_to_top_right() -> void:
 	var viewport_size := Vector2i(get_viewport_rect().size)
 	var top_right_x := viewport_size.x - scoreboard_window.size.x - SCOREBOARD_WINDOW_MARGIN.x
 	scoreboard_window.position = Vector2i(maxi(SCOREBOARD_WINDOW_MARGIN.x, top_right_x), SCOREBOARD_WINDOW_MARGIN.y)
+
+
+func _popup_position_below(anchor: Control, popup_size: Vector2i) -> Vector2i:
+	var viewport_size := Vector2i(get_viewport_rect().size)
+	var anchor_rect := Rect2i(Vector2i(anchor.get_screen_position()), Vector2i(anchor.size))
+	var x := clampi(anchor_rect.position.x, 8, maxi(8, viewport_size.x - popup_size.x - 8))
+	var y := anchor_rect.position.y + anchor_rect.size.y + 6
+	if popup_size.y > 0 and y + popup_size.y > viewport_size.y - 8:
+		y = anchor_rect.position.y - popup_size.y - 6
+	return Vector2i(maxi(8, x), maxi(8, y))
 
 
 func _populate_platform_options() -> void:

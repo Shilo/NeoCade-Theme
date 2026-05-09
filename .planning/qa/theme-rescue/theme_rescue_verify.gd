@@ -918,6 +918,15 @@ func _expect_editor_integration_chrome(theme: Theme, label: String) -> void:
 	var preset_fg := theme.get_stylebox(&"preset_fg", &"ColorPresetButton") as StyleBoxFlat
 	if preset_fg == null:
 		_fail("%s ColorPresetButton.preset_fg missing for ColorPicker preset swatches" % label)
+	for check_type in [&"CheckBox", &"CheckButton"]:
+		_expect_check_control_state_margins_stable(theme, label, check_type)
+	var spinbox_updown := theme.get_icon(&"updown", &"SpinBox")
+	if spinbox_updown != null and not spinbox_updown.get_size().is_zero_approx():
+		_fail("%s SpinBox.updown should stay empty so separate up/down icons center in their buttons, got %s" % [label, spinbox_updown.get_size()])
+	if Engine.is_editor_hint():
+		var editor_spinbox_updown := theme.get_icon(&"updown", &"EditorSpinSlider")
+		if editor_spinbox_updown == null or editor_spinbox_updown.get_size().is_zero_approx():
+			_fail("%s EditorSpinSlider.updown should keep its composite editor affordance" % label)
 
 
 func _expect_create_dialog_chrome(theme: Theme, label: String) -> void:
@@ -1034,6 +1043,48 @@ func _expect_shared_interaction_chrome(theme: Theme, label: String) -> void:
 				entry["slot"],
 				expected.bg_color.to_html(false),
 				stylebox.bg_color.to_html(false),
+			])
+
+
+func _expect_check_control_state_margins_stable(theme: Theme, label: String, theme_type: StringName) -> void:
+	var normal := theme.get_stylebox(&"normal", theme_type) as StyleBoxFlat
+	if normal == null:
+		_fail("%s %s.normal missing StyleBoxFlat" % [label, theme_type])
+		return
+	var normal_margins := Vector4(
+		normal.content_margin_left,
+		normal.content_margin_top,
+		normal.content_margin_right,
+		normal.content_margin_bottom
+	)
+	for slot_name in [
+		&"normal_mirrored",
+		&"hover",
+		&"hover_mirrored",
+		&"pressed",
+		&"pressed_mirrored",
+		&"disabled",
+		&"disabled_mirrored",
+		&"hover_pressed",
+		&"hover_pressed_mirrored",
+	]:
+		var state_style := theme.get_stylebox(slot_name, theme_type) as StyleBoxFlat
+		if state_style == null:
+			_fail("%s %s.%s missing StyleBoxFlat" % [label, theme_type, slot_name])
+			continue
+		var state_margins := Vector4(
+			state_style.content_margin_left,
+			state_style.content_margin_top,
+			state_style.content_margin_right,
+			state_style.content_margin_bottom
+		)
+		if not state_margins.is_equal_approx(normal_margins):
+			_fail("%s %s.%s margins %s should match normal margins %s to prevent text shift" % [
+				label,
+				theme_type,
+				slot_name,
+				state_margins,
+				normal_margins,
 			])
 
 
