@@ -892,9 +892,26 @@ func _expect_editor_integration_chrome(theme: Theme, label: String) -> void:
 				grabber.get_size(),
 				grabber_highlight.get_size(),
 			])
+	var h_slider := theme.get_stylebox(&"slider", &"HSlider") as StyleBoxFlat
+	if h_slider == null or h_slider.get_minimum_size().y < 4.0:
+		_fail("%s HSlider.slider should have a visible track height for ColorPicker intensity sliders" % label)
+	var v_slider := theme.get_stylebox(&"slider", &"VSlider") as StyleBoxFlat
+	if v_slider == null or v_slider.get_minimum_size().x < 4.0:
+		_fail("%s VSlider.slider should have a visible track width" % label)
 	var checker := theme.get_icon(&"sample_bg", &"ColorPicker")
 	if checker.get_size().x < 8 or checker.get_size().y < 8:
 		_fail("%s ColorPicker.sample_bg checker texture is too small: %s" % [label, checker.get_size()])
+	var hue := theme.get_icon(&"color_hue", &"ColorPicker")
+	if hue.get_size() != Vector2(800, 6):
+		_fail("%s ColorPicker.color_hue should be a generated 800x6 hue ramp, got %s" % [label, hue.get_size()])
+	else:
+		var hue_image := hue.get_image()
+		var hue_red := hue_image.get_pixel(0, 0)
+		var hue_cyan := hue_image.get_pixel(400, 0)
+		if hue_red.r < 0.95 or hue_red.g > 0.05 or hue_red.b > 0.05:
+			_fail("%s ColorPicker.color_hue left edge should start red, got %s" % [label, hue_red])
+		if hue_cyan.g < 0.85 or hue_cyan.b < 0.85 or hue_cyan.r > 0.20:
+			_fail("%s ColorPicker.color_hue middle should pass through cyan, got %s" % [label, hue_cyan])
 	var preset_checker := theme.get_icon(&"preset_bg", &"ColorPresetButton")
 	if preset_checker.get_size().x < 8 or preset_checker.get_size().y < 8:
 		_fail("%s ColorPresetButton.preset_bg checker texture is too small: %s" % [label, preset_checker.get_size()])

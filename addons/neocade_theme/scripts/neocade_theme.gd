@@ -2266,7 +2266,7 @@ const BINDING_TABLE: Dictionary = {
 		"icon": {
 			"add_preset":           {"icon": "colorpicker_add_preset"},
 			"bar_arrow":            {"icon": "colorpicker_bar_arrow"},
-			"color_hue":            {"icon": "colorpicker_color_hue"},
+			"color_hue":            {"generated_icon": "color_hue"},
 			"color_script":         {"icon": "colorpicker_color_script"},
 			"expanded_arrow":       {"icon": "colorpicker_expanded_arrow"},
 			"folded_arrow":         {"icon": "colorpicker_folded_arrow"},
@@ -2851,9 +2851,9 @@ const BINDING_TABLE: Dictionary = {
 	# 13. HSlider — visible calm track plus official grabber/tick icons.
 	"HSlider": {
 		"stylebox": {
-			"slider":                  {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
-			"grabber_area":            {"role": "role_primary",  "raised_intensity": 0, "padding": Vector2i(0, 0)},
-			"grabber_area_highlight":  {"role": "accent_offset", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"slider":                  {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 2)},
+			"grabber_area":            {"role": "role_primary",  "raised_intensity": 0, "padding": Vector2i(0, 2)},
+			"grabber_area_highlight":  {"role": "accent_offset", "raised_intensity": 0, "padding": Vector2i(0, 2)},
 		},
 		"constant": {
 			"center_grabber": {"value": 1},
@@ -4109,9 +4109,9 @@ const BINDING_TABLE: Dictionary = {
 	# 35. VSlider — transposed mirror of HSlider.
 	"VSlider": {
 		"stylebox": {
-			"slider":                 {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
-			"grabber_area":           {"role": "role_primary",  "raised_intensity": 0, "padding": Vector2i(0, 0)},
-			"grabber_area_highlight": {"role": "accent_offset", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"slider":                 {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(2, 0)},
+			"grabber_area":           {"role": "role_primary",  "raised_intensity": 0, "padding": Vector2i(2, 0)},
+			"grabber_area_highlight": {"role": "accent_offset", "raised_intensity": 0, "padding": Vector2i(2, 0)},
 		},
 		"constant": {
 			"center_grabber": {"value": 1},
@@ -5374,6 +5374,8 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			return _make_split_grabber_icon(recipe.get("orientation", "vertical") == "vertical", role_table, style_personality)
 		if recipe.get("generated_icon", "") == "slider_grabber":
 			return _make_slider_grabber_icon(bool(recipe.get("highlight", false)), role_table, style_personality)
+		if recipe.get("generated_icon", "") == "color_hue":
+			return _make_color_hue_texture()
 		if recipe.get("generated_icon", "") == "popup_selection_checkbox":
 			if use_runtime_popup_selection_icons:
 				return _make_popup_selection_checkbox_icon(bool(recipe.get("checked", false)), role_table)
@@ -5444,6 +5446,18 @@ func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_pe
 		_fill_round_rect(image, Rect2i(4, 4, 8, 8), inner_radius, knob_color)
 	else:
 		_fill_round_rect(image, Rect2i(3, 3, 10, 10), inner_radius, knob_color)
+	return ImageTexture.create_from_image(image)
+
+
+func _make_color_hue_texture() -> Texture2D:
+	const WIDTH := 800
+	const HEIGHT := 6
+	var image := Image.create(WIDTH, HEIGHT, false, Image.FORMAT_RGBA8)
+	for x in range(WIDTH):
+		var hue := float(x) / float(WIDTH - 1)
+		var color := Color.from_hsv(hue, 1.0, 1.0)
+		for y in range(HEIGHT):
+			image.set_pixel(x, y, color)
 	return ImageTexture.create_from_image(image)
 
 
