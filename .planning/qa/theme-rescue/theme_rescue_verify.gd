@@ -132,22 +132,34 @@ func _expect_window_chrome(theme: Theme, label: String, expect_raised: bool) -> 
 		return
 	if window_panel.expand_margin_top < 30 or window_panel.content_margin_top < 26:
 		_fail("%s Window.embedded_border does not cover title bar/content margin: expand_top=%s content_top=%s" % [label, window_panel.expand_margin_top, window_panel.content_margin_top])
-	if window_panel.expand_margin_left > 2 or window_panel.expand_margin_right > 2 or window_panel.expand_margin_bottom > 4:
-		_fail("%s Window.embedded_border frame is too wide: expand=%s/%s/%s/%s" % [
+	var window_density := window_panel.content_margin_top / 28.0
+	var expected_expand_left := int(round(8.0 * window_density))
+	var expected_expand_top := int(round(32.0 * window_density))
+	var expected_expand_right := int(round(8.0 * window_density))
+	var expected_expand_bottom := int(round(6.0 * window_density))
+	if window_panel.expand_margin_left != expected_expand_left or window_panel.expand_margin_top != expected_expand_top or window_panel.expand_margin_right != expected_expand_right or window_panel.expand_margin_bottom != expected_expand_bottom:
+		_fail("%s Window.embedded_border should match Godot default decoration expand margins: expand=%s/%s/%s/%s" % [
 			label,
 			window_panel.expand_margin_left,
 			window_panel.expand_margin_top,
 			window_panel.expand_margin_right,
 			window_panel.expand_margin_bottom,
 		])
-	var window_bottom_allowance: int = 4 + maxi(0, window_panel.border_width_bottom - window_panel.border_width_top)
-	if window_panel.content_margin_left > 2 or window_panel.content_margin_right > 2 or window_panel.content_margin_bottom > window_bottom_allowance:
-		_fail("%s Window.embedded_border content frame is too wide: margin=%s/%s/%s/%s" % [
+	var expected_content_left := int(round(10.0 * window_density))
+	var expected_content_top := int(round(28.0 * window_density))
+	var expected_content_right := int(round(10.0 * window_density))
+	var expected_bottom_margin: int = int(round(8.0 * window_density)) + maxi(0, window_panel.border_width_bottom - window_panel.border_width_top)
+	if window_panel.content_margin_left != expected_content_left or window_panel.content_margin_top != expected_content_top or window_panel.content_margin_right != expected_content_right or window_panel.content_margin_bottom != expected_bottom_margin:
+		_fail("%s Window.embedded_border should match Godot default content margins plus raised bottom reserve: margin=%s/%s/%s/%s expected=%s/%s/%s/%s" % [
 			label,
 			window_panel.content_margin_left,
 			window_panel.content_margin_top,
 			window_panel.content_margin_right,
 			window_panel.content_margin_bottom,
+			expected_content_left,
+			expected_content_top,
+			expected_content_right,
+			expected_bottom_margin,
 		])
 	if not window_panel.bg_color.is_equal_approx(button_panel.bg_color):
 		_fail("%s Window.embedded_border should use Button.normal face color: window=%s button=%s" % [
@@ -180,18 +192,25 @@ func _expect_window_chrome(theme: Theme, label: String, expect_raised: bool) -> 
 
 func _expect_popup_chrome(theme: Theme, label: String, expect_raised: bool) -> void:
 	var button_panel := theme.get_stylebox("normal", "Button") as StyleBoxFlat
+	var option_panel := theme.get_stylebox("normal", "OptionButton") as StyleBoxFlat
+	var option_hover := theme.get_stylebox("hover", "OptionButton") as StyleBoxFlat
+	var popup_hover := theme.get_stylebox("hover", "PopupMenu") as StyleBoxFlat
 	if button_panel == null:
 		_fail("%s missing Button.normal for popup chrome comparison" % label)
 		return
+	if option_panel == null or option_hover == null or popup_hover == null:
+		_fail("%s missing OptionButton/PopupMenu state styleboxes for dropdown comparison" % label)
+		return
 	for entry in [
-		{"type": &"PopupMenu", "slot": &"panel", "max_margin": 2},
-		{"type": &"PopupPanel", "slot": &"panel", "max_margin": 2},
-		{"type": &"TooltipPanel", "slot": &"panel", "max_margin": 8},
+		{"type": &"PopupMenu", "slot": &"panel", "max_margin": 2, "source": option_panel},
+		{"type": &"PopupPanel", "slot": &"panel", "max_margin": 2, "source": button_panel},
+		{"type": &"TooltipPanel", "slot": &"panel", "max_margin": 8, "source": button_panel},
 	]:
 		var popup_panel := theme.get_stylebox(entry["slot"], entry["type"]) as StyleBoxFlat
 		if popup_panel == null:
 			_fail("%s missing %s.%s" % [label, entry["type"], entry["slot"]])
 			continue
+		var source_panel := entry["source"] as StyleBoxFlat
 		var max_popup_margin := int(entry["max_margin"])
 		if popup_panel.content_margin_left > max_popup_margin or popup_panel.content_margin_top > max_popup_margin:
 			_fail("%s %s.%s popup margins too large: %s/%s/%s/%s" % [
@@ -203,13 +222,13 @@ func _expect_popup_chrome(theme: Theme, label: String, expect_raised: bool) -> v
 				popup_panel.content_margin_right,
 				popup_panel.content_margin_bottom,
 			])
-		if not popup_panel.bg_color.is_equal_approx(button_panel.bg_color):
-			_fail("%s %s.%s should use Button.normal face color: popup=%s button=%s" % [
+		if not popup_panel.bg_color.is_equal_approx(source_panel.bg_color):
+			_fail("%s %s.%s should use its source face color: popup=%s source=%s" % [
 				label,
 				entry["type"],
 				entry["slot"],
 				popup_panel.bg_color.to_html(false),
-				button_panel.bg_color.to_html(false),
+				source_panel.bg_color.to_html(false),
 			])
 		if not expect_raised and _max_border_width(popup_panel) != 1:
 			_fail("%s %s.%s flat popup border should be 1px, got %s/%s/%s/%s" % [
@@ -233,6 +252,12 @@ func _expect_popup_chrome(theme: Theme, label: String, expect_raised: bool) -> v
 				popup_panel.bg_color.to_html(false),
 				popup_panel.border_color.to_html(false),
 			])
+	if not popup_hover.bg_color.is_equal_approx(option_hover.bg_color):
+		_fail("%s PopupMenu.hover should use OptionButton.hover bg color: popup=%s option=%s" % [
+			label,
+			popup_hover.bg_color.to_html(false),
+			option_hover.bg_color.to_html(false),
+		])
 
 
 func _expect_panel_surface_chrome(theme: Theme, label: String, expect_raised: bool) -> void:
@@ -353,6 +378,12 @@ func _expect_tab_top_only_corners(theme: Theme, label: String) -> void:
 
 
 func _expect_tab_state_chrome(theme: Theme, label: String) -> void:
+	var button_normal := theme.get_stylebox("normal", "Button") as StyleBoxFlat
+	var button_hover := theme.get_stylebox("hover", "Button") as StyleBoxFlat
+	var button_pressed := theme.get_stylebox("pressed", "Button") as StyleBoxFlat
+	if button_normal == null or button_hover == null or button_pressed == null:
+		_fail("%s missing Button states for tab active-state comparison" % label)
+		return
 	for theme_type in [&"TabBar", &"TabContainer"]:
 		var unselected := theme.get_stylebox("tab_unselected", theme_type) as StyleBoxFlat
 		var hovered := theme.get_stylebox("tab_hovered", theme_type) as StyleBoxFlat
@@ -362,6 +393,31 @@ func _expect_tab_state_chrome(theme: Theme, label: String) -> void:
 			_fail("%s missing tab state styleboxes for %s" % [label, theme_type])
 			continue
 		_expect_state_step_visibility(unselected, hovered, selected, label, "%s.tab" % theme_type, 1.10, 1.05)
+		if not selected.bg_color.is_equal_approx(button_pressed.bg_color):
+			_fail("%s %s.tab_selected should use Button.pressed/toggled active bg: tab=%s button=%s" % [
+				label,
+				theme_type,
+				selected.bg_color.to_html(false),
+				button_pressed.bg_color.to_html(false),
+			])
+		if not hovered.bg_color.is_equal_approx(button_hover.bg_color):
+			_fail("%s %s.tab_hovered should use Button.hover bg: tab=%s button=%s" % [
+				label,
+				theme_type,
+				hovered.bg_color.to_html(false),
+				button_hover.bg_color.to_html(false),
+			])
+		if not unselected.bg_color.is_equal_approx(button_normal.bg_color):
+			_fail("%s %s.tab_unselected should use Button.normal bg: tab=%s button=%s" % [
+				label,
+				theme_type,
+				unselected.bg_color.to_html(false),
+				button_normal.bg_color.to_html(false),
+			])
+		if _relative_luminance(selected.bg_color) <= _relative_luminance(unselected.bg_color):
+			_fail("%s %s.tab_selected should be brighter than tab_unselected" % [label, theme_type])
+		if selected.border_width_bottom > selected.border_width_top:
+			_fail("%s %s.tab_selected should behave like toggled Button.pressed with no raised bottom extrusion" % [label, theme_type])
 		if _max_border_width(disabled) != 0:
 			_fail("%s %s.tab_disabled should not keep an outline border" % [label, theme_type])
 
