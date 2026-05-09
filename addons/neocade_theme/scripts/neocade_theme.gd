@@ -18,11 +18,6 @@ class_name NeoCadeTheme extends Theme
 ##
 ## See: .planning/DESIGN_TOKENS.md, .planning/phases/04-.../04-RESEARCH.md, .planning/phases/04-.../04-CONTEXT.md.
 
-## PopupMenu check/radio items are drawn with item icon_modulate, not CheckBox's
-## checked/unchecked color slots. Keep this on for consistent menu check/radio
-## fills; set false to fall back to the static SVG masks and avoid runtime icon generation.
-const ENABLE_RUNTIME_POPUP_SELECTION_ICONS := true
-
 ## Sizing mode used when regenerating NeoCade theme entries.
 enum Platform {
 	## Uses desktop control density and spacing.
@@ -133,6 +128,18 @@ enum Style {
 		if outline_width == value: return
 		outline_width = value
 		_after_direction_export_changed()
+
+# ─── Advanced ──────────────────────────────────────────────────────────────────────────────
+@export_group("Advanced")
+
+## PopupMenu check/radio items are drawn with item icon_modulate, not CheckBox's
+## checked/unchecked color slots. Keep this enabled for consistent menu check/radio
+## fills; disable it to fall back to static SVG masks and avoid trivial runtime SVG generation.
+@export var use_runtime_popup_selection_icons: bool = true:
+	set(value):
+		if use_runtime_popup_selection_icons == value: return
+		use_runtime_popup_selection_icons = value
+		_regenerate_theme()
 
 # ─── Internal state (NOT exported) ──────────────────────────────────────────────────────────
 var is_light: bool = false  # derived from base_color.get_luminance() at every regenerate
@@ -4690,11 +4697,11 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		if recipe.get("generated_icon", "") == "slider_grabber":
 			return _make_slider_grabber_icon(bool(recipe.get("highlight", false)), role_table, style_personality)
 		if recipe.get("generated_icon", "") == "popup_selection_checkbox":
-			if ENABLE_RUNTIME_POPUP_SELECTION_ICONS:
+			if use_runtime_popup_selection_icons:
 				return _make_popup_selection_checkbox_icon(bool(recipe.get("checked", false)), role_table)
 			return load("res://addons/neocade_theme/icons/%s.svg" % ["checkbox_checked" if bool(recipe.get("checked", false)) else "checkbox_unchecked"]) as Texture2D
 		if recipe.get("generated_icon", "") == "popup_selection_radio":
-			if ENABLE_RUNTIME_POPUP_SELECTION_ICONS:
+			if use_runtime_popup_selection_icons:
 				return _make_popup_selection_radio_icon(bool(recipe.get("checked", false)), role_table)
 			return load("res://addons/neocade_theme/icons/%s.svg" % ["radio_checked" if bool(recipe.get("checked", false)) else "radio_unchecked"]) as Texture2D
 		var icon_name: String = recipe.get("icon", "")
