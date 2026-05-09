@@ -44,74 +44,6 @@ enum Style {
 	CUSTOM = 0,
 }
 
-const WINDOW_BACKGROUND_NODE_NAME := "__NeoCadeWindowBackground"
-const WINDOW_BACKGROUND_MANAGED_META := &"_neocade_window_background_managed"
-const WINDOW_ORIGINAL_TRANSPARENT_META := &"_neocade_window_original_transparent"
-
-
-## Returns true only when a Control/Window is inside a NeoCade-themed branch.
-## A local non-NeoCade Theme interrupts the chain, matching Godot's theme inheritance rules.
-static func node_inherits_neocade_theme(node: Node) -> bool:
-	var current := node
-	while current != null:
-		if current is Window:
-			var window_theme := (current as Window).theme
-			if window_theme != null:
-				return window_theme is NeoCadeTheme
-
-		if current is Control:
-			var control_theme := (current as Control).theme
-			if control_theme != null:
-				return control_theme is NeoCadeTheme
-
-		current = current.get_parent()
-
-	var project_theme := ThemeDB.get_project_theme()
-	return project_theme is NeoCadeTheme
-
-
-## Opt-in fix for embedded Window clear-color gaps.
-## Godot draws Window viewport clear from renderer state, not Theme. For NeoCade-themed windows,
-## this makes the viewport transparent and inserts a themed background Control behind content.
-static func sync_inherited_window_background(window: Window) -> bool:
-	if window == null:
-		return false
-
-	var should_apply := node_inherits_neocade_theme(window)
-	var background := window.get_node_or_null(WINDOW_BACKGROUND_NODE_NAME) as Panel
-
-	if not should_apply:
-		if background != null and bool(background.get_meta(WINDOW_BACKGROUND_MANAGED_META, false)):
-			background.queue_free()
-		if window.has_meta(WINDOW_ORIGINAL_TRANSPARENT_META):
-			window.transparent = bool(window.get_meta(WINDOW_ORIGINAL_TRANSPARENT_META))
-			window.remove_meta(WINDOW_ORIGINAL_TRANSPARENT_META)
-		return false
-
-	if background != null and not bool(background.get_meta(WINDOW_BACKGROUND_MANAGED_META, false)):
-		return false
-
-	if not window.has_meta(WINDOW_ORIGINAL_TRANSPARENT_META):
-		window.set_meta(WINDOW_ORIGINAL_TRANSPARENT_META, window.transparent)
-	window.transparent = true
-
-	if background == null:
-		background = Panel.new()
-		background.name = WINDOW_BACKGROUND_NODE_NAME
-		background.set_meta(WINDOW_BACKGROUND_MANAGED_META, true)
-		window.add_child(background)
-
-	background.theme_type_variation = &"WindowContentPanel"
-	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	background.set_anchors_preset(Control.PRESET_FULL_RECT)
-	background.offset_left = 0.0
-	background.offset_top = 0.0
-	background.offset_right = 0.0
-	background.offset_bottom = 0.0
-	background.z_index = -1
-	window.move_child(background, 0)
-	return true
-
 # ─── Primary exports ────────────────────────────────────────────────────────────────────────
 ## Selects the built-in NeoCade visual style, or Custom for manual style values.
 @export var style: Style = Style.PULSE:
@@ -465,8 +397,8 @@ func _regenerate_theme() -> void:
 	var header_large_font  := preload("res://addons/neocade_theme/fonts/inter_header_large.tres") as FontVariation
 	var header_medium_font := preload("res://addons/neocade_theme/fonts/inter_header_medium.tres") as FontVariation
 	var header_small_font  := preload("res://addons/neocade_theme/fonts/inter_header_small.tres") as FontVariation
-	# Text-bearing variations get explicit set_font calls. WindowContentPanel is
-	# registered as a type variation but owns no font slots.
+	# 15 variations × set_font (Cross-AI Cycle 1 C4 fix: CodeLabel included;
+	# Plan 05-04 D-09: Kicker is the 15th variation per DESIGN_TOKENS §8.6).
 	set_font("font", "HeaderLarge",  header_large_font)
 	set_font("font", "HeaderMedium", header_medium_font)
 	set_font("font", "HeaderSmall",  header_small_font)
@@ -1090,13 +1022,12 @@ func _resolve_style_personality() -> Dictionary:
 
 
 # ─── Type variation registry (DESIGN_TOKENS §8.5; PITFALLS 1.2 mandate explicit fonts) ──────
-## 16 NeoCade type variations registered via Theme.set_type_variation():
+## 15 NeoCade type variations registered via Theme.set_type_variation():
 ##   - Phase 4 shipped 14 (Cross-AI Cycle 1 C4 fix included CodeLabel).
 ##   - Plan 05-04 (D-09) adds Kicker as the 15th, closing DESIGN_TOKENS §8.6's
 ##     explicit Phase 5 todo. Per PITFALLS 1.2, the Kicker entry below is paired
 ##     with explicit set_font + set_font_size calls (variations don't inherit
 ##     fonts from base type).
-##   - WindowContentPanel gives the runtime Window helper a real themed surface.
 ## Each entry: variation_name → base_type. Phases 5/6/7 author per-direction personality
 ## styleboxes per variation in `.tres` Theme Editor overrides; Phase 4 only registers + sets
 ## explicit fonts.
@@ -1128,10 +1059,9 @@ const TYPE_VARIATIONS: Dictionary = {
 	"Kicker":       "Label",
 	# InfoText (TYPEVAR-03; rich-text small body) — 1
 	"InfoText":     "RichTextLabel",
-	# Panel family (TYPEVAR-04) plus Window helper surface — 3
+	# Panel family (TYPEVAR-04) — 2
 	"CardPanel": "PanelContainer",
 	"HeroPanel": "PanelContainer",
-	"WindowContentPanel": "Panel",
 }
 
 
@@ -3119,21 +3049,7 @@ const BINDING_TABLE: Dictionary = {
 			},
 		},
 	},
-	# 52. WindowContentPanel — helper-owned background Control for embedded Window
-	#     viewport clear gaps. It intentionally has no border or padding; Window
-	#     embedded_border owns chrome, title bar, resize margins, and raised depth.
-	"WindowContentPanel": {
-		"stylebox": {
-			"panel": {
-				"role":             "button_normal",
-				"raised_intensity": 0,
-				"border_width":     0,
-				"radius":           0,
-				"padding":          Vector2i(0, 0),
-			},
-		},
-	},
-	# 53. CardPanel — PanelContainer variation (TYPEVAR-04). Uses
+	# 52. CardPanel — PanelContainer variation (TYPEVAR-04). Uses
 	#     shape.card_radius for per-direction radius personality (Pulse 0,
 	#     Slate 14, Bubble 26, Daybreak 8, Burst 18) plus the panel
 	#     surface_alpha and raised lift.
@@ -3153,7 +3069,7 @@ const BINDING_TABLE: Dictionary = {
 			"font_color": {"role": "text_strong"},
 		},
 	},
-	# 54. HeroPanel — PanelContainer variation (TYPEVAR-04). Uses
+	# 53. HeroPanel — PanelContainer variation (TYPEVAR-04). Uses
 	#     shape.hero_radius (sibling to card_radius; v1 ships matching pairs
 	#     per direction, but the schema lets v2 differentiate hero from card
 	#     for any direction). Surface role is surface_high (one tonal step

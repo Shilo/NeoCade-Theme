@@ -18,8 +18,6 @@ var _syncing_theme_controls := false
 
 
 func _ready() -> void:
-	if not theme_changed.is_connected(_on_showcase_theme_changed):
-		theme_changed.connect(_on_showcase_theme_changed)
 	_populate_platform_options()
 	_populate_menu_button_popup()
 	window_button.pressed.connect(_on_window_button_pressed)
@@ -28,7 +26,6 @@ func _ready() -> void:
 	raised_check_box.toggled.connect(_on_raised_check_box_toggled)
 	platform_option_button.item_selected.connect(_on_platform_option_button_item_selected)
 	_sync_theme_controls_from_current_theme()
-	_sync_scoreboard_window_background()
 	_move_scoreboard_window_to_top_right()
 
 
@@ -83,12 +80,6 @@ func _on_theme_selected(selected_theme: Theme, _index: int) -> void:
 	platform_option_button.disabled = not has_neocade_theme
 	if has_neocade_theme:
 		_apply_theme_controls_to_current_theme()
-	_sync_scoreboard_window_background()
-
-
-func _on_showcase_theme_changed() -> void:
-	_sync_theme_controls_from_current_theme()
-	_sync_scoreboard_window_background()
 
 
 func _on_raised_check_box_toggled(_button_pressed: bool) -> void:
@@ -109,11 +100,6 @@ func _apply_theme_controls_to_current_theme() -> void:
 
 	current_theme.raised = raised_check_box.button_pressed
 	current_theme.platform = _selected_platform()
-	_sync_scoreboard_window_background()
-
-
-func _sync_scoreboard_window_background() -> void:
-	NeoCadeTheme.sync_inherited_window_background(scoreboard_window)
 
 
 func _ensure_editable_neocade_theme() -> NeoCadeTheme:
