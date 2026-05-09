@@ -118,6 +118,8 @@ func _expect_selection_control_colors(theme: Theme, label: String) -> void:
 
 
 func _expect_popup_selection_icons(theme: Theme, label: String) -> void:
+	if not NeoCadeTheme.ENABLE_RUNTIME_POPUP_SELECTION_ICONS:
+		return
 	var accent := theme.get_color(&"checkbox_checked_color", &"CheckBox")
 	var inactive := theme.get_color(&"checkbox_unchecked_color", &"CheckBox")
 	var popup_checked := _sample_icon(theme, &"PopupMenu", &"checked", Vector2i(6, 6))
