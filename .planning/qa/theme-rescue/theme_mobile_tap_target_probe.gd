@@ -69,6 +69,12 @@ func _run() -> void:
 			_log_and_check(check["name"], (node as Control).get_combined_minimum_size(), check["axis"])
 
 	_check_mobile_icon_sizes(theme)
+	_check_mobile_window_chrome(theme)
+	_check_mobile_list_rows(theme)
+	_check_mobile_popup_icons(theme)
+	var fallback_popup_theme := theme.duplicate(true) as NeoCadeTheme
+	fallback_popup_theme.use_runtime_popup_selection_icons = false
+	_check_mobile_popup_icons(fallback_popup_theme, "fallback")
 
 	if _failures.is_empty():
 		print("THEME_MOBILE_TAP_TARGET_PROBE: PASS")
@@ -115,15 +121,52 @@ func _log_and_check(label: String, size: Vector2, axis: String) -> void:
 
 
 func _check_mobile_icon_sizes(theme: Theme) -> void:
-	_expect_icon_at_least(theme, &"CheckBox", &"checked", Vector2(32, 32))
-	_expect_icon_at_least(theme, &"CheckBox", &"unchecked", Vector2(32, 32))
-	_expect_icon_at_least(theme, &"CheckBox", &"radio_checked", Vector2(32, 32))
-	_expect_icon_at_least(theme, &"CheckBox", &"radio_unchecked", Vector2(32, 32))
-	_expect_icon_at_least(theme, &"CheckButton", &"checked", Vector2(46, 24))
-	_expect_icon_at_least(theme, &"CheckButton", &"unchecked", Vector2(46, 24))
+	_expect_icon_at_least(theme, &"CheckBox", &"checked", Vector2(40, 40))
+	_expect_icon_at_least(theme, &"CheckBox", &"unchecked", Vector2(40, 40))
+	_expect_icon_at_least(theme, &"CheckBox", &"radio_checked", Vector2(40, 40))
+	_expect_icon_at_least(theme, &"CheckBox", &"radio_unchecked", Vector2(40, 40))
+	_expect_icon_at_least(theme, &"CheckButton", &"checked", Vector2(56, 29))
+	_expect_icon_at_least(theme, &"CheckButton", &"unchecked", Vector2(56, 29))
 	_expect_icon_at_least(theme, &"LineEdit", &"clear", Vector2(24, 24))
 	_expect_icon_at_least(theme, &"TabBar", &"increment", Vector2(24, 24))
 	_expect_icon_at_least(theme, &"TabBar", &"decrement", Vector2(24, 24))
+
+
+func _check_mobile_window_chrome(theme: Theme) -> void:
+	var close_icon := theme.get_icon(&"close", &"Window")
+	var close_size := close_icon.get_size()
+	var title_height := theme.get_constant(&"title_height", &"Window")
+	var close_v_offset := theme.get_constant(&"close_v_offset", &"Window")
+	print("MOBILE_WINDOW close_size=%s title_height=%d close_v_offset=%d" % [close_size, title_height, close_v_offset])
+	if close_size.x < 24.0 or close_size.y < 24.0:
+		_failures.append("Window.close mobile icon %s below 24px" % close_size)
+	if title_height < TARGET:
+		_failures.append("Window.title_height %d below %.1f" % [title_height, TARGET])
+	var expected_center := (float(title_height) + close_size.y) * 0.5
+	if absf(float(close_v_offset) - expected_center) > 1.0:
+		_failures.append("Window.close_v_offset %d should center %s icon in %d title height, expected %.1f" % [close_v_offset, close_size, title_height, expected_center])
+
+
+func _check_mobile_list_rows(theme: Theme) -> void:
+	for theme_type in [&"ItemList", &"Tree"]:
+		var font := theme.get_font(&"font", theme_type)
+		var font_size := theme.get_font_size(&"font_size", theme_type)
+		var row_height := font.get_height(font_size) + theme.get_constant(&"v_separation", theme_type)
+		print("MOBILE_ROW %-10s row_height=%.1f font_size=%d v_separation=%d" % [theme_type, row_height, font_size, theme.get_constant(&"v_separation", theme_type)])
+		if row_height < TARGET:
+			_failures.append("%s mobile row height %.1f below %.1f" % [theme_type, row_height, TARGET])
+
+
+func _check_mobile_popup_icons(theme: Theme, label: String = "generated") -> void:
+	print("MOBILE_POPUP_MODE %s" % label)
+	_expect_icon_at_least(theme, &"PopupMenu", &"checked", Vector2(40, 40))
+	_expect_icon_at_least(theme, &"PopupMenu", &"unchecked", Vector2(40, 40))
+	_expect_icon_at_least(theme, &"PopupMenu", &"radio_checked", Vector2(40, 40))
+	_expect_icon_at_least(theme, &"PopupMenu", &"radio_unchecked", Vector2(40, 40))
+	var icon_max_width := theme.get_constant(&"icon_max_width", &"PopupMenu")
+	print("MOBILE_POPUP icon_max_width=%d" % icon_max_width)
+	if icon_max_width < 40:
+		_failures.append("PopupMenu.icon_max_width %d below 40 for mobile selection icons" % icon_max_width)
 
 
 func _expect_icon_at_least(theme: Theme, theme_type: StringName, slot: StringName, minimum: Vector2) -> void:

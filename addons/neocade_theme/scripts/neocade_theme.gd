@@ -2162,17 +2162,17 @@ const BINDING_TABLE: Dictionary = {
 			"check_v_offset": {"value": 0},
 		},
 		"icon": {
-			"checked":            {"icon": "checkbox_checked", "mobile_svg_scale": 1.0},
-			"unchecked":          {"icon": "checkbox_unchecked", "mobile_svg_scale": 1.0},
-			"radio_checked":      {"icon": "radio_checked", "mobile_svg_scale": 1.0},
-			"radio_unchecked":    {"icon": "radio_unchecked", "mobile_svg_scale": 1.0},
+			"checked":            {"icon": "checkbox_checked", "mobile_svg_scale": 1.25},
+			"unchecked":          {"icon": "checkbox_unchecked", "mobile_svg_scale": 1.25},
+			"radio_checked":      {"icon": "radio_checked", "mobile_svg_scale": 1.25},
+			"radio_unchecked":    {"icon": "radio_unchecked", "mobile_svg_scale": 1.25},
 			# Plan 05-03 Task 2 polish: REUSE the existing checked/unchecked
 			# SVGs for the disabled variants (Godot 4.6 exposes the slots; the
 			# font_disabled_color tints them through). No new artwork needed.
-			"checked_disabled":   {"icon": "checkbox_checked", "mobile_svg_scale": 1.0},
-			"unchecked_disabled": {"icon": "checkbox_unchecked", "mobile_svg_scale": 1.0},
-			"radio_checked_disabled":   {"icon": "radio_checked", "mobile_svg_scale": 1.0},
-			"radio_unchecked_disabled": {"icon": "radio_unchecked", "mobile_svg_scale": 1.0},
+			"checked_disabled":   {"icon": "checkbox_checked", "mobile_svg_scale": 1.25},
+			"unchecked_disabled": {"icon": "checkbox_unchecked", "mobile_svg_scale": 1.25},
+			"radio_checked_disabled":   {"icon": "radio_checked", "mobile_svg_scale": 1.25},
+			"radio_unchecked_disabled": {"icon": "radio_unchecked", "mobile_svg_scale": 1.25},
 		},
 	},
 	# 4. CheckButton — 2 icon slots (Cycle 6 F4 fix: `checked`/`unchecked`, not `on`/`off`)
@@ -2211,17 +2211,17 @@ const BINDING_TABLE: Dictionary = {
 			"button_unchecked_color":  {"role": "selection_control_off"},
 		},
 		"icon": {
-			"checked":            {"icon": "checkbutton_checked", "mobile_svg_scale": 1.25},
-			"unchecked":          {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.25},
+			"checked":            {"icon": "checkbutton_checked", "mobile_svg_scale": 1.5},
+			"unchecked":          {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.5},
 			# Plan 05-03 Task 2 polish: REUSE existing SVGs for disabled
 			# variants per the Action item; *_mirrored variants stay deferred
 			# to v1.x per Phase 4 CHANGELOG.
-			"checked_disabled":   {"icon": "checkbutton_checked", "mobile_svg_scale": 1.25},
-			"unchecked_disabled": {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.25},
-			"checked_mirrored":            {"icon": "checkbutton_checked", "mobile_svg_scale": 1.25},
-			"unchecked_mirrored":          {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.25},
-			"checked_disabled_mirrored":   {"icon": "checkbutton_checked", "mobile_svg_scale": 1.25},
-			"unchecked_disabled_mirrored": {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.25},
+			"checked_disabled":   {"icon": "checkbutton_checked", "mobile_svg_scale": 1.5},
+			"unchecked_disabled": {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.5},
+			"checked_mirrored":            {"icon": "checkbutton_checked", "mobile_svg_scale": 1.5},
+			"unchecked_mirrored":          {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.5},
+			"checked_disabled_mirrored":   {"icon": "checkbutton_checked", "mobile_svg_scale": 1.5},
+			"unchecked_disabled_mirrored": {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.5},
 		},
 	},
 	# 5. CodeEdit — inherits TextEdit; Phase 4 ships base stylebox set + Phase 5
@@ -3002,7 +3002,7 @@ const BINDING_TABLE: Dictionary = {
 			"scroll_hint_color":           {"role": "scroll_shadow"},
 		},
 		"constant": {
-			"v_separation":    {"value": "tokens.tapPadding"},
+			"v_separation":    {"value": "tokens.tapPadding", "mobile_value": 29},
 			"h_separation":    {"value": "tokens.tapPadding"},
 			"icon_margin":     {"value": 6},
 			"line_separation": {"value": 2},
@@ -3045,7 +3045,7 @@ const BINDING_TABLE: Dictionary = {
 			"scroll_hint_color":           {"role": "scroll_shadow"},
 		},
 		"constant": {
-			"v_separation":    {"value": "tokens.tapPadding"},
+			"v_separation":    {"value": "tokens.tapPadding", "mobile_value": 29},
 			"h_separation":    {"value": "tokens.tapPadding"},
 			"icon_margin":     {"value": 6},
 			"line_separation": {"value": 2},
@@ -3108,15 +3108,17 @@ const BINDING_TABLE: Dictionary = {
 	"MenuBar": {
 		"stylebox": {
 			"normal":   {"role": "surface_base", "raised_intensity": 0, "alpha": 0.0,
-						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
+						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3),
+						 "mobile_padding": Vector2i(14, 14)},
 			"hover":    {"role": "button_hover", "raised_intensity": 0,
 						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3),
-						 "border_width": 0},
+						 "mobile_padding": Vector2i(14, 14), "border_width": 0},
 			"pressed":  {"role": "button_pressed", "raised_intensity": 0,
 						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3),
-						 "border_width": 0},
+						 "mobile_padding": Vector2i(14, 14), "border_width": 0},
 			"disabled": {"role": "surface_base", "disabled": true, "raised_intensity": 0,
-						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
+						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3),
+						 "mobile_padding": Vector2i(14, 14)},
 		},
 		"color": {
 			"font_color":               {"role": "text_default"},
@@ -3237,7 +3239,7 @@ const BINDING_TABLE: Dictionary = {
 		"constant": {
 			"gutter_compact":         {"value": 1},
 			"h_separation":           {"value": 6},
-			"icon_max_width":         {"value": 18},
+			"icon_max_width":         {"value": 18, "mobile_value": 40},
 			"indent":                 {"value": 16},
 			"item_end_padding":       {"value": 8},
 			"item_start_padding":     {"value": 8},
@@ -3246,14 +3248,14 @@ const BINDING_TABLE: Dictionary = {
 			"v_separation":           {"value": 4, "mobile_value": 29},
 		},
 		"icon": {
-			"checked":                  {"generated_icon": "popup_selection_checkbox", "checked": true},
-			"checked_disabled":         {"generated_icon": "popup_selection_checkbox", "checked": true},
-			"unchecked":                {"generated_icon": "popup_selection_checkbox", "checked": false},
-			"unchecked_disabled":       {"generated_icon": "popup_selection_checkbox", "checked": false},
-			"radio_checked":            {"generated_icon": "popup_selection_radio", "checked": true},
-			"radio_checked_disabled":   {"generated_icon": "popup_selection_radio", "checked": true},
-			"radio_unchecked":          {"generated_icon": "popup_selection_radio", "checked": false},
-			"radio_unchecked_disabled": {"generated_icon": "popup_selection_radio", "checked": false},
+			"checked":                  {"generated_icon": "popup_selection_checkbox", "checked": true, "mobile_svg_scale": 1.25},
+			"checked_disabled":         {"generated_icon": "popup_selection_checkbox", "checked": true, "mobile_svg_scale": 1.25},
+			"unchecked":                {"generated_icon": "popup_selection_checkbox", "checked": false, "mobile_svg_scale": 1.25},
+			"unchecked_disabled":       {"generated_icon": "popup_selection_checkbox", "checked": false, "mobile_svg_scale": 1.25},
+			"radio_checked":            {"generated_icon": "popup_selection_radio", "checked": true, "mobile_svg_scale": 1.25},
+			"radio_checked_disabled":   {"generated_icon": "popup_selection_radio", "checked": true, "mobile_svg_scale": 1.25},
+			"radio_unchecked":          {"generated_icon": "popup_selection_radio", "checked": false, "mobile_svg_scale": 1.25},
+			"radio_unchecked_disabled": {"generated_icon": "popup_selection_radio", "checked": false, "mobile_svg_scale": 1.25},
 			"submenu":                  {"icon": "popup_submenu"},
 			"submenu_mirrored":         {"icon": "popup_submenu_mirrored"},
 		},
@@ -3957,7 +3959,8 @@ const BINDING_TABLE: Dictionary = {
 					  "offset_role": "button_normal_offset",
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "radius": "shape.secondary_radius",
-					  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(4, 2)},
+					  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(4, 2),
+					  "mobile_padding": Vector2i(8, 6)},
 		},
 	},
 	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
@@ -4048,7 +4051,7 @@ const BINDING_TABLE: Dictionary = {
 			"scrollbar_margin_right":    {"value": 0},
 			"scrollbar_margin_top":      {"value": 0},
 			"scrollbar_v_separation":    {"value": 4},
-			"v_separation":              {"value": 2},
+			"v_separation":              {"value": 2, "mobile_value": 29},
 		},
 		"font_size": {
 			"font_size":              {"value": "tokens.body"},
@@ -4278,15 +4281,15 @@ const BINDING_TABLE: Dictionary = {
 			"title_outline_modulate": {"role": "outline_color"},
 		},
 		"constant": {
-			"close_h_offset":    {"value": 18},
-			"close_v_offset":    {"value": 24},
+			"close_h_offset":    {"value": 18, "mobile_value": 36},
+			"close_v_offset":    {"value": 24, "mobile_value": 40},
 			"resize_margin":     {"value": 4},
-			"title_height":      {"value": 36},
+			"title_height":      {"value": 36, "mobile_value": 48},
 			"title_outline_size":{"value": 0},
 		},
 		"icon": {
-			"close":         {"icon": "close"},
-			"close_pressed": {"icon": "close"},
+			"close":         {"icon": "close", "mobile_svg_scale": 1.0},
+			"close_pressed": {"icon": "close", "mobile_svg_scale": 1.0},
 		},
 	},
 	# ─── TYPEVAR-01 button variations (Plan 05-03 Task 1) ──────────────────────────────────────
@@ -5439,13 +5442,19 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		if generated_icon_name == "color_hue":
 			return _make_color_hue_texture()
 		if generated_icon_name == "popup_selection_checkbox":
+			var checkbox_popup_scale := 0.0
+			if tokens.get("densityScale", 1.0) > 1.0 and recipe.has("mobile_svg_scale"):
+				checkbox_popup_scale = float(recipe.get("mobile_svg_scale", 0.0))
 			if use_runtime_popup_selection_icons:
-				return _make_popup_selection_checkbox_icon(bool(recipe.get("checked", false)), role_table)
-			return _load_icon("checkbox_checked" if bool(recipe.get("checked", false)) else "checkbox_unchecked")
+				return _make_popup_selection_checkbox_icon(bool(recipe.get("checked", false)), role_table, 0.75 if checkbox_popup_scale <= 0.0 else checkbox_popup_scale)
+			return _load_icon("checkbox_checked" if bool(recipe.get("checked", false)) else "checkbox_unchecked", checkbox_popup_scale)
 		if generated_icon_name == "popup_selection_radio":
+			var radio_popup_scale := 0.0
+			if tokens.get("densityScale", 1.0) > 1.0 and recipe.has("mobile_svg_scale"):
+				radio_popup_scale = float(recipe.get("mobile_svg_scale", 0.0))
 			if use_runtime_popup_selection_icons:
-				return _make_popup_selection_radio_icon(bool(recipe.get("checked", false)), role_table)
-			return _load_icon("radio_checked" if bool(recipe.get("checked", false)) else "radio_unchecked")
+				return _make_popup_selection_radio_icon(bool(recipe.get("checked", false)), role_table, 0.75 if radio_popup_scale <= 0.0 else radio_popup_scale)
+			return _load_icon("radio_checked" if bool(recipe.get("checked", false)) else "radio_unchecked", radio_popup_scale)
 		var icon_name: String = recipe.get("icon", "")
 		if icon_name == "":
 			return null
@@ -5587,9 +5596,9 @@ func _popup_selection_fill(checked: bool, role_table: Dictionary) -> Color:
 	return role_table.get("role_primary", Color.WHITE) if checked else role_table.get("selection_control_off", Color(0.70, 0.74, 0.86))
 
 
-func _make_popup_selection_checkbox_icon(checked: bool, role_table: Dictionary) -> Texture2D:
+func _make_popup_selection_checkbox_icon(checked: bool, role_table: Dictionary, svg_scale: float = 0.75) -> Texture2D:
 	var fill_color := _popup_selection_fill(checked, role_table)
-	var cache_key := "popup_checkbox:%s:%s" % ["checked" if checked else "unchecked", fill_color.to_html(true)]
+	var cache_key := "popup_checkbox:%s:%s:%.3f" % ["checked" if checked else "unchecked", fill_color.to_html(true), svg_scale]
 	var cached: Texture2D = _active_generated_texture_cache.get(cache_key)
 	if cached != null:
 		return cached
@@ -5597,12 +5606,12 @@ func _make_popup_selection_checkbox_icon(checked: bool, role_table: Dictionary) 
 	if checked:
 		check_path = "<path d=\"M9 16.5 L14 21.5 L23 11\" stroke=\"#000000\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>"
 	var svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\" fill=\"none\"><rect x=\"4\" y=\"4\" width=\"24\" height=\"24\" rx=\"3\" fill=\"%s\"/>%s</svg>" % [_color_to_svg_hex(fill_color), check_path]
-	return _make_svg_icon_texture(svg, cache_key)
+	return _make_svg_icon_texture(svg, cache_key, svg_scale)
 
 
-func _make_popup_selection_radio_icon(checked: bool, role_table: Dictionary) -> Texture2D:
+func _make_popup_selection_radio_icon(checked: bool, role_table: Dictionary, svg_scale: float = 0.75) -> Texture2D:
 	var fill_color := _popup_selection_fill(checked, role_table)
-	var cache_key := "popup_radio:%s:%s" % ["checked" if checked else "unchecked", fill_color.to_html(true)]
+	var cache_key := "popup_radio:%s:%s:%.3f" % ["checked" if checked else "unchecked", fill_color.to_html(true), svg_scale]
 	var cached: Texture2D = _active_generated_texture_cache.get(cache_key)
 	if cached != null:
 		return cached
@@ -5610,12 +5619,12 @@ func _make_popup_selection_radio_icon(checked: bool, role_table: Dictionary) -> 
 	if checked:
 		knob_circle = "<circle cx=\"16\" cy=\"16\" r=\"5\" fill=\"#000000\"/>"
 	var svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\" fill=\"none\"><circle cx=\"16\" cy=\"16\" r=\"12\" fill=\"%s\"/>%s</svg>" % [_color_to_svg_hex(fill_color), knob_circle]
-	return _make_svg_icon_texture(svg, cache_key)
+	return _make_svg_icon_texture(svg, cache_key, svg_scale)
 
 
-func _make_svg_icon_texture(svg: String, cache_key: String) -> Texture2D:
+func _make_svg_icon_texture(svg: String, cache_key: String, svg_scale: float = 0.75) -> Texture2D:
 	var image := Image.new()
-	var error := image.load_svg_from_string(svg, 0.75)
+	var error := image.load_svg_from_string(svg, svg_scale)
 	if error != OK:
 		push_warning("NeoCadeTheme: failed to rasterize generated PopupMenu SVG icon.")
 		image = Image.create(24, 24, false, Image.FORMAT_RGBA8)

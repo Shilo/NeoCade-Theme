@@ -1914,14 +1914,14 @@ INTENTIONAL_AUTHORED CheckBox.color.font_pressed_color default=#ffffffff neocade
 INTENTIONAL_AUTHORED CheckBox.constant.h_separation default=4 neocade=12
 DEFAULT_ONLY CheckBox.constant.outline_size default=0 neocade=<missing>
 INTENTIONAL_AUTHORED CheckBox.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
-INTENTIONAL_AUTHORED CheckBox.icon.checked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(32.0, 32.0) path=)
-INTENTIONAL_AUTHORED CheckBox.icon.checked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(32.0, 32.0) path=)
-INTENTIONAL_AUTHORED CheckBox.icon.radio_checked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(32.0, 32.0) path=)
-INTENTIONAL_AUTHORED CheckBox.icon.radio_checked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(32.0, 32.0) path=)
-INTENTIONAL_AUTHORED CheckBox.icon.radio_unchecked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(32.0, 32.0) path=)
-INTENTIONAL_AUTHORED CheckBox.icon.radio_unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(32.0, 32.0) path=)
-INTENTIONAL_AUTHORED CheckBox.icon.unchecked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(32.0, 32.0) path=)
-INTENTIONAL_AUTHORED CheckBox.icon.unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(32.0, 32.0) path=)
+INTENTIONAL_AUTHORED CheckBox.icon.checked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED CheckBox.icon.checked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED CheckBox.icon.radio_checked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED CheckBox.icon.radio_checked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED CheckBox.icon.radio_unchecked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED CheckBox.icon.radio_unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED CheckBox.icon.unchecked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED CheckBox.icon.unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
 INTENTIONAL_AUTHORED CheckBoxNoIconTint.color.icon_hover_color default=<missing> neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckBoxNoIconTint.color.icon_hover_pressed_color default=<missing> neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckBoxNoIconTint.color.icon_pressed_color default=<missing> neocade=#f7f8fbff
@@ -1949,14 +1949,14 @@ DEFAULT_ONLY CheckButton.constant.check_v_offset default=0 neocade=<missing>
 DEFAULT_ONLY CheckButton.constant.h_separation default=4 neocade=<missing>
 DEFAULT_ONLY CheckButton.constant.outline_size default=0 neocade=<missing>
 INTENTIONAL_AUTHORED CheckButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
-INTENTIONAL_AUTHORED CheckButton.icon.checked default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(48.0, 25.0) path=)
-INTENTIONAL_AUTHORED CheckButton.icon.checked_disabled default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(48.0, 25.0) path=)
-INTENTIONAL_AUTHORED CheckButton.icon.checked_disabled_mirrored default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(48.0, 25.0) path=)
-INTENTIONAL_AUTHORED CheckButton.icon.checked_mirrored default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(48.0, 25.0) path=)
-INTENTIONAL_AUTHORED CheckButton.icon.unchecked default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(48.0, 25.0) path=)
-INTENTIONAL_AUTHORED CheckButton.icon.unchecked_disabled default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(48.0, 25.0) path=)
-INTENTIONAL_AUTHORED CheckButton.icon.unchecked_disabled_mirrored default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(48.0, 25.0) path=)
-INTENTIONAL_AUTHORED CheckButton.icon.unchecked_mirrored default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(48.0, 25.0) path=)
+INTENTIONAL_AUTHORED CheckButton.icon.checked default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(57.0, 30.0) path=)
+INTENTIONAL_AUTHORED CheckButton.icon.checked_disabled default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(57.0, 30.0) path=)
+INTENTIONAL_AUTHORED CheckButton.icon.checked_disabled_mirrored default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(57.0, 30.0) path=)
+INTENTIONAL_AUTHORED CheckButton.icon.checked_mirrored default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(57.0, 30.0) path=)
+INTENTIONAL_AUTHORED CheckButton.icon.unchecked default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(57.0, 30.0) path=)
+INTENTIONAL_AUTHORED CheckButton.icon.unchecked_disabled default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(57.0, 30.0) path=)
+INTENTIONAL_AUTHORED CheckButton.icon.unchecked_disabled_mirrored default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(57.0, 30.0) path=)
+INTENTIONAL_AUTHORED CheckButton.icon.unchecked_mirrored default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(57.0, 30.0) path=)
 DEFAULT_ONLY CodeEdit.stylebox.completion default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
 INTENTIONAL_AUTHORED CodeEdit.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CodeEdit.stylebox.normal default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/2 border_color=#00000099 radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#0e1220ff border=0/0/0/0 border_color=#0e1220ff radius=0/0/0/0 margin=15.0/11.0/15.0/11.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2350,7 +2350,7 @@ INTENTIONAL_AUTHORED ItemList.color.font_selected_color default=#ffffffff neocad
 INTENTIONAL_AUTHORED ItemList.color.guide_color default=#b2b2b240 neocade=#10142300
 INTENTIONAL_AUTHORED ItemList.constant.h_separation default=4 neocade=12
 INTENTIONAL_AUTHORED ItemList.constant.icon_margin default=4 neocade=6
-INTENTIONAL_AUTHORED ItemList.constant.v_separation default=4 neocade=12
+INTENTIONAL_AUTHORED ItemList.constant.v_separation default=4 neocade=29
 INTENTIONAL_AUTHORED ItemList.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED ItemList.icon.scroll_hint default=Texture2D(size=(32.0, 24.0) path=) neocade=Texture2D(size=(16.0, 12.0) path=res://addons/neocade_theme/icons/tree_scroll_hint.svg)
 INTENTIONAL_AUTHORED Kicker.color.font_color default=<missing> neocade=#8bff6aff
@@ -2394,10 +2394,10 @@ DEFAULT_ONLY LinkButton.color.font_outline_color default=#000000ff neocade=<miss
 INTENTIONAL_AUTHORED LinkButton.color.font_pressed_color default=#ffffffff neocade=#8bff6aff
 DEFAULT_ONLY LinkButton.constant.outline_size default=0 neocade=<missing>
 INTENTIONAL_AUTHORED LinkButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
-INTENTIONAL_AUTHORED MenuBar.stylebox.disabled default=StyleBoxFlat(bg=#1a1a1a4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#151a2e6b border=1/1/1/1 border_color=#5e616fff radius=0/0/0/0 margin=12.0/5.0/12.0/5.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED MenuBar.stylebox.hover default=StyleBoxFlat(bg=#39393999 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=12.0/5.0/12.0/5.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED MenuBar.stylebox.normal default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#151a2e00 border=1/1/1/1 border_color=#5e616fff radius=0/0/0/0 margin=12.0/5.0/12.0/5.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED MenuBar.stylebox.pressed default=StyleBoxFlat(bg=#00000099 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=12.0/5.0/12.0/5.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED MenuBar.stylebox.disabled default=StyleBoxFlat(bg=#1a1a1a4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#151a2e6b border=1/1/1/1 border_color=#5e616fff radius=0/0/0/0 margin=14.0/14.0/14.0/14.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED MenuBar.stylebox.hover default=StyleBoxFlat(bg=#39393999 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=14.0/14.0/14.0/14.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED MenuBar.stylebox.normal default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#151a2e00 border=1/1/1/1 border_color=#5e616fff radius=0/0/0/0 margin=14.0/14.0/14.0/14.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED MenuBar.stylebox.pressed default=StyleBoxFlat(bg=#00000099 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=14.0/14.0/14.0/14.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED MenuBar.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED MenuBar.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED MenuBar.color.font_focus_color default=#f2f2f2ff neocade=#8bff6aff
@@ -2456,7 +2456,7 @@ INTENTIONAL_AUTHORED PopupMenu.color.font_outline_color default=#000000ff neocad
 INTENTIONAL_AUTHORED PopupMenu.color.font_separator_color default=#dfdfdfff neocade=#b9c1d0ff
 INTENTIONAL_AUTHORED PopupMenu.color.font_separator_outline_color default=#000000ff neocade=#5e616fff
 INTENTIONAL_AUTHORED PopupMenu.constant.h_separation default=4 neocade=6
-INTENTIONAL_AUTHORED PopupMenu.constant.icon_max_width default=0 neocade=18
+INTENTIONAL_AUTHORED PopupMenu.constant.icon_max_width default=0 neocade=40
 INTENTIONAL_AUTHORED PopupMenu.constant.indent default=10 neocade=16
 INTENTIONAL_AUTHORED PopupMenu.constant.item_end_padding default=2 neocade=8
 INTENTIONAL_AUTHORED PopupMenu.constant.item_start_padding default=2 neocade=8
@@ -2464,16 +2464,16 @@ INTENTIONAL_AUTHORED PopupMenu.constant.v_separation default=4 neocade=29
 INTENTIONAL_AUTHORED PopupMenu.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED PopupMenu.font.font_separator default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED PopupMenu.font_size.font_separator_size default=16 neocade=14
-INTENTIONAL_AUTHORED PopupMenu.icon.checked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=)
-INTENTIONAL_AUTHORED PopupMenu.icon.checked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=)
-INTENTIONAL_AUTHORED PopupMenu.icon.radio_checked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=)
-INTENTIONAL_AUTHORED PopupMenu.icon.radio_checked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=)
-INTENTIONAL_AUTHORED PopupMenu.icon.radio_unchecked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=)
-INTENTIONAL_AUTHORED PopupMenu.icon.radio_unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=)
+INTENTIONAL_AUTHORED PopupMenu.icon.checked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED PopupMenu.icon.checked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED PopupMenu.icon.radio_checked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED PopupMenu.icon.radio_checked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED PopupMenu.icon.radio_unchecked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED PopupMenu.icon.radio_unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
 INTENTIONAL_AUTHORED PopupMenu.icon.submenu default=Texture2D(size=(8.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/popup_submenu.svg)
 INTENTIONAL_AUTHORED PopupMenu.icon.submenu_mirrored default=Texture2D(size=(8.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/popup_submenu_mirrored.svg)
-INTENTIONAL_AUTHORED PopupMenu.icon.unchecked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=)
-INTENTIONAL_AUTHORED PopupMenu.icon.unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=)
+INTENTIONAL_AUTHORED PopupMenu.icon.unchecked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
+INTENTIONAL_AUTHORED PopupMenu.icon.unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(40.0, 40.0) path=)
 INTENTIONAL_AUTHORED PopupPanel.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=12.0/9.0/12.0/9.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED PrimaryButton.stylebox.disabled default=<missing> neocade=StyleBoxFlat(bg=#8bff6a6b border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=18.0/14.0/18.0/14.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED PrimaryButton.stylebox.focus default=<missing> neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2654,7 +2654,7 @@ INTENTIONAL_AUTHORED TooltipLabel.color.font_shadow_color default=#00000000 neoc
 INTENTIONAL_AUTHORED TooltipLabel.constant.shadow_offset_x default=1 neocade=0
 INTENTIONAL_AUTHORED TooltipLabel.constant.shadow_offset_y default=1 neocade=0
 INTENTIONAL_AUTHORED TooltipLabel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
-INTENTIONAL_AUTHORED TooltipPanel.stylebox.panel default=StyleBoxFlat(bg=#00000080 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=8.0/2.0/8.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=6.0/3.0/6.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TooltipPanel.stylebox.panel default=StyleBoxFlat(bg=#00000080 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=8.0/2.0/8.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=8.0/6.0/8.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.button_hover default=StyleBoxFlat(bg=#39393999 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=9.0/0.0/9.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.button_pressed default=StyleBoxFlat(bg=#00000099 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=9.0/0.0/9.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.cursor default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415ab8 border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2705,7 +2705,7 @@ INTENTIONAL_AUTHORED Tree.constant.scrollbar_margin_bottom default=-1 neocade=0
 INTENTIONAL_AUTHORED Tree.constant.scrollbar_margin_left default=-1 neocade=0
 INTENTIONAL_AUTHORED Tree.constant.scrollbar_margin_right default=-1 neocade=0
 INTENTIONAL_AUTHORED Tree.constant.scrollbar_margin_top default=-1 neocade=0
-INTENTIONAL_AUTHORED Tree.constant.v_separation default=4 neocade=2
+INTENTIONAL_AUTHORED Tree.constant.v_separation default=4 neocade=29
 INTENTIONAL_AUTHORED Tree.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED Tree.font.title_button_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_header_small.tres)
 INTENTIONAL_AUTHORED Tree.icon.arrow default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/disclosure_expanded.svg)
@@ -2746,16 +2746,19 @@ INTENTIONAL_AUTHORED Window.stylebox.embedded_border default=StyleBoxFlat(bg=#40
 INTENTIONAL_AUTHORED Window.stylebox.embedded_unfocused_border default=StyleBoxFlat(bg=#666666ff border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=10.0/28.0/10.0/8.0 expand=8.0/32.0/8.0/6.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=15.0/42.0/15.0/12.0 expand=12.0/48.0/12.0/9.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Window.color.title_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED Window.color.title_outline_modulate default=#000000ff neocade=#5e616fff
+INTENTIONAL_AUTHORED Window.constant.close_h_offset default=18 neocade=36
+INTENTIONAL_AUTHORED Window.constant.close_v_offset default=24 neocade=40
+INTENTIONAL_AUTHORED Window.constant.title_height default=36 neocade=48
 INTENTIONAL_AUTHORED Window.font.title_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_header_small.tres)
-INTENTIONAL_AUTHORED Window.icon.close default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/close.svg)
-INTENTIONAL_AUTHORED Window.icon.close_pressed default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/close.svg)
+INTENTIONAL_AUTHORED Window.icon.close default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(32.0, 32.0) path=)
+INTENTIONAL_AUTHORED Window.icon.close_pressed default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(32.0, 32.0) path=)
 INTENTIONAL_AUTHORED WindowContentPanel.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#101423ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 
 
 Summary:
-- SAME=281
+- SAME=278
 - FALLS_BACK=0
-- INTENTIONAL_AUTHORED=2392
+- INTENTIONAL_AUTHORED=2395
 - UNINTENTIONAL_EXTRA=0
 - UNINTENTIONAL_STYLE=0
 - NEOCADE_ONLY=0

@@ -87,13 +87,13 @@ Android density buckets are handled by Godot project scaling and stretch configu
 | VScrollBar | interactive | Scrollbars are intentionally not inflated for mobile; mobile scroll affordances are expected to be visually smaller than tap buttons. |
 | VSlider | interactive | Grabber and grabber_area proxies pass 48px. |
 | VSplitContainer | interactive | Split handle proxy passes 48px. |
-| Window | display | Engine/window-managed titlebar hit rects remain outside Theme-side enforcement. |
+| Window | display | Embedded titlebar uses mobile-only `title_height`/close-offset/icon scale so the close affordance and title alignment match the larger mobile chrome. |
 
 ## Tap-target Audit Summary
 
 Evidence lives at `.planning/phases/08-mobile-variant-token-block-tap-target-audit-updated-for-dyna/logs/08-tap-target-audit.log`.
 
-The Phase 8 audit runs all five directions with `platform=MOBILE`, `raised=false`, and `raised=true`. Current result: 250 PASS, 10 LIMITED, 110 N/A, 0 FAIL. Follow-up runtime probing in 2026-05-09 added `theme_mobile_tap_target_probe.gd`, which verifies actual `get_combined_minimum_size()` for common controls, button variations, and icon/flat buttons. It also verifies mobile-readable icons for CheckBox, RadioButton, CheckButton, LineEdit clear, and TabBar arrows. ColorPickerButton remains source-limited for theme-only minimum size, so the theme keeps its chrome margins small and consuming mobile layouts should assign a 48x48 minimum where the swatch is standalone. Scrollbars remain intentionally compact. Mobile metrics are 1920x1080 design-space units that the project scales to device resolution, not raw physical device pixels.
+The Phase 8 audit runs all five directions with `platform=MOBILE`, `raised=false`, and `raised=true`. Current result: 250 PASS, 10 LIMITED, 110 N/A, 0 FAIL. Follow-up runtime probing in 2026-05-09 added `theme_mobile_tap_target_probe.gd`, which verifies actual `get_combined_minimum_size()` for common controls, button variations, icon/flat buttons, MenuButton, Tree/ItemList row height, PopupMenu row/icon sizing, and embedded Window title/close chrome. It also verifies mobile-readable icons for CheckBox, RadioButton, CheckButton, PopupMenu check/radio items, LineEdit clear, and TabBar arrows. ColorPickerButton remains source-limited for theme-only minimum size, so the theme keeps its chrome margins small and consuming mobile layouts should assign a 48x48 minimum where the swatch is standalone. Scrollbars remain intentionally compact. Mobile metrics are 1920x1080 design-space units that the project scales to device resolution, not raw physical device pixels.
 
 ## Limitations
 
