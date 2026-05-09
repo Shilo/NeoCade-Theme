@@ -16,6 +16,7 @@ Start from the visible symptom and find the owning source class:
 rg -n "Filter Properties|InspectorDock|NoBorderHorizontalBottom|set_theme_type_variation|MarginContainer" C:\Programming_Files\Godot\godot-master\editor
 rg -n "FileSystemDock|toolbar_hbc|toolbar2_hbc|FlatMenuButton|NoBorderHorizontalBottom" C:\Programming_Files\Godot\godot-master\editor
 rg -n "DockTabContainer|SideDockTabContainer|BottomSideDockTabContainer" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
+rg -n "CreateDialog|TreeSecondary|ItemListSecondary|split_bar_background|HSplitContainer" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
 ```
 
 Then compare reference theme behavior:
@@ -23,6 +24,7 @@ Then compare reference theme behavior:
 ```powershell
 rg -n "EditorInspector|FlatMenuButton|NoBorderHorizontalBottom|TabContainer|HBoxContainer|VBoxContainer" C:\Programming_Files\Godot\godot-minimal-theme-main\minimal_theme.tres
 rg -n "EditorInspector|FlatMenuButton|NoBorderHorizontalBottom|TabContainer|HBoxContainer|VBoxContainer" C:\Programming_Files\Godot\godot-master\editor\themes\theme_modern.cpp
+rg -n "SplitContainer|split_bar_background|ItemListSecondary|TreeSecondary|draw_guides|guide_color" C:\Programming_Files\Godot\godot-minimal-theme-main\minimal_theme.tres C:\Programming_Files\Godot\godot-master\editor\themes C:\Programming_Files\Godot\godot-master\scene\theme\default_theme.cpp
 ```
 
 ## Common Source Mappings
@@ -54,6 +56,14 @@ rg -n "EditorInspector|FlatMenuButton|NoBorderHorizontalBottom|TabContainer|HBox
   - Source often pulls from `EditorIcons`, not only Control icon slots.
   - Useful icon names seen in editor tabs/toolbars: `GuiTabMenu`, `GuiTabMenuHl`, `GuiTabMenuHlDarkBackground`, `TripleBar`.
 
+- Create New Node dialog:
+  - Source: `editor/gui/create_dialog.cpp`
+  - Dialog inheritance: `CreateDialog -> ConfirmationDialog -> AcceptDialog`
+  - Main layout: outer `HSplitContainer`; left column `VSplitContainer`; right column `VSplitContainer`
+  - Side lists: Favorites and Matches are `Tree` with `TreeSecondary`; Recent is `ItemList` with `ItemListSecondary`
+  - Section labels come from `VBoxContainer::add_margin_child`, which uses `HeaderSmall`
+  - Useful theme hooks: `AcceptDialog.panel`, `ConfirmationDialog.panel`, `PopupDialog.panel`, `HeaderSmall.font_size`, `TreeSecondary.panel`, `ItemListSecondary.panel`, `ItemListSecondary` selected/hovered styleboxes and selected font colors, `SplitContainer/HSplitContainer/VSplitContainer.split_bar_background`
+
 ## Theme Editing Heuristics
 
 - Keep `MarginContainer` generic margins at zero unless the whole app should inherit padding.
@@ -61,9 +71,26 @@ rg -n "EditorInspector|FlatMenuButton|NoBorderHorizontalBottom|TabContainer|HBox
 - Add editor-specific rows/variations for editor chrome: `EditorDock`, `DockTabContainer`, `NoBorderHorizontalBottom`, etc.
 - Register custom variations in `TYPE_VARIATIONS` when inheritance from another theme type matters.
 - Add `BINDING_TABLE` entries for every intentional dynamic override so regeneration is stable.
+- Do not assume a custom variation will resolve every inherited dynamic slot the way the editor preview implies. If a probe shows fallback colors like Godot default red selected rows or black selected text, author the variation slots explicitly.
 - Update verification scripts whenever adding a new intentional override. The default comparison log should classify it as intentional, not unintentional or fallback.
 - Avoid soft shadows. Raised NeoCade depth should be solid border/extrusion behavior.
 - Labels and rich text labels should remain text-only unless source proves a panel is needed.
+- Prefer `StyleBoxEmpty` for contextual split-bar backgrounds. Godot default sets `split_bar_background` to empty for `SplitContainer`, `HSplitContainer`, and `VSplitContainer`; the modern editor theme and Godot Minimal Theme mostly set splitter constants/icons. A filled split-bar style paints a visible stripe and can make dialog layout look like unexpected spacing.
+- For list views that should be text/item focused, hide lines through `guide_color` alpha, remove panel borders, keep `outline_size` at 0, and make selected text color intentionally match the accent if that is the Tree convention.
+
+## Reusable Bug Patterns
+
+- Contextual gap vs painted stripe:
+  Split containers, tab headers, toolbar gutters, and dialog margins can all look like "spacing bugs" when the real issue is a child stylebox painting a color that should have been inherited from the parent. Compare against Godot default for `StyleBoxEmpty` before choosing a darker/lighter fill.
+
+- Base type fixed, variation still wrong:
+  Editor variants can retain default fallback slots after the base control looks correct. Probe both the base type and the exact variation seen in source, especially for selected/hovered state styleboxes, text colors, panel borders, and constants.
+
+- List/tree visual cleanup:
+  No separators usually requires more than one setting. Check guide colors, relationship line colors, draw constants, panel border widths, selected/hovered styleboxes, selected font colors, and outline constants together.
+
+- Dialogs share Control primitives:
+  A dialog-specific screenshot may still point to reusable primitives such as `AcceptDialog`, `PopupDialog`, `SplitContainer`, `Tree`, `ItemList`, `LineEdit`, `Button`, or `HeaderSmall`. Fix the primitive or variation when source proves it is reused; keep the dialog source map as evidence, not as a one-off patch target.
 
 ## Invisible Fix Recovery
 
@@ -105,6 +132,7 @@ Useful existing targeted probes:
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_scene_structure_probe.gd
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_tab_state_probe.gd
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_popup_scrollbar_probe.gd
+& 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_create_dialog_probe.gd
 ```
 
 ## Screenshot Measurement

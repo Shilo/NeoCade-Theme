@@ -65,6 +65,7 @@ Use scripts and logs as the main proof. Existing useful commands:
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_scene_structure_probe.gd
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_tab_state_probe.gd
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_popup_scrollbar_probe.gd
+& 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_create_dialog_probe.gd
 git diff --check
 ```
 
@@ -78,8 +79,19 @@ For spacing, padding, clipping, icon-size, or alignment complaints based on a us
 - Logging stylebox colors, borders, content margins, expand margins, corner radii, icon sizes, and constants.
 - Testing flat, raised, desktop, and mobile variants across all selectable styles when a change affects shared bindings.
 - Checking for `UNINTENTIONAL_STYLE`, positive shadows, wrong label chrome, excessive icon sizes, missing type variations, and fallback/default-only drift.
+- Checking `StyleBoxEmpty` vs `StyleBoxFlat` when a Godot default gap should inherit its parent surface instead of painting its own color.
+- Fully authoring state slots for editor secondary variations when probes show Godot is falling back to defaults instead of resolving inherited NeoCade slots.
 - Using Godot Minimal Theme as a practical reference for compact editor spacing and editor-specific variations, while avoiding code-for-code copying.
 - Regenerating comparison logs after changing intentional overrides so future sessions can see what changed and why.
+
+## Reusable Editor Patterns
+
+- Treat editor screenshots as compositions of nested generic controls plus editor-specific variations. Trace the owning source class first, then decide whether the fix belongs to the base control, an editor variation, or a wrapper.
+- Splitter gaps should usually be contextual. Godot's default theme sets `SplitContainer.split_bar_background`, `HSplitContainer.split_bar_background`, and `VSplitContainer.split_bar_background` to `StyleBoxEmpty`; the modern editor theme and Godot Minimal Theme mostly set splitter constants/icons, not a painted background. This lets docks, dialogs, and panels inherit the parent surface instead of forcing one global stripe color.
+- Do not globally paint split-bar backgrounds to the darkest surface unless the user explicitly wants a visible stripe everywhere. The safer editor-layout default is an empty split-bar background with explicit grabber icons/colors.
+- Secondary editor variations can be inheritance traps. Variations such as `TreeSecondary`, `ItemListSecondary`, `ScrollContainerSecondary`, and editor-only container variants may not resolve every dynamic NeoCade slot the way the base type does. If probes show fallback colors or sizes, explicitly author the variation slots.
+- For list/tree views with no separator/border/outline, check all relevant theme paths: panel border width, guide/relationship colors, guide/relationship constants, `outline_size`, and `font_outline_color`. Use Button hover/pressed styleboxes as the reference for item hover/selected backgrounds when the user asks for state consistency.
+- Keep concrete source maps as examples, not as the only target. Example: `CreateDialog` / "Create New Node" is built in `editor/gui/create_dialog.cpp` with nested split containers, `TreeSecondary`, `ItemListSecondary`, and `HeaderSmall`; the same investigation pattern applies to other editor dialogs and docks.
 
 ## Collaboration Style
 
