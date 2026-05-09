@@ -3320,8 +3320,8 @@ const BINDING_TABLE: Dictionary = {
 	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
 	"Tree": {
 		"stylebox": {
-			"panel":                  {"role": "surface_low", "border_role": "surface_low",
-										"raised_intensity": 0, "border_width": 0},
+			"panel":                  {"role": "surface_panel", "border_role": "surface_panel_edge",
+										"raised_intensity": 0, "border_width": 1},
 			"focus":                  {"role": "focus_ring"},
 			"title_button_normal":    {"role": "button_normal", "border_role": "button_normal",
 										"raised_intensity": 0, "border_width": 0},
@@ -3423,8 +3423,8 @@ const BINDING_TABLE: Dictionary = {
 	},
 	"TreeSecondary": {
 		"stylebox": {
-			"panel":               {"role": "surface_low", "border_role": "surface_low",
-									"raised_intensity": 0, "border_width": 0},
+			"panel":               {"role": "surface_panel", "border_role": "surface_panel_edge",
+									"raised_intensity": 0, "border_width": 1},
 			"title_button_normal": {"role": "surface_panel", "border_role": "surface_panel",
 									"raised_intensity": 0, "border_width": 0},
 			"title_button_hover":  {"role": "button_hover", "border_role": "button_hover",
@@ -3435,7 +3435,8 @@ const BINDING_TABLE: Dictionary = {
 	},
 	"TreeTable": {
 		"stylebox": {
-			"panel": {"empty": true},
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": 0, "border_width": 1},
 			"title_button_normal": {"role": "surface_panel", "border_role": "surface_panel",
 									"raised_intensity": 0, "border_width": 0},
 			"title_button_hover":  {"role": "button_hover", "border_role": "button_hover",
