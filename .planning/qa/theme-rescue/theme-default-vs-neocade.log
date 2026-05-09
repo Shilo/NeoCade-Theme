@@ -706,27 +706,6 @@ DEFAULT_ONLY RichTextLabel.icon.horizontal_rule default=Texture2D(size=(2.0, 2.0
 INTENTIONAL_AUTHORED ScrollContainer.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ffffffbf radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=4.0/4.0/4.0/4.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED ScrollContainer.icon.scroll_hint_horizontal default=Texture2D(size=(24.0, 32.0) path=) neocade=Texture2D(size=(12.0, 16.0) path=res://addons/neocade_theme/icons/scroll_hint_horizontal.svg)
 INTENTIONAL_AUTHORED ScrollContainer.icon.scroll_hint_vertical default=Texture2D(size=(32.0, 24.0) path=) neocade=Texture2D(size=(16.0, 12.0) path=res://addons/neocade_theme/icons/scroll_hint_vertical.svg)
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.disabled default=<missing> neocade=StyleBoxFlat(bg=#24293dff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=12.0/8.0/12.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.focus default=<missing> neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/1/1/1 border_color=#474c63ff radius=0/0/0/0 margin=12.0/8.0/12.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.hover_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=12.0/8.0/12.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.normal default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=12.0/8.0/12.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=12.0/8.0/12.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.color.font_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.font_disabled_color default=<missing> neocade=#f7f8fb6b
-INTENTIONAL_AUTHORED SecondaryButton.color.font_focus_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.font_hover_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.font_hover_pressed_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.font_pressed_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_disabled_color default=<missing> neocade=#f7f8fb6b
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_focus_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_hover_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_hover_pressed_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_normal_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_pressed_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.constant.h_separation default=<missing> neocade=8
-INTENTIONAL_AUTHORED SecondaryButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
-INTENTIONAL_AUTHORED SecondaryButton.font_size.font_size default=16 neocade=14
 DEFAULT_ONLY SpinBox.stylebox.down_background default=StyleBoxEmpty neocade=<missing>
 DEFAULT_ONLY SpinBox.stylebox.down_background_disabled default=StyleBoxEmpty neocade=<missing>
 INTENTIONAL_AUTHORED SpinBox.stylebox.down_background_hovered default=StyleBoxFlat(bg=#39393999 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -1652,27 +1631,6 @@ DEFAULT_ONLY RichTextLabel.icon.horizontal_rule default=Texture2D(size=(2.0, 2.0
 INTENTIONAL_AUTHORED ScrollContainer.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ffffffbf radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=4.0/4.0/4.0/4.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED ScrollContainer.icon.scroll_hint_horizontal default=Texture2D(size=(24.0, 32.0) path=) neocade=Texture2D(size=(12.0, 16.0) path=res://addons/neocade_theme/icons/scroll_hint_horizontal.svg)
 INTENTIONAL_AUTHORED ScrollContainer.icon.scroll_hint_vertical default=Texture2D(size=(32.0, 24.0) path=) neocade=Texture2D(size=(16.0, 12.0) path=res://addons/neocade_theme/icons/scroll_hint_vertical.svg)
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.disabled default=<missing> neocade=StyleBoxFlat(bg=#24293dff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=12.0/8.0/12.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.focus default=<missing> neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/1/1/4 border_color=#30354aff radius=0/0/0/0 margin=12.0/8.0/12.0/11.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.hover_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=12.0/8.0/12.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.normal default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/4 border_color=#20263dff radius=0/0/0/0 margin=12.0/8.0/12.0/11.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=12.0/8.0/12.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.color.font_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.font_disabled_color default=<missing> neocade=#f7f8fb6b
-INTENTIONAL_AUTHORED SecondaryButton.color.font_focus_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.font_hover_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.font_hover_pressed_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.font_pressed_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_disabled_color default=<missing> neocade=#f7f8fb6b
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_focus_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_hover_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_hover_pressed_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_normal_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_pressed_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.constant.h_separation default=<missing> neocade=8
-INTENTIONAL_AUTHORED SecondaryButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
-INTENTIONAL_AUTHORED SecondaryButton.font_size.font_size default=16 neocade=14
 DEFAULT_ONLY SpinBox.stylebox.down_background default=StyleBoxEmpty neocade=<missing>
 DEFAULT_ONLY SpinBox.stylebox.down_background_disabled default=StyleBoxEmpty neocade=<missing>
 INTENTIONAL_AUTHORED SpinBox.stylebox.down_background_hovered default=StyleBoxFlat(bg=#39393999 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2570,26 +2528,6 @@ DEFAULT_ONLY RichTextLabel.icon.horizontal_rule default=Texture2D(size=(2.0, 2.0
 INTENTIONAL_AUTHORED ScrollContainer.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ffffffbf radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=4.0/4.0/4.0/4.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED ScrollContainer.icon.scroll_hint_horizontal default=Texture2D(size=(24.0, 32.0) path=) neocade=Texture2D(size=(12.0, 16.0) path=res://addons/neocade_theme/icons/scroll_hint_horizontal.svg)
 INTENTIONAL_AUTHORED ScrollContainer.icon.scroll_hint_vertical default=Texture2D(size=(32.0, 24.0) path=) neocade=Texture2D(size=(16.0, 12.0) path=res://addons/neocade_theme/icons/scroll_hint_vertical.svg)
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.disabled default=<missing> neocade=StyleBoxFlat(bg=#24293dff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=18.0/12.0/18.0/12.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.focus default=<missing> neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/1/1/1 border_color=#474c63ff radius=0/0/0/0 margin=18.0/12.0/18.0/12.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.hover_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=18.0/12.0/18.0/12.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.normal default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=18.0/12.0/18.0/12.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.stylebox.pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=18.0/12.0/18.0/12.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED SecondaryButton.color.font_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.font_disabled_color default=<missing> neocade=#f7f8fb6b
-INTENTIONAL_AUTHORED SecondaryButton.color.font_focus_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.font_hover_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.font_hover_pressed_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.font_pressed_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_disabled_color default=<missing> neocade=#f7f8fb6b
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_focus_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_hover_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_hover_pressed_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_normal_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.color.icon_pressed_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED SecondaryButton.constant.h_separation default=<missing> neocade=12
-INTENTIONAL_AUTHORED SecondaryButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 DEFAULT_ONLY SpinBox.stylebox.down_background default=StyleBoxEmpty neocade=<missing>
 DEFAULT_ONLY SpinBox.stylebox.down_background_disabled default=StyleBoxEmpty neocade=<missing>
 INTENTIONAL_AUTHORED SpinBox.stylebox.down_background_hovered default=StyleBoxFlat(bg=#39393999 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2807,9 +2745,9 @@ INTENTIONAL_AUTHORED WindowContentPanel.stylebox.panel default=<missing> neocade
 
 
 Summary:
-- SAME=290
+- SAME=289
 - FALLS_BACK=0
-- INTENTIONAL_AUTHORED=2446
+- INTENTIONAL_AUTHORED=2384
 - UNINTENTIONAL_EXTRA=0
 - UNINTENTIONAL_STYLE=0
 - NEOCADE_ONLY=0

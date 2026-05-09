@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://beivemw6fcnld"]
 
+[ext_resource type="Theme" uid="uid://cgd7xydn3yu7t" path="res://addons/neocade_theme/neocade_theme.tres" id="1_lisp0"]
 [ext_resource type="Script" uid="uid://dky0m3dm07i6g" path="res://addons/neocade_theme/scripts/neocade_theme_option_button.gd" id="2_theme_option_button"]
 [ext_resource type="Script" uid="uid://dxu534volcw5j" path="res://showcase/showcase.gd" id="3_showcase"]
 
@@ -11,6 +12,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_lisp0")
 script = ExtResource("3_showcase")
 
 [node name="RootMargin" type="MarginContainer" parent="." unique_id=2104122416]
@@ -142,26 +144,6 @@ tooltip_text = "Start match button"
 accessibility_name = "Start match button"
 theme_type_variation = &"PrimaryButton"
 text = "Start Match"
-
-[node name="SecondaryPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid" unique_id=1491567016]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="SecondaryStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/SecondaryPanel" unique_id=2085380832]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/SecondaryPanel/SecondaryStack" unique_id=1495301916]
-layout_mode = 2
-theme_type_variation = &"Kicker"
-text = "SecondaryButton"
-
-[node name="Control" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/SecondaryPanel/SecondaryStack" unique_id=1302314939]
-layout_mode = 2
-tooltip_text = "View prizes button"
-accessibility_name = "View prizes button"
-theme_type_variation = &"SecondaryButton"
-text = "View Prizes"
 
 [node name="ButtonPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid" unique_id=709197925]
 layout_mode = 2
@@ -794,32 +776,26 @@ columns = 3
 
 [node name="Pad1" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/GridContainer" unique_id=2084541416]
 layout_mode = 2
-theme_type_variation = &"SecondaryButton"
 text = "Pad 1"
 
 [node name="Pad2" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/GridContainer" unique_id=970622537]
 layout_mode = 2
-theme_type_variation = &"SecondaryButton"
 text = "Pad 2"
 
 [node name="Pad3" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/GridContainer" unique_id=1414917993]
 layout_mode = 2
-theme_type_variation = &"SecondaryButton"
 text = "Pad 3"
 
 [node name="Pad4" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/GridContainer" unique_id=398565012]
 layout_mode = 2
-theme_type_variation = &"SecondaryButton"
 text = "Pad 4"
 
 [node name="Pad5" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/GridContainer" unique_id=212159676]
 layout_mode = 2
-theme_type_variation = &"SecondaryButton"
 text = "Pad 5"
 
 [node name="Pad6" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid/GridContainer" unique_id=218545613]
 layout_mode = 2
-theme_type_variation = &"SecondaryButton"
 text = "Pad 6"
 
 [node name="BoxAndCenter" type="HBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Containers & Layout/Margin/Grid" unique_id=930148749]
@@ -874,7 +850,6 @@ text = "AcceptDialog"
 
 [node name="ConfirmationDialogButton" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid" unique_id=893079939]
 layout_mode = 2
-theme_type_variation = &"SecondaryButton"
 text = "ConfirmationDialog"
 
 [node name="FileDialogButton" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid" unique_id=435082670]
@@ -884,12 +859,10 @@ text = "FileDialog"
 
 [node name="PopupPanelButton" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid" unique_id=1312019692]
 layout_mode = 2
-theme_type_variation = &"SecondaryButton"
 text = "PopupPanel"
 
 [node name="PopupMenuButton" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid" unique_id=1382647434]
 layout_mode = 2
-theme_type_variation = &"SecondaryButton"
 text = "PopupMenu"
 
 [node name="WindowButton" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid" unique_id=18071925]
@@ -897,7 +870,6 @@ unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Open scoreboard window"
 accessibility_name = "Open scoreboard window"
-theme_type_variation = &"SecondaryButton"
 text = "Scoreboard Window"
 
 [node name="MenuBar" type="MenuBar" parent="RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid" unique_id=488966441]
@@ -1297,10 +1269,10 @@ filters = PackedStringArray("*.tres ; Godot Theme resource", "*.json ; Token sna
 accessibility_name = "Popup panel"
 
 [node name="PopupMargin" type="MarginContainer" parent="PopupPanel" unique_id=1756477724]
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 96.0
-offset_bottom = 96.0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 92.0
+offset_bottom = 94.0
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16

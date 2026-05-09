@@ -103,7 +103,7 @@ func _make_section(title: String, theme: Theme) -> VBoxContainer:
 	grid.add_theme_constant_override("v_separation", 12)
 	section.add_child(grid)
 
-	for theme_type in [&"Button", &"PrimaryButton", &"SecondaryButton", &"GhostButton", &"DangerButton", &"OptionButton", &"ColorPickerButton"]:
+	for theme_type in [&"Button", &"PrimaryButton", &"GhostButton", &"DangerButton", &"OptionButton", &"ColorPickerButton"]:
 		grid.add_child(_make_button_column(String(theme_type), theme))
 
 	section.add_child(_make_tab_samples(theme))

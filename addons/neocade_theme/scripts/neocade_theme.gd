@@ -147,6 +147,8 @@ var _regenerating: bool = false  # reentry guard (per RESEARCH.md §4)
 var _last_regeneration_usec: int = 0  # diagnostic for probes and profiling
 var _applying_style_exports := false
 var _syncing_style_from_exports := false
+static var _icon_cache: Dictionary = {}
+static var _generated_texture_cache: Dictionary = {}
 
 func _init() -> void:
 	_regenerate_theme()
@@ -435,7 +437,6 @@ func _regenerate_theme() -> void:
 	# instead would similarly be silently ignored.
 	set_font("normal_font", "InfoText", body_font)
 	set_font("font", "PrimaryButton",   body_font)
-	set_font("font", "SecondaryButton", body_font)
 	set_font("font", "GhostButton",     body_font)
 	set_font("font", "DangerButton",    body_font)
 	set_font("font", "IconButton",      body_font)
@@ -503,7 +504,6 @@ func _regenerate_theme() -> void:
 	# default_font_size.
 	set_font_size("normal_font_size", "InfoText", tokens.body)
 	set_font_size("font_size", "PrimaryButton",   tokens.body)
-	set_font_size("font_size", "SecondaryButton", tokens.body)
 	set_font_size("font_size", "GhostButton",     tokens.body)
 	set_font_size("font_size", "DangerButton",    tokens.body)
 	set_font_size("font_size", "IconButton",      tokens.body)
@@ -1199,7 +1199,6 @@ func _resolve_style_personality() -> Dictionary:
 const TYPE_VARIATIONS: Dictionary = {
 	# Button family (TYPEVAR-01) plus editor flat-menu variation — 7
 	"PrimaryButton":   "Button",
-	"SecondaryButton": "Button",
 	"GhostButton":     "Button",
 	"DangerButton":    "Button",
 	"IconButton":      "Button",
@@ -4318,47 +4317,7 @@ const BINDING_TABLE: Dictionary = {
 			"h_separation": {"value": "tokens.tapPadding"},
 		},
 	},
-	# 39. SecondaryButton — alternate action, surface_panel bg, no strategy override.
-	# Uses shape.secondary_radius (per-direction secondary chrome family) and shape.primary_padding
-	# for parity with primary content metrics. Lifts at shape.raised_lifts.secondary (smaller
-	# than primary so the visual hierarchy is preserved when raised=true).
-	"SecondaryButton": {
-		"stylebox": {
-			"normal":        {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
-								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":         {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
-								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":       {"role": "button_pressed", "border_role": "button_border_pressed",
-								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"focus":         {"role": "focus_ring",
-								"radius": "shape.secondary_radius"},
-			"disabled":      {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover_pressed":{"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-		},
-		"color": {
-			"font_color":              {"role": "text_strong"},
-			"font_hover_color":        {"role": "text_strong"},
-			"font_pressed_color":      {"role": "text_strong"},
-			"font_focus_color":        {"role": "text_strong"},
-			"font_disabled_color":     {"role": "text_strong", "disabled": true},
-			"font_hover_pressed_color":{"role": "text_strong"},
-			"icon_normal_color":       {"role": "text_strong"},
-			"icon_hover_color":        {"role": "text_strong"},
-			"icon_pressed_color":      {"role": "text_strong"},
-			"icon_focus_color":        {"role": "text_strong"},
-			"icon_disabled_color":     {"role": "text_strong", "disabled": true},
-			"icon_hover_pressed_color":{"role": "text_strong"},
-		},
-		"constant": {
-			"h_separation": {"value": "tokens.tapPadding"},
-		},
-	},
-	# 40. GhostButton — outlined / transparent bg via shape.ghost_strategy.
+	# 39. GhostButton — outlined / transparent bg via shape.ghost_strategy.
 	# Surface_panel as the recipe `role` provides a non-null bg_color to start from; the ghost
 	# strategy overrides bg_color = TRANSPARENT and applies the per-direction outline
 	# (Pulse 2px accent / Slate 1px accent / Bubble 2px accent + radius 999 / Daybreak 1px
@@ -5386,31 +5345,51 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			return 0
 		return int(value_ref)
 	elif data_type == "icon":
-		if recipe.get("generated_icon", "") == "split_grabber":
+		var generated_icon_name: String = recipe.get("generated_icon", "")
+		if generated_icon_name == "split_grabber":
 			return _make_split_grabber_icon(recipe.get("orientation", "vertical") == "vertical", role_table, style_personality)
-		if recipe.get("generated_icon", "") == "slider_grabber":
+		if generated_icon_name == "slider_grabber":
 			return _make_slider_grabber_icon(bool(recipe.get("highlight", false)), role_table, style_personality)
-		if recipe.get("generated_icon", "") == "color_hue":
+		if generated_icon_name == "color_hue":
 			return _make_color_hue_texture()
-		if recipe.get("generated_icon", "") == "popup_selection_checkbox":
+		if generated_icon_name == "popup_selection_checkbox":
 			if use_runtime_popup_selection_icons:
 				return _make_popup_selection_checkbox_icon(bool(recipe.get("checked", false)), role_table)
-			return load("res://addons/neocade_theme/icons/%s.svg" % ["checkbox_checked" if bool(recipe.get("checked", false)) else "checkbox_unchecked"]) as Texture2D
-		if recipe.get("generated_icon", "") == "popup_selection_radio":
+			return _load_icon("checkbox_checked" if bool(recipe.get("checked", false)) else "checkbox_unchecked")
+		if generated_icon_name == "popup_selection_radio":
 			if use_runtime_popup_selection_icons:
 				return _make_popup_selection_radio_icon(bool(recipe.get("checked", false)), role_table)
-			return load("res://addons/neocade_theme/icons/%s.svg" % ["radio_checked" if bool(recipe.get("checked", false)) else "radio_unchecked"]) as Texture2D
+			return _load_icon("radio_checked" if bool(recipe.get("checked", false)) else "radio_unchecked")
 		var icon_name: String = recipe.get("icon", "")
 		if icon_name == "":
 			return null
 		if icon_name == "empty":
-			return ImageTexture.new()
-		var path: String = "res://addons/neocade_theme/icons/" + icon_name + ".svg"
-		var icon: Texture2D = load(path) as Texture2D
-		return icon
+			return _empty_icon()
+		return _load_icon(icon_name)
 	# Cross-AI Cycle 2 N1 fix: any unrecognized data_type (including the now-removed "font")
 	# falls through to null — caller skips silently per D-04 escape hatch.
 	return null
+
+
+static func _load_icon(icon_name: String) -> Texture2D:
+	var cached: Texture2D = _icon_cache.get(icon_name)
+	if cached != null:
+		return cached
+	var path := "res://addons/neocade_theme/icons/" + icon_name + ".svg"
+	var icon := load(path) as Texture2D
+	if icon != null:
+		_icon_cache[icon_name] = icon
+	return icon
+
+
+static func _empty_icon() -> Texture2D:
+	const CACHE_KEY := "__empty"
+	var cached: Texture2D = _generated_texture_cache.get(CACHE_KEY)
+	if cached != null:
+		return cached
+	var icon := ImageTexture.new()
+	_generated_texture_cache[CACHE_KEY] = icon
+	return icon
 
 
 func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, style_personality: Dictionary) -> Texture2D:
@@ -5425,6 +5404,10 @@ func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, 
 	var radius: float = float(clampi(shape_radius, 0, int(THICKNESS / 2)))
 	var grabber_color: Color = role_table.get("text_muted", Color.WHITE)
 	grabber_color = Color(grabber_color.r, grabber_color.g, grabber_color.b, grabber_color.a * 0.72)
+	var cache_key := "split:%s:%d:%s" % ["v" if vertical_indicator else "h", int(radius), grabber_color.to_html(true)]
+	var cached: Texture2D = _generated_texture_cache.get(cache_key)
+	if cached != null:
+		return cached
 
 	var image := Image.create(width, height, false, Image.FORMAT_RGBA8)
 	image.fill(Color(0, 0, 0, 0))
@@ -5440,7 +5423,9 @@ func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, 
 				coverage = clampf(1.0 - dist, 0.0, 1.0)
 			if coverage > 0.0:
 				image.set_pixel(x, y, Color(grabber_color.r, grabber_color.g, grabber_color.b, grabber_color.a * coverage))
-	return ImageTexture.create_from_image(image)
+	var texture := ImageTexture.create_from_image(image)
+	_generated_texture_cache[cache_key] = texture
+	return texture
 
 
 func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_personality: Dictionary) -> Texture2D:
@@ -5455,6 +5440,16 @@ func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_pe
 	knob_color = Color(knob_color.r, knob_color.g, knob_color.b, 0.92)
 	var ring_color: Color = role_table.get("role_primary", Color.WHITE)
 	ring_color = Color(ring_color.r, ring_color.g, ring_color.b, 0.95)
+	var cache_key := "slider:%s:%d:%d:%s:%s" % [
+		"highlight" if highlight else "normal",
+		int(outer_radius),
+		int(inner_radius),
+		knob_color.to_html(true),
+		ring_color.to_html(true),
+	]
+	var cached: Texture2D = _generated_texture_cache.get(cache_key)
+	if cached != null:
+		return cached
 	var image := Image.create(SIZE, SIZE, false, Image.FORMAT_RGBA8)
 	image.fill(Color(0, 0, 0, 0))
 	if highlight:
@@ -5462,19 +5457,27 @@ func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_pe
 		_fill_round_rect(image, Rect2i(4, 4, 8, 8), inner_radius, knob_color)
 	else:
 		_fill_round_rect(image, Rect2i(3, 3, 10, 10), inner_radius, knob_color)
-	return ImageTexture.create_from_image(image)
+	var texture := ImageTexture.create_from_image(image)
+	_generated_texture_cache[cache_key] = texture
+	return texture
 
 
 func _make_color_hue_texture() -> Texture2D:
 	const WIDTH := 800
 	const HEIGHT := 6
+	const CACHE_KEY := "color_hue"
+	var cached: Texture2D = _generated_texture_cache.get(CACHE_KEY)
+	if cached != null:
+		return cached
 	var image := Image.create(WIDTH, HEIGHT, false, Image.FORMAT_RGBA8)
 	for x in range(WIDTH):
 		var hue := float(x) / float(WIDTH - 1)
 		var color := Color.from_hsv(hue, 1.0, 1.0)
 		for y in range(HEIGHT):
 			image.set_pixel(x, y, color)
-	return ImageTexture.create_from_image(image)
+	var texture := ImageTexture.create_from_image(image)
+	_generated_texture_cache[CACHE_KEY] = texture
+	return texture
 
 
 func _popup_selection_fill(checked: bool, role_table: Dictionary) -> Color:
@@ -5483,30 +5486,40 @@ func _popup_selection_fill(checked: bool, role_table: Dictionary) -> Color:
 
 func _make_popup_selection_checkbox_icon(checked: bool, role_table: Dictionary) -> Texture2D:
 	var fill_color := _popup_selection_fill(checked, role_table)
+	var cache_key := "popup_checkbox:%s:%s" % ["checked" if checked else "unchecked", fill_color.to_html(true)]
+	var cached: Texture2D = _generated_texture_cache.get(cache_key)
+	if cached != null:
+		return cached
 	var check_path := ""
 	if checked:
 		check_path = "<path d=\"M9 16.5 L14 21.5 L23 11\" stroke=\"#000000\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>"
 	var svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\" fill=\"none\"><rect x=\"4\" y=\"4\" width=\"24\" height=\"24\" rx=\"3\" fill=\"%s\"/>%s</svg>" % [_color_to_svg_hex(fill_color), check_path]
-	return _make_svg_icon_texture(svg)
+	return _make_svg_icon_texture(svg, cache_key)
 
 
 func _make_popup_selection_radio_icon(checked: bool, role_table: Dictionary) -> Texture2D:
 	var fill_color := _popup_selection_fill(checked, role_table)
+	var cache_key := "popup_radio:%s:%s" % ["checked" if checked else "unchecked", fill_color.to_html(true)]
+	var cached: Texture2D = _generated_texture_cache.get(cache_key)
+	if cached != null:
+		return cached
 	var knob_circle := ""
 	if checked:
 		knob_circle = "<circle cx=\"16\" cy=\"16\" r=\"5\" fill=\"#000000\"/>"
 	var svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\" fill=\"none\"><circle cx=\"16\" cy=\"16\" r=\"12\" fill=\"%s\"/>%s</svg>" % [_color_to_svg_hex(fill_color), knob_circle]
-	return _make_svg_icon_texture(svg)
+	return _make_svg_icon_texture(svg, cache_key)
 
 
-func _make_svg_icon_texture(svg: String) -> Texture2D:
+func _make_svg_icon_texture(svg: String, cache_key: String) -> Texture2D:
 	var image := Image.new()
 	var error := image.load_svg_from_string(svg, 0.75)
 	if error != OK:
 		push_warning("NeoCadeTheme: failed to rasterize generated PopupMenu SVG icon.")
 		image = Image.create(24, 24, false, Image.FORMAT_RGBA8)
 		image.fill(Color(0, 0, 0, 0))
-	return ImageTexture.create_from_image(image)
+	var texture := ImageTexture.create_from_image(image)
+	_generated_texture_cache[cache_key] = texture
+	return texture
 
 
 func _color_to_svg_hex(color: Color) -> String:

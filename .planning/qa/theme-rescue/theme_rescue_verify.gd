@@ -1325,7 +1325,7 @@ func _expect_split_grabber_icon(theme: Theme, theme_type: StringName, slot_name:
 
 
 func _expect_button_surface_chrome(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:
-	for theme_type in [&"Button", &"SecondaryButton", &"OptionButton", &"MenuButton", &"ColorPickerButton", &"IconButton"]:
+	for theme_type in [&"Button", &"OptionButton", &"MenuButton", &"ColorPickerButton", &"IconButton"]:
 		var normal := theme.get_stylebox("normal", theme_type) as StyleBoxFlat
 		var hover := theme.get_stylebox("hover", theme_type) as StyleBoxFlat
 		var pressed := theme.get_stylebox("pressed", theme_type) as StyleBoxFlat
@@ -1394,7 +1394,7 @@ func _expect_colored_button_raised_chrome(theme: NeoCadeTheme, label: String, ex
 		if normal.shadow_size != 0 or normal.shadow_offset != Vector2.ZERO:
 			_fail("%s %s still uses StyleBoxFlat shadow" % [label, theme_type])
 		if normal.border_width_left < 1 or normal.border_width_top < 1 or normal.border_width_right < 1:
-			_fail("%s %s should use the same flat face edge model as SecondaryButton" % [label, theme_type])
+			_fail("%s %s should use the same flat face edge model as Button" % [label, theme_type])
 		if not expect_raised and _max_border_width(normal) > 1:
 			_fail("%s flat %s border too thick: %s/%s/%s/%s" % [
 				label,
