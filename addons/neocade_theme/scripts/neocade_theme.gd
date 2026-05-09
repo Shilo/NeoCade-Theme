@@ -5402,7 +5402,7 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			sb.bg_color = Color(layer_color.r, layer_color.g, layer_color.b, layer_alpha)
 		if sb_intensity > 0:
 			var keep_face_edge: bool = bool(recipe.get("raised_face_edge", false))
-			var reserve_height: bool = bool(recipe.get("reserve_raised_depth", keep_face_edge))
+			var reserve_height: bool = bool(recipe.get("reserve_raised_depth", true))
 			_apply_raised_depth_border(sb, offset_color, sb_intensity, keep_face_edge, reserve_height)
 		return sb
 	elif data_type == "color":
