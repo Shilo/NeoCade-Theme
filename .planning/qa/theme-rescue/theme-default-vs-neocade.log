@@ -1374,10 +1374,10 @@ INTENTIONAL_AUTHORED TreeSecondary.font.font default=Font(path=) neocade=Font(pa
 INTENTIONAL_AUTHORED TreeSecondary.font.title_button_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_header_small.tres)
 INTENTIONAL_AUTHORED TreeSecondary.font_size.font_size default=16 neocade=14
 INTENTIONAL_AUTHORED TreeSecondary.font_size.title_button_font_size default=16 neocade=14
-INTENTIONAL_AUTHORED TreeTable.stylebox.button_hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED TreeTable.stylebox.button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED TreeTable.stylebox.custom_button_hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED TreeTable.stylebox.custom_button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TreeTable.stylebox.button_hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/0/1/0 border_color=#3b415a00 radius=0/0/0/0 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TreeTable.stylebox.button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/0/1/0 border_color=#484e6400 radius=0/0/0/0 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TreeTable.stylebox.custom_button_hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/0/1/0 border_color=#3b415a00 radius=0/0/0/0 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TreeTable.stylebox.custom_button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/0/1/0 border_color=#484e6400 radius=0/0/0/0 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.stylebox.hovered default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.stylebox.hovered_dimmed default=<missing> neocade=StyleBoxFlat(bg=#3b415a8c border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.stylebox.hovered_selected default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -1387,6 +1387,13 @@ INTENTIONAL_AUTHORED TreeTable.stylebox.title_button_hover default=<missing> neo
 INTENTIONAL_AUTHORED TreeTable.stylebox.title_button_normal default=<missing> neocade=StyleBoxFlat(bg=#272c3eff border=0/0/0/0 border_color=#272c3eff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.stylebox.title_button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.color.title_button_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED TreeTable.constant.button_margin default=<missing> neocade=0
+INTENTIONAL_AUTHORED TreeTable.constant.h_separation default=<missing> neocade=0
+INTENTIONAL_AUTHORED TreeTable.constant.inner_item_margin_bottom default=<missing> neocade=4
+INTENTIONAL_AUTHORED TreeTable.constant.inner_item_margin_left default=<missing> neocade=12
+INTENTIONAL_AUTHORED TreeTable.constant.inner_item_margin_right default=<missing> neocade=12
+INTENTIONAL_AUTHORED TreeTable.constant.inner_item_margin_top default=<missing> neocade=4
+INTENTIONAL_AUTHORED TreeTable.constant.item_margin default=<missing> neocade=16
 INTENTIONAL_AUTHORED TreeTable.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED TreeTable.font.title_button_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_header_small.tres)
 INTENTIONAL_AUTHORED TreeTable.font_size.font_size default=16 neocade=14
@@ -2799,10 +2806,10 @@ INTENTIONAL_AUTHORED TreeSecondary.font.font default=Font(path=) neocade=Font(pa
 INTENTIONAL_AUTHORED TreeSecondary.font.title_button_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_header_small.tres)
 INTENTIONAL_AUTHORED TreeSecondary.font_size.font_size default=16 neocade=14
 INTENTIONAL_AUTHORED TreeSecondary.font_size.title_button_font_size default=16 neocade=14
-INTENTIONAL_AUTHORED TreeTable.stylebox.button_hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED TreeTable.stylebox.button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED TreeTable.stylebox.custom_button_hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED TreeTable.stylebox.custom_button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TreeTable.stylebox.button_hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/0/1/0 border_color=#3b415a00 radius=0/0/0/0 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TreeTable.stylebox.button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/0/1/0 border_color=#484e6400 radius=0/0/0/0 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TreeTable.stylebox.custom_button_hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/0/1/0 border_color=#3b415a00 radius=0/0/0/0 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TreeTable.stylebox.custom_button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/0/1/0 border_color=#484e6400 radius=0/0/0/0 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.stylebox.hovered default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.stylebox.hovered_dimmed default=<missing> neocade=StyleBoxFlat(bg=#3b415a8c border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.stylebox.hovered_selected default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2812,6 +2819,13 @@ INTENTIONAL_AUTHORED TreeTable.stylebox.title_button_hover default=<missing> neo
 INTENTIONAL_AUTHORED TreeTable.stylebox.title_button_normal default=<missing> neocade=StyleBoxFlat(bg=#272c3eff border=0/0/0/0 border_color=#272c3eff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.stylebox.title_button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.color.title_button_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED TreeTable.constant.button_margin default=<missing> neocade=0
+INTENTIONAL_AUTHORED TreeTable.constant.h_separation default=<missing> neocade=0
+INTENTIONAL_AUTHORED TreeTable.constant.inner_item_margin_bottom default=<missing> neocade=4
+INTENTIONAL_AUTHORED TreeTable.constant.inner_item_margin_left default=<missing> neocade=12
+INTENTIONAL_AUTHORED TreeTable.constant.inner_item_margin_right default=<missing> neocade=12
+INTENTIONAL_AUTHORED TreeTable.constant.inner_item_margin_top default=<missing> neocade=4
+INTENTIONAL_AUTHORED TreeTable.constant.item_margin default=<missing> neocade=16
 INTENTIONAL_AUTHORED TreeTable.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED TreeTable.font.title_button_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_header_small.tres)
 INTENTIONAL_AUTHORED TreeTable.font_size.font_size default=16 neocade=14
@@ -4179,10 +4193,10 @@ INTENTIONAL_AUTHORED TreeSecondary.stylebox.title_button_normal default=<missing
 INTENTIONAL_AUTHORED TreeSecondary.stylebox.title_button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeSecondary.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED TreeSecondary.font.title_button_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_header_small.tres)
-INTENTIONAL_AUTHORED TreeTable.stylebox.button_hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED TreeTable.stylebox.button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED TreeTable.stylebox.custom_button_hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED TreeTable.stylebox.custom_button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TreeTable.stylebox.button_hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/0/1/0 border_color=#3b415a00 radius=0/0/0/0 margin=6.0/0.0/6.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TreeTable.stylebox.button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/0/1/0 border_color=#484e6400 radius=0/0/0/0 margin=6.0/0.0/6.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TreeTable.stylebox.custom_button_hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/0/1/0 border_color=#3b415a00 radius=0/0/0/0 margin=6.0/0.0/6.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED TreeTable.stylebox.custom_button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/0/1/0 border_color=#484e6400 radius=0/0/0/0 margin=6.0/0.0/6.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.stylebox.hovered default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.stylebox.hovered_dimmed default=<missing> neocade=StyleBoxFlat(bg=#3b415a8c border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.stylebox.hovered_selected default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -4192,6 +4206,13 @@ INTENTIONAL_AUTHORED TreeTable.stylebox.title_button_hover default=<missing> neo
 INTENTIONAL_AUTHORED TreeTable.stylebox.title_button_normal default=<missing> neocade=StyleBoxFlat(bg=#272c3eff border=0/0/0/0 border_color=#272c3eff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.stylebox.title_button_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED TreeTable.color.title_button_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED TreeTable.constant.button_margin default=<missing> neocade=0
+INTENTIONAL_AUTHORED TreeTable.constant.h_separation default=<missing> neocade=0
+INTENTIONAL_AUTHORED TreeTable.constant.inner_item_margin_bottom default=<missing> neocade=4
+INTENTIONAL_AUTHORED TreeTable.constant.inner_item_margin_left default=<missing> neocade=12
+INTENTIONAL_AUTHORED TreeTable.constant.inner_item_margin_right default=<missing> neocade=12
+INTENTIONAL_AUTHORED TreeTable.constant.inner_item_margin_top default=<missing> neocade=4
+INTENTIONAL_AUTHORED TreeTable.constant.item_margin default=<missing> neocade=16
 INTENTIONAL_AUTHORED TreeTable.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED TreeTable.font.title_button_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_header_small.tres)
 INTENTIONAL_AUTHORED VBoxContainer.constant.separation default=4 neocade=2
@@ -4234,7 +4255,7 @@ INTENTIONAL_AUTHORED WindowContentPanel.stylebox.panel default=<missing> neocade
 Summary:
 - SAME=281
 - FALLS_BACK=0
-- INTENTIONAL_AUTHORED=3871
+- INTENTIONAL_AUTHORED=3892
 - UNINTENTIONAL_EXTRA=0
 - UNINTENTIONAL_STYLE=0
 - NEOCADE_ONLY=0

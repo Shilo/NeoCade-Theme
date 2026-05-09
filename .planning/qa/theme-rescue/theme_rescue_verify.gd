@@ -716,6 +716,18 @@ func _expect_editor_integration_chrome(theme: Theme, label: String) -> void:
 		if theme.get_type_variation_base(entry["variation"]) != entry["base"]:
 			_fail("%s %s should inherit %s" % [label, entry["variation"], entry["base"]])
 
+	# ActionMapEditor packs Revert/Add/Remove into a compact TreeTable action column.
+	# Match Godot's compact TreeTable button metric: button_margin stays zero, while the
+	# TreeTable button styleboxes reserve transparent left/right space around each icon.
+	_expect_equal(theme.get_constant(&"button_margin", &"TreeTable"), 0, "%s TreeTable.button_margin" % label)
+	_expect_equal(theme.get_constant(&"h_separation", &"TreeTable"), 0, "%s TreeTable.h_separation" % label)
+	_expect_equal(theme.get_constant(&"item_margin", &"TreeTable"), 16, "%s TreeTable.item_margin" % label)
+	var table_button := theme.get_stylebox(&"button_pressed", &"TreeTable")
+	if table_button == null:
+		_fail("%s TreeTable.button_pressed missing" % label)
+	elif table_button.get_minimum_size().x < 8.0:
+		_fail("%s TreeTable.button_pressed horizontal padding too small: %s" % [label, table_button.get_minimum_size()])
+
 	var accent := theme.get_color(&"drop_position_color", &"Tree")
 	for entry in [
 		{"type": &"CheckBox", "slot": &"checkbox_checked_color"},

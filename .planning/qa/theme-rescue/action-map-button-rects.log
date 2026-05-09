@@ -1,0 +1,16 @@
+TreeTable.button_margin=0
+TreeTable.h_separation=0
+TreeTable.icon_h_separation=0
+TreeTable.button_pressed.min_size=(8.0, 0.0)
+TreeTable.button_pressed.margins=4.0,0.0,4.0,0.0
+EditorIcons.ReloadSmall.size=(16.0, 16.0)
+EditorIcons.Add.size=(16.0, 16.0)
+EditorIcons.Remove.size=(16.0, 16.0)
+item.col2=[P: (232.0, 0.0), S: (126.0, 2.0)]
+button.0.rect=[P: (286.0, 0.0), S: (24.0, 2.0)]
+button.1.rect=[P: (310.0, 0.0), S: (24.0, 2.0)]
+button.1.left_gap=0.0
+button.1.visual_icon_gap=8.0
+button.2.rect=[P: (334.0, 0.0), S: (24.0, 2.0)]
+button.2.left_gap=0.0
+button.2.visual_icon_gap=8.0
