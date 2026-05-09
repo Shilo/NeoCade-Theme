@@ -426,9 +426,12 @@ func _regenerate_theme() -> void:
 	# keeps rows dense/readable; title buttons get a header-weight Inter variation.
 	set_font("font", "Tree",              body_font)
 	set_font("title_button_font", "Tree", header_small_font)
+	set_font("font", "TreeSecondary",              body_font)
+	set_font("title_button_font", "TreeSecondary", header_small_font)
 	# ItemList exposes one official font slot. Keep it explicit because BINDING_TABLE
 	# intentionally has no font branch.
 	set_font("font", "ItemList", body_font)
+	set_font("font", "ItemListSecondary", body_font)
 	# FoldableContainer likewise exposes a single official title/body font slot.
 	set_font("font", "FoldableContainer", body_font)
 	# Tabs expose explicit font slots outside the BINDING_TABLE schema.
@@ -440,7 +443,10 @@ func _regenerate_theme() -> void:
 	# ── Set per-variation font sizes (DESIGN_TOKENS §8.5 + tokens) ──
 	set_font_size("font_size", "HeaderLarge",  tokens.h1)
 	set_font_size("font_size", "HeaderMedium", tokens.h2)
-	set_font_size("font_size", "HeaderSmall",  tokens.h2)
+	# Godot editor uses HeaderSmall for compact add_margin_child() section labels
+	# such as CreateDialog's Favorites/Search/Description rows. Keep it at body
+	# scale like the built-in editor theme; HeaderMedium/Large carry display scale.
+	set_font_size("font_size", "HeaderSmall",  tokens.body)
 	set_font_size("font_size", "Caption",      tokens.label_)
 	set_font_size("font_size", "CodeLabel",    tokens.label_)
 	# Kicker (D-09): tokens.kicker is 12 desktop / 13 mobile per DESIGN_TOKENS §10.1.
@@ -466,6 +472,9 @@ func _regenerate_theme() -> void:
 	set_font_size("font_size", "IconButton",      tokens.body)
 	set_font_size("font_size", "FlatButton",      tokens.body)
 	set_font_size("font_size", "FlatMenuButton",  tokens.body)
+	set_font_size("font_size", "TreeSecondary", tokens.body)
+	set_font_size("title_button_font_size", "TreeSecondary", tokens.body)
+	set_font_size("font_size", "ItemListSecondary", tokens.body)
 
 	# ── Build role lookup table from derivation locals (Plan 04-04) ──
 	var role_table: Dictionary = {
@@ -1069,6 +1078,13 @@ const TYPE_VARIATIONS: Dictionary = {
 	"CardPanel": "PanelContainer",
 	"HeroPanel": "PanelContainer",
 	"WindowContentPanel": "PanelContainer",
+	# Editor-specific list/help variations used by CreateDialog, FileSystemDock, and docs popups.
+	"TreeSecondary": "Tree",
+	"ItemListSecondary": "ItemList",
+	"EditorHelpBitTitle": "RichTextLabel",
+	"EditorHelpBitContent": "RichTextLabel",
+	"EditorHelpBitTooltipTitle": "EditorHelpBitTitle",
+	"EditorHelpBitTooltipContent": "EditorHelpBitContent",
 	# Editor dock scroll-body wrappers used after toolbar stacks.
 	"NoBorderHorizontal":       "MarginContainer",
 	"NoBorderHorizontalBottom": "NoBorderHorizontal",
@@ -1482,11 +1498,34 @@ const BINDING_TABLE: Dictionary = {
 			"TripleBar":                  {"icon": "editor_triple_bar_24"},
 		},
 	},
+	# EditorHelp / EditorHelpBit rich text colors used inside CreateDialog descriptions.
+	"EditorHelp": {
+		"color": {
+			"text_color":      {"role": "text_default"},
+			"comment_color":   {"role": "text_muted"},
+			"symbol_color":    {"role": "text_muted"},
+			"value_color":     {"role": "text_muted"},
+			"qualifier_color": {"role": "text_default"},
+			"type_color":      {"role": "role_primary"},
+			"title_color":     {"role": "role_primary"},
+			"selection_color": {"role": "accent_offset"},
+			"link_color":      {"role": "role_primary"},
+			"code_color":      {"role": "role_primary"},
+		},
+		"constant": {
+			"line_separation":             {"value": 2},
+			"paragraph_separation":        {"value": 6},
+			"table_h_separation":          {"value": 12},
+			"table_v_separation":          {"value": 4},
+			"text_highlight_h_padding":    {"value": 1},
+			"text_highlight_v_padding":    {"value": 2},
+		},
+	},
 	# 1. AcceptDialog — explicit popup shell plus official button-container spacing.
 	"AcceptDialog": {
 		"stylebox": {
-			"panel": {"role": "button_normal", "border_role": "button_border",
-					  "offset_role": "button_normal_offset", "radius": "shape.secondary_radius",
+			"panel": {"role": "surface_base", "border_role": "surface_panel_edge",
+					  "offset_role": "surface_low_offset", "radius": "shape.secondary_radius",
 					  "raised_face_edge": true,
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
@@ -1730,14 +1769,24 @@ const BINDING_TABLE: Dictionary = {
 	# own slots in the local probe; runtime inheritance still reads this shell cleanly.
 	"ConfirmationDialog": {
 		"stylebox": {
-			"panel": {"role": "button_normal", "border_role": "button_border",
-					  "offset_role": "button_normal_offset", "radius": "shape.secondary_radius",
+			"panel": {"role": "surface_base", "border_role": "surface_panel_edge",
+					  "offset_role": "surface_low_offset", "radius": "shape.secondary_radius",
 					  "raised_face_edge": true,
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
 		},
 		"constant": {
 			"buttons_separation": {"value": "tokens.tapPadding"},
+		},
+	},
+	# 8a. PopupDialog — Godot editor themes style this alongside AcceptDialog.
+	"PopupDialog": {
+		"stylebox": {
+			"panel": {"role": "surface_base", "border_role": "surface_panel_edge",
+					  "offset_role": "surface_low_offset", "radius": "shape.secondary_radius",
+					  "raised_face_edge": true,
+					  "raised_intensity": "shape.raised_lifts.dialog",
+					  "padding": Vector2i(12, 10)},
 		},
 	},
 	# 9. FileDialog — official Godot 4.6.2 colors, thumbnail metric, and icon surface.
@@ -2031,6 +2080,12 @@ const BINDING_TABLE: Dictionary = {
 			"scroll_hint": {"icon": "tree_scroll_hint"},
 		},
 	},
+	"ItemListSecondary": {
+		"stylebox": {
+			"panel": {"role": "surface_low", "border_role": "surface_low_edge",
+					  "raised_intensity": 0},
+		},
+	},
 	# 16. Label — color only; labels must not own a background or border.
 	"Label": {
 		"color": {
@@ -2269,6 +2324,36 @@ const BINDING_TABLE: Dictionary = {
 			"default_color":    {"role": "text_default"},
 			"selection_color":  {"role": "accent_offset"},
 			"font_selected_color": {"role": "text_on_accent_offset"},
+		},
+	},
+	"EditorHelpBitTitle": {
+		"stylebox": {
+			"normal": {"role": "surface_low", "border_role": "surface_low_edge",
+					   "raised_intensity": 0, "border_width": 0,
+					   "radius": "shape.secondary_radius", "corner_profile": "top_only",
+					   "padding": Vector2i(8, 4)},
+		},
+	},
+	"EditorHelpBitContent": {
+		"stylebox": {
+			"normal": {"role": "surface_low", "border_role": "surface_low_edge",
+					   "raised_intensity": 0, "border_width": 0,
+					   "radius": "shape.secondary_radius", "corner_profile": "bottom_only",
+					   "padding": Vector2i(8, 4)},
+		},
+	},
+	"EditorHelpBitTooltipTitle": {
+		"stylebox": {
+			"normal": {"role": "button_normal", "border_role": "button_border",
+					   "raised_intensity": 0, "border_width": 0,
+					   "radius": 0, "padding": Vector2i(8, 4)},
+		},
+	},
+	"EditorHelpBitTooltipContent": {
+		"stylebox": {
+			"normal": {"role": "button_normal", "border_role": "button_border",
+					   "raised_intensity": 0, "border_width": 0,
+					   "radius": 0, "padding": Vector2i(8, 4)},
 		},
 	},
 	# 27. SpinBox — inherits LineEdit; Phase 4 ships button separation constants;
@@ -2586,6 +2671,18 @@ const BINDING_TABLE: Dictionary = {
 			"unchecked":                 {"icon": "checkbox_unchecked"},
 			"unchecked_disabled":        {"icon": "checkbox_unchecked"},
 			"updown":                    {"icon": "tree_updown"},
+		},
+	},
+	"TreeSecondary": {
+		"stylebox": {
+			"panel":               {"role": "surface_low", "border_role": "surface_low",
+									"raised_intensity": 0, "border_width": 0},
+			"title_button_normal": {"role": "surface_panel", "border_role": "surface_panel",
+									"raised_intensity": 0, "border_width": 0},
+			"title_button_hover":  {"role": "button_hover", "border_role": "button_hover",
+									"raised_intensity": 0, "border_width": 0},
+			"title_button_pressed":{"role": "button_pressed", "border_role": "button_pressed",
+									"raised_intensity": 0, "border_width": 0},
 		},
 	},
 	# 34. VScrollBar — mirror of HScrollBar with vertical directional icons.
@@ -3279,6 +3376,20 @@ func _set_tab_connected_radius(sb: StyleBoxFlat, r: int) -> void:
 	sb.corner_radius_bottom_right = 0
 
 
+func _set_top_only_radius(sb: StyleBoxFlat, r: int) -> void:
+	sb.corner_radius_top_left = r
+	sb.corner_radius_top_right = r
+	sb.corner_radius_bottom_left = 0
+	sb.corner_radius_bottom_right = 0
+
+
+func _set_bottom_only_radius(sb: StyleBoxFlat, r: int) -> void:
+	sb.corner_radius_top_left = 0
+	sb.corner_radius_top_right = 0
+	sb.corner_radius_bottom_left = r
+	sb.corner_radius_bottom_right = r
+
+
 ## Sets StyleBoxFlat content_margin_* from a Vector2i where x=horizontal, y=vertical.
 ## Plan 05-02 Task 2 helper (D-03): `padding: shape.<key>` recipes call this so the
 ## Vector2i convention (x→left/right, y→top/bottom) is enforced in one place. Phase 4
@@ -3540,6 +3651,10 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			var focus_corner_profile: String = str(recipe.get("corner_profile", ""))
 			if focus_corner_profile == "tab_connected":
 				_set_tab_connected_radius(focus_sb, fr_radius)
+			elif focus_corner_profile == "top_only":
+				_set_top_only_radius(focus_sb, fr_radius)
+			elif focus_corner_profile == "bottom_only":
+				_set_bottom_only_radius(focus_sb, fr_radius)
 			else:
 				_set_radius_all(focus_sb, fr_radius)
 			# Per-direction focus_offset (DESIGN_TOKENS §8.2): Pulse=0, Burst=1, others=2.
@@ -3578,6 +3693,10 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		var corner_profile: String = str(recipe.get("corner_profile", ""))
 		if corner_profile == "tab_connected":
 			_set_tab_connected_radius(sb, resolved_radius)
+		elif corner_profile == "top_only":
+			_set_top_only_radius(sb, resolved_radius)
+		elif corner_profile == "bottom_only":
+			_set_bottom_only_radius(sb, resolved_radius)
 		var border_width: int = int(recipe.get("border_width", outline_width))
 		var border_role: String = recipe.get("border_role", "outline_color")
 		var border_color: Color = role_table.get(border_role, role_table.outline_color)

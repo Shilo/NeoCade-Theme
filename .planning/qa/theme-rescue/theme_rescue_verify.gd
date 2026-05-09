@@ -66,6 +66,7 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_tab_top_only_corners(theme, label)
 	_expect_tab_state_chrome(theme, label)
 	_expect_editor_compact_chrome(theme, label)
+	_expect_create_dialog_chrome(theme, label)
 	_expect_shared_interaction_chrome(theme, label)
 	_expect_tree_view_chrome(theme, label)
 	_expect_split_container_chrome(theme, label)
@@ -613,6 +614,73 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 			_fail("%s EditorIcons.%s should be at least 24px, got %s" % [label, icon_name, editor_icon_size])
 		if editor_icon_size.x > 28 or editor_icon_size.y > 28:
 			_fail("%s EditorIcons.%s should stay toolbar-sized, got %s" % [label, icon_name, editor_icon_size])
+
+
+func _expect_create_dialog_chrome(theme: Theme, label: String) -> void:
+	_expect_equal(theme.get_font_size("font_size", "HeaderSmall"), theme.default_font_size, "%s HeaderSmall.font_size" % label)
+	if theme.get_type_variation_base(&"TreeSecondary") != &"Tree":
+		_fail("%s TreeSecondary should inherit Tree for CreateDialog sidebars" % label)
+	if theme.get_type_variation_base(&"ItemListSecondary") != &"ItemList":
+		_fail("%s ItemListSecondary should inherit ItemList for CreateDialog recent list" % label)
+	if theme.get_type_variation_base(&"EditorHelpBitTitle") != &"RichTextLabel":
+		_fail("%s EditorHelpBitTitle should inherit RichTextLabel" % label)
+	if theme.get_type_variation_base(&"EditorHelpBitContent") != &"RichTextLabel":
+		_fail("%s EditorHelpBitContent should inherit RichTextLabel" % label)
+
+	var neocade := theme as NeoCadeTheme
+	for dialog_type in [&"AcceptDialog", &"ConfirmationDialog", &"PopupDialog"]:
+		var dialog_panel := theme.get_stylebox(&"panel", dialog_type) as StyleBoxFlat
+		if dialog_panel == null:
+			_fail("%s missing %s.panel for editor dialog shell" % [label, dialog_type])
+			continue
+		if neocade != null and not dialog_panel.bg_color.is_equal_approx(neocade.base_color):
+			_fail("%s %s.panel should use base color, not button fill: panel=%s base=%s" % [
+				label,
+				dialog_type,
+				dialog_panel.bg_color.to_html(false),
+				neocade.base_color.to_html(false),
+			])
+
+	var tree_panel := theme.get_stylebox(&"panel", &"Tree") as StyleBoxFlat
+	var tree_secondary_panel := theme.get_stylebox(&"panel", &"TreeSecondary") as StyleBoxFlat
+	if tree_panel == null or tree_secondary_panel == null:
+		_fail("%s missing Tree/TreeSecondary panel for CreateDialog tree comparison" % label)
+	elif not tree_secondary_panel.bg_color.is_equal_approx(tree_panel.bg_color):
+		_fail("%s TreeSecondary.panel should match Tree.panel bg: secondary=%s tree=%s" % [
+			label,
+			tree_secondary_panel.bg_color.to_html(false),
+			tree_panel.bg_color.to_html(false),
+		])
+
+	var item_panel := theme.get_stylebox(&"panel", &"ItemList") as StyleBoxFlat
+	var item_secondary_panel := theme.get_stylebox(&"panel", &"ItemListSecondary") as StyleBoxFlat
+	if item_panel == null or item_secondary_panel == null:
+		_fail("%s missing ItemList/ItemListSecondary panel for CreateDialog recent list comparison" % label)
+	elif not item_secondary_panel.bg_color.is_equal_approx(item_panel.bg_color):
+		_fail("%s ItemListSecondary.panel should match ItemList.panel bg: secondary=%s item=%s" % [
+			label,
+			item_secondary_panel.bg_color.to_html(false),
+			item_panel.bg_color.to_html(false),
+		])
+
+	for help_type in [&"EditorHelpBitTitle", &"EditorHelpBitContent"]:
+		var help_style := theme.get_stylebox(&"normal", help_type) as StyleBoxFlat
+		if help_style == null:
+			_fail("%s missing %s.normal for EditorHelpBit in CreateDialog" % [label, help_type])
+			continue
+		if help_style.bg_color.a < 0.99:
+			_fail("%s %s.normal should draw a concrete help-bit panel" % [label, help_type])
+		if _max_border_width(help_style) != 0:
+			_fail("%s %s.normal should not draw an outline border" % [label, help_type])
+		if help_style.content_margin_left < 6 or help_style.content_margin_top < 3:
+			_fail("%s %s.normal padding too small for readable help text: %s/%s/%s/%s" % [
+				label,
+				help_type,
+				help_style.content_margin_left,
+				help_style.content_margin_top,
+				help_style.content_margin_right,
+				help_style.content_margin_bottom,
+			])
 
 
 func _expect_shared_interaction_chrome(theme: Theme, label: String) -> void:
