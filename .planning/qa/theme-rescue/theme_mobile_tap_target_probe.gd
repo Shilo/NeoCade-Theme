@@ -35,6 +35,7 @@ func _run() -> void:
 		{"name": "SpinBox", "node": SpinBox.new(), "axis": "height"},
 		{"name": "HSlider", "node": HSlider.new(), "axis": "height"},
 		{"name": "VSlider", "node": VSlider.new(), "axis": "width"},
+		{"name": "FoldableContainer", "node": FoldableContainer.new(), "axis": "height", "title": "Section"},
 		{"name": "HScrollBar", "node": HScrollBar.new(), "axis": "compact_height"},
 		{"name": "VScrollBar", "node": VScrollBar.new(), "axis": "compact_width"},
 		{"name": "TabBar", "node": TabBar.new(), "axis": "height", "tab": true},
@@ -50,6 +51,8 @@ func _run() -> void:
 			(node as Window).theme = theme
 		if check.has("text"):
 			node.set("text", check["text"])
+		if check.has("title"):
+			node.set("title", check["title"])
 		if check.has("variation"):
 			(node as Control).theme_type_variation = check["variation"]
 		if check.has("custom_min"):
@@ -127,6 +130,14 @@ func _check_mobile_icon_sizes(theme: Theme) -> void:
 	_expect_icon_at_least(theme, &"CheckBox", &"radio_unchecked", Vector2(40, 40))
 	_expect_icon_at_least(theme, &"CheckButton", &"checked", Vector2(56, 29))
 	_expect_icon_at_least(theme, &"CheckButton", &"unchecked", Vector2(56, 29))
+	_expect_icon_at_least(theme, &"HSlider", &"grabber", Vector2(48, 48))
+	_expect_icon_at_least(theme, &"VSlider", &"grabber", Vector2(48, 48))
+	_expect_visible_icon_bbox_at_least(theme, &"HSlider", &"grabber", Vector2(20, 20))
+	_expect_visible_icon_bbox_at_least(theme, &"VSlider", &"grabber", Vector2(20, 20))
+	_expect_stylebox_axis_at_least(theme, &"HSlider", &"slider", "height", 8.0)
+	_expect_stylebox_axis_at_least(theme, &"VSlider", &"slider", "width", 8.0)
+	_expect_icon_at_least(theme, &"FoldableContainer", &"expanded_arrow", Vector2(24, 24))
+	_expect_icon_at_least(theme, &"FoldableContainer", &"folded_arrow", Vector2(24, 24))
 	_expect_icon_at_least(theme, &"LineEdit", &"clear", Vector2(24, 24))
 	_expect_icon_at_least(theme, &"TabBar", &"increment", Vector2(24, 24))
 	_expect_icon_at_least(theme, &"TabBar", &"decrement", Vector2(24, 24))
@@ -160,9 +171,15 @@ func _check_mobile_list_rows(theme: Theme) -> void:
 func _check_mobile_popup_icons(theme: Theme, label: String = "generated") -> void:
 	print("MOBILE_POPUP_MODE %s" % label)
 	_expect_icon_at_least(theme, &"PopupMenu", &"checked", Vector2(40, 40))
+	_expect_icon_at_least(theme, &"PopupMenu", &"checked_disabled", Vector2(40, 40))
 	_expect_icon_at_least(theme, &"PopupMenu", &"unchecked", Vector2(40, 40))
 	_expect_icon_at_least(theme, &"PopupMenu", &"radio_checked", Vector2(40, 40))
+	_expect_icon_at_least(theme, &"PopupMenu", &"radio_checked_disabled", Vector2(40, 40))
 	_expect_icon_at_least(theme, &"PopupMenu", &"radio_unchecked", Vector2(40, 40))
+	_expect_icon_at_least(theme, &"PopupMenu", &"search", Vector2(32, 32))
+	if label == "generated":
+		_expect_icons_visibly_different(theme, &"PopupMenu", &"checked", &"checked_disabled")
+		_expect_icons_visibly_different(theme, &"PopupMenu", &"radio_checked", &"radio_checked_disabled")
 	var icon_max_width := theme.get_constant(&"icon_max_width", &"PopupMenu")
 	print("MOBILE_POPUP icon_max_width=%d" % icon_max_width)
 	if icon_max_width < 40:
@@ -175,3 +192,53 @@ func _expect_icon_at_least(theme: Theme, theme_type: StringName, slot: StringNam
 	print("MOBILE_ICON %-18s %-20s size=%s min=%s" % [theme_type, slot, size, minimum])
 	if size.x < minimum.x or size.y < minimum.y:
 		_failures.append("%s.%s icon %s below %s" % [theme_type, slot, size, minimum])
+
+
+func _expect_visible_icon_bbox_at_least(theme: Theme, theme_type: StringName, slot: StringName, minimum: Vector2) -> void:
+	var image := theme.get_icon(slot, theme_type).get_image()
+	if image == null:
+		_failures.append("%s.%s image data unavailable for visible-size check" % [theme_type, slot])
+		return
+	var min_x := image.get_width()
+	var min_y := image.get_height()
+	var max_x := -1
+	var max_y := -1
+	for y in range(image.get_height()):
+		for x in range(image.get_width()):
+			if image.get_pixel(x, y).a > 0.05:
+				min_x = mini(min_x, x)
+				min_y = mini(min_y, y)
+				max_x = maxi(max_x, x)
+				max_y = maxi(max_y, y)
+	if max_x < min_x or max_y < min_y:
+		_failures.append("%s.%s has no visible alpha for mobile icon check" % [theme_type, slot])
+		return
+	var visible_size := Vector2(max_x - min_x + 1, max_y - min_y + 1)
+	print("MOBILE_ICON_VISIBLE %-18s %-20s visible=%s min=%s" % [theme_type, slot, visible_size, minimum])
+	if visible_size.x < minimum.x or visible_size.y < minimum.y:
+		_failures.append("%s.%s visible bbox %s below %s" % [theme_type, slot, visible_size, minimum])
+
+
+func _expect_stylebox_axis_at_least(theme: Theme, theme_type: StringName, slot: StringName, axis: String, minimum: float) -> void:
+	var stylebox := theme.get_stylebox(slot, theme_type)
+	var size := stylebox.get_minimum_size()
+	print("MOBILE_STYLEBOX %-18s %-20s min_size=%s" % [theme_type, slot, size])
+	if axis == "height" and size.y < minimum:
+		_failures.append("%s.%s height %.1f below %.1f" % [theme_type, slot, size.y, minimum])
+	elif axis == "width" and size.x < minimum:
+		_failures.append("%s.%s width %.1f below %.1f" % [theme_type, slot, size.x, minimum])
+
+
+func _expect_icons_visibly_different(theme: Theme, theme_type: StringName, first_slot: StringName, second_slot: StringName) -> void:
+	var first_image := theme.get_icon(first_slot, theme_type).get_image()
+	var second_image := theme.get_icon(second_slot, theme_type).get_image()
+	if first_image == null or second_image == null:
+		_failures.append("%s.%s/%s image data unavailable for disabled-state comparison" % [theme_type, first_slot, second_slot])
+		return
+	var sample := Vector2i(12, 12)
+	var first_color := first_image.get_pixel(sample.x, sample.y)
+	var second_color := second_image.get_pixel(sample.x, sample.y)
+	var distance := absf(first_color.r - second_color.r) + absf(first_color.g - second_color.g) + absf(first_color.b - second_color.b)
+	print("MOBILE_ICON_STATE %-18s %s/%s distance=%.3f" % [theme_type, first_slot, second_slot, distance])
+	if distance < 0.05:
+		_failures.append("%s.%s and %s should differ so disabled PopupMenu icons do not read active" % [theme_type, first_slot, second_slot])

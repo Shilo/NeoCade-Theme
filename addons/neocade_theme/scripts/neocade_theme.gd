@@ -1194,17 +1194,11 @@ func _resolve_style_personality() -> Dictionary:
 
 
 # ─── Type variation registry (DESIGN_TOKENS §8.5; PITFALLS 1.2 mandate explicit fonts) ──────
-## 19 NeoCade type variations registered via Theme.set_type_variation():
-##   - Phase 4 shipped 14 (Cross-AI Cycle 1 C4 fix included CodeLabel).
-##   - Plan 05-04 (D-09) adds Kicker as the 15th, closing DESIGN_TOKENS §8.6's
-##     explicit Phase 5 todo. Per PITFALLS 1.2, the Kicker entry below is paired
-##     with explicit set_font + set_font_size calls (variations don't inherit
-##     fonts from base type).
-##   - WindowContentPanel is a structural PanelContainer variation for embedded Window content.
-##   - FlatMenuButton is included because Godot editor toolbars use that type variation heavily.
-## Each entry: variation_name → base_type. Phases 5/6/7 author per-direction personality
-## styleboxes per variation in `.tres` Theme Editor overrides; Phase 4 only registers + sets
-## explicit fonts.
+## NeoCade type variations registered via Theme.set_type_variation().
+## Each entry maps `variation_name -> base_type`; entries backed by editor-only
+## controls are skipped at runtime by `EDITOR_ONLY_THEME_TYPES`.
+## Text-bearing variations still need explicit set_font/set_font_size calls because
+## Godot type variations do not inherit those slots from their base type.
 ##
 ## Letter-spacing / case-transform note (research finding, Plan 05-04 Test 5):
 ## official Godot 4.6 Label theme properties do NOT expose a Theme-level
@@ -1222,7 +1216,7 @@ const TYPE_VARIATIONS: Dictionary = {
 	"DangerButton":    "Button",
 	"IconButton":      "Button",
 	"FlatButton":      "Button",
-	"FlatMenuButton":  "Button",
+	"FlatMenuButton":  "MenuButton",
 	"FlatButtonNoIconTint": "FlatButton",
 	"FlatMenuButtonNoIconTint": "FlatMenuButton",
 	"CheckBoxNoIconTint": "CheckBox",
@@ -1270,7 +1264,7 @@ const TYPE_VARIATIONS: Dictionary = {
 	"PanelForeground": "Panel",
 	"PanelContainerTabbarInner": "PanelContainer",
 	"ScrollContainerSecondary": "ScrollContainer",
-	"EditorAudioBusEffectsTree": "PanelContainer",
+	"EditorAudioBusEffectsTree": "Tree",
 	"TreeLineEdit": "LineEdit",
 	# Editor dock scroll-body wrappers used after toolbar stacks.
 	"NoBorderHorizontal":       "MarginContainer",
@@ -1483,12 +1477,13 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 		"color": ["font_accelerator_color", "font_color", "font_disabled_color", "font_hover_color",
 				  "font_outline_color", "font_separator_color", "font_separator_outline_color"],
 		"constant": ["gutter_compact", "h_separation", "icon_max_width", "indent", "item_end_padding",
-					 "item_start_padding", "outline_size", "separator_outline_size", "v_separation"],
+					 "item_start_padding", "outline_size", "search_bar_separation",
+					 "separator_outline_size", "v_separation"],
 		"font": ["font", "font_separator"],
 		"font_size": ["font_separator_size", "font_size"],
 		"icon": ["checked", "checked_disabled", "radio_checked", "radio_checked_disabled",
 				 "radio_unchecked", "radio_unchecked_disabled", "submenu", "submenu_mirrored",
-				 "unchecked", "unchecked_disabled"],
+				 "search", "unchecked", "unchecked_disabled"],
 	},
 	"AcceptDialog": {
 		"stylebox": ["panel"],
@@ -2213,9 +2208,8 @@ const BINDING_TABLE: Dictionary = {
 		"icon": {
 			"checked":            {"icon": "checkbutton_checked", "mobile_svg_scale": 1.5},
 			"unchecked":          {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.5},
-			# Plan 05-03 Task 2 polish: REUSE existing SVGs for disabled
-			# variants per the Action item; *_mirrored variants stay deferred
-			# to v1.x per Phase 4 CHANGELOG.
+			# Reuse existing SVG masks for disabled/mirrored variants; colors are
+			# supplied through CheckButton's theme color slots.
 			"checked_disabled":   {"icon": "checkbutton_checked", "mobile_svg_scale": 1.5},
 			"unchecked_disabled": {"icon": "checkbutton_unchecked", "mobile_svg_scale": 1.5},
 			"checked_mirrored":            {"icon": "checkbutton_checked", "mobile_svg_scale": 1.5},
@@ -2253,6 +2247,9 @@ const BINDING_TABLE: Dictionary = {
 			"read_only": {"role": "button_disabled", "disabled": true,
 						  "radius": "shape.secondary_radius", "border_width": 0,
 						  "padding": Vector2i(10, 7)},
+			"completion": {"role": "code_background", "border_role": "surface_low_edge",
+						   "radius": "shape.secondary_radius", "raised_intensity": 0,
+						   "border_width": 1, "padding": Vector2i(0, 0)},
 		},
 		"color": {
 			"font_color":            {"role": "text_default"},
@@ -2286,6 +2283,13 @@ const BINDING_TABLE: Dictionary = {
 			# sidecar uses svg/scale=0.5 + mipmaps/generate=true + compress/mode=0
 			# + process/fix_alpha_border=true.
 			"folded": {"icon": "code_folded"},
+		},
+		"constant": {
+			"completion_lines":        {"value": 7},
+			"completion_max_width":    {"value": 50},
+			"completion_scroll_width": {"value": 6},
+			"line_spacing":            {"value": 4, "mobile_value": 6},
+			"outline_size":            {"value": 0},
 		},
 	},
 	# 6. ColorPicker — official Godot 4.6.2 focus chrome, desktop metrics, and icon surface.
@@ -2630,13 +2634,16 @@ const BINDING_TABLE: Dictionary = {
 	# 10. FoldableContainer — minimal Phase 4 baseline (Phase 6 polish completes)
 	"FoldableContainer": {
 		"stylebox": {
-			"panel":                       {"role": "surface_panel", "raised_intensity": 0},
-			"title_panel":                 {"role": "surface_high",  "raised_intensity": 0},
+			"panel":                       {"role": "surface_panel", "raised_intensity": 0,
+											 "mobile_padding": Vector2i(12, 12)},
+			"title_panel":                 {"role": "surface_high",  "raised_intensity": 0,
+											 "mobile_padding": Vector2i(12, 15)},
 			"title_hover_panel":           {"role": "button_hover",  "raised_intensity": 0,
-											 "border_width": 0},
-			"title_collapsed_panel":       {"role": "surface_panel", "raised_intensity": 0},
+											 "border_width": 0, "mobile_padding": Vector2i(12, 15)},
+			"title_collapsed_panel":       {"role": "surface_panel", "raised_intensity": 0,
+											 "mobile_padding": Vector2i(12, 15)},
 			"title_collapsed_hover_panel": {"role": "button_hover",  "raised_intensity": 0,
-											 "border_width": 0},
+											 "border_width": 0, "mobile_padding": Vector2i(12, 15)},
 			"focus":                       {"role": "focus_ring"},
 		},
 		"color": {
@@ -2646,17 +2653,17 @@ const BINDING_TABLE: Dictionary = {
 			"font_outline_color":   {"role": "outline_color"},
 		},
 		"constant": {
-			"h_separation": {"value": 6},
+			"h_separation": {"value": 6, "mobile_value": 12},
 			"outline_size": {"value": 0},
 		},
 		"font_size": {
 			"font_size": {"value": "tokens.body"},
 		},
 		"icon": {
-			"expanded_arrow":           {"icon": "disclosure_expanded"},
-			"expanded_arrow_mirrored":  {"icon": "disclosure_expanded_mirrored"},
-			"folded_arrow":             {"icon": "disclosure_collapsed"},
-			"folded_arrow_mirrored":    {"icon": "disclosure_collapsed_mirrored"},
+			"expanded_arrow":           {"icon": "disclosure_expanded", "mobile_svg_scale": 0.75},
+			"expanded_arrow_mirrored":  {"icon": "disclosure_expanded_mirrored", "mobile_svg_scale": 0.75},
+			"folded_arrow":             {"icon": "disclosure_collapsed", "mobile_svg_scale": 0.75},
+			"folded_arrow_mirrored":    {"icon": "disclosure_collapsed_mirrored", "mobile_svg_scale": 0.75},
 		},
 	},
 	# 11. GraphEdit — basic-v1 graph canvas, toolbar, connection, selection, and focus slots.
@@ -2901,9 +2908,12 @@ const BINDING_TABLE: Dictionary = {
 	# 13. HSlider — visible calm track plus official grabber/tick icons.
 	"HSlider": {
 		"stylebox": {
-			"slider":                  {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 2)},
-			"grabber_area":            {"role": "role_primary",  "raised_intensity": 0, "padding": Vector2i(0, 2)},
-			"grabber_area_highlight":  {"role": "accent_offset", "raised_intensity": 0, "padding": Vector2i(0, 2)},
+			"slider":                  {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 2),
+										 "mobile_padding": Vector2i(0, 4)},
+			"grabber_area":            {"role": "role_primary",  "raised_intensity": 0, "padding": Vector2i(0, 2),
+										 "mobile_padding": Vector2i(0, 4)},
+			"grabber_area_highlight":  {"role": "accent_offset", "raised_intensity": 0, "padding": Vector2i(0, 2),
+										 "mobile_padding": Vector2i(0, 4)},
 		},
 		"constant": {
 			"center_grabber": {"value": 1},
@@ -3244,20 +3254,22 @@ const BINDING_TABLE: Dictionary = {
 			"item_end_padding":       {"value": 8},
 			"item_start_padding":     {"value": 8},
 			"outline_size":           {"value": 0},
+			"search_bar_separation":  {"value": 4, "mobile_value": 29},
 			"separator_outline_size": {"value": 0},
 			"v_separation":           {"value": 4, "mobile_value": 29},
 		},
 		"icon": {
 			"checked":                  {"generated_icon": "popup_selection_checkbox", "checked": true, "mobile_svg_scale": 1.25},
-			"checked_disabled":         {"generated_icon": "popup_selection_checkbox", "checked": true, "mobile_svg_scale": 1.25},
+			"checked_disabled":         {"generated_icon": "popup_selection_checkbox", "checked": true, "disabled": true, "mobile_svg_scale": 1.25},
 			"unchecked":                {"generated_icon": "popup_selection_checkbox", "checked": false, "mobile_svg_scale": 1.25},
-			"unchecked_disabled":       {"generated_icon": "popup_selection_checkbox", "checked": false, "mobile_svg_scale": 1.25},
+			"unchecked_disabled":       {"generated_icon": "popup_selection_checkbox", "checked": false, "disabled": true, "mobile_svg_scale": 1.25},
 			"radio_checked":            {"generated_icon": "popup_selection_radio", "checked": true, "mobile_svg_scale": 1.25},
-			"radio_checked_disabled":   {"generated_icon": "popup_selection_radio", "checked": true, "mobile_svg_scale": 1.25},
+			"radio_checked_disabled":   {"generated_icon": "popup_selection_radio", "checked": true, "disabled": true, "mobile_svg_scale": 1.25},
 			"radio_unchecked":          {"generated_icon": "popup_selection_radio", "checked": false, "mobile_svg_scale": 1.25},
-			"radio_unchecked_disabled": {"generated_icon": "popup_selection_radio", "checked": false, "mobile_svg_scale": 1.25},
+			"radio_unchecked_disabled": {"generated_icon": "popup_selection_radio", "checked": false, "disabled": true, "mobile_svg_scale": 1.25},
 			"submenu":                  {"icon": "popup_submenu"},
 			"submenu_mirrored":         {"icon": "popup_submenu_mirrored"},
+			"search":                   {"generated_icon": "search", "mobile_svg_scale": 1.0},
 		},
 	},
 	# 24. PopupPanel — first-class popup Window-boundary shell.
@@ -3829,6 +3841,9 @@ const BINDING_TABLE: Dictionary = {
 			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
 					  "raised_intensity": 0, "border_width": 0},
 		},
+		"constant": {
+			"h_separation": {"value": 0},
+		},
 	},
 	"EditorDebuggerInspector": {
 		"stylebox": {
@@ -4166,9 +4181,12 @@ const BINDING_TABLE: Dictionary = {
 	# 35. VSlider — transposed mirror of HSlider.
 	"VSlider": {
 		"stylebox": {
-			"slider":                 {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(2, 0)},
-			"grabber_area":           {"role": "role_primary",  "raised_intensity": 0, "padding": Vector2i(2, 0)},
-			"grabber_area_highlight": {"role": "accent_offset", "raised_intensity": 0, "padding": Vector2i(2, 0)},
+			"slider":                 {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(2, 0),
+										"mobile_padding": Vector2i(4, 0)},
+			"grabber_area":           {"role": "role_primary",  "raised_intensity": 0, "padding": Vector2i(2, 0),
+										"mobile_padding": Vector2i(4, 0)},
+			"grabber_area_highlight": {"role": "accent_offset", "raised_intensity": 0, "padding": Vector2i(2, 0),
+										"mobile_padding": Vector2i(4, 0)},
 		},
 		"constant": {
 			"center_grabber": {"value": 1},
@@ -5441,19 +5459,34 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			return _make_slider_grabber_icon(bool(recipe.get("highlight", false)), role_table, style_personality, tokens)
 		if generated_icon_name == "color_hue":
 			return _make_color_hue_texture()
+		if generated_icon_name == "search":
+			var search_scale := 0.75
+			if tokens.get("densityScale", 1.0) > 1.0 and recipe.has("mobile_svg_scale"):
+				search_scale = float(recipe.get("mobile_svg_scale", 0.75))
+			return _make_search_icon(search_scale)
 		if generated_icon_name == "popup_selection_checkbox":
 			var checkbox_popup_scale := 0.0
 			if tokens.get("densityScale", 1.0) > 1.0 and recipe.has("mobile_svg_scale"):
 				checkbox_popup_scale = float(recipe.get("mobile_svg_scale", 0.0))
 			if use_runtime_popup_selection_icons:
-				return _make_popup_selection_checkbox_icon(bool(recipe.get("checked", false)), role_table, 0.75 if checkbox_popup_scale <= 0.0 else checkbox_popup_scale)
+				return _make_popup_selection_checkbox_icon(
+					bool(recipe.get("checked", false)),
+					bool(recipe.get("disabled", false)),
+					role_table,
+					0.75 if checkbox_popup_scale <= 0.0 else checkbox_popup_scale
+				)
 			return _load_icon("checkbox_checked" if bool(recipe.get("checked", false)) else "checkbox_unchecked", checkbox_popup_scale)
 		if generated_icon_name == "popup_selection_radio":
 			var radio_popup_scale := 0.0
 			if tokens.get("densityScale", 1.0) > 1.0 and recipe.has("mobile_svg_scale"):
 				radio_popup_scale = float(recipe.get("mobile_svg_scale", 0.0))
 			if use_runtime_popup_selection_icons:
-				return _make_popup_selection_radio_icon(bool(recipe.get("checked", false)), role_table, 0.75 if radio_popup_scale <= 0.0 else radio_popup_scale)
+				return _make_popup_selection_radio_icon(
+					bool(recipe.get("checked", false)),
+					bool(recipe.get("disabled", false)),
+					role_table,
+					0.75 if radio_popup_scale <= 0.0 else radio_popup_scale
+				)
 			return _load_icon("radio_checked" if bool(recipe.get("checked", false)) else "radio_unchecked", radio_popup_scale)
 		var icon_name: String = recipe.get("icon", "")
 		if icon_name == "":
@@ -5537,23 +5570,27 @@ func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, 
 
 
 func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_personality: Dictionary, tokens: Dictionary) -> Texture2D:
-	var size := 48 if tokens.get("densityScale", 1.0) > 1.0 else 16
+	var mobile: bool = tokens.get("densityScale", 1.0) > 1.0
+	var size := 48 if mobile else 16
 	var shape_radius: int = corner_radius
 	var radius_lookup: Variant = _lookup_shape(style_personality, "shape.secondary_radius")
 	if radius_lookup != null and (typeof(radius_lookup) == TYPE_INT or typeof(radius_lookup) == TYPE_FLOAT):
 		shape_radius = int(radius_lookup)
-	var outer_radius := float(clampi(shape_radius, 0, 5))
-	var inner_radius := float(clampi(shape_radius, 0, 3))
-	var knob_size := 10
+	var outer_radius := float(clampi(shape_radius, 0, 8 if mobile else 5))
+	var inner_radius := float(clampi(shape_radius, 0, 6 if mobile else 3))
+	var knob_size := 20 if mobile else 10
+	var ring_size := 30 if mobile else 14
 	var knob_origin := int((size - knob_size) / 2)
-	var ring_origin := int((size - 14) / 2)
+	var ring_origin := int((size - ring_size) / 2)
 	var knob_color: Color = role_table.get("text_muted", Color.WHITE)
 	knob_color = Color(knob_color.r, knob_color.g, knob_color.b, 0.92)
 	var ring_color: Color = role_table.get("role_primary", Color.WHITE)
 	ring_color = Color(ring_color.r, ring_color.g, ring_color.b, 0.95)
-	var cache_key := "slider:%s:%d:%d:%d:%s:%s" % [
+	var cache_key := "slider:%s:%d:%d:%d:%d:%d:%s:%s" % [
 		"highlight" if highlight else "normal",
 		size,
+		knob_size,
+		ring_size,
 		int(outer_radius),
 		int(inner_radius),
 		knob_color.to_html(true),
@@ -5565,7 +5602,7 @@ func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_pe
 	var image := Image.create(size, size, false, Image.FORMAT_RGBA8)
 	image.fill(Color(0, 0, 0, 0))
 	if highlight:
-		_fill_round_rect(image, Rect2i(ring_origin, ring_origin, 14, 14), outer_radius, ring_color)
+		_fill_round_rect(image, Rect2i(ring_origin, ring_origin, ring_size, ring_size), outer_radius, ring_color)
 		_fill_round_rect(image, Rect2i(knob_origin, knob_origin, knob_size, knob_size), inner_radius, knob_color)
 	else:
 		_fill_round_rect(image, Rect2i(knob_origin, knob_origin, knob_size, knob_size), inner_radius, knob_color)
@@ -5592,13 +5629,25 @@ func _make_color_hue_texture() -> Texture2D:
 	return texture
 
 
-func _popup_selection_fill(checked: bool, role_table: Dictionary) -> Color:
-	return role_table.get("role_primary", Color.WHITE) if checked else role_table.get("selection_control_off", Color(0.70, 0.74, 0.86))
+func _make_search_icon(svg_scale: float = 0.75) -> Texture2D:
+	var cache_key := "search:%.3f" % svg_scale
+	var cached: Texture2D = _active_generated_texture_cache.get(cache_key)
+	if cached != null:
+		return cached
+	var svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\" fill=\"none\"><circle cx=\"14\" cy=\"14\" r=\"7\" stroke=\"#FFFFFF\" stroke-width=\"3\"/><path d=\"M19.5 19.5 L26 26\" stroke=\"#FFFFFF\" stroke-width=\"3\" stroke-linecap=\"round\"/></svg>"
+	return _make_svg_icon_texture(svg, cache_key, svg_scale)
 
 
-func _make_popup_selection_checkbox_icon(checked: bool, role_table: Dictionary, svg_scale: float = 0.75) -> Texture2D:
-	var fill_color := _popup_selection_fill(checked, role_table)
-	var cache_key := "popup_checkbox:%s:%s:%.3f" % ["checked" if checked else "unchecked", fill_color.to_html(true), svg_scale]
+func _popup_selection_fill(checked: bool, disabled: bool, role_table: Dictionary) -> Color:
+	var fill: Color = role_table.get("role_primary", Color.WHITE) if checked else role_table.get("selection_control_off", Color(0.70, 0.74, 0.86))
+	if disabled:
+		fill = _mix(fill, role_table.get("surface_base", Color.BLACK), 0.58)
+	return fill
+
+
+func _make_popup_selection_checkbox_icon(checked: bool, disabled: bool, role_table: Dictionary, svg_scale: float = 0.75) -> Texture2D:
+	var fill_color := _popup_selection_fill(checked, disabled, role_table)
+	var cache_key := "popup_checkbox:%s:%s:%s:%.3f" % ["checked" if checked else "unchecked", "disabled" if disabled else "enabled", fill_color.to_html(true), svg_scale]
 	var cached: Texture2D = _active_generated_texture_cache.get(cache_key)
 	if cached != null:
 		return cached
@@ -5609,9 +5658,9 @@ func _make_popup_selection_checkbox_icon(checked: bool, role_table: Dictionary, 
 	return _make_svg_icon_texture(svg, cache_key, svg_scale)
 
 
-func _make_popup_selection_radio_icon(checked: bool, role_table: Dictionary, svg_scale: float = 0.75) -> Texture2D:
-	var fill_color := _popup_selection_fill(checked, role_table)
-	var cache_key := "popup_radio:%s:%s:%.3f" % ["checked" if checked else "unchecked", fill_color.to_html(true), svg_scale]
+func _make_popup_selection_radio_icon(checked: bool, disabled: bool, role_table: Dictionary, svg_scale: float = 0.75) -> Texture2D:
+	var fill_color := _popup_selection_fill(checked, disabled, role_table)
+	var cache_key := "popup_radio:%s:%s:%s:%.3f" % ["checked" if checked else "unchecked", "disabled" if disabled else "enabled", fill_color.to_html(true), svg_scale]
 	var cached: Texture2D = _active_generated_texture_cache.get(cache_key)
 	if cached != null:
 		return cached
@@ -5626,7 +5675,7 @@ func _make_svg_icon_texture(svg: String, cache_key: String, svg_scale: float = 0
 	var image := Image.new()
 	var error := image.load_svg_from_string(svg, svg_scale)
 	if error != OK:
-		push_warning("NeoCadeTheme: failed to rasterize generated PopupMenu SVG icon.")
+		push_warning("NeoCadeTheme: failed to rasterize generated SVG icon.")
 		image = Image.create(24, 24, false, Image.FORMAT_RGBA8)
 		image.fill(Color(0, 0, 0, 0))
 	var texture := ImageTexture.create_from_image(image)
