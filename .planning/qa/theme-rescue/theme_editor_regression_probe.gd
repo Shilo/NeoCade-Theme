@@ -38,6 +38,7 @@ func _run() -> void:
 		_expect_top_bar_controls(theme, label)
 		_expect_editor_flat_button_spacing(theme, label)
 		_expect_popup_menu_spacing_and_separators(theme, label)
+		_expect_editor_rich_text_uses_code_surface(theme, label)
 
 	_finish()
 
@@ -228,6 +229,22 @@ func _expect_popup_menu_spacing_and_separators(theme: Theme, label: String) -> v
 			_fail("%s %s.%s vertical flag mismatch" % [label, entry["type"], entry["slot"]])
 		if line.thickness < 1 or line.color.a <= 0.01:
 			_fail("%s %s.%s should draw a visible 1px divider" % [label, entry["type"], entry["slot"]])
+
+
+func _expect_editor_rich_text_uses_code_surface(theme: Theme, label: String) -> void:
+	var rich_text := theme.get_stylebox(&"normal", &"RichTextLabel") as StyleBoxFlat
+	var code_view := theme.get_stylebox(&"normal", &"CodeEdit") as StyleBoxFlat
+	if rich_text == null or code_view == null:
+		_fail("%s RichTextLabel.normal / CodeEdit.normal missing StyleBoxFlat" % label)
+		return
+	if _color_distance(rich_text.bg_color, code_view.bg_color) > 0.01:
+		_fail("%s editor RichTextLabel.normal should use the CodeEdit/code-view surface, got %s vs %s" % [
+			label,
+			rich_text.bg_color.to_html(true),
+			code_view.bg_color.to_html(true),
+		])
+	if rich_text.border_width_left != 0 or rich_text.border_width_top != 0 or rich_text.border_width_right != 0 or rich_text.border_width_bottom != 0:
+		_fail("%s editor RichTextLabel.normal should stay borderless" % label)
 
 
 func _expect_selection_control_colors(theme: Theme, label: String) -> void:

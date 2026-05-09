@@ -706,18 +706,17 @@ func _apply_editor_theme_runtime_settings(role_table: Dictionary) -> void:
 	set_color("children_hl_line_color", "Tree", Color(line_base.r, line_base.g, line_base.b, relationship_opacity))
 	set_color("parent_hl_line_color", "Tree", Color(line_base.r, line_base.g, line_base.b, minf(1.0, relationship_opacity * 2.0)))
 
-	if Engine.is_editor_hint():
-		# Godot's editor log/help panes are plain RichTextLabels, but built-in editor
-		# themes give RichTextLabel a panel. Keep runtime RichTextLabel text-only by
-		# applying this only while the resource is used as the editor theme.
-		var editor_rich_text_panel := StyleBoxFlat.new()
-		editor_rich_text_panel.bg_color = role_table.get("surface_low", Color.TRANSPARENT)
-		editor_rich_text_panel.border_color = role_table.get("surface_low_edge", Color.TRANSPARENT)
-		editor_rich_text_panel.set_border_width_all(0)
-		editor_rich_text_panel.set_corner_radius_all(maxi(0, int(round(corner_radius * 0.5))))
-		editor_rich_text_panel.set_content_margin_all(8)
-		set_stylebox("normal", "RichTextLabel", editor_rich_text_panel)
-		set_stylebox("focus", "RichTextLabel", StyleBoxEmpty.new())
+	# Godot's editor log/help panes are plain RichTextLabels, but built-in editor
+	# themes give RichTextLabel a panel. Keep runtime RichTextLabel text-only by
+	# applying this only while the resource is used as the editor theme.
+	var editor_rich_text_panel := StyleBoxFlat.new()
+	editor_rich_text_panel.bg_color = role_table.get("code_background", Color.TRANSPARENT)
+	editor_rich_text_panel.border_color = role_table.get("code_background", Color.TRANSPARENT)
+	editor_rich_text_panel.set_border_width_all(0)
+	editor_rich_text_panel.set_corner_radius_all(maxi(0, int(round(corner_radius * 0.5))))
+	editor_rich_text_panel.set_content_margin_all(8)
+	set_stylebox("normal", "RichTextLabel", editor_rich_text_panel)
+	set_stylebox("focus", "RichTextLabel", StyleBoxEmpty.new())
 
 
 func _apply_separator_styleboxes(role_table: Dictionary) -> void:

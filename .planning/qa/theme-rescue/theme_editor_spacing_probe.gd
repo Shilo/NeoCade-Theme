@@ -132,6 +132,8 @@ func _expect_spacing_source_guard() -> void:
 		_fail("PopupMenu should stay dense; do not add panel padding for normal menu lists")
 	if not source.contains("if not Engine.is_editor_hint():\n\t\treturn"):
 		_fail("editor runtime settings must stay guarded by Engine.is_editor_hint()")
+	if not source.contains("editor_rich_text_panel.bg_color = role_table.get(\"code_background\", Color.TRANSPARENT)"):
+		_fail("editor-only RichTextLabel panel should use the CodeEdit/code_background surface")
 
 
 func _fail(message: String) -> void:
