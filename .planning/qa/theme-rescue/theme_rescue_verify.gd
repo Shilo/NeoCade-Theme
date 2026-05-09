@@ -59,7 +59,10 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_window_chrome(theme, label)
 	_expect_popup_chrome(theme, label)
 	_expect_no_label_chrome(theme, label)
+	_expect_no_rich_text_label_chrome(theme, label)
 	_expect_tab_top_only_corners(theme, label)
+	_expect_tab_state_chrome(theme, label)
+	_expect_shared_interaction_chrome(theme, label)
 	_expect_button_surface_chrome(theme, label, expect_raised)
 	_expect_colored_button_raised_chrome(theme, label, expect_raised)
 	_expect_ghost_button_raised_chrome(theme, label, expect_raised)
@@ -154,6 +157,24 @@ func _expect_no_label_chrome(theme: Theme, label: String) -> void:
 		_fail("%s Label.normal stylebox should not be authored" % label)
 
 
+func _expect_no_rich_text_label_chrome(theme: Theme, label: String) -> void:
+	for slot_name in [&"normal", &"focus"]:
+		var stylebox := theme.get_stylebox(slot_name, "RichTextLabel") as StyleBoxFlat
+		if stylebox == null:
+			_fail("%s RichTextLabel.%s transparent stylebox should be authored to block default fallback" % [label, slot_name])
+			continue
+		if stylebox.bg_color.a != 0.0 or _max_border_width(stylebox) != 0:
+			_fail("%s RichTextLabel.%s should draw no background/border: alpha=%.2f border=%s/%s/%s/%s" % [
+				label,
+				slot_name,
+				stylebox.bg_color.a,
+				stylebox.border_width_left,
+				stylebox.border_width_top,
+				stylebox.border_width_right,
+				stylebox.border_width_bottom,
+			])
+
+
 func _expect_tab_top_only_corners(theme: Theme, label: String) -> void:
 	for theme_type in [&"TabBar", &"TabContainer"]:
 		for slot_name in [&"tab_selected", &"tab_unselected", &"tab_hovered", &"tab_disabled", &"tab_focus"]:
@@ -170,6 +191,52 @@ func _expect_tab_top_only_corners(theme: Theme, label: String) -> void:
 					stylebox.corner_radius_bottom_left,
 					stylebox.corner_radius_bottom_right,
 				])
+
+
+func _expect_tab_state_chrome(theme: Theme, label: String) -> void:
+	for theme_type in [&"TabBar", &"TabContainer"]:
+		var unselected := theme.get_stylebox("tab_unselected", theme_type) as StyleBoxFlat
+		var hovered := theme.get_stylebox("tab_hovered", theme_type) as StyleBoxFlat
+		var selected := theme.get_stylebox("tab_selected", theme_type) as StyleBoxFlat
+		var disabled := theme.get_stylebox("tab_disabled", theme_type) as StyleBoxFlat
+		if unselected == null or hovered == null or selected == null or disabled == null:
+			_fail("%s missing tab state styleboxes for %s" % [label, theme_type])
+			continue
+		_expect_state_step_visibility(unselected, hovered, selected, label, "%s.tab" % theme_type, 1.10, 1.05)
+		if _max_border_width(disabled) != 0:
+			_fail("%s %s.tab_disabled should not keep an outline border" % [label, theme_type])
+
+
+func _expect_shared_interaction_chrome(theme: Theme, label: String) -> void:
+	var button_hover := theme.get_stylebox("hover", "Button") as StyleBoxFlat
+	var button_pressed := theme.get_stylebox("pressed", "Button") as StyleBoxFlat
+	if button_hover == null or button_pressed == null:
+		_fail("%s missing Button hover/pressed for shared interaction check" % label)
+		return
+	for entry in [
+		{"type": &"PopupMenu", "slot": &"hover", "state": button_hover},
+		{"type": &"ItemList", "slot": &"hovered", "state": button_hover},
+		{"type": &"MenuBar", "slot": &"hover", "state": button_hover},
+		{"type": &"MenuBar", "slot": &"pressed", "state": button_pressed},
+		{"type": &"Tree", "slot": &"hovered", "state": button_hover},
+		{"type": &"Tree", "slot": &"button_hover", "state": button_hover},
+		{"type": &"Tree", "slot": &"button_pressed", "state": button_pressed},
+		{"type": &"Tree", "slot": &"custom_button_hover", "state": button_hover},
+		{"type": &"Tree", "slot": &"custom_button_pressed", "state": button_pressed},
+	]:
+		var stylebox := theme.get_stylebox(entry["slot"], entry["type"]) as StyleBoxFlat
+		if stylebox == null:
+			_fail("%s missing shared interaction stylebox %s.%s" % [label, entry["type"], entry["slot"]])
+			continue
+		var expected := entry["state"] as StyleBoxFlat
+		if not stylebox.bg_color.is_equal_approx(expected.bg_color):
+			_fail("%s %s.%s interaction color drifted: expected=%s got=%s" % [
+				label,
+				entry["type"],
+				entry["slot"],
+				expected.bg_color.to_html(false),
+				stylebox.bg_color.to_html(false),
+			])
 
 
 func _expect_button_surface_chrome(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:
@@ -228,16 +295,33 @@ func _expect_button_surface_chrome(theme: NeoCadeTheme, label: String, expect_ra
 		else:
 			if hover_lum <= normal_lum or pressed_lum <= hover_lum:
 				_fail("%s %s button ramp does not brighten on hover/press for dark base" % [label, theme_type])
+		_expect_state_step_visibility(normal, hover, pressed, label, theme_type, 1.10, 1.08)
 
 
 func _expect_colored_button_raised_chrome(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:
 	for theme_type in [&"PrimaryButton", &"DangerButton"]:
 		var normal := theme.get_stylebox("normal", theme_type) as StyleBoxFlat
-		if normal == null:
+		var hover := theme.get_stylebox("hover", theme_type) as StyleBoxFlat
+		var pressed := theme.get_stylebox("pressed", theme_type) as StyleBoxFlat
+		if normal == null or hover == null or pressed == null:
 			_fail("%s missing colored button stylebox for %s" % [label, theme_type])
 			continue
 		if normal.shadow_size != 0 or normal.shadow_offset != Vector2.ZERO:
 			_fail("%s %s still uses StyleBoxFlat shadow" % [label, theme_type])
+		if normal.border_width_left < 1 or normal.border_width_top < 1 or normal.border_width_right < 1:
+			_fail("%s %s should use the same flat face edge model as SecondaryButton" % [label, theme_type])
+		if not expect_raised and _max_border_width(normal) > 1:
+			_fail("%s flat %s border too thick: %s/%s/%s/%s" % [
+				label,
+				theme_type,
+				normal.border_width_left,
+				normal.border_width_top,
+				normal.border_width_right,
+				normal.border_width_bottom,
+			])
+		if normal.bg_color.is_equal_approx(hover.bg_color) or hover.bg_color.is_equal_approx(pressed.bg_color):
+			_fail("%s %s hover/pressed states do not produce a visible face-color ramp" % [label, theme_type])
+		_expect_state_step_visibility(normal, hover, pressed, label, theme_type, 1.10, 1.08)
 		if not expect_raised:
 			continue
 		if normal.border_width_bottom <= normal.border_width_top:
@@ -252,18 +336,31 @@ func _expect_colored_button_raised_chrome(theme: NeoCadeTheme, label: String, ex
 				normal.border_width_bottom,
 			])
 		var edge_contrast := _contrast_ratio(normal.bg_color, normal.border_color)
-		if edge_contrast < 1.30:
+		if edge_contrast < 1.06:
 			_fail("%s raised %s colored rim is too subtle: ratio=%.2f" % [label, theme_type, edge_contrast])
 		_expect_reserved_bottom_depth(normal, label, theme_type)
 
 
 func _expect_ghost_button_raised_chrome(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:
 	var normal := theme.get_stylebox("normal", "GhostButton") as StyleBoxFlat
-	if normal == null:
-		_fail("%s missing GhostButton.normal" % label)
+	var hover := theme.get_stylebox("hover", "GhostButton") as StyleBoxFlat
+	var pressed := theme.get_stylebox("pressed", "GhostButton") as StyleBoxFlat
+	if normal == null or hover == null or pressed == null:
+		_fail("%s missing GhostButton state styleboxes" % label)
 		return
 	if normal.shadow_size != 0 or normal.shadow_offset != Vector2.ZERO:
 		_fail("%s GhostButton still uses StyleBoxFlat shadow" % label)
+	if normal.bg_color.a > 0.01:
+		_fail("%s GhostButton.normal should stay transparent: alpha=%.2f" % [label, normal.bg_color.a])
+	if hover.bg_color.a <= normal.bg_color.a or pressed.bg_color.a < hover.bg_color.a:
+		_fail("%s GhostButton hover/pressed state layer alpha is not increasing: normal=%.2f hover=%.2f pressed=%.2f" % [
+			label,
+			normal.bg_color.a,
+			hover.bg_color.a,
+			pressed.bg_color.a,
+		])
+	if pressed.border_width_left < 1 or pressed.border_width_top < 1 or pressed.border_width_right < 1 or pressed.border_width_bottom < 1:
+		_fail("%s GhostButton.pressed lost its outline border" % label)
 	if not expect_raised:
 		return
 	if normal.border_width_bottom <= normal.border_width_top:
@@ -327,6 +424,23 @@ func _expect_reserved_bottom_depth(stylebox: StyleBoxFlat, label: String, theme_
 			border_extra,
 			margin_extra,
 		])
+
+
+func _expect_state_step_visibility(
+	normal: StyleBoxFlat,
+	hover: StyleBoxFlat,
+	pressed: StyleBoxFlat,
+	label: String,
+	theme_type: String,
+	min_hover_ratio: float,
+	min_pressed_ratio: float
+) -> void:
+	var hover_ratio := _contrast_ratio(normal.bg_color, hover.bg_color)
+	var pressed_ratio := _contrast_ratio(hover.bg_color, pressed.bg_color)
+	if hover_ratio < min_hover_ratio:
+		_fail("%s %s normal->hover delta is too subtle: ratio=%.2f" % [label, theme_type, hover_ratio])
+	if pressed_ratio < min_pressed_ratio:
+		_fail("%s %s hover->pressed delta is too subtle: ratio=%.2f" % [label, theme_type, pressed_ratio])
 
 
 func _expect_margin_max(theme: Theme, theme_type: StringName, slot_name: StringName, max_h: int, max_v: int, label: String) -> void:

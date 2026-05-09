@@ -79,14 +79,14 @@ popup/item_5/text = "None"
 popup/item_5/id = 5
 script = ExtResource("2_theme_option_button")
 
-[node name="RaisedCheckBox" type="CheckBox" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow"]
+[node name="RaisedCheckBox" type="CheckBox" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow" unique_id=407145837]
 custom_minimum_size = Vector2(116, 40)
 layout_mode = 2
 tooltip_text = "Raised mode"
 accessibility_name = "Raised mode"
 text = "Raised"
 
-[node name="PlatformOptionButton" type="OptionButton" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow"]
+[node name="PlatformOptionButton" type="OptionButton" parent="RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow" unique_id=38559936]
 custom_minimum_size = Vector2(150, 40)
 layout_mode = 2
 tooltip_text = "Platform sizing"
@@ -163,6 +163,25 @@ tooltip_text = "View prizes button"
 accessibility_name = "View prizes button"
 theme_type_variation = &"SecondaryButton"
 text = "View Prizes"
+
+[node name="ButtonPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonStack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ButtonPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ButtonPanel/ButtonStack"]
+layout_mode = 2
+theme_type_variation = &"Kicker"
+text = "Button"
+
+[node name="Control" type="Button" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/ButtonPanel/ButtonStack"]
+layout_mode = 2
+tooltip_text = "Default button"
+accessibility_name = "Default button"
+text = "Default Button"
 
 [node name="GhostPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid" unique_id=491555373]
 layout_mode = 2
@@ -1280,8 +1299,8 @@ accessibility_name = "Popup panel"
 [node name="PopupMargin" type="MarginContainer" parent="PopupPanel" unique_id=1756477724]
 offset_left = 12.0
 offset_top = 10.0
-offset_right = 180.0
-offset_bottom = 114.0
+offset_right = 88.0
+offset_bottom = 90.0
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
