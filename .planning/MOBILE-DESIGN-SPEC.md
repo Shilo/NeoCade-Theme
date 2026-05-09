@@ -57,12 +57,12 @@ Android density buckets are handled by Godot project scaling and stretch configu
 | CheckButton | interactive | Mobile toggle/text proxy reaches at least 48px. |
 | CodeEdit | interactive | Mobile input proxy uses 16px body text and input minimum. |
 | ColorPicker | interactive | Picker constants and cursor/bar proxies remain above 48px. |
-| ColorPickerButton | interactive | Button-family mobile sizing applies to the swatch button. |
+| ColorPickerButton | interactive | LIMITED: Godot exposes only `normal` stylebox + `bg` icon for this class; a theme-only 48px min-size would consume the swatch draw rect, so consuming scenes should give standalone swatch buttons a mobile custom minimum size when needed. |
 | ConfirmationDialog | display | Shell delegates tap targets to child Buttons. |
 | FileDialog | display | Thumbnail proxy grows from 96 to 128; shell buttons inherit Button formulas. |
 | FoldableContainer | interactive | Title row and arrow proxy pass the 48px floor. |
 | GraphEdit | interactive | Port hotzone proxy is checked against the 48px floor. |
-| HScrollBar | interactive | Grabber and increment/decrement proxies pass 48px. |
+| HScrollBar | interactive | Scrollbars are intentionally not inflated for mobile; mobile scroll affordances are expected to be visually smaller than tap buttons. |
 | HSlider | interactive | Grabber and grabber_area proxies pass 48px. |
 | HSplitContainer | interactive | Split handle proxy passes 48px. |
 | ItemList | interactive | Row proxy uses mobile font/separation metrics and passes 48px. |
@@ -84,7 +84,7 @@ Android density buckets are handled by Godot project scaling and stretch configu
 | TooltipLabel | display | Tooltip text is not a tap target. |
 | TooltipPanel | display | Tooltip shell is not a tap target. |
 | Tree | interactive | Row proxy uses mobile font/separation/icon metrics and passes 48px. |
-| VScrollBar | interactive | Grabber and increment/decrement proxies pass 48px. |
+| VScrollBar | interactive | Scrollbars are intentionally not inflated for mobile; mobile scroll affordances are expected to be visually smaller than tap buttons. |
 | VSlider | interactive | Grabber and grabber_area proxies pass 48px. |
 | VSplitContainer | interactive | Split handle proxy passes 48px. |
 | Window | display | Engine/window-managed titlebar hit rects remain outside Theme-side enforcement. |
@@ -93,7 +93,7 @@ Android density buckets are handled by Godot project scaling and stretch configu
 
 Evidence lives at `.planning/phases/08-mobile-variant-token-block-tap-target-audit-updated-for-dyna/logs/08-tap-target-audit.log`.
 
-The Phase 8 audit runs all five directions with `platform=MOBILE`, `raised=false`, and `raised=true`. Current result: 250 PASS, 10 LIMITED, 110 N/A, 0 FAIL. The mobile floor is 48px for every enforceable interactive row.
+The Phase 8 audit runs all five directions with `platform=MOBILE`, `raised=false`, and `raised=true`. Current result: 250 PASS, 10 LIMITED, 110 N/A, 0 FAIL. The mobile floor is 48px for every enforceable interactive row. Follow-up runtime probing in 2026-05-09 added `theme_mobile_tap_target_probe.gd`, which verifies actual `get_combined_minimum_size()` for common controls, button variations, and icon/flat buttons; ColorPickerButton remains a source-backed theme-only limitation, and scrollbars remain intentionally compact. Mobile metrics are 1920x1080 design-space units that the project scales to device resolution, not raw physical device pixels.
 
 ## Limitations
 

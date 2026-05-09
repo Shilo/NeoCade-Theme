@@ -87,6 +87,16 @@ func _check_texture_cache_modes() -> void:
 	if not theme._active_icon_cache.is_empty() or not theme._active_generated_texture_cache.is_empty():
 		_fail("disabling texture_cache should release active texture caches")
 
+	var cached_a := NeoCadeTheme.new()
+	var cached_b := NeoCadeTheme.new()
+	cached_a.texture_cache = true
+	var a_icons := cached_a._active_icon_cache.size()
+	var a_generated := cached_a._active_generated_texture_cache.size()
+	cached_b.texture_cache = true
+	cached_b.texture_cache = false
+	if cached_a._active_icon_cache.size() != a_icons or cached_a._active_generated_texture_cache.size() != a_generated:
+		_fail("texture_cache should be per-instance; toggling another theme must not clear the first theme's retained cache")
+
 
 func _theme_variant(source: NeoCadeTheme, style_value: int, raised: bool, platform: int) -> NeoCadeTheme:
 	var theme := source.duplicate(true) as NeoCadeTheme
@@ -412,6 +422,7 @@ func _expect_panel_surface_chrome(theme: Theme, label: String, expect_raised: bo
 
 func _expect_scrollbar_chrome(theme: Theme, label: String) -> void:
 	var expect_square := label.ends_with(":Pulse")
+	var min_thickness := 6 if label.begins_with("mobile:") else 8
 	for theme_type in [&"HScrollBar", &"VScrollBar"]:
 		for slot_name in [&"decrement", &"decrement_highlight", &"decrement_pressed", &"increment", &"increment_highlight", &"increment_pressed"]:
 			_expect_icon_max(theme, theme_type, slot_name, 1, label)
@@ -435,11 +446,11 @@ func _expect_scrollbar_chrome(theme: Theme, label: String) -> void:
 		var min_size := scroll.get_minimum_size()
 		var grabber_min_size := grabber.get_minimum_size()
 		if theme_type == &"HScrollBar":
-			if min_size.y < 8 or grabber_min_size.y < 8:
-				_fail("%s HScrollBar track/grabber too thin: track=%s grabber=%s" % [label, min_size, grabber_min_size])
+			if min_size.y < min_thickness or grabber_min_size.y < min_thickness:
+				_fail("%s HScrollBar track/grabber too thin: track=%s grabber=%s min=%d" % [label, min_size, grabber_min_size, min_thickness])
 		else:
-			if min_size.x < 8 or grabber_min_size.x < 8:
-				_fail("%s VScrollBar track/grabber too thin: track=%s grabber=%s" % [label, min_size, grabber_min_size])
+			if min_size.x < min_thickness or grabber_min_size.x < min_thickness:
+				_fail("%s VScrollBar track/grabber too thin: track=%s grabber=%s min=%d" % [label, min_size, grabber_min_size, min_thickness])
 		if _max_border_width(grabber) != 0 or _max_border_width(hover) != 0 or _max_border_width(pressed) != 0:
 			_fail("%s %s grabbers should be filled pills without outline borders" % [label, theme_type])
 		if grabber.bg_color.a < 0.20 or grabber.bg_color.a > 0.45:

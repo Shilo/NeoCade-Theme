@@ -161,8 +161,8 @@ var _applying_style_exports := false
 var _syncing_style_from_exports := false
 var _active_icon_cache: Dictionary = {}
 var _active_generated_texture_cache: Dictionary = {}
-static var _persistent_icon_cache: Dictionary = {}
-static var _persistent_generated_texture_cache: Dictionary = {}
+var _persistent_icon_cache: Dictionary = {}
+var _persistent_generated_texture_cache: Dictionary = {}
 
 func _init() -> void:
 	_regenerate_theme()
@@ -2065,34 +2065,44 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 			"normal_mirrored":{"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 			"hover_mirrored": {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},  # pressed sinks; never lifted
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},  # pressed sinks; never lifted
 			"pressed_mirrored":{"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 			"focus":          {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
 			"disabled":       {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},  # Cycle 2 C2: per-direction alpha
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},  # Cycle 2 C2: per-direction alpha
 			"disabled_mirrored":{"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 			"hover_pressed":  {"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 			"hover_pressed_mirrored":{"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -2116,26 +2126,26 @@ const BINDING_TABLE: Dictionary = {
 	"CheckBox": {
 		"stylebox": {
 			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"normal_mirrored":{"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"hover":          {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"hover_mirrored": {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"pressed":        {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"pressed_mirrored":{"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"focus":          {"role": "focus_ring"},
 			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"disabled_mirrored":{"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"hover_pressed_mirrored":{"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -2169,26 +2179,26 @@ const BINDING_TABLE: Dictionary = {
 	"CheckButton": {
 		"stylebox": {
 			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"normal_mirrored":{"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"hover":          {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"hover_mirrored": {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"pressed":        {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"pressed_mirrored":{"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"focus":          {"role": "focus_ring"},
 			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"disabled_mirrored":{"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 			"hover_pressed_mirrored":{"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -2857,18 +2867,23 @@ const BINDING_TABLE: Dictionary = {
 	"HScrollBar": {
 		"stylebox": {
 			"scroll":            {"role": "surface_low",   "raised_intensity": 0,
-								  "alpha": 0.0, "border_width": 0, "radius": 0, "padding": Vector2i(0, 4)},
+								  "alpha": 0.0, "border_width": 0, "radius": 0,
+								  "padding": Vector2i(0, 4), "mobile_padding": Vector2i(0, 3)},
 			"scroll_focus":      {"role": "surface_low",   "raised_intensity": 0,
-								  "alpha": 0.0, "border_width": 0, "radius": 0, "padding": Vector2i(0, 4)},
+								  "alpha": 0.0, "border_width": 0, "radius": 0,
+								  "padding": Vector2i(0, 4), "mobile_padding": Vector2i(0, 3)},
 			"grabber":           {"role": "text_muted", "raised_intensity": 0,
 								  "alpha": 0.32, "border_width": 0,
-								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+								  "radius": "shape.secondary_radius",
+								  "padding": Vector2i(4, 4), "mobile_padding": Vector2i(3, 3)},
 			"grabber_highlight": {"role": "text_strong", "raised_intensity": 0,
 								  "alpha": 0.50, "radius": "shape.secondary_radius",
-								  "padding": Vector2i(4, 4), "border_width": 0},
+								  "padding": Vector2i(4, 4), "mobile_padding": Vector2i(3, 3),
+								  "border_width": 0},
 			"grabber_pressed":   {"role": "text_strong", "raised_intensity": 0,
 								  "alpha": 0.50, "radius": "shape.secondary_radius",
-								  "padding": Vector2i(4, 4), "border_width": 0},
+								  "padding": Vector2i(4, 4), "mobile_padding": Vector2i(3, 3),
+								  "border_width": 0},
 		},
 		"constant": {
 			"padding_top":    {"value": 0},
@@ -3055,11 +3070,11 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":    {"role": "button_normal", "border_role": "button_border",
 						  "radius": "shape.secondary_radius", "raised_intensity": 0,
-						  "padding": Vector2i(10, 6)},
+						  "padding": Vector2i(10, 6), "mobile_padding": Vector2i(15, 14)},
 			"focus":     {"role": "focus_ring"},
 			"read_only": {"role": "button_disabled", "disabled": true,
 						  "radius": "shape.secondary_radius", "border_width": 0,
-						  "padding": Vector2i(10, 6)},
+						  "padding": Vector2i(10, 6), "mobile_padding": Vector2i(15, 14)},
 		},
 		"color": {
 			"font_color":            {"role": "text_default"},
@@ -3124,19 +3139,19 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
 			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
 			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
 			"focus":          {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
 			"disabled":       {"role": "button_disabled", "border_width": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
 			"hover_pressed":  {"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -3156,19 +3171,19 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 16)},
 			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 16)},
 			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 16)},
 			"focus":          {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
 			"disabled":       {"role": "button_disabled", "border_width": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 16)},
 			"hover_pressed":  {"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 16)},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -3228,7 +3243,7 @@ const BINDING_TABLE: Dictionary = {
 			"item_start_padding":     {"value": 8},
 			"outline_size":           {"value": 0},
 			"separator_outline_size": {"value": 0},
-			"v_separation":           {"value": 4},
+			"v_separation":           {"value": 4, "mobile_value": 29},
 		},
 		"icon": {
 			"checked":                  {"generated_icon": "popup_selection_checkbox", "checked": true},
@@ -3363,7 +3378,7 @@ const BINDING_TABLE: Dictionary = {
 		},
 		"constant": {
 			"buttons_vertical_separation": {"value": 2},
-			"buttons_width":                {"value": 16},
+			"buttons_width":                {"value": 16, "mobile_value": 24},
 			"field_and_buttons_separation":{"value": 4},
 		},
 		"icon": {
@@ -3384,26 +3399,26 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"button_highlight": {"role": "button_hover", "border_role": "button_border_hover",
 									"raised_intensity": 0, "border_width": 0,
-									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "mobile_padding": Vector2i(8, 14)},
 			"button_pressed":   {"role": "button_pressed", "border_role": "button_border_pressed",
 									"raised_intensity": 0, "border_width": 0,
-									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "mobile_padding": Vector2i(8, 14)},
 			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
-									"padding": Vector2i(12, 6)},
+									"padding": Vector2i(12, 6), "mobile_padding": Vector2i(18, 14)},
 			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
-									"padding": Vector2i(12, 5)},
+									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
 			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
-									"padding": Vector2i(12, 5)},
+									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
 			"tab_disabled":     {"role": "button_disabled", "disabled": true, "border_width": 0,
 									"raised_intensity": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
-									"padding": Vector2i(12, 5)},
+									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
 			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
 									"corner_profile": "tab_connected"},
 		},
@@ -3443,19 +3458,19 @@ const BINDING_TABLE: Dictionary = {
 			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
-									"padding": Vector2i(12, 6)},
+									"padding": Vector2i(12, 6), "mobile_padding": Vector2i(18, 14)},
 			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
-									"padding": Vector2i(12, 5)},
+									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
 			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
-									"padding": Vector2i(12, 5)},
+									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
 			"tab_disabled":     {"role": "button_disabled", "disabled": true, "border_width": 0,
 									"raised_intensity": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
-									"padding": Vector2i(12, 5)},
+									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
 			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
 									"corner_profile": "tab_connected"},
 			"panel":            {"role": "surface_panel", "border_role": "surface_panel_edge",
@@ -4114,18 +4129,23 @@ const BINDING_TABLE: Dictionary = {
 	"VScrollBar": {
 		"stylebox": {
 			"scroll":            {"role": "surface_low",   "raised_intensity": 0,
-								  "alpha": 0.0, "border_width": 0, "radius": 0, "padding": Vector2i(4, 0)},
+								  "alpha": 0.0, "border_width": 0, "radius": 0,
+								  "padding": Vector2i(4, 0), "mobile_padding": Vector2i(3, 0)},
 			"scroll_focus":      {"role": "surface_low",   "raised_intensity": 0,
-								  "alpha": 0.0, "border_width": 0, "radius": 0, "padding": Vector2i(4, 0)},
+								  "alpha": 0.0, "border_width": 0, "radius": 0,
+								  "padding": Vector2i(4, 0), "mobile_padding": Vector2i(3, 0)},
 			"grabber":           {"role": "text_muted", "raised_intensity": 0,
 								  "alpha": 0.32, "border_width": 0,
-								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+								  "radius": "shape.secondary_radius",
+								  "padding": Vector2i(4, 4), "mobile_padding": Vector2i(3, 3)},
 			"grabber_highlight": {"role": "text_strong", "raised_intensity": 0,
 								  "alpha": 0.50, "radius": "shape.secondary_radius",
-								  "padding": Vector2i(4, 4), "border_width": 0},
+								  "padding": Vector2i(4, 4), "mobile_padding": Vector2i(3, 3),
+								  "border_width": 0},
 			"grabber_pressed":   {"role": "text_strong", "raised_intensity": 0,
 								  "alpha": 0.50, "radius": "shape.secondary_radius",
-								  "padding": Vector2i(4, 4), "border_width": 0},
+								  "padding": Vector2i(4, 4), "mobile_padding": Vector2i(3, 3),
+								  "border_width": 0},
 		},
 		"constant": {
 			"padding_left":  {"value": 0},
@@ -4299,23 +4319,28 @@ const BINDING_TABLE: Dictionary = {
 			"normal":        {"role": "primary_button_normal", "border_role": "primary_button_border",
 								"raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"offset_role": "primary_button_offset", "raised_face_edge": true},
 			"hover":         {"role": "primary_button_hover", "border_role": "primary_button_border_hover",
 								"raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"offset_role": "primary_button_hover_offset", "raised_face_edge": true},
 			"pressed":       {"role": "primary_button_pressed", "border_role": "primary_button_border_pressed",
 								"raised_intensity": 0,
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"offset_role": "primary_button_pressed_offset"},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.primary_radius"},
 			"disabled":      {"role": "primary_button_disabled", "disabled": true, "raised_intensity": 0,
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"border_width": 0},
 			"hover_pressed":{"role": "primary_button_pressed", "border_role": "primary_button_border_pressed",
 								"raised_intensity": 0,
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"offset_role": "primary_button_pressed_offset"},
 		},
 		"color": {
@@ -4345,24 +4370,29 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"strategy": "shape.ghost_strategy",
 								"offset_role": "role_primary_offset", "raised_face_edge": true},
 			"hover":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"strategy": "shape.ghost_strategy", "state_layer_role": "role_primary",
 								"state_layer_alpha": 0.08,
 								"offset_role": "role_primary_offset", "raised_face_edge": true},
 			"pressed":       {"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"strategy": "shape.ghost_strategy", "state_layer_role": "role_primary",
 								"state_layer_alpha": 0.12},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
 			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"strategy": "shape.ghost_strategy"},
 			"hover_pressed":{"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"strategy": "shape.ghost_strategy", "state_layer_role": "role_primary",
 								"state_layer_alpha": 0.12},
 		},
@@ -4394,23 +4424,28 @@ const BINDING_TABLE: Dictionary = {
 			"normal":        {"role": "danger_button_normal", "border_role": "danger_button_border",
 								"raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"offset_role": "danger_button_offset", "raised_face_edge": true},
 			"hover":         {"role": "danger_button_hover", "border_role": "danger_button_border_hover",
 								"raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"offset_role": "danger_button_hover_offset", "raised_face_edge": true},
 			"pressed":       {"role": "danger_button_pressed", "border_role": "danger_button_border_pressed",
 								"raised_intensity": 0,
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"offset_role": "danger_button_pressed_offset"},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.primary_radius"},
 			"disabled":      {"role": "danger_button_disabled", "disabled": true, "raised_intensity": 0,
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"border_width": 0},
 			"hover_pressed":{"role": "danger_button_pressed", "border_role": "danger_button_border_pressed",
 								"raised_intensity": 0,
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14),
 								"offset_role": "danger_button_pressed_offset"},
 		},
 		"color": {
@@ -4441,19 +4476,24 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":        {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.ghost",
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8),
+								"mobile_padding": Vector2i(16, 16)},
 			"hover":         {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.ghost",
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8),
+								"mobile_padding": Vector2i(16, 16)},
 			"pressed":       {"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8),
+								"mobile_padding": Vector2i(16, 16)},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
 			"disabled":      {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8),
+								"mobile_padding": Vector2i(16, 16)},
 			"hover_pressed":{"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8),
+								"mobile_padding": Vector2i(16, 16)},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -4483,35 +4523,45 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"alpha": 0.0, "border_width": 0},
 			"normal_mirrored":{"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"alpha": 0.0, "border_width": 0},
 			"hover":         {"role": "button_hover", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"border_width": 0},
 			"hover_mirrored":{"role": "button_hover", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"border_width": 0},
 			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"border_width": 0},
 			"pressed_mirrored":{"role": "button_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"border_width": 0},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
 			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"alpha": 0.0, "border_width": 0},
 			"disabled_mirrored":{"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"alpha": 0.0, "border_width": 0},
 			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"border_width": 0},
 			"hover_pressed_mirrored":{"role": "button_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"border_width": 0},
 		},
 		"color": {
@@ -4539,36 +4589,47 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"alpha": 0.0, "border_width": 0},
 			"normal_mirrored":{"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"alpha": 0.0, "border_width": 0},
 			"hover":         {"role": "button_hover", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"border_width": 0},
 			"hover_mirrored":{"role": "button_hover", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"border_width": 0},
 			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"border_width": 0},
 			"pressed_mirrored":{"role": "button_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"border_width": 0},
 			"focus":         {"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"alpha": 0.0, "border_width": 0},
 			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"alpha": 0.0, "border_width": 0},
 			"disabled_mirrored":{"role": "surface_panel", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"alpha": 0.0, "border_width": 0},
 			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"border_width": 0},
 			"hover_pressed_mirrored":{"role": "button_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"mobile_padding": Vector2i(16, 16),
 								"border_width": 0},
 		},
 		"color": {
@@ -5260,8 +5321,12 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		# opt into content margins instead of inheriting giant global chrome.
 		var content_margins_raw: Variant = recipe.get("content_margins", null)
 		var padding_raw: Variant = recipe.get("padding", null)
+		var mobile_padding_raw: Variant = recipe.get("mobile_padding", null)
 		var applied_padding: bool = false
-		if content_margins_raw != null and typeof(content_margins_raw) == TYPE_VECTOR4I:
+		if tokens.get("densityScale", 1.0) > 1.0 and mobile_padding_raw != null and typeof(mobile_padding_raw) == TYPE_VECTOR2I:
+			_set_content_margin_from_padding(sb, mobile_padding_raw as Vector2i)
+			applied_padding = true
+		elif content_margins_raw != null and typeof(content_margins_raw) == TYPE_VECTOR4I:
 			var density: float = tokens.get("densityScale", 1.0)
 			var margins := content_margins_raw as Vector4i
 			_set_content_margins(sb, Vector4i(
@@ -5352,6 +5417,8 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		return c
 	elif data_type == "constant" or data_type == "font_size":
 		var value_ref = recipe.get("value", 0)
+		if tokens.get("densityScale", 1.0) > 1.0 and recipe.has("mobile_value"):
+			value_ref = recipe.get("mobile_value", value_ref)
 		if typeof(value_ref) == TYPE_STRING and (value_ref as String).begins_with("tokens."):
 			var key: String = (value_ref as String).substr(7)
 			return tokens.get(key, 0)
@@ -5368,7 +5435,7 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		if generated_icon_name == "split_grabber":
 			return _make_split_grabber_icon(recipe.get("orientation", "vertical") == "vertical", role_table, style_personality)
 		if generated_icon_name == "slider_grabber":
-			return _make_slider_grabber_icon(bool(recipe.get("highlight", false)), role_table, style_personality)
+			return _make_slider_grabber_icon(bool(recipe.get("highlight", false)), role_table, style_personality, tokens)
 		if generated_icon_name == "color_hue":
 			return _make_color_hue_texture()
 		if generated_icon_name == "popup_selection_checkbox":
@@ -5447,20 +5514,24 @@ func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, 
 	return texture
 
 
-func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_personality: Dictionary) -> Texture2D:
-	const SIZE := 16
+func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_personality: Dictionary, tokens: Dictionary) -> Texture2D:
+	var size := 48 if tokens.get("densityScale", 1.0) > 1.0 else 16
 	var shape_radius: int = corner_radius
 	var radius_lookup: Variant = _lookup_shape(style_personality, "shape.secondary_radius")
 	if radius_lookup != null and (typeof(radius_lookup) == TYPE_INT or typeof(radius_lookup) == TYPE_FLOAT):
 		shape_radius = int(radius_lookup)
 	var outer_radius := float(clampi(shape_radius, 0, 5))
 	var inner_radius := float(clampi(shape_radius, 0, 3))
+	var knob_size := 10
+	var knob_origin := int((size - knob_size) / 2)
+	var ring_origin := int((size - 14) / 2)
 	var knob_color: Color = role_table.get("text_muted", Color.WHITE)
 	knob_color = Color(knob_color.r, knob_color.g, knob_color.b, 0.92)
 	var ring_color: Color = role_table.get("role_primary", Color.WHITE)
 	ring_color = Color(ring_color.r, ring_color.g, ring_color.b, 0.95)
-	var cache_key := "slider:%s:%d:%d:%s:%s" % [
+	var cache_key := "slider:%s:%d:%d:%d:%s:%s" % [
 		"highlight" if highlight else "normal",
+		size,
 		int(outer_radius),
 		int(inner_radius),
 		knob_color.to_html(true),
@@ -5469,13 +5540,13 @@ func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_pe
 	var cached: Texture2D = _active_generated_texture_cache.get(cache_key)
 	if cached != null:
 		return cached
-	var image := Image.create(SIZE, SIZE, false, Image.FORMAT_RGBA8)
+	var image := Image.create(size, size, false, Image.FORMAT_RGBA8)
 	image.fill(Color(0, 0, 0, 0))
 	if highlight:
-		_fill_round_rect(image, Rect2i(1, 1, 14, 14), outer_radius, ring_color)
-		_fill_round_rect(image, Rect2i(4, 4, 8, 8), inner_radius, knob_color)
+		_fill_round_rect(image, Rect2i(ring_origin, ring_origin, 14, 14), outer_radius, ring_color)
+		_fill_round_rect(image, Rect2i(knob_origin, knob_origin, knob_size, knob_size), inner_radius, knob_color)
 	else:
-		_fill_round_rect(image, Rect2i(3, 3, 10, 10), inner_radius, knob_color)
+		_fill_round_rect(image, Rect2i(knob_origin, knob_origin, knob_size, knob_size), inner_radius, knob_color)
 	var texture := ImageTexture.create_from_image(image)
 	_active_generated_texture_cache[cache_key] = texture
 	return texture
