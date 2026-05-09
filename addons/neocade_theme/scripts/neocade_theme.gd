@@ -4767,24 +4767,39 @@ func _popup_selection_fill(checked: bool, role_table: Dictionary) -> Color:
 
 
 func _make_popup_selection_checkbox_icon(checked: bool, role_table: Dictionary) -> Texture2D:
-	const SIZE := 24
-	var image := Image.create(SIZE, SIZE, false, Image.FORMAT_RGBA8)
-	image.fill(Color(0, 0, 0, 0))
-	_fill_round_rect(image, Rect2i(3, 3, 18, 18), 3.0, _popup_selection_fill(checked, role_table))
+	var fill_color := _popup_selection_fill(checked, role_table)
+	var check_path := ""
 	if checked:
-		_stroke_line(image, Vector2(7.0, 12.2), Vector2(10.8, 16.0), 2.4, Color.BLACK)
-		_stroke_line(image, Vector2(10.8, 16.0), Vector2(17.4, 8.4), 2.4, Color.BLACK)
-	return ImageTexture.create_from_image(image)
+		check_path = "<path d=\"M9 16.5 L14 21.5 L23 11\" stroke=\"#000000\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>"
+	var svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\" fill=\"none\"><rect x=\"4\" y=\"4\" width=\"24\" height=\"24\" rx=\"3\" fill=\"%s\"/>%s</svg>" % [_color_to_svg_hex(fill_color), check_path]
+	return _make_svg_icon_texture(svg)
 
 
 func _make_popup_selection_radio_icon(checked: bool, role_table: Dictionary) -> Texture2D:
-	const SIZE := 24
-	var image := Image.create(SIZE, SIZE, false, Image.FORMAT_RGBA8)
-	image.fill(Color(0, 0, 0, 0))
-	_fill_circle(image, Vector2(12.0, 12.0), 9.0, _popup_selection_fill(checked, role_table))
+	var fill_color := _popup_selection_fill(checked, role_table)
+	var knob_circle := ""
 	if checked:
-		_fill_circle(image, Vector2(12.0, 12.0), 4.0, Color.BLACK)
+		knob_circle = "<circle cx=\"16\" cy=\"16\" r=\"5\" fill=\"#000000\"/>"
+	var svg := "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\" fill=\"none\"><circle cx=\"16\" cy=\"16\" r=\"12\" fill=\"%s\"/>%s</svg>" % [_color_to_svg_hex(fill_color), knob_circle]
+	return _make_svg_icon_texture(svg)
+
+
+func _make_svg_icon_texture(svg: String) -> Texture2D:
+	var image := Image.new()
+	var error := image.load_svg_from_string(svg, 0.75)
+	if error != OK:
+		push_warning("NeoCadeTheme: failed to rasterize generated PopupMenu SVG icon.")
+		image = Image.create(24, 24, false, Image.FORMAT_RGBA8)
+		image.fill(Color(0, 0, 0, 0))
 	return ImageTexture.create_from_image(image)
+
+
+func _color_to_svg_hex(color: Color) -> String:
+	return "#%02X%02X%02X" % [
+		int(roundf(clampf(color.r, 0.0, 1.0) * 255.0)),
+		int(roundf(clampf(color.g, 0.0, 1.0) * 255.0)),
+		int(roundf(clampf(color.b, 0.0, 1.0) * 255.0)),
+	]
 
 
 func _fill_round_rect(image: Image, rect: Rect2i, radius: float, color: Color) -> void:
@@ -4800,37 +4815,5 @@ func _fill_round_rect(image: Image, rect: Rect2i, radius: float, color: Color) -
 				var nearest_y := clampf(py, radius, max_y)
 				var dist := Vector2(px - nearest_x, py - nearest_y).length() - radius
 				coverage = clampf(1.0 - dist, 0.0, 1.0)
-			if coverage > 0.0:
-				image.set_pixel(x, y, Color(color.r, color.g, color.b, color.a * coverage))
-
-
-func _fill_circle(image: Image, center: Vector2, radius: float, color: Color) -> void:
-	var min_x := maxi(0, int(floor(center.x - radius - 1.0)))
-	var max_x := mini(image.get_width() - 1, int(ceil(center.x + radius + 1.0)))
-	var min_y := maxi(0, int(floor(center.y - radius - 1.0)))
-	var max_y := mini(image.get_height() - 1, int(ceil(center.y + radius + 1.0)))
-	for y in range(min_y, max_y + 1):
-		for x in range(min_x, max_x + 1):
-			var dist := (Vector2(float(x) + 0.5, float(y) + 0.5) - center).length()
-			var coverage := clampf(radius + 0.5 - dist, 0.0, 1.0)
-			if coverage > 0.0:
-				image.set_pixel(x, y, Color(color.r, color.g, color.b, color.a * coverage))
-
-
-func _stroke_line(image: Image, from: Vector2, to: Vector2, width: float, color: Color) -> void:
-	var min_x := maxi(0, int(floor(minf(from.x, to.x) - width)))
-	var max_x := mini(image.get_width() - 1, int(ceil(maxf(from.x, to.x) + width)))
-	var min_y := maxi(0, int(floor(minf(from.y, to.y) - width)))
-	var max_y := mini(image.get_height() - 1, int(ceil(maxf(from.y, to.y) + width)))
-	var segment := to - from
-	var length_squared := maxf(segment.length_squared(), 0.001)
-	var radius := width * 0.5
-	for y in range(min_y, max_y + 1):
-		for x in range(min_x, max_x + 1):
-			var p := Vector2(float(x) + 0.5, float(y) + 0.5)
-			var t := clampf((p - from).dot(segment) / length_squared, 0.0, 1.0)
-			var closest := from + segment * t
-			var dist := (p - closest).length()
-			var coverage := clampf(radius + 0.5 - dist, 0.0, 1.0)
 			if coverage > 0.0:
 				image.set_pixel(x, y, Color(color.r, color.g, color.b, color.a * coverage))
