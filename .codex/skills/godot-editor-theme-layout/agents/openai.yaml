@@ -1,0 +1,4 @@
+interface:
+  display_name: "Godot Editor Theme Layout"
+  short_description: "Fix NeoCade editor theme layout"
+  default_prompt: "Use $godot-editor-theme-layout to investigate and fix NeoCade theme layout in the Godot editor with source tracing and script verification."
