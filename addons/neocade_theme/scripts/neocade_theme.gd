@@ -246,6 +246,8 @@ func _regenerate_theme() -> void:
 	var surface_high: Color    = _mix(base_color, elevate_target, 0.13 * spread_factor)
 	var surface_overlay: Color = _mix(base_color, elevate_target, 0.20 * spread_factor)
 	var outline_color: Color   = _mix(base_color, elevate_target, 0.24 * spread_factor)
+	var code_background: Color = _mix(surface_low, Color.BLACK, 0.10)
+	var code_current_line: Color = _state_layer_color(code_background, elevate_target, 0.05)
 
 	# Button chrome follows Godot editor/minimal theme behavior: a filled tonal surface
 	# derived from the base color, with a same-family edge. This is intentionally
@@ -497,6 +499,8 @@ func _regenerate_theme() -> void:
 		"surface_panel":          surface_panel,
 		"surface_high":           surface_high,
 		"surface_overlay":        surface_overlay,
+		"code_background":        code_background,
+		"code_current_line":      code_current_line,
 		"outline_color":          outline_color,
 		"button_normal":          button_normal,
 		"button_hover":           button_hover,
@@ -657,6 +661,19 @@ func _apply_editor_theme_runtime_settings(role_table: Dictionary) -> void:
 	set_color("relationship_line_color", "Tree", Color(line_base.r, line_base.g, line_base.b, relationship_opacity))
 	set_color("children_hl_line_color", "Tree", Color(line_base.r, line_base.g, line_base.b, relationship_opacity))
 	set_color("parent_hl_line_color", "Tree", Color(line_base.r, line_base.g, line_base.b, minf(1.0, relationship_opacity * 2.0)))
+
+	if Engine.is_editor_hint():
+		# Godot's editor log/help panes are plain RichTextLabels, but built-in editor
+		# themes give RichTextLabel a panel. Keep runtime RichTextLabel text-only by
+		# applying this only while the resource is used as the editor theme.
+		var editor_rich_text_panel := StyleBoxFlat.new()
+		editor_rich_text_panel.bg_color = role_table.get("surface_low", Color.TRANSPARENT)
+		editor_rich_text_panel.border_color = role_table.get("surface_low_edge", Color.TRANSPARENT)
+		editor_rich_text_panel.set_border_width_all(0)
+		editor_rich_text_panel.set_corner_radius_all(maxi(0, int(round(corner_radius * 0.5))))
+		editor_rich_text_panel.set_content_margin_all(8)
+		set_stylebox("normal", "RichTextLabel", editor_rich_text_panel)
+		set_stylebox("focus", "RichTextLabel", StyleBoxEmpty.new())
 
 
 # ─── Color helpers (DESIGN_TOKENS §6.1) ─────────────────────────────────────────────────────
@@ -1362,6 +1379,10 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 		"font_size": ["font_size"],
 		"icon": ["bg"],
 	},
+	"ColorPresetButton": {
+		"stylebox": ["preset_fg", "preset_focus"],
+		"icon": ["preset_bg", "overbright_indicator"],
+	},
 	"GraphEdit": {
 		"stylebox": ["menu_panel", "panel", "panel_focus"],
 		"color": ["activity", "connection_hover_tint_color", "connection_rim_color",
@@ -1583,26 +1604,78 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"prop_subsection_stylebox": {
 				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
-				"raised_intensity": 0, "border_width": 0, "radius": "shape.secondary_radius",
-				"padding": Vector2i(4, 2)
+				"raised_intensity": 0, "border_width": 0,
+				"radius": "shape.secondary_radius", "padding": Vector2i(5, 2)
 			},
 			"prop_subsection_stylebox_left": {
 				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
-				"raised_intensity": 0, "border_width": 0, "radius": "shape.secondary_radius",
-				"padding": Vector2i(4, 2)
+				"raised_intensity": 0, "border_width": 0,
+				"radius": "shape.secondary_radius", "padding": Vector2i(5, 2)
 			},
 			"prop_subsection_stylebox_right": {
 				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
-				"raised_intensity": 0, "border_width": 0, "radius": "shape.secondary_radius",
-				"padding": Vector2i(4, 2)
+				"raised_intensity": 0, "border_width": 0,
+				"radius": "shape.secondary_radius", "padding": Vector2i(5, 2)
 			},
 		},
 		"color": {
+			"base_color": {"role": "surface_base"},
+			"background": {"role": "surface_base"},
+			"accent_color": {"role": "role_primary"},
+			"mono_color": {"role": "text_default"},
+			"dark_color_1": {"role": "surface_low"},
+			"dark_color_2": {"role": "surface_panel"},
+			"dark_color_3": {"role": "code_background"},
+			"contrast_color_1": {"role": "surface_high"},
+			"contrast_color_2": {"role": "surface_overlay"},
+			"highlight_color": {"role": "button_pressed"},
+			"highlight_disabled_color": {"role": "button_disabled"},
+			"disabled_highlight_color": {"role": "button_disabled"},
+			"success_color": {"role": "role_success"},
+			"success_color_dark_background": {"role": "role_success"},
+			"warning_color": {"role": "role_warning"},
+			"warning_color_dark_background": {"role": "role_warning"},
+			"error_color": {"role": "role_danger"},
+			"error_color_dark_background": {"role": "role_danger"},
+			"ruler_color": {"role": "surface_high_edge"},
+			"selection_color": {"role": "accent_offset"},
+			"separator_color": {"role": "surface_high_edge"},
+			"disabled_border_color": {"role": "surface_high_edge", "disabled": true},
+			"disabled_bg_color": {"role": "button_disabled"},
+			"extra_border_color_1": {"role": "surface_high_edge"},
+			"extra_border_color_2": {"role": "surface_overlay_edge"},
+			"box_selection_fill_color": {"role": "role_primary", "alpha": 0.18},
+			"box_selection_stroke_color": {"role": "role_primary", "alpha": 0.55},
+			"axis_x_color": {"role": "editor_property_x"},
+			"axis_y_color": {"role": "editor_property_y"},
+			"axis_z_color": {"role": "editor_property_z"},
+			"axis_w_color": {"role": "editor_property_w"},
+			"axis_view_plane_color": {"role": "text_muted", "alpha": 0.33},
 			"prop_subsection": {"role": "editor_prop_subsection"},
 			"prop_subsection_stylebox_color": {"role": "editor_prop_subsection"},
 			"font_color": {"role": "text_default"},
-			"mono_color": {"role": "role_primary"},
-			"warning_color": {"role": "role_warning"},
+			"font_focus_color": {"role": "text_strong"},
+			"font_hover_color": {"role": "text_strong"},
+			"font_pressed_color": {"role": "text_strong"},
+			"font_hover_pressed_color": {"role": "text_strong"},
+			"font_disabled_color": {"role": "text_muted", "disabled": true},
+			"font_readonly_color": {"role": "text_muted"},
+			"font_placeholder_color": {"role": "text_muted", "alpha": 0.72},
+			"font_outline_color": {"role": "outline_color"},
+			"font_dark_background_color": {"role": "text_default"},
+			"font_dark_background_focus_color": {"role": "text_strong"},
+			"font_dark_background_hover_color": {"role": "text_strong"},
+			"font_dark_background_pressed_color": {"role": "text_strong"},
+			"font_dark_background_hover_pressed_color": {"role": "text_strong"},
+			"readonly_font_color": {"role": "text_muted"},
+			"disabled_font_color": {"role": "text_muted", "disabled": true},
+			"readonly_color": {"role": "text_muted"},
+			"highlighted_font_color": {"role": "text_strong"},
+			"icon_normal_color": {"role": "text_default"},
+			"icon_focus_color": {"role": "text_strong"},
+			"icon_hover_color": {"role": "text_strong"},
+			"icon_pressed_color": {"role": "role_primary"},
+			"icon_disabled_color": {"role": "text_muted", "disabled": true},
 			"property_color_x": {"role": "editor_property_x"},
 			"property_color_y": {"role": "editor_property_y"},
 			"property_color_z": {"role": "editor_property_z"},
@@ -1652,7 +1725,8 @@ const BINDING_TABLE: Dictionary = {
 							  "radius": "shape.secondary_radius", "border_width": 1},
 			"bg_group_note": {"role": "role_primary", "alpha": 0.10,
 							  "raised_intensity": 0, "border_width": 0,
-							  "radius": "shape.secondary_radius"},
+							  "radius": "shape.secondary_radius",
+							  "content_margins": Vector4i(8, 6, 8, 6)},
 		},
 		"color": {
 			"property_color":          {"role": "text_default"},
@@ -1821,12 +1895,12 @@ const BINDING_TABLE: Dictionary = {
 	"CheckBox": {
 		"stylebox": {
 			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(4, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2)},
 			"hover":          {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 			"pressed":        {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 			"focus":          {"role": "focus_ring"},
 			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(4, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2)},
 			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 		},
 		"color": {
@@ -1837,7 +1911,7 @@ const BINDING_TABLE: Dictionary = {
 			"font_disabled_color":     {"role": "text_strong", "disabled": true},
 			"font_hover_pressed_color":{"role": "text_strong"},
 			"checkbox_checked_color":  {"role": "role_primary"},
-			"checkbox_unchecked_color":{"role": "text_default"},
+			"checkbox_unchecked_color":{"role": "button_normal"},
 		},
 		"constant": {
 			"h_separation": {"value": "tokens.tapPadding"},
@@ -1861,12 +1935,12 @@ const BINDING_TABLE: Dictionary = {
 	"CheckButton": {
 		"stylebox": {
 			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(4, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2)},
 			"hover":          {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 			"pressed":        {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 			"focus":          {"role": "focus_ring"},
 			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(4, 2)},
+								"border_width": 0, "padding": Vector2i(6, 2)},
 			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 		},
 		"color": {
@@ -1877,7 +1951,7 @@ const BINDING_TABLE: Dictionary = {
 			"font_disabled_color":     {"role": "text_strong", "disabled": true},
 			"font_hover_pressed_color":{"role": "text_strong"},
 			"button_checked_color":    {"role": "role_primary"},
-			"button_unchecked_color":  {"role": "text_default"},
+			"button_unchecked_color":  {"role": "button_normal"},
 		},
 		"icon": {
 			"checked":            {"icon": "checkbutton_checked"},
@@ -1914,8 +1988,9 @@ const BINDING_TABLE: Dictionary = {
 	# rather than silently picking a different slot.
 	"CodeEdit": {
 		"stylebox": {
-			"normal":    {"role": "button_normal", "border_role": "button_border",
+			"normal":    {"role": "code_background", "border_role": "code_background",
 						  "radius": "shape.secondary_radius", "raised_intensity": 0,
+						  "border_width": 0,
 						  "padding": Vector2i(10, 7)},
 			"focus":     {"role": "focus_ring"},
 			"read_only": {"role": "button_disabled", "disabled": true,
@@ -1929,7 +2004,7 @@ const BINDING_TABLE: Dictionary = {
 			"font_selected_color":   {"role": "text_on_accent_offset"},
 			"caret_color":           {"role": "role_primary"},
 			"selection_color":       {"role": "accent_offset"},
-			"current_line_color":    {"role": "surface_panel"},
+			"current_line_color":    {"role": "code_current_line"},
 			"line_number_color":     {"role": "text_muted"},
 			# Plan 05-05 Task 2: gutter color slots (Godot 4.6 official names).
 			"breakpoint_color":            {"role": "role_danger"},
@@ -2017,6 +2092,18 @@ const BINDING_TABLE: Dictionary = {
 		},
 		"icon": {
 			"bg": {"icon": "colorpicker_button_bg"},
+		},
+	},
+	"ColorPresetButton": {
+		"stylebox": {
+			"preset_fg": {"role": "button_normal", "border_role": "button_border",
+						  "raised_intensity": 0, "border_width": 1,
+						  "radius": "shape.secondary_radius", "padding": Vector2i(0, 0)},
+			"preset_focus": {"role": "focus_ring", "radius": "shape.secondary_radius"},
+		},
+		"icon": {
+			"preset_bg": {"icon": "colorpicker_sample_bg"},
+			"overbright_indicator": {"icon": "colorpicker_overbright_indicator"},
 		},
 	},
 	# 8. ConfirmationDialog — explicit traceability entry even though Godot exposes no
@@ -2277,9 +2364,9 @@ const BINDING_TABLE: Dictionary = {
 			"tick_offset":    {"value": 8},
 		},
 		"icon": {
-			"grabber":           {"icon": "slider_grabber"},
-			"grabber_disabled":  {"icon": "slider_grabber"},
-			"grabber_highlight": {"icon": "slider_grabber"},
+			"grabber":           {"generated_icon": "slider_grabber"},
+			"grabber_disabled":  {"generated_icon": "slider_grabber"},
+			"grabber_highlight": {"generated_icon": "slider_grabber", "highlight": true},
 			"tick":              {"icon": "slider_tick"},
 		},
 	},
@@ -3011,7 +3098,8 @@ const BINDING_TABLE: Dictionary = {
 	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
 	"Tree": {
 		"stylebox": {
-			"panel":                  {"empty": true},
+			"panel":                  {"role": "surface_low", "border_role": "surface_low",
+										"raised_intensity": 0, "border_width": 0},
 			"focus":                  {"role": "focus_ring"},
 			"title_button_normal":    {"role": "button_normal", "border_role": "button_normal",
 										"raised_intensity": 0, "border_width": 0},
@@ -3180,9 +3268,9 @@ const BINDING_TABLE: Dictionary = {
 			"tick_offset":    {"value": 8},
 		},
 		"icon": {
-			"grabber":           {"icon": "slider_grabber"},
-			"grabber_disabled":  {"icon": "slider_grabber"},
-			"grabber_highlight": {"icon": "slider_grabber"},
+			"grabber":           {"generated_icon": "slider_grabber"},
+			"grabber_disabled":  {"generated_icon": "slider_grabber"},
+			"grabber_highlight": {"generated_icon": "slider_grabber", "highlight": true},
 			"tick":              {"icon": "slider_tick"},
 		},
 	},
@@ -4236,7 +4324,16 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		var border_alpha: float = float(recipe.get("border_alpha", 1.0))
 		if border_alpha < 1.0:
 			border_color = Color(border_color.r, border_color.g, border_color.b, border_color.a * border_alpha)
-		_apply_outline_border(sb, border_color, maxi(0, border_width))
+		var border_widths_raw: Variant = recipe.get("border_widths", null)
+		if border_widths_raw != null and typeof(border_widths_raw) == TYPE_VECTOR4I:
+			var widths := border_widths_raw as Vector4i
+			sb.border_color = border_color
+			sb.border_width_left = maxi(0, widths.x)
+			sb.border_width_top = maxi(0, widths.y)
+			sb.border_width_right = maxi(0, widths.z)
+			sb.border_width_bottom = maxi(0, widths.w)
+		else:
+			_apply_outline_border(sb, border_color, maxi(0, border_width))
 		# Plan 05-02 Task 2 (D-03): padding may be a `shape.<key>` Vector2i lookup
 		# or an explicit Vector2i. Unspecified padding is zero; structural styleboxes must
 		# opt into content margins instead of inheriting giant global chrome.
@@ -4348,6 +4445,8 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 	elif data_type == "icon":
 		if recipe.get("generated_icon", "") == "split_grabber":
 			return _make_split_grabber_icon(recipe.get("orientation", "vertical") == "vertical", role_table, style_personality)
+		if recipe.get("generated_icon", "") == "slider_grabber":
+			return _make_slider_grabber_icon(bool(recipe.get("highlight", false)), role_table, style_personality)
 		var icon_name: String = recipe.get("icon", "")
 		if icon_name == "":
 			return null
@@ -4389,3 +4488,42 @@ func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, 
 			if coverage > 0.0:
 				image.set_pixel(x, y, Color(grabber_color.r, grabber_color.g, grabber_color.b, grabber_color.a * coverage))
 	return ImageTexture.create_from_image(image)
+
+
+func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_personality: Dictionary) -> Texture2D:
+	const SIZE := 16
+	var shape_radius: int = corner_radius
+	var radius_lookup: Variant = _lookup_shape(style_personality, "shape.secondary_radius")
+	if radius_lookup != null and (typeof(radius_lookup) == TYPE_INT or typeof(radius_lookup) == TYPE_FLOAT):
+		shape_radius = int(radius_lookup)
+	var outer_radius := float(clampi(shape_radius, 0, 5))
+	var inner_radius := float(clampi(shape_radius, 0, 3))
+	var knob_color: Color = role_table.get("text_muted", Color.WHITE)
+	knob_color = Color(knob_color.r, knob_color.g, knob_color.b, 0.92)
+	var ring_color: Color = role_table.get("role_primary", Color.WHITE)
+	ring_color = Color(ring_color.r, ring_color.g, ring_color.b, 0.95)
+	var image := Image.create(SIZE, SIZE, false, Image.FORMAT_RGBA8)
+	image.fill(Color(0, 0, 0, 0))
+	if highlight:
+		_fill_round_rect(image, Rect2i(1, 1, 14, 14), outer_radius, ring_color)
+		_fill_round_rect(image, Rect2i(4, 4, 8, 8), inner_radius, knob_color)
+	else:
+		_fill_round_rect(image, Rect2i(3, 3, 10, 10), inner_radius, knob_color)
+	return ImageTexture.create_from_image(image)
+
+
+func _fill_round_rect(image: Image, rect: Rect2i, radius: float, color: Color) -> void:
+	for y in range(rect.position.y, rect.position.y + rect.size.y):
+		for x in range(rect.position.x, rect.position.x + rect.size.x):
+			var coverage := 1.0
+			if radius > 0.0:
+				var px := float(x - rect.position.x) + 0.5
+				var py := float(y - rect.position.y) + 0.5
+				var max_x := float(rect.size.x) - radius
+				var max_y := float(rect.size.y) - radius
+				var nearest_x := clampf(px, radius, max_x)
+				var nearest_y := clampf(py, radius, max_y)
+				var dist := Vector2(px - nearest_x, py - nearest_y).length() - radius
+				coverage = clampf(1.0 - dist, 0.0, 1.0)
+			if coverage > 0.0:
+				image.set_pixel(x, y, Color(color.r, color.g, color.b, color.a * coverage))

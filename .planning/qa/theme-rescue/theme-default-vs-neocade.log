@@ -75,14 +75,14 @@ INTENTIONAL_AUTHORED Caption.font_size.font_size default=16 neocade=12
 INTENTIONAL_AUTHORED CardPanel.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#272c3eff border=1/1/1/1 border_color=#34384aff radius=0/0/0/0 margin=12.0/10.0/12.0/10.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CardPanel.color.font_color default=<missing> neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CardPanel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
-INTENTIONAL_AUTHORED CheckBox.stylebox.disabled default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CheckBox.stylebox.disabled default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/2.0/6.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.hover default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#23283b00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.hover_pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED CheckBox.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CheckBox.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/2.0/6.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.color.checkbox_checked_color default=#ffffffff neocade=#8bff6aff
-INTENTIONAL_AUTHORED CheckBox.color.checkbox_unchecked_color default=#ffffffff neocade=#f7f8fbff
+INTENTIONAL_AUTHORED CheckBox.color.checkbox_unchecked_color default=#ffffffff neocade=#272d48ff
 INTENTIONAL_AUTHORED CheckBox.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckBox.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED CheckBox.color.font_focus_color default=#f2f2f2ff neocade=#f7f8fbff
@@ -102,14 +102,14 @@ INTENTIONAL_AUTHORED CheckBox.icon.radio_unchecked default=Texture2D(size=(16.0,
 INTENTIONAL_AUTHORED CheckBox.icon.radio_unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/radio_unchecked.svg)
 INTENTIONAL_AUTHORED CheckBox.icon.unchecked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/checkbox_unchecked.svg)
 INTENTIONAL_AUTHORED CheckBox.icon.unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/checkbox_unchecked.svg)
-INTENTIONAL_AUTHORED CheckButton.stylebox.disabled default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CheckButton.stylebox.disabled default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/2.0/6.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.hover default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#23283b00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.hover_pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED CheckButton.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CheckButton.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/2.0/6.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.color.button_checked_color default=#ffffffff neocade=#8bff6aff
-INTENTIONAL_AUTHORED CheckButton.color.button_unchecked_color default=#ffffffff neocade=#f7f8fbff
+INTENTIONAL_AUTHORED CheckButton.color.button_unchecked_color default=#ffffffff neocade=#272d48ff
 INTENTIONAL_AUTHORED CheckButton.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckButton.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED CheckButton.color.font_focus_color default=#f2f2f2ff neocade=#f7f8fbff
@@ -132,7 +132,7 @@ INTENTIONAL_AUTHORED CheckButton.icon.unchecked_disabled_mirrored default=Textur
 INTENTIONAL_AUTHORED CheckButton.icon.unchecked_mirrored default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(32.0, 16.0) path=res://addons/neocade_theme/icons/checkbutton_unchecked.svg)
 DEFAULT_ONLY CodeEdit.stylebox.completion default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
 INTENTIONAL_AUTHORED CodeEdit.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED CodeEdit.stylebox.normal default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/2 border_color=#00000099 radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=10.0/7.0/10.0/7.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CodeEdit.stylebox.normal default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/2 border_color=#00000099 radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#0e1220ff border=0/0/0/0 border_color=#0e1220ff radius=0/0/0/0 margin=10.0/7.0/10.0/7.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CodeEdit.stylebox.read_only default=StyleBoxFlat(bg=#1a1a1a4d border=0/0/0/2 border_color=#0000004d radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#24293d6b border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=10.0/7.0/10.0/7.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 DEFAULT_ONLY CodeEdit.color.background_color default=#00000000 neocade=<missing>
 INTENTIONAL_AUTHORED CodeEdit.color.bookmark_color default=#80a3ffcc neocade=#ffd166ff
@@ -146,7 +146,7 @@ DEFAULT_ONLY CodeEdit.color.completion_existing_color default=#dedede21 neocade=
 DEFAULT_ONLY CodeEdit.color.completion_scroll_color default=#ffffff4a neocade=<missing>
 DEFAULT_ONLY CodeEdit.color.completion_scroll_hovered_color default=#ffffff66 neocade=<missing>
 DEFAULT_ONLY CodeEdit.color.completion_selected_color default=#424245ff neocade=<missing>
-INTENTIONAL_AUTHORED CodeEdit.color.current_line_color default=#404042cc neocade=#272c3eff
+INTENTIONAL_AUTHORED CodeEdit.color.current_line_color default=#404042cc neocade=#1b1e2bff
 INTENTIONAL_AUTHORED CodeEdit.color.executing_line_color default=#fae345ff neocade=#8bff6aff
 DEFAULT_ONLY CodeEdit.color.folded_code_region_color default=#ad75c433 neocade=<missing>
 INTENTIONAL_AUTHORED CodeEdit.color.font_color default=#dfdfdfff neocade=#f7f8fbff
@@ -200,7 +200,7 @@ INTENTIONAL_AUTHORED ColorPicker.icon.menu_option default=Texture2D(size=(16.0, 
 INTENTIONAL_AUTHORED ColorPicker.icon.overbright_indicator default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_overbright_indicator.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.picker_cursor default=Texture2D(size=(12.0, 12.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_picker_cursor.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.picker_cursor_bg default=Texture2D(size=(12.0, 12.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_picker_cursor_bg.svg)
-INTENTIONAL_AUTHORED ColorPicker.icon.sample_bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_sample_bg.svg)
+INTENTIONAL_AUTHORED ColorPicker.icon.sample_bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(8.0, 8.0) path=res://addons/neocade_theme/icons/colorpicker_sample_bg.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.sample_revert default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_sample_revert.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.screen_picker default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_screen_picker.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.shape_circle default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_shape_circle.svg)
@@ -220,11 +220,11 @@ INTENTIONAL_AUTHORED ColorPickerButton.color.font_pressed_color default=#ccccccf
 INTENTIONAL_AUTHORED ColorPickerButton.constant.h_separation default=4 neocade=8
 INTENTIONAL_AUTHORED ColorPickerButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED ColorPickerButton.font_size.font_size default=16 neocade=14
-INTENTIONAL_AUTHORED ColorPickerButton.icon.bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_button_bg.svg)
-DEFAULT_ONLY ColorPresetButton.stylebox.preset_fg default=StyleBoxFlat(bg=#ffffffff border=0/0/0/0 border_color=#ccccccff radius=2/2/2/2 margin=2.0/2.0/2.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
-DEFAULT_ONLY ColorPresetButton.stylebox.preset_focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
-DEFAULT_ONLY ColorPresetButton.icon.overbright_indicator default=Texture2D(size=(16.0, 16.0) path=) neocade=<missing>
-DEFAULT_ONLY ColorPresetButton.icon.preset_bg default=Texture2D(size=(16.0, 16.0) path=) neocade=<missing>
+INTENTIONAL_AUTHORED ColorPickerButton.icon.bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(8.0, 8.0) path=res://addons/neocade_theme/icons/colorpicker_button_bg.svg)
+INTENTIONAL_AUTHORED ColorPresetButton.stylebox.preset_fg default=StyleBoxFlat(bg=#ffffffff border=0/0/0/0 border_color=#ccccccff radius=2/2/2/2 margin=2.0/2.0/2.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED ColorPresetButton.stylebox.preset_focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED ColorPresetButton.icon.overbright_indicator default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_overbright_indicator.svg)
+INTENTIONAL_AUTHORED ColorPresetButton.icon.preset_bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(8.0, 8.0) path=res://addons/neocade_theme/icons/colorpicker_sample_bg.svg)
 INTENTIONAL_AUTHORED ConfirmationDialog.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#151a2eff border=1/1/1/1 border_color=#34384aff radius=0/0/0/0 margin=12.0/10.0/12.0/10.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED ConfirmationDialog.constant.buttons_separation default=<missing> neocade=8
 INTENTIONAL_AUTHORED DangerButton.stylebox.disabled default=<missing> neocade=StyleBoxFlat(bg=#ff6e6e6b border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=12.0/8.0/12.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -250,18 +250,70 @@ INTENTIONAL_AUTHORED DangerButton.font.font default=Font(path=) neocade=Font(pat
 INTENTIONAL_AUTHORED DangerButton.font_size.font_size default=16 neocade=14
 INTENTIONAL_AUTHORED DockTabContainer.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#272c3eff border=1/1/1/1 border_color=#34384aff radius=0/0/0/0 margin=6.0/5.0/6.0/5.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED DockTabContainer.stylebox.tabbar_background default=<missing> neocade=StyleBoxFlat(bg=#151a2eff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/2.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox_left default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox_right default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=5.0/2.0/5.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox_left default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=5.0/2.0/5.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox_right default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=5.0/2.0/5.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED Editor.color.accent_color default=<missing> neocade=#8bff6aff
+INTENTIONAL_AUTHORED Editor.color.axis_view_plane_color default=<missing> neocade=#b9c1d054
+INTENTIONAL_AUTHORED Editor.color.axis_w_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.axis_x_color default=<missing> neocade=#e16277ff
+INTENTIONAL_AUTHORED Editor.color.axis_y_color default=<missing> neocade=#c3ef65ff
+INTENTIONAL_AUTHORED Editor.color.axis_z_color default=<missing> neocade=#6aabf6ff
+INTENTIONAL_AUTHORED Editor.color.background default=<missing> neocade=#151a2eff
+INTENTIONAL_AUTHORED Editor.color.base_color default=<missing> neocade=#151a2eff
+INTENTIONAL_AUTHORED Editor.color.box_selection_fill_color default=<missing> neocade=#8bff6a2e
+INTENTIONAL_AUTHORED Editor.color.box_selection_stroke_color default=<missing> neocade=#8bff6a8c
+INTENTIONAL_AUTHORED Editor.color.contrast_color_1 default=<missing> neocade=#3d4151ff
+INTENTIONAL_AUTHORED Editor.color.contrast_color_2 default=<missing> neocade=#525664ff
+INTENTIONAL_AUTHORED Editor.color.dark_color_1 default=<missing> neocade=#101423ff
+INTENTIONAL_AUTHORED Editor.color.dark_color_2 default=<missing> neocade=#272c3eff
+INTENTIONAL_AUTHORED Editor.color.dark_color_3 default=<missing> neocade=#0e1220ff
+INTENTIONAL_AUTHORED Editor.color.disabled_bg_color default=<missing> neocade=#24293dff
+INTENTIONAL_AUTHORED Editor.color.disabled_border_color default=<missing> neocade=#484c5c6b
+INTENTIONAL_AUTHORED Editor.color.disabled_font_color default=<missing> neocade=#b9c1d06b
+INTENTIONAL_AUTHORED Editor.color.disabled_highlight_color default=<missing> neocade=#24293dff
+INTENTIONAL_AUTHORED Editor.color.error_color default=<missing> neocade=#ff6e6eff
+INTENTIONAL_AUTHORED Editor.color.error_color_dark_background default=<missing> neocade=#ff6e6eff
+INTENTIONAL_AUTHORED Editor.color.extra_border_color_1 default=<missing> neocade=#484c5cff
+INTENTIONAL_AUTHORED Editor.color.extra_border_color_2 default=<missing> neocade=#5c5f6dff
 INTENTIONAL_AUTHORED Editor.color.font_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED Editor.color.mono_color default=<missing> neocade=#8bff6aff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_hover_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_disabled_color default=<missing> neocade=#b9c1d06b
+INTENTIONAL_AUTHORED Editor.color.font_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_hover_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_outline_color default=<missing> neocade=#5e616fff
+INTENTIONAL_AUTHORED Editor.color.font_placeholder_color default=<missing> neocade=#b9c1d0b8
+INTENTIONAL_AUTHORED Editor.color.font_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_readonly_color default=<missing> neocade=#b9c1d0ff
+INTENTIONAL_AUTHORED Editor.color.highlight_color default=<missing> neocade=#484e64ff
+INTENTIONAL_AUTHORED Editor.color.highlight_disabled_color default=<missing> neocade=#24293dff
+INTENTIONAL_AUTHORED Editor.color.highlighted_font_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.icon_disabled_color default=<missing> neocade=#b9c1d06b
+INTENTIONAL_AUTHORED Editor.color.icon_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.icon_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.icon_normal_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.icon_pressed_color default=<missing> neocade=#8bff6aff
+INTENTIONAL_AUTHORED Editor.color.mono_color default=<missing> neocade=#f7f8fbff
 INTENTIONAL_AUTHORED Editor.color.prop_subsection default=<missing> neocade=#1d2236ff
 INTENTIONAL_AUTHORED Editor.color.prop_subsection_stylebox_color default=<missing> neocade=#1d2236ff
 INTENTIONAL_AUTHORED Editor.color.property_color_w default=<missing> neocade=#f7f8fbff
 INTENTIONAL_AUTHORED Editor.color.property_color_x default=<missing> neocade=#e16277ff
 INTENTIONAL_AUTHORED Editor.color.property_color_y default=<missing> neocade=#c3ef65ff
 INTENTIONAL_AUTHORED Editor.color.property_color_z default=<missing> neocade=#6aabf6ff
+INTENTIONAL_AUTHORED Editor.color.readonly_color default=<missing> neocade=#b9c1d0ff
+INTENTIONAL_AUTHORED Editor.color.readonly_font_color default=<missing> neocade=#b9c1d0ff
+INTENTIONAL_AUTHORED Editor.color.ruler_color default=<missing> neocade=#484c5cff
+INTENTIONAL_AUTHORED Editor.color.selection_color default=<missing> neocade=#5ca352ff
+INTENTIONAL_AUTHORED Editor.color.separator_color default=<missing> neocade=#484c5cff
+INTENTIONAL_AUTHORED Editor.color.success_color default=<missing> neocade=#5cc971ff
+INTENTIONAL_AUTHORED Editor.color.success_color_dark_background default=<missing> neocade=#5cc971ff
 INTENTIONAL_AUTHORED Editor.color.warning_color default=<missing> neocade=#ffd166ff
+INTENTIONAL_AUTHORED Editor.color.warning_color_dark_background default=<missing> neocade=#ffd166ff
 INTENTIONAL_AUTHORED Editor.constant.class_icon_size default=<missing> neocade=16
 INTENTIONAL_AUTHORED Editor.constant.inspector_margin default=<missing> neocade=12
 INTENTIONAL_AUTHORED EditorAbout.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#151a2eff border=0/0/0/0 border_color=#151a2eff radius=0/0/0/0 margin=12.0/10.0/12.0/10.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -353,7 +405,7 @@ INTENTIONAL_AUTHORED EditorLogFilterButton.constant.h_separation default=<missin
 INTENTIONAL_AUTHORED EditorLogFilterButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED EditorLogFilterButton.font_size.font_size default=16 neocade=14
 INTENTIONAL_AUTHORED EditorProperty.stylebox.bg default=<missing> neocade=StyleBoxEmpty
-INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_group_note default=<missing> neocade=StyleBoxFlat(bg=#8bff6a1a border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_group_note default=<missing> neocade=StyleBoxFlat(bg=#8bff6a1a border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=8.0/6.0/8.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_selected default=<missing> neocade=StyleBoxFlat(bg=#484e6452 border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED EditorProperty.stylebox.child_bg default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED EditorProperty.color.property_color default=<missing> neocade=#f7f8fbff
@@ -555,9 +607,6 @@ INTENTIONAL_AUTHORED HSlider.stylebox.grabber_area_highlight default=StyleBoxFla
 INTENTIONAL_AUTHORED HSlider.stylebox.slider default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=4/4/4/4 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#101423ff border=1/1/1/1 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED HSlider.constant.center_grabber default=0 neocade=1
 INTENTIONAL_AUTHORED HSlider.constant.tick_offset default=0 neocade=8
-INTENTIONAL_AUTHORED HSlider.icon.grabber default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
-INTENTIONAL_AUTHORED HSlider.icon.grabber_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
-INTENTIONAL_AUTHORED HSlider.icon.grabber_highlight default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
 INTENTIONAL_AUTHORED HSlider.icon.tick default=Texture2D(size=(4.0, 8.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_tick.svg)
 INTENTIONAL_AUTHORED HSplitContainer.constant.separation default=12 neocade=6
 INTENTIONAL_AUTHORED HSplitContainer.icon.grabber default=Texture2D(size=(8.0, 48.0) path=) neocade=Texture2D(size=(6.0, 32.0) path=)
@@ -1040,7 +1089,7 @@ INTENTIONAL_AUTHORED Tree.stylebox.hovered default=StyleBoxFlat(bg=#ffffff12 bor
 INTENTIONAL_AUTHORED Tree.stylebox.hovered_dimmed default=StyleBoxFlat(bg=#ffffff08 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415a8c border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.hovered_selected default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.hovered_selected_focus default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Tree.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/5.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxEmpty
+INTENTIONAL_AUTHORED Tree.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/5.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#101423ff border=0/0/0/0 border_color=#101423ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.selected default=StyleBoxFlat(bg=#ffffff4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.selected_focus default=StyleBoxFlat(bg=#ffffff4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.title_button_hover default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -1128,9 +1177,6 @@ INTENTIONAL_AUTHORED VSlider.stylebox.grabber_area_highlight default=StyleBoxFla
 INTENTIONAL_AUTHORED VSlider.stylebox.slider default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=4/4/4/4 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#101423ff border=1/1/1/1 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED VSlider.constant.center_grabber default=0 neocade=1
 INTENTIONAL_AUTHORED VSlider.constant.tick_offset default=0 neocade=8
-INTENTIONAL_AUTHORED VSlider.icon.grabber default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
-INTENTIONAL_AUTHORED VSlider.icon.grabber_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
-INTENTIONAL_AUTHORED VSlider.icon.grabber_highlight default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
 INTENTIONAL_AUTHORED VSlider.icon.tick default=Texture2D(size=(8.0, 4.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_tick.svg)
 INTENTIONAL_AUTHORED VSplitContainer.constant.separation default=12 neocade=6
 INTENTIONAL_AUTHORED VSplitContainer.icon.grabber default=Texture2D(size=(48.0, 8.0) path=) neocade=Texture2D(size=(32.0, 6.0) path=)
@@ -1217,14 +1263,14 @@ INTENTIONAL_AUTHORED Caption.font_size.font_size default=16 neocade=12
 INTENTIONAL_AUTHORED CardPanel.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#272c3eff border=1/1/1/4 border_color=#202538ff radius=0/0/0/0 margin=12.0/10.0/12.0/13.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CardPanel.color.font_color default=<missing> neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CardPanel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
-INTENTIONAL_AUTHORED CheckBox.stylebox.disabled default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CheckBox.stylebox.disabled default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/2.0/6.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.hover default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#23283b00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.hover_pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED CheckBox.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CheckBox.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/2.0/6.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.color.checkbox_checked_color default=#ffffffff neocade=#8bff6aff
-INTENTIONAL_AUTHORED CheckBox.color.checkbox_unchecked_color default=#ffffffff neocade=#f7f8fbff
+INTENTIONAL_AUTHORED CheckBox.color.checkbox_unchecked_color default=#ffffffff neocade=#272d48ff
 INTENTIONAL_AUTHORED CheckBox.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckBox.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED CheckBox.color.font_focus_color default=#f2f2f2ff neocade=#f7f8fbff
@@ -1244,14 +1290,14 @@ INTENTIONAL_AUTHORED CheckBox.icon.radio_unchecked default=Texture2D(size=(16.0,
 INTENTIONAL_AUTHORED CheckBox.icon.radio_unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/radio_unchecked.svg)
 INTENTIONAL_AUTHORED CheckBox.icon.unchecked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/checkbox_unchecked.svg)
 INTENTIONAL_AUTHORED CheckBox.icon.unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/checkbox_unchecked.svg)
-INTENTIONAL_AUTHORED CheckButton.stylebox.disabled default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CheckButton.stylebox.disabled default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/2.0/6.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.hover default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#23283b00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.hover_pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED CheckButton.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CheckButton.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/2.0/6.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.color.button_checked_color default=#ffffffff neocade=#8bff6aff
-INTENTIONAL_AUTHORED CheckButton.color.button_unchecked_color default=#ffffffff neocade=#f7f8fbff
+INTENTIONAL_AUTHORED CheckButton.color.button_unchecked_color default=#ffffffff neocade=#272d48ff
 INTENTIONAL_AUTHORED CheckButton.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckButton.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED CheckButton.color.font_focus_color default=#f2f2f2ff neocade=#f7f8fbff
@@ -1274,7 +1320,7 @@ INTENTIONAL_AUTHORED CheckButton.icon.unchecked_disabled_mirrored default=Textur
 INTENTIONAL_AUTHORED CheckButton.icon.unchecked_mirrored default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(32.0, 16.0) path=res://addons/neocade_theme/icons/checkbutton_unchecked.svg)
 DEFAULT_ONLY CodeEdit.stylebox.completion default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
 INTENTIONAL_AUTHORED CodeEdit.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED CodeEdit.stylebox.normal default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/2 border_color=#00000099 radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=10.0/7.0/10.0/7.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CodeEdit.stylebox.normal default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/2 border_color=#00000099 radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#0e1220ff border=0/0/0/0 border_color=#0e1220ff radius=0/0/0/0 margin=10.0/7.0/10.0/7.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CodeEdit.stylebox.read_only default=StyleBoxFlat(bg=#1a1a1a4d border=0/0/0/2 border_color=#0000004d radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#24293d6b border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=10.0/7.0/10.0/7.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 DEFAULT_ONLY CodeEdit.color.background_color default=#00000000 neocade=<missing>
 INTENTIONAL_AUTHORED CodeEdit.color.bookmark_color default=#80a3ffcc neocade=#ffd166ff
@@ -1288,7 +1334,7 @@ DEFAULT_ONLY CodeEdit.color.completion_existing_color default=#dedede21 neocade=
 DEFAULT_ONLY CodeEdit.color.completion_scroll_color default=#ffffff4a neocade=<missing>
 DEFAULT_ONLY CodeEdit.color.completion_scroll_hovered_color default=#ffffff66 neocade=<missing>
 DEFAULT_ONLY CodeEdit.color.completion_selected_color default=#424245ff neocade=<missing>
-INTENTIONAL_AUTHORED CodeEdit.color.current_line_color default=#404042cc neocade=#272c3eff
+INTENTIONAL_AUTHORED CodeEdit.color.current_line_color default=#404042cc neocade=#1b1e2bff
 INTENTIONAL_AUTHORED CodeEdit.color.executing_line_color default=#fae345ff neocade=#8bff6aff
 DEFAULT_ONLY CodeEdit.color.folded_code_region_color default=#ad75c433 neocade=<missing>
 INTENTIONAL_AUTHORED CodeEdit.color.font_color default=#dfdfdfff neocade=#f7f8fbff
@@ -1342,7 +1388,7 @@ INTENTIONAL_AUTHORED ColorPicker.icon.menu_option default=Texture2D(size=(16.0, 
 INTENTIONAL_AUTHORED ColorPicker.icon.overbright_indicator default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_overbright_indicator.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.picker_cursor default=Texture2D(size=(12.0, 12.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_picker_cursor.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.picker_cursor_bg default=Texture2D(size=(12.0, 12.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_picker_cursor_bg.svg)
-INTENTIONAL_AUTHORED ColorPicker.icon.sample_bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_sample_bg.svg)
+INTENTIONAL_AUTHORED ColorPicker.icon.sample_bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(8.0, 8.0) path=res://addons/neocade_theme/icons/colorpicker_sample_bg.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.sample_revert default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_sample_revert.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.screen_picker default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_screen_picker.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.shape_circle default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_shape_circle.svg)
@@ -1362,11 +1408,11 @@ INTENTIONAL_AUTHORED ColorPickerButton.color.font_pressed_color default=#ccccccf
 INTENTIONAL_AUTHORED ColorPickerButton.constant.h_separation default=4 neocade=8
 INTENTIONAL_AUTHORED ColorPickerButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED ColorPickerButton.font_size.font_size default=16 neocade=14
-INTENTIONAL_AUTHORED ColorPickerButton.icon.bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_button_bg.svg)
-DEFAULT_ONLY ColorPresetButton.stylebox.preset_fg default=StyleBoxFlat(bg=#ffffffff border=0/0/0/0 border_color=#ccccccff radius=2/2/2/2 margin=2.0/2.0/2.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
-DEFAULT_ONLY ColorPresetButton.stylebox.preset_focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
-DEFAULT_ONLY ColorPresetButton.icon.overbright_indicator default=Texture2D(size=(16.0, 16.0) path=) neocade=<missing>
-DEFAULT_ONLY ColorPresetButton.icon.preset_bg default=Texture2D(size=(16.0, 16.0) path=) neocade=<missing>
+INTENTIONAL_AUTHORED ColorPickerButton.icon.bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(8.0, 8.0) path=res://addons/neocade_theme/icons/colorpicker_button_bg.svg)
+INTENTIONAL_AUTHORED ColorPresetButton.stylebox.preset_fg default=StyleBoxFlat(bg=#ffffffff border=0/0/0/0 border_color=#ccccccff radius=2/2/2/2 margin=2.0/2.0/2.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED ColorPresetButton.stylebox.preset_focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED ColorPresetButton.icon.overbright_indicator default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_overbright_indicator.svg)
+INTENTIONAL_AUTHORED ColorPresetButton.icon.preset_bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(8.0, 8.0) path=res://addons/neocade_theme/icons/colorpicker_sample_bg.svg)
 INTENTIONAL_AUTHORED ConfirmationDialog.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#151a2eff border=1/1/1/4 border_color=#121628ff radius=0/0/0/0 margin=12.0/10.0/12.0/13.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED ConfirmationDialog.constant.buttons_separation default=<missing> neocade=8
 INTENTIONAL_AUTHORED DangerButton.stylebox.disabled default=<missing> neocade=StyleBoxFlat(bg=#ff6e6e6b border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=12.0/8.0/12.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -1392,18 +1438,70 @@ INTENTIONAL_AUTHORED DangerButton.font.font default=Font(path=) neocade=Font(pat
 INTENTIONAL_AUTHORED DangerButton.font_size.font_size default=16 neocade=14
 INTENTIONAL_AUTHORED DockTabContainer.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#272c3eff border=1/1/1/4 border_color=#202538ff radius=0/0/0/0 margin=6.0/5.0/6.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED DockTabContainer.stylebox.tabbar_background default=<missing> neocade=StyleBoxFlat(bg=#151a2eff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/2.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox_left default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox_right default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=4.0/2.0/4.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=5.0/2.0/5.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox_left default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=5.0/2.0/5.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox_right default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=5.0/2.0/5.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED Editor.color.accent_color default=<missing> neocade=#8bff6aff
+INTENTIONAL_AUTHORED Editor.color.axis_view_plane_color default=<missing> neocade=#b9c1d054
+INTENTIONAL_AUTHORED Editor.color.axis_w_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.axis_x_color default=<missing> neocade=#e16277ff
+INTENTIONAL_AUTHORED Editor.color.axis_y_color default=<missing> neocade=#c3ef65ff
+INTENTIONAL_AUTHORED Editor.color.axis_z_color default=<missing> neocade=#6aabf6ff
+INTENTIONAL_AUTHORED Editor.color.background default=<missing> neocade=#151a2eff
+INTENTIONAL_AUTHORED Editor.color.base_color default=<missing> neocade=#151a2eff
+INTENTIONAL_AUTHORED Editor.color.box_selection_fill_color default=<missing> neocade=#8bff6a2e
+INTENTIONAL_AUTHORED Editor.color.box_selection_stroke_color default=<missing> neocade=#8bff6a8c
+INTENTIONAL_AUTHORED Editor.color.contrast_color_1 default=<missing> neocade=#3d4151ff
+INTENTIONAL_AUTHORED Editor.color.contrast_color_2 default=<missing> neocade=#525664ff
+INTENTIONAL_AUTHORED Editor.color.dark_color_1 default=<missing> neocade=#101423ff
+INTENTIONAL_AUTHORED Editor.color.dark_color_2 default=<missing> neocade=#272c3eff
+INTENTIONAL_AUTHORED Editor.color.dark_color_3 default=<missing> neocade=#0e1220ff
+INTENTIONAL_AUTHORED Editor.color.disabled_bg_color default=<missing> neocade=#24293dff
+INTENTIONAL_AUTHORED Editor.color.disabled_border_color default=<missing> neocade=#484c5c6b
+INTENTIONAL_AUTHORED Editor.color.disabled_font_color default=<missing> neocade=#b9c1d06b
+INTENTIONAL_AUTHORED Editor.color.disabled_highlight_color default=<missing> neocade=#24293dff
+INTENTIONAL_AUTHORED Editor.color.error_color default=<missing> neocade=#ff6e6eff
+INTENTIONAL_AUTHORED Editor.color.error_color_dark_background default=<missing> neocade=#ff6e6eff
+INTENTIONAL_AUTHORED Editor.color.extra_border_color_1 default=<missing> neocade=#484c5cff
+INTENTIONAL_AUTHORED Editor.color.extra_border_color_2 default=<missing> neocade=#5c5f6dff
 INTENTIONAL_AUTHORED Editor.color.font_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED Editor.color.mono_color default=<missing> neocade=#8bff6aff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_hover_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_disabled_color default=<missing> neocade=#b9c1d06b
+INTENTIONAL_AUTHORED Editor.color.font_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_hover_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_outline_color default=<missing> neocade=#5e616fff
+INTENTIONAL_AUTHORED Editor.color.font_placeholder_color default=<missing> neocade=#b9c1d0b8
+INTENTIONAL_AUTHORED Editor.color.font_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_readonly_color default=<missing> neocade=#b9c1d0ff
+INTENTIONAL_AUTHORED Editor.color.highlight_color default=<missing> neocade=#484e64ff
+INTENTIONAL_AUTHORED Editor.color.highlight_disabled_color default=<missing> neocade=#24293dff
+INTENTIONAL_AUTHORED Editor.color.highlighted_font_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.icon_disabled_color default=<missing> neocade=#b9c1d06b
+INTENTIONAL_AUTHORED Editor.color.icon_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.icon_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.icon_normal_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.icon_pressed_color default=<missing> neocade=#8bff6aff
+INTENTIONAL_AUTHORED Editor.color.mono_color default=<missing> neocade=#f7f8fbff
 INTENTIONAL_AUTHORED Editor.color.prop_subsection default=<missing> neocade=#1d2236ff
 INTENTIONAL_AUTHORED Editor.color.prop_subsection_stylebox_color default=<missing> neocade=#1d2236ff
 INTENTIONAL_AUTHORED Editor.color.property_color_w default=<missing> neocade=#f7f8fbff
 INTENTIONAL_AUTHORED Editor.color.property_color_x default=<missing> neocade=#e16277ff
 INTENTIONAL_AUTHORED Editor.color.property_color_y default=<missing> neocade=#c3ef65ff
 INTENTIONAL_AUTHORED Editor.color.property_color_z default=<missing> neocade=#6aabf6ff
+INTENTIONAL_AUTHORED Editor.color.readonly_color default=<missing> neocade=#b9c1d0ff
+INTENTIONAL_AUTHORED Editor.color.readonly_font_color default=<missing> neocade=#b9c1d0ff
+INTENTIONAL_AUTHORED Editor.color.ruler_color default=<missing> neocade=#484c5cff
+INTENTIONAL_AUTHORED Editor.color.selection_color default=<missing> neocade=#5ca352ff
+INTENTIONAL_AUTHORED Editor.color.separator_color default=<missing> neocade=#484c5cff
+INTENTIONAL_AUTHORED Editor.color.success_color default=<missing> neocade=#5cc971ff
+INTENTIONAL_AUTHORED Editor.color.success_color_dark_background default=<missing> neocade=#5cc971ff
 INTENTIONAL_AUTHORED Editor.color.warning_color default=<missing> neocade=#ffd166ff
+INTENTIONAL_AUTHORED Editor.color.warning_color_dark_background default=<missing> neocade=#ffd166ff
 INTENTIONAL_AUTHORED Editor.constant.class_icon_size default=<missing> neocade=16
 INTENTIONAL_AUTHORED Editor.constant.inspector_margin default=<missing> neocade=12
 INTENTIONAL_AUTHORED EditorAbout.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#151a2eff border=0/0/0/0 border_color=#151a2eff radius=0/0/0/0 margin=12.0/10.0/12.0/10.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -1495,7 +1593,7 @@ INTENTIONAL_AUTHORED EditorLogFilterButton.constant.h_separation default=<missin
 INTENTIONAL_AUTHORED EditorLogFilterButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED EditorLogFilterButton.font_size.font_size default=16 neocade=14
 INTENTIONAL_AUTHORED EditorProperty.stylebox.bg default=<missing> neocade=StyleBoxEmpty
-INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_group_note default=<missing> neocade=StyleBoxFlat(bg=#8bff6a1a border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_group_note default=<missing> neocade=StyleBoxFlat(bg=#8bff6a1a border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=8.0/6.0/8.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_selected default=<missing> neocade=StyleBoxFlat(bg=#484e6452 border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED EditorProperty.stylebox.child_bg default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/4 border_color=#20263dff radius=0/0/0/0 margin=0.0/0.0/0.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED EditorProperty.color.property_color default=<missing> neocade=#f7f8fbff
@@ -1697,9 +1795,6 @@ INTENTIONAL_AUTHORED HSlider.stylebox.grabber_area_highlight default=StyleBoxFla
 INTENTIONAL_AUTHORED HSlider.stylebox.slider default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=4/4/4/4 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#101423ff border=1/1/1/1 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED HSlider.constant.center_grabber default=0 neocade=1
 INTENTIONAL_AUTHORED HSlider.constant.tick_offset default=0 neocade=8
-INTENTIONAL_AUTHORED HSlider.icon.grabber default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
-INTENTIONAL_AUTHORED HSlider.icon.grabber_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
-INTENTIONAL_AUTHORED HSlider.icon.grabber_highlight default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
 INTENTIONAL_AUTHORED HSlider.icon.tick default=Texture2D(size=(4.0, 8.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_tick.svg)
 INTENTIONAL_AUTHORED HSplitContainer.constant.separation default=12 neocade=6
 INTENTIONAL_AUTHORED HSplitContainer.icon.grabber default=Texture2D(size=(8.0, 48.0) path=) neocade=Texture2D(size=(6.0, 32.0) path=)
@@ -2182,7 +2277,7 @@ INTENTIONAL_AUTHORED Tree.stylebox.hovered default=StyleBoxFlat(bg=#ffffff12 bor
 INTENTIONAL_AUTHORED Tree.stylebox.hovered_dimmed default=StyleBoxFlat(bg=#ffffff08 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415a8c border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.hovered_selected default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.hovered_selected_focus default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Tree.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/5.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxEmpty
+INTENTIONAL_AUTHORED Tree.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/5.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#101423ff border=0/0/0/0 border_color=#101423ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.selected default=StyleBoxFlat(bg=#ffffff4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.selected_focus default=StyleBoxFlat(bg=#ffffff4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.title_button_hover default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2270,9 +2365,6 @@ INTENTIONAL_AUTHORED VSlider.stylebox.grabber_area_highlight default=StyleBoxFla
 INTENTIONAL_AUTHORED VSlider.stylebox.slider default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=4/4/4/4 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#101423ff border=1/1/1/1 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED VSlider.constant.center_grabber default=0 neocade=1
 INTENTIONAL_AUTHORED VSlider.constant.tick_offset default=0 neocade=8
-INTENTIONAL_AUTHORED VSlider.icon.grabber default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
-INTENTIONAL_AUTHORED VSlider.icon.grabber_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
-INTENTIONAL_AUTHORED VSlider.icon.grabber_highlight default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
 INTENTIONAL_AUTHORED VSlider.icon.tick default=Texture2D(size=(8.0, 4.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_tick.svg)
 INTENTIONAL_AUTHORED VSplitContainer.constant.separation default=12 neocade=6
 INTENTIONAL_AUTHORED VSplitContainer.icon.grabber default=Texture2D(size=(48.0, 8.0) path=) neocade=Texture2D(size=(32.0, 6.0) path=)
@@ -2357,14 +2449,14 @@ INTENTIONAL_AUTHORED Caption.font_size.font_size default=16 neocade=14
 INTENTIONAL_AUTHORED CardPanel.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#272c3eff border=1/1/1/1 border_color=#34384aff radius=0/0/0/0 margin=18.0/15.0/18.0/15.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CardPanel.color.font_color default=<missing> neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CardPanel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
-INTENTIONAL_AUTHORED CheckBox.stylebox.disabled default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/3.0/6.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CheckBox.stylebox.disabled default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=9.0/3.0/9.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.hover default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#23283b00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.hover_pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED CheckBox.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/3.0/6.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CheckBox.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=9.0/3.0/9.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.stylebox.pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckBox.color.checkbox_checked_color default=#ffffffff neocade=#8bff6aff
-INTENTIONAL_AUTHORED CheckBox.color.checkbox_unchecked_color default=#ffffffff neocade=#f7f8fbff
+INTENTIONAL_AUTHORED CheckBox.color.checkbox_unchecked_color default=#ffffffff neocade=#272d48ff
 INTENTIONAL_AUTHORED CheckBox.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckBox.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED CheckBox.color.font_focus_color default=#f2f2f2ff neocade=#f7f8fbff
@@ -2383,14 +2475,14 @@ INTENTIONAL_AUTHORED CheckBox.icon.radio_unchecked default=Texture2D(size=(16.0,
 INTENTIONAL_AUTHORED CheckBox.icon.radio_unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/radio_unchecked.svg)
 INTENTIONAL_AUTHORED CheckBox.icon.unchecked default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/checkbox_unchecked.svg)
 INTENTIONAL_AUTHORED CheckBox.icon.unchecked_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/checkbox_unchecked.svg)
-INTENTIONAL_AUTHORED CheckButton.stylebox.disabled default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/3.0/6.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CheckButton.stylebox.disabled default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=9.0/3.0/9.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.hover default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#23283b00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.hover_pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED CheckButton.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/3.0/6.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CheckButton.stylebox.normal default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#272c3e00 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=9.0/3.0/9.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.stylebox.pressed default=StyleBoxEmpty neocade=StyleBoxFlat(bg=#13172900 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CheckButton.color.button_checked_color default=#ffffffff neocade=#8bff6aff
-INTENTIONAL_AUTHORED CheckButton.color.button_unchecked_color default=#ffffffff neocade=#f7f8fbff
+INTENTIONAL_AUTHORED CheckButton.color.button_unchecked_color default=#ffffffff neocade=#272d48ff
 INTENTIONAL_AUTHORED CheckButton.color.font_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED CheckButton.color.font_disabled_color default=#dfdfdf80 neocade=#f7f8fb6b
 INTENTIONAL_AUTHORED CheckButton.color.font_focus_color default=#f2f2f2ff neocade=#f7f8fbff
@@ -2412,7 +2504,7 @@ INTENTIONAL_AUTHORED CheckButton.icon.unchecked_disabled_mirrored default=Textur
 INTENTIONAL_AUTHORED CheckButton.icon.unchecked_mirrored default=Texture2D(size=(32.0, 16.0) path=) neocade=Texture2D(size=(32.0, 16.0) path=res://addons/neocade_theme/icons/checkbutton_unchecked.svg)
 DEFAULT_ONLY CodeEdit.stylebox.completion default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
 INTENTIONAL_AUTHORED CodeEdit.stylebox.focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED CodeEdit.stylebox.normal default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/2 border_color=#00000099 radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=15.0/11.0/15.0/11.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED CodeEdit.stylebox.normal default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/2 border_color=#00000099 radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#0e1220ff border=0/0/0/0 border_color=#0e1220ff radius=0/0/0/0 margin=15.0/11.0/15.0/11.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED CodeEdit.stylebox.read_only default=StyleBoxFlat(bg=#1a1a1a4d border=0/0/0/2 border_color=#0000004d radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#24293d6b border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=15.0/11.0/15.0/11.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 DEFAULT_ONLY CodeEdit.color.background_color default=#00000000 neocade=<missing>
 INTENTIONAL_AUTHORED CodeEdit.color.bookmark_color default=#80a3ffcc neocade=#ffd166ff
@@ -2426,7 +2518,7 @@ DEFAULT_ONLY CodeEdit.color.completion_existing_color default=#dedede21 neocade=
 DEFAULT_ONLY CodeEdit.color.completion_scroll_color default=#ffffff4a neocade=<missing>
 DEFAULT_ONLY CodeEdit.color.completion_scroll_hovered_color default=#ffffff66 neocade=<missing>
 DEFAULT_ONLY CodeEdit.color.completion_selected_color default=#424245ff neocade=<missing>
-INTENTIONAL_AUTHORED CodeEdit.color.current_line_color default=#404042cc neocade=#272c3eff
+INTENTIONAL_AUTHORED CodeEdit.color.current_line_color default=#404042cc neocade=#1b1e2bff
 INTENTIONAL_AUTHORED CodeEdit.color.executing_line_color default=#fae345ff neocade=#8bff6aff
 DEFAULT_ONLY CodeEdit.color.folded_code_region_color default=#ad75c433 neocade=<missing>
 INTENTIONAL_AUTHORED CodeEdit.color.font_color default=#dfdfdfff neocade=#f7f8fbff
@@ -2479,7 +2571,7 @@ INTENTIONAL_AUTHORED ColorPicker.icon.menu_option default=Texture2D(size=(16.0, 
 INTENTIONAL_AUTHORED ColorPicker.icon.overbright_indicator default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_overbright_indicator.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.picker_cursor default=Texture2D(size=(12.0, 12.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_picker_cursor.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.picker_cursor_bg default=Texture2D(size=(12.0, 12.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_picker_cursor_bg.svg)
-INTENTIONAL_AUTHORED ColorPicker.icon.sample_bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_sample_bg.svg)
+INTENTIONAL_AUTHORED ColorPicker.icon.sample_bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(8.0, 8.0) path=res://addons/neocade_theme/icons/colorpicker_sample_bg.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.sample_revert default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_sample_revert.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.screen_picker default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_screen_picker.svg)
 INTENTIONAL_AUTHORED ColorPicker.icon.shape_circle default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_shape_circle.svg)
@@ -2498,11 +2590,11 @@ INTENTIONAL_AUTHORED ColorPickerButton.color.font_outline_color default=#000000f
 INTENTIONAL_AUTHORED ColorPickerButton.color.font_pressed_color default=#ccccccff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED ColorPickerButton.constant.h_separation default=4 neocade=12
 INTENTIONAL_AUTHORED ColorPickerButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
-INTENTIONAL_AUTHORED ColorPickerButton.icon.bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_button_bg.svg)
-DEFAULT_ONLY ColorPresetButton.stylebox.preset_fg default=StyleBoxFlat(bg=#ffffffff border=0/0/0/0 border_color=#ccccccff radius=2/2/2/2 margin=2.0/2.0/2.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
-DEFAULT_ONLY ColorPresetButton.stylebox.preset_focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=<missing>
-DEFAULT_ONLY ColorPresetButton.icon.overbright_indicator default=Texture2D(size=(16.0, 16.0) path=) neocade=<missing>
-DEFAULT_ONLY ColorPresetButton.icon.preset_bg default=Texture2D(size=(16.0, 16.0) path=) neocade=<missing>
+INTENTIONAL_AUTHORED ColorPickerButton.icon.bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(8.0, 8.0) path=res://addons/neocade_theme/icons/colorpicker_button_bg.svg)
+INTENTIONAL_AUTHORED ColorPresetButton.stylebox.preset_fg default=StyleBoxFlat(bg=#ffffffff border=0/0/0/0 border_color=#ccccccff radius=2/2/2/2 margin=2.0/2.0/2.0/2.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED ColorPresetButton.stylebox.preset_focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#00000000 border=2/2/2/2 border_color=#8bff6aff radius=0/0/0/0 margin=-1.0/-1.0/-1.0/-1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED ColorPresetButton.icon.overbright_indicator default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/colorpicker_overbright_indicator.svg)
+INTENTIONAL_AUTHORED ColorPresetButton.icon.preset_bg default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(8.0, 8.0) path=res://addons/neocade_theme/icons/colorpicker_sample_bg.svg)
 INTENTIONAL_AUTHORED ConfirmationDialog.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#151a2eff border=1/1/1/1 border_color=#34384aff radius=0/0/0/0 margin=18.0/15.0/18.0/15.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED ConfirmationDialog.constant.buttons_separation default=<missing> neocade=12
 INTENTIONAL_AUTHORED DangerButton.stylebox.disabled default=<missing> neocade=StyleBoxFlat(bg=#ff6e6e6b border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=18.0/12.0/18.0/12.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2527,18 +2619,70 @@ INTENTIONAL_AUTHORED DangerButton.constant.h_separation default=<missing> neocad
 INTENTIONAL_AUTHORED DangerButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED DockTabContainer.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#272c3eff border=1/1/1/1 border_color=#34384aff radius=0/0/0/0 margin=9.0/8.0/9.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED DockTabContainer.stylebox.tabbar_background default=<missing> neocade=StyleBoxFlat(bg=#151a2eff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/3.0/6.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=6.0/3.0/6.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox_left default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=6.0/3.0/6.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox_right default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=6.0/3.0/6.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=8.0/3.0/8.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox_left default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=8.0/3.0/8.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED Editor.stylebox.prop_subsection_stylebox_right default=<missing> neocade=StyleBoxFlat(bg=#1d2236ff border=0/0/0/0 border_color=#1d2236ff radius=0/0/0/0 margin=8.0/3.0/8.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED Editor.color.accent_color default=<missing> neocade=#8bff6aff
+INTENTIONAL_AUTHORED Editor.color.axis_view_plane_color default=<missing> neocade=#b9c1d054
+INTENTIONAL_AUTHORED Editor.color.axis_w_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.axis_x_color default=<missing> neocade=#e16277ff
+INTENTIONAL_AUTHORED Editor.color.axis_y_color default=<missing> neocade=#c3ef65ff
+INTENTIONAL_AUTHORED Editor.color.axis_z_color default=<missing> neocade=#6aabf6ff
+INTENTIONAL_AUTHORED Editor.color.background default=<missing> neocade=#151a2eff
+INTENTIONAL_AUTHORED Editor.color.base_color default=<missing> neocade=#151a2eff
+INTENTIONAL_AUTHORED Editor.color.box_selection_fill_color default=<missing> neocade=#8bff6a2e
+INTENTIONAL_AUTHORED Editor.color.box_selection_stroke_color default=<missing> neocade=#8bff6a8c
+INTENTIONAL_AUTHORED Editor.color.contrast_color_1 default=<missing> neocade=#3d4151ff
+INTENTIONAL_AUTHORED Editor.color.contrast_color_2 default=<missing> neocade=#525664ff
+INTENTIONAL_AUTHORED Editor.color.dark_color_1 default=<missing> neocade=#101423ff
+INTENTIONAL_AUTHORED Editor.color.dark_color_2 default=<missing> neocade=#272c3eff
+INTENTIONAL_AUTHORED Editor.color.dark_color_3 default=<missing> neocade=#0e1220ff
+INTENTIONAL_AUTHORED Editor.color.disabled_bg_color default=<missing> neocade=#24293dff
+INTENTIONAL_AUTHORED Editor.color.disabled_border_color default=<missing> neocade=#484c5c6b
+INTENTIONAL_AUTHORED Editor.color.disabled_font_color default=<missing> neocade=#b9c1d06b
+INTENTIONAL_AUTHORED Editor.color.disabled_highlight_color default=<missing> neocade=#24293dff
+INTENTIONAL_AUTHORED Editor.color.error_color default=<missing> neocade=#ff6e6eff
+INTENTIONAL_AUTHORED Editor.color.error_color_dark_background default=<missing> neocade=#ff6e6eff
+INTENTIONAL_AUTHORED Editor.color.extra_border_color_1 default=<missing> neocade=#484c5cff
+INTENTIONAL_AUTHORED Editor.color.extra_border_color_2 default=<missing> neocade=#5c5f6dff
 INTENTIONAL_AUTHORED Editor.color.font_color default=<missing> neocade=#f7f8fbff
-INTENTIONAL_AUTHORED Editor.color.mono_color default=<missing> neocade=#8bff6aff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_hover_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_dark_background_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_disabled_color default=<missing> neocade=#b9c1d06b
+INTENTIONAL_AUTHORED Editor.color.font_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_hover_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_outline_color default=<missing> neocade=#5e616fff
+INTENTIONAL_AUTHORED Editor.color.font_placeholder_color default=<missing> neocade=#b9c1d0b8
+INTENTIONAL_AUTHORED Editor.color.font_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.font_readonly_color default=<missing> neocade=#b9c1d0ff
+INTENTIONAL_AUTHORED Editor.color.highlight_color default=<missing> neocade=#484e64ff
+INTENTIONAL_AUTHORED Editor.color.highlight_disabled_color default=<missing> neocade=#24293dff
+INTENTIONAL_AUTHORED Editor.color.highlighted_font_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.icon_disabled_color default=<missing> neocade=#b9c1d06b
+INTENTIONAL_AUTHORED Editor.color.icon_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.icon_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.icon_normal_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED Editor.color.icon_pressed_color default=<missing> neocade=#8bff6aff
+INTENTIONAL_AUTHORED Editor.color.mono_color default=<missing> neocade=#f7f8fbff
 INTENTIONAL_AUTHORED Editor.color.prop_subsection default=<missing> neocade=#1d2236ff
 INTENTIONAL_AUTHORED Editor.color.prop_subsection_stylebox_color default=<missing> neocade=#1d2236ff
 INTENTIONAL_AUTHORED Editor.color.property_color_w default=<missing> neocade=#f7f8fbff
 INTENTIONAL_AUTHORED Editor.color.property_color_x default=<missing> neocade=#e16277ff
 INTENTIONAL_AUTHORED Editor.color.property_color_y default=<missing> neocade=#c3ef65ff
 INTENTIONAL_AUTHORED Editor.color.property_color_z default=<missing> neocade=#6aabf6ff
+INTENTIONAL_AUTHORED Editor.color.readonly_color default=<missing> neocade=#b9c1d0ff
+INTENTIONAL_AUTHORED Editor.color.readonly_font_color default=<missing> neocade=#b9c1d0ff
+INTENTIONAL_AUTHORED Editor.color.ruler_color default=<missing> neocade=#484c5cff
+INTENTIONAL_AUTHORED Editor.color.selection_color default=<missing> neocade=#5ca352ff
+INTENTIONAL_AUTHORED Editor.color.separator_color default=<missing> neocade=#484c5cff
+INTENTIONAL_AUTHORED Editor.color.success_color default=<missing> neocade=#5cc971ff
+INTENTIONAL_AUTHORED Editor.color.success_color_dark_background default=<missing> neocade=#5cc971ff
 INTENTIONAL_AUTHORED Editor.color.warning_color default=<missing> neocade=#ffd166ff
+INTENTIONAL_AUTHORED Editor.color.warning_color_dark_background default=<missing> neocade=#ffd166ff
 INTENTIONAL_AUTHORED Editor.constant.class_icon_size default=<missing> neocade=16
 INTENTIONAL_AUTHORED Editor.constant.inspector_margin default=<missing> neocade=12
 INTENTIONAL_AUTHORED EditorAbout.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#151a2eff border=0/0/0/0 border_color=#151a2eff radius=0/0/0/0 margin=18.0/15.0/18.0/15.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2627,7 +2771,7 @@ INTENTIONAL_AUTHORED EditorLogFilterButton.color.icon_pressed_color default=<mis
 INTENTIONAL_AUTHORED EditorLogFilterButton.constant.h_separation default=<missing> neocade=4
 INTENTIONAL_AUTHORED EditorLogFilterButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED EditorProperty.stylebox.bg default=<missing> neocade=StyleBoxEmpty
-INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_group_note default=<missing> neocade=StyleBoxFlat(bg=#8bff6a1a border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_group_note default=<missing> neocade=StyleBoxFlat(bg=#8bff6a1a border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=12.0/9.0/12.0/9.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_selected default=<missing> neocade=StyleBoxFlat(bg=#484e6452 border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED EditorProperty.stylebox.child_bg default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED EditorProperty.color.property_color default=<missing> neocade=#f7f8fbff
@@ -2824,9 +2968,6 @@ INTENTIONAL_AUTHORED HSlider.stylebox.grabber_area_highlight default=StyleBoxFla
 INTENTIONAL_AUTHORED HSlider.stylebox.slider default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=4/4/4/4 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#101423ff border=1/1/1/1 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED HSlider.constant.center_grabber default=0 neocade=1
 INTENTIONAL_AUTHORED HSlider.constant.tick_offset default=0 neocade=8
-INTENTIONAL_AUTHORED HSlider.icon.grabber default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
-INTENTIONAL_AUTHORED HSlider.icon.grabber_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
-INTENTIONAL_AUTHORED HSlider.icon.grabber_highlight default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
 INTENTIONAL_AUTHORED HSlider.icon.tick default=Texture2D(size=(4.0, 8.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_tick.svg)
 INTENTIONAL_AUTHORED HSplitContainer.constant.separation default=12 neocade=6
 INTENTIONAL_AUTHORED HSplitContainer.icon.grabber default=Texture2D(size=(8.0, 48.0) path=) neocade=Texture2D(size=(6.0, 32.0) path=)
@@ -3285,7 +3426,7 @@ INTENTIONAL_AUTHORED Tree.stylebox.hovered default=StyleBoxFlat(bg=#ffffff12 bor
 INTENTIONAL_AUTHORED Tree.stylebox.hovered_dimmed default=StyleBoxFlat(bg=#ffffff08 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415a8c border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.hovered_selected default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.hovered_selected_focus default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Tree.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/5.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxEmpty
+INTENTIONAL_AUTHORED Tree.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/5.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#101423ff border=0/0/0/0 border_color=#101423ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.selected default=StyleBoxFlat(bg=#ffffff4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.selected_focus default=StyleBoxFlat(bg=#ffffff4d border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.title_button_hover default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -3367,9 +3508,6 @@ INTENTIONAL_AUTHORED VSlider.stylebox.grabber_area_highlight default=StyleBoxFla
 INTENTIONAL_AUTHORED VSlider.stylebox.slider default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=4/4/4/4 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#101423ff border=1/1/1/1 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED VSlider.constant.center_grabber default=0 neocade=1
 INTENTIONAL_AUTHORED VSlider.constant.tick_offset default=0 neocade=8
-INTENTIONAL_AUTHORED VSlider.icon.grabber default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
-INTENTIONAL_AUTHORED VSlider.icon.grabber_disabled default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
-INTENTIONAL_AUTHORED VSlider.icon.grabber_highlight default=Texture2D(size=(16.0, 16.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_grabber.svg)
 INTENTIONAL_AUTHORED VSlider.icon.tick default=Texture2D(size=(8.0, 4.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/slider_tick.svg)
 INTENTIONAL_AUTHORED VSplitContainer.constant.separation default=12 neocade=6
 INTENTIONAL_AUTHORED VSplitContainer.icon.grabber default=Texture2D(size=(48.0, 8.0) path=) neocade=Texture2D(size=(32.0, 6.0) path=)
@@ -3385,10 +3523,10 @@ INTENTIONAL_AUTHORED WindowContentPanel.stylebox.panel default=<missing> neocade
 
 
 Summary:
-- SAME=258
+- SAME=276
 - FALLS_BACK=0
-- INTENTIONAL_AUTHORED=2922
+- INTENTIONAL_AUTHORED=3072
 - UNINTENTIONAL_EXTRA=0
 - UNINTENTIONAL_STYLE=0
 - NEOCADE_ONLY=0
-- DEFAULT_ONLY=453
+- DEFAULT_ONLY=441

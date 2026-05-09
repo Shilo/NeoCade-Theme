@@ -717,6 +717,13 @@ func _expect_editor_integration_chrome(theme: Theme, label: String) -> void:
 	]:
 		if not theme.get_color(entry["slot"], entry["type"]).is_equal_approx(accent):
 			_fail("%s %s.%s should use accent when active/checked" % [label, entry["type"], entry["slot"]])
+	var button_normal := (theme.get_stylebox(&"normal", &"Button") as StyleBoxFlat).bg_color
+	for entry in [
+		{"type": &"CheckBox", "slot": &"checkbox_unchecked_color"},
+		{"type": &"CheckButton", "slot": &"button_unchecked_color"},
+	]:
+		if not theme.get_color(entry["slot"], entry["type"]).is_equal_approx(button_normal):
+			_fail("%s %s.%s should use solid inactive control fill, matching Button.normal" % [label, entry["type"], entry["slot"]])
 
 	for icon_name in [&"FileBigThumb", &"FileDeadBigThumb", &"FolderBigThumb", &"FileMediumThumb", &"FileDeadMediumThumb", &"FolderMediumThumb"]:
 		var icon := theme.get_icon(icon_name, &"EditorIcons")
@@ -731,7 +738,20 @@ func _expect_editor_integration_chrome(theme: Theme, label: String) -> void:
 	if subsection_style == null:
 		_fail("%s Editor.prop_subsection_stylebox missing for Signals/inspector headers" % label)
 	elif _max_border_width(subsection_style) != 0:
-		_fail("%s Editor.prop_subsection_stylebox should not draw separator borders" % label)
+		_fail("%s Editor.prop_subsection_stylebox should use padding instead of painted side rails, got %s/%s/%s/%s" % [
+			label,
+			subsection_style.border_width_left,
+			subsection_style.border_width_top,
+			subsection_style.border_width_right,
+			subsection_style.border_width_bottom,
+		])
+	elif subsection_style.content_margin_left < 5 or subsection_style.content_margin_right < 5:
+		_fail("%s Editor.prop_subsection_stylebox needs small left/right inset so parent view edges remain visible" % label)
+	var group_note := theme.get_stylebox(&"bg_group_note", &"EditorProperty") as StyleBoxFlat
+	if group_note == null:
+		_fail("%s EditorProperty.bg_group_note missing for inspector layout hint" % label)
+	elif group_note.content_margin_left < 8 or group_note.content_margin_top < 6:
+		_fail("%s EditorProperty.bg_group_note needs inner padding so hint icons/text do not hug the edge" % label)
 	var category_bg := theme.get_stylebox(&"bg", &"EditorInspectorCategory") as StyleBoxFlat
 	if category_bg == null:
 		_fail("%s EditorInspectorCategory.bg missing" % label)
@@ -746,6 +766,32 @@ func _expect_editor_integration_chrome(theme: Theme, label: String) -> void:
 		_fail("%s BottomPanel.tab_selected should not draw an outline" % label)
 	if odd_tab == null:
 		_fail("%s TabContainerOdd.tab_selected missing for Editor Settings tabs" % label)
+
+	var code_style := theme.get_stylebox(&"normal", &"CodeEdit") as StyleBoxFlat
+	var text_style := theme.get_stylebox(&"normal", &"TextEdit") as StyleBoxFlat
+	if code_style == null:
+		_fail("%s CodeEdit.normal missing" % label)
+	elif text_style != null and code_style.bg_color.get_luminance() >= text_style.bg_color.get_luminance():
+		_fail("%s CodeEdit.normal should be darker than generic TextEdit for readable code view bg" % label)
+	for slider_type in [&"HSlider", &"VSlider"]:
+		var grabber := theme.get_icon(&"grabber", slider_type)
+		var grabber_highlight := theme.get_icon(&"grabber_highlight", slider_type)
+		if grabber.get_size() != Vector2(16, 16) or grabber_highlight.get_size() != Vector2(16, 16):
+			_fail("%s %s grabber icons should stay compact generated 16px rectangles, got %s/%s" % [
+				label,
+				slider_type,
+				grabber.get_size(),
+				grabber_highlight.get_size(),
+			])
+	var checker := theme.get_icon(&"sample_bg", &"ColorPicker")
+	if checker.get_size().x < 8 or checker.get_size().y < 8:
+		_fail("%s ColorPicker.sample_bg checker texture is too small: %s" % [label, checker.get_size()])
+	var preset_checker := theme.get_icon(&"preset_bg", &"ColorPresetButton")
+	if preset_checker.get_size().x < 8 or preset_checker.get_size().y < 8:
+		_fail("%s ColorPresetButton.preset_bg checker texture is too small: %s" % [label, preset_checker.get_size()])
+	var preset_fg := theme.get_stylebox(&"preset_fg", &"ColorPresetButton") as StyleBoxFlat
+	if preset_fg == null:
+		_fail("%s ColorPresetButton.preset_fg missing for ColorPicker preset swatches" % label)
 
 
 func _expect_create_dialog_chrome(theme: Theme, label: String) -> void:
@@ -781,6 +827,8 @@ func _expect_create_dialog_chrome(theme: Theme, label: String) -> void:
 		_fail("%s TreeSecondary.panel should match Tree.panel bg when Tree.panel draws a bg" % label)
 	elif tree_panel is StyleBoxEmpty and tree_secondary_panel.bg_color.a < 0.99:
 		_fail("%s TreeSecondary.panel should draw the explicit list surface now that Tree.panel is empty for resource pickers" % label)
+	elif tree_panel is StyleBoxFlat and (tree_panel as StyleBoxFlat).bg_color.a < 0.99:
+		_fail("%s Tree.panel should draw a real list surface for plain editor Tree dialogs" % label)
 
 	var item_panel := theme.get_stylebox(&"panel", &"ItemList") as StyleBoxFlat
 	var item_secondary_panel := theme.get_stylebox(&"panel", &"ItemListSecondary") as StyleBoxFlat

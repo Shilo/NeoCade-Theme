@@ -1298,8 +1298,8 @@ accessibility_name = "Popup panel"
 [node name="PopupMargin" type="MarginContainer" parent="PopupPanel" unique_id=1756477724]
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 160.0
-offset_bottom = 118.0
+offset_right = 96.0
+offset_bottom = 96.0
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
@@ -1425,3 +1425,11 @@ text = "09  Marquee Sol       9,740 tickets"
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "10  Slider Nia        8,690 tickets"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=456370435]
+layout_mode = 0
+offset_left = 403.0
+offset_top = 1038.0
+offset_right = 562.0
+offset_bottom = 1078.0
+text = "asdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsf"

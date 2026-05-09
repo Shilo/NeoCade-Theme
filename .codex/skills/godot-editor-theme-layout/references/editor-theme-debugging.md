@@ -20,6 +20,7 @@ rg -n "CreateDialog|TreeSecondary|ItemListSecondary|split_bar_background|HSplitC
 rg -n "EditorProperty|EditorInspectorButton|EditorSpinSlider|set_flat\(true\)" C:\Programming_Files\Godot\godot-master\editor\inspector C:\Programming_Files\Godot\godot-master\editor\gui C:\Programming_Files\Godot\godot-master\editor\settings
 rg -n "BottomPanel|BottomPanelButton|EditorLogFilterButton|TabContainerOdd|prop_subsection|draw_relationship_lines|relationship_line_opacity" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
 rg -n "FileBigThumb|FolderBigThumb|file_thumbnail|folder_thumbnail|checkbox_checked_color|button_checked_color|EditorResourcePicker" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
+rg -n "EditorLog|RichTextLabel|ControlPositioningWarning|bg_group_note|ColorPresetButton|sample_bg|preset_bg|grabber_highlight|text_editor/theme/highlighting" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
 ```
 
 Then compare reference theme behavior:
@@ -67,6 +68,7 @@ rg -n "BottomPanelButton|EditorLogFilterButton|TabContainerOdd|EditorInspectorCa
   - Pin/expand/clear/collapse buttons use `BottomPanelButton`.
   - Output filter/count buttons use `EditorLogFilterButton`.
   - The Output log body itself is a plain `RichTextLabel` owned by `EditorLog`; identify it before changing any `RichTextLabel`/bottom-panel surface.
+  - Godot Modern/Minimal make global `RichTextLabel.normal` opaque, which is why default Output has an inner background. NeoCade keeps base `RichTextLabel` text-only; without a custom type variation in Godot source or an editor plugin, the theme-only safe target is the bottom-panel parent shell.
 
 - Create New Node dialog:
   - Source: `editor/gui/create_dialog.cpp`
@@ -94,6 +96,13 @@ rg -n "BottomPanelButton|EditorLogFilterButton|TabContainerOdd|EditorInspectorCa
   - Source: `editor/docks/signals_dock.cpp`, `editor/scene/connections_dialog.cpp`
   - Class/header rows are custom `TreeItem`s, not Tree column title buttons.
   - Useful hooks are `Editor.prop_subsection`, `Editor.prop_subsection_stylebox`, and related left/right subsection styleboxes.
+  - Godot source uses single-column `prop_subsection_stylebox` for Signals/Groups headers, while Action Map can use `_left` and `_right` for two-column headers. Side rails belong on these styleboxes; top/bottom borders usually read as unwanted outlines.
+
+- Inspector layout hint:
+  - Source: `editor/scene/gui/control_editor_plugin.cpp`
+  - Class: `ControlPositioningWarning`
+  - The hint panel applies `EditorProperty.bg_group_note` directly to an internal `PanelContainer`.
+  - If the hint icon/text alignment is wrong, first check `bg_group_note` content margins. The child nodes are plain `TextureRect`/`Label` inside a 3-column `GridContainer`.
 
 - Editor Settings top tabs:
   - Source: `editor/settings/editor_settings_dialog.cpp`
@@ -104,6 +113,18 @@ rg -n "BottomPanelButton|EditorLogFilterButton|TabContainerOdd|EditorInspectorCa
   - `FileDialog` thumbnail mode uses `FileDialog.thumbnail_size` plus `file_thumbnail` / `folder_thumbnail`.
   - The filesystem dock uses `EditorIcons` thumbnail names: `FileBigThumb`, `FileDeadBigThumb`, `FolderBigThumb`, `FileMediumThumb`, `FileDeadMediumThumb`, `FolderMediumThumb`.
   - Blurry fallback icons usually mean the imported SVG texture is much smaller than the fixed icon size and is being scaled up.
+
+- ColorPicker and color swatches:
+  - Source: `scene/gui/color_picker.cpp`
+  - The intensity row is hardcoded as label text `I` plus a generic `HSlider` and `SpinBox`; it inherits normal slider/input theme slots.
+  - Transparent color previews tile `ColorPicker.sample_bg`, `ColorPickerButton.bg`, and `ColorPresetButton.preset_bg`. These must be checker textures. If they are pictorial icons, the icon repeats across swatches and looks like broken glyphs.
+  - `ColorPresetButton` also uses `preset_fg`, `preset_focus`, and `overbright_indicator`.
+
+- Code editor:
+  - Source: `editor/gui/code_editor.cpp`, `editor/script/script_text_editor.cpp`, `scene/gui/text_edit.cpp`, `scene/gui/code_edit.cpp`
+  - `CodeEdit` owns the editor surface, gutter, caret, current-line, completion, and folding theme slots.
+  - GDScript syntax token colors are loaded from `text_editor/theme/highlighting/*` EditorSettings via syntax highlighters. Do not expect every visible code color to come from the Theme resource.
+  - A theme can still improve readability by making `CodeEdit.normal` darker than generic input fields and tuning selection/current-line/gutter/completion colors.
 
 ## Theme Editing Heuristics
 
@@ -121,6 +142,8 @@ rg -n "BottomPanelButton|EditorLogFilterButton|TabContainerOdd|EditorInspectorCa
 - For Tree views, distinguish guide/separator lines from hierarchy relationship lines. Keep `draw_guides` and `guide_color` off when row guides look noisy, but use `draw_relationship_lines`, `relationship_line_width`, `parent_hl_line_width`, `children_hl_line_width`, and muted relationship colors when the hierarchy path should remain visible like the Godot editor.
 - For selected-only Tree relationship lines, match Godot Modern: `draw_relationship_lines=1`, `relationship_line_width=0`, highlighted parent/child widths nonzero, and opacity from `interface/theme/relationship_line_opacity`. Guard `EditorInterface` access with `Engine.is_editor_hint()`; headless project scripts can report the singleton but still reject retrieval.
 - For checkbox/toggle icon color, check the control-specific draw colors: `CheckBox.checkbox_checked_color` / `checkbox_unchecked_color` and `CheckButton.button_checked_color` / `button_unchecked_color`. Ordinary `Button.icon_pressed_color` will not tint those icons.
+- CheckBox and CheckButton checked icons are single-color-modulated by Godot. If the desired look is accent fill with a contrasting checkmark or toggle knob, adjust the icon artwork/generator as well as the checked color slot.
+- For EditorSpinSlider hover shape issues, inspect `HSlider.grabber_highlight` and `HSlider.grabber`, because the spinner overlay grabs those icons directly on hover/drag. Use generated or matched icon pairs if per-style corner radius matters.
 - For scrollbars, Godot modern uses an empty/transparent track and semi-transparent thumb fills. In `theme_modern.cpp`, normal grabber alpha is roughly 0.225 and hover/pressed roughly 0.5; Godot Minimal Theme uses a similar translucent color recipe. Preserve Pulse square corners if that is part of the style, but avoid opaque thumbs unless the user asks.
 
 ## Reusable Bug Patterns
