@@ -65,6 +65,7 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_no_rich_text_label_chrome(theme, label)
 	_expect_tab_top_only_corners(theme, label)
 	_expect_tab_state_chrome(theme, label)
+	_expect_editor_compact_chrome(theme, label)
 	_expect_shared_interaction_chrome(theme, label)
 	_expect_tree_view_chrome(theme, label)
 	_expect_split_container_chrome(theme, label)
@@ -310,12 +311,22 @@ func _expect_scrollbar_chrome(theme: Theme, label: String) -> void:
 		for slot_name in [&"decrement", &"decrement_highlight", &"decrement_pressed", &"increment", &"increment_highlight", &"increment_pressed"]:
 			_expect_icon_max(theme, theme_type, slot_name, 1, label)
 		var scroll := theme.get_stylebox("scroll", theme_type) as StyleBoxFlat
+		var scroll_focus := theme.get_stylebox("scroll_focus", theme_type) as StyleBoxFlat
 		var grabber := theme.get_stylebox("grabber", theme_type) as StyleBoxFlat
 		var hover := theme.get_stylebox("grabber_highlight", theme_type) as StyleBoxFlat
 		var pressed := theme.get_stylebox("grabber_pressed", theme_type) as StyleBoxFlat
-		if scroll == null or grabber == null or hover == null or pressed == null:
+		if scroll == null or scroll_focus == null or grabber == null or hover == null or pressed == null:
 			_fail("%s missing scrollbar styleboxes for %s" % [label, theme_type])
 			continue
+		if scroll.bg_color.a > 0.01 or scroll_focus.bg_color.a > 0.01:
+			_fail("%s %s track should be transparent: scroll_alpha=%.2f focus_alpha=%.2f" % [
+				label,
+				theme_type,
+				scroll.bg_color.a,
+				scroll_focus.bg_color.a,
+			])
+		if _max_border_width(scroll) != 0 or _max_border_width(scroll_focus) != 0:
+			_fail("%s %s track/focus should not draw borders" % [label, theme_type])
 		var min_size := scroll.get_minimum_size()
 		var grabber_min_size := grabber.get_minimum_size()
 		if theme_type == &"HScrollBar":
@@ -434,10 +445,79 @@ func _expect_tab_state_chrome(theme: Theme, label: String) -> void:
 			])
 		if _relative_luminance(selected.bg_color) <= _relative_luminance(unselected.bg_color):
 			_fail("%s %s.tab_selected should be brighter than tab_unselected" % [label, theme_type])
-		if selected.border_width_bottom > selected.border_width_top:
-			_fail("%s %s.tab_selected should behave like toggled Button.pressed with no raised bottom extrusion" % [label, theme_type])
+		for state in [
+			{"name": &"tab_selected", "stylebox": selected},
+			{"name": &"tab_unselected", "stylebox": unselected},
+			{"name": &"tab_hovered", "stylebox": hovered},
+			{"name": &"tab_disabled", "stylebox": disabled},
+		]:
+			var state_stylebox := state["stylebox"] as StyleBoxFlat
+			if _max_border_width(state_stylebox) != 0:
+				_fail("%s %s.%s should not draw an outline border" % [label, theme_type, state["name"]])
 		if _max_border_width(disabled) != 0:
 			_fail("%s %s.tab_disabled should not keep an outline border" % [label, theme_type])
+
+
+func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
+	for margin_name in [&"margin_top", &"margin_bottom", &"margin_left", &"margin_right"]:
+		_expect_equal(theme.get_constant(margin_name, "MarginContainer"), 0, "%s MarginContainer.%s" % [label, margin_name])
+	_expect_equal(theme.get_constant("separation", "HBoxContainer"), 4, "%s HBoxContainer.separation" % label)
+	_expect_equal(theme.get_constant("separation", "VBoxContainer"), 4, "%s VBoxContainer.separation" % label)
+	_expect_equal(theme.get_constant("h_separation", "FlowContainer"), 4, "%s FlowContainer.h_separation" % label)
+	_expect_equal(theme.get_constant("v_separation", "FlowContainer"), 4, "%s FlowContainer.v_separation" % label)
+	_expect_equal(theme.get_constant("h_separation", "GridContainer"), 4, "%s GridContainer.h_separation" % label)
+	_expect_equal(theme.get_constant("v_separation", "GridContainer"), 4, "%s GridContainer.v_separation" % label)
+	_expect_equal(theme.get_constant("side_margin", "TabContainer"), 4, "%s TabContainer.side_margin" % label)
+	_expect_equal(theme.get_constant("tab_separation", "TabContainer"), 0, "%s TabContainer.tab_separation" % label)
+	_expect_equal(theme.get_constant("icon_max_width", "TabBar"), 0, "%s TabBar.icon_max_width" % label)
+	_expect_equal(theme.get_constant("icon_max_width", "TabContainer"), 0, "%s TabContainer.icon_max_width" % label)
+
+	var tabbar_background := theme.get_stylebox("tabbar_background", "TabContainer") as StyleBoxFlat
+	if tabbar_background == null:
+		_fail("%s missing TabContainer.tabbar_background" % label)
+	else:
+		if _max_border_width(tabbar_background) != 0:
+			_fail("%s TabContainer.tabbar_background should not draw an outline border" % label)
+		if tabbar_background.get_minimum_size() != Vector2.ZERO:
+			_fail("%s TabContainer.tabbar_background should not add tab strip margins, got %s" % [label, tabbar_background.get_minimum_size()])
+
+	var option_normal := theme.get_stylebox("normal", "OptionButton") as StyleBoxFlat
+	if option_normal == null:
+		_fail("%s missing OptionButton.normal" % label)
+	else:
+		if option_normal.content_margin_top > 6 or option_normal.content_margin_bottom > 9:
+			_fail("%s OptionButton vertical margins should stay editor-compact, got top/bottom=%s/%s" % [
+				label,
+				option_normal.content_margin_top,
+				option_normal.content_margin_bottom,
+			])
+	_expect_equal(theme.get_constant("arrow_margin", "OptionButton"), 6, "%s OptionButton.arrow_margin" % label)
+	_expect_equal(theme.get_constant("h_separation", "OptionButton"), 4, "%s OptionButton.h_separation" % label)
+
+	for theme_type in [&"FlatButton", &"FlatMenuButton"]:
+		var normal := theme.get_stylebox("normal", theme_type) as StyleBoxFlat
+		var hover := theme.get_stylebox("hover", theme_type) as StyleBoxFlat
+		if normal == null or hover == null:
+			_fail("%s missing compact editor styleboxes for %s" % [label, theme_type])
+			continue
+		if normal.bg_color.a > 0.01 or _max_border_width(normal) != 0:
+			_fail("%s %s.normal should be transparent and borderless" % [label, theme_type])
+		if normal.content_margin_left > 6 or normal.content_margin_top > 4:
+			_fail("%s %s.normal margins should be compact, got %s/%s/%s/%s" % [
+				label,
+				theme_type,
+				normal.content_margin_left,
+				normal.content_margin_top,
+				normal.content_margin_right,
+				normal.content_margin_bottom,
+			])
+		if _max_border_width(hover) != 0:
+			_fail("%s %s.hover should not draw an outline border" % [label, theme_type])
+		_expect_equal(theme.get_constant("h_separation", theme_type), 4, "%s %s.h_separation" % [label, theme_type])
+
+	var menu_icon := theme.get_icon("menu", "TabContainer")
+	if menu_icon.get_size().x < 20 or menu_icon.get_size().y < 20:
+		_fail("%s TabContainer.menu icon should be at least 20px for editor more menu, got %s" % [label, menu_icon.get_size()])
 
 
 func _expect_shared_interaction_chrome(theme: Theme, label: String) -> void:
@@ -617,11 +697,11 @@ func _expect_split_grabber_icon(theme: Theme, theme_type: StringName, slot_name:
 		return
 	var size := theme.get_icon(slot_name, theme_type).get_size()
 	if vertical_indicator:
-		if size.x > 6 or size.y < 32:
-			_fail("%s %s.%s should be a narrow long vertical indicator, got %s" % [label, theme_type, slot_name, size])
+		if size.x != 6 or size.y < 32:
+			_fail("%s %s.%s should be a 6px-thick long vertical indicator, got %s" % [label, theme_type, slot_name, size])
 	else:
-		if size.y > 6 or size.x < 32:
-			_fail("%s %s.%s should be a narrow long horizontal indicator, got %s" % [label, theme_type, slot_name, size])
+		if size.y != 6 or size.x < 32:
+			_fail("%s %s.%s should be a 6px-thick long horizontal indicator, got %s" % [label, theme_type, slot_name, size])
 
 
 func _expect_button_surface_chrome(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:

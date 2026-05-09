@@ -1298,8 +1298,8 @@ accessibility_name = "Popup panel"
 [node name="PopupMargin" type="MarginContainer" parent="PopupPanel" unique_id=1756477724]
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 172.0
-offset_bottom = 108.0
+offset_right = 96.0
+offset_bottom = 96.0
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
