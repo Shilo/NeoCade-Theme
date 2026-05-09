@@ -1619,17 +1619,20 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"prop_subsection_stylebox": {
 				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
-				"raised_intensity": 0, "border_width": 0,
+				"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
+				"border_alpha": 0.0,
 				"radius": "shape.secondary_radius", "padding": Vector2i(6, 2)
 			},
 			"prop_subsection_stylebox_left": {
 				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
-				"raised_intensity": 0, "border_width": 0,
+				"raised_intensity": 0, "border_widths": Vector4i(1, 0, 0, 0),
+				"border_alpha": 0.0,
 				"radius": "shape.secondary_radius", "padding": Vector2i(6, 2)
 			},
 			"prop_subsection_stylebox_right": {
 				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
-				"raised_intensity": 0, "border_width": 0,
+				"raised_intensity": 0, "border_widths": Vector4i(0, 0, 1, 0),
+				"border_alpha": 0.0,
 				"radius": "shape.secondary_radius", "padding": Vector2i(6, 2)
 			},
 		},
@@ -1666,7 +1669,10 @@ const BINDING_TABLE: Dictionary = {
 			"axis_z_color": {"role": "editor_property_z"},
 			"axis_w_color": {"role": "editor_property_w"},
 			"axis_view_plane_color": {"role": "text_muted", "alpha": 0.33},
-			"prop_subsection": {"role": "editor_prop_subsection"},
+			# Signals/Groups subsection rows pass this to TreeItem.set_custom_bg_color(),
+			# which paints edge-to-edge before the stylebox is drawn. Keep it transparent
+			# so prop_subsection_stylebox owns the visible inset fill.
+			"prop_subsection": {"role": "editor_prop_subsection", "alpha": 0.0},
 			"prop_subsection_stylebox_color": {"role": "editor_prop_subsection"},
 			"font_color": {"role": "text_default"},
 			"font_focus_color": {"role": "text_strong"},

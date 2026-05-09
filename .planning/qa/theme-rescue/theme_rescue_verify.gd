@@ -735,16 +735,21 @@ func _expect_editor_integration_chrome(theme: Theme, label: String) -> void:
 			_fail("%s FileDialog.%s should be large enough for thumbnail mode, got %s" % [label, icon_slot, icon.get_size()])
 
 	var subsection_style := theme.get_stylebox(&"prop_subsection_stylebox", &"Editor") as StyleBoxFlat
+	var subsection_color := theme.get_color(&"prop_subsection", &"Editor")
+	if subsection_color.a > 0.01:
+		_fail("%s Editor.prop_subsection must remain transparent; Signals/Groups TreeItem custom_bg_color otherwise paints full-width over the parent edge" % label)
 	if subsection_style == null:
 		_fail("%s Editor.prop_subsection_stylebox missing for Signals/inspector headers" % label)
-	elif _max_border_width(subsection_style) != 0:
-		_fail("%s Editor.prop_subsection_stylebox should use padding instead of painted side rails, got %s/%s/%s/%s" % [
+	elif subsection_style.border_width_left < 1 or subsection_style.border_width_right < 1:
+		_fail("%s Editor.prop_subsection_stylebox should reserve transparent side spacing, got %s/%s/%s/%s" % [
 			label,
 			subsection_style.border_width_left,
 			subsection_style.border_width_top,
 			subsection_style.border_width_right,
 			subsection_style.border_width_bottom,
 		])
+	elif subsection_style.border_color.a > 0.01:
+		_fail("%s Editor.prop_subsection_stylebox side reservation should be transparent" % label)
 	elif subsection_style.content_margin_left < 5 or subsection_style.content_margin_right < 5:
 		_fail("%s Editor.prop_subsection_stylebox needs small left/right inset so parent view edges remain visible" % label)
 	var group_note := theme.get_stylebox(&"bg_group_note", &"EditorProperty") as StyleBoxFlat

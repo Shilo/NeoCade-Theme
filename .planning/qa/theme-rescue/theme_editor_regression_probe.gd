@@ -45,12 +45,18 @@ func _expect_focus_viewport_outline_only(theme: Theme, label: String) -> void:
 
 
 func _expect_editor_subsection_padding(theme: Theme, label: String) -> void:
+	var subsection_color := theme.get_color(&"prop_subsection", &"Editor")
+	if subsection_color.a > 0.01:
+		_fail("%s Editor.prop_subsection must stay transparent because TreeItem custom_bg_color fills the full row" % label)
+
 	var section := theme.get_stylebox(&"prop_subsection_stylebox", &"Editor") as StyleBoxFlat
 	if section == null:
 		_fail("%s Editor.prop_subsection_stylebox missing StyleBoxFlat" % label)
 		return
-	if section.border_width_left != 0 or section.border_width_right != 0:
-		_fail("%s Editor.prop_subsection_stylebox should use padding, not side rails" % label)
+	if section.border_width_left < 1 or section.border_width_right < 1:
+		_fail("%s Editor.prop_subsection_stylebox should reserve transparent side spacing" % label)
+	if section.border_color.a > 0.01:
+		_fail("%s Editor.prop_subsection_stylebox side reservation should be transparent" % label)
 	if section.content_margin_left < 6.0 or section.content_margin_right < 6.0:
 		_fail("%s Editor.prop_subsection_stylebox side padding too small: %.1f/%.1f" % [
 			label,
