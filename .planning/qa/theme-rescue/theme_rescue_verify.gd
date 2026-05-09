@@ -467,7 +467,7 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 	_expect_equal(theme.get_constant("v_separation", "FlowContainer"), 4, "%s FlowContainer.v_separation" % label)
 	_expect_equal(theme.get_constant("h_separation", "GridContainer"), 4, "%s GridContainer.h_separation" % label)
 	_expect_equal(theme.get_constant("v_separation", "GridContainer"), 4, "%s GridContainer.v_separation" % label)
-	_expect_equal(theme.get_constant("side_margin", "TabContainer"), 4, "%s TabContainer.side_margin" % label)
+	_expect_equal(theme.get_constant("side_margin", "TabContainer"), 0, "%s TabContainer.side_margin" % label)
 	_expect_equal(theme.get_constant("tab_separation", "TabContainer"), 0, "%s TabContainer.tab_separation" % label)
 	_expect_equal(theme.get_constant("icon_max_width", "TabBar"), 0, "%s TabBar.icon_max_width" % label)
 	_expect_equal(theme.get_constant("icon_max_width", "TabContainer"), 0, "%s TabContainer.icon_max_width" % label)
@@ -478,8 +478,18 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 	else:
 		if _max_border_width(tabbar_background) != 0:
 			_fail("%s TabContainer.tabbar_background should not draw an outline border" % label)
-		if tabbar_background.get_minimum_size() != Vector2.ZERO:
-			_fail("%s TabContainer.tabbar_background should not add tab strip margins, got %s" % [label, tabbar_background.get_minimum_size()])
+		if tabbar_background.content_margin_left < 4 or tabbar_background.content_margin_right < 4:
+			_fail("%s TabContainer.tabbar_background should own left/right tab strip inset, got %s/%s" % [
+				label,
+				tabbar_background.content_margin_left,
+				tabbar_background.content_margin_right,
+			])
+		if tabbar_background.content_margin_top < 3 or tabbar_background.content_margin_bottom < 2:
+			_fail("%s TabContainer.tabbar_background should keep compact top/bottom inset, got %s/%s" % [
+				label,
+				tabbar_background.content_margin_top,
+				tabbar_background.content_margin_bottom,
+			])
 
 	var option_normal := theme.get_stylebox("normal", "OptionButton") as StyleBoxFlat
 	if option_normal == null:
@@ -502,7 +512,7 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 			continue
 		if normal.bg_color.a > 0.01 or _max_border_width(normal) != 0:
 			_fail("%s %s.normal should be transparent and borderless" % [label, theme_type])
-		if normal.content_margin_left > 6 or normal.content_margin_top > 4:
+		if normal.content_margin_left > 6 or normal.content_margin_top > 5:
 			_fail("%s %s.normal margins should be compact, got %s/%s/%s/%s" % [
 				label,
 				theme_type,
@@ -511,13 +521,36 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 				normal.content_margin_right,
 				normal.content_margin_bottom,
 			])
+		if normal.content_margin_top < 3 or normal.content_margin_bottom < 2:
+			_fail("%s %s.normal margins should keep visible toolbar inset, got top/bottom=%s/%s" % [
+				label,
+				theme_type,
+				normal.content_margin_top,
+				normal.content_margin_bottom,
+			])
 		if _max_border_width(hover) != 0:
 			_fail("%s %s.hover should not draw an outline border" % [label, theme_type])
+		var expected_accent := (theme as NeoCadeTheme).accent_color
+		if not theme.get_color("icon_pressed_color", theme_type).is_equal_approx(expected_accent):
+			_fail("%s %s.icon_pressed_color should use accent for toggled editor buttons" % [label, theme_type])
+		if not theme.get_color("icon_hover_pressed_color", theme_type).is_equal_approx(expected_accent):
+			_fail("%s %s.icon_hover_pressed_color should keep accent while toggled+hovered" % [label, theme_type])
 		_expect_equal(theme.get_constant("h_separation", theme_type), 4, "%s %s.h_separation" % [label, theme_type])
 
 	var menu_icon := theme.get_icon("menu", "TabContainer")
-	if menu_icon.get_size().x < 20 or menu_icon.get_size().y < 20:
-		_fail("%s TabContainer.menu icon should be at least 20px for editor more menu, got %s" % [label, menu_icon.get_size()])
+	if menu_icon.get_size().x < 24 or menu_icon.get_size().y < 24:
+		_fail("%s TabContainer.menu icon should be at least 24px for editor more menu, got %s" % [label, menu_icon.get_size()])
+	if menu_icon.get_size().x > 28 or menu_icon.get_size().y > 28:
+		_fail("%s TabContainer.menu icon should stay toolbar-sized, got %s" % [label, menu_icon.get_size()])
+	for icon_name in [&"GuiTabMenu", &"GuiTabMenuHl", &"GuiTabMenuHlDarkBackground", &"TripleBar"]:
+		if not theme.has_icon(icon_name, "EditorIcons"):
+			_fail("%s missing EditorIcons.%s override" % [label, icon_name])
+			continue
+		var editor_icon_size := theme.get_icon(icon_name, "EditorIcons").get_size()
+		if editor_icon_size.x < 24 or editor_icon_size.y < 24:
+			_fail("%s EditorIcons.%s should be at least 24px, got %s" % [label, icon_name, editor_icon_size])
+		if editor_icon_size.x > 28 or editor_icon_size.y > 28:
+			_fail("%s EditorIcons.%s should stay toolbar-sized, got %s" % [label, icon_name, editor_icon_size])
 
 
 func _expect_shared_interaction_chrome(theme: Theme, label: String) -> void:

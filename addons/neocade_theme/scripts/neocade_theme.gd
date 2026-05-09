@@ -1448,9 +1448,10 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 }
 
 
-# ─── BINDING_TABLE (Plan 04-05; 37 canonical scorecard Controls) ────────────────────────────
+# ─── BINDING_TABLE (Plan 04-05; 37 canonical Controls + narrow EditorIcons overrides) ────────
 ## CANONICAL 37-ROW FREEZE (Cross-AI Cycle 1 C1 fix; sourced verbatim from
 ## MINIMAL-THEME-COVERAGE-DELTA.md §Coverage Scorecard). NO executor discretion to add/drop.
+## The EditorIcons row below is a non-Control editor integration shim, not a scorecard Control.
 ##
 ## Structure: theme_type → data_type ("stylebox"/"color"/"constant"/"font_size"/"icon")
 ##   → slot_name → recipe Dictionary. Recipes:
@@ -1467,6 +1468,17 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 ## Resource model post-Phase-4. The public @export surface + .tres format are stable; only
 ## the internal binding mechanism would change.
 const BINDING_TABLE: Dictionary = {
+	# Editor icon overrides — Godot editor toolbar/menu buttons request these through
+	# EditorIcons, not through TabContainer icon slots. Keep this narrow: only the
+	# "more/menu" family that NeoCade restyles for editor chrome.
+	"EditorIcons": {
+		"icon": {
+			"GuiTabMenu":                 {"icon": "tab_menu"},
+			"GuiTabMenuHl":               {"icon": "tab_menu"},
+			"GuiTabMenuHlDarkBackground": {"icon": "tab_menu"},
+			"TripleBar":                  {"icon": "editor_triple_bar_24"},
+		},
+	},
 	# 1. AcceptDialog — explicit popup shell plus official button-container spacing.
 	"AcceptDialog": {
 		"stylebox": {
@@ -2360,7 +2372,7 @@ const BINDING_TABLE: Dictionary = {
 			"panel":            {"role": "surface_panel", "border_role": "surface_panel_edge",
 								  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true},
 			"tabbar_background":{"role": "surface_base",  "raised_intensity": 0,
-								  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
+								  "border_width": 0, "radius": 0, "content_margins": Vector4i(4, 3, 4, 2)},
 		},
 		"color": {
 			"font_selected_color":   {"role": "text_strong"},
@@ -2378,7 +2390,7 @@ const BINDING_TABLE: Dictionary = {
 			"icon_max_width":   {"value": 0},
 			"icon_separation":  {"value": 6},
 			"outline_size":     {"value": 0},
-			"side_margin":      {"value": 4},
+			"side_margin":      {"value": 0},
 			"tab_separation":   {"value": 0},
 		},
 		"font_size": {
@@ -2938,21 +2950,21 @@ const BINDING_TABLE: Dictionary = {
 	"FlatButton": {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
 								"alpha": 0.0, "border_width": 0},
 			"hover":         {"role": "button_hover", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
 								"border_width": 0},
 			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
 								"border_width": 0},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
 			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
 								"alpha": 0.0, "border_width": 0},
 			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
 								"border_width": 0},
 		},
 		"color": {
@@ -2964,10 +2976,10 @@ const BINDING_TABLE: Dictionary = {
 			"font_hover_pressed_color":{"role": "text_strong"},
 			"icon_normal_color":       {"role": "text_default"},
 			"icon_hover_color":        {"role": "text_strong"},
-			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "role_primary"},
 			"icon_focus_color":        {"role": "text_strong"},
 			"icon_disabled_color":     {"role": "text_default", "disabled": true},
-			"icon_hover_pressed_color":{"role": "text_strong"},
+			"icon_hover_pressed_color":{"role": "role_primary"},
 		},
 		"constant": {
 			"h_separation": {"value": 4},
@@ -2979,22 +2991,22 @@ const BINDING_TABLE: Dictionary = {
 	"FlatMenuButton": {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
 								"alpha": 0.0, "border_width": 0},
 			"hover":         {"role": "button_hover", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
 								"border_width": 0},
 			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
 								"border_width": 0},
 			"focus":         {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
 								"alpha": 0.0, "border_width": 0},
 			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
 								"alpha": 0.0, "border_width": 0},
 			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(4, 2),
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
 								"border_width": 0},
 		},
 		"color": {
@@ -3006,10 +3018,10 @@ const BINDING_TABLE: Dictionary = {
 			"font_hover_pressed_color":{"role": "text_strong"},
 			"icon_normal_color":       {"role": "text_default"},
 			"icon_hover_color":        {"role": "text_strong"},
-			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "role_primary"},
 			"icon_focus_color":        {"role": "text_strong"},
 			"icon_disabled_color":     {"role": "text_default", "disabled": true},
-			"icon_hover_pressed_color":{"role": "text_strong"},
+			"icon_hover_pressed_color":{"role": "role_primary"},
 		},
 		"constant": {
 			"h_separation": {"value": 4},
