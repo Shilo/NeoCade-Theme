@@ -8,6 +8,11 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	if not Engine.is_editor_hint():
+		print("THEME_EDITOR_DOCK_PROBE: SKIP Engine.is_editor_hint() is false; run with --editor")
+		quit(0)
+		return
+
 	var canonical := load(THEME_PATH) as NeoCadeTheme
 	if canonical == null:
 		printerr("THEME_EDITOR_DOCK_PROBE: missing NeoCadeTheme")

@@ -124,6 +124,8 @@ func _expect_spacing_source_guard() -> void:
 		_fail("stale compact flat-button margins remain in source")
 	if not source.contains("\"FlatButton\"") or not source.contains("content_margins\": Vector4i(6, 4, 6, 4)"):
 		_fail("shared flat-button recipes should own 6/4/6/4 margins directly")
+	if not source.contains("\"BottomPanel\": {\"role\": \"surface_panel\", \"border_role\": \"surface_panel_edge\",\n\t\t\t\t\t\t\t\"raised_intensity\": \"shape.raised_lifts.panel\",\n\t\t\t\t\t\t\t\"raised_face_edge\": true, \"content_margins\": Vector4i(0, 0, 0, 0)}"):
+		_fail("EditorStyles.BottomPanel should not add an outer shell inset around Output/Audio/Shader bottom panes")
 	if not source.contains("\"PopupPanel\"") or not source.contains("\"padding\": Vector2i(8, 6)"):
 		_fail("PopupPanel should own dock-position/custom-popup edge padding")
 	if not source.contains("\"PopupMenu\"") or not source.contains("\"padding\": Vector2i(0, 0)"):

@@ -12,6 +12,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_check_project_settings()
+	_check_new_theme_defaults()
 
 	var canonical := load(THEME_PATH) as NeoCadeTheme
 	if canonical == null:
@@ -36,6 +37,25 @@ func _check_project_settings() -> void:
 	_expect_equal(ProjectSettings.get_setting("display/window/size/viewport_width"), 1920, "viewport_width")
 	_expect_equal(ProjectSettings.get_setting("display/window/size/viewport_height"), 1080, "viewport_height")
 	_expect_equal(ProjectSettings.get_setting("display/window/subwindows/embed_subwindows"), true, "embed_subwindows")
+
+
+func _check_new_theme_defaults() -> void:
+	var theme := NeoCadeTheme.new()
+	_expect_equal(theme.style, NeoCadeTheme.Style.PULSE, "NeoCadeTheme.new style")
+	_expect_equal(theme.raised, false, "NeoCadeTheme.new raised")
+	_expect_equal(theme.platform, NeoCadeTheme.Platform.AUTO, "NeoCadeTheme.new platform")
+	_expect_color_equal(theme.base_color, Color("#151A2E"), "NeoCadeTheme.new base_color")
+	_expect_color_equal(theme.accent_color, Color("#8BFF6A"), "NeoCadeTheme.new accent_color")
+	_expect_equal(theme.corner_radius, 0, "NeoCadeTheme.new corner_radius")
+	_expect_equal(theme.spacing, 14, "NeoCadeTheme.new spacing")
+	_expect_equal(theme.raised_strength, 2, "NeoCadeTheme.new raised_strength")
+	_expect_equal(theme.focus_thickness, 2, "NeoCadeTheme.new focus_thickness")
+	_expect_equal(theme.outline_width, 1, "NeoCadeTheme.new outline_width")
+	_expect_equal(theme.use_runtime_popup_selection_icons, true, "NeoCadeTheme.new use_runtime_popup_selection_icons")
+	if not theme.has_stylebox(&"normal", &"Button"):
+		_fail("NeoCadeTheme.new should generate Button.normal")
+	if not theme.has_icon(&"checked", &"PopupMenu"):
+		_fail("NeoCadeTheme.new should generate PopupMenu.checked")
 
 
 func _theme_variant(source: NeoCadeTheme, style_value: int, raised: bool, platform: int) -> NeoCadeTheme:
@@ -852,7 +872,7 @@ func _expect_editor_integration_chrome(theme: Theme, label: String) -> void:
 	var contextual_toolbar := theme.get_stylebox(&"ContextualToolbar", &"EditorStyles") as StyleBoxFlat
 	var editor_content := theme.get_stylebox(&"Content", &"EditorStyles") as StyleBoxFlat
 	if contextual_toolbar == null:
-		_fail("%s EditorStyles.ContextualToolbar missing for viewport toolbar background" % label)
+		_fail("%s EditorStyles.ContextualToolbar missing for secondary contextual toolbar background" % label)
 	elif editor_content != null and contextual_toolbar.bg_color.is_equal_approx(editor_content.bg_color):
 		_fail("%s EditorStyles.ContextualToolbar should stand off from the viewport/editor content surface" % label)
 
@@ -1495,6 +1515,11 @@ func _expect_contrast(theme: Theme, theme_type: StringName, stylebox_slot: Strin
 func _expect_equal(actual: Variant, expected: Variant, label: String) -> void:
 	if actual != expected:
 		_fail("%s expected %s got %s" % [label, expected, actual])
+
+
+func _expect_color_equal(actual: Color, expected: Color, label: String) -> void:
+	if not actual.is_equal_approx(expected):
+		_fail("%s expected %s got %s" % [label, expected.to_html(true), actual.to_html(true)])
 
 
 func _max_border_width(stylebox: StyleBoxFlat) -> int:

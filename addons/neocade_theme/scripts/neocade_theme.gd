@@ -98,7 +98,7 @@ enum Style {
 		_after_direction_export_changed()
 
 ## Base spacing value used to derive margins, separations, and control padding.
-@export var spacing: int = 18:
+@export var spacing: int = 14:
 	set(value):
 		value = maxi(0, value)
 		if spacing == value: return
@@ -106,7 +106,7 @@ enum Style {
 		_after_direction_export_changed()
 
 ## Multiplier for raised offset depth when raised mode is enabled.
-@export var raised_strength: int = 3:
+@export var raised_strength: int = 2:
 	set(value):
 		value = maxi(0, value)
 		if raised_strength == value: return
@@ -144,7 +144,7 @@ enum Style {
 # ─── Internal state (NOT exported) ──────────────────────────────────────────────────────────
 var is_light: bool = false  # derived from base_color.get_luminance() at every regenerate
 var _regenerating: bool = false  # reentry guard (per RESEARCH.md §4)
-var _last_regeneration_usec: int = 0  # diagnostic; logged via Output in editor
+var _last_regeneration_usec: int = 0  # diagnostic for probes and profiling
 var _applying_style_exports := false
 var _syncing_style_from_exports := false
 
@@ -386,7 +386,7 @@ func _regenerate_theme() -> void:
 
 	# ── BINDING_TABLE walk lands here (Plan 04-05). ──
 	# The locals above are the precomputed inputs every entry-population path consumes.
-	# Iteration is additive only; no Theme reset is permitted in this method (D-01 invariant).
+	# Regeneration clears this Theme first, then repopulates every authored slot.
 
 	# ── Theme defaults (Cross-AI Cycle 1 C3 fix + Cycle 6 F6 fix; BL-01 fix 2026-05-06) ──
 	# Set the theme-level default_font + default_font_size BEFORE the BINDING_TABLE walk
@@ -613,7 +613,7 @@ func _regenerate_theme() -> void:
 		role_table["editor_property_w"] = text_default
 		role_table["editor_prop_subsection"] = _mix(button_disabled, surface_base, 0.48)
 
-	# ── Walk BINDING_TABLE — additive iteration; entries not in table are LEFT UNTOUCHED (D-04) ──
+	# ── Walk BINDING_TABLE — entries not in table remain unset and fall through to Godot defaults. ──
 	# Cross-AI Cycle 2 N1 fix: only 5 setter branches — NO set_font branch. Per-Control
 	# fonts are handled by default_font + explicit set_font on the 14 type variations.
 	# Cross-AI Cycle 2 C2 fix: style_personality passed to _resolve_recipe so disabled alpha is
@@ -3585,7 +3585,7 @@ const BINDING_TABLE: Dictionary = {
 									"corner_profile": "bottom_only"},
 			"panel":            {"role": "surface_panel", "border_role": "surface_panel_edge",
 								  "raised_intensity": "shape.raised_lifts.panel",
-								  "raised_face_edge": true, "content_margins": Vector4i(6, 5, 6, 5)},
+								  "raised_face_edge": true, "content_margins": Vector4i(0, 0, 0, 0)},
 			"tabbar_background":{"role": "surface_base", "raised_intensity": 0,
 								  "border_width": 0, "radius": 0, "content_margins": Vector4i(4, 2, 4, 0)},
 		},
@@ -3608,10 +3608,10 @@ const BINDING_TABLE: Dictionary = {
 						   "raised_intensity": 0, "border_width": 0},
 			"BottomPanel": {"role": "surface_panel", "border_role": "surface_panel_edge",
 							"raised_intensity": "shape.raised_lifts.panel",
-							"raised_face_edge": true, "content_margins": Vector4i(6, 5, 6, 5)},
+							"raised_face_edge": true, "content_margins": Vector4i(0, 0, 0, 0)},
 			"Content": {"role": "surface_base", "border_role": "surface_base",
 						"raised_intensity": 0, "border_width": 0},
-			"ContextualToolbar": {"role": "surface_high", "border_role": "surface_high",
+			"ContextualToolbar": {"role": "surface_overlay", "border_role": "surface_overlay",
 								  "raised_intensity": 0, "border_width": 0},
 			"DebuggerPanel": {"role": "surface_panel", "border_role": "surface_panel_edge",
 							  "raised_intensity": 0, "border_width": 1,
