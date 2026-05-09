@@ -237,6 +237,8 @@ func _exports_match_style(style_value: int) -> bool:
 func _regenerate_theme() -> void:
 	if _regenerating: return
 	_regenerating = true
+	var was_blocking_signals := is_blocking_signals()
+	set_block_signals(true)
 	var t0 := Time.get_ticks_usec()
 	clear()
 
@@ -664,6 +666,9 @@ func _regenerate_theme() -> void:
 	set_font_size("font_size", "ColorPickerButton", tokens.body)
 
 	_last_regeneration_usec = Time.get_ticks_usec() - t0
+	set_block_signals(was_blocking_signals)
+	if not was_blocking_signals:
+		emit_changed()
 	_regenerating = false
 
 

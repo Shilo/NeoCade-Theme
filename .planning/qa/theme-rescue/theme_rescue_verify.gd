@@ -13,6 +13,7 @@ func _initialize() -> void:
 func _run() -> void:
 	_check_project_settings()
 	_check_new_theme_defaults()
+	_check_regeneration_batches_changed_signal()
 
 	var canonical := load(THEME_PATH) as NeoCadeTheme
 	if canonical == null:
@@ -56,6 +57,15 @@ func _check_new_theme_defaults() -> void:
 		_fail("NeoCadeTheme.new should generate Button.normal")
 	if not theme.has_icon(&"checked", &"PopupMenu"):
 		_fail("NeoCadeTheme.new should generate PopupMenu.checked")
+
+
+func _check_regeneration_batches_changed_signal() -> void:
+	var theme := NeoCadeTheme.new()
+	var changed_count := [0]
+	theme.changed.connect(func() -> void: changed_count[0] += 1)
+	theme.raised = not theme.raised
+	if int(changed_count[0]) != 1:
+		_fail("NeoCadeTheme regeneration should emit exactly one changed signal, got %d" % int(changed_count[0]))
 
 
 func _theme_variant(source: NeoCadeTheme, style_value: int, raised: bool, platform: int) -> NeoCadeTheme:
