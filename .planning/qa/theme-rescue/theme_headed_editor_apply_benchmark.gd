@@ -48,17 +48,54 @@ func _benchmark_resource_costs() -> void:
 
 func _benchmark_regeneration_costs() -> void:
 	var theme := load(THEME_PATH).duplicate(true) as NeoCadeTheme
-	_measure("regen: toggle raised", func() -> void:
+	print("  texture_cache default=%s" % str(theme.texture_cache))
+	_measure("regen: toggle raised temp cache", func() -> void:
 		theme.raised = not theme.raised
-		print("    last_regen=%7.3fms" % (float(theme._last_regeneration_usec) / 1000.0))
+		print("    last_regen=%7.3fms active_icons=%d active_generated=%d" % [
+			float(theme._last_regeneration_usec) / 1000.0,
+			theme._active_icon_cache.size(),
+			theme._active_generated_texture_cache.size(),
+		])
 	)
 	_measure("regen: style Slate", func() -> void:
 		theme.style = NeoCadeTheme.Style.SLATE
-		print("    last_regen=%7.3fms" % (float(theme._last_regeneration_usec) / 1000.0))
+		print("    last_regen=%7.3fms active_icons=%d active_generated=%d" % [
+			float(theme._last_regeneration_usec) / 1000.0,
+			theme._active_icon_cache.size(),
+			theme._active_generated_texture_cache.size(),
+		])
 	)
 	_measure("regen: style Pulse", func() -> void:
 		theme.style = NeoCadeTheme.Style.PULSE
-		print("    last_regen=%7.3fms" % (float(theme._last_regeneration_usec) / 1000.0))
+		print("    last_regen=%7.3fms active_icons=%d active_generated=%d" % [
+			float(theme._last_regeneration_usec) / 1000.0,
+			theme._active_icon_cache.size(),
+			theme._active_generated_texture_cache.size(),
+		])
+	)
+	_measure("regen: enable texture cache", func() -> void:
+		theme.texture_cache = true
+		print("    last_regen=%7.3fms active_icons=%d active_generated=%d" % [
+			float(theme._last_regeneration_usec) / 1000.0,
+			theme._active_icon_cache.size(),
+			theme._active_generated_texture_cache.size(),
+		])
+	)
+	_measure("regen: toggle raised persistent", func() -> void:
+		theme.raised = not theme.raised
+		print("    last_regen=%7.3fms active_icons=%d active_generated=%d" % [
+			float(theme._last_regeneration_usec) / 1000.0,
+			theme._active_icon_cache.size(),
+			theme._active_generated_texture_cache.size(),
+		])
+	)
+	_measure("regen: disable texture cache", func() -> void:
+		theme.texture_cache = false
+		print("    last_regen=%7.3fms active_icons=%d active_generated=%d" % [
+			float(theme._last_regeneration_usec) / 1000.0,
+			theme._active_icon_cache.size(),
+			theme._active_generated_texture_cache.size(),
+		])
 	)
 
 

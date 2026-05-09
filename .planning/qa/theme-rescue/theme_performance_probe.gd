@@ -57,21 +57,32 @@ func _benchmark_duplicate_theme() -> void:
 
 func _benchmark_regeneration_mutations() -> void:
 	var theme := load(THEME_PATH).duplicate(true) as NeoCadeTheme
+	print("PERF %-34s value=%s active_icons=%d active_generated=%d" % [
+		"texture_cache default",
+		str(theme.texture_cache),
+		theme._active_icon_cache.size(),
+		theme._active_generated_texture_cache.size(),
+	])
 	var cases: Array[Dictionary] = [
-		{"name": "toggle raised", "call": func() -> void: theme.raised = not theme.raised},
+		{"name": "toggle raised temp cache", "call": func() -> void: theme.raised = not theme.raised},
 		{"name": "set style SLATE", "call": func() -> void: theme.style = NeoCadeTheme.Style.SLATE},
 		{"name": "set style PULSE", "call": func() -> void: theme.style = NeoCadeTheme.Style.PULSE},
 		{"name": "set base color", "call": func() -> void: theme.base_color = Color("#151B30")},
 		{"name": "toggle popup icons", "call": func() -> void: theme.use_runtime_popup_selection_icons = not theme.use_runtime_popup_selection_icons},
+		{"name": "enable texture cache", "call": func() -> void: theme.texture_cache = true},
+		{"name": "toggle raised persistent cache", "call": func() -> void: theme.raised = not theme.raised},
+		{"name": "disable texture cache", "call": func() -> void: theme.texture_cache = false},
 	]
 	for perf_case in cases:
 		var start := Time.get_ticks_usec()
 		(perf_case["call"] as Callable).call()
 		var elapsed := Time.get_ticks_usec() - start
-		print("PERF %-34s elapsed=%7.3fms last_regen=%7.3fms" % [
+		print("PERF %-34s elapsed=%7.3fms last_regen=%7.3fms active_icons=%d active_generated=%d" % [
 			String(perf_case["name"]),
 			float(elapsed) / 1000.0,
 			float(theme._last_regeneration_usec) / 1000.0,
+			theme._active_icon_cache.size(),
+			theme._active_generated_texture_cache.size(),
 		])
 
 

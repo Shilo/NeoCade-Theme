@@ -14,6 +14,7 @@ func _run() -> void:
 	_check_project_settings()
 	_check_new_theme_defaults()
 	_check_regeneration_batches_changed_signal()
+	_check_texture_cache_modes()
 
 	var canonical := load(THEME_PATH) as NeoCadeTheme
 	if canonical == null:
@@ -53,6 +54,7 @@ func _check_new_theme_defaults() -> void:
 	_expect_equal(theme.focus_thickness, 2, "NeoCadeTheme.new focus_thickness")
 	_expect_equal(theme.outline_width, 1, "NeoCadeTheme.new outline_width")
 	_expect_equal(theme.use_runtime_popup_selection_icons, true, "NeoCadeTheme.new use_runtime_popup_selection_icons")
+	_expect_equal(theme.texture_cache, false, "NeoCadeTheme.new texture_cache")
 	if not theme.has_stylebox(&"normal", &"Button"):
 		_fail("NeoCadeTheme.new should generate Button.normal")
 	if not theme.has_icon(&"checked", &"PopupMenu"):
@@ -66,6 +68,24 @@ func _check_regeneration_batches_changed_signal() -> void:
 	theme.raised = not theme.raised
 	if int(changed_count[0]) != 1:
 		_fail("NeoCadeTheme regeneration should emit exactly one changed signal, got %d" % int(changed_count[0]))
+
+
+func _check_texture_cache_modes() -> void:
+	var theme := NeoCadeTheme.new()
+	if theme.texture_cache:
+		_fail("texture_cache should default to false")
+	if not theme._active_icon_cache.is_empty() or not theme._active_generated_texture_cache.is_empty():
+		_fail("texture_cache=false should release active texture caches after regeneration")
+
+	theme.texture_cache = true
+	if theme._active_icon_cache.is_empty():
+		_fail("texture_cache=true should retain loaded icon cache after regeneration")
+	if theme._active_generated_texture_cache.is_empty():
+		_fail("texture_cache=true should retain generated texture cache after regeneration")
+
+	theme.texture_cache = false
+	if not theme._active_icon_cache.is_empty() or not theme._active_generated_texture_cache.is_empty():
+		_fail("disabling texture_cache should release active texture caches")
 
 
 func _theme_variant(source: NeoCadeTheme, style_value: int, raised: bool, platform: int) -> NeoCadeTheme:

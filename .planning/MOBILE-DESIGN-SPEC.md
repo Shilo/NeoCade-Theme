@@ -105,14 +105,13 @@ The Phase 8 audit runs all five directions with `platform=MOBILE`, `raised=false
 | Display text | Labels, tooltips, and rich text are not tap targets. | Rows are display/N/A. |
 | Layout chrome | Panels and non-interactive chrome are not tap targets. | Rows are layout/N/A. |
 
-## 15 Type Variations
+## 14 Core Runtime Type Variations
 
-The older 13-variation research wording is superseded by the live `TYPE_VARIATIONS` registry in `addons/neocade_theme/scripts/neocade_theme.gd`. Phase 8 documents exactly 15 type variations:
+The older 13-variation research wording is superseded by the live `TYPE_VARIATIONS` registry in `addons/neocade_theme/scripts/neocade_theme.gd`. Phase 8 documents the core runtime variations; editor-only variations may also exist in the registry for Godot editor integration:
 
 | Variation | Base | Mobile behavior |
 |---|---|---|
 | PrimaryButton | Button | Uses mobile Button body size, density-scaled padding, and 48px floor. |
-| SecondaryButton | Button | Uses mobile Button body size, density-scaled padding, and 48px floor. |
 | GhostButton | Button | Uses mobile Button body size, density-scaled padding, and 48px floor. |
 | DangerButton | Button | Uses mobile Button body size, density-scaled padding, and 48px floor. |
 | IconButton | Button | Uses mobile Button body size and touch-friendly icon button padding. |
@@ -140,7 +139,7 @@ The older 13-variation research wording is superseded by the live `TYPE_VARIATIO
 | MOBILE-07 | This root spec documents deltas, rationale, evidence, and limitations. |
 | MOBILE-08 | Mobile preserves NeoCade identity and avoids native iOS/Android imitation. |
 | DOCS-02 | Root mobile delta documentation exists. |
-| TYPEVAR-06 | The authoritative 15 type variations are documented with mobile behavior. |
+| TYPEVAR-06 | The authoritative core runtime variations are documented with mobile behavior; editor-only variations are handled separately in `TYPE_VARIATIONS`. |
 
 ## Phase 9 And Phase 10 Handoff
 

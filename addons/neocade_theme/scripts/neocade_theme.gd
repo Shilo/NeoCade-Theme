@@ -141,14 +141,28 @@ enum Style {
 		use_runtime_popup_selection_icons = value
 		_regenerate_theme()
 
+## Keeps loaded and generated textures cached across theme regenerations for faster
+## live tweaking. Leave disabled for one-shot runtime use; NeoCade still uses a
+## temporary cache during each regeneration and releases it when the pass finishes.
+@export var texture_cache: bool = false:
+	set(value):
+		if texture_cache == value: return
+		texture_cache = value
+		if not texture_cache:
+			_persistent_icon_cache.clear()
+			_persistent_generated_texture_cache.clear()
+		_regenerate_theme()
+
 # ─── Internal state (NOT exported) ──────────────────────────────────────────────────────────
 var is_light: bool = false  # derived from base_color.get_luminance() at every regenerate
 var _regenerating: bool = false  # reentry guard (per RESEARCH.md §4)
 var _last_regeneration_usec: int = 0  # diagnostic for probes and profiling
 var _applying_style_exports := false
 var _syncing_style_from_exports := false
-static var _icon_cache: Dictionary = {}
-static var _generated_texture_cache: Dictionary = {}
+var _active_icon_cache: Dictionary = {}
+var _active_generated_texture_cache: Dictionary = {}
+static var _persistent_icon_cache: Dictionary = {}
+static var _persistent_generated_texture_cache: Dictionary = {}
 
 func _init() -> void:
 	_regenerate_theme()
@@ -241,6 +255,8 @@ func _regenerate_theme() -> void:
 	_regenerating = true
 	var was_blocking_signals := is_blocking_signals()
 	set_block_signals(true)
+	_active_icon_cache = _persistent_icon_cache if texture_cache else {}
+	_active_generated_texture_cache = _persistent_generated_texture_cache if texture_cache else {}
 	var t0 := Time.get_ticks_usec()
 	clear()
 
@@ -666,6 +682,9 @@ func _regenerate_theme() -> void:
 	set_font_size("font_size", "ColorPickerButton", tokens.body)
 
 	_last_regeneration_usec = Time.get_ticks_usec() - t0
+	if not texture_cache:
+		_active_icon_cache = {}
+		_active_generated_texture_cache = {}
 	set_block_signals(was_blocking_signals)
 	if not was_blocking_signals:
 		emit_changed()
@@ -5371,24 +5390,24 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 	return null
 
 
-static func _load_icon(icon_name: String) -> Texture2D:
-	var cached: Texture2D = _icon_cache.get(icon_name)
+func _load_icon(icon_name: String) -> Texture2D:
+	var cached: Texture2D = _active_icon_cache.get(icon_name)
 	if cached != null:
 		return cached
 	var path := "res://addons/neocade_theme/icons/" + icon_name + ".svg"
 	var icon := load(path) as Texture2D
 	if icon != null:
-		_icon_cache[icon_name] = icon
+		_active_icon_cache[icon_name] = icon
 	return icon
 
 
-static func _empty_icon() -> Texture2D:
+func _empty_icon() -> Texture2D:
 	const CACHE_KEY := "__empty"
-	var cached: Texture2D = _generated_texture_cache.get(CACHE_KEY)
+	var cached: Texture2D = _active_generated_texture_cache.get(CACHE_KEY)
 	if cached != null:
 		return cached
 	var icon := ImageTexture.new()
-	_generated_texture_cache[CACHE_KEY] = icon
+	_active_generated_texture_cache[CACHE_KEY] = icon
 	return icon
 
 
@@ -5405,7 +5424,7 @@ func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, 
 	var grabber_color: Color = role_table.get("text_muted", Color.WHITE)
 	grabber_color = Color(grabber_color.r, grabber_color.g, grabber_color.b, grabber_color.a * 0.72)
 	var cache_key := "split:%s:%d:%s" % ["v" if vertical_indicator else "h", int(radius), grabber_color.to_html(true)]
-	var cached: Texture2D = _generated_texture_cache.get(cache_key)
+	var cached: Texture2D = _active_generated_texture_cache.get(cache_key)
 	if cached != null:
 		return cached
 
@@ -5424,7 +5443,7 @@ func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, 
 			if coverage > 0.0:
 				image.set_pixel(x, y, Color(grabber_color.r, grabber_color.g, grabber_color.b, grabber_color.a * coverage))
 	var texture := ImageTexture.create_from_image(image)
-	_generated_texture_cache[cache_key] = texture
+	_active_generated_texture_cache[cache_key] = texture
 	return texture
 
 
@@ -5447,7 +5466,7 @@ func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_pe
 		knob_color.to_html(true),
 		ring_color.to_html(true),
 	]
-	var cached: Texture2D = _generated_texture_cache.get(cache_key)
+	var cached: Texture2D = _active_generated_texture_cache.get(cache_key)
 	if cached != null:
 		return cached
 	var image := Image.create(SIZE, SIZE, false, Image.FORMAT_RGBA8)
@@ -5458,7 +5477,7 @@ func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_pe
 	else:
 		_fill_round_rect(image, Rect2i(3, 3, 10, 10), inner_radius, knob_color)
 	var texture := ImageTexture.create_from_image(image)
-	_generated_texture_cache[cache_key] = texture
+	_active_generated_texture_cache[cache_key] = texture
 	return texture
 
 
@@ -5466,7 +5485,7 @@ func _make_color_hue_texture() -> Texture2D:
 	const WIDTH := 800
 	const HEIGHT := 6
 	const CACHE_KEY := "color_hue"
-	var cached: Texture2D = _generated_texture_cache.get(CACHE_KEY)
+	var cached: Texture2D = _active_generated_texture_cache.get(CACHE_KEY)
 	if cached != null:
 		return cached
 	var image := Image.create(WIDTH, HEIGHT, false, Image.FORMAT_RGBA8)
@@ -5476,7 +5495,7 @@ func _make_color_hue_texture() -> Texture2D:
 		for y in range(HEIGHT):
 			image.set_pixel(x, y, color)
 	var texture := ImageTexture.create_from_image(image)
-	_generated_texture_cache[CACHE_KEY] = texture
+	_active_generated_texture_cache[CACHE_KEY] = texture
 	return texture
 
 
@@ -5487,7 +5506,7 @@ func _popup_selection_fill(checked: bool, role_table: Dictionary) -> Color:
 func _make_popup_selection_checkbox_icon(checked: bool, role_table: Dictionary) -> Texture2D:
 	var fill_color := _popup_selection_fill(checked, role_table)
 	var cache_key := "popup_checkbox:%s:%s" % ["checked" if checked else "unchecked", fill_color.to_html(true)]
-	var cached: Texture2D = _generated_texture_cache.get(cache_key)
+	var cached: Texture2D = _active_generated_texture_cache.get(cache_key)
 	if cached != null:
 		return cached
 	var check_path := ""
@@ -5500,7 +5519,7 @@ func _make_popup_selection_checkbox_icon(checked: bool, role_table: Dictionary) 
 func _make_popup_selection_radio_icon(checked: bool, role_table: Dictionary) -> Texture2D:
 	var fill_color := _popup_selection_fill(checked, role_table)
 	var cache_key := "popup_radio:%s:%s" % ["checked" if checked else "unchecked", fill_color.to_html(true)]
-	var cached: Texture2D = _generated_texture_cache.get(cache_key)
+	var cached: Texture2D = _active_generated_texture_cache.get(cache_key)
 	if cached != null:
 		return cached
 	var knob_circle := ""
@@ -5518,7 +5537,7 @@ func _make_svg_icon_texture(svg: String, cache_key: String) -> Texture2D:
 		image = Image.create(24, 24, false, Image.FORMAT_RGBA8)
 		image.fill(Color(0, 0, 0, 0))
 	var texture := ImageTexture.create_from_image(image)
-	_generated_texture_cache[cache_key] = texture
+	_active_generated_texture_cache[cache_key] = texture
 	return texture
 
 

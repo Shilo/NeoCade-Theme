@@ -15,3 +15,4 @@ raised_strength = 2
 focus_thickness = 2
 outline_width = 1
 use_runtime_popup_selection_icons = true
+texture_cache = false
