@@ -24,6 +24,7 @@ func _run() -> void:
 	var file_dialog := scene.get_node_or_null("FileDialog") as FileDialog
 	var popup_panel := scene.get_node_or_null("PopupPanel") as PopupPanel
 	var popup_menu := scene.get_node_or_null("PopupMenu") as PopupMenu
+	var showcase_tabs := scene.get_node_or_null("RootMargin/RootStack/ShowcaseTabs") as TabContainer
 	var content_panel := scene.get_node_or_null("Window/WindowContentPanel") as PanelContainer
 	var margin := scene.get_node_or_null("Window/WindowContentPanel/WindowMargin") as MarginContainer
 	var direct_margin := scene.get_node_or_null("Window/WindowMargin")
@@ -34,6 +35,7 @@ func _run() -> void:
 	_expect(file_dialog != null, "showcase FileDialog exists")
 	_expect(popup_panel != null, "showcase PopupPanel exists")
 	_expect(popup_menu != null, "showcase PopupMenu exists")
+	_expect(showcase_tabs != null, "showcase TabContainer exists")
 	_expect(content_panel != null, "WindowMargin is wrapped by WindowContentPanel")
 	_expect(margin != null, "WindowMargin remains inside WindowContentPanel")
 	_expect(direct_margin == null, "WindowMargin should not be a direct Window child")
@@ -52,6 +54,7 @@ func _run() -> void:
 	_expect_popup_button_opens(scene, "RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/FileDialogButton", file_dialog, "FileDialog")
 	_expect_popup_button_opens(scene, "RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/PopupPanelButton", popup_panel, "PopupPanel")
 	_expect_popup_button_opens(scene, "RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/PopupMenuButton", popup_menu, "PopupMenu")
+	_expect_showcase_tab_scrollbars(showcase_tabs)
 
 	if content_panel != null:
 		_expect(content_panel.theme_type_variation == &"WindowContentPanel", "WindowContentPanel uses the dedicated theme variation")
@@ -84,6 +87,17 @@ func _expect_popup_button_opens(scene: Node, button_path: NodePath, popup: Windo
 	button.pressed.emit()
 	_expect(popup.visible, "%s showcase button opens its popup/dialog" % label)
 	popup.hide()
+
+
+func _expect_showcase_tab_scrollbars(showcase_tabs: TabContainer) -> void:
+	if showcase_tabs == null:
+		return
+	for child in showcase_tabs.get_children():
+		var scroll := child as ScrollContainer
+		if scroll == null:
+			continue
+		_expect(scroll.horizontal_scroll_mode != ScrollContainer.SCROLL_MODE_DISABLED, "%s tab page keeps horizontal scrolling available" % scroll.name)
+		_expect(scroll.vertical_scroll_mode != ScrollContainer.SCROLL_MODE_DISABLED, "%s tab page keeps vertical scrolling available" % scroll.name)
 
 
 func _fail(message: String) -> void:
