@@ -1139,6 +1139,13 @@ const TYPE_VARIATIONS: Dictionary = {
 	"IconButton":      "Button",
 	"FlatButton":      "Button",
 	"FlatMenuButton":  "Button",
+	"FlatButtonNoIconTint": "FlatButton",
+	"FlatMenuButtonNoIconTint": "FlatMenuButton",
+	"CheckBoxNoIconTint": "CheckBox",
+	"MainScreenButton": "Button",
+	"PreviewLightButton": "Button",
+	"RunBarButton": "Button",
+	"RunBarButtonMovieMakerEnabled": "RunBarButton",
 	"EditorInspectorButton": "Button",
 	"EditorInspectorFlatButton": "FlatButton",
 	"BottomPanelButton": "FlatMenuButton",
@@ -1676,6 +1683,7 @@ const BINDING_TABLE: Dictionary = {
 			"icon_hover_color": {"role": "text_strong"},
 			"icon_pressed_color": {"role": "role_primary"},
 			"icon_disabled_color": {"role": "text_muted", "disabled": true},
+			"icon_saturation": {"role": "text_default"},
 			"property_color_x": {"role": "editor_property_x"},
 			"property_color_y": {"role": "editor_property_y"},
 			"property_color_z": {"role": "editor_property_z"},
@@ -1688,8 +1696,14 @@ const BINDING_TABLE: Dictionary = {
 	},
 	# EditorHelp / EditorHelpBit rich text colors used inside CreateDialog descriptions.
 	"EditorHelp": {
+		"stylebox": {
+			"background": {"role": "surface_base", "border_role": "surface_base",
+						   "raised_intensity": 0, "border_width": 0,
+						   "radius": 0, "padding": Vector2i(0, 0)},
+		},
 		"color": {
 			"text_color":      {"role": "text_default"},
+			"headline_color":  {"role": "text_strong"},
 			"comment_color":   {"role": "text_muted"},
 			"symbol_color":    {"role": "text_muted"},
 			"value_color":     {"role": "text_muted"},
@@ -1699,6 +1713,13 @@ const BINDING_TABLE: Dictionary = {
 			"selection_color": {"role": "accent_offset"},
 			"link_color":      {"role": "role_primary"},
 			"code_color":      {"role": "role_primary"},
+			"override_color":  {"role": "role_warning"},
+			"code_bg_color":   {"role": "code_background"},
+			"kbd_bg_color":    {"role": "surface_low"},
+			"param_bg_color":  {"role": "surface_low"},
+			"kbd_color":       {"role": "text_strong"},
+			"primary_hr_color": {"role": "surface_high_edge"},
+			"secondary_hr_color": {"role": "surface_low_edge"},
 		},
 		"constant": {
 			"line_separation":             {"value": 2},
@@ -2006,6 +2027,16 @@ const BINDING_TABLE: Dictionary = {
 			"selection_color":       {"role": "accent_offset"},
 			"current_line_color":    {"role": "code_current_line"},
 			"line_number_color":     {"role": "text_muted"},
+			"completion_background_color":     {"role": "code_background"},
+			"completion_selected_color":       {"role": "button_pressed", "alpha": 0.86},
+			"completion_existing_color":       {"role": "button_hover", "alpha": 0.72},
+			"completion_scroll_color":         {"role": "text_muted", "alpha": 0.36},
+			"completion_scroll_hovered_color": {"role": "text_default", "alpha": 0.50},
+			"brace_mismatch_color":            {"role": "role_danger"},
+			"word_highlighted_color":          {"role": "role_primary", "alpha": 0.16},
+			"search_result_color":             {"role": "role_warning", "alpha": 0.20},
+			"search_result_border_color":      {"role": "role_warning", "alpha": 0.64},
+			"folded_code_region_color":        {"role": "text_muted", "alpha": 0.36},
 			# Plan 05-05 Task 2: gutter color slots (Godot 4.6 official names).
 			"breakpoint_color":            {"role": "role_danger"},
 			"code_folding_color":          {"role": "text_muted"},
@@ -2104,6 +2135,91 @@ const BINDING_TABLE: Dictionary = {
 		"icon": {
 			"preset_bg": {"icon": "colorpicker_sample_bg"},
 			"overbright_indicator": {"icon": "colorpicker_overbright_indicator"},
+		},
+	},
+	"CheckBoxNoIconTint": {
+		"color": {
+			"icon_pressed_color": {"role": "text_default"},
+			"icon_hover_color": {"role": "text_strong"},
+			"icon_hover_pressed_color": {"role": "text_strong"},
+		},
+	},
+	"FlatButtonNoIconTint": {
+		"color": {
+			"icon_pressed_color": {"role": "text_default"},
+			"icon_hover_color": {"role": "text_strong"},
+			"icon_hover_pressed_color": {"role": "text_strong"},
+		},
+	},
+	"FlatMenuButtonNoIconTint": {
+		"color": {
+			"icon_pressed_color": {"role": "text_default"},
+			"icon_hover_color": {"role": "text_strong"},
+			"icon_hover_pressed_color": {"role": "text_strong"},
+		},
+	},
+	"MainScreenButton": {
+		"color": {
+			"font_color": {"role": "text_default"},
+			"font_hover_color": {"role": "text_strong"},
+			"font_pressed_color": {"role": "role_primary"},
+			"font_hover_pressed_color": {"role": "role_primary"},
+			"icon_normal_color": {"role": "text_default"},
+			"icon_hover_color": {"role": "text_strong"},
+			"icon_pressed_color": {"role": "role_primary"},
+			"icon_hover_pressed_color": {"role": "role_primary"},
+		},
+	},
+	"PreviewLightButton": {
+		"color": {
+			"icon_normal_color": {"role": "text_muted"},
+			"icon_focus_color": {"role": "text_muted"},
+			"icon_pressed_color": {"role": "text_default"},
+			"icon_hover_pressed_color": {"role": "text_default"},
+			"icon_hover_color": {"role": "text_strong"},
+		},
+	},
+	"RunBarButton": {
+		"stylebox": {
+			"hover": {"role": "button_hover", "border_role": "button_hover",
+					  "raised_intensity": 0, "border_width": 0,
+					  "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+			"hover_pressed": {"role": "button_pressed", "border_role": "button_pressed",
+							  "raised_intensity": 0, "border_width": 0,
+							  "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+		},
+	},
+	"RunBarButtonMovieMakerEnabled": {
+		"stylebox": {
+			"hover": {"role": "button_hover", "border_role": "button_hover",
+					  "raised_intensity": 0, "border_width": 0,
+					  "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+			"hover_pressed": {"role": "button_pressed", "border_role": "button_pressed",
+							  "raised_intensity": 0, "border_width": 0,
+							  "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+		},
+		"color": {
+			"icon_normal_color": {"role": "text_default"},
+			"icon_pressed_color": {"role": "role_primary"},
+			"icon_hover_color": {"role": "text_strong"},
+			"icon_hover_pressed_color": {"role": "role_primary"},
+		},
+	},
+	"AnimationBezierTrackEdit": {
+		"color": {
+			"focus_color": {"role": "role_primary", "alpha": 0.80},
+			"track_focus_color": {"role": "text_muted", "alpha": 0.10},
+			"h_line_color": {"role": "text_muted", "alpha": 0.12},
+			"v_line_color": {"role": "text_muted", "alpha": 0.0},
+		},
+	},
+	"AnimationTimelineEdit": {
+		"color": {
+			"v_line_primary_color": {"role": "text_muted", "alpha": 0.40},
+			"v_line_secondary_color": {"role": "text_muted", "alpha": 0.08},
+			"h_line_color": {"role": "text_muted", "alpha": 0.0},
+			"font_primary_color": {"role": "text_default"},
+			"font_secondary_color": {"role": "text_muted"},
 		},
 	},
 	# 8. ConfirmationDialog — explicit traceability entry even though Godot exposes no
@@ -2273,6 +2389,58 @@ const BINDING_TABLE: Dictionary = {
 			"zoom_reset":      {"icon": "graph_zoom_reset"},
 		},
 	},
+	"GraphEditMinimap": {
+		"stylebox": {
+			"node": {"role": "surface_high", "border_role": "surface_high_edge",
+					 "raised_intensity": 0, "border_width": 1,
+					 "radius": 0, "padding": Vector2i(0, 0)},
+		},
+		"color": {
+			"resizer_color": {"role": "text_muted", "alpha": 0.65},
+		},
+	},
+	"GraphElement": {
+		"stylebox": {
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": 0, "border_width": 1,
+					  "radius": "shape.card_radius", "padding": Vector2i(10, 8)},
+			"panel_selected": {"role": "surface_high", "border_role": "role_primary",
+							   "raised_intensity": 0, "border_width": 1,
+							   "radius": "shape.card_radius", "padding": Vector2i(10, 8)},
+			"titlebar": {"role": "surface_high", "border_role": "surface_high",
+						 "raised_intensity": 0, "border_width": 0,
+						 "radius": "shape.card_radius", "padding": Vector2i(10, 4)},
+			"titlebar_selected": {"role": "accent_offset", "border_role": "role_primary",
+								  "raised_intensity": 0, "border_width": 1,
+								  "radius": "shape.card_radius", "padding": Vector2i(10, 4)},
+		},
+		"color": {
+			"resizer_color": {"role": "text_muted", "alpha": 0.85},
+		},
+	},
+	"GraphFrameTitleLabel": {
+		"color": {
+			"font_color": {"role": "text_strong"},
+			"font_outline_color": {"role": "outline_color"},
+		},
+	},
+	"GraphNodeTitleLabel": {
+		"color": {
+			"font_shadow_color": {"role": "outline_color", "alpha": 0.10},
+		},
+	},
+	"GraphStateMachine": {
+		"color": {
+			"guideline_color": {"role": "text_muted", "alpha": 0.22},
+			"node_title_font_color": {"role": "text_default"},
+			"playback_background_color": {"role": "surface_high", "alpha": 0.22},
+			"playback_color": {"role": "text_default"},
+			"transition_color": {"role": "text_default"},
+			"transition_disabled_color": {"role": "text_muted", "disabled": true},
+			"transition_icon_color": {"role": "text_strong"},
+			"transition_icon_disabled_color": {"role": "text_muted", "disabled": true},
+		},
+	},
 	# 11a. GraphNode — compact functional graph panel with explicit selected/focus/slot states.
 	"GraphNode": {
 		"stylebox": {
@@ -2319,6 +2487,43 @@ const BINDING_TABLE: Dictionary = {
 		},
 		"icon": {
 			"resizer": {"icon": "graph_resizer"},
+		},
+	},
+	"ProjectList": {
+		"stylebox": {
+			"hovered": {"role": "button_hover", "border_role": "button_hover",
+						"raised_intensity": 0, "border_width": 0,
+						"radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+			"selected": {"role": "button_pressed", "border_role": "button_pressed",
+						 "raised_intensity": 0, "border_width": 0,
+						 "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+			"hover_pressed": {"role": "button_pressed", "border_role": "button_pressed",
+							  "raised_intensity": 0, "border_width": 0,
+							  "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+			"focus": {"role": "focus_ring"},
+		},
+		"color": {
+			"font_color": {"role": "text_default"},
+			"guide_color": {"role": "surface_low", "alpha": 0.0},
+		},
+	},
+	"VSRerouteNode": {
+		"stylebox": {
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": 0, "border_width": 1,
+					  "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+			"panel_selected": {"role": "surface_high", "border_role": "role_primary",
+							   "raised_intensity": 0, "border_width": 1,
+							   "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+			"titlebar": {"role": "surface_high", "raised_intensity": 0,
+						 "border_width": 0, "radius": "shape.secondary_radius"},
+			"titlebar_selected": {"role": "accent_offset", "raised_intensity": 0,
+								  "border_width": 0, "radius": "shape.secondary_radius"},
+			"slot": {"empty": true},
+		},
+		"color": {
+			"drag_background": {"role": "surface_low"},
+			"selected_rim_color": {"role": "role_primary"},
 		},
 	},
 	# 12. HScrollBar — official styleboxes plus six increment/decrement icon slots.
@@ -2786,6 +2991,14 @@ const BINDING_TABLE: Dictionary = {
 	# `disabled_icon` reuse pattern); Godot tints them through the
 	# disabled state at draw time so two SVGs cover all four slots.
 	"SpinBox": {
+		"color": {
+			"up_icon_modulate":          {"role": "text_default"},
+			"up_hover_icon_modulate":    {"role": "text_strong"},
+			"up_disabled_icon_modulate": {"role": "text_muted", "disabled": true},
+			"down_icon_modulate":          {"role": "text_default"},
+			"down_hover_icon_modulate":    {"role": "text_strong"},
+			"down_disabled_icon_modulate": {"role": "text_muted", "disabled": true},
+		},
 		"constant": {
 			"buttons_vertical_separation": {"value": 2},
 			"buttons_width":                {"value": 16},
@@ -3018,6 +3231,15 @@ const BINDING_TABLE: Dictionary = {
 			"BottomPanel": {"role": "surface_panel", "border_role": "surface_panel_edge",
 							"raised_intensity": "shape.raised_lifts.panel",
 							"raised_face_edge": true, "content_margins": Vector4i(6, 5, 6, 5)},
+			"FocusViewport": {"role": "surface_base", "border_role": "role_primary",
+							  "raised_intensity": 0, "border_width": 1,
+							  "radius": "shape.secondary_radius"},
+			"ObjectDBContentWrapper": {"role": "surface_low", "border_role": "surface_low_edge",
+									   "raised_intensity": 0, "border_width": 0,
+									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 6)},
+		},
+		"color": {
+			"sub_inspector_property_color": {"role": "text_default"},
 		},
 	},
 	# 29a. Editor dock tab containers — FileSystem/Scene/Inspector docks are DockTabContainer
