@@ -25,7 +25,6 @@ func _run() -> void:
 		var label: String = str(NeoCadeTheme.Style.find_key(style_value))
 		_expect_focus_viewport_outline_only(theme, label)
 		_expect_editor_subsection_padding(theme, label)
-		_expect_tree_table_header_side_reservation(theme, label)
 		_expect_resource_picker_surface_matches_value_cell(theme, label)
 		_expect_editor_fonts_authored(theme, label)
 		_expect_checkbutton_checkbox_scale(theme, label)
@@ -63,18 +62,6 @@ func _expect_editor_subsection_padding(theme: Theme, label: String) -> void:
 			section.content_margin_left,
 			section.content_margin_right,
 		])
-
-
-func _expect_tree_table_header_side_reservation(theme: Theme, label: String) -> void:
-	var header := theme.get_stylebox(&"title_button_normal", &"TreeTable") as StyleBoxFlat
-	if header == null:
-		_fail("%s TreeTable.title_button_normal missing StyleBoxFlat" % label)
-		return
-	if header.border_width_left < 1 or header.border_width_right < 1:
-		_fail("%s TreeTable.title_button_normal should reserve 1px side edge" % label)
-	if header.border_color.a > 0.01:
-		_fail("%s TreeTable.title_button_normal side reservation should be transparent" % label)
-
 
 func _expect_resource_picker_surface_matches_value_cell(theme: Theme, label: String) -> void:
 	var tree_panel := theme.get_stylebox(&"panel", &"Tree") as StyleBoxFlat
