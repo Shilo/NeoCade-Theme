@@ -66,6 +66,7 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_tab_top_only_corners(theme, label)
 	_expect_tab_state_chrome(theme, label)
 	_expect_editor_compact_chrome(theme, label)
+	_expect_editor_property_input_chrome(theme, label, expect_raised)
 	_expect_create_dialog_chrome(theme, label)
 	_expect_shared_interaction_chrome(theme, label)
 	_expect_tree_view_chrome(theme, label)
@@ -339,6 +340,26 @@ func _expect_scrollbar_chrome(theme: Theme, label: String) -> void:
 				_fail("%s VScrollBar track/grabber too thin: track=%s grabber=%s" % [label, min_size, grabber_min_size])
 		if _max_border_width(grabber) != 0 or _max_border_width(hover) != 0 or _max_border_width(pressed) != 0:
 			_fail("%s %s grabbers should be filled pills without outline borders" % [label, theme_type])
+		if grabber.bg_color.a < 0.20 or grabber.bg_color.a > 0.45:
+			_fail("%s %s grabber should be semi-transparent like Godot editor default, alpha=%.2f" % [
+				label,
+				theme_type,
+				grabber.bg_color.a,
+			])
+		if hover.bg_color.a <= grabber.bg_color.a or hover.bg_color.a > 0.65:
+			_fail("%s %s hover grabber alpha should visibly increase without becoming opaque: normal=%.2f hover=%.2f" % [
+				label,
+				theme_type,
+				grabber.bg_color.a,
+				hover.bg_color.a,
+			])
+		if not pressed.bg_color.is_equal_approx(hover.bg_color):
+			_fail("%s %s pressed grabber should share hover alpha/color like Godot modern: pressed=%s hover=%s" % [
+				label,
+				theme_type,
+				pressed.bg_color.to_html(true),
+				hover.bg_color.to_html(true),
+			])
 		if expect_square:
 			for stylebox in [scroll, grabber, hover, pressed]:
 				if stylebox.corner_radius_top_left != 0 or stylebox.corner_radius_top_right != 0 or stylebox.corner_radius_bottom_left != 0 or stylebox.corner_radius_bottom_right != 0:
@@ -617,6 +638,59 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 			_fail("%s EditorIcons.%s should stay toolbar-sized, got %s" % [label, icon_name, editor_icon_size])
 
 
+func _expect_editor_property_input_chrome(theme: Theme, label: String, expect_raised: bool) -> void:
+	if theme.get_type_variation_base(&"EditorInspectorButton") != &"Button":
+		_fail("%s EditorInspectorButton should inherit Button for inspector value controls" % label)
+	if theme.get_type_variation_base(&"EditorInspectorFlatButton") != &"FlatButton":
+		_fail("%s EditorInspectorFlatButton should inherit FlatButton for editor-only flat controls" % label)
+
+	var option_normal := theme.get_stylebox("normal", "OptionButton") as StyleBoxFlat
+	var child_bg := theme.get_stylebox("child_bg", "EditorProperty") as StyleBoxFlat
+	var spin_label_bg := theme.get_stylebox("label_bg", "EditorSpinSlider") as StyleBoxFlat
+	if option_normal == null or child_bg == null or spin_label_bg == null:
+		_fail("%s missing editor property input surface styleboxes" % label)
+		return
+
+	var row_bg := theme.get_stylebox("bg", "EditorProperty")
+	if row_bg is StyleBoxFlat:
+		var row_flat := row_bg as StyleBoxFlat
+		if row_flat.bg_color.a > 0.01 or _max_border_width(row_flat) != 0:
+			_fail("%s EditorProperty.bg should stay transparent; child_bg owns value input surface" % label)
+	elif not (row_bg is StyleBoxEmpty):
+		_fail("%s EditorProperty.bg should be StyleBoxEmpty or transparent StyleBoxFlat" % label)
+
+	for entry in [
+		{"name": &"EditorProperty.child_bg", "stylebox": child_bg},
+		{"name": &"EditorSpinSlider.label_bg", "stylebox": spin_label_bg},
+	]:
+		var stylebox := entry["stylebox"] as StyleBoxFlat
+		if not stylebox.bg_color.is_equal_approx(option_normal.bg_color):
+			_fail("%s %s should use the same face color as OptionButton.normal because flat inspector controls rely on parent/label bg: got=%s option=%s" % [
+				label,
+				entry["name"],
+				stylebox.bg_color.to_html(false),
+				option_normal.bg_color.to_html(false),
+			])
+		if not expect_raised and _max_border_width(stylebox) != 1:
+			_fail("%s %s flat border should match input/button 1px edge" % [label, entry["name"]])
+		if expect_raised and stylebox.border_width_bottom <= stylebox.border_width_top:
+			_fail("%s raised %s should reserve bottom depth like other input/button surfaces" % [label, entry["name"]])
+		var edge_contrast := _contrast_ratio(stylebox.bg_color, stylebox.border_color)
+		if edge_contrast > (1.80 if expect_raised else 1.45):
+			_fail("%s %s edge is too contrasty for editor property input chrome: ratio=%.2f" % [
+				label,
+				entry["name"],
+				edge_contrast,
+			])
+
+	_expect_equal(theme.get_constant(&"line_edit_margin", &"EditorSpinSlider"), 28, "%s EditorSpinSlider.line_edit_margin" % label)
+	_expect_equal(theme.get_constant(&"line_edit_margin_empty", &"EditorSpinSlider"), 20, "%s EditorSpinSlider.line_edit_margin_empty" % label)
+	if not theme.get_color(&"label_color", &"EditorSpinSlider").is_equal_approx(theme.get_color(&"font_color", &"LineEdit")):
+		_fail("%s EditorSpinSlider.label_color should match LineEdit.font_color" % label)
+	_expect_icon_max(theme, &"EditorSpinSlider", &"updown", 24, label)
+	_expect_icon_max(theme, &"SpinBox", &"updown", 24, label)
+
+
 func _expect_create_dialog_chrome(theme: Theme, label: String) -> void:
 	_expect_equal(theme.get_font_size("font_size", "HeaderSmall"), theme.default_font_size, "%s HeaderSmall.font_size" % label)
 	if theme.get_type_variation_base(&"TreeSecondary") != &"Tree":
@@ -762,24 +836,24 @@ func _expect_tree_view_chrome(theme: Theme, label: String) -> void:
 	if not theme.get_color("scroll_hint_color", "ItemList").is_equal_approx(Color.BLACK):
 		_fail("%s ItemList.scroll_hint_color should be neutral black like Godot's default fade modulate" % label)
 
-	for constant_name in [
-		&"draw_guides",
-		&"draw_relationship_lines",
-		&"relationship_line_width",
-		&"parent_hl_line_width",
-		&"children_hl_line_width",
-	]:
-		if theme.get_constant(constant_name, "Tree") != 0:
-			_fail("%s Tree.%s should be 0 so TreeViews do not draw guide/separator lines" % [label, constant_name])
+	_expect_equal(theme.get_constant(&"draw_guides", &"Tree"), 0, "%s Tree.draw_guides" % label)
+	if theme.get_color(&"guide_color", &"Tree").a > 0.01:
+		_fail("%s Tree.guide_color should stay transparent; row guide/separator lines remain hidden" % label)
+	_expect_equal(theme.get_constant(&"draw_relationship_lines", &"Tree"), 1, "%s Tree.draw_relationship_lines" % label)
+	for constant_name in [&"relationship_line_width", &"parent_hl_line_width", &"children_hl_line_width"]:
+		if theme.get_constant(constant_name, "Tree") < 1:
+			_fail("%s Tree.%s should be at least 1 so parent-child nesting paths are visible" % [label, constant_name])
+	_expect_equal(theme.get_constant(&"parent_hl_line_margin", &"Tree"), 3, "%s Tree.parent_hl_line_margin" % label)
 
-	for color_name in [
-		&"guide_color",
-		&"relationship_line_color",
-		&"parent_hl_line_color",
-		&"children_hl_line_color",
-	]:
-		if theme.get_color(color_name, "Tree").a > 0.01:
-			_fail("%s Tree.%s should be transparent" % [label, color_name])
+	var relationship_line := theme.get_color(&"relationship_line_color", &"Tree")
+	var parent_line := theme.get_color(&"parent_hl_line_color", &"Tree")
+	var children_line := theme.get_color(&"children_hl_line_color", &"Tree")
+	if relationship_line.a < 0.12 or relationship_line.a > 0.45:
+		_fail("%s Tree.relationship_line_color should be a subtle visible nesting line, alpha=%.2f" % [label, relationship_line.a])
+	if parent_line.a <= relationship_line.a:
+		_fail("%s Tree.parent_hl_line_color should be stronger than relationship_line_color for the selected branch" % label)
+	if children_line.a < relationship_line.a:
+		_fail("%s Tree.children_hl_line_color should be at least as visible as normal relationship lines" % label)
 
 	for slot_name in [
 		&"panel",

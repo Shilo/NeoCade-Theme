@@ -242,6 +242,49 @@ INTENTIONAL_AUTHORED EditorIcons.icon.GuiTabMenu default=<missing> neocade=Textu
 INTENTIONAL_AUTHORED EditorIcons.icon.GuiTabMenuHl default=<missing> neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/tab_menu.svg)
 INTENTIONAL_AUTHORED EditorIcons.icon.GuiTabMenuHlDarkBackground default=<missing> neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/tab_menu.svg)
 INTENTIONAL_AUTHORED EditorIcons.icon.TripleBar default=<missing> neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/editor_triple_bar_24.svg)
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.disabled default=<missing> neocade=StyleBoxFlat(bg=#24293dff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.disabled_mirrored default=<missing> neocade=StyleBoxFlat(bg=#24293dff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/1/1/1 border_color=#474c63ff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.hover_mirrored default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/1/1/1 border_color=#474c63ff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.hover_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.hover_pressed_mirrored default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.normal default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.normal_mirrored default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.pressed_mirrored default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_disabled_color default=<missing> neocade=#f7f8fb6b
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_hover_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_disabled_color default=<missing> neocade=#f7f8fb6b
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_hover_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_normal_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.constant.h_separation default=<missing> neocade=4
+INTENTIONAL_AUTHORED EditorInspectorButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED EditorInspectorButton.font_size.font_size default=16 neocade=14
+INTENTIONAL_AUTHORED EditorInspectorFlatButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED EditorInspectorFlatButton.font_size.font_size default=16 neocade=14
+INTENTIONAL_AUTHORED EditorProperty.stylebox.bg default=<missing> neocade=StyleBoxEmpty
+INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_group_note default=<missing> neocade=StyleBoxFlat(bg=#8bff6a1a border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_selected default=<missing> neocade=StyleBoxFlat(bg=#484e6452 border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorProperty.stylebox.child_bg default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorProperty.color.property_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorProperty.color.readonly_color default=<missing> neocade=#b9c1d0ff
+INTENTIONAL_AUTHORED EditorProperty.color.readonly_warning_color default=<missing> neocade=#ffd166b2
+INTENTIONAL_AUTHORED EditorProperty.color.warning_color default=<missing> neocade=#ffd166ff
+INTENTIONAL_AUTHORED EditorProperty.constant.font_offset default=<missing> neocade=8
+INTENTIONAL_AUTHORED EditorSpinSlider.stylebox.label_bg default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorSpinSlider.color.label_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorSpinSlider.color.read_only_label_color default=<missing> neocade=#b9c1d06b
+INTENTIONAL_AUTHORED EditorSpinSlider.constant.line_edit_margin default=<missing> neocade=28
+INTENTIONAL_AUTHORED EditorSpinSlider.constant.line_edit_margin_empty default=<missing> neocade=20
+INTENTIONAL_AUTHORED EditorSpinSlider.icon.updown default=<missing> neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/tree_updown.svg)
+INTENTIONAL_AUTHORED EditorSpinSlider.icon.updown_disabled default=<missing> neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/tree_updown.svg)
 INTENTIONAL_AUTHORED FileDialog.color.file_disabled_color default=#ffffff40 neocade=#b9c1d06b
 INTENTIONAL_AUTHORED FileDialog.color.file_icon_color default=#ffffffff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED FileDialog.color.folder_icon_color default=#ffffffff neocade=#5ca352ff
@@ -414,9 +457,9 @@ INTENTIONAL_AUTHORED GraphNodeTitleLabel.font_size.font_size default=16 neocade=
 INTENTIONAL_AUTHORED HBoxContainer.constant.separation default=4 neocade=2
 DEFAULT_ONLY HFlowContainer.constant.h_separation default=4 neocade=<missing>
 DEFAULT_ONLY HFlowContainer.constant.v_separation default=4 neocade=<missing>
-INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#333952ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber_highlight default=StyleBoxFlat(bg=#ffffffbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber_pressed default=StyleBoxFlat(bg=#bfbfbfbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#b9c1d052 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber_highlight default=StyleBoxFlat(bg=#ffffffbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#f7f8fb80 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber_pressed default=StyleBoxFlat(bg=#bfbfbfbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#f7f8fb80 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED HScrollBar.stylebox.scroll default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=0.0/4.0/0.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#10142300 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/4.0/0.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED HScrollBar.stylebox.scroll_focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#10142300 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/4.0/0.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED HScrollBar.constant.padding_bottom default=<missing> neocade=0
@@ -767,7 +810,8 @@ INTENTIONAL_AUTHORED SpinBox.icon.up default=Texture2D(size=(16.0, 8.0) path=) n
 INTENTIONAL_AUTHORED SpinBox.icon.up_disabled default=Texture2D(size=(16.0, 8.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/spinbox_up.svg)
 DEFAULT_ONLY SpinBox.icon.up_hover default=Texture2D(size=(16.0, 8.0) path=) neocade=<missing>
 DEFAULT_ONLY SpinBox.icon.up_pressed default=Texture2D(size=(16.0, 8.0) path=) neocade=<missing>
-DEFAULT_ONLY SpinBox.icon.updown default=Texture2D(size=(0.0, 0.0) path=) neocade=<missing>
+INTENTIONAL_AUTHORED SpinBox.icon.updown default=Texture2D(size=(0.0, 0.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/tree_updown.svg)
+INTENTIONAL_AUTHORED SpinBox.icon.updown_disabled default=<missing> neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/tree_updown.svg)
 INTENTIONAL_AUTHORED SplitContainer.color.touch_dragger_color default=#ffffff4d neocade=#b9c1d0ff
 INTENTIONAL_AUTHORED SplitContainer.color.touch_dragger_hover_color default=#ffffff99 neocade=#8bff6ad6
 INTENTIONAL_AUTHORED SplitContainer.color.touch_dragger_pressed_color default=#ffffffff neocade=#8bff6aff
@@ -882,7 +926,7 @@ INTENTIONAL_AUTHORED Tree.stylebox.selected_focus default=StyleBoxFlat(bg=#fffff
 INTENTIONAL_AUTHORED Tree.stylebox.title_button_hover default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.title_button_normal default=StyleBoxFlat(bg=#00000099 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=0/0/0/0 border_color=#272d48ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.title_button_pressed default=StyleBoxFlat(bg=#39393999 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Tree.color.children_hl_line_color default=#454545ff neocade=#10142300
+INTENTIONAL_AUTHORED Tree.color.children_hl_line_color default=#454545ff neocade=#b9c1d057
 INTENTIONAL_AUTHORED Tree.color.custom_button_font_highlight default=#f2f2f2ff neocade=#8bff6aff
 INTENTIONAL_AUTHORED Tree.color.drop_position_color default=#ffffffff neocade=#8bff6aff
 INTENTIONAL_AUTHORED Tree.color.font_color default=#b2b2b2ff neocade=#f7f8fbff
@@ -893,13 +937,13 @@ INTENTIONAL_AUTHORED Tree.color.font_hovered_selected_color default=#ffffffff ne
 INTENTIONAL_AUTHORED Tree.color.font_outline_color default=#000000ff neocade=#5e616fff
 INTENTIONAL_AUTHORED Tree.color.font_selected_color default=#ffffffff neocade=#8bff6aff
 INTENTIONAL_AUTHORED Tree.color.guide_color default=#b2b2b240 neocade=#10142300
-INTENTIONAL_AUTHORED Tree.color.parent_hl_line_color default=#454545ff neocade=#10142300
-INTENTIONAL_AUTHORED Tree.color.relationship_line_color default=#454545ff neocade=#10142300
+INTENTIONAL_AUTHORED Tree.color.parent_hl_line_color default=#454545ff neocade=#b9c1d094
+INTENTIONAL_AUTHORED Tree.color.relationship_line_color default=#454545ff neocade=#b9c1d047
 INTENTIONAL_AUTHORED Tree.color.title_button_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED Tree.constant.check_h_separation default=4 neocade=6
-INTENTIONAL_AUTHORED Tree.constant.children_hl_line_width default=1 neocade=0
 INTENTIONAL_AUTHORED Tree.constant.dragging_unfold_wait_msec default=500 neocade=1000
 INTENTIONAL_AUTHORED Tree.constant.draw_guides default=1 neocade=0
+INTENTIONAL_AUTHORED Tree.constant.draw_relationship_lines default=0 neocade=1
 INTENTIONAL_AUTHORED Tree.constant.h_separation default=4 neocade=8
 INTENTIONAL_AUTHORED Tree.constant.icon_h_separation default=4 neocade=6
 INTENTIONAL_AUTHORED Tree.constant.inner_item_margin_bottom default=0 neocade=2
@@ -907,8 +951,7 @@ INTENTIONAL_AUTHORED Tree.constant.inner_item_margin_left default=0 neocade=4
 INTENTIONAL_AUTHORED Tree.constant.inner_item_margin_right default=0 neocade=4
 INTENTIONAL_AUTHORED Tree.constant.inner_item_margin_top default=0 neocade=2
 INTENTIONAL_AUTHORED Tree.constant.item_margin default=16 neocade=18
-INTENTIONAL_AUTHORED Tree.constant.parent_hl_line_width default=1 neocade=0
-INTENTIONAL_AUTHORED Tree.constant.relationship_line_width default=1 neocade=0
+INTENTIONAL_AUTHORED Tree.constant.parent_hl_line_margin default=0 neocade=3
 INTENTIONAL_AUTHORED Tree.constant.scroll_border default=4 neocade=18
 INTENTIONAL_AUTHORED Tree.constant.scrollbar_margin_bottom default=-1 neocade=0
 INTENTIONAL_AUTHORED Tree.constant.scrollbar_margin_left default=-1 neocade=0
@@ -942,9 +985,9 @@ INTENTIONAL_AUTHORED TreeSecondary.font_size.title_button_font_size default=16 n
 INTENTIONAL_AUTHORED VBoxContainer.constant.separation default=4 neocade=2
 DEFAULT_ONLY VFlowContainer.constant.h_separation default=4 neocade=<missing>
 DEFAULT_ONLY VFlowContainer.constant.v_separation default=4 neocade=<missing>
-INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#333952ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber_highlight default=StyleBoxFlat(bg=#ffffffbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber_pressed default=StyleBoxFlat(bg=#bfbfbfbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#b9c1d052 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber_highlight default=StyleBoxFlat(bg=#ffffffbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#f7f8fb80 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber_pressed default=StyleBoxFlat(bg=#bfbfbfbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#f7f8fb80 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED VScrollBar.stylebox.scroll default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#10142300 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED VScrollBar.stylebox.scroll_focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#10142300 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED VScrollBar.constant.padding_left default=<missing> neocade=0
@@ -1211,6 +1254,49 @@ INTENTIONAL_AUTHORED EditorIcons.icon.GuiTabMenu default=<missing> neocade=Textu
 INTENTIONAL_AUTHORED EditorIcons.icon.GuiTabMenuHl default=<missing> neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/tab_menu.svg)
 INTENTIONAL_AUTHORED EditorIcons.icon.GuiTabMenuHlDarkBackground default=<missing> neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/tab_menu.svg)
 INTENTIONAL_AUTHORED EditorIcons.icon.TripleBar default=<missing> neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/editor_triple_bar_24.svg)
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.disabled default=<missing> neocade=StyleBoxFlat(bg=#24293dff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.disabled_mirrored default=<missing> neocade=StyleBoxFlat(bg=#24293dff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/1/1/4 border_color=#30354aff radius=0/0/0/0 margin=8.0/4.0/8.0/7.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.hover_mirrored default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/1/1/4 border_color=#30354aff radius=0/0/0/0 margin=8.0/4.0/8.0/7.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.hover_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.hover_pressed_mirrored default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.normal default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/4 border_color=#20263dff radius=0/0/0/0 margin=8.0/4.0/8.0/7.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.normal_mirrored default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/4 border_color=#20263dff radius=0/0/0/0 margin=8.0/4.0/8.0/7.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.pressed_mirrored default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=8.0/4.0/8.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_disabled_color default=<missing> neocade=#f7f8fb6b
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_hover_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_disabled_color default=<missing> neocade=#f7f8fb6b
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_hover_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_normal_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.constant.h_separation default=<missing> neocade=4
+INTENTIONAL_AUTHORED EditorInspectorButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED EditorInspectorButton.font_size.font_size default=16 neocade=14
+INTENTIONAL_AUTHORED EditorInspectorFlatButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED EditorInspectorFlatButton.font_size.font_size default=16 neocade=14
+INTENTIONAL_AUTHORED EditorProperty.stylebox.bg default=<missing> neocade=StyleBoxEmpty
+INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_group_note default=<missing> neocade=StyleBoxFlat(bg=#8bff6a1a border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_selected default=<missing> neocade=StyleBoxFlat(bg=#484e6452 border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorProperty.stylebox.child_bg default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/4 border_color=#20263dff radius=0/0/0/0 margin=0.0/0.0/0.0/3.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorProperty.color.property_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorProperty.color.readonly_color default=<missing> neocade=#b9c1d0ff
+INTENTIONAL_AUTHORED EditorProperty.color.readonly_warning_color default=<missing> neocade=#ffd166b2
+INTENTIONAL_AUTHORED EditorProperty.color.warning_color default=<missing> neocade=#ffd166ff
+INTENTIONAL_AUTHORED EditorProperty.constant.font_offset default=<missing> neocade=8
+INTENTIONAL_AUTHORED EditorSpinSlider.stylebox.label_bg default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/4 border_color=#20263dff radius=0/0/0/0 margin=8.0/4.0/8.0/7.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorSpinSlider.color.label_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorSpinSlider.color.read_only_label_color default=<missing> neocade=#b9c1d06b
+INTENTIONAL_AUTHORED EditorSpinSlider.constant.line_edit_margin default=<missing> neocade=28
+INTENTIONAL_AUTHORED EditorSpinSlider.constant.line_edit_margin_empty default=<missing> neocade=20
+INTENTIONAL_AUTHORED EditorSpinSlider.icon.updown default=<missing> neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/tree_updown.svg)
+INTENTIONAL_AUTHORED EditorSpinSlider.icon.updown_disabled default=<missing> neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/tree_updown.svg)
 INTENTIONAL_AUTHORED FileDialog.color.file_disabled_color default=#ffffff40 neocade=#b9c1d06b
 INTENTIONAL_AUTHORED FileDialog.color.file_icon_color default=#ffffffff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED FileDialog.color.folder_icon_color default=#ffffffff neocade=#5ca352ff
@@ -1383,9 +1469,9 @@ INTENTIONAL_AUTHORED GraphNodeTitleLabel.font_size.font_size default=16 neocade=
 INTENTIONAL_AUTHORED HBoxContainer.constant.separation default=4 neocade=2
 DEFAULT_ONLY HFlowContainer.constant.h_separation default=4 neocade=<missing>
 DEFAULT_ONLY HFlowContainer.constant.v_separation default=4 neocade=<missing>
-INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#333952ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber_highlight default=StyleBoxFlat(bg=#ffffffbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber_pressed default=StyleBoxFlat(bg=#bfbfbfbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#b9c1d052 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber_highlight default=StyleBoxFlat(bg=#ffffffbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#f7f8fb80 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber_pressed default=StyleBoxFlat(bg=#bfbfbfbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#f7f8fb80 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED HScrollBar.stylebox.scroll default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=0.0/4.0/0.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#10142300 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/4.0/0.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED HScrollBar.stylebox.scroll_focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#10142300 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/4.0/0.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED HScrollBar.constant.padding_bottom default=<missing> neocade=0
@@ -1736,7 +1822,8 @@ INTENTIONAL_AUTHORED SpinBox.icon.up default=Texture2D(size=(16.0, 8.0) path=) n
 INTENTIONAL_AUTHORED SpinBox.icon.up_disabled default=Texture2D(size=(16.0, 8.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/spinbox_up.svg)
 DEFAULT_ONLY SpinBox.icon.up_hover default=Texture2D(size=(16.0, 8.0) path=) neocade=<missing>
 DEFAULT_ONLY SpinBox.icon.up_pressed default=Texture2D(size=(16.0, 8.0) path=) neocade=<missing>
-DEFAULT_ONLY SpinBox.icon.updown default=Texture2D(size=(0.0, 0.0) path=) neocade=<missing>
+INTENTIONAL_AUTHORED SpinBox.icon.updown default=Texture2D(size=(0.0, 0.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/tree_updown.svg)
+INTENTIONAL_AUTHORED SpinBox.icon.updown_disabled default=<missing> neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/tree_updown.svg)
 INTENTIONAL_AUTHORED SplitContainer.color.touch_dragger_color default=#ffffff4d neocade=#b9c1d0ff
 INTENTIONAL_AUTHORED SplitContainer.color.touch_dragger_hover_color default=#ffffff99 neocade=#8bff6ad6
 INTENTIONAL_AUTHORED SplitContainer.color.touch_dragger_pressed_color default=#ffffffff neocade=#8bff6aff
@@ -1851,7 +1938,7 @@ INTENTIONAL_AUTHORED Tree.stylebox.selected_focus default=StyleBoxFlat(bg=#fffff
 INTENTIONAL_AUTHORED Tree.stylebox.title_button_hover default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.title_button_normal default=StyleBoxFlat(bg=#00000099 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=0/0/0/0 border_color=#272d48ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.title_button_pressed default=StyleBoxFlat(bg=#39393999 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Tree.color.children_hl_line_color default=#454545ff neocade=#10142300
+INTENTIONAL_AUTHORED Tree.color.children_hl_line_color default=#454545ff neocade=#b9c1d057
 INTENTIONAL_AUTHORED Tree.color.custom_button_font_highlight default=#f2f2f2ff neocade=#8bff6aff
 INTENTIONAL_AUTHORED Tree.color.drop_position_color default=#ffffffff neocade=#8bff6aff
 INTENTIONAL_AUTHORED Tree.color.font_color default=#b2b2b2ff neocade=#f7f8fbff
@@ -1862,13 +1949,13 @@ INTENTIONAL_AUTHORED Tree.color.font_hovered_selected_color default=#ffffffff ne
 INTENTIONAL_AUTHORED Tree.color.font_outline_color default=#000000ff neocade=#5e616fff
 INTENTIONAL_AUTHORED Tree.color.font_selected_color default=#ffffffff neocade=#8bff6aff
 INTENTIONAL_AUTHORED Tree.color.guide_color default=#b2b2b240 neocade=#10142300
-INTENTIONAL_AUTHORED Tree.color.parent_hl_line_color default=#454545ff neocade=#10142300
-INTENTIONAL_AUTHORED Tree.color.relationship_line_color default=#454545ff neocade=#10142300
+INTENTIONAL_AUTHORED Tree.color.parent_hl_line_color default=#454545ff neocade=#b9c1d094
+INTENTIONAL_AUTHORED Tree.color.relationship_line_color default=#454545ff neocade=#b9c1d047
 INTENTIONAL_AUTHORED Tree.color.title_button_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED Tree.constant.check_h_separation default=4 neocade=6
-INTENTIONAL_AUTHORED Tree.constant.children_hl_line_width default=1 neocade=0
 INTENTIONAL_AUTHORED Tree.constant.dragging_unfold_wait_msec default=500 neocade=1000
 INTENTIONAL_AUTHORED Tree.constant.draw_guides default=1 neocade=0
+INTENTIONAL_AUTHORED Tree.constant.draw_relationship_lines default=0 neocade=1
 INTENTIONAL_AUTHORED Tree.constant.h_separation default=4 neocade=8
 INTENTIONAL_AUTHORED Tree.constant.icon_h_separation default=4 neocade=6
 INTENTIONAL_AUTHORED Tree.constant.inner_item_margin_bottom default=0 neocade=2
@@ -1876,8 +1963,7 @@ INTENTIONAL_AUTHORED Tree.constant.inner_item_margin_left default=0 neocade=4
 INTENTIONAL_AUTHORED Tree.constant.inner_item_margin_right default=0 neocade=4
 INTENTIONAL_AUTHORED Tree.constant.inner_item_margin_top default=0 neocade=2
 INTENTIONAL_AUTHORED Tree.constant.item_margin default=16 neocade=18
-INTENTIONAL_AUTHORED Tree.constant.parent_hl_line_width default=1 neocade=0
-INTENTIONAL_AUTHORED Tree.constant.relationship_line_width default=1 neocade=0
+INTENTIONAL_AUTHORED Tree.constant.parent_hl_line_margin default=0 neocade=3
 INTENTIONAL_AUTHORED Tree.constant.scroll_border default=4 neocade=18
 INTENTIONAL_AUTHORED Tree.constant.scrollbar_margin_bottom default=-1 neocade=0
 INTENTIONAL_AUTHORED Tree.constant.scrollbar_margin_left default=-1 neocade=0
@@ -1911,9 +1997,9 @@ INTENTIONAL_AUTHORED TreeSecondary.font_size.title_button_font_size default=16 n
 INTENTIONAL_AUTHORED VBoxContainer.constant.separation default=4 neocade=2
 DEFAULT_ONLY VFlowContainer.constant.h_separation default=4 neocade=<missing>
 DEFAULT_ONLY VFlowContainer.constant.v_separation default=4 neocade=<missing>
-INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#333952ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber_highlight default=StyleBoxFlat(bg=#ffffffbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber_pressed default=StyleBoxFlat(bg=#bfbfbfbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#b9c1d052 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber_highlight default=StyleBoxFlat(bg=#ffffffbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#f7f8fb80 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber_pressed default=StyleBoxFlat(bg=#bfbfbfbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#f7f8fb80 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED VScrollBar.stylebox.scroll default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#10142300 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED VScrollBar.stylebox.scroll_focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#10142300 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED VScrollBar.constant.padding_left default=<missing> neocade=0
@@ -2174,6 +2260,47 @@ INTENTIONAL_AUTHORED EditorIcons.icon.GuiTabMenu default=<missing> neocade=Textu
 INTENTIONAL_AUTHORED EditorIcons.icon.GuiTabMenuHl default=<missing> neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/tab_menu.svg)
 INTENTIONAL_AUTHORED EditorIcons.icon.GuiTabMenuHlDarkBackground default=<missing> neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/tab_menu.svg)
 INTENTIONAL_AUTHORED EditorIcons.icon.TripleBar default=<missing> neocade=Texture2D(size=(24.0, 24.0) path=res://addons/neocade_theme/icons/editor_triple_bar_24.svg)
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.disabled default=<missing> neocade=StyleBoxFlat(bg=#24293dff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=12.0/6.0/12.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.disabled_mirrored default=<missing> neocade=StyleBoxFlat(bg=#24293dff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=12.0/6.0/12.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.hover default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/1/1/1 border_color=#474c63ff radius=0/0/0/0 margin=12.0/6.0/12.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.hover_mirrored default=<missing> neocade=StyleBoxFlat(bg=#3b415aff border=1/1/1/1 border_color=#474c63ff radius=0/0/0/0 margin=12.0/6.0/12.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.hover_pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=12.0/6.0/12.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.hover_pressed_mirrored default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=12.0/6.0/12.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.normal default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=12.0/6.0/12.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.normal_mirrored default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=12.0/6.0/12.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.pressed default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=12.0/6.0/12.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.stylebox.pressed_mirrored default=<missing> neocade=StyleBoxFlat(bg=#484e64ff border=1/1/1/1 border_color=#52586dff radius=0/0/0/0 margin=12.0/6.0/12.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_disabled_color default=<missing> neocade=#f7f8fb6b
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_hover_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.font_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_disabled_color default=<missing> neocade=#f7f8fb6b
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_focus_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_hover_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_hover_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_normal_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.color.icon_pressed_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorInspectorButton.constant.h_separation default=<missing> neocade=4
+INTENTIONAL_AUTHORED EditorInspectorButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED EditorInspectorFlatButton.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED EditorProperty.stylebox.bg default=<missing> neocade=StyleBoxEmpty
+INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_group_note default=<missing> neocade=StyleBoxFlat(bg=#8bff6a1a border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorProperty.stylebox.bg_selected default=<missing> neocade=StyleBoxFlat(bg=#484e6452 border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorProperty.stylebox.child_bg default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorProperty.color.property_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorProperty.color.readonly_color default=<missing> neocade=#b9c1d0ff
+INTENTIONAL_AUTHORED EditorProperty.color.readonly_warning_color default=<missing> neocade=#ffd166b2
+INTENTIONAL_AUTHORED EditorProperty.color.warning_color default=<missing> neocade=#ffd166ff
+INTENTIONAL_AUTHORED EditorProperty.constant.font_offset default=<missing> neocade=8
+INTENTIONAL_AUTHORED EditorSpinSlider.stylebox.label_bg default=<missing> neocade=StyleBoxFlat(bg=#272d48ff border=1/1/1/1 border_color=#333952ff radius=0/0/0/0 margin=12.0/6.0/12.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED EditorSpinSlider.color.label_color default=<missing> neocade=#f7f8fbff
+INTENTIONAL_AUTHORED EditorSpinSlider.color.read_only_label_color default=<missing> neocade=#b9c1d06b
+INTENTIONAL_AUTHORED EditorSpinSlider.constant.line_edit_margin default=<missing> neocade=28
+INTENTIONAL_AUTHORED EditorSpinSlider.constant.line_edit_margin_empty default=<missing> neocade=20
+INTENTIONAL_AUTHORED EditorSpinSlider.icon.updown default=<missing> neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/tree_updown.svg)
+INTENTIONAL_AUTHORED EditorSpinSlider.icon.updown_disabled default=<missing> neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/tree_updown.svg)
 INTENTIONAL_AUTHORED FileDialog.color.file_disabled_color default=#ffffff40 neocade=#b9c1d06b
 INTENTIONAL_AUTHORED FileDialog.color.file_icon_color default=#ffffffff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED FileDialog.color.folder_icon_color default=#ffffffff neocade=#5ca352ff
@@ -2341,9 +2468,9 @@ INTENTIONAL_AUTHORED GraphNodeTitleLabel.font.font default=Font(path=) neocade=F
 INTENTIONAL_AUTHORED HBoxContainer.constant.separation default=4 neocade=2
 DEFAULT_ONLY HFlowContainer.constant.h_separation default=4 neocade=<missing>
 DEFAULT_ONLY HFlowContainer.constant.v_separation default=4 neocade=<missing>
-INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#333952ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/6.0/6.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber_highlight default=StyleBoxFlat(bg=#ffffffbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/6.0/6.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber_pressed default=StyleBoxFlat(bg=#bfbfbfbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/6.0/6.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#b9c1d052 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/6.0/6.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber_highlight default=StyleBoxFlat(bg=#ffffffbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#f7f8fb80 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/6.0/6.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED HScrollBar.stylebox.grabber_pressed default=StyleBoxFlat(bg=#bfbfbfbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#f7f8fb80 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/6.0/6.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED HScrollBar.stylebox.scroll default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=0.0/4.0/0.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#10142300 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/6.0/0.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED HScrollBar.stylebox.scroll_focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#10142300 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=0.0/6.0/0.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED HScrollBar.constant.padding_bottom default=<missing> neocade=0
@@ -2675,7 +2802,8 @@ INTENTIONAL_AUTHORED SpinBox.icon.up default=Texture2D(size=(16.0, 8.0) path=) n
 INTENTIONAL_AUTHORED SpinBox.icon.up_disabled default=Texture2D(size=(16.0, 8.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/spinbox_up.svg)
 DEFAULT_ONLY SpinBox.icon.up_hover default=Texture2D(size=(16.0, 8.0) path=) neocade=<missing>
 DEFAULT_ONLY SpinBox.icon.up_pressed default=Texture2D(size=(16.0, 8.0) path=) neocade=<missing>
-DEFAULT_ONLY SpinBox.icon.updown default=Texture2D(size=(0.0, 0.0) path=) neocade=<missing>
+INTENTIONAL_AUTHORED SpinBox.icon.updown default=Texture2D(size=(0.0, 0.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/tree_updown.svg)
+INTENTIONAL_AUTHORED SpinBox.icon.updown_disabled default=<missing> neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/tree_updown.svg)
 INTENTIONAL_AUTHORED SplitContainer.color.touch_dragger_color default=#ffffff4d neocade=#b9c1d0ff
 INTENTIONAL_AUTHORED SplitContainer.color.touch_dragger_hover_color default=#ffffff99 neocade=#8bff6ad6
 INTENTIONAL_AUTHORED SplitContainer.color.touch_dragger_pressed_color default=#ffffffff neocade=#8bff6aff
@@ -2786,7 +2914,7 @@ INTENTIONAL_AUTHORED Tree.stylebox.selected_focus default=StyleBoxFlat(bg=#fffff
 INTENTIONAL_AUTHORED Tree.stylebox.title_button_hover default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#3b415aff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.title_button_normal default=StyleBoxFlat(bg=#00000099 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#272d48ff border=0/0/0/0 border_color=#272d48ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED Tree.stylebox.title_button_pressed default=StyleBoxFlat(bg=#39393999 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#484e64ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED Tree.color.children_hl_line_color default=#454545ff neocade=#10142300
+INTENTIONAL_AUTHORED Tree.color.children_hl_line_color default=#454545ff neocade=#b9c1d057
 INTENTIONAL_AUTHORED Tree.color.custom_button_font_highlight default=#f2f2f2ff neocade=#8bff6aff
 INTENTIONAL_AUTHORED Tree.color.drop_position_color default=#ffffffff neocade=#8bff6aff
 INTENTIONAL_AUTHORED Tree.color.font_color default=#b2b2b2ff neocade=#f7f8fbff
@@ -2797,13 +2925,13 @@ INTENTIONAL_AUTHORED Tree.color.font_hovered_selected_color default=#ffffffff ne
 INTENTIONAL_AUTHORED Tree.color.font_outline_color default=#000000ff neocade=#5e616fff
 INTENTIONAL_AUTHORED Tree.color.font_selected_color default=#ffffffff neocade=#8bff6aff
 INTENTIONAL_AUTHORED Tree.color.guide_color default=#b2b2b240 neocade=#10142300
-INTENTIONAL_AUTHORED Tree.color.parent_hl_line_color default=#454545ff neocade=#10142300
-INTENTIONAL_AUTHORED Tree.color.relationship_line_color default=#454545ff neocade=#10142300
+INTENTIONAL_AUTHORED Tree.color.parent_hl_line_color default=#454545ff neocade=#b9c1d094
+INTENTIONAL_AUTHORED Tree.color.relationship_line_color default=#454545ff neocade=#b9c1d047
 INTENTIONAL_AUTHORED Tree.color.title_button_color default=#dfdfdfff neocade=#f7f8fbff
 INTENTIONAL_AUTHORED Tree.constant.check_h_separation default=4 neocade=6
-INTENTIONAL_AUTHORED Tree.constant.children_hl_line_width default=1 neocade=0
 INTENTIONAL_AUTHORED Tree.constant.dragging_unfold_wait_msec default=500 neocade=1000
 INTENTIONAL_AUTHORED Tree.constant.draw_guides default=1 neocade=0
+INTENTIONAL_AUTHORED Tree.constant.draw_relationship_lines default=0 neocade=1
 INTENTIONAL_AUTHORED Tree.constant.h_separation default=4 neocade=8
 INTENTIONAL_AUTHORED Tree.constant.icon_h_separation default=4 neocade=6
 INTENTIONAL_AUTHORED Tree.constant.inner_item_margin_bottom default=0 neocade=2
@@ -2811,8 +2939,7 @@ INTENTIONAL_AUTHORED Tree.constant.inner_item_margin_left default=0 neocade=4
 INTENTIONAL_AUTHORED Tree.constant.inner_item_margin_right default=0 neocade=4
 INTENTIONAL_AUTHORED Tree.constant.inner_item_margin_top default=0 neocade=2
 INTENTIONAL_AUTHORED Tree.constant.item_margin default=16 neocade=18
-INTENTIONAL_AUTHORED Tree.constant.parent_hl_line_width default=1 neocade=0
-INTENTIONAL_AUTHORED Tree.constant.relationship_line_width default=1 neocade=0
+INTENTIONAL_AUTHORED Tree.constant.parent_hl_line_margin default=0 neocade=3
 INTENTIONAL_AUTHORED Tree.constant.scroll_border default=4 neocade=18
 INTENTIONAL_AUTHORED Tree.constant.scrollbar_margin_bottom default=-1 neocade=0
 INTENTIONAL_AUTHORED Tree.constant.scrollbar_margin_left default=-1 neocade=0
@@ -2842,9 +2969,9 @@ INTENTIONAL_AUTHORED TreeSecondary.font.title_button_font default=Font(path=) ne
 INTENTIONAL_AUTHORED VBoxContainer.constant.separation default=4 neocade=2
 DEFAULT_ONLY VFlowContainer.constant.h_separation default=4 neocade=<missing>
 DEFAULT_ONLY VFlowContainer.constant.v_separation default=4 neocade=<missing>
-INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#333952ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/6.0/6.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber_highlight default=StyleBoxFlat(bg=#ffffffbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3b415aff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/6.0/6.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
-INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber_pressed default=StyleBoxFlat(bg=#bfbfbfbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#484e64ff border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/6.0/6.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber default=StyleBoxFlat(bg=#ffffff66 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#b9c1d052 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/6.0/6.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber_highlight default=StyleBoxFlat(bg=#ffffffbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#f7f8fb80 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/6.0/6.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED VScrollBar.stylebox.grabber_pressed default=StyleBoxFlat(bg=#bfbfbfbf border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#f7f8fb80 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/6.0/6.0/6.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED VScrollBar.stylebox.scroll default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=10/10/10/10 margin=4.0/0.0/4.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#10142300 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/0.0/6.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED VScrollBar.stylebox.scroll_focus default=StyleBoxFlat(bg=#ffffffbf border=2/2/2/2 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=2.0/2.0/2.0/2.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#10142300 border=0/0/0/0 border_color=#5e616fff radius=0/0/0/0 margin=6.0/0.0/6.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED VScrollBar.constant.padding_left default=<missing> neocade=0
@@ -2873,10 +3000,10 @@ INTENTIONAL_AUTHORED WindowContentPanel.stylebox.panel default=<missing> neocade
 
 
 Summary:
-- SAME=251
+- SAME=256
 - FALLS_BACK=0
-- INTENTIONAL_AUTHORED=2377
+- INTENTIONAL_AUTHORED=2507
 - UNINTENTIONAL_EXTRA=0
 - UNINTENTIONAL_STYLE=0
 - NEOCADE_ONLY=0
-- DEFAULT_ONLY=486
+- DEFAULT_ONLY=483

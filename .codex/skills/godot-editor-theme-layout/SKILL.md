@@ -81,6 +81,7 @@ For spacing, padding, clipping, icon-size, or alignment complaints based on a us
 - Checking for `UNINTENTIONAL_STYLE`, positive shadows, wrong label chrome, excessive icon sizes, missing type variations, and fallback/default-only drift.
 - Checking `StyleBoxEmpty` vs `StyleBoxFlat` when a Godot default gap should inherit its parent surface instead of painting its own color.
 - Fully authoring state slots for editor secondary variations when probes show Godot is falling back to defaults instead of resolving inherited NeoCade slots.
+- Tracing flat editor inspector controls back to their parent paint source. Many editor property `OptionButton`s and `EditorSpinSlider`s set `flat = true`, so their normal face is not drawn by the control itself; `EditorProperty.child_bg` is the reusable value-cell surface.
 - Using Godot Minimal Theme as a practical reference for compact editor spacing and editor-specific variations, while avoiding code-for-code copying.
 - Regenerating comparison logs after changing intentional overrides so future sessions can see what changed and why.
 
@@ -91,6 +92,8 @@ For spacing, padding, clipping, icon-size, or alignment complaints based on a us
 - Do not globally paint split-bar backgrounds to the darkest surface unless the user explicitly wants a visible stripe everywhere. The safer editor-layout default is an empty split-bar background with explicit grabber icons/colors.
 - Secondary editor variations can be inheritance traps. Variations such as `TreeSecondary`, `ItemListSecondary`, `ScrollContainerSecondary`, and editor-only container variants may not resolve every dynamic NeoCade slot the way the base type does. If probes show fallback colors or sizes, explicitly author the variation slots.
 - For list/tree views with no separator/border/outline, check all relevant theme paths: panel border width, guide/relationship colors, guide/relationship constants, `outline_size`, and `font_outline_color`. Use Button hover/pressed styleboxes as the reference for item hover/selected backgrounds when the user asks for state consistency.
+- For Tree nesting paths, do not confuse row guides with relationship lines. `draw_guides`/`guide_color` control guide/separator style lines; `draw_relationship_lines`, `relationship_line_width`, `parent_hl_line_width`, `children_hl_line_width`, and the related colors control the parent-child path lines.
+- For editor settings/project settings property inputs, source usually routes enum and numeric fields through `EditorProperty` children. Theme the value surface with `EditorProperty.child_bg`, keep `EditorProperty.bg` transparent, and use `EditorSpinSlider.label_bg` plus `EditorInspectorButton` sizing/color slots for consistency.
 - Keep concrete source maps as examples, not as the only target. Example: `CreateDialog` / "Create New Node" is built in `editor/gui/create_dialog.cpp` with nested split containers, `TreeSecondary`, `ItemListSecondary`, and `HeaderSmall`; the same investigation pattern applies to other editor dialogs and docks.
 
 ## Collaboration Style

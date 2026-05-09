@@ -17,6 +17,7 @@ rg -n "Filter Properties|InspectorDock|NoBorderHorizontalBottom|set_theme_type_v
 rg -n "FileSystemDock|toolbar_hbc|toolbar2_hbc|FlatMenuButton|NoBorderHorizontalBottom" C:\Programming_Files\Godot\godot-master\editor
 rg -n "DockTabContainer|SideDockTabContainer|BottomSideDockTabContainer" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
 rg -n "CreateDialog|TreeSecondary|ItemListSecondary|split_bar_background|HSplitContainer" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
+rg -n "EditorProperty|EditorInspectorButton|EditorSpinSlider|set_flat\(true\)" C:\Programming_Files\Godot\godot-master\editor\inspector C:\Programming_Files\Godot\godot-master\editor\gui C:\Programming_Files\Godot\godot-master\editor\settings
 ```
 
 Then compare reference theme behavior:
@@ -25,6 +26,7 @@ Then compare reference theme behavior:
 rg -n "EditorInspector|FlatMenuButton|NoBorderHorizontalBottom|TabContainer|HBoxContainer|VBoxContainer" C:\Programming_Files\Godot\godot-minimal-theme-main\minimal_theme.tres
 rg -n "EditorInspector|FlatMenuButton|NoBorderHorizontalBottom|TabContainer|HBoxContainer|VBoxContainer" C:\Programming_Files\Godot\godot-master\editor\themes\theme_modern.cpp
 rg -n "SplitContainer|split_bar_background|ItemListSecondary|TreeSecondary|draw_guides|guide_color" C:\Programming_Files\Godot\godot-minimal-theme-main\minimal_theme.tres C:\Programming_Files\Godot\godot-master\editor\themes C:\Programming_Files\Godot\godot-master\scene\theme\default_theme.cpp
+rg -n "EditorProperty|EditorSpinSlider|relationship_line|ScrollBar|grabber_style" C:\Programming_Files\Godot\godot-minimal-theme-main\minimal_theme.tres C:\Programming_Files\Godot\godot-master\editor\themes\theme_modern.cpp
 ```
 
 ## Common Source Mappings
@@ -64,6 +66,14 @@ rg -n "SplitContainer|split_bar_background|ItemListSecondary|TreeSecondary|draw_
   - Section labels come from `VBoxContainer::add_margin_child`, which uses `HeaderSmall`
   - Useful theme hooks: `AcceptDialog.panel`, `ConfirmationDialog.panel`, `PopupDialog.panel`, `HeaderSmall.font_size`, `TreeSecondary.panel`, `ItemListSecondary.panel`, `ItemListSecondary` selected/hovered styleboxes and selected font colors, `SplitContainer/HSplitContainer/VSplitContainer.split_bar_background`
 
+- Editor/Project Settings property grids:
+  - Source: `editor/settings/editor_settings_dialog.cpp` feeds settings into inspector-style property editors.
+  - Property drawing: `editor/inspector/editor_inspector.cpp`, especially `EditorProperty::_notification`.
+  - Enum controls: `EditorPropertyEnum` and `EditorPropertyTextEnum` create `OptionButton`, call `set_flat(true)`, and set variation `EditorInspectorButton`.
+  - Numeric controls: many properties create `EditorSpinSlider`, call `set_flat(true)`, and rely on `LineEdit` metrics plus editor-specific theme items.
+  - Important consequence: flat controls do not draw their normal stylebox in `Button::_notification`/`EditorSpinSlider::_draw_spin_slider`. The reusable normal-state value surface is `EditorProperty.child_bg`, not `OptionButton.normal`.
+  - Useful theme hooks: `EditorProperty.bg`, `EditorProperty.bg_selected`, `EditorProperty.child_bg`, `EditorSpinSlider.label_bg`, `EditorSpinSlider.label_color`, `EditorSpinSlider.line_edit_margin`, `EditorInspectorButton` styleboxes/colors, and the `SpinBox.updown` icon used by `EditorSpinSlider`.
+
 ## Theme Editing Heuristics
 
 - Keep `MarginContainer` generic margins at zero unless the whole app should inherit padding.
@@ -77,6 +87,8 @@ rg -n "SplitContainer|split_bar_background|ItemListSecondary|TreeSecondary|draw_
 - Labels and rich text labels should remain text-only unless source proves a panel is needed.
 - Prefer `StyleBoxEmpty` for contextual split-bar backgrounds. Godot default sets `split_bar_background` to empty for `SplitContainer`, `HSplitContainer`, and `VSplitContainer`; the modern editor theme and Godot Minimal Theme mostly set splitter constants/icons. A filled split-bar style paints a visible stripe and can make dialog layout look like unexpected spacing.
 - For list views that should be text/item focused, hide lines through `guide_color` alpha, remove panel borders, keep `outline_size` at 0, and make selected text color intentionally match the accent if that is the Tree convention.
+- For Tree views, distinguish guide/separator lines from hierarchy relationship lines. Keep `draw_guides` and `guide_color` off when row guides look noisy, but use `draw_relationship_lines`, `relationship_line_width`, `parent_hl_line_width`, `children_hl_line_width`, and muted relationship colors when the hierarchy path should remain visible like the Godot editor.
+- For scrollbars, Godot modern uses an empty/transparent track and semi-transparent thumb fills. In `theme_modern.cpp`, normal grabber alpha is roughly 0.225 and hover/pressed roughly 0.5; Godot Minimal Theme uses a similar translucent color recipe. Preserve Pulse square corners if that is part of the style, but avoid opaque thumbs unless the user asks.
 
 ## Reusable Bug Patterns
 
@@ -88,6 +100,9 @@ rg -n "SplitContainer|split_bar_background|ItemListSecondary|TreeSecondary|draw_
 
 - List/tree visual cleanup:
   No separators usually requires more than one setting. Check guide colors, relationship line colors, draw constants, panel border widths, selected/hovered styleboxes, selected font colors, and outline constants together.
+
+- Flat inspector input controls:
+  If `OptionButton`, `Button`, or `EditorSpinSlider` looks transparent only inside Editor Settings, Project Settings, or Inspector rows, check source for `set_flat(true)` before changing base `OptionButton` or `SpinBox`. Flat buttons skip stylebox drawing entirely in normal/hover/pressed states; the visible normal surface is usually the `EditorProperty.child_bg` rectangle behind the right-side child control.
 
 - Dialogs share Control primitives:
   A dialog-specific screenshot may still point to reusable primitives such as `AcceptDialog`, `PopupDialog`, `SplitContainer`, `Tree`, `ItemList`, `LineEdit`, `Button`, or `HeaderSmall`. Fix the primitive or variation when source proves it is reused; keep the dialog source map as evidence, not as a one-off patch target.

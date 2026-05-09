@@ -420,6 +420,8 @@ func _regenerate_theme() -> void:
 	set_font("font", "IconButton",      body_font)
 	set_font("font", "FlatButton",      body_font)
 	set_font("font", "FlatMenuButton",  body_font)
+	set_font("font", "EditorInspectorButton",     body_font)
+	set_font("font", "EditorInspectorFlatButton", body_font)
 	set_font("font", "CardPanel",       body_font)
 	set_font("font", "HeroPanel",       header_medium_font)
 	# Tree exposes explicit font slots outside the BINDING_TABLE schema. The body face
@@ -472,6 +474,8 @@ func _regenerate_theme() -> void:
 	set_font_size("font_size", "IconButton",      tokens.body)
 	set_font_size("font_size", "FlatButton",      tokens.body)
 	set_font_size("font_size", "FlatMenuButton",  tokens.body)
+	set_font_size("font_size", "EditorInspectorButton",     tokens.body)
+	set_font_size("font_size", "EditorInspectorFlatButton", tokens.body)
 	set_font_size("font_size", "TreeSecondary", tokens.body)
 	set_font_size("title_button_font_size", "TreeSecondary", tokens.body)
 	set_font_size("font_size", "ItemListSecondary", tokens.body)
@@ -1064,6 +1068,8 @@ const TYPE_VARIATIONS: Dictionary = {
 	"IconButton":      "Button",
 	"FlatButton":      "Button",
 	"FlatMenuButton":  "Button",
+	"EditorInspectorButton": "Button",
+	"EditorInspectorFlatButton": "FlatButton",
 	# Label / heading family (TYPEVAR-02) — 5
 	"HeaderLarge":  "Label",
 	"HeaderMedium": "Label",
@@ -1522,6 +1528,110 @@ const BINDING_TABLE: Dictionary = {
 			"text_highlight_v_padding":    {"value": 2},
 		},
 	},
+	# Editor inspector/settings properties: Godot source sets most property
+	# OptionButtons and EditorSpinSliders to flat=true, so their own normal
+	# Button/LineEdit faces are not drawn. The value-cell surface comes from
+	# EditorProperty.child_bg instead.
+	"EditorProperty": {
+		"stylebox": {
+			"bg":            {"empty": true},
+			"bg_selected":   {"role": "button_pressed", "border_role": "button_pressed",
+							  "raised_intensity": 0, "alpha": 0.32, "border_width": 0,
+							  "radius": "shape.secondary_radius"},
+			"child_bg":      {"role": "button_normal", "border_role": "button_border",
+							  "raised_face_edge": true,
+							  "raised_intensity": "shape.raised_lifts.secondary",
+							  "radius": "shape.secondary_radius", "border_width": 1},
+			"bg_group_note": {"role": "role_primary", "alpha": 0.10,
+							  "raised_intensity": 0, "border_width": 0,
+							  "radius": "shape.secondary_radius"},
+		},
+		"color": {
+			"property_color":          {"role": "text_default"},
+			"readonly_color":          {"role": "text_muted"},
+			"warning_color":           {"role": "role_warning"},
+			"readonly_warning_color":  {"role": "role_warning", "alpha": 0.70},
+		},
+		"constant": {
+			"font_offset": {"value": 8},
+		},
+	},
+	"EditorSpinSlider": {
+		"stylebox": {
+			"label_bg": {"role": "button_normal", "border_role": "button_border",
+						 "raised_face_edge": true,
+						 "raised_intensity": "shape.raised_lifts.secondary",
+						 "radius": "shape.secondary_radius", "border_width": 1,
+						 "padding": Vector2i(8, 4)},
+		},
+		"color": {
+			"label_color":           {"role": "text_default"},
+			"read_only_label_color": {"role": "text_muted", "disabled": true},
+		},
+		"constant": {
+			"line_edit_margin":       {"value": 28},
+			"line_edit_margin_empty": {"value": 20},
+		},
+		"icon": {
+			"updown":          {"icon": "tree_updown"},
+			"updown_disabled": {"icon": "tree_updown"},
+		},
+	},
+	"EditorInspectorButton": {
+		"stylebox": {
+			"normal":                 {"role": "button_normal", "border_role": "button_border",
+									   "raised_face_edge": true,
+									   "raised_intensity": "shape.raised_lifts.secondary",
+									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+			"normal_mirrored":        {"role": "button_normal", "border_role": "button_border",
+									   "raised_face_edge": true,
+									   "raised_intensity": "shape.raised_lifts.secondary",
+									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+			"hover":                  {"role": "button_hover", "border_role": "button_border_hover",
+									   "raised_face_edge": true,
+									   "raised_intensity": "shape.raised_lifts.secondary",
+									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+			"hover_mirrored":         {"role": "button_hover", "border_role": "button_border_hover",
+									   "raised_face_edge": true,
+									   "raised_intensity": "shape.raised_lifts.secondary",
+									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+			"pressed":                {"role": "button_pressed", "border_role": "button_border_pressed",
+									   "raised_intensity": 0,
+									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+			"pressed_mirrored":       {"role": "button_pressed", "border_role": "button_border_pressed",
+									   "raised_intensity": 0,
+									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+			"hover_pressed":          {"role": "button_pressed", "border_role": "button_border_pressed",
+									   "raised_intensity": 0,
+									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+			"hover_pressed_mirrored": {"role": "button_pressed", "border_role": "button_border_pressed",
+									   "raised_intensity": 0,
+									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+			"disabled":               {"role": "button_disabled", "raised_intensity": 0,
+									   "border_width": 0, "radius": "shape.secondary_radius",
+									   "padding": Vector2i(8, 4)},
+			"disabled_mirrored":      {"role": "button_disabled", "raised_intensity": 0,
+									   "border_width": 0, "radius": "shape.secondary_radius",
+									   "padding": Vector2i(8, 4)},
+		},
+		"color": {
+			"font_color":               {"role": "text_strong"},
+			"font_hover_color":         {"role": "text_strong"},
+			"font_pressed_color":       {"role": "text_strong"},
+			"font_focus_color":         {"role": "text_strong"},
+			"font_disabled_color":      {"role": "text_strong", "disabled": true},
+			"font_hover_pressed_color": {"role": "text_strong"},
+			"icon_normal_color":        {"role": "text_strong"},
+			"icon_hover_color":         {"role": "text_strong"},
+			"icon_pressed_color":       {"role": "text_strong"},
+			"icon_focus_color":         {"role": "text_strong"},
+			"icon_disabled_color":      {"role": "text_strong", "disabled": true},
+			"icon_hover_pressed_color": {"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": 4},
+		},
+	},
 	# 1. AcceptDialog — explicit popup shell plus official button-container spacing.
 	"AcceptDialog": {
 		"stylebox": {
@@ -1946,12 +2056,15 @@ const BINDING_TABLE: Dictionary = {
 								  "alpha": 0.0, "border_width": 0, "radius": 0, "padding": Vector2i(0, 4)},
 			"scroll_focus":      {"role": "surface_low",   "raised_intensity": 0,
 								  "alpha": 0.0, "border_width": 0, "radius": 0, "padding": Vector2i(0, 4)},
-			"grabber":           {"role": "button_border", "raised_intensity": 0,
-								  "border_width": 0, "radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
-			"grabber_highlight": {"role": "button_hover",   "raised_intensity": 0,
-								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "border_width": 0},
-			"grabber_pressed":   {"role": "button_pressed", "raised_intensity": 0,
-								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "border_width": 0},
+			"grabber":           {"role": "text_muted", "raised_intensity": 0,
+								  "alpha": 0.32, "border_width": 0,
+								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+			"grabber_highlight": {"role": "text_strong", "raised_intensity": 0,
+								  "alpha": 0.50, "radius": "shape.secondary_radius",
+								  "padding": Vector2i(4, 4), "border_width": 0},
+			"grabber_pressed":   {"role": "text_strong", "raised_intensity": 0,
+								  "alpha": 0.50, "radius": "shape.secondary_radius",
+								  "padding": Vector2i(4, 4), "border_width": 0},
 		},
 		"constant": {
 			"padding_top":    {"value": 0},
@@ -2411,6 +2524,11 @@ const BINDING_TABLE: Dictionary = {
 			"up_disabled":  {"icon": "spinbox_up"},
 			"down":         {"icon": "spinbox_down"},
 			"down_disabled":{"icon": "spinbox_down"},
+			# EditorSpinSlider currently requests this composite slot through
+			# the SpinBox theme type even though it also binds EditorSpinSlider
+			# updown slots.
+			"updown":          {"icon": "tree_updown"},
+			"updown_disabled": {"icon": "tree_updown"},
 		},
 	},
 	# 28. TabBar — official Godot 4.6.2 tab strip slots. Shared tab state
@@ -2646,7 +2764,7 @@ const BINDING_TABLE: Dictionary = {
 										"border_role": "button_hover", "alpha": 0.46, "border_width": 0},
 		},
 		"color": {
-			"children_hl_line_color":      {"role": "surface_low", "alpha": 0.0},
+			"children_hl_line_color":      {"role": "text_muted", "alpha": 0.34},
 			"custom_button_font_highlight":{"role": "role_primary"},
 			"drop_position_color":         {"role": "role_primary"},
 			"font_color":                  {"role": "text_default"},
@@ -2657,18 +2775,18 @@ const BINDING_TABLE: Dictionary = {
 			"font_outline_color":          {"role": "outline_color"},
 			"font_selected_color":         {"role": "role_primary"},
 			"guide_color":                 {"role": "surface_low", "alpha": 0.0},
-			"parent_hl_line_color":        {"role": "surface_low", "alpha": 0.0},
-			"relationship_line_color":     {"role": "surface_low", "alpha": 0.0},
+			"parent_hl_line_color":        {"role": "text_muted", "alpha": 0.58},
+			"relationship_line_color":     {"role": "text_muted", "alpha": 0.28},
 			"scroll_hint_color":           {"role": "scroll_shadow"},
 			"title_button_color":          {"role": "text_strong"},
 		},
 		"constant": {
 			"button_margin":             {"value": 4},
 			"check_h_separation":        {"value": 6},
-			"children_hl_line_width":    {"value": 0},
+			"children_hl_line_width":    {"value": 1},
 			"dragging_unfold_wait_msec": {"value": 1000},
 			"draw_guides":               {"value": 0},
-			"draw_relationship_lines":   {"value": 0},
+			"draw_relationship_lines":   {"value": 1},
 			"h_separation":              {"value": 8},
 			"icon_h_separation":         {"value": 6},
 			"icon_max_width":            {"value": 0},
@@ -2678,9 +2796,9 @@ const BINDING_TABLE: Dictionary = {
 			"inner_item_margin_top":     {"value": 2},
 			"item_margin":               {"value": 18},
 			"outline_size":              {"value": 0},
-			"parent_hl_line_margin":     {"value": 0},
-			"parent_hl_line_width":      {"value": 0},
-			"relationship_line_width":   {"value": 0},
+			"parent_hl_line_margin":     {"value": 3},
+			"parent_hl_line_width":      {"value": 1},
+			"relationship_line_width":   {"value": 1},
 			"scroll_border":             {"value": 18},
 			"scroll_speed":              {"value": 12},
 			"scrollbar_h_separation":    {"value": 4},
@@ -2729,12 +2847,15 @@ const BINDING_TABLE: Dictionary = {
 								  "alpha": 0.0, "border_width": 0, "radius": 0, "padding": Vector2i(4, 0)},
 			"scroll_focus":      {"role": "surface_low",   "raised_intensity": 0,
 								  "alpha": 0.0, "border_width": 0, "radius": 0, "padding": Vector2i(4, 0)},
-			"grabber":           {"role": "button_border", "raised_intensity": 0,
-								  "border_width": 0, "radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
-			"grabber_highlight": {"role": "button_hover",   "raised_intensity": 0,
-								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "border_width": 0},
-			"grabber_pressed":   {"role": "button_pressed", "raised_intensity": 0,
-								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "border_width": 0},
+			"grabber":           {"role": "text_muted", "raised_intensity": 0,
+								  "alpha": 0.32, "border_width": 0,
+								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+			"grabber_highlight": {"role": "text_strong", "raised_intensity": 0,
+								  "alpha": 0.50, "radius": "shape.secondary_radius",
+								  "padding": Vector2i(4, 4), "border_width": 0},
+			"grabber_pressed":   {"role": "text_strong", "raised_intensity": 0,
+								  "alpha": 0.50, "radius": "shape.secondary_radius",
+								  "padding": Vector2i(4, 4), "border_width": 0},
 		},
 		"constant": {
 			"padding_left":  {"value": 0},
