@@ -436,6 +436,11 @@ func _regenerate_theme() -> void:
 	set_font("title_button_font", "TreeSecondary", header_small_font)
 	set_font("font", "TreeTable",              body_font)
 	set_font("title_button_font", "TreeTable", header_small_font)
+	# Godot editor internals read inspector section/property fonts from EditorFonts,
+	# not always from Control font slots. Keep those aliases on the same family.
+	set_font("main", "EditorFonts", body_font)
+	set_font("bold", "EditorFonts", header_small_font)
+	set_font("title", "EditorFonts", header_small_font)
 	# ItemList exposes one official font slot. Keep it explicit because BINDING_TABLE
 	# intentionally has no font branch.
 	set_font("font", "ItemList", body_font)
@@ -490,6 +495,9 @@ func _regenerate_theme() -> void:
 	set_font_size("title_button_font_size", "TreeSecondary", tokens.body)
 	set_font_size("font_size", "TreeTable", tokens.body)
 	set_font_size("title_button_font_size", "TreeTable", tokens.body)
+	set_font_size("main_size", "EditorFonts", tokens.body)
+	set_font_size("bold_size", "EditorFonts", tokens.body)
+	set_font_size("title_size", "EditorFonts", maxi(tokens.body, 16))
 	set_font_size("font_size", "ItemListSecondary", tokens.body)
 
 	# ── Build role lookup table from derivation locals (Plan 04-04) ──
@@ -3318,7 +3326,7 @@ const BINDING_TABLE: Dictionary = {
 	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
 	"Tree": {
 		"stylebox": {
-			"panel":                  {"role": "surface_panel", "border_role": "surface_panel_edge",
+			"panel":                  {"role": "button_normal", "border_role": "button_border",
 										"raised_intensity": 0, "border_width": 1},
 			"focus":                  {"role": "focus_ring"},
 			"title_button_normal":    {"role": "button_normal", "border_role": "button_normal",
@@ -3421,7 +3429,7 @@ const BINDING_TABLE: Dictionary = {
 	},
 	"TreeSecondary": {
 		"stylebox": {
-			"panel":               {"role": "surface_panel", "border_role": "surface_panel_edge",
+			"panel":               {"role": "button_normal", "border_role": "button_border",
 									"raised_intensity": 0, "border_width": 1},
 			"title_button_normal": {"role": "surface_panel", "border_role": "surface_panel",
 									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
@@ -3436,7 +3444,7 @@ const BINDING_TABLE: Dictionary = {
 	},
 	"TreeTable": {
 		"stylebox": {
-			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+			"panel": {"role": "button_normal", "border_role": "button_border",
 					  "raised_intensity": 0, "border_width": 1},
 			"title_button_normal": {"role": "surface_panel", "border_role": "surface_panel",
 									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),

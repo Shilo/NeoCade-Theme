@@ -1425,11 +1425,3 @@ text = "09  Marquee Sol       9,740 tickets"
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "10  Slider Nia        8,690 tickets"
-
-[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=456370435]
-layout_mode = 0
-offset_left = 403.0
-offset_top = 1038.0
-offset_right = 562.0
-offset_bottom = 1078.0
-text = "asdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsfasdfdsf"
