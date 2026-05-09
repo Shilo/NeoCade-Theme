@@ -7,9 +7,8 @@ class_name NeoCadeTheme extends Theme
 ## `addons/neocade_theme/neocade_theme.tres` resource. The `style` export switches between
 ## the approved NeoCade directions; `Style.CUSTOM` leaves the remaining exports fully manual.
 ##
-## Setters on every `@export` property trigger `_regenerate_theme()`, which walks an internal
-## BINDING_TABLE (Plan 04-05) to populate every formula-owned theme entry. Slots NOT in the
-## binding table are LEFT UNTOUCHED (D-04 escape hatch — Theme Editor authored content survives).
+## Setters on every `@export` property trigger `_regenerate_theme()`, which rebuilds the
+## generated theme entries from BINDING_TABLE so stale runtime values cannot survive a style change.
 ##
 ## Binding mechanism (D-03 TENTATIVE): the current implementation uses a slot-name + property-name
 ## table compiled into this file. The user has signaled this may be revised toward a property-name
@@ -227,6 +226,7 @@ func _regenerate_theme() -> void:
 	if _regenerating: return
 	_regenerating = true
 	var t0 := Time.get_ticks_usec()
+	clear()
 
 	is_light = base_color.get_luminance() >= 0.5
 	var p: Platform = _resolve_platform()
@@ -246,6 +246,12 @@ func _regenerate_theme() -> void:
 	var surface_high: Color    = _mix(base_color, elevate_target, 0.13 * spread_factor)
 	var surface_overlay: Color = _mix(base_color, elevate_target, 0.20 * spread_factor)
 	var outline_color: Color   = _mix(base_color, elevate_target, 0.24 * spread_factor)
+
+	# Button chrome follows Godot editor/minimal theme behavior: a filled tonal surface
+	# derived from the base color, with a same-family edge. This is intentionally
+	# separate from surface_panel/outline_color so buttons do not render as outlined boxes.
+	var button_normal: Color = _button_tonal_color(base_color, 0.35, 0.85)
+	var button_disabled: Color = _button_tonal_color(base_color, 0.20, 0.75)
 
 	# ── Per-color tinted offsets for raised mode (DESIGN_TOKENS §6.3) ──
 	var accent_offset: Color          = _tint_toward_base(accent_color, base_color)
@@ -297,14 +303,69 @@ func _regenerate_theme() -> void:
 	var role_warning: Color = Color("#FFD166")
 	var role_danger:  Color = Color("#FF6E6E")
 	var role_info:    Color = Color("#5FE3FF")
+	var role_success_offset: Color = _raised_depth_color(role_success, base_color)
+	var role_warning_offset: Color = _raised_depth_color(role_warning, base_color)
+	var role_info_offset: Color = _raised_depth_color(role_info, base_color)
 	var text_on_primary: Color = _readable_text_color(role_primary)
 	var text_on_accent_offset: Color = _readable_text_color(accent_offset)
+	var progress_text_color: Color = text_strong
+	var progress_text_outline: Color = surface_low
 	var text_on_danger: Color = Color("#151922")
 	var text_on_success: Color = _readable_text_color(role_success)
 	var text_on_warning: Color = _readable_text_color(role_warning)
 	var text_on_info: Color = _readable_text_color(role_info)
 	var primary_strategy_value: Variant = _lookup_shape(style_personality, "shape.primary_strategy")
 	var text_on_primary_button: Color = text_strong if String(primary_strategy_value) == "quiet-pill" else text_on_primary
+
+	# MD3-style state layers: hover/pressed are the same component foreground color
+	# over the button's normal container, so each button family changes by the same
+	# rule while preserving its own face hue. Semantic filled buttons need a stronger
+	# ramp than neutral controls so Primary/Danger read clearly without making every
+	# surface feel heavy.
+	var neutral_hover_layer := 0.10
+	var neutral_pressed_layer := 0.16
+	var semantic_hover_layer := 0.18
+	var semantic_pressed_layer := 0.30
+	var button_edge_layer := 0.06
+	var button_hover: Color = _state_layer_color(button_normal, text_strong, neutral_hover_layer)
+	var button_pressed: Color = _state_layer_color(button_normal, text_strong, neutral_pressed_layer)
+	var button_border: Color = _state_layer_color(button_normal, text_strong, button_edge_layer)
+	var button_border_hover: Color = _state_layer_color(button_hover, text_strong, button_edge_layer)
+	var button_border_pressed: Color = _state_layer_color(button_pressed, text_strong, button_edge_layer)
+	var surface_low_edge: Color = _state_layer_color(surface_low, text_strong, button_edge_layer)
+	var surface_panel_edge: Color = _state_layer_color(surface_panel, text_strong, button_edge_layer)
+	var surface_high_edge: Color = _state_layer_color(surface_high, text_strong, button_edge_layer)
+	var surface_overlay_edge: Color = _state_layer_color(surface_overlay, text_strong, button_edge_layer)
+
+	var primary_button_normal: Color = button_normal if String(primary_strategy_value) == "quiet-pill" else role_primary
+	text_on_primary_button = text_strong if String(primary_strategy_value) == "quiet-pill" else _readable_text_color(primary_button_normal)
+	var primary_button_hover: Color = _state_layer_color(primary_button_normal, text_on_primary_button, semantic_hover_layer)
+	var primary_button_pressed: Color = _state_layer_color(primary_button_normal, text_on_primary_button, semantic_pressed_layer)
+	var primary_button_border: Color = _state_layer_color(primary_button_normal, text_on_primary_button, button_edge_layer)
+	var primary_button_border_hover: Color = _state_layer_color(primary_button_hover, text_on_primary_button, button_edge_layer)
+	var primary_button_border_pressed: Color = _state_layer_color(primary_button_pressed, text_on_primary_button, button_edge_layer)
+	var primary_button_disabled: Color = primary_button_normal
+
+	var danger_button_normal: Color = role_danger
+	var danger_button_hover: Color = _state_layer_color(danger_button_normal, text_on_danger, semantic_hover_layer)
+	var danger_button_pressed: Color = _state_layer_color(danger_button_normal, text_on_danger, semantic_pressed_layer)
+	var danger_button_border: Color = _state_layer_color(danger_button_normal, text_on_danger, button_edge_layer)
+	var danger_button_border_hover: Color = _state_layer_color(danger_button_hover, text_on_danger, button_edge_layer)
+	var danger_button_border_pressed: Color = _state_layer_color(danger_button_pressed, text_on_danger, button_edge_layer)
+	var danger_button_disabled: Color = danger_button_normal
+
+	var button_normal_offset: Color = _raised_depth_color(button_normal, base_color)
+	var button_hover_offset: Color = _raised_depth_color(button_hover, base_color)
+	var button_pressed_offset: Color = _raised_depth_color(button_pressed, base_color)
+	var button_disabled_offset: Color = _raised_depth_color(button_disabled, base_color)
+	var primary_button_offset: Color = _raised_depth_color(primary_button_normal, base_color)
+	var primary_button_hover_offset: Color = _raised_depth_color(primary_button_hover, base_color)
+	var primary_button_pressed_offset: Color = _raised_depth_color(primary_button_pressed, base_color)
+	var role_primary_offset: Color = _raised_depth_color(role_primary, base_color)
+	var danger_button_offset: Color = _raised_depth_color(danger_button_normal, base_color)
+	var danger_button_hover_offset: Color = _raised_depth_color(danger_button_hover, base_color)
+	var danger_button_pressed_offset: Color = _raised_depth_color(danger_button_pressed, base_color)
+	var role_danger_offset: Color = _raised_depth_color(role_danger, base_color)
 
 	# ── BINDING_TABLE walk lands here (Plan 04-05). ──
 	# The locals above are the precomputed inputs every entry-population path consumes.
@@ -336,8 +397,8 @@ func _regenerate_theme() -> void:
 	var header_large_font  := preload("res://addons/neocade_theme/fonts/inter_header_large.tres") as FontVariation
 	var header_medium_font := preload("res://addons/neocade_theme/fonts/inter_header_medium.tres") as FontVariation
 	var header_small_font  := preload("res://addons/neocade_theme/fonts/inter_header_small.tres") as FontVariation
-	# 15 variations × set_font (Cross-AI Cycle 1 C4 fix: CodeLabel included;
-	# Plan 05-04 D-09: Kicker is the 15th variation per DESIGN_TOKENS §8.6).
+	# Text-bearing variations get explicit set_font calls (Cross-AI Cycle 1 C4 fix:
+	# CodeLabel included; WindowContentPanel is structural and owns no font slots).
 	set_font("font", "HeaderLarge",  header_large_font)
 	set_font("font", "HeaderMedium", header_medium_font)
 	set_font("font", "HeaderSmall",  header_small_font)
@@ -358,6 +419,7 @@ func _regenerate_theme() -> void:
 	set_font("font", "DangerButton",    body_font)
 	set_font("font", "IconButton",      body_font)
 	set_font("font", "FlatButton",      body_font)
+	set_font("font", "FlatMenuButton",  body_font)
 	set_font("font", "CardPanel",       body_font)
 	set_font("font", "HeroPanel",       header_medium_font)
 	# Tree exposes explicit font slots outside the BINDING_TABLE schema. The body face
@@ -403,6 +465,7 @@ func _regenerate_theme() -> void:
 	set_font_size("font_size", "DangerButton",    tokens.body)
 	set_font_size("font_size", "IconButton",      tokens.body)
 	set_font_size("font_size", "FlatButton",      tokens.body)
+	set_font_size("font_size", "FlatMenuButton",  tokens.body)
 
 	# ── Build role lookup table from derivation locals (Plan 04-04) ──
 	var role_table: Dictionary = {
@@ -412,26 +475,69 @@ func _regenerate_theme() -> void:
 		"surface_high":           surface_high,
 		"surface_overlay":        surface_overlay,
 		"outline_color":          outline_color,
+		"button_normal":          button_normal,
+		"button_hover":           button_hover,
+		"button_pressed":         button_pressed,
+		"button_disabled":        button_disabled,
+		"button_border":          button_border,
+		"button_border_hover":    button_border_hover,
+		"button_border_pressed":  button_border_pressed,
+		"surface_low_edge":       surface_low_edge,
+		"surface_panel_edge":     surface_panel_edge,
+		"surface_high_edge":      surface_high_edge,
+		"surface_overlay_edge":   surface_overlay_edge,
+		"primary_button_normal":  primary_button_normal,
+		"primary_button_hover":   primary_button_hover,
+		"primary_button_pressed": primary_button_pressed,
+		"primary_button_disabled": primary_button_disabled,
+		"primary_button_border":  primary_button_border,
+		"primary_button_border_hover": primary_button_border_hover,
+		"primary_button_border_pressed": primary_button_border_pressed,
+		"danger_button_normal":   danger_button_normal,
+		"danger_button_hover":    danger_button_hover,
+		"danger_button_pressed":  danger_button_pressed,
+		"danger_button_disabled": danger_button_disabled,
+		"danger_button_border":   danger_button_border,
+		"danger_button_border_hover": danger_button_border_hover,
+		"danger_button_border_pressed": danger_button_border_pressed,
 		"accent_offset":          accent_offset,
 		"surface_high_offset":    surface_high_offset,
 		"surface_panel_offset":   surface_panel_offset,
 		"surface_overlay_offset": surface_overlay_offset,
 		"surface_low_offset":     surface_low_offset,
+		"button_normal_offset":   button_normal_offset,
+		"button_hover_offset":    button_hover_offset,
+		"button_pressed_offset":  button_pressed_offset,
+		"button_disabled_offset": button_disabled_offset,
+		"primary_button_offset":  primary_button_offset,
+		"primary_button_hover_offset": primary_button_hover_offset,
+		"primary_button_pressed_offset": primary_button_pressed_offset,
+		"danger_button_offset":   danger_button_offset,
+		"danger_button_hover_offset": danger_button_hover_offset,
+		"danger_button_pressed_offset": danger_button_pressed_offset,
 		"text_strong":            text_strong,
 		"text_default":           text_default,
 		"text_muted":             text_muted,
 		"state_hover":            state_hover,
 		"state_pressed":          state_pressed,
 		"role_primary":           role_primary,
+		"role_primary_offset":    role_primary_offset,
 		"accent_rim":             accent_rim,
+		"scroll_shadow":          Color.BLACK,
 		# Semantic roles (Plan 05-02 Task 2; DESIGN_TOKENS §7.1).
 		"role_success":           role_success,
 		"role_warning":           role_warning,
 		"role_danger":            role_danger,
 		"role_info":              role_info,
+		"role_success_offset":    role_success_offset,
+		"role_warning_offset":    role_warning_offset,
+		"role_danger_offset":     role_danger_offset,
+		"role_info_offset":       role_info_offset,
 		"text_on_primary":        text_on_primary,
 		"text_on_primary_button": text_on_primary_button,
 		"text_on_accent_offset":  text_on_accent_offset,
+		"progress_text_color":    progress_text_color,
+		"progress_text_outline":  progress_text_outline,
 		"text_on_danger":         text_on_danger,
 		"text_on_success":        text_on_success,
 		"text_on_warning":        text_on_warning,
@@ -470,7 +576,7 @@ func _regenerate_theme() -> void:
 	# as real Theme font/font_size entries, but the binding iterator intentionally has no
 	# font branch and review convergence requires direct calls after the table walk.
 	set_font("title_font", "Window", header_small_font)
-	set_font_size("title_font_size", "Window", tokens.body)
+	set_font_size("title_font_size", "Window", maxi(tokens.body, 16))
 	set_font("font", "TooltipLabel", body_font)
 	set_font_size("font_size", "TooltipLabel", tokens.body)
 	set_font("font", "MenuBar", body_font)
@@ -501,6 +607,34 @@ func _mix(a: Color, b: Color, amount: float) -> Color:
 ## HSL-darken-floored-at-0 antipattern. Default ratio 0.40 per MOCKUP-REVISION-3-HANDOFF.md.
 func _tint_toward_base(element: Color, base_c: Color, ratio: float = 0.40) -> Color:
 	return _mix(element, base_c, ratio)
+
+
+func _button_tonal_color(source: Color, brightness_offset: float, saturation_multiplier: float) -> Color:
+	var result := Color(source)
+	var amount := clampf(0.35 * absf(brightness_offset), 0.0, 1.0)
+	var dark_theme := not is_light
+	if dark_theme == (brightness_offset > 0.0):
+		result.v = lerpf(result.v, 1.0, amount)
+	else:
+		result.v = lerpf(result.v, 0.0, amount)
+	result.s = clampf(result.s * saturation_multiplier, 0.0, 1.0)
+	result.a = source.a
+	return result
+
+
+func _state_layer_color(container: Color, foreground: Color, opacity: float) -> Color:
+	var result := _mix(container, foreground, clampf(opacity, 0.0, 1.0))
+	result.a = container.a
+	return result
+
+
+func _raised_depth_color(element: Color, base_c: Color) -> Color:
+	var base_pull := 0.16 if not is_light else 0.10
+	var depth_amount := 0.10 if not is_light else 0.12
+	var result := _mix(element, base_c, base_pull)
+	result = _mix(result, Color.BLACK, depth_amount)
+	result.a = element.a
+	return result
 
 
 func _readable_text_color(bg: Color) -> Color:
@@ -581,7 +715,7 @@ func _platform_tokens(p: Platform) -> Dictionary:
 # ─── Raised stylebox helper (DESIGN_TOKENS §9) ──────────────────────────────────────────────
 
 ## Construct a StyleBoxFlat base for flat or raised mode.
-## Raised depth is applied later as hard bottom/right borders, never StyleBoxFlat shadows.
+## Raised depth is applied later as a hard bottom extrusion, never a StyleBoxFlat shadow.
 func _make_raised_stylebox(bg: Color, _offset_color: Color, _intensity: int) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = bg
@@ -629,7 +763,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"surface_alpha_buttons": 1.00,
 			"raised_lifts": {
 				"primary":         2,
-				"secondary":       1,
+				"secondary":       2,
 				"ghost":           1,
 				"selected_tab":    2,
 				"unselected_tab":  2,
@@ -891,12 +1025,14 @@ func _resolve_style_personality() -> Dictionary:
 
 
 # ─── Type variation registry (DESIGN_TOKENS §8.5; PITFALLS 1.2 mandate explicit fonts) ──────
-## 15 NeoCade type variations registered via Theme.set_type_variation():
+## 19 NeoCade type variations registered via Theme.set_type_variation():
 ##   - Phase 4 shipped 14 (Cross-AI Cycle 1 C4 fix included CodeLabel).
 ##   - Plan 05-04 (D-09) adds Kicker as the 15th, closing DESIGN_TOKENS §8.6's
 ##     explicit Phase 5 todo. Per PITFALLS 1.2, the Kicker entry below is paired
 ##     with explicit set_font + set_font_size calls (variations don't inherit
 ##     fonts from base type).
+##   - WindowContentPanel is a structural PanelContainer variation for embedded Window content.
+##   - FlatMenuButton is included because Godot editor toolbars use that type variation heavily.
 ## Each entry: variation_name → base_type. Phases 5/6/7 author per-direction personality
 ## styleboxes per variation in `.tres` Theme Editor overrides; Phase 4 only registers + sets
 ## explicit fonts.
@@ -911,13 +1047,14 @@ func _resolve_style_personality() -> Dictionary:
 ## release exposes such a constant, the wiring can be added with a documented
 ## docs URL plus a precise has_constant assertion in the verifier.
 const TYPE_VARIATIONS: Dictionary = {
-	# Button family (TYPEVAR-01) — 6
+	# Button family (TYPEVAR-01) plus editor flat-menu variation — 7
 	"PrimaryButton":   "Button",
 	"SecondaryButton": "Button",
 	"GhostButton":     "Button",
 	"DangerButton":    "Button",
 	"IconButton":      "Button",
 	"FlatButton":      "Button",
+	"FlatMenuButton":  "Button",
 	# Label / heading family (TYPEVAR-02) — 5
 	"HeaderLarge":  "Label",
 	"HeaderMedium": "Label",
@@ -928,9 +1065,13 @@ const TYPE_VARIATIONS: Dictionary = {
 	"Kicker":       "Label",
 	# InfoText (TYPEVAR-03; rich-text small body) — 1
 	"InfoText":     "RichTextLabel",
-	# Panel family (TYPEVAR-04) — 2
+	# Panel family (TYPEVAR-04) plus embedded Window content surface — 3
 	"CardPanel": "PanelContainer",
 	"HeroPanel": "PanelContainer",
+	"WindowContentPanel": "PanelContainer",
+	# Editor dock scroll-body wrappers used after toolbar stacks.
+	"NoBorderHorizontal":       "MarginContainer",
+	"NoBorderHorizontalBottom": "NoBorderHorizontal",
 }
 
 
@@ -1164,12 +1305,14 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 	# HScrollBar — official Godot 4.6.2 slot freeze
 	"HScrollBar": {
 		"stylebox": ["scroll", "scroll_focus", "grabber", "grabber_highlight", "grabber_pressed"],
+		"constant": ["padding_top", "padding_bottom"],
 		"icon": ["decrement", "decrement_highlight", "decrement_pressed",
 				 "increment", "increment_highlight", "increment_pressed"],
 	},
 	# VScrollBar — official Godot 4.6.2 slot freeze
 	"VScrollBar": {
 		"stylebox": ["scroll", "scroll_focus", "grabber", "grabber_highlight", "grabber_pressed"],
+		"constant": ["padding_left", "padding_right"],
 		"icon": ["decrement", "decrement_highlight", "decrement_pressed",
 				 "increment", "increment_highlight", "increment_pressed"],
 	},
@@ -1206,7 +1349,7 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 		"color": ["drop_mark_color", "font_disabled_color", "font_hovered_color", "font_outline_color",
 				  "font_selected_color", "font_unselected_color", "icon_disabled_color",
 				  "icon_hovered_color", "icon_selected_color", "icon_unselected_color"],
-		"constant": ["icon_max_width", "icon_separation", "outline_size", "side_margin"],
+		"constant": ["icon_max_width", "icon_separation", "outline_size", "side_margin", "tab_separation"],
 		"font": ["font"],
 		"font_size": ["font_size"],
 		"icon": ["decrement", "decrement_highlight", "drop_mark", "increment",
@@ -1286,14 +1429,16 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 		"stylebox": ["separator"],
 		"constant": ["separation"],
 	},
-	# Label — 1 stylebox + 1 color
+	# Label — color only. Labels should not draw background chrome.
 	"Label": {
-		"stylebox": ["normal"],
+		"stylebox": [],
 		"color": ["font_color"],
 	},
-	# RichTextLabel — 1 stylebox
+	# RichTextLabel — text only. Explicit transparent styleboxes prevent fallback
+	# to Godot's default focus border while still drawing no panel/background chrome.
 	"RichTextLabel": {
-		"stylebox": ["normal"],
+		"stylebox": ["normal", "focus"],
+		"color": ["default_color", "selection_color", "font_selected_color"],
 	},
 	# PanelContainer-like (Panel) — 1 stylebox
 	"Panel": {
@@ -1306,9 +1451,10 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 }
 
 
-# ─── BINDING_TABLE (Plan 04-05; 37 canonical scorecard Controls) ────────────────────────────
+# ─── BINDING_TABLE (Plan 04-05; 37 canonical Controls + narrow EditorIcons overrides) ────────
 ## CANONICAL 37-ROW FREEZE (Cross-AI Cycle 1 C1 fix; sourced verbatim from
 ## MINIMAL-THEME-COVERAGE-DELTA.md §Coverage Scorecard). NO executor discretion to add/drop.
+## The EditorIcons row below is a non-Control editor integration shim, not a scorecard Control.
 ##
 ## Structure: theme_type → data_type ("stylebox"/"color"/"constant"/"font_size"/"icon")
 ##   → slot_name → recipe Dictionary. Recipes:
@@ -1325,11 +1471,24 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 ## Resource model post-Phase-4. The public @export surface + .tres format are stable; only
 ## the internal binding mechanism would change.
 const BINDING_TABLE: Dictionary = {
+	# Editor icon overrides — Godot editor toolbar/menu buttons request these through
+	# EditorIcons, not through TabContainer icon slots. Keep this narrow: only the
+	# "more/menu" family that NeoCade restyles for editor chrome.
+	"EditorIcons": {
+		"icon": {
+			"GuiTabMenu":                 {"icon": "tab_menu"},
+			"GuiTabMenuHl":               {"icon": "tab_menu"},
+			"GuiTabMenuHlDarkBackground": {"icon": "tab_menu"},
+			"TripleBar":                  {"icon": "editor_triple_bar_24"},
+		},
+	},
 	# 1. AcceptDialog — explicit popup shell plus official button-container spacing.
 	"AcceptDialog": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay", "raised_intensity": 0,
-					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
+			"panel": {"role": "button_normal", "border_role": "button_border",
+					  "offset_role": "button_normal_offset", "radius": "shape.secondary_radius",
+					  "raised_face_edge": true,
+					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
 		},
 		"constant": {
@@ -1344,17 +1503,21 @@ const BINDING_TABLE: Dictionary = {
 	# PrimaryButton variation per TYPEVAR-01 / DESIGN_TOKENS §5.
 	"Button": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
+								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":          {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
+								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0,
+			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},  # pressed sinks; never lifted
 			"focus":          {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
-			"disabled":       {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+			"disabled":       {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},  # Cycle 2 C2: per-direction alpha
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0,
+			"hover_pressed":  {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
@@ -1378,12 +1541,12 @@ const BINDING_TABLE: Dictionary = {
 	# 3. CheckBox — 4 icon slots (CheckBox alternates as RadioButton in Godot)
 	"CheckBox": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": 0},
-			"hover":          {"role": "state_hover",   "raised_intensity": 0},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0},
+			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"hover":          {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"pressed":        {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 			"focus":          {"role": "focus_ring"},
-			"disabled":       {"role": "surface_panel", "disabled": true},
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0},
+			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -1412,12 +1575,12 @@ const BINDING_TABLE: Dictionary = {
 	# 4. CheckButton — 2 icon slots (Cycle 6 F4 fix: `checked`/`unchecked`, not `on`/`off`)
 	"CheckButton": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": 0},
-			"hover":          {"role": "state_hover",   "raised_intensity": 0},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0},
+			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"hover":          {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"pressed":        {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 			"focus":          {"role": "focus_ring"},
-			"disabled":       {"role": "surface_panel", "disabled": true},
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0},
+			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -1458,10 +1621,12 @@ const BINDING_TABLE: Dictionary = {
 	# rather than silently picking a different slot.
 	"CodeEdit": {
 		"stylebox": {
-			"normal":    {"role": "surface_low",   "raised_intensity": 0,
+			"normal":    {"role": "button_normal", "border_role": "button_border",
+						  "radius": "shape.secondary_radius", "raised_intensity": 0,
 						  "padding": Vector2i(10, 7)},
 			"focus":     {"role": "focus_ring"},
-			"read_only": {"role": "surface_low",   "disabled": true,
+			"read_only": {"role": "button_disabled", "disabled": true,
+						  "radius": "shape.secondary_radius", "border_width": 0,
 						  "padding": Vector2i(10, 7)},
 		},
 		"color": {
@@ -1531,17 +1696,19 @@ const BINDING_TABLE: Dictionary = {
 	# so the swatch button reads with per-direction radius/padding/lift like Button proper.
 	"ColorPickerButton": {
 		"stylebox": {
-			"normal":   {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
-							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":    {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
-							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":  {"role": "state_pressed", "raised_intensity": 0,
-							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"normal":   {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
+							"raised_intensity": "shape.raised_lifts.secondary",
+							"radius": "shape.secondary_radius", "padding": Vector2i(1, 1)},
+			"hover":    {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
+							"raised_intensity": "shape.raised_lifts.secondary",
+							"radius": "shape.secondary_radius", "padding": Vector2i(1, 1)},
+			"pressed":  {"role": "button_pressed", "border_role": "button_border_pressed",
+							"raised_intensity": 0,
+							"radius": "shape.secondary_radius", "padding": Vector2i(1, 1)},
 			"focus":    {"role": "focus_ring",
 							"radius": "shape.secondary_radius"},
-			"disabled": {"role": "surface_panel", "disabled": true,
-							"raised_intensity": 0,
-							"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"disabled": {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
+							"radius": "shape.secondary_radius", "padding": Vector2i(1, 1)},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -1563,8 +1730,10 @@ const BINDING_TABLE: Dictionary = {
 	# own slots in the local probe; runtime inheritance still reads this shell cleanly.
 	"ConfirmationDialog": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay", "raised_intensity": 0,
-					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
+			"panel": {"role": "button_normal", "border_role": "button_border",
+					  "offset_role": "button_normal_offset", "radius": "shape.secondary_radius",
+					  "raised_face_edge": true,
+					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
 		},
 		"constant": {
@@ -1611,9 +1780,11 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"panel":                       {"role": "surface_panel", "raised_intensity": 0},
 			"title_panel":                 {"role": "surface_high",  "raised_intensity": 0},
-			"title_hover_panel":           {"role": "state_hover",   "raised_intensity": 0},
+			"title_hover_panel":           {"role": "button_hover",  "raised_intensity": 0,
+											 "border_width": 0},
 			"title_collapsed_panel":       {"role": "surface_panel", "raised_intensity": 0},
-			"title_collapsed_hover_panel": {"role": "state_hover",   "raised_intensity": 0},
+			"title_collapsed_hover_panel": {"role": "button_hover",  "raised_intensity": 0,
+											 "border_width": 0},
 			"focus":                       {"role": "focus_ring"},
 		},
 		"color": {
@@ -1721,19 +1892,28 @@ const BINDING_TABLE: Dictionary = {
 	# 12. HScrollBar — official styleboxes plus six increment/decrement icon slots.
 	"HScrollBar": {
 		"stylebox": {
-			"scroll":            {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
-			"scroll_focus":      {"role": "focus_ring"},
-			"grabber":           {"role": "surface_high",  "raised_intensity": 1, "padding": Vector2i(2, 2)},
-			"grabber_highlight": {"role": "state_hover",   "raised_intensity": 1, "padding": Vector2i(2, 2), "alpha": 0.72},
-			"grabber_pressed":   {"role": "state_pressed", "raised_intensity": 0, "padding": Vector2i(2, 2), "alpha": 0.82},
+			"scroll":            {"role": "surface_low",   "raised_intensity": 0,
+								  "alpha": 0.0, "border_width": 0, "radius": 0, "padding": Vector2i(0, 4)},
+			"scroll_focus":      {"role": "surface_low",   "raised_intensity": 0,
+								  "alpha": 0.0, "border_width": 0, "radius": 0, "padding": Vector2i(0, 4)},
+			"grabber":           {"role": "button_border", "raised_intensity": 0,
+								  "border_width": 0, "radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+			"grabber_highlight": {"role": "button_hover",   "raised_intensity": 0,
+								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "border_width": 0},
+			"grabber_pressed":   {"role": "button_pressed", "raised_intensity": 0,
+								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "border_width": 0},
+		},
+		"constant": {
+			"padding_top":    {"value": 0},
+			"padding_bottom": {"value": 0},
 		},
 		"icon": {
-			"decrement":           {"icon": "scrollbar_left"},
-			"decrement_highlight": {"icon": "scrollbar_left"},
-			"decrement_pressed":   {"icon": "scrollbar_left"},
-			"increment":           {"icon": "scrollbar_right"},
-			"increment_highlight": {"icon": "scrollbar_right"},
-			"increment_pressed":   {"icon": "scrollbar_right"},
+			"decrement":           {"icon": "empty"},
+			"decrement_highlight": {"icon": "empty"},
+			"decrement_pressed":   {"icon": "empty"},
+			"increment":           {"icon": "empty"},
+			"increment_highlight": {"icon": "empty"},
+			"increment_pressed":   {"icon": "empty"},
 		},
 	},
 	# 13. HSlider — visible calm track plus official grabber/tick icons.
@@ -1759,11 +1939,12 @@ const BINDING_TABLE: Dictionary = {
 	"ScrollContainer": {
 		"stylebox": {
 			"focus": {"role": "focus_ring"},
-			"panel": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"panel": {"role": "surface_low", "border_role": "surface_low_edge",
+					  "raised_intensity": 0, "padding": Vector2i(0, 0)},
 		},
 		"color": {
-			"scroll_hint_horizontal_color": {"role": "role_primary", "alpha": 0.72},
-			"scroll_hint_vertical_color":   {"role": "role_primary", "alpha": 0.72},
+			"scroll_hint_horizontal_color": {"role": "scroll_shadow"},
+			"scroll_hint_vertical_color":   {"role": "scroll_shadow"},
 		},
 		"icon": {
 			"scroll_hint_horizontal": {"icon": "scroll_hint_horizontal"},
@@ -1773,7 +1954,8 @@ const BINDING_TABLE: Dictionary = {
 	# 13b. SplitContainer — base class owns h/v grabbers and touch-dragger colors.
 	"SplitContainer": {
 		"stylebox": {
-			"split_bar_background": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"split_bar_background": {"role": "surface_low", "border_role": "surface_low", "raised_intensity": 0,
+									  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
 		},
 		"color": {
 			"touch_dragger_color":         {"role": "text_muted"},
@@ -1781,29 +1963,30 @@ const BINDING_TABLE: Dictionary = {
 			"touch_dragger_pressed_color": {"role": "role_primary"},
 		},
 		"constant": {
-			"autohide":               {"value": 0},
-			"minimum_grab_thickness": {"value": "tokens.tapPadding"},
-			"separation":             {"value": "tokens.tapPadding"},
+			"autohide":               {"value": 1},
+			"minimum_grab_thickness": {"value": 6},
+			"separation":             {"value": 6},
 		},
 		"icon": {
-			"h_grabber":       {"icon": "split_grabber_h"},
+			"h_grabber":       {"generated_icon": "split_grabber", "orientation": "vertical"},
 			"h_touch_dragger": {"icon": "split_touch_dragger_h"},
-			"v_grabber":       {"icon": "split_grabber_v"},
+			"v_grabber":       {"generated_icon": "split_grabber", "orientation": "horizontal"},
 			"v_touch_dragger": {"icon": "split_touch_dragger_v"},
 		},
 	},
 	# 14. HSplitContainer — split-bar chrome plus official grabber/touch-dragger icons.
 	"HSplitContainer": {
 		"stylebox": {
-			"split_bar_background": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"split_bar_background": {"role": "surface_low", "border_role": "surface_low", "raised_intensity": 0,
+									  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
 		},
 		"constant": {
-			"autohide":               {"value": 0},
-			"separation":             {"value": "tokens.tapPadding"},
-			"minimum_grab_thickness": {"value": "tokens.tapPadding"},
+			"autohide":               {"value": 1},
+			"separation":             {"value": 6},
+			"minimum_grab_thickness": {"value": 6},
 		},
 		"icon": {
-			"grabber":       {"icon": "split_grabber_h"},
+			"grabber":       {"generated_icon": "split_grabber", "orientation": "vertical"},
 			"touch_dragger": {"icon": "split_touch_dragger_h"},
 		},
 	},
@@ -1811,11 +1994,15 @@ const BINDING_TABLE: Dictionary = {
 	# because Godot draws them above row content (Phase 6 D-04).
 	"ItemList": {
 		"stylebox": {
-			"panel":                  {"role": "surface_low",   "raised_intensity": 0},
+			"panel":                  {"role": "surface_low", "border_role": "surface_low_edge",
+									   "raised_intensity": 0},
 			"focus":                  {"role": "focus_ring"},
-			"cursor":                 {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.24},
-			"cursor_unfocused":       {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.14},
-			"hovered":                {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.20},
+			"cursor":                 {"role": "button_hover",  "raised_intensity": 0,
+										"alpha": 0.72, "border_width": 0},
+			"cursor_unfocused":       {"role": "button_hover",  "raised_intensity": 0,
+										"alpha": 0.46, "border_width": 0},
+			"hovered":                {"role": "button_hover",  "raised_intensity": 0,
+										"border_width": 0},
 			"selected":               {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
 			"selected_focus":         {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
 			"hovered_selected":       {"role": "accent_offset", "raised_intensity": "shape.raised_lifts.selected_row"},
@@ -1828,7 +2015,7 @@ const BINDING_TABLE: Dictionary = {
 			"font_hovered_selected_color": {"role": "text_on_accent_offset"},
 			"font_outline_color":          {"role": "outline_color"},
 			"guide_color":                 {"role": "outline_color"},
-			"scroll_hint_color":           {"role": "role_primary", "alpha": 0.82},
+			"scroll_hint_color":           {"role": "scroll_shadow"},
 		},
 		"constant": {
 			"v_separation":    {"value": "tokens.tapPadding"},
@@ -1844,11 +2031,8 @@ const BINDING_TABLE: Dictionary = {
 			"scroll_hint": {"icon": "tree_scroll_hint"},
 		},
 	},
-	# 16. Label — 1 stylebox + 1 color
+	# 16. Label — color only; labels must not own a background or border.
 	"Label": {
-		"stylebox": {
-			"normal": {"role": "surface_base", "raised_intensity": 0},
-		},
 		"color": {
 			"font_color": {"role": "text_strong"},
 		},
@@ -1856,10 +2040,12 @@ const BINDING_TABLE: Dictionary = {
 	# 17. LineEdit — 3 stylebox + caret + selection + clear icon
 	"LineEdit": {
 		"stylebox": {
-			"normal":    {"role": "surface_low",   "raised_intensity": 0,
+			"normal":    {"role": "button_normal", "border_role": "button_border",
+						  "radius": "shape.secondary_radius", "raised_intensity": 0,
 						  "padding": Vector2i(10, 6)},
 			"focus":     {"role": "focus_ring"},
-			"read_only": {"role": "surface_low",   "disabled": true,
+			"read_only": {"role": "button_disabled", "disabled": true,
+						  "radius": "shape.secondary_radius", "border_width": 0,
 						  "padding": Vector2i(10, 6)},
 		},
 		"color": {
@@ -1895,10 +2081,12 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":   {"role": "surface_base", "raised_intensity": 0, "alpha": 0.0,
 						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
-			"hover":    {"role": "state_hover",  "raised_intensity": 0, "alpha": 0.42,
-						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
-			"pressed":  {"role": "state_pressed","raised_intensity": 0, "alpha": 0.70,
-						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
+			"hover":    {"role": "button_hover", "raised_intensity": 0,
+						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3),
+						 "border_width": 0},
+			"pressed":  {"role": "button_pressed", "raised_intensity": 0,
+						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3),
+						 "border_width": 0},
 			"disabled": {"role": "surface_base", "disabled": true, "raised_intensity": 0,
 						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3)},
 		},
@@ -1921,18 +2109,21 @@ const BINDING_TABLE: Dictionary = {
 	# shape.raised_lifts.secondary so the per-direction shape language flows.
 	"MenuButton": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":          {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
+								"raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5)},
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
+								"raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5)},
+			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5)},
 			"focus":          {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
-			"disabled":       {"role": "surface_panel", "disabled": true,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"disabled":       {"role": "button_disabled", "border_width": 0,
+								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5)},
+			"hover_pressed":  {"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5)},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -1945,23 +2136,26 @@ const BINDING_TABLE: Dictionary = {
 			"h_separation": {"value": "tokens.tapPadding"},
 		},
 	},
-	# 21. OptionButton — 6 stylebox + arrow icon + arrow_margin constant
-	# Plan 05-03 Task 2 polish: shape.secondary_radius + shape.primary_padding +
-	# shape.raised_lifts.secondary so the per-direction shape language flows.
+	# 21. OptionButton — 6 stylebox + arrow icon + arrow_margin constant.
+	# Editor inspector dropdowns use this control heavily, so keep its content padding
+	# tighter than game CTA buttons while sharing the same button-state colors.
 	"OptionButton": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":          {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":        {"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
+								"raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
+								"raised_intensity": "shape.raised_lifts.secondary",
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
 			"focus":          {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
-			"disabled":       {"role": "surface_panel", "disabled": true,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"disabled":       {"role": "button_disabled", "border_width": 0,
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+			"hover_pressed":  {"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -1971,8 +2165,8 @@ const BINDING_TABLE: Dictionary = {
 			"font_disabled_color": {"role": "text_strong", "disabled": true},
 		},
 		"constant": {
-			"arrow_margin":  {"value": "tokens.tapPadding"},
-			"h_separation": {"value": "tokens.tapPadding"},
+			"arrow_margin":  {"value": 6},
+			"h_separation": {"value": 4},
 		},
 		"icon": {
 			"arrow": {"icon": "arrow_down"},
@@ -1981,16 +2175,21 @@ const BINDING_TABLE: Dictionary = {
 	# 22. Panel — 1 stylebox (the bare-class)
 	"Panel": {
 		"stylebox": {
-			"panel": {"role": "surface_panel", "raised_intensity": 0},
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true},
 		},
 	},
 	# 23. PopupMenu — dense menu rows, structural separators, full icon coverage.
 	"PopupMenu": {
 		"stylebox": {
-			"panel":                 {"role": "surface_overlay", "raised_intensity": 0,
-									  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-									  "padding": Vector2i(8, 6)},
-			"hover":                 {"role": "state_hover",    "raised_intensity": 0, "alpha": 0.36},
+			"panel":                 {"role": "button_normal", "border_role": "button_border",
+									  "offset_role": "button_normal_offset",
+									  "raised_intensity": "shape.raised_lifts.dialog",
+									  "radius": "shape.secondary_radius",
+									  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(0, 0)},
+			"hover":                 {"role": "button_hover",   "raised_intensity": 0,
+									  "border_role": "button_border_hover",
+									  "radius": "shape.secondary_radius", "border_width": 0},
 			"separator":             {"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
 									  "padding": Vector2i(0, 0)},
 			"labeled_separator_left":{"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
@@ -2034,9 +2233,11 @@ const BINDING_TABLE: Dictionary = {
 	# 24. PopupPanel — first-class popup Window-boundary shell.
 	"PopupPanel": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay", "raised_intensity": 0,
-					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-					  "padding": Vector2i(12, 10)},
+			"panel": {"role": "button_normal", "border_role": "button_border",
+					  "offset_role": "button_normal_offset",
+					  "raised_intensity": "shape.raised_lifts.dialog",
+					  "radius": "shape.secondary_radius",
+					  "raised_face_edge": true, "padding": Vector2i(0, 0)},
 		},
 	},
 	# 25. ProgressBar — 2 styleboxes
@@ -2046,21 +2247,23 @@ const BINDING_TABLE: Dictionary = {
 			"fill":       {"role": "role_primary", "raised_intensity": 0, "padding": Vector2i(0, 0)},
 		},
 		"color": {
-			"font_color":         {"role": "text_strong"},
-			"font_outline_color": {"role": "outline_color"},
+			"font_color":         {"role": "progress_text_color"},
+			"font_outline_color": {"role": "progress_text_outline"},
 		},
 		"constant": {
-			"outline_size": {"value": 0},
+			"outline_size": {"value": 4},
 		},
 		"font_size": {
 			"font_size": {"value": "tokens.body"},
 		},
 	},
-	# 26. RichTextLabel — 1 stylebox + colors
+	# 26. RichTextLabel — text-only, matching Label visually: no background or border.
 	"RichTextLabel": {
 		"stylebox": {
-			"normal": {"role": "surface_base", "raised_intensity": 0},
-			"focus":  {"role": "focus_ring"},
+			"normal": {"role": "surface_base", "raised_intensity": 0, "alpha": 0.0,
+					   "border_width": 0, "padding": Vector2i(0, 0)},
+			"focus":  {"role": "surface_base", "raised_intensity": 0, "alpha": 0.0,
+					   "border_width": 0, "padding": Vector2i(0, 0)},
 		},
 		"color": {
 			"default_color":    {"role": "text_default"},
@@ -2093,20 +2296,30 @@ const BINDING_TABLE: Dictionary = {
 	# (D-08); overflow button slots are compact icon-button surfaces, not primary buttons.
 	"TabBar": {
 		"stylebox": {
-			"button_highlight": {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.unselected_tab",
+			"button_highlight": {"role": "button_hover", "border_role": "button_border_hover",
+									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
-			"button_pressed":   {"role": "state_pressed", "raised_intensity": 0,
+			"button_pressed":   {"role": "button_pressed", "border_role": "button_border_pressed",
+									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
-			"tab_selected":     {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.selected_tab",
+			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
+									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 6)},
-			"tab_unselected":   {"role": "surface_low",   "raised_intensity": "shape.raised_lifts.unselected_tab",
-									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
-			"tab_hovered":      {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.unselected_tab",
-									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
-			"tab_disabled":     {"role": "surface_low",   "disabled": true, "raised_intensity": 0,
-									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
-			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius"},
+			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
+									"raised_intensity": 0, "border_width": 0,
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
+			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
+									"raised_intensity": 0, "border_width": 0,
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
+			"tab_disabled":     {"role": "button_disabled", "disabled": true, "border_width": 0,
+									"raised_intensity": 0,
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
+			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
+									"corner_profile": "tab_connected"},
 		},
 		"color": {
 			"font_selected_color":   {"role": "text_strong"},
@@ -2123,7 +2336,7 @@ const BINDING_TABLE: Dictionary = {
 		"constant": {
 			"h_separation":           {"value": 2},
 			"hover_switch_wait_msec": {"value": 180},
-			"icon_max_width":         {"value": 24},
+			"icon_max_width":         {"value": 0},
 			"outline_size":           {"value": 0},
 		},
 		"font_size": {
@@ -2141,18 +2354,28 @@ const BINDING_TABLE: Dictionary = {
 	# 29. TabContainer — shared TabBar tab_* recipes plus content panel and menu icons.
 	"TabContainer": {
 		"stylebox": {
-			"tab_selected":     {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.selected_tab",
+			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
+									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 6)},
-			"tab_unselected":   {"role": "surface_low",   "raised_intensity": "shape.raised_lifts.unselected_tab",
-									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
-			"tab_hovered":      {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.unselected_tab",
-									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
-			"tab_disabled":     {"role": "surface_low",   "disabled": true, "raised_intensity": 0,
-									"radius": "shape.tab_radius", "padding": Vector2i(12, 5)},
-			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius"},
-			"panel":            {"role": "surface_panel", "raised_intensity": 0},
-			"tabbar_background":{"role": "surface_base",  "raised_intensity": 0},
+			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
+									"raised_intensity": 0, "border_width": 0,
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
+			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
+									"raised_intensity": 0, "border_width": 0,
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
+			"tab_disabled":     {"role": "button_disabled", "disabled": true, "border_width": 0,
+									"raised_intensity": 0,
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
+			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
+									"corner_profile": "tab_connected"},
+			"panel":            {"role": "surface_panel", "border_role": "surface_panel_edge",
+								  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true},
+			"tabbar_background":{"role": "surface_base",  "raised_intensity": 0,
+								  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
 		},
 		"color": {
 			"font_selected_color":   {"role": "text_strong"},
@@ -2167,10 +2390,11 @@ const BINDING_TABLE: Dictionary = {
 			"drop_mark_color":       {"role": "role_primary"},
 		},
 		"constant": {
-			"icon_max_width":   {"value": 24},
+			"icon_max_width":   {"value": 0},
 			"icon_separation":  {"value": 6},
 			"outline_size":     {"value": 0},
-			"side_margin":      {"value": "tokens.tapPadding"},
+			"side_margin":      {"value": 0},
+			"tab_separation":   {"value": 0},
 		},
 		"font_size": {
 			"font_size": {"value": "tokens.body"},
@@ -2185,13 +2409,46 @@ const BINDING_TABLE: Dictionary = {
 			"menu_highlight":      {"icon": "tab_menu"},
 		},
 	},
+	# 29a. Editor dock tab containers — FileSystem/Scene/Inspector docks are DockTabContainer
+	# subclasses, not authored scenes with themeable toolbar panels. Godot's FileSystemDock
+	# builds a VBoxContainer with HBoxContainer toolbar rows; those containers cannot draw a
+	# stylebox, so the dock panel must own the inset while painting the background underneath.
+	"DockTabContainer": {
+		"stylebox": {
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true,
+					  "content_margins": Vector4i(6, 5, 6, 5)},
+			"tabbar_background": {"role": "surface_base", "raised_intensity": 0,
+					  "border_width": 0, "radius": 0, "content_margins": Vector4i(4, 2, 4, 0)},
+		},
+	},
+	"SideDockTabContainer": {
+		"stylebox": {
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true,
+					  "content_margins": Vector4i(6, 5, 6, 5)},
+			"tabbar_background": {"role": "surface_base", "raised_intensity": 0,
+					  "border_width": 0, "radius": 0, "content_margins": Vector4i(4, 2, 4, 0)},
+		},
+	},
+	"BottomSideDockTabContainer": {
+		"stylebox": {
+			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+					  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true,
+					  "content_margins": Vector4i(6, 5, 6, 5)},
+			"tabbar_background": {"role": "surface_base", "raised_intensity": 0,
+					  "border_width": 0, "radius": 0, "content_margins": Vector4i(4, 2, 4, 0)},
+		},
+	},
 	# 30. TextEdit — 3 stylebox set
 	"TextEdit": {
 		"stylebox": {
-			"normal":    {"role": "surface_low",   "raised_intensity": 0,
+			"normal":    {"role": "button_normal", "border_role": "button_border",
+						  "radius": "shape.secondary_radius", "raised_intensity": 0,
 						  "padding": Vector2i(10, 7)},
 			"focus":     {"role": "focus_ring"},
-			"read_only": {"role": "surface_low",   "disabled": true,
+			"read_only": {"role": "button_disabled", "disabled": true,
+						  "radius": "shape.secondary_radius", "border_width": 0,
 						  "padding": Vector2i(10, 7)},
 		},
 		"color": {
@@ -2220,57 +2477,76 @@ const BINDING_TABLE: Dictionary = {
 	# 32. TooltipPanel — compact first-class tooltip structure.
 	"TooltipPanel": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay", "raised_intensity": 0,
-					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-					  "padding": Vector2i(8, 5)},
+			"panel": {"role": "button_normal", "border_role": "button_border",
+					  "offset_role": "button_normal_offset",
+					  "raised_intensity": "shape.raised_lifts.dialog",
+					  "radius": "shape.secondary_radius",
+					  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(4, 2)},
 		},
 	},
 	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
 	"Tree": {
 		"stylebox": {
-			"panel":                  {"role": "surface_low",   "raised_intensity": 0},
+			"panel":                  {"role": "surface_low", "border_role": "surface_low",
+									   "raised_intensity": 0, "border_width": 0},
 			"focus":                  {"role": "focus_ring"},
-			"title_button_normal":    {"role": "surface_panel", "raised_intensity": 0},
-			"title_button_pressed":   {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.78},
-			"title_button_hover":     {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.30},
-			"button_hover":           {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.28},
-			"button_pressed":         {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.78},
-			"custom_button":          {"role": "surface_panel", "raised_intensity": 0},
-			"hovered":                {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.22},
-			"hovered_dimmed":         {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.12},
-			"selected":               {"role": "accent_offset", "raised_intensity": 0},
-			"selected_focus":         {"role": "accent_offset", "raised_intensity": 0},
-			"hovered_selected":       {"role": "accent_offset", "raised_intensity": 0},
-			"hovered_selected_focus": {"role": "accent_offset", "raised_intensity": 0},
-			"custom_button_hover":    {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.30},
-			"custom_button_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.82},
-			"cursor":                 {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.26},
-			"cursor_unfocused":       {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.16},
+			"title_button_normal":    {"role": "button_normal", "border_role": "button_normal",
+										"raised_intensity": 0, "border_width": 0},
+			"title_button_pressed":   {"role": "button_pressed", "raised_intensity": 0,
+										"border_role": "button_pressed", "border_width": 0},
+			"title_button_hover":     {"role": "button_hover",   "raised_intensity": 0,
+										"border_role": "button_hover", "border_width": 0},
+			"button_hover":           {"role": "button_hover",   "raised_intensity": 0,
+										"border_role": "button_hover", "border_width": 0},
+			"button_pressed":         {"role": "button_pressed", "raised_intensity": 0,
+										"border_role": "button_pressed", "border_width": 0},
+			"custom_button":          {"role": "button_normal", "border_role": "button_normal",
+										"raised_intensity": 0, "border_width": 0},
+			"hovered":                {"role": "button_hover",  "raised_intensity": 0,
+										"border_role": "button_hover", "border_width": 0},
+			"hovered_dimmed":         {"role": "button_hover",  "raised_intensity": 0,
+										"border_role": "button_hover", "alpha": 0.55, "border_width": 0},
+			"selected":               {"role": "button_pressed", "raised_intensity": 0,
+										"border_role": "button_pressed", "border_width": 0},
+			"selected_focus":         {"role": "button_pressed", "raised_intensity": 0,
+										"border_role": "button_pressed", "border_width": 0},
+			"hovered_selected":       {"role": "button_pressed", "raised_intensity": 0,
+										"border_role": "button_pressed", "border_width": 0},
+			"hovered_selected_focus": {"role": "button_pressed", "raised_intensity": 0,
+										"border_role": "button_pressed", "border_width": 0},
+			"custom_button_hover":    {"role": "button_hover",  "raised_intensity": 0,
+										"border_role": "button_hover", "border_width": 0},
+			"custom_button_pressed":  {"role": "button_pressed", "raised_intensity": 0,
+										"border_role": "button_pressed", "border_width": 0},
+			"cursor":                 {"role": "button_hover",  "raised_intensity": 0,
+										"border_role": "button_hover", "alpha": 0.72, "border_width": 0},
+			"cursor_unfocused":       {"role": "button_hover",  "raised_intensity": 0,
+										"border_role": "button_hover", "alpha": 0.46, "border_width": 0},
 		},
 		"color": {
-			"children_hl_line_color":      {"role": "outline_color"},
+			"children_hl_line_color":      {"role": "surface_low", "alpha": 0.0},
 			"custom_button_font_highlight":{"role": "role_primary"},
 			"drop_position_color":         {"role": "role_primary"},
 			"font_color":                  {"role": "text_default"},
 			"font_disabled_color":         {"role": "text_default", "disabled": true},
 			"font_hovered_color":          {"role": "text_strong"},
 			"font_hovered_dimmed_color":   {"role": "text_muted"},
-			"font_hovered_selected_color": {"role": "text_on_accent_offset"},
+			"font_hovered_selected_color": {"role": "role_primary"},
 			"font_outline_color":          {"role": "outline_color"},
-			"font_selected_color":         {"role": "text_on_accent_offset"},
-			"guide_color":                 {"role": "outline_color"},
-			"parent_hl_line_color":        {"role": "outline_color"},
-			"relationship_line_color":     {"role": "outline_color"},
-			"scroll_hint_color":           {"role": "role_primary", "alpha": 0.82},
+			"font_selected_color":         {"role": "role_primary"},
+			"guide_color":                 {"role": "surface_low", "alpha": 0.0},
+			"parent_hl_line_color":        {"role": "surface_low", "alpha": 0.0},
+			"relationship_line_color":     {"role": "surface_low", "alpha": 0.0},
+			"scroll_hint_color":           {"role": "scroll_shadow"},
 			"title_button_color":          {"role": "text_strong"},
 		},
 		"constant": {
 			"button_margin":             {"value": 4},
 			"check_h_separation":        {"value": 6},
-			"children_hl_line_width":    {"value": 1},
+			"children_hl_line_width":    {"value": 0},
 			"dragging_unfold_wait_msec": {"value": 1000},
-			"draw_guides":               {"value": 1},
-			"draw_relationship_lines":   {"value": 1},
+			"draw_guides":               {"value": 0},
+			"draw_relationship_lines":   {"value": 0},
 			"h_separation":              {"value": 8},
 			"icon_h_separation":         {"value": 6},
 			"icon_max_width":            {"value": 0},
@@ -2278,11 +2554,11 @@ const BINDING_TABLE: Dictionary = {
 			"inner_item_margin_left":    {"value": 4},
 			"inner_item_margin_right":   {"value": 4},
 			"inner_item_margin_top":     {"value": 2},
-			"item_margin":               {"value": 4},
+			"item_margin":               {"value": 18},
 			"outline_size":              {"value": 0},
-			"parent_hl_line_margin":     {"value": 4},
-			"parent_hl_line_width":      {"value": 1},
-			"relationship_line_width":   {"value": 1},
+			"parent_hl_line_margin":     {"value": 0},
+			"parent_hl_line_width":      {"value": 0},
+			"relationship_line_width":   {"value": 0},
 			"scroll_border":             {"value": 18},
 			"scroll_speed":              {"value": 12},
 			"scrollbar_h_separation":    {"value": 4},
@@ -2315,19 +2591,28 @@ const BINDING_TABLE: Dictionary = {
 	# 34. VScrollBar — mirror of HScrollBar with vertical directional icons.
 	"VScrollBar": {
 		"stylebox": {
-			"scroll":            {"role": "surface_low",   "raised_intensity": 0, "padding": Vector2i(0, 0)},
-			"scroll_focus":      {"role": "focus_ring"},
-			"grabber":           {"role": "surface_high",  "raised_intensity": 1, "padding": Vector2i(2, 2)},
-			"grabber_highlight": {"role": "state_hover",   "raised_intensity": 1, "padding": Vector2i(2, 2), "alpha": 0.72},
-			"grabber_pressed":   {"role": "state_pressed", "raised_intensity": 0, "padding": Vector2i(2, 2), "alpha": 0.82},
+			"scroll":            {"role": "surface_low",   "raised_intensity": 0,
+								  "alpha": 0.0, "border_width": 0, "radius": 0, "padding": Vector2i(4, 0)},
+			"scroll_focus":      {"role": "surface_low",   "raised_intensity": 0,
+								  "alpha": 0.0, "border_width": 0, "radius": 0, "padding": Vector2i(4, 0)},
+			"grabber":           {"role": "button_border", "raised_intensity": 0,
+								  "border_width": 0, "radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+			"grabber_highlight": {"role": "button_hover",   "raised_intensity": 0,
+								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "border_width": 0},
+			"grabber_pressed":   {"role": "button_pressed", "raised_intensity": 0,
+								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "border_width": 0},
+		},
+		"constant": {
+			"padding_left":  {"value": 0},
+			"padding_right": {"value": 0},
 		},
 		"icon": {
-			"decrement":           {"icon": "scrollbar_up"},
-			"decrement_highlight": {"icon": "scrollbar_up"},
-			"decrement_pressed":   {"icon": "scrollbar_up"},
-			"increment":           {"icon": "scrollbar_down"},
-			"increment_highlight": {"icon": "scrollbar_down"},
-			"increment_pressed":   {"icon": "scrollbar_down"},
+			"decrement":           {"icon": "empty"},
+			"decrement_highlight": {"icon": "empty"},
+			"decrement_pressed":   {"icon": "empty"},
+			"increment":           {"icon": "empty"},
+			"increment_highlight": {"icon": "empty"},
+			"increment_pressed":   {"icon": "empty"},
 		},
 	},
 	# 35. VSlider — transposed mirror of HSlider.
@@ -2352,47 +2637,61 @@ const BINDING_TABLE: Dictionary = {
 	# 36. VSplitContainer — mirror of HSplitContainer with vertical affordance icons.
 	"VSplitContainer": {
 		"stylebox": {
-			"split_bar_background": {"role": "surface_low", "raised_intensity": 0, "padding": Vector2i(0, 0)},
+			"split_bar_background": {"role": "surface_low", "border_role": "surface_low", "raised_intensity": 0,
+									  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
 		},
 		"constant": {
-			"autohide":               {"value": 0},
-			"separation":             {"value": "tokens.tapPadding"},
-			"minimum_grab_thickness": {"value": "tokens.tapPadding"},
+			"autohide":               {"value": 1},
+			"separation":             {"value": 6},
+			"minimum_grab_thickness": {"value": 6},
 		},
 		"icon": {
-			"grabber":       {"icon": "split_grabber_v"},
+			"grabber":       {"generated_icon": "split_grabber", "orientation": "horizontal"},
 			"touch_dragger": {"icon": "split_touch_dragger_v"},
 		},
 	},
 	# 36a. Layout-only containers — constants only; no fake surfaces.
 	"MarginContainer": {
 		"constant": {
-			"margin_bottom": {"value": "tokens.tapPadding"},
-			"margin_left":   {"value": "tokens.tapPadding"},
-			"margin_right":  {"value": "tokens.tapPadding"},
-			"margin_top":    {"value": "tokens.tapPadding"},
+			"margin_bottom": {"value": 0},
+			"margin_left":   {"value": 0},
+			"margin_right":  {"value": 0},
+			"margin_top":    {"value": 0},
+		},
+	},
+	"EditorDock": {
+		"constant": {
+			"margin_bottom": {"value": 6},
+			"margin_left":   {"value": 6},
+			"margin_right":  {"value": 6},
+			"margin_top":    {"value": 6},
+		},
+	},
+	"NoBorderHorizontalBottom": {
+		"constant": {
+			"margin_top": {"value": 4},
 		},
 	},
 	"HBoxContainer": {
 		"constant": {
-			"separation": {"value": "tokens.tapPadding"},
+			"separation": {"value": 2},
 		},
 	},
 	"VBoxContainer": {
 		"constant": {
-			"separation": {"value": "tokens.tapPadding"},
+			"separation": {"value": 2},
 		},
 	},
 	"FlowContainer": {
 		"constant": {
-			"h_separation": {"value": "tokens.tapPadding"},
-			"v_separation": {"value": "tokens.tapPadding"},
+			"h_separation": {"value": 4},
+			"v_separation": {"value": 4},
 		},
 	},
 	"GridContainer": {
 		"constant": {
-			"h_separation": {"value": "tokens.tapPadding"},
-			"v_separation": {"value": "tokens.tapPadding"},
+			"h_separation": {"value": 4},
+			"v_separation": {"value": 4},
 		},
 	},
 	# 36b. Separators — outline-color rules with modest spacing only.
@@ -2415,22 +2714,30 @@ const BINDING_TABLE: Dictionary = {
 	# 37. Window — embedded chrome complete, quiet, and popup-boundary safe.
 	"Window": {
 		"stylebox": {
-			"embedded_border":          {"role": "surface_overlay", "raised_intensity": 0,
-										 "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-										 "padding": Vector2i(8, 6)},
-			"embedded_unfocused_border":{"role": "surface_high", "raised_intensity": 0,
-										 "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-										 "padding": Vector2i(8, 6)},
+			"embedded_border":          {"role": "button_normal", "border_role": "button_border",
+										 "offset_role": "button_normal_offset",
+										 "raised_intensity": "shape.raised_lifts.dialog",
+										 "radius": "shape.secondary_radius",
+										 "border_width": 1, "raised_face_edge": true,
+										 "content_margins": Vector4i(10, 28, 10, 8),
+										 "expand_margins": Vector4i(8, 32, 8, 6)},
+			"embedded_unfocused_border":{"role": "button_normal", "border_role": "button_border",
+										 "offset_role": "button_normal_offset",
+										 "raised_intensity": "shape.raised_lifts.dialog",
+										 "radius": "shape.secondary_radius",
+										 "border_width": 1, "raised_face_edge": true,
+										 "content_margins": Vector4i(10, 28, 10, 8),
+										 "expand_margins": Vector4i(8, 32, 8, 6)},
 		},
 		"color": {
 			"title_color":            {"role": "text_strong"},
 			"title_outline_modulate": {"role": "outline_color"},
 		},
 		"constant": {
-			"close_h_offset":    {"value": 6},
-			"close_v_offset":    {"value": 4},
-			"resize_margin":     {"value": 6},
-			"title_height":      {"value": 28},
+			"close_h_offset":    {"value": 18},
+			"close_v_offset":    {"value": 24},
+			"resize_margin":     {"value": 4},
+			"title_height":      {"value": 36},
 			"title_outline_size":{"value": 0},
 		},
 		"icon": {
@@ -2465,34 +2772,41 @@ const BINDING_TABLE: Dictionary = {
 	# the user's mental model of "pressed = darker" stays consistent across directions).
 	"PrimaryButton": {
 		"stylebox": {
-			"normal":        {"role": "role_primary",  "raised_intensity": "shape.raised_lifts.primary",
+			"normal":        {"role": "primary_button_normal", "border_role": "primary_button_border",
+								"raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"strategy": "shape.primary_strategy"},
-			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.primary",
+								"offset_role": "primary_button_offset", "raised_face_edge": true},
+			"hover":         {"role": "primary_button_hover", "border_role": "primary_button_border_hover",
+								"raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"strategy": "shape.primary_strategy"},
-			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+								"offset_role": "primary_button_hover_offset", "raised_face_edge": true},
+			"pressed":       {"role": "primary_button_pressed", "border_role": "primary_button_border_pressed",
+								"raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"offset_role": "primary_button_pressed_offset"},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.primary_radius"},
-			"disabled":      {"role": "role_primary",  "disabled": true, "raised_intensity": 0,
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
-			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
+			"disabled":      {"role": "primary_button_disabled", "disabled": true, "raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"border_width": 0},
+			"hover_pressed":{"role": "primary_button_pressed", "border_role": "primary_button_border_pressed",
+								"raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"offset_role": "primary_button_pressed_offset"},
 		},
 		"color": {
 			"font_color":              {"role": "text_on_primary_button"},
 			"font_hover_color":        {"role": "text_on_primary_button"},
-			"font_pressed_color":      {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_on_primary_button"},
 			"font_focus_color":        {"role": "text_on_primary_button"},
 			"font_disabled_color":     {"role": "text_on_primary_button", "disabled": true},
-			"font_hover_pressed_color":{"role": "text_strong"},
+			"font_hover_pressed_color":{"role": "text_on_primary_button"},
 			"icon_normal_color":       {"role": "text_on_primary_button"},
 			"icon_hover_color":        {"role": "text_on_primary_button"},
-			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "text_on_primary_button"},
 			"icon_focus_color":        {"role": "text_on_primary_button"},
 			"icon_disabled_color":     {"role": "text_on_primary_button", "disabled": true},
-			"icon_hover_pressed_color":{"role": "text_strong"},
+			"icon_hover_pressed_color":{"role": "text_on_primary_button"},
 		},
 		"constant": {
 			"h_separation": {"value": "tokens.tapPadding"},
@@ -2504,17 +2818,20 @@ const BINDING_TABLE: Dictionary = {
 	# than primary so the visual hierarchy is preserved when raised=true).
 	"SecondaryButton": {
 		"stylebox": {
-			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.secondary",
+			"normal":        {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
+								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.secondary",
+			"hover":         {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
+								"raised_intensity": "shape.raised_lifts.secondary",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+			"pressed":       {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
-			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+			"disabled":      {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+			"hover_pressed":{"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
 		},
 		"color": {
@@ -2544,33 +2861,40 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"strategy": "shape.ghost_strategy"},
-			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.ghost",
+								"strategy": "shape.ghost_strategy",
+								"offset_role": "role_primary_offset", "raised_face_edge": true},
+			"hover":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"strategy": "shape.ghost_strategy"},
-			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+								"strategy": "shape.ghost_strategy", "state_layer_role": "role_primary",
+								"state_layer_alpha": 0.08,
+								"offset_role": "role_primary_offset", "raised_face_edge": true},
+			"pressed":       {"role": "surface_panel", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"strategy": "shape.ghost_strategy", "state_layer_role": "role_primary",
+								"state_layer_alpha": 0.12},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
 			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
 								"strategy": "shape.ghost_strategy"},
-			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"hover_pressed":{"role": "surface_panel", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"strategy": "shape.ghost_strategy", "state_layer_role": "role_primary",
+								"state_layer_alpha": 0.12},
 		},
 		"color": {
 			"font_color":              {"role": "role_primary"},
 			"font_hover_color":        {"role": "role_primary"},
-			"font_pressed_color":      {"role": "text_strong"},
+			"font_pressed_color":      {"role": "role_primary"},
 			"font_focus_color":        {"role": "role_primary"},
 			"font_disabled_color":     {"role": "role_primary", "disabled": true},
-			"font_hover_pressed_color":{"role": "text_strong"},
+			"font_hover_pressed_color":{"role": "role_primary"},
 			"icon_normal_color":       {"role": "role_primary"},
 			"icon_hover_color":        {"role": "role_primary"},
-			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "role_primary"},
 			"icon_focus_color":        {"role": "role_primary"},
 			"icon_disabled_color":     {"role": "role_primary", "disabled": true},
-			"icon_hover_pressed_color":{"role": "text_strong"},
+			"icon_hover_pressed_color":{"role": "role_primary"},
 		},
 		"constant": {
 			"h_separation": {"value": "tokens.tapPadding"},
@@ -2583,21 +2907,27 @@ const BINDING_TABLE: Dictionary = {
 	# DangerButton uses primary radius/padding (the danger CTA is a primary-grade action).
 	"DangerButton": {
 		"stylebox": {
-			"normal":        {"role": "role_danger",   "raised_intensity": "shape.raised_lifts.primary",
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
-			"hover":         {"role": "role_danger",   "raised_intensity": "shape.raised_lifts.primary",
+			"normal":        {"role": "danger_button_normal", "border_role": "danger_button_border",
+								"raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"alpha": 0.92},
-			"pressed":       {"role": "role_danger",   "raised_intensity": 0,
+								"offset_role": "danger_button_offset", "raised_face_edge": true},
+			"hover":         {"role": "danger_button_hover", "border_role": "danger_button_border_hover",
+								"raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"alpha": 0.78},
+								"offset_role": "danger_button_hover_offset", "raised_face_edge": true},
+			"pressed":       {"role": "danger_button_pressed", "border_role": "danger_button_border_pressed",
+								"raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"offset_role": "danger_button_pressed_offset"},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.primary_radius"},
-			"disabled":      {"role": "role_danger",   "disabled": true, "raised_intensity": 0,
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding"},
-			"hover_pressed":{"role": "role_danger",   "raised_intensity": 0,
+			"disabled":      {"role": "danger_button_disabled", "disabled": true, "raised_intensity": 0,
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"alpha": 0.78},
+								"border_width": 0},
+			"hover_pressed":{"role": "danger_button_pressed", "border_role": "danger_button_border_pressed",
+								"raised_intensity": 0,
+								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
+								"offset_role": "danger_button_pressed_offset"},
 		},
 		"color": {
 			"font_color":              {"role": "text_on_danger"},
@@ -2625,17 +2955,20 @@ const BINDING_TABLE: Dictionary = {
 	# affordance compared to primary chrome.
 	"IconButton": {
 		"stylebox": {
-			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
+			"normal":        {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
+								"raised_intensity": "shape.raised_lifts.ghost",
 								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
-			"hover":         {"role": "state_hover",   "raised_intensity": "shape.raised_lifts.ghost",
+			"hover":         {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
+								"raised_intensity": "shape.raised_lifts.ghost",
 								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
-			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
+			"pressed":       {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
-			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
+			"disabled":      {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
-			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
+			"hover_pressed":{"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
 								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8)},
 		},
 		"color": {
@@ -2664,19 +2997,22 @@ const BINDING_TABLE: Dictionary = {
 	"FlatButton": {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"alpha": 0.0},
-			"hover":         {"role": "state_hover",   "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
-			"pressed":       {"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"alpha": 0.0, "border_width": 0},
+			"hover":         {"role": "button_hover", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"border_width": 0},
+			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"border_width": 0},
 			"focus":         {"role": "focus_ring",
 								"radius": "shape.secondary_radius"},
-			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"alpha": 0.0},
-			"hover_pressed":{"role": "state_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding"},
+			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"alpha": 0.0, "border_width": 0},
+			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"border_width": 0},
 		},
 		"color": {
 			"font_color":              {"role": "text_default"},
@@ -2687,19 +3023,61 @@ const BINDING_TABLE: Dictionary = {
 			"font_hover_pressed_color":{"role": "text_strong"},
 			"icon_normal_color":       {"role": "text_default"},
 			"icon_hover_color":        {"role": "text_strong"},
-			"icon_pressed_color":      {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "role_primary"},
 			"icon_focus_color":        {"role": "text_strong"},
 			"icon_disabled_color":     {"role": "text_default", "disabled": true},
-			"icon_hover_pressed_color":{"role": "text_strong"},
+			"icon_hover_pressed_color":{"role": "role_primary"},
 		},
 		"constant": {
-			"h_separation": {"value": "tokens.tapPadding"},
+			"h_separation": {"value": 4},
+		},
+	},
+	# 43a. FlatMenuButton — Godot editor toolbars use this variation for compact icon
+	# menus. Keep normal/focus states visually empty and make hover/press compact so
+	# editor docks do not inherit full game-button padding.
+	"FlatMenuButton": {
+		"stylebox": {
+			"normal":        {"role": "surface_panel", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"alpha": 0.0, "border_width": 0},
+			"hover":         {"role": "button_hover", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"border_width": 0},
+			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"border_width": 0},
+			"focus":         {"role": "surface_panel", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"alpha": 0.0, "border_width": 0},
+			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"alpha": 0.0, "border_width": 0},
+			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(4, 3, 4, 2),
+								"border_width": 0},
+		},
+		"color": {
+			"font_color":              {"role": "text_default"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_default", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_default"},
+			"icon_hover_color":        {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "role_primary"},
+			"icon_focus_color":        {"role": "text_strong"},
+			"icon_disabled_color":     {"role": "text_default", "disabled": true},
+			"icon_hover_pressed_color":{"role": "role_primary"},
+		},
+		"constant": {
+			"h_separation": {"value": 4},
 		},
 	},
 	# ─── Phase 5 Plan 05-04: Type-variation rows (TYPEVAR-02..05 + Kicker D-09) ───
 	# These rows extend BINDING_TABLE with the 7 NeoCade text/label/RTL type
 	# variations whose chrome is owned by Plan 05-04 Task 2. The 6 button-family
-	# variations (PrimaryButton..FlatButton) are owned by Plan 05-03 (sibling
+	# variations (PrimaryButton..FlatMenuButton) are owned by Plan 05-03 (sibling
 	# wave) and live in the rows above. The 2 panel variations (CardPanel,
 	# HeroPanel) plus PanelContainer are owned by Plan 05-04 Task 3 and follow
 	# this section.
@@ -2784,13 +3162,29 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"panel": {
 				"role":             "surface_panel",
+				"border_role":      "surface_panel_edge",
 				"alpha":            "shape.surface_alpha_panels",
 				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
 				"padding":          Vector2i(10, 8),
 			},
 		},
 	},
-	# 52. CardPanel — PanelContainer variation (TYPEVAR-04). Uses
+	# 52. WindowContentPanel — full-rect content surface inside embedded Window.
+	#     No border or padding; Window.embedded_border owns the chrome, and the
+	#     wrapped MarginContainer owns content spacing.
+	"WindowContentPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "surface_low",
+				"raised_intensity": 0,
+				"border_width":     0,
+				"radius":           0,
+				"padding":          Vector2i(0, 0),
+			},
+		},
+	},
+	# 53. CardPanel — PanelContainer variation (TYPEVAR-04). Uses
 	#     shape.card_radius for per-direction radius personality (Pulse 0,
 	#     Slate 14, Bubble 26, Daybreak 8, Burst 18) plus the panel
 	#     surface_alpha and raised lift.
@@ -2798,9 +3192,11 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"panel": {
 				"role":             "surface_panel",
+				"border_role":      "surface_panel_edge",
 				"radius":           "shape.card_radius",
 				"alpha":            "shape.surface_alpha_panels",
 				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
 				"padding":          Vector2i(12, 10),
 			},
 		},
@@ -2808,7 +3204,7 @@ const BINDING_TABLE: Dictionary = {
 			"font_color": {"role": "text_strong"},
 		},
 	},
-	# 53. HeroPanel — PanelContainer variation (TYPEVAR-04). Uses
+	# 54. HeroPanel — PanelContainer variation (TYPEVAR-04). Uses
 	#     shape.hero_radius (sibling to card_radius; v1 ships matching pairs
 	#     per direction, but the schema lets v2 differentiate hero from card
 	#     for any direction). Surface role is surface_high (one tonal step
@@ -2818,9 +3214,11 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"panel": {
 				"role":             "surface_high",
+				"border_role":      "surface_high_edge",
 				"radius":           "shape.hero_radius",
 				"alpha":            "shape.surface_alpha_panels",
 				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
 				"padding":          Vector2i(14, 12),
 			},
 		},
@@ -2892,21 +3290,55 @@ func _set_content_margin_from_padding(sb: StyleBoxFlat, padding: Vector2i) -> vo
 	sb.content_margin_bottom = padding.y
 
 
-func _apply_outline_border(sb: StyleBoxFlat, color: Color) -> void:
+func _set_content_margins(sb: StyleBoxFlat, margins: Vector4i) -> void:
+	sb.content_margin_left = margins.x
+	sb.content_margin_top = margins.y
+	sb.content_margin_right = margins.z
+	sb.content_margin_bottom = margins.w
+
+
+func _set_expand_margins(sb: StyleBoxFlat, margins: Vector4i) -> void:
+	sb.expand_margin_left = margins.x
+	sb.expand_margin_top = margins.y
+	sb.expand_margin_right = margins.z
+	sb.expand_margin_bottom = margins.w
+
+
+func _apply_outline_border(sb: StyleBoxFlat, color: Color, width: int = -1) -> void:
+	var resolved_width := outline_width if width < 0 else width
 	sb.border_color = color
-	sb.border_width_left = outline_width
-	sb.border_width_top = outline_width
-	sb.border_width_right = outline_width
-	sb.border_width_bottom = outline_width
+	sb.border_width_left = resolved_width
+	sb.border_width_top = resolved_width
+	sb.border_width_right = resolved_width
+	sb.border_width_bottom = resolved_width
 
 
-func _apply_raised_depth_border(sb: StyleBoxFlat, offset_color: Color, intensity: int) -> void:
+func _reserve_bottom_depth_height(sb: StyleBoxFlat) -> void:
+	var face_width: int = maxi(sb.border_width_left, maxi(sb.border_width_top, sb.border_width_right))
+	var bottom_extra: int = maxi(0, sb.border_width_bottom - face_width)
+	sb.content_margin_bottom += bottom_extra
+
+
+func _apply_raised_depth_border(sb: StyleBoxFlat, offset_color: Color, intensity: int,
+								 keep_face_edge: bool = false, reserve_height: bool = false) -> void:
 	var depth := maxi(1, intensity)
+	if keep_face_edge:
+		sb.border_color = offset_color
+		var face_width: int = maxi(1, maxi(sb.border_width_left, maxi(sb.border_width_top, sb.border_width_right)))
+		sb.border_width_left = face_width
+		sb.border_width_top = face_width
+		sb.border_width_right = face_width
+		sb.border_width_bottom = maxi(depth, face_width + 1)
+		if reserve_height:
+			_reserve_bottom_depth_height(sb)
+		return
 	sb.border_color = offset_color
 	sb.border_width_left = 0
 	sb.border_width_top = 0
-	sb.border_width_right = depth
+	sb.border_width_right = 0
 	sb.border_width_bottom = depth
+	if reserve_height:
+		_reserve_bottom_depth_height(sb)
 
 
 ## Applies the per-direction primary_strategy mutation to a StyleBoxFlat representing
@@ -3105,7 +3537,11 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 					fr_radius = int(fr_r_lookup)
 			elif fr_radius_raw != null and (typeof(fr_radius_raw) == TYPE_INT or typeof(fr_radius_raw) == TYPE_FLOAT):
 				fr_radius = int(fr_radius_raw)
-			_set_radius_all(focus_sb, fr_radius)
+			var focus_corner_profile: String = str(recipe.get("corner_profile", ""))
+			if focus_corner_profile == "tab_connected":
+				_set_tab_connected_radius(focus_sb, fr_radius)
+			else:
+				_set_radius_all(focus_sb, fr_radius)
 			# Per-direction focus_offset (DESIGN_TOKENS §8.2): Pulse=0, Burst=1, others=2.
 			var focus_offset_v: Variant = _lookup_shape(style_personality, "shape.focus_offset")
 			var focus_offset_int: int = 2
@@ -3121,7 +3557,8 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		if alpha < 1.0:
 			bg_color = Color(bg_color.r, bg_color.g, bg_color.b, alpha)
 		# Pick the matching offset color (per §6.3) for the bg's family.
-		var offset_color: Color = role_table.get(role + "_offset", role_table.surface_panel_offset)
+		var offset_role: String = recipe.get("offset_role", role + "_offset")
+		var offset_color: Color = role_table.get(offset_role, role_table.get(role + "_offset", role_table.surface_panel_offset))
 		var sb_intensity: int = (raised_strength * raised_intensity) if raised else 0
 		var sb := _make_raised_stylebox(bg_color, offset_color, sb_intensity)
 		# Plan 05-02 Task 2 (D-03): radius may be either the @export `corner_radius` baseline
@@ -3141,13 +3578,30 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		var corner_profile: String = str(recipe.get("corner_profile", ""))
 		if corner_profile == "tab_connected":
 			_set_tab_connected_radius(sb, resolved_radius)
-		_apply_outline_border(sb, role_table.outline_color)
+		var border_width: int = int(recipe.get("border_width", outline_width))
+		var border_role: String = recipe.get("border_role", "outline_color")
+		var border_color: Color = role_table.get(border_role, role_table.outline_color)
+		var border_alpha: float = float(recipe.get("border_alpha", 1.0))
+		if border_alpha < 1.0:
+			border_color = Color(border_color.r, border_color.g, border_color.b, border_color.a * border_alpha)
+		_apply_outline_border(sb, border_color, maxi(0, border_width))
 		# Plan 05-02 Task 2 (D-03): padding may be a `shape.<key>` Vector2i lookup
 		# or an explicit Vector2i. Unspecified padding is zero; structural styleboxes must
 		# opt into content margins instead of inheriting giant global chrome.
+		var content_margins_raw: Variant = recipe.get("content_margins", null)
 		var padding_raw: Variant = recipe.get("padding", null)
 		var applied_padding: bool = false
-		if padding_raw != null and typeof(padding_raw) == TYPE_STRING and (padding_raw as String).begins_with("shape."):
+		if content_margins_raw != null and typeof(content_margins_raw) == TYPE_VECTOR4I:
+			var density: float = tokens.get("densityScale", 1.0)
+			var margins := content_margins_raw as Vector4i
+			_set_content_margins(sb, Vector4i(
+				int(round(margins.x * density)),
+				int(round(margins.y * density)),
+				int(round(margins.z * density)),
+				int(round(margins.w * density))
+			))
+			applied_padding = true
+		elif padding_raw != null and typeof(padding_raw) == TYPE_STRING and (padding_raw as String).begins_with("shape."):
 			var pad_lookup: Variant = _lookup_shape(style_personality, padding_raw)
 			if pad_lookup != null and typeof(pad_lookup) == TYPE_VECTOR2I:
 				var density: float = tokens.get("densityScale", 1.0)
@@ -3159,6 +3613,16 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			applied_padding = true
 		if not applied_padding:
 			_set_content_margin_from_padding(sb, Vector2i.ZERO)
+		var expand_margins_raw: Variant = recipe.get("expand_margins", null)
+		if expand_margins_raw != null and typeof(expand_margins_raw) == TYPE_VECTOR4I:
+			var expand_density: float = tokens.get("densityScale", 1.0)
+			var expand := expand_margins_raw as Vector4i
+			_set_expand_margins(sb, Vector4i(
+				int(round(expand.x * expand_density)),
+				int(round(expand.y * expand_density)),
+				int(round(expand.z * expand_density)),
+				int(round(expand.w * expand_density))
+			))
 		# Plan 05-02 Task 2 (D-04): strategy dispatch (closed-enum, sourced VERBATIM
 		# from DESIGN_TOKENS §5.1-§5.5). Recipes opt-in via `strategy: "shape.primary_strategy"`
 		# (or `"shape.ghost_strategy"`); _apply_primary_strategy / _apply_ghost_strategy
@@ -3175,8 +3639,15 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 					_apply_ghost_strategy(sb, strat_name, role_table, style_personality)
 				# Other strategy paths (kicker_style etc.) are NOT dispatched on stylebox;
 				# they're color-recipe territory handled below.
+		if recipe.has("state_layer_role"):
+			var layer_role: String = recipe.get("state_layer_role", "role_primary")
+			var layer_color: Color = role_table.get(layer_role, role_table.role_primary)
+			var layer_alpha := clampf(float(recipe.get("state_layer_alpha", 0.0)), 0.0, 1.0)
+			sb.bg_color = Color(layer_color.r, layer_color.g, layer_color.b, layer_alpha)
 		if sb_intensity > 0:
-			_apply_raised_depth_border(sb, offset_color, sb_intensity)
+			var keep_face_edge: bool = bool(recipe.get("raised_face_edge", false))
+			var reserve_height: bool = bool(recipe.get("reserve_raised_depth", keep_face_edge))
+			_apply_raised_depth_border(sb, offset_color, sb_intensity, keep_face_edge, reserve_height)
 		return sb
 	elif data_type == "color":
 		var role: String = recipe.get("role", "text_strong")
@@ -3223,12 +3694,46 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			return 0
 		return int(value_ref)
 	elif data_type == "icon":
+		if recipe.get("generated_icon", "") == "split_grabber":
+			return _make_split_grabber_icon(recipe.get("orientation", "vertical") == "vertical", role_table, style_personality)
 		var icon_name: String = recipe.get("icon", "")
 		if icon_name == "":
 			return null
+		if icon_name == "empty":
+			return ImageTexture.new()
 		var path: String = "res://addons/neocade_theme/icons/" + icon_name + ".svg"
 		var icon: Texture2D = load(path) as Texture2D
 		return icon
 	# Cross-AI Cycle 2 N1 fix: any unrecognized data_type (including the now-removed "font")
 	# falls through to null — caller skips silently per D-04 escape hatch.
 	return null
+
+
+func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, style_personality: Dictionary) -> Texture2D:
+	const THICKNESS := 6
+	const LENGTH := 32
+	var width := THICKNESS if vertical_indicator else LENGTH
+	var height := LENGTH if vertical_indicator else THICKNESS
+	var shape_radius: int = corner_radius
+	var radius_lookup: Variant = _lookup_shape(style_personality, "shape.secondary_radius")
+	if radius_lookup != null and (typeof(radius_lookup) == TYPE_INT or typeof(radius_lookup) == TYPE_FLOAT):
+		shape_radius = int(radius_lookup)
+	var radius: float = float(clampi(shape_radius, 0, int(THICKNESS / 2)))
+	var grabber_color: Color = role_table.get("text_muted", Color.WHITE)
+	grabber_color = Color(grabber_color.r, grabber_color.g, grabber_color.b, grabber_color.a * 0.72)
+
+	var image := Image.create(width, height, false, Image.FORMAT_RGBA8)
+	image.fill(Color(0, 0, 0, 0))
+	for y in range(height):
+		for x in range(width):
+			var coverage := 1.0
+			if radius > 0.0:
+				var px := float(x) + 0.5
+				var py := float(y) + 0.5
+				var nearest_x := clampf(px, radius, float(width) - radius)
+				var nearest_y := clampf(py, radius, float(height) - radius)
+				var dist := Vector2(px - nearest_x, py - nearest_y).length() - radius
+				coverage = clampf(1.0 - dist, 0.0, 1.0)
+			if coverage > 0.0:
+				image.set_pixel(x, y, Color(grabber_color.r, grabber_color.g, grabber_color.b, grabber_color.a * coverage))
+	return ImageTexture.create_from_image(image)

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://diwdhudkahot8"
-path="res://.godot/imported/radio_unchecked.svg-f22828ee9a1f607cbcd09e7fe013d9b7.ctex"
+uid="uid://b8xf8ghovw2ql"
+path="res://.godot/imported/editor_triple_bar_24.svg-ced46bb13738d81b23c84536ab8e50c6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/neocade_theme/icons/radio_unchecked.svg"
-dest_files=["res://.godot/imported/radio_unchecked.svg-f22828ee9a1f607cbcd09e7fe013d9b7.ctex"]
+source_file="res://addons/neocade_theme/icons/editor_triple_bar_24.svg"
+dest_files=["res://.godot/imported/editor_triple_bar_24.svg-ced46bb13738d81b23c84536ab8e50c6.ctex"]
 
 [params]
 
@@ -23,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
@@ -38,6 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=0.75
+svg/scale=1.0
 editor/scale_with_editor_scale=false
 editor/convert_colors_with_editor_theme=false
