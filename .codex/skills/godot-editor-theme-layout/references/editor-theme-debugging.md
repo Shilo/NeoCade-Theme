@@ -18,6 +18,8 @@ rg -n "FileSystemDock|toolbar_hbc|toolbar2_hbc|FlatMenuButton|NoBorderHorizontal
 rg -n "DockTabContainer|SideDockTabContainer|BottomSideDockTabContainer" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
 rg -n "CreateDialog|TreeSecondary|ItemListSecondary|split_bar_background|HSplitContainer" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
 rg -n "EditorProperty|EditorInspectorButton|EditorSpinSlider|set_flat\(true\)" C:\Programming_Files\Godot\godot-master\editor\inspector C:\Programming_Files\Godot\godot-master\editor\gui C:\Programming_Files\Godot\godot-master\editor\settings
+rg -n "BottomPanel|BottomPanelButton|EditorLogFilterButton|TabContainerOdd|prop_subsection|draw_relationship_lines|relationship_line_opacity" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
+rg -n "FileBigThumb|FolderBigThumb|file_thumbnail|folder_thumbnail|checkbox_checked_color|button_checked_color|EditorResourcePicker" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
 ```
 
 Then compare reference theme behavior:
@@ -27,6 +29,7 @@ rg -n "EditorInspector|FlatMenuButton|NoBorderHorizontalBottom|TabContainer|HBox
 rg -n "EditorInspector|FlatMenuButton|NoBorderHorizontalBottom|TabContainer|HBoxContainer|VBoxContainer" C:\Programming_Files\Godot\godot-master\editor\themes\theme_modern.cpp
 rg -n "SplitContainer|split_bar_background|ItemListSecondary|TreeSecondary|draw_guides|guide_color" C:\Programming_Files\Godot\godot-minimal-theme-main\minimal_theme.tres C:\Programming_Files\Godot\godot-master\editor\themes C:\Programming_Files\Godot\godot-master\scene\theme\default_theme.cpp
 rg -n "EditorProperty|EditorSpinSlider|relationship_line|ScrollBar|grabber_style" C:\Programming_Files\Godot\godot-minimal-theme-main\minimal_theme.tres C:\Programming_Files\Godot\godot-master\editor\themes\theme_modern.cpp
+rg -n "BottomPanelButton|EditorLogFilterButton|TabContainerOdd|EditorInspectorCategory|EditorHelpBit|Tree.panel" C:\Programming_Files\Godot\godot-minimal-theme-main\minimal_theme.tres C:\Programming_Files\Godot\godot-master\editor\themes\theme_modern.cpp
 ```
 
 ## Common Source Mappings
@@ -58,6 +61,13 @@ rg -n "EditorProperty|EditorSpinSlider|relationship_line|ScrollBar|grabber_style
   - Source often pulls from `EditorIcons`, not only Control icon slots.
   - Useful icon names seen in editor tabs/toolbars: `GuiTabMenu`, `GuiTabMenuHl`, `GuiTabMenuHlDarkBackground`, `TripleBar`.
 
+- Bottom panel:
+  - Source: `editor/gui/editor_bottom_panel.cpp`, `editor/editor_log.cpp`
+  - The bottom labels such as Output/Debugger are tabs on `EditorBottomPanel -> DockTabContainer -> TabContainer` with theme variation `BottomPanel`.
+  - Pin/expand/clear/collapse buttons use `BottomPanelButton`.
+  - Output filter/count buttons use `EditorLogFilterButton`.
+  - The Output log body itself is a plain `RichTextLabel` owned by `EditorLog`; identify it before changing any `RichTextLabel`/bottom-panel surface.
+
 - Create New Node dialog:
   - Source: `editor/gui/create_dialog.cpp`
   - Dialog inheritance: `CreateDialog -> ConfirmationDialog -> AcceptDialog`
@@ -74,6 +84,27 @@ rg -n "EditorProperty|EditorSpinSlider|relationship_line|ScrollBar|grabber_style
   - Important consequence: flat controls do not draw their normal stylebox in `Button::_notification`/`EditorSpinSlider::_draw_spin_slider`. The reusable normal-state value surface is `EditorProperty.child_bg`, not `OptionButton.normal`.
   - Useful theme hooks: `EditorProperty.bg`, `EditorProperty.bg_selected`, `EditorProperty.child_bg`, `EditorSpinSlider.label_bg`, `EditorSpinSlider.label_color`, `EditorSpinSlider.line_edit_margin`, `EditorInspectorButton` styleboxes/colors, and the `SpinBox.updown` icon used by `EditorSpinSlider`.
 
+- Resource picker fields:
+  - Source: `editor/inspector/editor_resource_picker.cpp`, `editor/inspector/editor_properties.cpp`
+  - Resource fields such as Theme, Material, Script route through `EditorPropertyResource -> EditorResourcePicker`.
+  - Assign button uses `EditorInspectorButton`; quick-load/edit buttons use `EditorInspectorFlatButton`.
+  - Current Godot source draws the picker background from `Tree.panel`, so if these fields look unlike other inspector values, check whether `Tree.panel` is painting over `EditorProperty.child_bg`.
+
+- Signals dock headers:
+  - Source: `editor/docks/signals_dock.cpp`, `editor/scene/connections_dialog.cpp`
+  - Class/header rows are custom `TreeItem`s, not Tree column title buttons.
+  - Useful hooks are `Editor.prop_subsection`, `Editor.prop_subsection_stylebox`, and related left/right subsection styleboxes.
+
+- Editor Settings top tabs:
+  - Source: `editor/settings/editor_settings_dialog.cpp`
+  - The General/Shortcuts tabs are a `TabContainer` with type variation `TabContainerOdd`.
+  - `TabContainer` forwards its `tab_*` slots to its internal `TabBar`, so author the `TabContainerOdd` variation if only this dialog is wrong.
+
+- File dialog and filesystem thumbnails:
+  - `FileDialog` thumbnail mode uses `FileDialog.thumbnail_size` plus `file_thumbnail` / `folder_thumbnail`.
+  - The filesystem dock uses `EditorIcons` thumbnail names: `FileBigThumb`, `FileDeadBigThumb`, `FolderBigThumb`, `FileMediumThumb`, `FileDeadMediumThumb`, `FolderMediumThumb`.
+  - Blurry fallback icons usually mean the imported SVG texture is much smaller than the fixed icon size and is being scaled up.
+
 ## Theme Editing Heuristics
 
 - Keep `MarginContainer` generic margins at zero unless the whole app should inherit padding.
@@ -88,6 +119,8 @@ rg -n "EditorProperty|EditorSpinSlider|relationship_line|ScrollBar|grabber_style
 - Prefer `StyleBoxEmpty` for contextual split-bar backgrounds. Godot default sets `split_bar_background` to empty for `SplitContainer`, `HSplitContainer`, and `VSplitContainer`; the modern editor theme and Godot Minimal Theme mostly set splitter constants/icons. A filled split-bar style paints a visible stripe and can make dialog layout look like unexpected spacing.
 - For list views that should be text/item focused, hide lines through `guide_color` alpha, remove panel borders, keep `outline_size` at 0, and make selected text color intentionally match the accent if that is the Tree convention.
 - For Tree views, distinguish guide/separator lines from hierarchy relationship lines. Keep `draw_guides` and `guide_color` off when row guides look noisy, but use `draw_relationship_lines`, `relationship_line_width`, `parent_hl_line_width`, `children_hl_line_width`, and muted relationship colors when the hierarchy path should remain visible like the Godot editor.
+- For selected-only Tree relationship lines, match Godot Modern: `draw_relationship_lines=1`, `relationship_line_width=0`, highlighted parent/child widths nonzero, and opacity from `interface/theme/relationship_line_opacity`. Guard `EditorInterface` access with `Engine.is_editor_hint()`; headless project scripts can report the singleton but still reject retrieval.
+- For checkbox/toggle icon color, check the control-specific draw colors: `CheckBox.checkbox_checked_color` / `checkbox_unchecked_color` and `CheckButton.button_checked_color` / `button_unchecked_color`. Ordinary `Button.icon_pressed_color` will not tint those icons.
 - For scrollbars, Godot modern uses an empty/transparent track and semi-transparent thumb fills. In `theme_modern.cpp`, normal grabber alpha is roughly 0.225 and hover/pressed roughly 0.5; Godot Minimal Theme uses a similar translucent color recipe. Preserve Pulse square corners if that is part of the style, but avoid opaque thumbs unless the user asks.
 
 ## Reusable Bug Patterns

@@ -422,6 +422,8 @@ func _regenerate_theme() -> void:
 	set_font("font", "FlatMenuButton",  body_font)
 	set_font("font", "EditorInspectorButton",     body_font)
 	set_font("font", "EditorInspectorFlatButton", body_font)
+	set_font("font", "BottomPanelButton", body_font)
+	set_font("font", "EditorLogFilterButton", body_font)
 	set_font("font", "CardPanel",       body_font)
 	set_font("font", "HeroPanel",       header_medium_font)
 	# Tree exposes explicit font slots outside the BINDING_TABLE schema. The body face
@@ -430,6 +432,8 @@ func _regenerate_theme() -> void:
 	set_font("title_button_font", "Tree", header_small_font)
 	set_font("font", "TreeSecondary",              body_font)
 	set_font("title_button_font", "TreeSecondary", header_small_font)
+	set_font("font", "TreeTable",              body_font)
+	set_font("title_button_font", "TreeTable", header_small_font)
 	# ItemList exposes one official font slot. Keep it explicit because BINDING_TABLE
 	# intentionally has no font branch.
 	set_font("font", "ItemList", body_font)
@@ -439,6 +443,8 @@ func _regenerate_theme() -> void:
 	# Tabs expose explicit font slots outside the BINDING_TABLE schema.
 	set_font("font", "TabBar", body_font)
 	set_font("font", "TabContainer", body_font)
+	set_font("font", "TabContainerOdd", body_font)
+	set_font("font", "BottomPanel", body_font)
 	# ProgressBar exposes an official font slot for optional percentage/text display.
 	set_font("font", "ProgressBar", body_font)
 
@@ -476,8 +482,12 @@ func _regenerate_theme() -> void:
 	set_font_size("font_size", "FlatMenuButton",  tokens.body)
 	set_font_size("font_size", "EditorInspectorButton",     tokens.body)
 	set_font_size("font_size", "EditorInspectorFlatButton", tokens.body)
+	set_font_size("font_size", "BottomPanelButton", tokens.body)
+	set_font_size("font_size", "EditorLogFilterButton", tokens.body)
 	set_font_size("font_size", "TreeSecondary", tokens.body)
 	set_font_size("title_button_font_size", "TreeSecondary", tokens.body)
+	set_font_size("font_size", "TreeTable", tokens.body)
+	set_font_size("title_button_font_size", "TreeTable", tokens.body)
 	set_font_size("font_size", "ItemListSecondary", tokens.body)
 
 	# ── Build role lookup table from derivation locals (Plan 04-04) ──
@@ -555,6 +565,11 @@ func _regenerate_theme() -> void:
 		"text_on_success":        text_on_success,
 		"text_on_warning":        text_on_warning,
 		"text_on_info":           text_on_info,
+		"editor_property_x":      Color("#E16277") if not is_light else Color("#670A18"),
+		"editor_property_y":      Color("#C3EF65") if not is_light else Color("#455E10"),
+		"editor_property_z":      Color("#6AABF6") if not is_light else Color("#143862"),
+		"editor_property_w":      text_default,
+		"editor_prop_subsection": _mix(button_disabled, surface_base, 0.48),
 	}
 
 	# ── Walk BINDING_TABLE — additive iteration; entries not in table are LEFT UNTOUCHED (D-04) ──
@@ -585,6 +600,8 @@ func _regenerate_theme() -> void:
 				# explicitly excludes "font". If they did, _resolve_recipe returns null
 				# (its switch has no font branch), and the value==null check above skips.
 
+	_apply_editor_theme_runtime_settings(role_table)
+
 	# Phase 7 popup/menu font slots must stay outside BINDING_TABLE. Godot exposes these
 	# as real Theme font/font_size entries, but the binding iterator intentionally has no
 	# font branch and review convergence requires direct calls after the table walk.
@@ -603,6 +620,43 @@ func _regenerate_theme() -> void:
 
 	_last_regeneration_usec = Time.get_ticks_usec() - t0
 	_regenerating = false
+
+
+func _get_editor_setting_value(path: String, fallback: Variant) -> Variant:
+	if not Engine.is_editor_hint():
+		return fallback
+	if not Engine.has_singleton("EditorInterface"):
+		return fallback
+	var editor_interface := Engine.get_singleton("EditorInterface")
+	if editor_interface == null or not editor_interface.has_method("get_editor_settings"):
+		return fallback
+	var settings: Object = editor_interface.call("get_editor_settings")
+	if settings == null:
+		return fallback
+	if settings.has_method("has_setting") and not bool(settings.call("has_setting", path)):
+		return fallback
+	if settings.has_method("get_setting"):
+		return settings.call("get_setting", path)
+	return fallback
+
+
+func _apply_editor_theme_runtime_settings(role_table: Dictionary) -> void:
+	# Match Godot Modern's editor setting semantics:
+	# None=0, Selected Only=1, All=2. Selected Only keeps normal relationship
+	# width at 0 and draws only the highlighted selected parent/child path.
+	var relationship_mode := int(_get_editor_setting_value("interface/theme/draw_relationship_lines", 1))
+	var relationship_opacity := clampf(float(_get_editor_setting_value("interface/theme/relationship_line_opacity", 0.10)), 0.0, 1.0)
+	var draw_lines := relationship_mode != 0 and relationship_opacity >= 0.01
+	set_constant("draw_relationship_lines", "Tree", 1 if draw_lines else 0)
+	set_constant("relationship_line_width", "Tree", 1 if draw_lines and relationship_mode == 2 else 0)
+	set_constant("parent_hl_line_width", "Tree", 1 if draw_lines else 0)
+	set_constant("children_hl_line_width", "Tree", 1 if draw_lines else 0)
+	set_constant("parent_hl_line_margin", "Tree", 3)
+
+	var line_base: Color = role_table.get("text_muted", Color.WHITE)
+	set_color("relationship_line_color", "Tree", Color(line_base.r, line_base.g, line_base.b, relationship_opacity))
+	set_color("children_hl_line_color", "Tree", Color(line_base.r, line_base.g, line_base.b, relationship_opacity))
+	set_color("parent_hl_line_color", "Tree", Color(line_base.r, line_base.g, line_base.b, minf(1.0, relationship_opacity * 2.0)))
 
 
 # ─── Color helpers (DESIGN_TOKENS §6.1) ─────────────────────────────────────────────────────
@@ -1070,6 +1124,8 @@ const TYPE_VARIATIONS: Dictionary = {
 	"FlatMenuButton":  "Button",
 	"EditorInspectorButton": "Button",
 	"EditorInspectorFlatButton": "FlatButton",
+	"BottomPanelButton": "FlatMenuButton",
+	"EditorLogFilterButton": "Button",
 	# Label / heading family (TYPEVAR-02) — 5
 	"HeaderLarge":  "Label",
 	"HeaderMedium": "Label",
@@ -1086,11 +1142,14 @@ const TYPE_VARIATIONS: Dictionary = {
 	"WindowContentPanel": "PanelContainer",
 	# Editor-specific list/help variations used by CreateDialog, FileSystemDock, and docs popups.
 	"TreeSecondary": "Tree",
+	"TreeTable": "Tree",
 	"ItemListSecondary": "ItemList",
 	"EditorHelpBitTitle": "RichTextLabel",
 	"EditorHelpBitContent": "RichTextLabel",
 	"EditorHelpBitTooltipTitle": "EditorHelpBitTitle",
 	"EditorHelpBitTooltipContent": "EditorHelpBitContent",
+	"TabContainerOdd": "TabContainer",
+	"BottomPanel": "TabContainer",
 	# Editor dock scroll-body wrappers used after toolbar stacks.
 	"NoBorderHorizontal":       "MarginContainer",
 	"NoBorderHorizontalBottom": "NoBorderHorizontal",
@@ -1162,8 +1221,11 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 	},
 	# CheckBox — 4 icon slots (per MINIMAL-THEME-DISSECTION.md §CheckBox)
 	"CheckBox": {
-		"icon": ["checked", "unchecked", "radio_checked", "radio_unchecked"],
-		"color": ["font_pressed_color", "font_hover_pressed_color"],
+		"icon": ["checked", "unchecked", "radio_checked", "radio_unchecked",
+				 "checked_disabled", "unchecked_disabled", "radio_checked_disabled",
+				 "radio_unchecked_disabled"],
+		"color": ["font_pressed_color", "font_hover_pressed_color",
+				  "checkbox_checked_color", "checkbox_unchecked_color"],
 		"stylebox": ["normal"],
 	},
 	# CheckButton — 2 icon slots: `checked`/`unchecked` per Godot 4.6 class_checkbutton.md
@@ -1173,8 +1235,11 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 	# Phase 4 ships only the 2 primary slots; the 6 disabled/mirrored variants are
 	# deferred to v1.x per CHANGELOG (Plan 04-08).
 	"CheckButton": {
-		"icon": ["checked", "unchecked"],
-		"color": ["font_focus_color", "font_hover_pressed_color", "font_pressed_color"],
+		"icon": ["checked", "unchecked", "checked_disabled", "unchecked_disabled",
+				 "checked_mirrored", "unchecked_mirrored", "checked_disabled_mirrored",
+				 "unchecked_disabled_mirrored"],
+		"color": ["font_focus_color", "font_hover_pressed_color", "font_pressed_color",
+				  "button_checked_color", "button_unchecked_color"],
 	},
 	# OptionButton — 6 stylebox + 1 constant + 1 icon
 	"OptionButton": {
@@ -1503,6 +1568,49 @@ const BINDING_TABLE: Dictionary = {
 			"GuiTabMenuHl":               {"icon": "tab_menu"},
 			"GuiTabMenuHlDarkBackground": {"icon": "tab_menu"},
 			"TripleBar":                  {"icon": "editor_triple_bar_24"},
+			"FileBigThumb":               {"icon": "filedialog_file_thumbnail"},
+			"FileDeadBigThumb":           {"icon": "filedialog_file_thumbnail"},
+			"FolderBigThumb":             {"icon": "filedialog_folder_thumbnail"},
+			"FileMediumThumb":            {"icon": "filedialog_file_thumbnail"},
+			"FileDeadMediumThumb":        {"icon": "filedialog_file_thumbnail"},
+			"FolderMediumThumb":          {"icon": "filedialog_folder_thumbnail"},
+		},
+	},
+	# Editor globals used by inspector sections, vector component labels, Signals dock
+	# subsection rows, and complex editor dialogs. These are not Control subclasses, but
+	# Godot's editor source requests them from the "Editor" theme type.
+	"Editor": {
+		"stylebox": {
+			"prop_subsection_stylebox": {
+				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
+				"raised_intensity": 0, "border_width": 0, "radius": "shape.secondary_radius",
+				"padding": Vector2i(4, 2)
+			},
+			"prop_subsection_stylebox_left": {
+				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
+				"raised_intensity": 0, "border_width": 0, "radius": "shape.secondary_radius",
+				"padding": Vector2i(4, 2)
+			},
+			"prop_subsection_stylebox_right": {
+				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
+				"raised_intensity": 0, "border_width": 0, "radius": "shape.secondary_radius",
+				"padding": Vector2i(4, 2)
+			},
+		},
+		"color": {
+			"prop_subsection": {"role": "editor_prop_subsection"},
+			"prop_subsection_stylebox_color": {"role": "editor_prop_subsection"},
+			"font_color": {"role": "text_default"},
+			"mono_color": {"role": "role_primary"},
+			"warning_color": {"role": "role_warning"},
+			"property_color_x": {"role": "editor_property_x"},
+			"property_color_y": {"role": "editor_property_y"},
+			"property_color_z": {"role": "editor_property_z"},
+			"property_color_w": {"role": "editor_property_w"},
+		},
+		"constant": {
+			"class_icon_size": {"value": 16},
+			"inspector_margin": {"value": 12},
 		},
 	},
 	# EditorHelp / EditorHelpBit rich text colors used inside CreateDialog descriptions.
@@ -1556,6 +1664,27 @@ const BINDING_TABLE: Dictionary = {
 			"font_offset": {"value": 8},
 		},
 	},
+	"EditorInspectorCategory": {
+		"stylebox": {
+			"bg": {"role": "surface_high", "border_role": "surface_high_edge",
+				   "raised_intensity": 0, "border_width": 0, "radius": 0,
+				   "content_margins": Vector4i(0, 6, 0, 6)},
+		},
+	},
+	"EditorInspectorSection": {
+		"stylebox": {
+			"indent_box": {"role": "role_primary", "alpha": 0.20,
+						   "raised_intensity": 0, "border_width": 0,
+						   "radius": 0, "padding": Vector2i(2, 0)},
+		},
+		"color": {
+			"font_color": {"role": "text_strong"},
+		},
+		"constant": {
+			"h_separation": {"value": 4},
+			"indent_size": {"value": 6},
+		},
+	},
 	"EditorSpinSlider": {
 		"stylebox": {
 			"label_bg": {"role": "button_normal", "border_role": "button_border",
@@ -1565,7 +1694,7 @@ const BINDING_TABLE: Dictionary = {
 						 "padding": Vector2i(8, 4)},
 		},
 		"color": {
-			"label_color":           {"role": "text_default"},
+			"label_color":           {"role": "role_primary"},
 			"read_only_label_color": {"role": "text_muted", "disabled": true},
 		},
 		"constant": {
@@ -1691,11 +1820,13 @@ const BINDING_TABLE: Dictionary = {
 	# 3. CheckBox — 4 icon slots (CheckBox alternates as RadioButton in Godot)
 	"CheckBox": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
+								"border_width": 0, "padding": Vector2i(4, 2)},
 			"hover":          {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 			"pressed":        {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 			"focus":          {"role": "focus_ring"},
-			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
+								"border_width": 0, "padding": Vector2i(4, 2)},
 			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 		},
 		"color": {
@@ -1705,6 +1836,8 @@ const BINDING_TABLE: Dictionary = {
 			"font_focus_color":        {"role": "text_strong"},
 			"font_disabled_color":     {"role": "text_strong", "disabled": true},
 			"font_hover_pressed_color":{"role": "text_strong"},
+			"checkbox_checked_color":  {"role": "role_primary"},
+			"checkbox_unchecked_color":{"role": "text_default"},
 		},
 		"constant": {
 			"h_separation": {"value": "tokens.tapPadding"},
@@ -1720,16 +1853,20 @@ const BINDING_TABLE: Dictionary = {
 			# font_disabled_color tints them through). No new artwork needed.
 			"checked_disabled":   {"icon": "checkbox_checked"},
 			"unchecked_disabled": {"icon": "checkbox_unchecked"},
+			"radio_checked_disabled":   {"icon": "radio_checked"},
+			"radio_unchecked_disabled": {"icon": "radio_unchecked"},
 		},
 	},
 	# 4. CheckButton — 2 icon slots (Cycle 6 F4 fix: `checked`/`unchecked`, not `on`/`off`)
 	"CheckButton": {
 		"stylebox": {
-			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
+								"border_width": 0, "padding": Vector2i(4, 2)},
 			"hover":          {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 			"pressed":        {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 			"focus":          {"role": "focus_ring"},
-			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
+			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
+								"border_width": 0, "padding": Vector2i(4, 2)},
 			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0, "border_width": 0},
 		},
 		"color": {
@@ -1739,6 +1876,8 @@ const BINDING_TABLE: Dictionary = {
 			"font_focus_color":        {"role": "text_strong"},
 			"font_disabled_color":     {"role": "text_strong", "disabled": true},
 			"font_hover_pressed_color":{"role": "text_strong"},
+			"button_checked_color":    {"role": "role_primary"},
+			"button_unchecked_color":  {"role": "text_default"},
 		},
 		"icon": {
 			"checked":            {"icon": "checkbutton_checked"},
@@ -1748,6 +1887,10 @@ const BINDING_TABLE: Dictionary = {
 			# to v1.x per Phase 4 CHANGELOG.
 			"checked_disabled":   {"icon": "checkbutton_checked"},
 			"unchecked_disabled": {"icon": "checkbutton_unchecked"},
+			"checked_mirrored":            {"icon": "checkbutton_checked"},
+			"unchecked_mirrored":          {"icon": "checkbutton_unchecked"},
+			"checked_disabled_mirrored":   {"icon": "checkbutton_checked"},
+			"unchecked_disabled_mirrored": {"icon": "checkbutton_unchecked"},
 		},
 	},
 	# 5. CodeEdit — inherits TextEdit; Phase 4 ships base stylebox set + Phase 5
@@ -1898,6 +2041,48 @@ const BINDING_TABLE: Dictionary = {
 					  "raised_face_edge": true,
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
+		},
+	},
+	"EditorSettingsDialog": {
+		"stylebox": {
+			"panel": {"role": "surface_base", "border_role": "surface_base",
+					  "raised_intensity": 0, "border_width": 0,
+					  "radius": "shape.secondary_radius", "padding": Vector2i(12, 10)},
+		},
+	},
+	"ProjectSettingsEditor": {
+		"stylebox": {
+			"panel": {"role": "surface_base", "border_role": "surface_base",
+					  "raised_intensity": 0, "border_width": 0,
+					  "radius": "shape.secondary_radius", "padding": Vector2i(12, 10)},
+		},
+	},
+	"ProjectExportDialog": {
+		"stylebox": {
+			"panel": {"role": "surface_base", "border_role": "surface_base",
+					  "raised_intensity": 0, "border_width": 0,
+					  "radius": "shape.secondary_radius", "padding": Vector2i(12, 10)},
+		},
+	},
+	"SceneImportSettingsDialog": {
+		"stylebox": {
+			"panel": {"role": "surface_base", "border_role": "surface_base",
+					  "raised_intensity": 0, "border_width": 0,
+					  "radius": "shape.secondary_radius", "padding": Vector2i(12, 10)},
+		},
+	},
+	"EditorAbout": {
+		"stylebox": {
+			"panel": {"role": "surface_base", "border_role": "surface_base",
+					  "raised_intensity": 0, "border_width": 0,
+					  "radius": "shape.secondary_radius", "padding": Vector2i(12, 10)},
+		},
+	},
+	"ThemeItemEditorDialog": {
+		"stylebox": {
+			"panel": {"role": "surface_base", "border_role": "surface_base",
+					  "raised_intensity": 0, "border_width": 0,
+					  "radius": "shape.secondary_radius", "padding": Vector2i(12, 10)},
 		},
 	},
 	# 9. FileDialog — official Godot 4.6.2 colors, thumbnail metric, and icon surface.
@@ -2649,6 +2834,105 @@ const BINDING_TABLE: Dictionary = {
 			"menu_highlight":      {"icon": "tab_menu"},
 		},
 	},
+	"TabContainerOdd": {
+		"stylebox": {
+			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
+									"raised_intensity": 0, "border_width": 0,
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 6)},
+			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
+									"raised_intensity": 0, "border_width": 0,
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
+			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
+									"raised_intensity": 0, "border_width": 0,
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
+			"tab_disabled":     {"role": "button_disabled", "disabled": true, "border_width": 0,
+									"raised_intensity": 0,
+									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
+									"padding": Vector2i(12, 5)},
+			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
+									"corner_profile": "tab_connected"},
+			"panel":            {"role": "surface_base", "border_role": "surface_base",
+								  "raised_intensity": 0, "border_width": 0},
+			"tabbar_background":{"role": "surface_base", "raised_intensity": 0,
+								  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
+		},
+		"color": {
+			"font_selected_color":   {"role": "text_strong"},
+			"font_unselected_color": {"role": "text_muted"},
+			"font_hovered_color":    {"role": "text_strong"},
+			"font_outline_color":    {"role": "outline_color"},
+			"font_disabled_color":   {"role": "text_muted", "disabled": true},
+			"icon_selected_color":   {"role": "text_strong"},
+			"icon_unselected_color": {"role": "text_muted"},
+			"icon_hovered_color":    {"role": "text_strong"},
+			"icon_disabled_color":   {"role": "text_muted", "disabled": true},
+			"drop_mark_color":       {"role": "role_primary"},
+		},
+		"constant": {
+			"icon_max_width":   {"value": 0},
+			"icon_separation":  {"value": 6},
+			"outline_size":     {"value": 0},
+			"side_margin":      {"value": 0},
+			"tab_separation":   {"value": 0},
+		},
+		"font_size": {
+			"font_size": {"value": "tokens.body"},
+		},
+		"icon": {
+			"increment":           {"icon": "tab_increment"},
+			"increment_highlight": {"icon": "tab_increment"},
+			"decrement":           {"icon": "tab_decrement"},
+			"decrement_highlight": {"icon": "tab_decrement"},
+			"drop_mark":           {"icon": "tab_drop_mark"},
+			"menu":                {"icon": "tab_menu"},
+			"menu_highlight":      {"icon": "tab_menu"},
+		},
+	},
+	"BottomPanel": {
+		"stylebox": {
+			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
+									"raised_intensity": 0, "border_width": 0,
+									"radius": "shape.tab_radius", "corner_profile": "bottom_only",
+									"padding": Vector2i(12, 6)},
+			"tab_unselected":   {"role": "surface_base", "border_role": "surface_base",
+									"raised_intensity": 0, "border_width": 0,
+									"radius": "shape.tab_radius", "corner_profile": "bottom_only",
+									"padding": Vector2i(12, 5)},
+			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
+									"raised_intensity": 0, "border_width": 0,
+									"radius": "shape.tab_radius", "corner_profile": "bottom_only",
+									"padding": Vector2i(12, 5)},
+			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
+									"corner_profile": "bottom_only"},
+			"panel":            {"role": "surface_panel", "border_role": "surface_panel_edge",
+								  "raised_intensity": "shape.raised_lifts.panel",
+								  "raised_face_edge": true, "content_margins": Vector4i(6, 5, 6, 5)},
+			"tabbar_background":{"role": "surface_base", "raised_intensity": 0,
+								  "border_width": 0, "radius": 0, "content_margins": Vector4i(4, 2, 4, 0)},
+		},
+		"color": {
+			"font_selected_color":   {"role": "text_strong"},
+			"font_unselected_color": {"role": "text_default"},
+			"font_hovered_color":    {"role": "text_strong"},
+			"icon_hover_color":      {"role": "text_strong"},
+			"icon_hover_pressed_color": {"role": "role_primary"},
+		},
+		"constant": {
+			"tab_separation": {"value": 0},
+			"side_margin": {"value": 0},
+			"outline_size": {"value": 0},
+		},
+	},
+	"EditorStyles": {
+		"stylebox": {
+			"BottomPanel": {"role": "surface_panel", "border_role": "surface_panel_edge",
+							"raised_intensity": "shape.raised_lifts.panel",
+							"raised_face_edge": true, "content_margins": Vector4i(6, 5, 6, 5)},
+		},
+	},
 	# 29a. Editor dock tab containers — FileSystem/Scene/Inspector docks are DockTabContainer
 	# subclasses, not authored scenes with themeable toolbar panels. Godot's FileSystemDock
 	# builds a VBoxContainer with HBoxContainer toolbar rows; those containers cannot draw a
@@ -2727,8 +3011,7 @@ const BINDING_TABLE: Dictionary = {
 	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
 	"Tree": {
 		"stylebox": {
-			"panel":                  {"role": "surface_low", "border_role": "surface_low",
-									   "raised_intensity": 0, "border_width": 0},
+			"panel":                  {"empty": true},
 			"focus":                  {"role": "focus_ring"},
 			"title_button_normal":    {"role": "button_normal", "border_role": "button_normal",
 										"raised_intensity": 0, "border_width": 0},
@@ -2798,7 +3081,7 @@ const BINDING_TABLE: Dictionary = {
 			"outline_size":              {"value": 0},
 			"parent_hl_line_margin":     {"value": 3},
 			"parent_hl_line_width":      {"value": 1},
-			"relationship_line_width":   {"value": 1},
+			"relationship_line_width":   {"value": 0},
 			"scroll_border":             {"value": 18},
 			"scroll_speed":              {"value": 12},
 			"scrollbar_h_separation":    {"value": 4},
@@ -2838,6 +3121,20 @@ const BINDING_TABLE: Dictionary = {
 									"raised_intensity": 0, "border_width": 0},
 			"title_button_pressed":{"role": "button_pressed", "border_role": "button_pressed",
 									"raised_intensity": 0, "border_width": 0},
+		},
+	},
+	"TreeTable": {
+		"stylebox": {
+			"panel": {"empty": true},
+			"title_button_normal": {"role": "surface_panel", "border_role": "surface_panel",
+									"raised_intensity": 0, "border_width": 0},
+			"title_button_hover":  {"role": "button_hover", "border_role": "button_hover",
+									"raised_intensity": 0, "border_width": 0},
+			"title_button_pressed":{"role": "button_pressed", "border_role": "button_pressed",
+									"raised_intensity": 0, "border_width": 0},
+		},
+		"color": {
+			"title_button_color": {"role": "text_strong"},
 		},
 	},
 	# 34. VScrollBar — mirror of HScrollBar with vertical directional icons.
@@ -3322,6 +3619,82 @@ const BINDING_TABLE: Dictionary = {
 			"icon_pressed_color":      {"role": "role_primary"},
 			"icon_focus_color":        {"role": "text_strong"},
 			"icon_disabled_color":     {"role": "text_default", "disabled": true},
+			"icon_hover_pressed_color":{"role": "role_primary"},
+		},
+		"constant": {
+			"h_separation": {"value": 4},
+		},
+	},
+	"BottomPanelButton": {
+		"stylebox": {
+			"normal":        {"role": "surface_panel", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(8, 5, 8, 5),
+								"alpha": 0.0, "border_width": 0},
+			"hover":         {"role": "button_hover", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(8, 5, 8, 5),
+								"border_width": 0},
+			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(8, 5, 8, 5),
+								"border_width": 0},
+			"focus":         {"role": "surface_panel", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(8, 5, 8, 5),
+								"alpha": 0.0, "border_width": 0},
+			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(8, 5, 8, 5),
+								"alpha": 0.0, "border_width": 0},
+			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
+								"radius": "shape.secondary_radius", "content_margins": Vector4i(8, 5, 8, 5),
+								"border_width": 0},
+		},
+		"color": {
+			"font_color":              {"role": "text_default"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "text_strong"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_default", "disabled": true},
+			"font_hover_pressed_color":{"role": "text_strong"},
+			"icon_normal_color":       {"role": "text_default"},
+			"icon_hover_color":        {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "role_primary"},
+			"icon_focus_color":        {"role": "text_strong"},
+			"icon_disabled_color":     {"role": "text_default", "disabled": true},
+			"icon_hover_pressed_color":{"role": "role_primary"},
+		},
+		"constant": {
+			"h_separation": {"value": 4},
+		},
+	},
+	"EditorLogFilterButton": {
+		"stylebox": {
+			"normal":        {"role": "button_normal", "border_role": "button_border",
+								"raised_intensity": 0, "border_width": 0,
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 5)},
+			"hover":         {"role": "button_hover", "border_role": "button_border_hover",
+								"raised_intensity": 0, "border_width": 0,
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 5)},
+			"pressed":       {"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0, "border_width": 0,
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 5)},
+			"focus":         {"role": "focus_ring", "radius": "shape.secondary_radius"},
+			"disabled":      {"role": "button_disabled", "disabled": true,
+								"raised_intensity": 0, "border_width": 0,
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 5)},
+			"hover_pressed":{"role": "button_pressed", "border_role": "button_border_pressed",
+								"raised_intensity": 0, "border_width": 0,
+								"radius": "shape.secondary_radius", "padding": Vector2i(8, 5)},
+		},
+		"color": {
+			"font_color":              {"role": "text_strong"},
+			"font_hover_color":        {"role": "text_strong"},
+			"font_pressed_color":      {"role": "role_primary"},
+			"font_focus_color":        {"role": "text_strong"},
+			"font_disabled_color":     {"role": "text_strong", "disabled": true},
+			"font_hover_pressed_color":{"role": "role_primary"},
+			"icon_normal_color":       {"role": "text_strong"},
+			"icon_hover_color":        {"role": "text_strong"},
+			"icon_pressed_color":      {"role": "role_primary"},
+			"icon_focus_color":        {"role": "text_strong"},
+			"icon_disabled_color":     {"role": "text_strong", "disabled": true},
 			"icon_hover_pressed_color":{"role": "role_primary"},
 		},
 		"constant": {

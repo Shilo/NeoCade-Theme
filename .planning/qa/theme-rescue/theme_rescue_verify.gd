@@ -66,6 +66,7 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_tab_top_only_corners(theme, label)
 	_expect_tab_state_chrome(theme, label)
 	_expect_editor_compact_chrome(theme, label)
+	_expect_editor_integration_chrome(theme, label)
 	_expect_editor_property_input_chrome(theme, label, expect_raised)
 	_expect_create_dialog_chrome(theme, label)
 	_expect_shared_interaction_chrome(theme, label)
@@ -278,9 +279,15 @@ func _expect_panel_surface_chrome(theme: Theme, label: String, expect_raised: bo
 		{"type": &"ItemList", "slot": &"panel", "raises": false},
 		{"type": &"Tree", "slot": &"panel", "raises": false},
 	]:
-		var panel := theme.get_stylebox(entry["slot"], entry["type"]) as StyleBoxFlat
-		if panel == null:
+		var panel_style := theme.get_stylebox(entry["slot"], entry["type"])
+		if panel_style == null:
 			_fail("%s missing panel stylebox %s.%s" % [label, entry["type"], entry["slot"]])
+			continue
+		if panel_style is StyleBoxEmpty:
+			continue
+		var panel := panel_style as StyleBoxFlat
+		if panel == null:
+			_fail("%s panel stylebox %s.%s should be StyleBoxFlat or StyleBoxEmpty" % [label, entry["type"], entry["slot"]])
 			continue
 		var edge_contrast := _contrast_ratio(panel.bg_color, panel.border_color)
 		if edge_contrast > (1.80 if expect_raised and bool(entry["raises"]) else 1.45):
@@ -685,10 +692,60 @@ func _expect_editor_property_input_chrome(theme: Theme, label: String, expect_ra
 
 	_expect_equal(theme.get_constant(&"line_edit_margin", &"EditorSpinSlider"), 28, "%s EditorSpinSlider.line_edit_margin" % label)
 	_expect_equal(theme.get_constant(&"line_edit_margin_empty", &"EditorSpinSlider"), 20, "%s EditorSpinSlider.line_edit_margin_empty" % label)
-	if not theme.get_color(&"label_color", &"EditorSpinSlider").is_equal_approx(theme.get_color(&"font_color", &"LineEdit")):
-		_fail("%s EditorSpinSlider.label_color should match LineEdit.font_color" % label)
+	if not theme.get_color(&"label_color", &"EditorSpinSlider").is_equal_approx(theme.get_color(&"drop_position_color", &"Tree")):
+		_fail("%s EditorSpinSlider.label_color should use the accent color so vector x/y/z labels stand out" % label)
 	_expect_icon_max(theme, &"EditorSpinSlider", &"updown", 24, label)
 	_expect_icon_max(theme, &"SpinBox", &"updown", 24, label)
+
+
+func _expect_editor_integration_chrome(theme: Theme, label: String) -> void:
+	for entry in [
+		{"variation": &"BottomPanel", "base": &"TabContainer"},
+		{"variation": &"BottomPanelButton", "base": &"FlatMenuButton"},
+		{"variation": &"EditorLogFilterButton", "base": &"Button"},
+		{"variation": &"TabContainerOdd", "base": &"TabContainer"},
+		{"variation": &"TreeTable", "base": &"Tree"},
+	]:
+		if theme.get_type_variation_base(entry["variation"]) != entry["base"]:
+			_fail("%s %s should inherit %s" % [label, entry["variation"], entry["base"]])
+
+	var accent := theme.get_color(&"drop_position_color", &"Tree")
+	for entry in [
+		{"type": &"CheckBox", "slot": &"checkbox_checked_color"},
+		{"type": &"CheckButton", "slot": &"button_checked_color"},
+		{"type": &"EditorLogFilterButton", "slot": &"icon_pressed_color"},
+	]:
+		if not theme.get_color(entry["slot"], entry["type"]).is_equal_approx(accent):
+			_fail("%s %s.%s should use accent when active/checked" % [label, entry["type"], entry["slot"]])
+
+	for icon_name in [&"FileBigThumb", &"FileDeadBigThumb", &"FolderBigThumb", &"FileMediumThumb", &"FileDeadMediumThumb", &"FolderMediumThumb"]:
+		var icon := theme.get_icon(icon_name, &"EditorIcons")
+		if icon.get_size().x < 64 or icon.get_size().y < 64:
+			_fail("%s EditorIcons.%s should be large enough for crisp file thumbnails, got %s" % [label, icon_name, icon.get_size()])
+	for icon_slot in [&"file_thumbnail", &"folder_thumbnail"]:
+		var icon := theme.get_icon(icon_slot, &"FileDialog")
+		if icon.get_size().x < 64 or icon.get_size().y < 64:
+			_fail("%s FileDialog.%s should be large enough for thumbnail mode, got %s" % [label, icon_slot, icon.get_size()])
+
+	var subsection_style := theme.get_stylebox(&"prop_subsection_stylebox", &"Editor") as StyleBoxFlat
+	if subsection_style == null:
+		_fail("%s Editor.prop_subsection_stylebox missing for Signals/inspector headers" % label)
+	elif _max_border_width(subsection_style) != 0:
+		_fail("%s Editor.prop_subsection_stylebox should not draw separator borders" % label)
+	var category_bg := theme.get_stylebox(&"bg", &"EditorInspectorCategory") as StyleBoxFlat
+	if category_bg == null:
+		_fail("%s EditorInspectorCategory.bg missing" % label)
+	elif category_bg.bg_color.is_equal_approx(theme.get_color(&"prop_subsection", &"Editor")):
+		_fail("%s EditorInspectorCategory.bg should be distinct from subsection headers" % label)
+
+	var bottom_tab := theme.get_stylebox(&"tab_selected", &"BottomPanel") as StyleBoxFlat
+	var odd_tab := theme.get_stylebox(&"tab_selected", &"TabContainerOdd") as StyleBoxFlat
+	if bottom_tab == null:
+		_fail("%s BottomPanel.tab_selected missing" % label)
+	elif _max_border_width(bottom_tab) != 0:
+		_fail("%s BottomPanel.tab_selected should not draw an outline" % label)
+	if odd_tab == null:
+		_fail("%s TabContainerOdd.tab_selected missing for Editor Settings tabs" % label)
 
 
 func _expect_create_dialog_chrome(theme: Theme, label: String) -> void:
@@ -716,16 +773,14 @@ func _expect_create_dialog_chrome(theme: Theme, label: String) -> void:
 				neocade.base_color.to_html(false),
 			])
 
-	var tree_panel := theme.get_stylebox(&"panel", &"Tree") as StyleBoxFlat
+	var tree_panel := theme.get_stylebox(&"panel", &"Tree")
 	var tree_secondary_panel := theme.get_stylebox(&"panel", &"TreeSecondary") as StyleBoxFlat
 	if tree_panel == null or tree_secondary_panel == null:
 		_fail("%s missing Tree/TreeSecondary panel for CreateDialog tree comparison" % label)
-	elif not tree_secondary_panel.bg_color.is_equal_approx(tree_panel.bg_color):
-		_fail("%s TreeSecondary.panel should match Tree.panel bg: secondary=%s tree=%s" % [
-			label,
-			tree_secondary_panel.bg_color.to_html(false),
-			tree_panel.bg_color.to_html(false),
-		])
+	elif tree_panel is StyleBoxFlat and not tree_secondary_panel.bg_color.is_equal_approx((tree_panel as StyleBoxFlat).bg_color):
+		_fail("%s TreeSecondary.panel should match Tree.panel bg when Tree.panel draws a bg" % label)
+	elif tree_panel is StyleBoxEmpty and tree_secondary_panel.bg_color.a < 0.99:
+		_fail("%s TreeSecondary.panel should draw the explicit list surface now that Tree.panel is empty for resource pickers" % label)
 
 	var item_panel := theme.get_stylebox(&"panel", &"ItemList") as StyleBoxFlat
 	var item_secondary_panel := theme.get_stylebox(&"panel", &"ItemListSecondary") as StyleBoxFlat
@@ -840,23 +895,23 @@ func _expect_tree_view_chrome(theme: Theme, label: String) -> void:
 	if theme.get_color(&"guide_color", &"Tree").a > 0.01:
 		_fail("%s Tree.guide_color should stay transparent; row guide/separator lines remain hidden" % label)
 	_expect_equal(theme.get_constant(&"draw_relationship_lines", &"Tree"), 1, "%s Tree.draw_relationship_lines" % label)
-	for constant_name in [&"relationship_line_width", &"parent_hl_line_width", &"children_hl_line_width"]:
+	_expect_equal(theme.get_constant(&"relationship_line_width", &"Tree"), 0, "%s Tree.relationship_line_width for selected-only mode" % label)
+	for constant_name in [&"parent_hl_line_width", &"children_hl_line_width"]:
 		if theme.get_constant(constant_name, "Tree") < 1:
-			_fail("%s Tree.%s should be at least 1 so parent-child nesting paths are visible" % [label, constant_name])
+			_fail("%s Tree.%s should be at least 1 so selected parent-child nesting paths are visible" % [label, constant_name])
 	_expect_equal(theme.get_constant(&"parent_hl_line_margin", &"Tree"), 3, "%s Tree.parent_hl_line_margin" % label)
 
 	var relationship_line := theme.get_color(&"relationship_line_color", &"Tree")
 	var parent_line := theme.get_color(&"parent_hl_line_color", &"Tree")
 	var children_line := theme.get_color(&"children_hl_line_color", &"Tree")
-	if relationship_line.a < 0.12 or relationship_line.a > 0.45:
-		_fail("%s Tree.relationship_line_color should be a subtle visible nesting line, alpha=%.2f" % [label, relationship_line.a])
+	if relationship_line.a < 0.08 or relationship_line.a > 0.30:
+		_fail("%s Tree.relationship_line_color should follow editor relationship_line_opacity, alpha=%.2f" % [label, relationship_line.a])
 	if parent_line.a <= relationship_line.a:
 		_fail("%s Tree.parent_hl_line_color should be stronger than relationship_line_color for the selected branch" % label)
 	if children_line.a < relationship_line.a:
 		_fail("%s Tree.children_hl_line_color should be at least as visible as normal relationship lines" % label)
 
 	for slot_name in [
-		&"panel",
 		&"title_button_normal",
 		&"title_button_hover",
 		&"title_button_pressed",

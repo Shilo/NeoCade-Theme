@@ -49,12 +49,14 @@ func _check_theme(theme: NeoCadeTheme, label: String) -> void:
 				theme.base_color.to_html(false),
 			])
 
-	var tree_panel := theme.get_stylebox(&"panel", &"Tree") as StyleBoxFlat
+	var tree_panel := theme.get_stylebox(&"panel", &"Tree")
 	var tree_secondary_panel := theme.get_stylebox(&"panel", &"TreeSecondary") as StyleBoxFlat
 	if tree_panel == null or tree_secondary_panel == null:
 		_fail("%s missing Tree/TreeSecondary panel" % label)
-	elif not tree_panel.bg_color.is_equal_approx(tree_secondary_panel.bg_color):
-		_fail("%s TreeSecondary.panel should match Tree.panel" % label)
+	elif tree_panel is StyleBoxFlat and not (tree_panel as StyleBoxFlat).bg_color.is_equal_approx(tree_secondary_panel.bg_color):
+		_fail("%s TreeSecondary.panel should match Tree.panel when Tree.panel draws a bg" % label)
+	elif tree_panel is StyleBoxEmpty and tree_secondary_panel.bg_color.a < 0.99:
+		_fail("%s TreeSecondary.panel should draw a contextual surface when Tree.panel is empty" % label)
 
 	var item_panel := theme.get_stylebox(&"panel", &"ItemList") as StyleBoxFlat
 	var item_secondary_panel := theme.get_stylebox(&"panel", &"ItemListSecondary") as StyleBoxFlat
