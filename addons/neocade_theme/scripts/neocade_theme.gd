@@ -1612,17 +1612,17 @@ const BINDING_TABLE: Dictionary = {
 			"prop_subsection_stylebox": {
 				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
 				"raised_intensity": 0, "border_width": 0,
-				"radius": "shape.secondary_radius", "padding": Vector2i(5, 2)
+				"radius": "shape.secondary_radius", "padding": Vector2i(6, 2)
 			},
 			"prop_subsection_stylebox_left": {
 				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
 				"raised_intensity": 0, "border_width": 0,
-				"radius": "shape.secondary_radius", "padding": Vector2i(5, 2)
+				"radius": "shape.secondary_radius", "padding": Vector2i(6, 2)
 			},
 			"prop_subsection_stylebox_right": {
 				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
 				"raised_intensity": 0, "border_width": 0,
-				"radius": "shape.secondary_radius", "padding": Vector2i(5, 2)
+				"radius": "shape.secondary_radius", "padding": Vector2i(6, 2)
 			},
 		},
 		"color": {
@@ -3231,9 +3231,7 @@ const BINDING_TABLE: Dictionary = {
 			"BottomPanel": {"role": "surface_panel", "border_role": "surface_panel_edge",
 							"raised_intensity": "shape.raised_lifts.panel",
 							"raised_face_edge": true, "content_margins": Vector4i(6, 5, 6, 5)},
-			"FocusViewport": {"role": "surface_base", "border_role": "role_primary",
-							  "raised_intensity": 0, "border_width": 1,
-							  "radius": "shape.secondary_radius"},
+			"FocusViewport": {"role": "focus_ring", "radius": 0},
 			"ObjectDBContentWrapper": {"role": "surface_low", "border_role": "surface_low_edge",
 									   "raised_intensity": 0, "border_width": 0,
 									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 6)},
@@ -3426,11 +3424,14 @@ const BINDING_TABLE: Dictionary = {
 			"panel":               {"role": "surface_panel", "border_role": "surface_panel_edge",
 									"raised_intensity": 0, "border_width": 1},
 			"title_button_normal": {"role": "surface_panel", "border_role": "surface_panel",
-									"raised_intensity": 0, "border_width": 0},
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
+									"border_alpha": 0.0},
 			"title_button_hover":  {"role": "button_hover", "border_role": "button_hover",
-									"raised_intensity": 0, "border_width": 0},
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
+									"border_alpha": 0.0},
 			"title_button_pressed":{"role": "button_pressed", "border_role": "button_pressed",
-									"raised_intensity": 0, "border_width": 0},
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
+									"border_alpha": 0.0},
 		},
 	},
 	"TreeTable": {
@@ -3438,11 +3439,14 @@ const BINDING_TABLE: Dictionary = {
 			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
 					  "raised_intensity": 0, "border_width": 1},
 			"title_button_normal": {"role": "surface_panel", "border_role": "surface_panel",
-									"raised_intensity": 0, "border_width": 0},
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
+									"border_alpha": 0.0},
 			"title_button_hover":  {"role": "button_hover", "border_role": "button_hover",
-									"raised_intensity": 0, "border_width": 0},
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
+									"border_alpha": 0.0},
 			"title_button_pressed":{"role": "button_pressed", "border_role": "button_pressed",
-									"raised_intensity": 0, "border_width": 0},
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
+									"border_alpha": 0.0},
 		},
 		"color": {
 			"title_button_color": {"role": "text_strong"},

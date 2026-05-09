@@ -53,6 +53,12 @@ Recovery order:
 
 Session pattern to remember: `DockTabContainer.panel` did not visibly fix Inspector toolbar spacing; `EditorDock.margin_*` affected the dock content; `NoBorderHorizontalBottom.margin_top` controlled the remaining bottom gap.
 
+## Regression Avoidance
+
+- Do not turn overlay/focus styleboxes into normal filled panels. `EditorStyles.FocusViewport` is drawn directly over the 2D/3D viewport; it must be transparent center / outline-only (`draw_center=false` in Godot source terms, or NeoCade's `focus_ring` recipe). A filled background here hides the entire viewport on hover/focus.
+- Do not fix one plain dialog by broadening base `Tree.panel` without checking every source path that also uses it. `EditorResourcePicker` draws its inspector fields from `Tree.panel`, and `TreeSecondary` / `TreeTable` inherit from `Tree`; a base Tree surface change can regress Scene, Signals, Groups, resource pickers, dependency dialogs, and settings tables.
+- When a subsection/header row should reveal the parent list edge on the left/right, first check existing probes before copying Godot's transparent side-border trick. NeoCade's current guard for `Editor.prop_subsection_stylebox` expects padding, not painted side rails; use transparent side reservations only for Tree title buttons or other slots that are not covered by that guard.
+
 ## Verification Standard
 
 Use scripts and logs as the main proof. Existing useful commands:
@@ -66,6 +72,7 @@ Use scripts and logs as the main proof. Existing useful commands:
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_tab_state_probe.gd
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_popup_scrollbar_probe.gd
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_create_dialog_probe.gd
+& 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --path . --script .planning/qa/theme-rescue/theme_editor_regression_probe.gd
 & 'C:\Programming_Files\Godot\Godot_v4.6.2-stable_win64.exe\Godot_v4.6.2-stable_win64.exe' --headless --editor --path . --script .planning/qa/theme-rescue/theme_editor_merge_leak_probe.gd
 git diff --check
 ```
