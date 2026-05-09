@@ -308,6 +308,8 @@ func _regenerate_theme() -> void:
 	var role_info_offset: Color = _raised_depth_color(role_info, base_color)
 	var text_on_primary: Color = _readable_text_color(role_primary)
 	var text_on_accent_offset: Color = _readable_text_color(accent_offset)
+	var progress_text_color: Color = text_strong
+	var progress_text_outline: Color = surface_low
 	var text_on_danger: Color = Color("#151922")
 	var text_on_success: Color = _readable_text_color(role_success)
 	var text_on_warning: Color = _readable_text_color(role_warning)
@@ -531,6 +533,8 @@ func _regenerate_theme() -> void:
 		"text_on_primary":        text_on_primary,
 		"text_on_primary_button": text_on_primary_button,
 		"text_on_accent_offset":  text_on_accent_offset,
+		"progress_text_color":    progress_text_color,
+		"progress_text_outline":  progress_text_outline,
 		"text_on_danger":         text_on_danger,
 		"text_on_success":        text_on_success,
 		"text_on_warning":        text_on_warning,
@@ -1459,9 +1463,9 @@ const BINDING_TABLE: Dictionary = {
 	# 1. AcceptDialog — explicit popup shell plus official button-container spacing.
 	"AcceptDialog": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay",
-					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-					  "border_role": "surface_overlay_edge", "raised_face_edge": true,
+			"panel": {"role": "button_normal", "border_role": "button_border",
+					  "offset_role": "button_normal_offset", "radius": "shape.secondary_radius",
+					  "raised_face_edge": true,
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
 		},
@@ -1704,9 +1708,9 @@ const BINDING_TABLE: Dictionary = {
 	# own slots in the local probe; runtime inheritance still reads this shell cleanly.
 	"ConfirmationDialog": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay",
-					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-					  "border_role": "surface_overlay_edge", "raised_face_edge": true,
+			"panel": {"role": "button_normal", "border_role": "button_border",
+					  "offset_role": "button_normal_offset", "radius": "shape.secondary_radius",
+					  "raised_face_edge": true,
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
 		},
@@ -1867,14 +1871,14 @@ const BINDING_TABLE: Dictionary = {
 	"HScrollBar": {
 		"stylebox": {
 			"scroll":            {"role": "surface_low",   "raised_intensity": 0,
-								  "border_width": 0, "radius": 999, "padding": Vector2i(0, 4)},
+								  "border_width": 0, "radius": "shape.secondary_radius", "padding": Vector2i(0, 4)},
 			"scroll_focus":      {"role": "focus_ring"},
 			"grabber":           {"role": "button_border", "raised_intensity": 0,
-								  "border_width": 0, "radius": 999, "padding": Vector2i(4, 4)},
+								  "border_width": 0, "radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
 			"grabber_highlight": {"role": "button_hover",   "raised_intensity": 0,
-								  "radius": 999, "padding": Vector2i(4, 4), "border_width": 0},
+								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "border_width": 0},
 			"grabber_pressed":   {"role": "button_pressed", "raised_intensity": 0,
-								  "radius": 999, "padding": Vector2i(4, 4), "border_width": 0},
+								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "border_width": 0},
 		},
 		"constant": {
 			"padding_top":    {"value": 0},
@@ -2153,10 +2157,11 @@ const BINDING_TABLE: Dictionary = {
 	# 23. PopupMenu — dense menu rows, structural separators, full icon coverage.
 	"PopupMenu": {
 		"stylebox": {
-			"panel":                 {"role": "surface_overlay", "border_role": "surface_overlay_edge",
+			"panel":                 {"role": "button_normal", "border_role": "button_border",
+									  "offset_role": "button_normal_offset",
 									  "raised_intensity": "shape.raised_lifts.dialog",
-									  "radius": 3, "alpha": "shape.surface_alpha_popup",
-									  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(4, 4)},
+									  "radius": "shape.secondary_radius",
+									  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(0, 0)},
 			"hover":                 {"role": "button_hover",   "raised_intensity": 0,
 									  "radius": "shape.secondary_radius", "border_width": 0},
 			"separator":             {"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
@@ -2202,10 +2207,11 @@ const BINDING_TABLE: Dictionary = {
 	# 24. PopupPanel — first-class popup Window-boundary shell.
 	"PopupPanel": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay", "border_role": "surface_overlay_edge",
+			"panel": {"role": "button_normal", "border_role": "button_border",
+					  "offset_role": "button_normal_offset",
 					  "raised_intensity": "shape.raised_lifts.dialog",
-					  "radius": "shape.card_radius", "alpha": "shape.surface_alpha_popup",
-					  "raised_face_edge": true, "padding": Vector2i(12, 10)},
+					  "radius": "shape.secondary_radius",
+					  "raised_face_edge": true, "padding": Vector2i(0, 0)},
 		},
 	},
 	# 25. ProgressBar — 2 styleboxes
@@ -2215,11 +2221,11 @@ const BINDING_TABLE: Dictionary = {
 			"fill":       {"role": "role_primary", "raised_intensity": 0, "padding": Vector2i(0, 0)},
 		},
 		"color": {
-			"font_color":         {"role": "text_strong"},
-			"font_outline_color": {"role": "outline_color"},
+			"font_color":         {"role": "progress_text_color"},
+			"font_outline_color": {"role": "progress_text_outline"},
 		},
 		"constant": {
-			"outline_size": {"value": 0},
+			"outline_size": {"value": 4},
 		},
 		"font_size": {
 			"font_size": {"value": "tokens.body"},
@@ -2412,10 +2418,11 @@ const BINDING_TABLE: Dictionary = {
 	# 32. TooltipPanel — compact first-class tooltip structure.
 	"TooltipPanel": {
 		"stylebox": {
-			"panel": {"role": "surface_overlay", "border_role": "surface_overlay_edge",
+			"panel": {"role": "button_normal", "border_role": "button_border",
+					  "offset_role": "button_normal_offset",
 					  "raised_intensity": "shape.raised_lifts.dialog",
-					  "radius": 3, "alpha": "shape.surface_alpha_popup",
-					  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(8, 2)},
+					  "radius": "shape.secondary_radius",
+					  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(4, 2)},
 		},
 	},
 	# 33. Tree — official Godot 4.6.2 styleboxes per CANONICAL_SLOT_NAMES.
@@ -2520,14 +2527,14 @@ const BINDING_TABLE: Dictionary = {
 	"VScrollBar": {
 		"stylebox": {
 			"scroll":            {"role": "surface_low",   "raised_intensity": 0,
-								  "border_width": 0, "radius": 999, "padding": Vector2i(4, 0)},
+								  "border_width": 0, "radius": "shape.secondary_radius", "padding": Vector2i(4, 0)},
 			"scroll_focus":      {"role": "focus_ring"},
 			"grabber":           {"role": "button_border", "raised_intensity": 0,
-								  "border_width": 0, "radius": 999, "padding": Vector2i(4, 4)},
+								  "border_width": 0, "radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
 			"grabber_highlight": {"role": "button_hover",   "raised_intensity": 0,
-								  "radius": 999, "padding": Vector2i(4, 4), "border_width": 0},
+								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "border_width": 0},
 			"grabber_pressed":   {"role": "button_pressed", "raised_intensity": 0,
-								  "radius": 999, "padding": Vector2i(4, 4), "border_width": 0},
+								  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "border_width": 0},
 		},
 		"constant": {
 			"padding_left":  {"value": 0},
@@ -2627,18 +2634,20 @@ const BINDING_TABLE: Dictionary = {
 	# 37. Window — embedded chrome complete, quiet, and popup-boundary safe.
 	"Window": {
 		"stylebox": {
-			"embedded_border":          {"role": "surface_panel", "border_role": "surface_panel_edge",
+			"embedded_border":          {"role": "button_normal", "border_role": "button_border",
+										 "offset_role": "button_normal_offset",
 										 "raised_intensity": "shape.raised_lifts.dialog",
-										 "radius": 3, "alpha": "shape.surface_alpha_popup",
+										 "radius": "shape.secondary_radius",
 										 "border_width": 1, "raised_face_edge": true,
-										 "content_margins": Vector4i(10, 28, 10, 8),
-										 "expand_margins": Vector4i(8, 32, 8, 6)},
-			"embedded_unfocused_border":{"role": "surface_panel", "border_role": "surface_panel_edge",
+										 "content_margins": Vector4i(1, 28, 1, 1),
+										 "expand_margins": Vector4i(1, 32, 1, 1)},
+			"embedded_unfocused_border":{"role": "button_normal", "border_role": "button_border",
+										 "offset_role": "button_normal_offset",
 										 "raised_intensity": "shape.raised_lifts.dialog",
-										 "radius": 3, "alpha": "shape.surface_alpha_popup",
+										 "radius": "shape.secondary_radius",
 										 "border_width": 1, "raised_face_edge": true,
-										 "content_margins": Vector4i(10, 28, 10, 8),
-										 "expand_margins": Vector4i(8, 32, 8, 6)},
+										 "content_margins": Vector4i(1, 28, 1, 1),
+										 "expand_margins": Vector4i(1, 32, 1, 1)},
 		},
 		"color": {
 			"title_color":            {"role": "text_strong"},

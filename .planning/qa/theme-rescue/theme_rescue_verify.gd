@@ -69,6 +69,7 @@ func _check_theme(theme: NeoCadeTheme, label: String, expect_raised: bool) -> vo
 	_expect_colored_button_raised_chrome(theme, label, expect_raised)
 	_expect_ghost_button_raised_chrome(theme, label, expect_raised)
 	_expect_input_surface_chrome(theme, label)
+	_expect_progress_bar_text_chrome(theme, label)
 
 	_expect_contrast(theme, "PrimaryButton", "normal", "font_color", MIN_TEXT_CONTRAST, label)
 	_expect_contrast(theme, "DangerButton", "normal", "font_color", MIN_TEXT_CONTRAST, label)
@@ -122,11 +123,38 @@ func _expect_icon_between(theme: Theme, theme_type: StringName, slot_name: Strin
 
 func _expect_window_chrome(theme: Theme, label: String, expect_raised: bool) -> void:
 	var window_panel := theme.get_stylebox("embedded_border", "Window") as StyleBoxFlat
+	var button_panel := theme.get_stylebox("normal", "Button") as StyleBoxFlat
 	if window_panel == null:
 		_fail("%s missing Window.embedded_border" % label)
 		return
+	if button_panel == null:
+		_fail("%s missing Button.normal for Window chrome comparison" % label)
+		return
 	if window_panel.expand_margin_top < 30 or window_panel.content_margin_top < 26:
 		_fail("%s Window.embedded_border does not cover title bar/content margin: expand_top=%s content_top=%s" % [label, window_panel.expand_margin_top, window_panel.content_margin_top])
+	if window_panel.expand_margin_left > 2 or window_panel.expand_margin_right > 2 or window_panel.expand_margin_bottom > 4:
+		_fail("%s Window.embedded_border frame is too wide: expand=%s/%s/%s/%s" % [
+			label,
+			window_panel.expand_margin_left,
+			window_panel.expand_margin_top,
+			window_panel.expand_margin_right,
+			window_panel.expand_margin_bottom,
+		])
+	var window_bottom_allowance: int = 4 + maxi(0, window_panel.border_width_bottom - window_panel.border_width_top)
+	if window_panel.content_margin_left > 2 or window_panel.content_margin_right > 2 or window_panel.content_margin_bottom > window_bottom_allowance:
+		_fail("%s Window.embedded_border content frame is too wide: margin=%s/%s/%s/%s" % [
+			label,
+			window_panel.content_margin_left,
+			window_panel.content_margin_top,
+			window_panel.content_margin_right,
+			window_panel.content_margin_bottom,
+		])
+	if not window_panel.bg_color.is_equal_approx(button_panel.bg_color):
+		_fail("%s Window.embedded_border should use Button.normal face color: window=%s button=%s" % [
+			label,
+			window_panel.bg_color.to_html(false),
+			button_panel.bg_color.to_html(false),
+		])
 	if not expect_raised and _max_border_width(window_panel) != 1:
 		_fail("%s Window.embedded_border flat border should be 1px, got %s/%s/%s/%s" % [
 			label,
@@ -151,16 +179,20 @@ func _expect_window_chrome(theme: Theme, label: String, expect_raised: bool) -> 
 
 
 func _expect_popup_chrome(theme: Theme, label: String, expect_raised: bool) -> void:
-	var max_popup_margin := 18 if label.begins_with("mobile:") else 12
+	var button_panel := theme.get_stylebox("normal", "Button") as StyleBoxFlat
+	if button_panel == null:
+		_fail("%s missing Button.normal for popup chrome comparison" % label)
+		return
 	for entry in [
-		{"type": &"PopupMenu", "slot": &"panel"},
-		{"type": &"PopupPanel", "slot": &"panel"},
-		{"type": &"TooltipPanel", "slot": &"panel"},
+		{"type": &"PopupMenu", "slot": &"panel", "max_margin": 2},
+		{"type": &"PopupPanel", "slot": &"panel", "max_margin": 2},
+		{"type": &"TooltipPanel", "slot": &"panel", "max_margin": 8},
 	]:
 		var popup_panel := theme.get_stylebox(entry["slot"], entry["type"]) as StyleBoxFlat
 		if popup_panel == null:
 			_fail("%s missing %s.%s" % [label, entry["type"], entry["slot"]])
 			continue
+		var max_popup_margin := int(entry["max_margin"])
 		if popup_panel.content_margin_left > max_popup_margin or popup_panel.content_margin_top > max_popup_margin:
 			_fail("%s %s.%s popup margins too large: %s/%s/%s/%s" % [
 				label,
@@ -170,6 +202,14 @@ func _expect_popup_chrome(theme: Theme, label: String, expect_raised: bool) -> v
 				popup_panel.content_margin_top,
 				popup_panel.content_margin_right,
 				popup_panel.content_margin_bottom,
+			])
+		if not popup_panel.bg_color.is_equal_approx(button_panel.bg_color):
+			_fail("%s %s.%s should use Button.normal face color: popup=%s button=%s" % [
+				label,
+				entry["type"],
+				entry["slot"],
+				popup_panel.bg_color.to_html(false),
+				button_panel.bg_color.to_html(false),
 			])
 		if not expect_raised and _max_border_width(popup_panel) != 1:
 			_fail("%s %s.%s flat popup border should be 1px, got %s/%s/%s/%s" % [
@@ -237,6 +277,7 @@ func _expect_panel_surface_chrome(theme: Theme, label: String, expect_raised: bo
 
 
 func _expect_scrollbar_chrome(theme: Theme, label: String) -> void:
+	var expect_square := label.ends_with(":Pulse")
 	for theme_type in [&"HScrollBar", &"VScrollBar"]:
 		for slot_name in [&"decrement", &"decrement_highlight", &"decrement_pressed", &"increment", &"increment_highlight", &"increment_pressed"]:
 			_expect_icon_max(theme, theme_type, slot_name, 1, label)
@@ -257,6 +298,17 @@ func _expect_scrollbar_chrome(theme: Theme, label: String) -> void:
 				_fail("%s VScrollBar track/grabber too thin: track=%s grabber=%s" % [label, min_size, grabber_min_size])
 		if _max_border_width(grabber) != 0 or _max_border_width(hover) != 0 or _max_border_width(pressed) != 0:
 			_fail("%s %s grabbers should be filled pills without outline borders" % [label, theme_type])
+		if expect_square:
+			for stylebox in [scroll, grabber, hover, pressed]:
+				if stylebox.corner_radius_top_left != 0 or stylebox.corner_radius_top_right != 0 or stylebox.corner_radius_bottom_left != 0 or stylebox.corner_radius_bottom_right != 0:
+					_fail("%s %s should be square in Pulse, got radius %s/%s/%s/%s" % [
+						label,
+						theme_type,
+						stylebox.corner_radius_top_left,
+						stylebox.corner_radius_top_right,
+						stylebox.corner_radius_bottom_right,
+						stylebox.corner_radius_bottom_left,
+					])
 
 
 func _expect_no_label_chrome(theme: Theme, label: String) -> void:
@@ -518,6 +570,41 @@ func _expect_input_surface_chrome(theme: NeoCadeTheme, label: String) -> void:
 			])
 		if _max_border_width(read_only) != 0:
 			_fail("%s %s.read_only should not keep an outline border" % [label, theme_type])
+
+
+func _expect_progress_bar_text_chrome(theme: Theme, label: String) -> void:
+	var background := theme.get_stylebox("background", "ProgressBar") as StyleBoxFlat
+	var fill := theme.get_stylebox("fill", "ProgressBar") as StyleBoxFlat
+	if background == null or fill == null:
+		_fail("%s missing ProgressBar background/fill styleboxes" % label)
+		return
+	var font_color := theme.get_color("font_color", "ProgressBar")
+	var outline_color := theme.get_color("font_outline_color", "ProgressBar")
+	var outline_size := theme.get_constant("outline_size", "ProgressBar")
+	var track_text_contrast := _contrast_ratio(background.bg_color, font_color)
+	var fill_outline_contrast := _contrast_ratio(fill.bg_color, outline_color)
+	if track_text_contrast < MIN_TEXT_CONTRAST:
+		_fail("%s ProgressBar.font_color does not contrast with empty track: ratio=%.2f track=%s font=%s" % [
+			label,
+			track_text_contrast,
+			background.bg_color.to_html(false),
+			font_color.to_html(false),
+		])
+	if not outline_color.is_equal_approx(background.bg_color):
+		_fail("%s ProgressBar.font_outline_color should match the track background: track=%s outline=%s" % [
+			label,
+			background.bg_color.to_html(false),
+			outline_color.to_html(false),
+		])
+	if fill_outline_contrast < MIN_TEXT_CONTRAST:
+		_fail("%s ProgressBar.font_outline_color does not contrast with full fill: ratio=%.2f fill=%s outline=%s" % [
+			label,
+			fill_outline_contrast,
+			fill.bg_color.to_html(false),
+			outline_color.to_html(false),
+		])
+	if outline_size < 2:
+		_fail("%s ProgressBar.outline_size should be at least 2 for mixed fill/track text readability, got %s" % [label, outline_size])
 
 
 func _expect_reserved_bottom_depth(stylebox: StyleBoxFlat, label: String, theme_type: String) -> void:

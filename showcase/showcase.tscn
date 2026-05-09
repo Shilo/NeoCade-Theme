@@ -513,7 +513,7 @@ value = 125.0
 [node name="ProgressBar" type="ProgressBar" parent="RootMargin/RootStack/ShowcaseTabs/Numbers & Range/Margin/Grid" unique_id=1473654398]
 custom_minimum_size = Vector2(300, 36)
 layout_mode = 2
-value = 36.97
+value = 58.26
 
 [node name="HSlider" type="HSlider" parent="RootMargin/RootStack/ShowcaseTabs/Numbers & Range/Margin/Grid" unique_id=874508467]
 custom_minimum_size = Vector2(300, 36)
