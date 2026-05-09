@@ -20,7 +20,7 @@ rg -n "CreateDialog|TreeSecondary|ItemListSecondary|split_bar_background|HSplitC
 rg -n "EditorProperty|EditorInspectorButton|EditorSpinSlider|set_flat\(true\)" C:\Programming_Files\Godot\godot-master\editor\inspector C:\Programming_Files\Godot\godot-master\editor\gui C:\Programming_Files\Godot\godot-master\editor\settings
 rg -n "BottomPanel|BottomPanelButton|EditorLogFilterButton|TabContainerOdd|prop_subsection|draw_relationship_lines|relationship_line_opacity" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
 rg -n "FileBigThumb|FolderBigThumb|file_thumbnail|folder_thumbnail|checkbox_checked_color|button_checked_color|EditorResourcePicker" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
-rg -n "EditorLog|RichTextLabel|ControlPositioningWarning|bg_group_note|ColorPresetButton|sample_bg|preset_bg|grabber_highlight|text_editor/theme/highlighting" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
+rg -n "EditorLog|RichTextLabel|ControlPositioningWarning|bg_group_note|ColorPresetButton|sample_bg|preset_bg|grabber_highlight|text_editor/theme/highlighting|Files have been modified outside Godot" C:\Programming_Files\Godot\godot-master\editor C:\Programming_Files\Godot\godot-master\scene
 ```
 
 Then compare reference theme behavior:
@@ -69,6 +69,14 @@ rg -n "BottomPanelButton|EditorLogFilterButton|TabContainerOdd|EditorInspectorCa
   - Output filter/count buttons use `EditorLogFilterButton`.
   - The Output log body itself is a plain `RichTextLabel` owned by `EditorLog`; identify it before changing any `RichTextLabel`/bottom-panel surface.
   - Godot Modern/Minimal make global `RichTextLabel.normal` opaque, which is why default Output has an inner background. NeoCade keeps base `RichTextLabel` text-only; without a custom type variation in Godot source or an editor plugin, the theme-only safe target is the bottom-panel parent shell.
+  - If editor-only RichTextLabel panels are acceptable, gate the global `RichTextLabel.normal` override behind editor runtime checks so runtime/game RichTextLabels remain text-only.
+
+- Modified/external files dialogs:
+  - Source: `editor/editor_node.cpp` and `editor/script/script_editor_plugin.cpp`
+  - Title text: "Files have been modified outside Godot"
+  - The file list is a plain `Tree`, not an `ItemList` and not a custom dialog-specific variation.
+  - Useful hooks: base `Tree.panel`, Tree selected/hovered styleboxes, and dialog shell `ConfirmationDialog.panel`.
+  - If plain editor dialogs blend into their parent, verify whether a previously-empty base `Tree.panel` is the cause before changing window/dialog chrome.
 
 - Create New Node dialog:
   - Source: `editor/gui/create_dialog.cpp`
@@ -90,13 +98,13 @@ rg -n "BottomPanelButton|EditorLogFilterButton|TabContainerOdd|EditorInspectorCa
   - Source: `editor/inspector/editor_resource_picker.cpp`, `editor/inspector/editor_properties.cpp`
   - Resource fields such as Theme, Material, Script route through `EditorPropertyResource -> EditorResourcePicker`.
   - Assign button uses `EditorInspectorButton`; quick-load/edit buttons use `EditorInspectorFlatButton`.
-  - Current Godot source draws the picker background from `Tree.panel`, so if these fields look unlike other inspector values, check whether `Tree.panel` is painting over `EditorProperty.child_bg`.
+  - Current Godot source draws the picker background from `Tree.panel`, so if these fields look unlike other inspector values, check whether `Tree.panel` is painting over `EditorProperty.child_bg`. This can conflict with plain dialog Trees that need a visible panel; choose the least bad generic Tree panel first, then look for source-supported variations before using editor plugins.
 
 - Signals dock headers:
   - Source: `editor/docks/signals_dock.cpp`, `editor/scene/connections_dialog.cpp`
   - Class/header rows are custom `TreeItem`s, not Tree column title buttons.
   - Useful hooks are `Editor.prop_subsection`, `Editor.prop_subsection_stylebox`, and related left/right subsection styleboxes.
-  - Godot source uses single-column `prop_subsection_stylebox` for Signals/Groups headers, while Action Map can use `_left` and `_right` for two-column headers. Side rails belong on these styleboxes; top/bottom borders usually read as unwanted outlines.
+  - Godot source uses single-column `prop_subsection_stylebox` for Signals/Groups headers, while Action Map can use `_left` and `_right` for two-column headers. Side rails belong on these styleboxes only when explicitly desired; otherwise use tiny side content margins and no border so the parent view edge can show through. Top/bottom borders usually read as unwanted outlines.
 
 - Inspector layout hint:
   - Source: `editor/scene/gui/control_editor_plugin.cpp`
@@ -131,6 +139,7 @@ rg -n "BottomPanelButton|EditorLogFilterButton|TabContainerOdd|EditorInspectorCa
 - Keep `MarginContainer` generic margins at zero unless the whole app should inherit padding.
 - Treat generic base classes as high blast radius. Do not patch generic `TabContainer`, `MarginContainer`, `HBoxContainer`, `VBoxContainer`, `PanelContainer`, or `Button` behavior for an editor-only symptom until source proves the same hook owns the runtime and editor cases.
 - Add editor-specific rows/variations for editor chrome: `EditorDock`, `DockTabContainer`, `NoBorderHorizontalBottom`, etc.
+- Add explicit `Editor` color slots when fallback editor settings colors leak through: base/accent/background/mono, dark/contrast/highlight, font/icon states, selection/separators, success/warning/error, and axis/property colors are common internal lookups in Godot's editor theme source.
 - Register custom variations in `TYPE_VARIATIONS` when inheritance from another theme type matters.
 - Add `BINDING_TABLE` entries for every intentional dynamic override so regeneration is stable.
 - Do not assume a custom variation will resolve every inherited dynamic slot the way the editor preview implies. If a probe shows fallback colors like Godot default red selected rows or black selected text, author the variation slots explicitly.
@@ -143,6 +152,7 @@ rg -n "BottomPanelButton|EditorLogFilterButton|TabContainerOdd|EditorInspectorCa
 - For selected-only Tree relationship lines, match Godot Modern: `draw_relationship_lines=1`, `relationship_line_width=0`, highlighted parent/child widths nonzero, and opacity from `interface/theme/relationship_line_opacity`. Guard `EditorInterface` access with `Engine.is_editor_hint()`; headless project scripts can report the singleton but still reject retrieval.
 - For checkbox/toggle icon color, check the control-specific draw colors: `CheckBox.checkbox_checked_color` / `checkbox_unchecked_color` and `CheckButton.button_checked_color` / `button_unchecked_color`. Ordinary `Button.icon_pressed_color` will not tint those icons.
 - CheckBox and CheckButton checked icons are single-color-modulated by Godot. If the desired look is accent fill with a contrasting checkmark or toggle knob, adjust the icon artwork/generator as well as the checked color slot.
+- Radio buttons are CheckBox radios in Godot. Keep `radio_checked` / `radio_unchecked` artwork and the CheckBox checked/unchecked colors in sync with ordinary checkbox visual logic.
 - For EditorSpinSlider hover shape issues, inspect `HSlider.grabber_highlight` and `HSlider.grabber`, because the spinner overlay grabs those icons directly on hover/drag. Use generated or matched icon pairs if per-style corner radius matters.
 - For scrollbars, Godot modern uses an empty/transparent track and semi-transparent thumb fills. In `theme_modern.cpp`, normal grabber alpha is roughly 0.225 and hover/pressed roughly 0.5; Godot Minimal Theme uses a similar translucent color recipe. Preserve Pulse square corners if that is part of the style, but avoid opaque thumbs unless the user asks.
 
