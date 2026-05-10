@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 
 ## Current Position
 
-Phase: 11 (closed) · Visual Identity Distinctiveness spike (closed 2026-05-10)
-Plan: Complete + spike series delivered
-Next: (1) Owner action — dispatch `release.yml` for v1 cut. (2) Run `/gsd-phase add "Signature Visual Moves"` to plan Phase 12 against the locked spike scope (REPORT.md + MANIFEST.md). All spike sub-deliverables validated; refined scope locked through 6+ revision rounds with user.
-Status: v1 mechanically ship-ready. UAT items closed by user attestation 2026-05-10. Visual-identity spike complete; Phase 12 ready to plan.
-Last activity: 2026-05-10 -- Visual Identity Distinctiveness spike completed (001-005); Phase 12 scope locked with 5 success criteria including per-direction uniqueness thumbnail gate.
+Phase: 11 (closed) · Visual Identity Distinctiveness spike (closed 2026-05-10) · Phase 12+13 split locked 2026-05-10
+Plan: Complete + spike series delivered + 2-phase split locked
+Next: (1) Owner action — dispatch `release.yml` for v1 cut. (2) Run `/gsd-phase add "Signature Visual Moves"` to plan Phase 12 (defaults: C4+C2'+C6, ~7-10h). Phase 13 (opt-ins: C1+C3, ~5-6h) runs after Phase 12 ships, independently. Split into two phases per user request to respect token-window limits and produce cleaner commit boundaries.
+Status: v1 mechanically ship-ready. UAT items closed by user attestation 2026-05-10. Visual-identity spike complete; Phase 12 + 13 scope locked with 5 success criteria including per-direction uniqueness thumbnail gate.
+Last activity: 2026-05-10 -- Visual Identity Distinctiveness spike completed (001-005); refined scope locked through 8+ revision rounds; split into Phase 12 (defaults, ~7-10h, headline fix) and Phase 13 (opt-in role variations, ~5-6h, additive toolkit).
 
 Progress: [████████████████████] 67/67 plans (100%; redirected Phase 3 historical partial preserved)
 

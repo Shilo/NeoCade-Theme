@@ -34,7 +34,8 @@ If everything else fails, this single deliverable must work: a polished, feature
 
 ### Active
 
-- [ ] **Phase 12 — Signature Visual Moves (post-v1)**: Visual Identity Distinctiveness spike completed 2026-05-10 with 5 sub-spikes (001-005). Refined scope locked through 6+ revision rounds: C2' accent expansion (default) + C4 HSV value-darken depth (default) + C6 per-direction signature moves (default) + C1 opt-in role Labels + C3 opt-in role Panels. ~10-13h focused implementation, zero public-export changes, no new hues introduced. Run `/gsd-phase add "Signature Visual Moves"` to begin planning. Scope authority: `.planning/spikes/visual-identity-distinctiveness/REPORT.md` + `.planning/spikes/MANIFEST.md`.
+- [ ] **Phase 12 — Signature Visual Moves: Defaults (post-v1, ~7-10h)**: Visual Identity Distinctiveness spike completed 2026-05-10 with 5 sub-spikes (001-005). Refined scope locked through 8+ revision rounds. Phase 12 implements only the default-behavior moves (C4 + C2' + C6) — the headline fix for the "generic dark Godot theme with green tint" complaint. Run `/gsd-phase add "Signature Visual Moves"` to begin planning. Scope authority: `.planning/spikes/visual-identity-distinctiveness/REPORT.md` + `.planning/spikes/MANIFEST.md`.
+- [ ] **Phase 13 — Role Variations: Opt-Ins (post-v1, ~5-6h)**: Carved out of Phase 12 to keep each phase in a single executable session. Adds 4 role Label variations + 5 role Panel variations + new Role Variations showcase section. Zero auto-bindings; baseline chrome unchanged from Phase 12. Independent of Phase 12 (depends only on the public 12-export contract). Run after Phase 12 ships.
 - [ ] **Release dispatch (owner action)**: confirm GitHub Pages source and release workflow permissions, then manually trigger `release.yml`. Phase 11 UAT for this is closed by user attestation 2026-05-10; the dispatch itself is a repository-side owner action and out of autonomous scope.
 
 ### Out of Scope (v1)

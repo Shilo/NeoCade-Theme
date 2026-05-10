@@ -78,41 +78,134 @@ that:
 4. Marks each candidate as adopt / reject / open. The phase below consumes
    the adopt set.
 
-### Phase 12 — Signature Visual Moves (proposed)
+### Phase 12 — Signature Visual Moves: Defaults (~7-10h)
 
-**Trigger command:** `/gsd-phase 12 add` (after spike closes)
+**Trigger command:** `/gsd-phase add "Signature Visual Moves"`
 
-**Goal:** Translate the spike's adopted candidate moves into the live
-`NeoCadeTheme` engine so the rendered output reads as distinctly NeoCade,
-not a generic dark Godot theme.
+**Status:** Spike series 001-005 closed 2026-05-10. Scope locked in
+`.planning/spikes/visual-identity-distinctiveness/REPORT.md` and
+`.planning/spikes/MANIFEST.md`. Phase 12 implements only the **default-
+behavior moves** (C4 + C2' + C6). Opt-in role variations (C1 + C3)
+deferred to Phase 13 to keep Phase 12 in a single executable session.
 
-**Likely candidate moves (subject to spike outcome — do NOT implement
-without spike approval):**
-1. **Section/role color tinting on Panels and TabContainers** — LDtk's
-   signature sidebar tinting per layer adapted to NeoCade's surface ramp.
-   Add a `panel_role` type-variation family (`InfoPanel`, `WarnPanel`,
-   `DangerPanel`, `SuccessPanel`) so consumers tag panels semantically and
-   receive a distinct hue overlay tied to `role_*` tokens.
-2. **Severity-coded notification/banner system** — translate LDtk HAXE-03
-   and HAXE-19 patterns into a `NeoCadeNotificationBanner` reusable Control
-   under `addons/neocade_theme/scripts/`, parallel to the option-button
-   helper. Pure Theme/StyleBox primitives.
-3. **Distinctive selected-row treatment** — Tree and ItemList rows currently
-   use a tonal accent fill. Add a left-edge color stripe + selected tick
-   chip pattern derived from the active style's accent so selection reads
-   visually as NeoCade, not a generic accent fill.
-4. **Branded icon pass** — current 79 SVGs are functional Godot-slot
-   mirrors. Add a small (≈10–15) brand-personality icon set (marquee,
-   ticket, scoreboard, prize, attract-mode, score-bump) for showcase use
-   and consumer reuse, monochrome single-color per ICON-03.
-5. **Header / kicker treatment with stronger character** — the existing
-   `kicker_style` enum in `STYLE_PERSONALITY.shape` is wired but mostly
-   defers to content. Implement the full per-style kicker (uppercase-tracked,
-   small-caps, sentence-case, bold-larger-scale) as actual rendered chrome
-   on `Kicker` and `HeaderLarge` variations.
-6. **Optional opt-in display font slot** — without bundling, expose a
-   documented `display_font` override pattern for headings so consumers can
-   add character without theme bundle bloat (FONT-09 lineage).
+**Goal:** Resolve the user's "generic dark Godot theme with an accent
+color" complaint by surfacing the existing accent in idle chrome (C2'),
+fixing raised-button affordance on colored buttons (C4), and giving each
+of the 5 directions a non-color/non-radius signature move (C6).
+
+**Scope (3 default-behavior candidates):**
+
+1. **C4 — HSV value-darken depth formula.** Replace `_raised_depth_color`
+   at `addons/neocade_theme/scripts/neocade_theme.gd:800-806` with
+   `Color.from_hsv(h, s, v * (1.0 - strength))` at
+   `strength = 0.20 + 0.10 * raised_strength`. Hue/saturation preserved,
+   depth strip stays in same hue family ~40% darker. Helps colored
+   buttons (accent fills, role-colored CTAs); naturally no-op on dark
+   neutral buttons where face and depth converge. ~30 min.
+
+2. **C2' — Accent expansion in idle chrome.** Rebind ~6-8 existing
+   BINDING_TABLE slots to use `accent_color` in idle state:
+   selected TabBar indicator (top stripe), selected ItemList/Tree row
+   left-stripe, kicker text color, active section indicators, slider
+   value labels, section-header underlines. No new public exports.
+   Same palette per direction — accent gets airtime via redistribution.
+   ~2-3h. **The headline fix.**
+
+3. **C6 — Per-direction signature moves.** Edit `STYLE_PERSONALITY`
+   per direction with one non-color/non-radius distinguishing move:
+   - Pulse: uppercase-tracked kicker labels (0.24em letter-spacing)
+   - Slate: 1px hairline borders on panels + quiet-pill primary
+   - Bubble: forced ≥26 corner radius across all chrome (pillow)
+   - Daybreak: 1px outer mint outline (3px offset) + generous primary
+     padding (no halo, no glow — fully flat per locked invariant)
+   - Burst: oversized 56-64px primary CTAs with thicker depth strip
+   ~4-6h.
+
+**Minor showcase additions:** demo Pulse kicker chrome in the existing
+"Buttons" section. C6 changes are otherwise visible automatically.
+
+**Locked success criteria (carried from spike series):**
+1. `raised=false` MUST show ZERO 3D elements anywhere
+2. `raised=true` keeps current lift subset (panels + buttons, NOT tabs)
+3. No glow halos in any state
+4. Every direction identifiable at thumbnail scale without color cues
+   (greyscale thumbnail render is a hard verification gate)
+5. No new hues introduced — palette per direction unchanged
+6. Zero public-export changes — 12-export contract preserved
+
+**Mid-phase fallback if needed:** the natural micro-checkpoint is after
+C4 + C2' (~3-4h). At that point the headline complaint is resolved
+(depth fixed + accent present in idle). C6 (per-direction signatures)
+can defer to a follow-up if execution runs long.
+
+**Pre-implementation visual approval:** [mockup-refined-plan.html](.planning/spikes/visual-identity-distinctiveness/005-before-after-comparison/mockup-refined-plan.html)
+shows the AFTER state for all 5 directions; [comparison.html](.planning/spikes/visual-identity-distinctiveness/005-before-after-comparison/comparison.html)
+shows the BEFORE state. The forward-looking mockup is the visual contract.
+
+### Phase 13 — Role Variation Type-Set: Opt-Ins (~5-6h)
+
+**Trigger command:** `/gsd-phase add "Role Variations"` (after Phase 12 ships)
+
+**Status:** Carved out from the original Phase 12 to keep each phase in a
+single executable session. Independent of Phase 12 — no shared code path,
+no shared verification surface.
+
+**Goal:** Add opt-in role-coded type variations consumers can apply
+deliberately when a widget semantically represents success / warning /
+danger / info / accent state. Zero auto-bindings; baseline chrome
+unchanged.
+
+**Scope (2 opt-in candidates + showcase polish):**
+
+1. **C1 — Role Label type variations.** Register 4 new entries in
+   `TYPE_VARIATIONS`: `SuccessLabel`, `WarningLabel`, `DangerLabel`,
+   `InfoLabel` (all extending Label). Add BINDING_TABLE color bindings
+   so each variation's `font_color` reads from `role_success` /
+   `role_warning` / `role_danger` / `role_info` respectively. Consumer
+   usage: `my_label.theme_type_variation = "SuccessLabel"`. ~1.5h.
+
+2. **C3 — Role Panel type variations.** Register 5 new entries:
+   `AccentPanel`, `InfoPanel`, `WarningPanel`, `DangerPanel`,
+   `SuccessPanel` (all extending PanelContainer). Add BINDING_TABLE
+   stylebox bindings so each gets a 6%-mix tint of the corresponding
+   role color over the current panel_bg. ~2-3h.
+
+3. **New "Role Variations" showcase section.** Add a 10th section to
+   `showcase/showcase.tscn` demonstrating the 4 Labels + 5 Panels with
+   real consumer-style content. README documents the opt-in pattern.
+   ~2h.
+
+**Locked success criteria:**
+- Default chrome unchanged from Phase 12 baseline (smoke test 30 configs)
+- All 4 Labels + 5 Panels visible in the new Showcase section
+- Type variations only activate when consumer applies them via
+  `theme_type_variation` — never auto-bound to widget defaults
+
+### Why split into two phases?
+
+The user explicitly requested splitting due to token-window concerns
+during execution. The split is non-deviating because:
+- Phase 12 is the coherent ship-point (headline complaint resolved)
+- Phase 13 is additive — depends on nothing in Phase 12, doesn't change
+  Phase 12's rendered output
+- Each phase has clearly bounded code surface (different files /
+  different BINDING_TABLE sections / different showcase scope)
+- Both phases respect the same 5 locked success criteria
+
+### Deferred follow-up spikes (NOT in Phase 12 or 13)
+
+- **C2** — MD3 secondary/tertiary auto-derivation from accent. Adds 2 new
+  hues per direction; user explicitly rejected this in favor of C2' on
+  2026-05-10. Revisit only if accent-expansion proves insufficient and
+  user opts in via a future `use_md3_extended_palette: bool` export.
+- **C5** — Per-direction lift thickness bump. Deferred until visual
+  validation of the Phase 12 package proves the current lift sizes are
+  too thin (they may already be sufficient once C2' lifts accent
+  presence + C6 differentiates directions).
+- **Surface tonal range expansion** — User idea: lift face brightness
+  across the 5-stop ramp so dark themes like Pulse have more contrast
+  between panel and button. Higher risk than C4 (touches every surface
+  stop). Future spike.
 
 **Out-of-scope guardrails:** any move that would require a custom shader,
 a `plugin.cfg`, motion/animation, GDExtension, or breaking the 12-export

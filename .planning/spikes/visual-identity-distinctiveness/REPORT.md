@@ -143,17 +143,33 @@ The mockup uses real Pulse / Slate / Bubble / Daybreak / Burst base + accent + p
 
 ## 5. Recommendation (BRIEF Definition-of-Done #5)
 
-**Phase 12 scope (refined by user 2026-05-10): adopt C2'+C6+C4 as default behavior; C1+C3 as opt-in type variations; defer C2 and C5.**
+**Refined plan (locked by user 2026-05-10): adopt C2'+C6+C4 as default behavior; C1+C3 as opt-in type variations; defer C2 and C5.**
 
-**Phase 12 implementation order:**
+**Phase split (locked 2026-05-10 for token-window safety):**
+
+The refined plan is split into two independent phases so each fits a single
+executable session. Phase 12 ships the default-behavior fix (the headline
+complaint resolution); Phase 13 adds the opt-in role variations + showcase
+polish. Phase 13 has zero dependency on Phase 12's implementation details.
+
+### Phase 12 — Signature Visual Moves: Defaults (~7-10h)
 
 1. **C4** — XS, ~6 lines replacing `_raised_depth_color`. Helps colored-button affordance. (~30 min)
 2. **C2'** — S, rebind existing BINDING_TABLE rows to use `accent_color` in more idle-state slots: selected TabBar indicator, selected ItemList/Tree row left-stripe, kicker color, active section indicators, slider/range value labels, section-header underlines. The HEADLINE FIX. (~2-3h)
 3. **C6** — M, 5 mini-features (one per direction). Seals direction uniqueness. (~4-6h)
-4. **C1** — S, register 4 generic Label type variations (`SuccessLabel` / `WarningLabel` / `DangerLabel` / `InfoLabel`) with role-color bindings. Opt-in only. Showcase demos them. (~1.5h)
-5. **C3** — S-M, register 5 generic Panel type variations (`AccentPanel` / `InfoPanel` / `WarningPanel` / `DangerPanel` / `SuccessPanel`) with role-tint bindings. Opt-in only. Showcase demos them. (~2-3h)
 
-**Total estimate: 10-13 hours focused implementation.** Plus ~2 hours of showcase scene additions to demonstrate the new chrome (accent now visible in idle state via C2'; opt-in role labels/panels in a "Role Variations" showcase section).
+Mid-phase fallback if execution runs long: after C4+C2' (~3-4h), the
+headline complaint is resolved; C6 can defer to a follow-up.
+
+### Phase 13 — Role Variation Type-Set: Opt-Ins (~5-6h)
+
+4. **C1** — S, register 4 generic Label type variations (`SuccessLabel` / `WarningLabel` / `DangerLabel` / `InfoLabel`) with role-color bindings. Opt-in only. (~1.5h)
+5. **C3** — S-M, register 5 generic Panel type variations (`AccentPanel` / `InfoPanel` / `WarningPanel` / `DangerPanel` / `SuccessPanel`) with role-tint bindings. Opt-in only. (~2-3h)
+6. **Showcase additions** — new "Role Variations" section in `showcase/showcase.tscn` demonstrating the 4 Labels + 5 Panels. README documents the opt-in pattern. (~2h)
+
+**Total combined estimate: 13-17h.** Run as two independent phases for
+token-safety + cleaner commit boundaries; both respect the same 5 locked
+success criteria.
 
 **Deferred to follow-up spikes:**
 - **C2 (MD3 secondary/tertiary auto-derivation)** — introduces 2 new hues per direction; user prefers existing accent to surface more often first. Revisit as opt-in export (e.g., `use_md3_extended_palette: bool`) after Phase 12 ships and the accent-expansion fix is validated in practice.
@@ -198,12 +214,20 @@ User locked these as binding gates on 2026-05-10:
 
 ## 6. Hand-off
 
-When the user is ready to proceed:
+### Phase 12 (start here)
 
 ```
 /gsd-phase add "Signature Visual Moves" --before <next-version>
 /gsd-discuss-phase signature-visual-moves
 /gsd-plan-phase signature-visual-moves
+```
+
+### Phase 13 (after Phase 12 ships)
+
+```
+/gsd-phase add "Role Variations" --before <next-version>
+/gsd-discuss-phase role-variations
+/gsd-plan-phase role-variations
 ```
 
 Phase context inputs (read-only references):
