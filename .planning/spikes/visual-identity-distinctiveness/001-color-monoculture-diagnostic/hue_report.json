@@ -1,0 +1,321 @@
+[
+  {
+    "path": "C:\\Programming_Files\\Shilocity\\Godot\\NeoCade-Theme\\.planning\\mockups\\3.4\\concepts\\pulse-finalist-desktop-flat.png",
+    "pixels_total": 199660,
+    "pixels_after_mask": 189792,
+    "grey_share": 0.007227286386857658,
+    "dark_share": 0.04088951217069017,
+    "white_share": 0.0013072222778723831,
+    "hue_count": 2,
+    "families": [
+      {
+        "hue_deg": 226.96150396411207,
+        "rgb": [
+          76,
+          87,
+          127
+        ],
+        "share_of_keep": 0.947503108155985,
+        "saturation_mean": 0.38528883804773295,
+        "value_mean": 0.23616794378848874
+      },
+      {
+        "hue_deg": 106.17656963615521,
+        "rgb": [
+          133,
+          234,
+          102
+        ],
+        "share_of_keep": 0.0313133057382918,
+        "saturation_mean": 0.5616231537109946,
+        "value_mean": 0.9193308845978095
+      }
+    ]
+  },
+  {
+    "path": "C:\\Programming_Files\\Shilocity\\Godot\\NeoCade-Theme\\.planning\\mockups\\3.4\\concepts\\slate-desktop-flat.png",
+    "pixels_total": 199660,
+    "pixels_after_mask": 144176,
+    "grey_share": 0.00937593909646399,
+    "dark_share": 0.26794049884804166,
+    "white_share": 0.0005759791645797857,
+    "hue_count": 1,
+    "families": [
+      {
+        "hue_deg": 212.24596155312,
+        "rgb": [
+          76,
+          100,
+          127
+        ],
+        "share_of_keep": 0.9967587365427251,
+        "saturation_mean": 0.32508222486845834,
+        "value_mean": 0.19551175976565338
+      }
+    ]
+  },
+  {
+    "path": "C:\\Programming_Files\\Shilocity\\Godot\\NeoCade-Theme\\.planning\\mockups\\3.4\\concepts\\bubble-desktop-flat.png",
+    "pixels_total": 199660,
+    "pixels_after_mask": 147152,
+    "grey_share": 0.00777822297906441,
+    "dark_share": 0.2538715816888711,
+    "white_share": 0.001337273364720024,
+    "hue_count": 2,
+    "families": [
+      {
+        "hue_deg": 292.13468200479383,
+        "rgb": [
+          120,
+          76,
+          127
+        ],
+        "share_of_keep": 0.9622506367209412,
+        "saturation_mean": 0.3274719028275232,
+        "value_mean": 0.2150848290593237
+      },
+      {
+        "hue_deg": 321.0,
+        "rgb": [
+          241,
+          145,
+          207
+        ],
+        "share_of_keep": 0.025709806854216744,
+        "saturation_mean": 0.2975559467943275,
+        "value_mean": 0.9479246449844041
+      }
+    ]
+  },
+  {
+    "path": "C:\\Programming_Files\\Shilocity\\Godot\\NeoCade-Theme\\.planning\\mockups\\3.4\\concepts\\daybreak-desktop-flat.png",
+    "pixels_total": 199660,
+    "pixels_after_mask": 146342,
+    "grey_share": 0.006405890013022137,
+    "dark_share": 0.2595362115596514,
+    "white_share": 0.0011018731844135029,
+    "hue_count": 1,
+    "families": [
+      {
+        "hue_deg": 170.5734769500414,
+        "rgb": [
+          69,
+          127,
+          118
+        ],
+        "share_of_keep": 0.9866205837319941,
+        "saturation_mean": 0.45152629602186284,
+        "value_mean": 0.22468438086619283
+      }
+    ]
+  },
+  {
+    "path": "C:\\Programming_Files\\Shilocity\\Godot\\NeoCade-Theme\\.planning\\mockups\\3.4\\concepts\\burst-desktop-flat.png",
+    "pixels_total": 199660,
+    "pixels_after_mask": 190105,
+    "grey_share": 0.006611239106481018,
+    "dark_share": 0.039957928478413306,
+    "white_share": 0.0012871882199739558,
+    "hue_count": 2,
+    "families": [
+      {
+        "hue_deg": 272.9640402096154,
+        "rgb": [
+          101,
+          70,
+          127
+        ],
+        "share_of_keep": 0.9364986493113491,
+        "saturation_mean": 0.44747097297178745,
+        "value_mean": 0.2332637231264005
+      },
+      {
+        "hue_deg": 38.35230121446479,
+        "rgb": [
+          226,
+          180,
+          99
+        ],
+        "share_of_keep": 0.045525466725023465,
+        "saturation_mean": 0.5620208641031936,
+        "value_mean": 0.8882555380205824
+      }
+    ]
+  },
+  {
+    "path": "md3-reference.png",
+    "pixels_total": 199660,
+    "pixels_after_mask": 134406,
+    "grey_share": 0.0004407492737654012,
+    "dark_share": 0.3263848542522288,
+    "white_share": 0.0,
+    "hue_count": 3,
+    "families": [
+      {
+        "hue_deg": 212.56704615102618,
+        "rgb": [
+          76,
+          99,
+          127
+        ],
+        "share_of_keep": 0.7740492649115858,
+        "saturation_mean": 0.2190857945058862,
+        "value_mean": 0.2501569588035931
+      },
+      {
+        "hue_deg": 349.1029204911546,
+        "rgb": [
+          161,
+          42,
+          64
+        ],
+        "share_of_keep": 0.17493522914382947,
+        "saturation_mean": 0.7345365354960615,
+        "value_mean": 0.6339755432811951
+      },
+      {
+        "hue_deg": 303.0,
+        "rgb": [
+          134,
+          80,
+          131
+        ],
+        "share_of_keep": 0.040791353245491165,
+        "saturation_mean": 0.17670054061192,
+        "value_mean": 0.5256649067784809
+      }
+    ]
+  },
+  {
+    "path": "game-ui-reference.png",
+    "pixels_total": 199660,
+    "pixels_after_mask": 199660,
+    "grey_share": 0.0,
+    "dark_share": 0.0,
+    "white_share": 0.0,
+    "hue_count": 5,
+    "families": [
+      {
+        "hue_deg": 249.00000000000003,
+        "rgb": [
+          72,
+          62,
+          127
+        ],
+        "share_of_keep": 0.7066117247708225,
+        "saturation_mean": 0.508672867855754,
+        "value_mean": 0.29565678320748406
+      },
+      {
+        "hue_deg": 333.0,
+        "rgb": [
+          247,
+          74,
+          152
+        ],
+        "share_of_keep": 0.0985912158282795,
+        "saturation_mean": 0.6992414158872773,
+        "value_mean": 0.9704186591740228
+      },
+      {
+        "hue_deg": 188.99999999999997,
+        "rgb": [
+          61,
+          187,
+          210
+        ],
+        "share_of_keep": 0.0958214940675893,
+        "saturation_mean": 0.7056324810046083,
+        "value_mean": 0.8240202878141657
+      },
+      {
+        "hue_deg": 39.00000000000001,
+        "rgb": [
+          251,
+          194,
+          86
+        ],
+        "share_of_keep": 0.04086739867745287,
+        "saturation_mean": 0.6557200220240987,
+        "value_mean": 0.9875806303734475
+      },
+      {
+        "hue_deg": 129.0,
+        "rgb": [
+          125,
+          222,
+          139
+        ],
+        "share_of_keep": 0.03511299662533937,
+        "saturation_mean": 0.43664045532567364,
+        "value_mean": 0.8726390170696366
+      }
+    ]
+  },
+  {
+    "path": "C:\\Programming_Files\\Shilocity\\Godot\\NeoCade-Theme\\.planning\\inputs\\NeoCade-Theme-Prototype.png",
+    "pixels_total": 199660,
+    "pixels_after_mask": 34549,
+    "grey_share": 0.005559451066813583,
+    "dark_share": 0.820980667134128,
+    "white_share": 0.00042071521586697387,
+    "hue_count": 5,
+    "families": [
+      {
+        "hue_deg": 216.5352407956875,
+        "rgb": [
+          61,
+          87,
+          127
+        ],
+        "share_of_keep": 0.6861519883980468,
+        "saturation_mean": 0.5183055136328802,
+        "value_mean": 0.30931285829174615
+      },
+      {
+        "hue_deg": 188.44294608367187,
+        "rgb": [
+          15,
+          154,
+          177
+        ],
+        "share_of_keep": 0.07393257843545911,
+        "saturation_mean": 0.9123005165734421,
+        "value_mean": 0.6952799730772002
+      },
+      {
+        "hue_deg": 256.2757043265901,
+        "rgb": [
+          68,
+          46,
+          127
+        ],
+        "share_of_keep": 0.0725249689802473,
+        "saturation_mean": 0.6373911904667646,
+        "value_mean": 0.3978455356033632
+      },
+      {
+        "hue_deg": 326.42806611457553,
+        "rgb": [
+          127,
+          46,
+          91
+        ],
+        "share_of_keep": 0.06079695242671239,
+        "saturation_mean": 0.6389344105378453,
+        "value_mean": 0.42419359330670603
+      },
+      {
+        "hue_deg": 156.77078297235428,
+        "rgb": [
+          6,
+          154,
+          97
+        ],
+        "share_of_keep": 0.023395887929229996,
+        "saturation_mean": 0.9596881246566773,
+        "value_mean": 0.606670809074452
+      }
+    ]
+  }
+]
