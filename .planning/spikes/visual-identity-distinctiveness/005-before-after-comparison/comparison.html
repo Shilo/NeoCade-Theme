@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NeoCade — Before vs After comparison</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #0a0c12; color: #e8ecf3; line-height: 1.5; }
+  body { padding: 32px 24px 80px; max-width: 1600px; margin: 0 auto; }
+  h1.page-title { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+  p.page-sub { color: #98a3b6; max-width: 1100px; margin-bottom: 16px; font-size: 14px; }
+
+  .toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 32px; flex-wrap: wrap; padding: 12px 16px; background: #11162A; border: 1px solid #1f2638; border-radius: 8px; }
+  .toolbar label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #98a3b6; cursor: pointer; }
+  .toolbar input[type="radio"], .toolbar input[type="checkbox"] { margin-right: 6px; }
+  .toolbar a { color: #6ce5a0; text-decoration: none; font-size: 12px; margin-left: auto; }
+  .toolbar a:hover { text-decoration: underline; }
+
+  .direction-block { margin-bottom: 56px; border-top: 1px solid #1f2638; padding-top: 24px; }
+  .direction-block:first-of-type { border-top: 0; padding-top: 0; }
+  .direction-header { display: flex; gap: 16px; align-items: baseline; margin-bottom: 4px; }
+  .direction-header h2 { font-size: 22px; font-weight: 700; }
+  .direction-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #6e7a90; padding: 3px 8px; border: 1px solid #2a3148; border-radius: 4px; }
+  .direction-desc { color: #98a3b6; font-size: 13px; margin-bottom: 16px; max-width: 1100px; }
+  .annotation { color: #c9d2e0; font-size: 12px; margin-top: 12px; line-height: 1.6; background: #11162A; border-left: 3px solid #6ce5a0; padding: 10px 14px; border-radius: 4px; }
+  .annotation b { color: #6ce5a0; }
+
+  .variant-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .variant-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6e7a90; margin-bottom: 8px; padding: 4px 8px; background: #1b2030; border-radius: 4px; display: inline-block; }
+  .variant-cell { display: flex; flex-direction: column; }
+  .frame { border-radius: 8px; overflow: hidden; aspect-ratio: 16/10; background: #0d1018; position: relative; }
+  .frame img { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .placeholder { display: flex; align-items: center; justify-content: center; color: #6e7a90; font-size: 13px; text-align: center; padding: 24px; height: 100%; }
+  .placeholder .big { font-size: 18px; font-weight: 700; color: #98a3b6; margin-bottom: 8px; }
+  .placeholder a { color: #6ce5a0; text-decoration: underline; }
+
+  .pair-header { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px; }
+  .pair-header .col-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  .pair-header .before { color: #ff8090; }
+  .pair-header .after { color: #6ce5a0; }
+
+  /* slider-overlay mode */
+  body.slider-mode .variant-row { display: block; }
+  body.slider-mode .pair-header { display: none; }
+  body.slider-mode .variant-cell + .variant-cell { display: none; }
+  body.slider-mode .frame { aspect-ratio: 16/10; }
+  body.slider-mode .frame::after {
+    content: 'After-shots not yet captured. Open mockup-refined-plan.html for forward-looking preview.';
+    position: absolute; left: 50%; transform: translateX(-50%); bottom: 12px;
+    background: rgba(0,0,0,0.75); color: #6ce5a0; padding: 6px 12px; border-radius: 4px;
+    font-size: 11px;
+  }
+  body.slider-mode .variant-tag::before { content: 'BEFORE-only mode — '; color: #ff8090; }
+
+  /* raised filter */
+  body.filter-flat .raised-row { display: none; }
+  body.filter-raised .flat-row { display: none; }
+  .raised-tag { color: #6ce5a0; font-weight: 700; }
+
+  /* footer status */
+  .status-card { background: #11162A; border: 1px solid #1f2638; border-radius: 8px; padding: 20px; margin-bottom: 32px; }
+  .status-card h3 { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #6ce5a0; margin-bottom: 10px; }
+  .status-row { display: grid; grid-template-columns: 220px 1fr; gap: 12px; font-size: 13px; padding: 4px 0; }
+  .status-row .label { color: #98a3b6; font-weight: 600; }
+  .status-row .ok { color: #6ce5a0; }
+  .status-row .pending { color: #FFD166; }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">NeoCade — Before vs After</h1>
+<p class="page-sub">Real Godot rendering of <code>showcase/showcase.tscn</code> with each direction × flat/raised, captured automatically by <code>capture_screenshots.gd</code>. BEFORE = current production code. AFTER = will be populated after Phase 12 ships the refined plan (C2' accent expansion + C4 HSV value-darken depth + C6 per-direction signature moves). Until then, AFTER cells link to the forward-looking HTML mockup that simulates the expected result.</p>
+
+<div class="toolbar">
+  <label><input type="radio" name="layout" value="side-by-side" checked> Side-by-side</label>
+  <label><input type="radio" name="layout" value="slider"> BEFORE only</label>
+  <span style="color:#1f2638;">|</span>
+  <label><input type="radio" name="filter" value="all" checked> Flat + Raised</label>
+  <label><input type="radio" name="filter" value="flat"> Flat only</label>
+  <label><input type="radio" name="filter" value="raised"> Raised only</label>
+  <a href="mockup-refined-plan.html">Open forward-looking AFTER mockup →</a>
+</div>
+
+<div class="status-card">
+  <h3>Capture status</h3>
+  <div class="status-row"><span class="label">BEFORE shots</span><span class="ok">✓ 10/10 captured (5 styles × flat/raised, 1280×800 each)</span></div>
+  <div class="status-row"><span class="label">AFTER shots</span><span class="pending">⏳ pending — re-run <code>capture_screenshots.gd</code> with <code>phase=after</code> after Phase 12 ships</span></div>
+  <div class="status-row"><span class="label">Forward-looking mockup</span><span class="ok">✓ available at <a href="mockup-refined-plan.html" style="color:#6ce5a0;">mockup-refined-plan.html</a></span></div>
+  <div class="status-row"><span class="label">Re-capture command</span><span style="font-family:ui-monospace,monospace;color:#c9d2e0;font-size:12px;">godot --script .planning/spikes/visual-identity-distinctiveness/005-before-after-comparison/capture_screenshots.gd -- phase=before|after</span></div>
+</div>
+
+<!-- ─── PULSE ─────────────────────────────────────────────────────────────── -->
+<div class="direction-block">
+  <div class="direction-header">
+    <span class="direction-tag">DIRECTION 1/5</span>
+    <h2 style="color:#8BFF6A;">Pulse</h2>
+    <span style="font-size:12px; color:#98a3b6;">arcade-dense cabinet · base #151A2E · accent #8BFF6A · radius 0</span>
+  </div>
+  <div class="direction-desc">Pulse is the recommended starter style. Current BEFORE rendering shows the "generic dark Godot theme with a green tint" complaint clearly — accent only appears on PrimaryButton, DangerButton (red), and a few stateful indicators. After: accent visible in kicker, selected tab, ItemList row stripes, active nav. C6 signature: uppercase-tracked kicker labels.</div>
+
+  <div class="variant-row flat-row">
+    <div class="variant-cell">
+      <span class="variant-tag">flat</span>
+      <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="frame"><img src="screenshots/before/pulse-flat.png" alt="Pulse flat BEFORE"></div>
+        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="variant-row raised-row">
+    <div class="variant-cell">
+      <span class="variant-tag raised-tag">raised</span>
+      <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="frame"><img src="screenshots/before/pulse-raised.png" alt="Pulse raised BEFORE"></div>
+        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation">
+    <b>What you should see change after Phase 12:</b><br>
+    • <b>C2' accent expansion:</b> "Buttons / Text Inputs / ..." section labels gain lime accent · selected tab "Buttons" gets a lime underline · OptionButton "Prize Pop Plaza" selected row would gain a lime left-stripe · LinkButton "Open release notes" stays lime (unchanged).<br>
+    • <b>C4 HSV value-darken depth:</b> "Start Match" PrimaryButton (when raised=true) gets a darker-lime same-hue depth strip beneath it instead of the current pull-toward-navy edge.<br>
+    • <b>C6 Pulse signature:</b> Section kicker labels ("PrimaryButton", "DangerButton", "OptionButton" etc.) become uppercase-tracked (0.24em letter-spacing) for arcade-marquee feel.
+  </div>
+</div>
+
+<!-- ─── SLATE ─────────────────────────────────────────────────────────────── -->
+<div class="direction-block">
+  <div class="direction-header">
+    <span class="direction-tag">DIRECTION 2/5</span>
+    <h2 style="color:#8BD3FF;">Slate</h2>
+    <span style="font-size:12px; color:#98a3b6;">iOS-premium quiet · base #111820 · accent #8BD3FF · radius 14</span>
+  </div>
+  <div class="direction-desc">Slate is the modern-minimal direction. BEFORE: accent practically invisible — quiet-pill primary button has accent border/text but it disappears against the panel; everything else is dark slate. After: accent visible as kicker text, hairline borders, selected tab indicator. C6 signature: 1px hairline borders on panels (iOS-premium feel) + quiet-pill primary stays.</div>
+
+  <div class="variant-row flat-row">
+    <div class="variant-cell">
+      <span class="variant-tag">flat</span>
+      <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="frame"><img src="screenshots/before/slate-flat.png" alt="Slate flat BEFORE"></div>
+        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="variant-row raised-row">
+    <div class="variant-cell">
+      <span class="variant-tag raised-tag">raised</span>
+      <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="frame"><img src="screenshots/before/slate-raised.png" alt="Slate raised BEFORE"></div>
+        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation">
+    <b>What you should see change after Phase 12:</b><br>
+    • <b>C2' accent expansion:</b> kicker labels gain sky-blue tint · selected tab gets sky-blue underline · CheckBox tick stays sky-blue (unchanged) · CheckButton ON stays sky-blue (unchanged) · LinkButton stays sky-blue (unchanged).<br>
+    • <b>C4 HSV value-darken depth:</b> minimal visible effect — Slate's quiet-pill primary has no fill, so no depth strip needed. C4 only affects raised buttons with colored fills.<br>
+    • <b>C6 Slate signature:</b> All panels gain 1px sky-blue-tinted hairline borders for iOS-premium quiet feel.
+  </div>
+</div>
+
+<!-- ─── BUBBLE ────────────────────────────────────────────────────────────── -->
+<div class="direction-block">
+  <div class="direction-header">
+    <span class="direction-tag">DIRECTION 3/5</span>
+    <h2 style="color:#FFB3E6;">Bubble</h2>
+    <span style="font-size:12px; color:#98a3b6;">candy-pillowy · base #241326 · accent #FFB3E6 · radius 26 (999 pill primary)</span>
+  </div>
+  <div class="direction-desc">Bubble already has the strongest pillow-silhouette character among the 5 directions. BEFORE: pink accent on PrimaryButton pill + DangerButton (red pill) + selected toggle. After: accent visible in more idle slots, raised primary gains a clearly darker pink depth strip.</div>
+
+  <div class="variant-row flat-row">
+    <div class="variant-cell">
+      <span class="variant-tag">flat</span>
+      <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="frame"><img src="screenshots/before/bubble-flat.png" alt="Bubble flat BEFORE"></div>
+        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="variant-row raised-row">
+    <div class="variant-cell">
+      <span class="variant-tag raised-tag">raised</span>
+      <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="frame"><img src="screenshots/before/bubble-raised.png" alt="Bubble raised BEFORE"></div>
+        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation">
+    <b>What you should see change after Phase 12:</b><br>
+    • <b>C2' accent expansion:</b> kicker labels gain pink tint · selected tab gets pink underline · already-pink-strong primary stays pink (visible win is at idle: the rest of the UI gains pink presence).<br>
+    • <b>C4 HSV value-darken depth:</b> "Start Match" raised primary button gets a clearly darker-pink (~#B370A3) depth strip — the candy-button affordance shows clearly because the pink face contrasts well with both the panel and the darker-pink depth.<br>
+    • <b>C6 Bubble signature:</b> All chrome forced to ≥22 radius (pillow consistency across the whole UI, not just primary CTAs).
+  </div>
+</div>
+
+<!-- ─── DAYBREAK ──────────────────────────────────────────────────────────── -->
+<div class="direction-block">
+  <div class="direction-header">
+    <span class="direction-tag">DIRECTION 4/5</span>
+    <h2 style="color:#76F2D1;">Daybreak</h2>
+    <span style="font-size:12px; color:#98a3b6;">airy-welcoming lobby · base #0B2420 · accent #76F2D1 · radius 8</span>
+  </div>
+  <div class="direction-desc">Daybreak is the friendliest direction. BEFORE: mint accent appears on PrimaryButton + LinkButton + a few state indicators; otherwise dark forest-teal. After: accent in kicker, selected tab, row stripes; C6 signature adds a soft mint halo around primary CTAs for welcoming-lobby softness.</div>
+
+  <div class="variant-row flat-row">
+    <div class="variant-cell">
+      <span class="variant-tag">flat</span>
+      <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="frame"><img src="screenshots/before/daybreak-flat.png" alt="Daybreak flat BEFORE"></div>
+        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="variant-row raised-row">
+    <div class="variant-cell">
+      <span class="variant-tag raised-tag">raised</span>
+      <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="frame"><img src="screenshots/before/daybreak-raised.png" alt="Daybreak raised BEFORE"></div>
+        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation">
+    <b>What you should see change after Phase 12:</b><br>
+    • <b>C2' accent expansion:</b> kicker labels gain mint tint · selected tab gets mint underline + mint text · selected ItemList rows gain mint left-stripe.<br>
+    • <b>C4 HSV value-darken depth:</b> "Start Match" raised primary gets a clearly darker-mint depth strip.<br>
+    • <b>C6 Daybreak signature:</b> Primary CTAs gain a 4px soft mint halo (box-shadow-style outer glow) for welcoming-lobby softness — distinct from the focus ring.
+  </div>
+</div>
+
+<!-- ─── BURST ─────────────────────────────────────────────────────────────── -->
+<div class="direction-block">
+  <div class="direction-header">
+    <span class="direction-tag">DIRECTION 5/5</span>
+    <h2 style="color:#FFD166;">Burst</h2>
+    <span style="font-size:12px; color:#98a3b6;">event-celebration statement · base #20112E · accent #FFD166 · radius 18-28</span>
+  </div>
+  <div class="direction-desc">Burst is the loudest direction. BEFORE: gold accent on primary + danger red; everything else dark plum. After: gold in more idle slots, plus C6 signature oversized primary CTAs for event-poster statement energy.</div>
+
+  <div class="variant-row flat-row">
+    <div class="variant-cell">
+      <span class="variant-tag">flat</span>
+      <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="frame"><img src="screenshots/before/burst-flat.png" alt="Burst flat BEFORE"></div>
+        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="variant-row raised-row">
+    <div class="variant-cell">
+      <span class="variant-tag raised-tag">raised</span>
+      <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="frame"><img src="screenshots/before/burst-raised.png" alt="Burst raised BEFORE"></div>
+        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation">
+    <b>What you should see change after Phase 12:</b><br>
+    • <b>C2' accent expansion:</b> kicker labels gain gold tint · selected tab gets gold underline + gold text · selected ItemList rows gain gold left-stripe.<br>
+    • <b>C4 HSV value-darken depth:</b> "Start Match" raised primary gets a darker-gold depth strip; the thicker depth (paired with C6 oversized CTA) makes the press affordance read like a poster button.<br>
+    • <b>C6 Burst signature:</b> Primary CTAs oversized to 56-64px height with thicker 6px depth strips — event-poster statement.
+  </div>
+</div>
+
+<div style="margin-top: 64px; padding: 24px; background: #11162A; border-radius: 12px; border: 1px solid #1f2638; font-size: 13px; color: #c9d2e0;">
+  <h3 style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #6ce5a0; margin-bottom: 12px;">Workflow notes</h3>
+  <ul style="padding-left: 20px; line-height: 1.7;">
+    <li><b>Pre-Phase-12 use:</b> Review BEFORE shots here, then open <a href="mockup-refined-plan.html" style="color:#6ce5a0;">mockup-refined-plan.html</a> to preview the spirit/direction. Use both to decide whether to approve the refined Phase 12 scope.</li>
+    <li><b>Post-Phase-12 use:</b> Run <code>godot --script .planning/spikes/visual-identity-distinctiveness/005-before-after-comparison/capture_screenshots.gd -- phase=after</code> to capture AFTER shots. Reload this page; AFTER cells will populate automatically via the manifest.</li>
+    <li><b>BEFORE shots are baseline:</b> Captured against commit <code>96b4e52</code> (color_hue row+blit perf only — no visual changes vs 53df7dc). These are the canonical "what NeoCade currently renders" reference.</li>
+    <li><b>Real Godot rendering, not HTML mocks:</b> Every BEFORE screenshot is the actual <code>showcase/showcase.tscn</code> rendered by Godot 4.6.2 using OpenGL Compatibility renderer. Same code path users would see.</li>
+  </ul>
+</div>
+
+<script>
+  // Layout toggle
+  const layoutRadios = document.querySelectorAll('input[name="layout"]');
+  layoutRadios.forEach(r => r.addEventListener('change', e => {
+    document.body.classList.toggle('slider-mode', e.target.value === 'slider');
+  }));
+
+  // Filter toggle
+  const filterRadios = document.querySelectorAll('input[name="filter"]');
+  filterRadios.forEach(r => r.addEventListener('change', e => {
+    document.body.classList.remove('filter-flat', 'filter-raised');
+    if (e.target.value === 'flat') document.body.classList.add('filter-flat');
+    if (e.target.value === 'raised') document.body.classList.add('filter-raised');
+  }));
+
+  // Attempt to load AFTER manifest if present, swap placeholders for real shots.
+  fetch('screenshots/after/manifest.json')
+    .then(r => r.ok ? r.json() : null)
+    .then(manifest => {
+      if (!manifest || !manifest.entries) return;
+      console.log('AFTER manifest found:', manifest);
+      manifest.entries.forEach(entry => {
+        if (!entry.ok) return;
+        // Find the placeholder for this slug and replace.
+        const placeholders = document.querySelectorAll('.placeholder');
+        // Slug like "pulse-flat" maps to alt="Pulse flat BEFORE"; the next .frame is the AFTER cell.
+        const beforeImg = document.querySelector(`img[src="screenshots/before/${entry.slug}.png"]`);
+        if (!beforeImg) return;
+        const beforeFrame = beforeImg.closest('.frame');
+        const afterFrame = beforeFrame.parentElement.children[1];
+        if (!afterFrame) return;
+        afterFrame.innerHTML = `<img src="screenshots/after/${entry.slug}.png" alt="${entry.style} ${entry.raised ? 'raised' : 'flat'} AFTER">`;
+      });
+      // Update status row.
+      const statusOk = document.querySelector('.status-row:nth-child(3) .pending');
+      if (statusOk) {
+        statusOk.classList.remove('pending');
+        statusOk.classList.add('ok');
+        statusOk.innerHTML = `✓ ${manifest.entries.filter(e => e.ok).length}/${manifest.entries.length} captured at ${manifest.captured_at}`;
+      }
+    })
+    .catch(() => {/* No AFTER manifest yet — that's fine, leave placeholders. */});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NeoCade — Refined Phase 12 Mockup (Before vs After)</title>
+<style>
+  /* ─── Global frame ───────────────────────────────────────────────────────── */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #0a0c12; color: #e8ecf3; line-height: 1.4; }
+  body { padding: 32px 24px 80px; }
+  h1.page-title { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+  p.page-sub { color: #98a3b6; max-width: 900px; margin-bottom: 32px; font-size: 14px; }
+  .legend-strip { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; font-size: 11px; color: #b9c1d0; }
+  .legend-pill { padding: 4px 10px; border-radius: 12px; background: #1b2030; border: 1px solid #2a3148; }
+  .legend-pill b { color: #e8ecf3; font-weight: 600; }
+
+  .direction-block { margin-bottom: 64px; border-top: 1px solid #1f2638; padding-top: 32px; }
+  .direction-block:first-of-type { border-top: 0; padding-top: 0; }
+  .direction-title { display: flex; align-items: baseline; gap: 16px; margin-bottom: 4px; }
+  .direction-title h2 { font-size: 22px; font-weight: 700; }
+  .direction-title .kicker { font-size: 11px; letter-spacing: 0.16em; font-weight: 700; text-transform: uppercase; color: #6e7a90; }
+  .direction-desc { color: #98a3b6; font-size: 13px; margin-bottom: 16px; max-width: 800px; }
+  .direction-tokens { display: flex; gap: 6px; margin-bottom: 16px; font-size: 11px; font-family: ui-monospace, monospace; color: #6e7a90; }
+  .swatch { width: 18px; height: 18px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.12); }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 12px; }
+  .frame-wrap { display: flex; flex-direction: column; gap: 8px; }
+  .frame-label { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #98a3b6; }
+  .frame-label.before { color: #ff8090; }
+  .frame-label.after  { color: #6ce5a0; }
+  .frame-label-tag { padding: 2px 8px; border-radius: 4px; background: #1b2030; }
+  .annotation { color: #6e7a90; font-size: 12px; margin-top: 4px; line-height: 1.5; }
+
+  .frame { border-radius: 16px; padding: 24px; aspect-ratio: 16/10; overflow: hidden; position: relative; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+
+  /* HUD bar - top strip */
+  .hud { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 10px; }
+  .hud-left, .hud-right { display: flex; align-items: center; gap: 10px; }
+  .hud-chip { display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; font-weight: 700; font-size: 12px; }
+  .hud-icon { width: 16px; height: 16px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
+
+  /* Hero card */
+  .hero { display: flex; gap: 16px; align-items: stretch; margin: 14px 0; }
+  .hero-text { flex: 1; }
+  .hero-kicker { font-size: 10px; letter-spacing: 0.18em; font-weight: 800; text-transform: uppercase; }
+  .hero-title { font-size: 22px; font-weight: 800; line-height: 1.1; margin: 4px 0 6px; }
+  .hero-sub { font-size: 11px; opacity: 0.7; margin-bottom: 10px; }
+  .hero-actions { display: flex; gap: 8px; }
+  .btn { padding: 8px 14px; font-weight: 700; font-size: 12px; cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 6px; position: relative; }
+  .btn.cta { padding: 10px 18px; font-size: 13px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 2px; margin: 12px 0 14px; border-bottom: 1px solid; }
+  .tab { padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; position: relative; }
+  .tab.active::after { content: ''; position: absolute; left: 8px; right: 8px; bottom: -1px; height: 2px; }
+
+  /* Card grid (level select pattern) */
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  .card { aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; position: relative; }
+  .card.locked { opacity: 0.45; }
+  .card .num { font-size: 16px; }
+  .card .stars { font-size: 8px; opacity: 0.85; }
+
+  /* ItemList rows */
+  .item-list { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }
+  .item-row { padding: 6px 10px; border-radius: 6px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+  .item-row.selected::before { content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 3px; border-radius: 2px; }
+
+  /* Bottom nav */
+  .bottom-nav { display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid; margin-top: auto; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.6; }
+  .nav-item.active { opacity: 1; }
+  .nav-icon { width: 18px; height: 18px; border-radius: 4px; }
+
+  /* ─── Direction-specific palettes ───────────────────────────────────────── */
+
+  /* PULSE: base=#151A2E, accent=#8BFF6A */
+  .pulse-bg { background: #151A2E; color: #E8ECF3; }
+  .pulse-panel { background: #1B2138; }
+  .pulse-low { background: #11162A; }
+  .pulse-accent { color: #8BFF6A; }
+  .pulse-accent-bg { background: #8BFF6A; color: #0E1226; }
+  .pulse-text-muted { color: #98a3b6; }
+
+  /* SLATE: base=#111820, accent=#8BD3FF */
+  .slate-bg { background: #111820; color: #E8ECF3; }
+  .slate-panel { background: #18212C; }
+  .slate-low { background: #0D141C; }
+  .slate-accent { color: #8BD3FF; }
+  .slate-accent-bg { background: #18212C; color: #8BD3FF; border: 1px solid #8BD3FF; }
+  .slate-text-muted { color: #98a3b6; }
+
+  /* BUBBLE: base=#241326, accent=#FFB3E6 */
+  .bubble-bg { background: #241326; color: #FBEEF6; }
+  .bubble-panel { background: #2E1A30; }
+  .bubble-low { background: #1C0E1F; }
+  .bubble-accent { color: #FFB3E6; }
+  .bubble-accent-bg { background: #FFB3E6; color: #2B0E29; }
+  .bubble-text-muted { color: #B89AAA; }
+
+  /* DAYBREAK: base=#0B2420, accent=#76F2D1 */
+  .daybreak-bg { background: #0B2420; color: #E6F4EE; }
+  .daybreak-panel { background: #102E29; }
+  .daybreak-low { background: #061C18; }
+  .daybreak-accent { color: #76F2D1; }
+  .daybreak-accent-bg { background: #76F2D1; color: #052420; }
+  .daybreak-text-muted { color: #93B8AC; }
+
+  /* BURST: base=#20112E, accent=#FFD166 */
+  .burst-bg { background: #20112E; color: #F4E6F1; }
+  .burst-panel { background: #2A1739; }
+  .burst-low { background: #170B22; }
+  .burst-accent { color: #FFD166; }
+  .burst-accent-bg { background: #FFD166; color: #2B1240; }
+  .burst-text-muted { color: #B59CB3; }
+
+  /* Role colors (only used in AFTER for HUD chips - subtle, sparse) */
+  .role-danger { color: #FF6E6E; }
+  .role-warning { color: #FFD166; }
+  .role-success { color: #5CC971; }
+  .role-info { color: #5FE3FF; }
+
+  /* ─── BEFORE state: mono-tint, accent only on primary CTA + focus ─────── */
+  .before .hud { background: var(--panel-bg); color: var(--text-muted); }
+  .before .hud-chip { background: rgba(255,255,255,0.04); color: inherit; }
+  .before .hero-kicker { color: var(--text-muted); }
+  .before .hero-title { color: inherit; }
+  .before .btn { background: var(--panel-bg); color: inherit; border-radius: var(--radius); }
+  .before .btn.cta { background: var(--accent-bg-color); color: var(--accent-fg); }
+  .before .tabs { border-color: rgba(255,255,255,0.06); }
+  .before .tab { color: var(--text-muted); }
+  .before .tab.active { color: inherit; }
+  .before .tab.active::after { background: rgba(255,255,255,0.18); }
+  .before .card { background: var(--panel-bg); }
+  .before .item-row { background: var(--low-bg); color: var(--text-muted); }
+  .before .item-row.selected { background: var(--panel-bg); color: inherit; }
+  .before .bottom-nav { border-color: rgba(255,255,255,0.06); }
+  .before .nav-icon { background: var(--text-muted); }
+
+  /* ─── AFTER state: C2' accent expansion + C4 depth + C6 signature ─────── */
+  .after .hud { background: var(--panel-bg); color: inherit; }
+  .after .hud-chip { background: rgba(255,255,255,0.05); }
+  .after .hero-kicker { color: var(--accent); /* C2': accent in kicker */ }
+  .after .hero-title { color: inherit; }
+  .after .btn { background: var(--panel-bg); color: inherit; border-radius: var(--radius); }
+  .after .btn.cta { background: var(--accent-bg-color); color: var(--accent-fg); position: relative; }
+  /* C4: candy-button depth strip on CTAs */
+  .after .btn.cta::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 4px;
+    background: var(--accent-depth); border-radius: 0 0 var(--radius) var(--radius);
+  }
+  .after .tabs { border-color: rgba(255,255,255,0.06); }
+  .after .tab { color: var(--text-muted); }
+  .after .tab.active { color: var(--accent); /* C2': accent in active tab text */ }
+  .after .tab.active::after { background: var(--accent); /* C2': accent in selected tab indicator */ }
+  .after .card { background: var(--panel-bg); }
+  .after .item-row { background: var(--low-bg); color: var(--text-muted); }
+  .after .item-row.selected { background: var(--panel-bg); color: inherit; }
+  .after .item-row.selected::before { background: var(--accent); /* C2': accent left-stripe */ }
+  .after .bottom-nav { border-color: rgba(255,255,255,0.06); }
+  .after .nav-item.active { color: var(--accent); /* C2': accent on active nav */ }
+  .after .nav-item.active .nav-icon { background: var(--accent); }
+  .after .nav-icon { background: var(--text-muted); }
+
+  /* ─── Direction-specific variables ──────────────────────────────────────── */
+  .pulse-frame { --panel-bg: #1B2138; --low-bg: #11162A; --accent: #8BFF6A; --accent-bg-color: #8BFF6A; --accent-fg: #0E1226; --accent-depth: #589933; --text-muted: #6E7A90; --radius: 0px; }
+  .slate-frame { --panel-bg: #18212C; --low-bg: #0D141C; --accent: #8BD3FF; --accent-bg-color: #18212C; --accent-fg: #8BD3FF; --accent-depth: rgba(0,0,0,0); --text-muted: #6E7A90; --radius: 14px; }
+  .bubble-frame { --panel-bg: #2E1A30; --low-bg: #1C0E1F; --accent: #FFB3E6; --accent-bg-color: #FFB3E6; --accent-fg: #2B0E29; --accent-depth: #B370A3; --text-muted: #6E5566; --radius: 999px; }
+  .daybreak-frame { --panel-bg: #102E29; --low-bg: #061C18; --accent: #76F2D1; --accent-bg-color: #76F2D1; --accent-fg: #052420; --accent-depth: #44A88B; --text-muted: #5A8077; --radius: 8px; }
+  .burst-frame { --panel-bg: #2A1739; --low-bg: #170B22; --accent: #FFD166; --accent-bg-color: #FFD166; --accent-fg: #2B1240; --accent-depth: #B3823C; --text-muted: #785574; --radius: 18px; }
+
+  /* C6 per-direction signature moves (AFTER only) */
+  /* Pulse: uppercase-tracked kicker */
+  .after.pulse-frame .hero-kicker { letter-spacing: 0.24em; font-weight: 900; }
+  /* Slate: 1px hairlines on panels */
+  .after.slate-frame .card { border: 1px solid rgba(139, 211, 255, 0.16); }
+  .after.slate-frame .hud { border: 1px solid rgba(139, 211, 255, 0.16); }
+  /* Slate: ghost-style primary (quiet pill) */
+  .after.slate-frame .btn.cta { background: transparent; border: 1.5px solid #8BD3FF; }
+  .after.slate-frame .btn.cta::after { display: none; }
+  /* Bubble: forced pillow radius */
+  .after.bubble-frame .card { border-radius: 22px; }
+  .after.bubble-frame .hud { border-radius: 16px; }
+  /* Daybreak: 4px soft halo on primary CTA */
+  .after.daybreak-frame .btn.cta { box-shadow: 0 0 0 4px rgba(118, 242, 209, 0.18); }
+  /* Burst: oversized primary CTA */
+  .after.burst-frame .btn.cta { padding: 14px 28px; font-size: 15px; border-radius: 28px; }
+  .after.burst-frame .btn.cta::after { height: 6px; border-radius: 0 0 28px 28px; bottom: -6px; }
+
+  /* ─── Misc dot annotations ──────────────────────────────────────────────── */
+  .role-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot-success { background: #5CC971; }
+  .dot-danger { background: #FF6E6E; }
+  .dot-warning { background: #FFD166; }
+  .dot-info { background: #5FE3FF; }
+
+  /* HUD widgets — match HCGames-style colored chips on the top bar */
+  .after .hud-icon-heart { background: #FF4D6D; color: #fff; }
+  .after .hud-icon-coin { background: #FFD166; color: #2B1B05; }
+  .after .hud-icon-gem { background: #5FE3FF; color: #0A2A33; }
+  .before .hud-icon-heart, .before .hud-icon-coin, .before .hud-icon-gem { background: rgba(255,255,255,0.18); color: inherit; }
+
+  /* Spirit-section header */
+  .spirit-section { background: #11162A; border: 1px solid #1f2638; border-radius: 12px; padding: 20px; margin-bottom: 40px; }
+  .spirit-section h3 { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: #6ce5a0; margin-bottom: 10px; }
+  .spirit-row { display: grid; grid-template-columns: 200px 1fr; gap: 16px; margin-bottom: 8px; font-size: 12px; }
+  .spirit-row .label { color: #98a3b6; font-weight: 600; }
+  .spirit-row .desc { color: #c9d2e0; }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">NeoCade — Refined Phase 12 Mockup</h1>
+<p class="page-sub">Forward-looking preview of all 5 themes with the user-refined plan applied. <b>BEFORE</b> = current production rendering (mono-tint, accent only on primary CTA / focus ring). <b>AFTER</b> = C2' accent expansion + C4 same-hue depth + C6 per-direction signature. Same color palette per direction — no new hues introduced. Game-shaped surface (HUD strip + hero + tabs + card grid + bottom nav) to demonstrate game-UI conventions rather than the current tool-shaped showcase.</p>
+
+<div class="legend-strip">
+  <span class="legend-pill"><b>C2'</b> accent expansion → kicker / selected tab / row stripe / active nav</span>
+  <span class="legend-pill"><b>C4</b> HSV value-darken → same-hue darker depth strip on CTAs</span>
+  <span class="legend-pill"><b>C6 Pulse</b> uppercase-tracked kicker</span>
+  <span class="legend-pill"><b>C6 Slate</b> 1px hairlines + quiet-pill CTA</span>
+  <span class="legend-pill"><b>C6 Bubble</b> forced pillow radius</span>
+  <span class="legend-pill"><b>C6 Daybreak</b> soft halo</span>
+  <span class="legend-pill"><b>C6 Burst</b> oversized CTA</span>
+</div>
+
+<div class="spirit-section">
+  <h3>Spirit alignment</h3>
+  <div class="spirit-row"><span class="label">HCGames Flat Game UI</span><span class="desc">Colored HUD chips (heart / coin / gem) appear on every screen. Primary CTA has bold same-hue depth strip readable as a 3D affordance. Pillow / chunky proportions on Bubble + Burst.</span></div>
+  <div class="spirit-row"><span class="label">LDtk</span><span class="desc">Accent surfaces as left-stripes on selected ItemList rows, as the active tab indicator, and as active nav-icon coloring — the per-section color-cue pattern adapted to a flat MD3 grammar.</span></div>
+  <div class="spirit-row"><span class="label">Material Design 3 Expressive</span><span class="desc">Accent earns its keep: appears in 6+ purposeful slots per idle screen (kicker, selected tab, row stripe, active section, active nav, value labels, slider grabber). No new hues introduced. Restraint preserved — danger/warning/success role colors are opt-in via type variation, not auto-bound.</span></div>
+</div>
+
+<!-- ─── PULSE ─────────────────────────────────────────────────────────────── -->
+<div class="direction-block pulse-bg">
+  <div class="direction-title">
+    <span class="kicker">DIRECTION</span><h2 class="pulse-accent">PULSE</h2>
+    <span class="pulse-text-muted" style="font-size:12px;">arcade-dense cabinet · radius 0 · uppercase-tracked kicker signature</span>
+  </div>
+  <div class="direction-desc">Pulse base #151A2E (dark navy) + accent #8BFF6A (lime). After: accent surfaces in kicker, selected tab, row stripe, active nav. C6 signature: uppercase-tracked 0.24em kicker labels (arcade-marquee energy).</div>
+  <div class="direction-tokens">
+    <div class="swatch" style="background:#151A2E"></div><span>base #151A2E</span>
+    <div class="swatch" style="background:#8BFF6A"></div><span>accent #8BFF6A</span>
+    <div class="swatch" style="background:#1B2138"></div><span>panel #1B2138</span>
+    <div class="swatch" style="background:#589933"></div><span>accent depth (C4) #589933</span>
+  </div>
+  <div class="pair">
+    <div class="frame-wrap">
+      <div class="frame-label before"><span class="frame-label-tag">BEFORE</span> current production rendering</div>
+      <div class="frame before pulse-frame pulse-bg">
+        <div class="hud">
+          <div class="hud-left">
+            <div class="hud-chip"><span class="hud-icon hud-icon-heart">♥</span>FULL</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-coin">¢</span>83,029</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-gem">◆</span>12</div>
+          </div>
+          <div class="hud-right pulse-text-muted">LV 47</div>
+        </div>
+        <div class="hero">
+          <div class="hero-text">
+            <div class="hero-kicker">ARCADE</div>
+            <div class="hero-title">Cabinet Lobby</div>
+            <div class="hero-sub pulse-text-muted">Pick a cabinet to begin.</div>
+            <div class="hero-actions">
+              <div class="btn cta">PLAY</div>
+              <div class="btn">Options</div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">Lobby</div>
+          <div class="tab">Cabinets</div>
+          <div class="tab">Profile</div>
+          <div class="tab">Settings</div>
+        </div>
+        <div class="item-list">
+          <div class="item-row">Cabinet A <span>ready</span></div>
+          <div class="item-row selected">Mini-game list <span>3 new</span></div>
+          <div class="item-row">Settings row <span>stable</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-wrap">
+      <div class="frame-label after"><span class="frame-label-tag">AFTER</span> C2'+C4+C6 applied</div>
+      <div class="frame after pulse-frame pulse-bg">
+        <div class="hud">
+          <div class="hud-left">
+            <div class="hud-chip"><span class="hud-icon hud-icon-heart">♥</span>FULL</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-coin">¢</span>83,029</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-gem">◆</span>12</div>
+          </div>
+          <div class="hud-right pulse-accent">LV 47</div>
+        </div>
+        <div class="hero">
+          <div class="hero-text">
+            <div class="hero-kicker">ARCADE</div>
+            <div class="hero-title">Cabinet Lobby</div>
+            <div class="hero-sub pulse-text-muted">Pick a cabinet to begin.</div>
+            <div class="hero-actions">
+              <div class="btn cta">PLAY</div>
+              <div class="btn">Options</div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">Lobby</div>
+          <div class="tab">Cabinets</div>
+          <div class="tab">Profile</div>
+          <div class="tab">Settings</div>
+        </div>
+        <div class="item-list">
+          <div class="item-row">Cabinet A <span>ready</span></div>
+          <div class="item-row selected">Mini-game list <span>3 new</span></div>
+          <div class="item-row">Settings row <span>stable</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation"><b>What changed:</b> kicker "ARCADE" now lime + tighter tracking · selected tab "Lobby" gets lime underline + lime text · selected ItemList row "Mini-game list" gets lime left-stripe · PLAY button gains a same-hue darker green depth strip · HUD chip icons gain HCGames-style role colors · level number lime-colored.</div>
+</div>
+
+<!-- ─── SLATE ─────────────────────────────────────────────────────────────── -->
+<div class="direction-block slate-bg">
+  <div class="direction-title">
+    <span class="kicker">DIRECTION</span><h2 class="slate-accent">SLATE</h2>
+    <span class="slate-text-muted" style="font-size:12px;">iOS-premium quiet · radius 14 · 1px hairlines signature</span>
+  </div>
+  <div class="direction-desc">Slate base #111820 (dark slate) + accent #8BD3FF (sky blue). After: accent surfaces in kicker, selected tab, row stripe, active nav. C6 signature: 1px hairline borders on panels (iOS-premium feel) + quiet-pill primary (outline-only).</div>
+  <div class="direction-tokens">
+    <div class="swatch" style="background:#111820"></div><span>base #111820</span>
+    <div class="swatch" style="background:#8BD3FF"></div><span>accent #8BD3FF</span>
+    <div class="swatch" style="background:#18212C"></div><span>panel #18212C</span>
+  </div>
+  <div class="pair">
+    <div class="frame-wrap">
+      <div class="frame-label before"><span class="frame-label-tag">BEFORE</span> current production rendering</div>
+      <div class="frame before slate-frame slate-bg">
+        <div class="hud">
+          <div class="hud-left">
+            <div class="hud-chip"><span class="hud-icon hud-icon-heart">♥</span>FULL</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-coin">¢</span>83,029</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-gem">◆</span>12</div>
+          </div>
+          <div class="hud-right slate-text-muted">LV 47</div>
+        </div>
+        <div class="hero">
+          <div class="hero-text">
+            <div class="hero-kicker">SETTINGS</div>
+            <div class="hero-title">Preferences</div>
+            <div class="hero-sub slate-text-muted">Adjust audio, video, and controls.</div>
+            <div class="hero-actions">
+              <div class="btn cta">Save</div>
+              <div class="btn">Cancel</div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">General</div>
+          <div class="tab">Audio</div>
+          <div class="tab">Video</div>
+          <div class="tab">Controls</div>
+        </div>
+        <div class="item-list">
+          <div class="item-row">Master volume <span>80%</span></div>
+          <div class="item-row selected">Music volume <span>65%</span></div>
+          <div class="item-row">Voice volume <span>90%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-wrap">
+      <div class="frame-label after"><span class="frame-label-tag">AFTER</span> C2'+C4+C6 applied</div>
+      <div class="frame after slate-frame slate-bg">
+        <div class="hud">
+          <div class="hud-left">
+            <div class="hud-chip"><span class="hud-icon hud-icon-heart">♥</span>FULL</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-coin">¢</span>83,029</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-gem">◆</span>12</div>
+          </div>
+          <div class="hud-right slate-accent">LV 47</div>
+        </div>
+        <div class="hero">
+          <div class="hero-text">
+            <div class="hero-kicker">SETTINGS</div>
+            <div class="hero-title">Preferences</div>
+            <div class="hero-sub slate-text-muted">Adjust audio, video, and controls.</div>
+            <div class="hero-actions">
+              <div class="btn cta">Save</div>
+              <div class="btn">Cancel</div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">General</div>
+          <div class="tab">Audio</div>
+          <div class="tab">Video</div>
+          <div class="tab">Controls</div>
+        </div>
+        <div class="item-list">
+          <div class="item-row">Master volume <span>80%</span></div>
+          <div class="item-row selected">Music volume <span>65%</span></div>
+          <div class="item-row">Voice volume <span>90%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation"><b>What changed:</b> kicker "SETTINGS" now sky-blue · 1px sky-blue hairlines outline the HUD strip and chrome · "Save" button is a quiet-pill outline (not filled — C6 Slate ghost-strategy) · selected tab "General" gets sky-blue underline · selected row "Music volume" gets sky-blue left-stripe · level number sky-blue.</div>
+</div>
+
+<!-- ─── BUBBLE ────────────────────────────────────────────────────────────── -->
+<div class="direction-block bubble-bg">
+  <div class="direction-title">
+    <span class="kicker">DIRECTION</span><h2 class="bubble-accent">BUBBLE</h2>
+    <span class="bubble-text-muted" style="font-size:12px;">candy-pillowy · radius 999 pill · forced ≥26 radius signature</span>
+  </div>
+  <div class="direction-desc">Bubble base #241326 (dark berry) + accent #FFB3E6 (bubblegum). After: accent surfaces in kicker, selected tab, row stripe, active nav. C6 signature: forced ≥22 radius on all panels and chrome (pillow consistency).</div>
+  <div class="direction-tokens">
+    <div class="swatch" style="background:#241326"></div><span>base #241326</span>
+    <div class="swatch" style="background:#FFB3E6"></div><span>accent #FFB3E6</span>
+    <div class="swatch" style="background:#2E1A30"></div><span>panel #2E1A30</span>
+    <div class="swatch" style="background:#B370A3"></div><span>accent depth (C4) #B370A3</span>
+  </div>
+  <div class="pair">
+    <div class="frame-wrap">
+      <div class="frame-label before"><span class="frame-label-tag">BEFORE</span> current production rendering</div>
+      <div class="frame before bubble-frame bubble-bg">
+        <div class="hud">
+          <div class="hud-left">
+            <div class="hud-chip"><span class="hud-icon hud-icon-heart">♥</span>FULL</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-coin">¢</span>83,029</div>
+          </div>
+          <div class="hud-right bubble-text-muted">LV 47</div>
+        </div>
+        <div class="hero">
+          <div class="hero-text">
+            <div class="hero-kicker">PLAYTIME</div>
+            <div class="hero-title">Choose a Game</div>
+            <div class="hero-sub bubble-text-muted">12 new puzzles this week.</div>
+            <div class="hero-actions">
+              <div class="btn cta">START</div>
+              <div class="btn">Help</div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">Puzzles</div>
+          <div class="tab">Match-3</div>
+          <div class="tab">Story</div>
+        </div>
+        <div class="grid">
+          <div class="card"><span class="num">1</span><span class="stars">★★★</span></div>
+          <div class="card"><span class="num">2</span><span class="stars">★★★</span></div>
+          <div class="card"><span class="num">3</span><span class="stars">★★☆</span></div>
+          <div class="card"><span class="num">4</span><span class="stars">★☆☆</span></div>
+          <div class="card locked"><span class="num">5</span><span class="stars">🔒</span></div>
+          <div class="card locked"><span class="num">6</span><span class="stars">🔒</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-wrap">
+      <div class="frame-label after"><span class="frame-label-tag">AFTER</span> C2'+C4+C6 applied</div>
+      <div class="frame after bubble-frame bubble-bg">
+        <div class="hud">
+          <div class="hud-left">
+            <div class="hud-chip"><span class="hud-icon hud-icon-heart">♥</span>FULL</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-coin">¢</span>83,029</div>
+          </div>
+          <div class="hud-right bubble-accent">LV 47</div>
+        </div>
+        <div class="hero">
+          <div class="hero-text">
+            <div class="hero-kicker">PLAYTIME</div>
+            <div class="hero-title">Choose a Game</div>
+            <div class="hero-sub bubble-text-muted">12 new puzzles this week.</div>
+            <div class="hero-actions">
+              <div class="btn cta">START</div>
+              <div class="btn">Help</div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">Puzzles</div>
+          <div class="tab">Match-3</div>
+          <div class="tab">Story</div>
+        </div>
+        <div class="grid">
+          <div class="card"><span class="num">1</span><span class="stars">★★★</span></div>
+          <div class="card"><span class="num">2</span><span class="stars">★★★</span></div>
+          <div class="card"><span class="num">3</span><span class="stars">★★☆</span></div>
+          <div class="card"><span class="num">4</span><span class="stars">★☆☆</span></div>
+          <div class="card locked"><span class="num">5</span><span class="stars">🔒</span></div>
+          <div class="card locked"><span class="num">6</span><span class="stars">🔒</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation"><b>What changed:</b> kicker "PLAYTIME" now pink · selected tab "Puzzles" gets pink underline + pink text · START button gains a same-hue darker pink depth strip · cards forced to 22+ radius (pillow consistency) · level number pink.</div>
+</div>
+
+<!-- ─── DAYBREAK ──────────────────────────────────────────────────────────── -->
+<div class="direction-block daybreak-bg">
+  <div class="direction-title">
+    <span class="kicker">DIRECTION</span><h2 class="daybreak-accent">DAYBREAK</h2>
+    <span class="daybreak-text-muted" style="font-size:12px;">airy-welcoming lobby · radius 8 · soft halo on CTAs signature</span>
+  </div>
+  <div class="direction-desc">Daybreak base #0B2420 (dark forest-teal) + accent #76F2D1 (fresh mint). After: accent surfaces in kicker, selected tab, row stripe, active nav. C6 signature: 4px soft inner halo around primary CTAs (welcoming-lobby softness).</div>
+  <div class="direction-tokens">
+    <div class="swatch" style="background:#0B2420"></div><span>base #0B2420</span>
+    <div class="swatch" style="background:#76F2D1"></div><span>accent #76F2D1</span>
+    <div class="swatch" style="background:#102E29"></div><span>panel #102E29</span>
+    <div class="swatch" style="background:#44A88B"></div><span>accent depth (C4) #44A88B</span>
+  </div>
+  <div class="pair">
+    <div class="frame-wrap">
+      <div class="frame-label before"><span class="frame-label-tag">BEFORE</span> current production rendering</div>
+      <div class="frame before daybreak-frame daybreak-bg">
+        <div class="hud">
+          <div class="hud-left">
+            <div class="hud-chip"><span class="hud-icon hud-icon-heart">♥</span>FULL</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-coin">¢</span>83,029</div>
+          </div>
+          <div class="hud-right daybreak-text-muted">LV 47</div>
+        </div>
+        <div class="hero">
+          <div class="hero-text">
+            <div class="hero-kicker">LOBBY</div>
+            <div class="hero-title">Welcome Back</div>
+            <div class="hero-sub daybreak-text-muted">Your daily quests are ready.</div>
+            <div class="hero-actions">
+              <div class="btn cta">Continue</div>
+              <div class="btn">View Map</div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">Quests</div>
+          <div class="tab">Inventory</div>
+          <div class="tab">Friends</div>
+        </div>
+        <div class="item-list">
+          <div class="item-row">Daily login <span>3 streak</span></div>
+          <div class="item-row selected">Defeat 5 enemies <span>3/5</span></div>
+          <div class="item-row">Collect 100 gold <span>87/100</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-wrap">
+      <div class="frame-label after"><span class="frame-label-tag">AFTER</span> C2'+C4+C6 applied</div>
+      <div class="frame after daybreak-frame daybreak-bg">
+        <div class="hud">
+          <div class="hud-left">
+            <div class="hud-chip"><span class="hud-icon hud-icon-heart">♥</span>FULL</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-coin">¢</span>83,029</div>
+          </div>
+          <div class="hud-right daybreak-accent">LV 47</div>
+        </div>
+        <div class="hero">
+          <div class="hero-text">
+            <div class="hero-kicker">LOBBY</div>
+            <div class="hero-title">Welcome Back</div>
+            <div class="hero-sub daybreak-text-muted">Your daily quests are ready.</div>
+            <div class="hero-actions">
+              <div class="btn cta">Continue</div>
+              <div class="btn">View Map</div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">Quests</div>
+          <div class="tab">Inventory</div>
+          <div class="tab">Friends</div>
+        </div>
+        <div class="item-list">
+          <div class="item-row">Daily login <span>3 streak</span></div>
+          <div class="item-row selected">Defeat 5 enemies <span>3/5</span></div>
+          <div class="item-row">Collect 100 gold <span>87/100</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation"><b>What changed:</b> kicker "LOBBY" now mint · selected tab "Quests" gets mint underline + mint text · Continue button gains 4px soft mint halo around it (C6 Daybreak signature) + same-hue darker mint depth strip (C4) · selected row "Defeat 5 enemies" gets mint left-stripe · level number mint.</div>
+</div>
+
+<!-- ─── BURST ─────────────────────────────────────────────────────────────── -->
+<div class="direction-block burst-bg">
+  <div class="direction-title">
+    <span class="kicker">DIRECTION</span><h2 class="burst-accent">BURST</h2>
+    <span class="burst-text-muted" style="font-size:12px;">event-celebration-statement · radius 18-28 · oversized primary CTA signature</span>
+  </div>
+  <div class="direction-desc">Burst base #20112E (dark plum) + accent #FFD166 (warm gold). After: accent surfaces in kicker, selected tab, row stripe, active nav. C6 signature: oversized 56-64px primary CTAs with thicker depth strips (event-poster statement).</div>
+  <div class="direction-tokens">
+    <div class="swatch" style="background:#20112E"></div><span>base #20112E</span>
+    <div class="swatch" style="background:#FFD166"></div><span>accent #FFD166</span>
+    <div class="swatch" style="background:#2A1739"></div><span>panel #2A1739</span>
+    <div class="swatch" style="background:#B3823C"></div><span>accent depth (C4) #B3823C</span>
+  </div>
+  <div class="pair">
+    <div class="frame-wrap">
+      <div class="frame-label before"><span class="frame-label-tag">BEFORE</span> current production rendering</div>
+      <div class="frame before burst-frame burst-bg">
+        <div class="hud">
+          <div class="hud-left">
+            <div class="hud-chip"><span class="hud-icon hud-icon-heart">♥</span>FULL</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-coin">¢</span>83,029</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-gem">◆</span>12</div>
+          </div>
+          <div class="hud-right burst-text-muted">LV 47</div>
+        </div>
+        <div class="hero">
+          <div class="hero-text">
+            <div class="hero-kicker">EVENT</div>
+            <div class="hero-title">Festival Weekend</div>
+            <div class="hero-sub burst-text-muted">2x rewards on all completions.</div>
+            <div class="hero-actions">
+              <div class="btn cta">JOIN EVENT</div>
+              <div class="btn">Skip</div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">Featured</div>
+          <div class="tab">Rewards</div>
+          <div class="tab">Schedule</div>
+        </div>
+        <div class="item-list">
+          <div class="item-row">Boss raid <span>2h left</span></div>
+          <div class="item-row selected">Mini-game tournament <span>23m left</span></div>
+          <div class="item-row">Daily challenge <span>active</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-wrap">
+      <div class="frame-label after"><span class="frame-label-tag">AFTER</span> C2'+C4+C6 applied</div>
+      <div class="frame after burst-frame burst-bg">
+        <div class="hud">
+          <div class="hud-left">
+            <div class="hud-chip"><span class="hud-icon hud-icon-heart">♥</span>FULL</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-coin">¢</span>83,029</div>
+            <div class="hud-chip"><span class="hud-icon hud-icon-gem">◆</span>12</div>
+          </div>
+          <div class="hud-right burst-accent">LV 47</div>
+        </div>
+        <div class="hero">
+          <div class="hero-text">
+            <div class="hero-kicker">EVENT</div>
+            <div class="hero-title">Festival Weekend</div>
+            <div class="hero-sub burst-text-muted">2x rewards on all completions.</div>
+            <div class="hero-actions">
+              <div class="btn cta">JOIN EVENT</div>
+              <div class="btn">Skip</div>
+            </div>
+          </div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">Featured</div>
+          <div class="tab">Rewards</div>
+          <div class="tab">Schedule</div>
+        </div>
+        <div class="item-list">
+          <div class="item-row">Boss raid <span>2h left</span></div>
+          <div class="item-row selected">Mini-game tournament <span>23m left</span></div>
+          <div class="item-row">Daily challenge <span>active</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation"><b>What changed:</b> kicker "EVENT" now gold · selected tab "Featured" gets gold underline + gold text · JOIN EVENT button is oversized (14×28 padding, 15px text, 28 radius) with thick 6px same-hue darker gold depth strip (event-poster statement — C6 Burst signature) · selected row gets gold left-stripe · level number gold.</div>
+</div>
+
+<!-- ─── Opt-in role variations demo (C1 + C3) ─────────────────────────────── -->
+<div class="direction-block">
+  <div class="direction-title">
+    <span class="kicker">OPT-IN ONLY</span><h2>Role variations (C1 + C3)</h2>
+    <span style="font-size:12px; color:#98a3b6;">applied via theme_type_variation — never bound to widget defaults</span>
+  </div>
+  <div class="direction-desc">These are <b>not part of the baseline chrome</b>. Consumers apply them deliberately when a Label or Panel semantically represents success / warning / danger / info / accent state. The showcase scene will include a "Role Variations" demo section so consumers see they exist. They do NOT auto-tint any existing widget.</div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 16px;">
+    <div>
+      <h3 style="font-size: 13px; font-weight: 700; color: #6ce5a0; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">C1: Label variations</h3>
+      <div style="background: #151A2E; padding: 16px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+        <div><span style="color: #5CC971; font-weight: 700;">✓ SuccessLabel</span> — Quest complete!</div>
+        <div><span style="color: #FFD166; font-weight: 700;">⚠ WarningLabel</span> — Low inventory.</div>
+        <div><span style="color: #FF6E6E; font-weight: 700;">✕ DangerLabel</span> — Connection lost.</div>
+        <div><span style="color: #5FE3FF; font-weight: 700;">ℹ InfoLabel</span> — New patch available.</div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); color: #6e7a90; font-size: 11px; font-family: ui-monospace, monospace;">my_label.theme_type_variation = "SuccessLabel"</div>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size: 13px; font-weight: 700; color: #6ce5a0; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">C3: Panel variations</h3>
+      <div style="background: #151A2E; padding: 16px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px; font-size: 11px;">
+        <div style="background: rgba(139, 255, 106, 0.08); border-left: 3px solid #8BFF6A; padding: 8px 10px; border-radius: 4px;"><b style="color: #8BFF6A;">AccentPanel</b> — generic accent-tinted container</div>
+        <div style="background: rgba(95, 227, 255, 0.08); border-left: 3px solid #5FE3FF; padding: 8px 10px; border-radius: 4px;"><b style="color: #5FE3FF;">InfoPanel</b> — informational state container</div>
+        <div style="background: rgba(255, 209, 102, 0.08); border-left: 3px solid #FFD166; padding: 8px 10px; border-radius: 4px;"><b style="color: #FFD166;">WarningPanel</b> — non-blocking warning</div>
+        <div style="background: rgba(255, 110, 110, 0.08); border-left: 3px solid #FF6E6E; padding: 8px 10px; border-radius: 4px;"><b style="color: #FF6E6E;">DangerPanel</b> — blocking error or destructive action</div>
+        <div style="background: rgba(92, 201, 113, 0.08); border-left: 3px solid #5CC971; padding: 8px 10px; border-radius: 4px;"><b style="color: #5CC971;">SuccessPanel</b> — confirmation state</div>
+      </div>
+    </div>
+  </div>
+  <div class="annotation" style="margin-top: 16px;"><b>Purposeful use only.</b> A normal Panel stays neutral. A Panel only becomes role-tinted when the consumer explicitly tags it with the corresponding type variation. Same model for Labels. Zero baseline chrome changes from C1 and C3 — they only become visible when consumed.</div>
+</div>
+
+<div style="margin-top: 64px; padding: 24px; background: #11162A; border-radius: 12px; border: 1px solid #1f2638; font-size: 13px; color: #c9d2e0;">
+  <h3 style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #6ce5a0; margin-bottom: 12px;">Honest disclaimers</h3>
+  <ul style="padding-left: 20px; line-height: 1.7;">
+    <li><b>HTML mockup, not Godot rendering.</b> CSS does what Theme/StyleBox can do, but exact pixel rendering will differ slightly when implemented in Godot. The mockup is for spirit/direction approval, not pixel-perfect preview.</li>
+    <li><b>Game-shaped layout used here is illustrative.</b> The actual NeoCade <code>showcase/showcase.tscn</code> is tool-shaped (control gallery). Phase 12 will add a "Game UI Demo" section to the showcase to render these layouts in real Godot, then capture-script will produce after-shots that go into <code>comparison.html</code>.</li>
+    <li><b>Layout is approximate.</b> Real implementation will respect existing showcase scaffolding; this mockup just demonstrates which chrome slots gain accent under C2' and which signatures define each direction under C6.</li>
+    <li><b>Same color palette per direction — zero new hues.</b> Every color shown is either the direction's existing <code>base_color</code>, <code>accent_color</code>, panel tone, or the same-hue darker depth via HSV value-darken (C4). No MD3 secondary/tertiary derivation here (that's deferred C2). Role colors only appear in opt-in variation demos (bottom section).</li>
+  </ul>
+</div>
+
+</body>
+</html>
