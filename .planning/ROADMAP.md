@@ -582,6 +582,16 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 - UD-5 (real-device cross-platform testing matrix) — addressed in Phase 10 acceptance with `(if-real-device-available)` qualifier; ship-or-defer decision in Phase 10
 - UD-6 (AccessKit / VoiceOver / TalkBack screen-reader integration) — `accessibility_name` only in v1 (Phase 9 SHOW-06); deeper QA deferred to v1.x
 
+### Phase 12: Signature Visual Moves
+
+**Goal:** Resolve the "generic dark Godot theme with an accent color" complaint by adopting the three default-behavior signature moves locked by the Visual Identity Distinctiveness spike (C4 + C2' + C6) so the rendered theme reads as a unique flat-MD3 game-UI identity. (1) C4 replaces `_raised_depth_color` with HSV value-darken at `0.20 + 0.10 * raised_strength` to fix colored-button affordance. (2) C2' rebinds existing BINDING_TABLE slots (selected TabBar indicator, selected ItemList/Tree row left-stripe, kicker text color, active section indicators, slider value labels, section-header underlines) to use the existing `accent_color` in idle chrome — the headline fix, zero new hues. (3) C6 gives each of the 5 directions one non-color/non-radius signature: Pulse uppercase-tracked kicker, Slate 1px hairline borders + quiet-pill primary, Bubble forced ≥26 corner radius across all chrome, Daybreak 1px outer mint outline + generous primary padding, Burst oversized 56-64px primary CTAs with thicker depth strip. Locked success criteria (binding): `raised=false` shows ZERO 3D elements, no glow halos anywhere, every direction identifiable at thumbnail scale via greyscale render without color cues, no new hues introduced, zero public-export changes (12-export contract preserved).
+**Requirements**: TBD (Phase 12 is post-v1 visual-identity work; no REQUIREMENTS.md REQ-IDs map to it — coverage is via the 6 locked success criteria above)
+**Depends on:** Phase 11
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 12 to break down)
+
 ---
 *Roadmap authored: 2026-05-04 from SUMMARY.md 11-phase plan + REQUIREMENTS.md traceability*
 *Last updated: 2026-05-07 — autonomous Phase 9-11 closeout; UAT/device QA deferred per user instruction*
