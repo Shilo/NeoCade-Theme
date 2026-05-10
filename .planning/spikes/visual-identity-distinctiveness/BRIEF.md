@@ -48,6 +48,42 @@ flat MD3 editor theme. The current implementation has crossed into editor
 territory AND simultaneously underdelivers on MD3's own multi-color
 expectation, which is the worst of both worlds.
 
+3. **The `raised=true` export doesn't capture the spirit of flat game UI.**
+   The user's anchor reference for flat game UI was always
+   [HCGames Flat GUI for Mobile Games](https://hcgamestudios.itch.io/flat-game-ui-for-mobile-games)
+   — explicitly a "user exemplar" in `FLAT-3D-UI-RESEARCH.md`. Its
+   distinctive moves: (a) **5 button hues per screen** (blue / red / green /
+   purple / orange) used as a role-color hierarchy; (b) **same-family
+   strong depth strip** under each button — bright pink button → noticeably
+   darker pink shadow (not black, not desaturated, same hue family ~40-50%
+   darker); (c) **fully rounded pill silhouettes** with chunky generous
+   padding; (d) **HUD widgets in their own colors** (red heart, gold coin
+   chip on the top bar). NeoCade's `raised` mode currently delivers none
+   of these:
+
+   - **Depth-color drift.** `_raised_depth_color` at lines 800-806 mixes
+     the source color 16% toward `base_color` *and* 10% toward black.
+     Net effect on a hot-pink button: depth becomes a muted purple-black,
+     not a darker pink. The per-button hue identity is literally erased
+     in the depth strip. HCGames does the opposite — depth stays in the
+     same hue family.
+   - **Subtle depth instead of bold.** Combined ~26% darker yields a
+     thin "tool-bar shadow line" reading, not a "candy button you can
+     press" reading. HCGames depth strips are visually 40-50% darker
+     and clearly readable as a 3D affordance.
+   - **Only one button color.** Most BINDING_TABLE button slots resolve
+     to `button_normal` (a tonal derivation of `base_color`); only
+     `PrimaryButton` and `DangerButton` get a role color, and even then
+     the rest of the chrome stays mono-tint.
+   - **Rectangular silhouette by default.** Pulse `corner_radius=0`,
+     Slate `14`, Daybreak `8`, Burst `18-28`. Only Bubble at `26 / 999`
+     reaches HCGames-pillow territory. The other four directions look
+     like editor rectangles by comparison.
+
+   So `raised=true` currently produces "rectangular flat buttons with
+   a thin same-color shadow line", not "extruded candy buttons in role
+   colors with bold same-hue depth strips" the research dossier promised.
+
 ## Spike Mandate
 
 Identify the specific patterns and design moves that make Game UIs read as
@@ -106,17 +142,26 @@ For each comparison axis, the spike should:
 
 2. **Sample the game-UI cohort** — what conventions do they all share that
    the editors don't?
+   - **Anchor reference (highest priority):** HCGames Flat GUI for Mobile
+     Games (`hcgamestudios.itch.io/flat-game-ui-for-mobile-games`). The
+     user has named this as the canonical "what NeoCade's `raised=true`
+     should look like". It is also already documented as a "user exemplar"
+     in `.planning/research/FLAT-3D-UI-RESEARCH.md`. The spike must
+     measure NeoCade's current Pulse/Slate/Bubble/Daybreak/Burst raised
+     output against the specific HCGames moves listed in the user-read
+     section above (5 hues per screen, same-family depth strips,
+     pillow silhouettes, HUD widget chrome).
+   - **Companion exemplar:** fajrulaslim UI Button Flat Design (also a
+     documented user exemplar) for additional button-shape vocabulary.
    - Mobile flat-modern: Brawl Stars, Royal Match, Match Masters, Toon
      Blast, Among Us, Friday Night Funkin'
    - Indie flat-modern: Celeste menus, Untitled Goose Game, Mini Metro,
      Slay the Spire menus, Hades menus (lightly textured but mostly flat
      chrome), Balatro menu chrome (skip CRT scanlines per anti-cyberpunk
      filter)
-   - Game-UI asset packs already in the project's research surface:
-     - `hcgamestudios.itch.io/flat-game-ui-for-mobile-games`
-     - `fajrulaslim.itch.io/ui-button-flat-design`
-     - Kenney UI Pack, GameArt2D Minimalist Flat, MODI Main Menu UI Pack,
-       LILA Pinky UI, SunGraphica Flat Game UI
+   - Other game-UI asset packs already in the project's research surface:
+     Kenney UI Pack, GameArt2D Minimalist Flat, MODI Main Menu UI Pack,
+     LILA Pinky UI, SunGraphica Flat Game UI
    - **Exclude from the game cohort** anything that violates NeoCade's
      hard constraints: cyberpunk, neon-noir, synthwave, scanline, painterly,
      leather, wood, grunge, gradient-on-chrome, pixel-art chrome,
@@ -150,6 +195,38 @@ For each comparison axis, the spike should:
      editors use a subtle bg highlight only.
    - **Generous spacing + tap target lift** — game UIs use 44-56px
      buttons with breathing room; editors pack 22-28px rows for density.
+
+   **b'. Raised-mode fidelity axis (NEW — directly addresses the user's
+   primary complaint).** The spike must specifically inspect what
+   `raised=true` currently produces vs what it should produce per
+   `FLAT-3D-UI-RESEARCH.md`:
+   - **Depth-color formula.** Current `_raised_depth_color` (lines
+     800-806) drifts the depth color toward `base_color` and black,
+     erasing per-button hue identity. The spike should propose a
+     replacement formula that keeps the depth in the same hue family
+     (e.g., HSV value-darken at 30-40%, no base-pull) so a hot-pink
+     button gets a darker pink shadow strip, matching HCGames.
+   - **Depth strength.** Current ~26% darker is "tool shadow line"
+     subtle; HCGames uses ~40-50% darker for clear "press me" affordance.
+     The spike should propose a stronger default for `raised_strength`
+     that doesn't break accessibility.
+   - **Bottom-strip thickness.** Current `raised_lifts.primary=2`
+     produces a 2px strip. HCGames-style strips look ~4-6px on similarly
+     sized buttons. Propose a per-direction lift scale that fits
+     each personality.
+
+   **b''. Pillow silhouette per direction (NEW).** Of the 5 directions,
+   only Bubble (`primary_radius=999`, `secondary_radius=26`) reaches
+   HCGames-pillow territory. The other four (Pulse 0, Slate 14,
+   Daybreak 8, Burst 28) read as editor rectangles by comparison. The
+   spike should evaluate per direction:
+   - Should each direction have at least ONE control class with a fully
+     pilled / strongly rounded silhouette to anchor the "game UI"
+     reading, even if other classes stay rectangular for the direction's
+     personality?
+   - Or should `raised=true` itself force a more rounded silhouette
+     across the board (different visual contract: flat=rectangular,
+     raised=pillow)?
 
    **c. Branding / character axis:**
    - **Section/role color coding** — HUD-style color semantics on panels
@@ -235,7 +312,12 @@ that:
    read as game UI. AT LEAST ONE candidate must directly address the
    color-monoculture diagnosis (e.g., "wire MD3 secondary/tertiary roles",
    "bind semantic role colors to chrome states", "per-section/role panel
-   tinting", "add a `secondary_color` export"). Each candidate must include:
+   tinting", "add a `secondary_color` export"). AT LEAST ONE candidate
+   must directly address the raised-mode fidelity gap (e.g., "rewrite
+   `_raised_depth_color` to keep depth in same hue family at 30-40%
+   value-darken", "lift `raised_strength` defaults", "thicken
+   `raised_lifts.primary` per direction to 4-6px"). Each candidate must
+   include:
    - Move name + 1-paragraph description
    - Which game-UI references it pulls from (with citations)
    - Which Pulse/Slate/Bubble/Daybreak/Burst personality it serves
