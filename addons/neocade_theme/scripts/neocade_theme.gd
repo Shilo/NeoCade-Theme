@@ -812,6 +812,26 @@ func _readable_text_color(bg: Color) -> Color:
 	return dark_text if bg.get_luminance() >= 0.20 else light_text
 
 
+func _contrast_ratio(a: Color, b: Color) -> float:
+	var a_lum := _relative_luminance(a)
+	var b_lum := _relative_luminance(b)
+	var lighter: float = maxf(a_lum, b_lum)
+	var darker: float = minf(a_lum, b_lum)
+	return (lighter + 0.05) / (darker + 0.05)
+
+
+func _relative_luminance(c: Color) -> float:
+	return (
+		0.2126 * _srgb_to_linear(c.r)
+		+ 0.7152 * _srgb_to_linear(c.g)
+		+ 0.0722 * _srgb_to_linear(c.b)
+	)
+
+
+func _srgb_to_linear(channel: float) -> float:
+	return channel / 12.92 if channel <= 0.03928 else pow((channel + 0.055) / 1.055, 2.4)
+
+
 # ─── Platform helpers (DESIGN_TOKENS §10.1, §10.2) ──────────────────────────────────────────
 
 ## Resolve `Platform.AUTO` to MOBILE or DESKTOP via Godot's feature flags.
@@ -865,12 +885,12 @@ func _platform_tokens(p: Platform) -> Dictionary:
 
 ## Construct a StyleBoxFlat base for flat or raised mode.
 ## Raised depth is applied later as a hard bottom extrusion, never a StyleBoxFlat shadow.
-## Per Godot 4.6 source, StyleBoxFlat defaults to `shadow_size=0` and `shadow_offset=Vector2()`,
-## and with `shadow_size=0` the shadow never renders regardless of `shadow_color`. The previous
-## explicit zeroing of all three shadow_* fields was redundant and has been removed.
-func _make_raised_stylebox(bg: Color) -> StyleBoxFlat:
+func _make_raised_stylebox(bg: Color, _offset_color: Color, _intensity: int) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = bg
+	sb.shadow_color = Color(0, 0, 0, 0)
+	sb.shadow_size = 0
+	sb.shadow_offset = Vector2.ZERO
 	return sb
 
 
@@ -5010,43 +5030,6 @@ func _lookup_shape(style_personality: Dictionary, dotted_path: String) -> Varian
 	return current
 
 
-## Resolves a recipe value that may be a `shape.<key>` lookup string, a numeric literal,
-## or null/absent. Returns `fallback` when the value is null, a string that fails to
-## resolve to a numeric `shape.<key>` lookup, or any non-numeric type. Centralizes the
-## typeof/begins_with/_lookup_shape pattern that previously repeated 4 times in
-## `_resolve_recipe` for raised_intensity / radius (sb path) / fr_radius (focus path) /
-## focus_offset / value (constant/font_size shape branch).
-func _resolve_int_recipe(raw: Variant, fallback: int, style_personality: Dictionary) -> int:
-	if raw == null:
-		return fallback
-	if typeof(raw) == TYPE_STRING:
-		if (raw as String).begins_with("shape."):
-			var lookup: Variant = _lookup_shape(style_personality, raw)
-			if lookup != null and (typeof(lookup) == TYPE_INT or typeof(lookup) == TYPE_FLOAT):
-				return int(lookup)
-		return fallback
-	if typeof(raw) == TYPE_INT or typeof(raw) == TYPE_FLOAT:
-		return int(raw)
-	return fallback
-
-
-## Float twin of `_resolve_int_recipe` for `alpha` recipe values that may be either a
-## literal float/int or a `shape.<key>` lookup. Behavior mirrors the inline pattern that
-## previously repeated in the stylebox and color branches of `_resolve_recipe`.
-func _resolve_float_recipe(raw: Variant, fallback: float, style_personality: Dictionary) -> float:
-	if raw == null:
-		return fallback
-	if typeof(raw) == TYPE_STRING:
-		if (raw as String).begins_with("shape."):
-			var lookup: Variant = _lookup_shape(style_personality, raw)
-			if lookup != null and (typeof(lookup) == TYPE_FLOAT or typeof(lookup) == TYPE_INT):
-				return float(lookup)
-		return fallback
-	if typeof(raw) == TYPE_FLOAT or typeof(raw) == TYPE_INT:
-		return float(raw)
-	return fallback
-
-
 ## Sets all four StyleBoxFlat corner_radius_* fields to the same int radius.
 ## Plan 05-02 Task 2 helper (D-03): factored out so `radius: shape.<key>` recipes
 ## can apply uniformly without inlining 4 setters at every call site.
@@ -5059,11 +5042,11 @@ func _set_radius_all(sb: StyleBoxFlat, r: int) -> void:
 
 ## Selected tabs should visually attach to the TabContainer panel: top corners keep the
 ## direction tab radius, bottom corners are square so the tab reads as part of the content.
-## Functionally identical to `_set_top_only_radius`; kept as a separate symbol for
-## semantic clarity at call sites — the corner_profile dispatch in `_resolve_recipe` reads
-## better with both names available.
 func _set_tab_connected_radius(sb: StyleBoxFlat, r: int) -> void:
-	_set_top_only_radius(sb, r)
+	sb.corner_radius_top_left = r
+	sb.corner_radius_top_right = r
+	sb.corner_radius_bottom_left = 0
+	sb.corner_radius_bottom_right = 0
 
 
 func _set_top_only_radius(sb: StyleBoxFlat, r: int) -> void:
@@ -5103,24 +5086,6 @@ func _set_expand_margins(sb: StyleBoxFlat, margins: Vector4i) -> void:
 	sb.expand_margin_top = margins.y
 	sb.expand_margin_right = margins.z
 	sb.expand_margin_bottom = margins.w
-
-
-## Multiply each component of a Vector2i by `density` and round to int. Replaces 4 inline
-## copies of the same pattern in `_resolve_recipe`'s padding section. Density is the
-## per-platform scale factor (1.0 desktop, 1.5 mobile per `_platform_tokens`).
-func _scale_vec2i(v: Vector2i, density: float) -> Vector2i:
-	return Vector2i(int(round(v.x * density)), int(round(v.y * density)))
-
-
-## Vector4i twin of `_scale_vec2i`. Replaces the inline 4-line `int(round(... * density))`
-## blocks for `content_margins` and `expand_margins` recipes in `_resolve_recipe`.
-func _scale_vec4i(v: Vector4i, density: float) -> Vector4i:
-	return Vector4i(
-		int(round(v.x * density)),
-		int(round(v.y * density)),
-		int(round(v.z * density)),
-		int(round(v.w * density)),
-	)
 
 
 func _apply_outline_border(sb: StyleBoxFlat, color: Color, width: int = -1) -> void:
@@ -5187,7 +5152,11 @@ func _apply_primary_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_t
 		"quiet-pill":
 			# Slate: muted surface bg + thin accent border (the "iOS quiet pill" read).
 			sb.bg_color = role_table.get("surface_panel", role_table.surface_panel)
-			_apply_outline_border(sb, role_table.get("role_primary", role_table.outline_color), 1)
+			sb.border_color = role_table.get("role_primary", role_table.outline_color)
+			sb.border_width_left = 1
+			sb.border_width_top = 1
+			sb.border_width_right = 1
+			sb.border_width_bottom = 1
 		"pillowy-fully-rounded":
 			# Bubble: accent fill + radius locked to 999 regardless of prior radius set.
 			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
@@ -5222,21 +5191,41 @@ func _apply_ghost_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_tab
 	match String(strategy_name):
 		"accent-outlined-accent-text":
 			# Pulse ghost: transparent bg + 2px accent border.
-			_apply_outline_border(sb, role_table.get("role_primary", role_table.outline_color), 2)
+			sb.border_color = role_table.get("role_primary", role_table.outline_color)
+			sb.border_width_left = 2
+			sb.border_width_top = 2
+			sb.border_width_right = 2
+			sb.border_width_bottom = 2
 		"thin-accent-outline":
 			# Slate ghost: 1px accent.
-			_apply_outline_border(sb, role_table.get("role_primary", role_table.outline_color), 1)
+			sb.border_color = role_table.get("role_primary", role_table.outline_color)
+			sb.border_width_left = 1
+			sb.border_width_top = 1
+			sb.border_width_right = 1
+			sb.border_width_bottom = 1
 		"rounded-ghost-thicker-outline":
 			# Bubble ghost: 2px accent + force radius 999 (pill) to read with the
 			# pillowy primary nearby.
-			_apply_outline_border(sb, role_table.get("role_primary", role_table.outline_color), 2)
+			sb.border_color = role_table.get("role_primary", role_table.outline_color)
+			sb.border_width_left = 2
+			sb.border_width_top = 2
+			sb.border_width_right = 2
+			sb.border_width_bottom = 2
 			_set_radius_all(sb, 999)
 		"soft-outline":
 			# Daybreak / DEFAULT ghost: 1px outline_color (calmer than accent).
-			_apply_outline_border(sb, role_table.get("outline_color", role_table.outline_color), 1)
+			sb.border_color = role_table.get("outline_color", role_table.outline_color)
+			sb.border_width_left = 1
+			sb.border_width_top = 1
+			sb.border_width_right = 1
+			sb.border_width_bottom = 1
 		"normal-accent-ghost":
 			# Burst ghost: 2px accent border.
-			_apply_outline_border(sb, role_table.get("role_primary", role_table.outline_color), 2)
+			sb.border_color = role_table.get("role_primary", role_table.outline_color)
+			sb.border_width_left = 2
+			sb.border_width_top = 2
+			sb.border_width_right = 2
+			sb.border_width_bottom = 2
 		_:
 			# Unknown strategy — verifier flags this; no mutation (D-04 escape hatch).
 			pass
@@ -5258,9 +5247,13 @@ func _apply_ghost_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_tab
 ## Returns the resolved Color so Plan 05-04's color-recipe path can use it directly.
 func _apply_kicker_style(kicker_style: StringName, role_table: Dictionary) -> Color:
 	match String(kicker_style):
+		"uppercase-tracked-accent":
+			return role_table.get("role_primary", role_table.text_strong)
 		"small-caps-subtle":
 			return role_table.get("text_muted", role_table.text_strong)
-		"uppercase-tracked-accent", "sentence-case-accent", "uppercase-bold-larger-scale":
+		"sentence-case-accent":
+			return role_table.get("role_primary", role_table.text_strong)
+		"uppercase-bold-larger-scale":
 			return role_table.get("role_primary", role_table.text_strong)
 		_:
 			return role_table.get("text_strong", Color.WHITE)
@@ -5282,23 +5275,31 @@ func _apply_kicker_style(kicker_style: StringName, role_table: Dictionary) -> Co
 ## Returns null if the recipe references an unknown role or icon (caller skips silently — D-04).
 func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictionary,
 					  tokens: Dictionary, style_personality: Dictionary) -> Variant:
-	# Hoisted once: density and the derived is_mobile flag are read from `tokens` at every
-	# branch entry below. Pre-2026-05-10 versions called `tokens.get("densityScale", 1.0)`
-	# 11 separate times across this function (4× in stylebox, 1× in constant, 4× in icon).
-	# Centralizing keeps the BINDING_TABLE walk loop tighter on hot regenerations.
-	var density: float = tokens.get("densityScale", 1.0)
-	var is_mobile: bool = density > 1.0
 	if data_type == "stylebox":
 		if bool(recipe.get("empty", false)):
 			return StyleBoxEmpty.new()
 		var role: String = recipe.get("role", "surface_panel")
 		# raised_intensity may be either an int literal or a `shape.<key>` lookup string.
-		var raised_intensity: int = _resolve_int_recipe(recipe.get("raised_intensity", 0), 0, style_personality)
+		var raised_intensity_raw: Variant = recipe.get("raised_intensity", 0)
+		var raised_intensity: int = 0
+		if typeof(raised_intensity_raw) == TYPE_STRING and (raised_intensity_raw as String).begins_with("shape."):
+			var lifted: Variant = _lookup_shape(style_personality, raised_intensity_raw)
+			if lifted != null and (typeof(lifted) == TYPE_INT or typeof(lifted) == TYPE_FLOAT):
+				raised_intensity = int(lifted)
+		else:
+			raised_intensity = int(raised_intensity_raw)
 		# Cross-AI Cycle 2 C2 fix: disabled flag pulls per-direction alpha from style_personality,
 		# NOT a hard-coded literal. Recipes carrying "disabled": true get style_personality.disabled_opacity.
 		var is_disabled: bool = recipe.get("disabled", false)
 		# Plan 05-02 Task 2 (D-03): alpha may be a literal float or a `shape.<key>` lookup.
-		var alpha: float = _resolve_float_recipe(recipe.get("alpha", 1.0), 1.0, style_personality)
+		var alpha_raw: Variant = recipe.get("alpha", 1.0)
+		var alpha: float = 1.0
+		if typeof(alpha_raw) == TYPE_STRING and (alpha_raw as String).begins_with("shape."):
+			var alpha_lookup: Variant = _lookup_shape(style_personality, alpha_raw)
+			if alpha_lookup != null and (typeof(alpha_lookup) == TYPE_FLOAT or typeof(alpha_lookup) == TYPE_INT):
+				alpha = float(alpha_lookup)
+		else:
+			alpha = float(alpha_raw)
 		if is_disabled:
 			alpha = style_personality.disabled_opacity
 		if role == "focus_ring":
@@ -5306,20 +5307,42 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			# Plan 05-02 Task 2: focus_offset comes from shape per D-08 (per-direction gap).
 			var focus_sb := StyleBoxFlat.new()
 			focus_sb.bg_color = Color(0, 0, 0, 0)
-			_apply_outline_border(focus_sb, role_table.role_primary, focus_thickness)
+			focus_sb.border_color = role_table.role_primary
+			focus_sb.border_width_left = focus_thickness
+			focus_sb.border_width_top = focus_thickness
+			focus_sb.border_width_right = focus_thickness
+			focus_sb.border_width_bottom = focus_thickness
 			# Per-direction shape.primary_radius drives the focus ring radius if the
 			# recipe specifies `radius: "shape.<key>"`; otherwise stay on the @export
 			# corner_radius. Plan 05-03 wires the radius lookup for variation-specific
 			# focus rings; the base focus_ring keeps the @export default.
-			var fr_radius: int = _resolve_int_recipe(recipe.get("radius", null), corner_radius, style_personality)
-			match str(recipe.get("corner_profile", "")):
-				"tab_connected": _set_tab_connected_radius(focus_sb, fr_radius)
-				"top_only":      _set_top_only_radius(focus_sb, fr_radius)
-				"bottom_only":   _set_bottom_only_radius(focus_sb, fr_radius)
-				_:               _set_radius_all(focus_sb, fr_radius)
+			var fr_radius: int = corner_radius
+			var fr_radius_raw: Variant = recipe.get("radius", null)
+			if fr_radius_raw != null and typeof(fr_radius_raw) == TYPE_STRING and (fr_radius_raw as String).begins_with("shape."):
+				var fr_r_lookup: Variant = _lookup_shape(style_personality, fr_radius_raw)
+				if fr_r_lookup != null and (typeof(fr_r_lookup) == TYPE_INT or typeof(fr_r_lookup) == TYPE_FLOAT):
+					fr_radius = int(fr_r_lookup)
+			elif fr_radius_raw != null and (typeof(fr_radius_raw) == TYPE_INT or typeof(fr_radius_raw) == TYPE_FLOAT):
+				fr_radius = int(fr_radius_raw)
+			var focus_corner_profile: String = str(recipe.get("corner_profile", ""))
+			if focus_corner_profile == "tab_connected":
+				_set_tab_connected_radius(focus_sb, fr_radius)
+			elif focus_corner_profile == "top_only":
+				_set_top_only_radius(focus_sb, fr_radius)
+			elif focus_corner_profile == "bottom_only":
+				_set_bottom_only_radius(focus_sb, fr_radius)
+			else:
+				_set_radius_all(focus_sb, fr_radius)
 			# Per-direction focus_offset (DESIGN_TOKENS §8.2): Pulse=0, Burst=1, others=2.
-			var focus_offset_int: int = _resolve_int_recipe("shape.focus_offset", 2, style_personality)
-			_set_expand_margins(focus_sb, Vector4i(focus_offset_int, focus_offset_int, focus_offset_int, focus_offset_int))
+			var focus_offset_v: Variant = _lookup_shape(style_personality, "shape.focus_offset")
+			var focus_offset_int: int = 2
+			if focus_offset_v != null and (typeof(focus_offset_v) == TYPE_INT or typeof(focus_offset_v) == TYPE_FLOAT):
+				focus_offset_int = int(focus_offset_v)
+			focus_sb.expand_margin_left = focus_offset_int
+			focus_sb.expand_margin_top = focus_offset_int
+			focus_sb.expand_margin_right = focus_offset_int
+			focus_sb.expand_margin_bottom = focus_offset_int
+			focus_sb.shadow_size = 0
 			return focus_sb
 		var bg_color: Color = role_table.get(role, role_table.surface_panel)
 		if alpha < 1.0:
@@ -5328,17 +5351,28 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		var offset_role: String = recipe.get("offset_role", role + "_offset")
 		var offset_color: Color = role_table.get(offset_role, role_table.get(role + "_offset", role_table.surface_panel_offset))
 		var sb_intensity: int = (raised_strength * raised_intensity) if raised else 0
-		var sb := _make_raised_stylebox(bg_color)
+		var sb := _make_raised_stylebox(bg_color, offset_color, sb_intensity)
 		# Plan 05-02 Task 2 (D-03): radius may be either the @export `corner_radius` baseline
 		# (no recipe override), an int literal, or a `shape.<key>` lookup. _set_radius_all
 		# applies uniformly. The @export `corner_radius` is the variation-agnostic baseline;
 		# recipes opting into shape.* pin to per-direction values from DESIGN_TOKENS §5.1-§5.5.
-		var resolved_radius: int = _resolve_int_recipe(recipe.get("radius", null), corner_radius, style_personality)
+		var radius_raw: Variant = recipe.get("radius", null)
+		var resolved_radius: int = corner_radius
+		if radius_raw != null:
+			if typeof(radius_raw) == TYPE_STRING and (radius_raw as String).begins_with("shape."):
+				var r_lookup: Variant = _lookup_shape(style_personality, radius_raw)
+				if r_lookup != null and (typeof(r_lookup) == TYPE_INT or typeof(r_lookup) == TYPE_FLOAT):
+					resolved_radius = int(r_lookup)
+			elif typeof(radius_raw) == TYPE_INT or typeof(radius_raw) == TYPE_FLOAT:
+				resolved_radius = int(radius_raw)
 		_set_radius_all(sb, resolved_radius)
-		match str(recipe.get("corner_profile", "")):
-			"tab_connected": _set_tab_connected_radius(sb, resolved_radius)
-			"top_only":      _set_top_only_radius(sb, resolved_radius)
-			"bottom_only":   _set_bottom_only_radius(sb, resolved_radius)
+		var corner_profile: String = str(recipe.get("corner_profile", ""))
+		if corner_profile == "tab_connected":
+			_set_tab_connected_radius(sb, resolved_radius)
+		elif corner_profile == "top_only":
+			_set_top_only_radius(sb, resolved_radius)
+		elif corner_profile == "bottom_only":
+			_set_bottom_only_radius(sb, resolved_radius)
 		var border_width: int = int(recipe.get("border_width", outline_width))
 		var border_role: String = recipe.get("border_role", "outline_color")
 		var border_color: Color = role_table.get(border_role, role_table.outline_color)
@@ -5362,25 +5396,41 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		var padding_raw: Variant = recipe.get("padding", null)
 		var mobile_padding_raw: Variant = recipe.get("mobile_padding", null)
 		var applied_padding: bool = false
-		if is_mobile and mobile_padding_raw != null and typeof(mobile_padding_raw) == TYPE_VECTOR2I:
+		if tokens.get("densityScale", 1.0) > 1.0 and mobile_padding_raw != null and typeof(mobile_padding_raw) == TYPE_VECTOR2I:
 			_set_content_margin_from_padding(sb, mobile_padding_raw as Vector2i)
 			applied_padding = true
 		elif content_margins_raw != null and typeof(content_margins_raw) == TYPE_VECTOR4I:
-			_set_content_margins(sb, _scale_vec4i(content_margins_raw as Vector4i, density))
+			var density: float = tokens.get("densityScale", 1.0)
+			var margins := content_margins_raw as Vector4i
+			_set_content_margins(sb, Vector4i(
+				int(round(margins.x * density)),
+				int(round(margins.y * density)),
+				int(round(margins.z * density)),
+				int(round(margins.w * density))
+			))
 			applied_padding = true
 		elif padding_raw != null and typeof(padding_raw) == TYPE_STRING and (padding_raw as String).begins_with("shape."):
 			var pad_lookup: Variant = _lookup_shape(style_personality, padding_raw)
 			if pad_lookup != null and typeof(pad_lookup) == TYPE_VECTOR2I:
-				_set_content_margin_from_padding(sb, _scale_vec2i(pad_lookup as Vector2i, density))
+				var density: float = tokens.get("densityScale", 1.0)
+				_set_content_margin_from_padding(sb, Vector2i(int(round(pad_lookup.x * density)), int(round(pad_lookup.y * density))))
 				applied_padding = true
 		elif padding_raw != null and typeof(padding_raw) == TYPE_VECTOR2I:
-			_set_content_margin_from_padding(sb, _scale_vec2i(padding_raw as Vector2i, density))
+			var density: float = tokens.get("densityScale", 1.0)
+			_set_content_margin_from_padding(sb, Vector2i(int(round((padding_raw as Vector2i).x * density)), int(round((padding_raw as Vector2i).y * density))))
 			applied_padding = true
 		if not applied_padding:
 			_set_content_margin_from_padding(sb, Vector2i.ZERO)
 		var expand_margins_raw: Variant = recipe.get("expand_margins", null)
 		if expand_margins_raw != null and typeof(expand_margins_raw) == TYPE_VECTOR4I:
-			_set_expand_margins(sb, _scale_vec4i(expand_margins_raw as Vector4i, density))
+			var expand_density: float = tokens.get("densityScale", 1.0)
+			var expand := expand_margins_raw as Vector4i
+			_set_expand_margins(sb, Vector4i(
+				int(round(expand.x * expand_density)),
+				int(round(expand.y * expand_density)),
+				int(round(expand.z * expand_density)),
+				int(round(expand.w * expand_density))
+			))
 		# Plan 05-02 Task 2 (D-04): strategy dispatch (closed-enum, sourced VERBATIM
 		# from DESIGN_TOKENS §5.1-§5.5). Recipes opt-in via `strategy: "shape.primary_strategy"`
 		# (or `"shape.ghost_strategy"`); _apply_primary_strategy / _apply_ghost_strategy
@@ -5412,7 +5462,14 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		# Cross-AI Cycle 2 C2 fix: disabled flag pulls per-direction alpha from style_personality.
 		var is_disabled: bool = recipe.get("disabled", false)
 		# Plan 05-02 Task 2 (D-03): alpha may be a literal or shape.<key> lookup here too.
-		var alpha: float = _resolve_float_recipe(recipe.get("alpha", 1.0), 1.0, style_personality)
+		var alpha_raw: Variant = recipe.get("alpha", 1.0)
+		var alpha: float = 1.0
+		if typeof(alpha_raw) == TYPE_STRING and (alpha_raw as String).begins_with("shape."):
+			var alpha_lookup: Variant = _lookup_shape(style_personality, alpha_raw)
+			if alpha_lookup != null and (typeof(alpha_lookup) == TYPE_FLOAT or typeof(alpha_lookup) == TYPE_INT):
+				alpha = float(alpha_lookup)
+		else:
+			alpha = float(alpha_raw)
 		if is_disabled:
 			alpha = style_personality.disabled_opacity
 		# Plan 05-02 Task 2 (D-09 prep): recipes can reference `kicker_style: "shape.kicker_style"`
@@ -5433,14 +5490,18 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		return c
 	elif data_type == "constant" or data_type == "font_size":
 		var value_ref = recipe.get("value", 0)
-		if is_mobile and recipe.has("mobile_value"):
+		if tokens.get("densityScale", 1.0) > 1.0 and recipe.has("mobile_value"):
 			value_ref = recipe.get("mobile_value", value_ref)
 		if typeof(value_ref) == TYPE_STRING and (value_ref as String).begins_with("tokens."):
-			return tokens.get((value_ref as String).substr(7), 0)
+			var key: String = (value_ref as String).substr(7)
+			return tokens.get(key, 0)
 		# Plan 05-02 Task 2 (D-03): constants/font_sizes can also pull from shape.* (e.g.,
 		# `value: "shape.focus_offset"` for outline widths or focus expand metadata).
 		if typeof(value_ref) == TYPE_STRING and (value_ref as String).begins_with("shape."):
-			return _resolve_int_recipe(value_ref, 0, style_personality)
+			var shape_v: Variant = _lookup_shape(style_personality, value_ref)
+			if shape_v != null and (typeof(shape_v) == TYPE_INT or typeof(shape_v) == TYPE_FLOAT):
+				return int(shape_v)
+			return 0
 		return int(value_ref)
 	elif data_type == "icon":
 		var generated_icon_name: String = recipe.get("generated_icon", "")
@@ -5450,40 +5511,44 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			return _make_slider_grabber_icon(bool(recipe.get("highlight", false)), role_table, style_personality, tokens)
 		if generated_icon_name == "color_hue":
 			return _make_color_hue_texture()
-		# Mobile icon scale override: when on mobile, the recipe's `mobile_svg_scale` (if any)
-		# overrides the per-icon default. Computed once for all generated/loaded icon paths
-		# below to avoid repeating the `is_mobile and recipe.has(...)` check 4 times.
-		var mobile_override_scale: float = -1.0
-		if is_mobile and recipe.has("mobile_svg_scale"):
-			mobile_override_scale = float(recipe.get("mobile_svg_scale", 0.0))
 		if generated_icon_name == "search":
-			return _make_search_icon(0.75 if mobile_override_scale < 0.0 else mobile_override_scale)
+			var search_scale := 0.75
+			if tokens.get("densityScale", 1.0) > 1.0 and recipe.has("mobile_svg_scale"):
+				search_scale = float(recipe.get("mobile_svg_scale", 0.75))
+			return _make_search_icon(search_scale)
 		if generated_icon_name == "popup_selection_checkbox":
-			var popup_scale_cb: float = 0.0 if mobile_override_scale < 0.0 else mobile_override_scale
+			var checkbox_popup_scale := 0.0
+			if tokens.get("densityScale", 1.0) > 1.0 and recipe.has("mobile_svg_scale"):
+				checkbox_popup_scale = float(recipe.get("mobile_svg_scale", 0.0))
 			if use_runtime_popup_selection_icons:
 				return _make_popup_selection_checkbox_icon(
 					bool(recipe.get("checked", false)),
 					bool(recipe.get("disabled", false)),
 					role_table,
-					0.75 if popup_scale_cb <= 0.0 else popup_scale_cb
+					0.75 if checkbox_popup_scale <= 0.0 else checkbox_popup_scale
 				)
-			return _load_icon("checkbox_checked" if bool(recipe.get("checked", false)) else "checkbox_unchecked", popup_scale_cb)
+			return _load_icon("checkbox_checked" if bool(recipe.get("checked", false)) else "checkbox_unchecked", checkbox_popup_scale)
 		if generated_icon_name == "popup_selection_radio":
-			var popup_scale_rd: float = 0.0 if mobile_override_scale < 0.0 else mobile_override_scale
+			var radio_popup_scale := 0.0
+			if tokens.get("densityScale", 1.0) > 1.0 and recipe.has("mobile_svg_scale"):
+				radio_popup_scale = float(recipe.get("mobile_svg_scale", 0.0))
 			if use_runtime_popup_selection_icons:
 				return _make_popup_selection_radio_icon(
 					bool(recipe.get("checked", false)),
 					bool(recipe.get("disabled", false)),
 					role_table,
-					0.75 if popup_scale_rd <= 0.0 else popup_scale_rd
+					0.75 if radio_popup_scale <= 0.0 else radio_popup_scale
 				)
-			return _load_icon("radio_checked" if bool(recipe.get("checked", false)) else "radio_unchecked", popup_scale_rd)
+			return _load_icon("radio_checked" if bool(recipe.get("checked", false)) else "radio_unchecked", radio_popup_scale)
 		var icon_name: String = recipe.get("icon", "")
 		if icon_name == "":
 			return null
 		if icon_name == "empty":
 			return _empty_icon()
-		return _load_icon(icon_name, 0.0 if mobile_override_scale < 0.0 else mobile_override_scale)
+		var mobile_svg_scale := 0.0
+		if tokens.get("densityScale", 1.0) > 1.0 and recipe.has("mobile_svg_scale"):
+			mobile_svg_scale = float(recipe.get("mobile_svg_scale", 0.0))
+		return _load_icon(icon_name, mobile_svg_scale)
 	# Cross-AI Cycle 2 N1 fix: any unrecognized data_type (including the now-removed "font")
 	# falls through to null — caller skips silently per D-04 escape hatch.
 	return null
@@ -5539,13 +5604,12 @@ func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, 
 
 	var image := Image.create(width, height, false, Image.FORMAT_RGBA8)
 	image.fill(Color(0, 0, 0, 0))
-	# Hoist r/g/b/base_a outside the loop (verified 2026-05-10: 3.28× faster on a
-	# 6×48 split grabber). Only alpha varies per pixel; the previous code rebuilt
-	# `Color(c.r, c.g, c.b, c.a*coverage)` 288 times per generation. Coverage math
-	# is byte-identical, so the rendered grabber is pixel-identical.
-	# fill_core optimization is intentionally skipped here — for thin bars
-	# (6×48, radius=3) the inner solid block has zero width, so the per-pixel
-	# pass already covers everything; fill_core has no work to skip.
+	# Hoist r/g/b/base_a outside the loop so the per-pixel write doesn't rebuild
+	# `Color(c.r, c.g, c.b, c.a*coverage)` 288 times per generation. Only alpha
+	# varies per pixel. fill_core (used in _fill_round_rect for square shapes) is
+	# intentionally skipped here — for thin bars (6×48 r=3) the inner solid block
+	# collapses to zero width, so the per-pixel pass already covers everything.
+	# Coverage math is byte-identical to the prior implementation.
 	var cr := grabber_color.r
 	var cg := grabber_color.g
 	var cb := grabber_color.b
@@ -5619,10 +5683,12 @@ func _make_color_hue_texture() -> Texture2D:
 	if cached != null:
 		return cached
 	# Compute one HSV row, then blit it `HEIGHT - 1` more times via Image.blit_rect.
-	# Verified 2026-05-10 (.planning/tmp/bench_image_gen2.gd): 4.38× faster than the
-	# previous `for x in W: for y in H: set_pixel(x, y, color)` double-loop because
-	# the inner Y loop was re-doing the same set_pixel work for identical rows
-	# (color_hue is a horizontal gradient — every Y row is byte-identical).
+	# Verified 2026-05-10 by 3-way A/B/C bisect (.planning/tmp/bench/bench_bisect.gd):
+	# this commit's image-gen wins net -3.84% at the noise floor and -3.19% at median
+	# vs the pre-optimization baseline. The previous `for x in W: for y in H: set_pixel`
+	# double-loop did 4,800 set_pixel calls when 4,800 of those wrote identical bytes
+	# to the same X but a different Y (color_hue is a horizontal gradient — every Y
+	# row is byte-identical). Now: 800 set_pixel calls + H-1 blit_rect calls.
 	var row := Image.create(WIDTH, 1, false, Image.FORMAT_RGBA8)
 	for x in range(WIDTH):
 		row.set_pixel(x, 0, Color.from_hsv(float(x) / float(WIDTH - 1), 1.0, 1.0))
@@ -5697,15 +5763,17 @@ func _color_to_svg_hex(color: Color) -> String:
 
 
 func _fill_round_rect(image: Image, rect: Rect2i, radius: float, color: Color) -> void:
-	# Optimized 2026-05-10 (verified by .planning/tmp/bench_image_gen2.gd, 200-iter benchmark):
-	# (1) `Image.fill_rect` covers the always-opaque interior in a single C++ call; the
-	#     per-pixel set_pixel loop only touches the AA band along the rounded edge.
-	#     Mobile 48×48 r=8: 1024 of 2304 pixels are interior → 1.34× faster (305→228 us).
-	# (2) Hoisting r/g/b/base_a out of the loop avoids rebuilding `Color(c.r,c.g,c.b,...)`
-	#     2,304 times per frame; the only thing that varies per pixel is alpha.
-	#     Desktop 16×16 r=5: 3.75× faster (120→32 us).
-	# Coverage math is byte-identical to the prior implementation, so the rendered
-	# textures are pixel-identical (verified by smoke test post-edit).
+	# Optimized 2026-05-10 (verified by .planning/tmp/bench/bench_bisect.gd, 3-way A/B/C
+	# bisect across 1,800 samples). Two changes, both pixel-identical to the prior
+	# implementation (verified by Image.get_data() byte-equality across 7 size/radius
+	# cases including the radius=0 fast-path):
+	#   (1) `Image.fill_rect` covers the always-opaque interior in a single C++ call;
+	#       the per-pixel set_pixel loop only touches the AA band along the rounded
+	#       edge. Mobile 48x48 r=8 saves ~1024 of 2304 set_pixel calls.
+	#   (2) Hoist r/g/b/base_a out of the loop so we don't rebuild
+	#       `Color(c.r, c.g, c.b, c.a*coverage)` per pixel — only alpha varies.
+	# Net effect on full theme regen: -3.84% at noise floor, -3.19% at median vs
+	# pre-optimization baseline.
 	if radius <= 0.0:
 		image.fill_rect(rect, color)
 		return
