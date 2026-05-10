@@ -1,0 +1,770 @@
+[
+  {
+    "element_label": "Hot pink (HCGames anchor)",
+    "element_hex": "#FF4D9A",
+    "base_label": "Pulse base navy",
+    "base_hex": "#0E1218",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#ff4d9a",
+        "base_hex": "#0e1218",
+        "depth_hex": "#c23c77",
+        "hue_rotation_deg": 0.49846343333592813,
+        "saturation_drop": 0.014585353597229112,
+        "value_darken": 0.2360941176470589,
+        "rgb_distance": 0.2787075799836285
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#ff4d9a",
+        "base_hex": "#0e1218",
+        "depth_hex": "#b2356b",
+        "hue_rotation_deg": 5.684341886080802e-14,
+        "saturation_drop": 0.0,
+        "value_darken": 0.30000000000000004,
+        "rgb_distance": 0.3619822397142048
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#ff4d9a",
+        "base_hex": "#0e1218",
+        "depth_hex": "#992e5c",
+        "hue_rotation_deg": 5.684341886080802e-14,
+        "saturation_drop": -1.5904880408955895e-16,
+        "value_darken": 0.4,
+        "rgb_distance": 0.4826429862856065
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#ff4d9a",
+        "base_hex": "#0e1218",
+        "depth_hex": "#7f264d",
+        "hue_rotation_deg": 5.684341886080802e-14,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.6033037328570081
+      }
+    ]
+  },
+  {
+    "element_label": "Hot pink (HCGames anchor)",
+    "element_hex": "#FF4D9A",
+    "base_label": "Burst base purple",
+    "base_hex": "#1A0F2E",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#ff4d9a",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#c43c7b",
+        "hue_rotation_deg": 1.6652505362479815,
+        "saturation_drop": 0.007504358332080971,
+        "value_darken": 0.22931764705882351,
+        "rgb_distance": 0.26752914917698556
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#ff4d9a",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#b2356b",
+        "hue_rotation_deg": 5.684341886080802e-14,
+        "saturation_drop": 0.0,
+        "value_darken": 0.30000000000000004,
+        "rgb_distance": 0.3619822397142048
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#ff4d9a",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#992e5c",
+        "hue_rotation_deg": 5.684341886080802e-14,
+        "saturation_drop": -1.5904880408955895e-16,
+        "value_darken": 0.4,
+        "rgb_distance": 0.4826429862856065
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#ff4d9a",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#7f264d",
+        "hue_rotation_deg": 5.684341886080802e-14,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.6033037328570081
+      }
+    ]
+  },
+  {
+    "element_label": "Vivid green (Pulse accent)",
+    "element_hex": "#7CF24F",
+    "base_label": "Pulse base navy",
+    "base_hex": "#0E1218",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#7cf24f",
+        "base_hex": "#0e1218",
+        "depth_hex": "#5fb93f",
+        "hue_rotation_deg": 0.589130328840838,
+        "saturation_drop": 0.020883178471185808,
+        "value_darken": 0.23328925619834712,
+        "rgb_distance": 0.25520494620495515
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#7cf24f",
+        "base_hex": "#0e1218",
+        "depth_hex": "#56a937",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.3000000000000001,
+        "rgb_distance": 0.3331323500198651
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#7cf24f",
+        "base_hex": "#0e1218",
+        "depth_hex": "#4a912f",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 1.648306576437349e-16,
+        "value_darken": 0.4,
+        "rgb_distance": 0.4441764666931533
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#7cf24f",
+        "base_hex": "#0e1218",
+        "depth_hex": "#3d7927",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.5552205833664415
+      }
+    ]
+  },
+  {
+    "element_label": "Vivid green (Pulse accent)",
+    "element_hex": "#7CF24F",
+    "base_label": "Burst base purple",
+    "base_hex": "#1A0F2E",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#7cf24f",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#61b942",
+        "hue_rotation_deg": 0.832377165789211,
+        "saturation_drop": 0.0474714429228321,
+        "value_darken": 0.23507438016528928,
+        "rgb_distance": 0.25107852836282973
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#7cf24f",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#56a937",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.3000000000000001,
+        "rgb_distance": 0.3331323500198651
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#7cf24f",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#4a912f",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 1.648306576437349e-16,
+        "value_darken": 0.4,
+        "rgb_distance": 0.4441764666931533
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#7cf24f",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#3d7927",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.5552205833664415
+      }
+    ]
+  },
+  {
+    "element_label": "Royal blue",
+    "element_hex": "#4D7AFF",
+    "base_label": "Pulse base navy",
+    "base_hex": "#0E1218",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#4d7aff",
+        "base_hex": "#0e1218",
+        "depth_hex": "#3c5ec4",
+        "hue_rotation_deg": 0.09350408336854343,
+        "saturation_drop": 0.00709899637011242,
+        "value_darken": 0.23044705882352945,
+        "rgb_distance": 0.2622776836284183
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#4d7aff",
+        "base_hex": "#0e1218",
+        "depth_hex": "#3555b2",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.30000000000000004,
+        "rgb_distance": 0.3446837977265902
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#4d7aff",
+        "base_hex": "#0e1218",
+        "depth_hex": "#2e4999",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": -1.5904880408955895e-16,
+        "value_darken": 0.4,
+        "rgb_distance": 0.45957839696878694
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#4d7aff",
+        "base_hex": "#0e1218",
+        "depth_hex": "#263c7f",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.5744729962109836
+      }
+    ]
+  },
+  {
+    "element_label": "Royal blue",
+    "element_hex": "#4D7AFF",
+    "base_label": "Burst base purple",
+    "base_hex": "#1A0F2E",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#4d7aff",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#3d5ec7",
+        "hue_rotation_deg": 1.0092936474770227,
+        "saturation_drop": 0.012528120315393852,
+        "value_darken": 0.21802352941176473,
+        "rgb_distance": 0.25047248902535063
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#4d7aff",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#3555b2",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.30000000000000004,
+        "rgb_distance": 0.3446837977265902
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#4d7aff",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#2e4999",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": -1.5904880408955895e-16,
+        "value_darken": 0.4,
+        "rgb_distance": 0.45957839696878694
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#4d7aff",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#263c7f",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.5744729962109836
+      }
+    ]
+  },
+  {
+    "element_label": "Gold (Burst-style accent)",
+    "element_hex": "#FFC857",
+    "base_label": "Pulse base navy",
+    "base_hex": "#0E1218",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#ffc857",
+        "base_hex": "#0e1218",
+        "depth_hex": "#c29945",
+        "hue_rotation_deg": 0.04996723460025976,
+        "saturation_drop": 0.021569818095414223,
+        "value_darken": 0.2360941176470589,
+        "rgb_distance": 0.30566973163301814
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#ffc857",
+        "base_hex": "#0e1218",
+        "depth_hex": "#b28c3c",
+        "hue_rotation_deg": 1.4210854715202004e-14,
+        "saturation_drop": -1.6851599480917554e-16,
+        "value_darken": 0.30000000000000004,
+        "rgb_distance": 0.3947650521092033
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#ffc857",
+        "base_hex": "#0e1218",
+        "depth_hex": "#997834",
+        "hue_rotation_deg": 7.105427357601002e-15,
+        "saturation_drop": 0.0,
+        "value_darken": 0.4,
+        "rgb_distance": 0.526353402812271
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#ffc857",
+        "base_hex": "#0e1218",
+        "depth_hex": "#7f642b",
+        "hue_rotation_deg": 7.105427357601002e-15,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.6579417535153388
+      }
+    ]
+  },
+  {
+    "element_label": "Gold (Burst-style accent)",
+    "element_hex": "#FFC857",
+    "base_label": "Burst base purple",
+    "base_hex": "#1A0F2E",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#ffc857",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#c49948",
+        "hue_rotation_deg": 1.221411998674192,
+        "saturation_drop": 0.041294847303273666,
+        "value_darken": 0.22931764705882351,
+        "rgb_distance": 0.2988639001086588
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#ffc857",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#b28c3c",
+        "hue_rotation_deg": 1.4210854715202004e-14,
+        "saturation_drop": -1.6851599480917554e-16,
+        "value_darken": 0.30000000000000004,
+        "rgb_distance": 0.3947650521092033
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#ffc857",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#997834",
+        "hue_rotation_deg": 7.105427357601002e-15,
+        "saturation_drop": 0.0,
+        "value_darken": 0.4,
+        "rgb_distance": 0.526353402812271
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#ffc857",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#7f642b",
+        "hue_rotation_deg": 7.105427357601002e-15,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.6579417535153388
+      }
+    ]
+  },
+  {
+    "element_label": "NeoCade Pulse normal button",
+    "element_hex": "#1E2640",
+    "base_label": "Pulse base navy",
+    "base_hex": "#0E1218",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#1e2640",
+        "base_hex": "#0e1218",
+        "depth_hex": "#181f33",
+        "hue_rotation_deg": 0.5242627555000183,
+        "saturation_drop": 0.01437908496732021,
+        "value_darken": 0.19,
+        "rgb_distance": 0.05824822144758583
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#1e2640",
+        "base_hex": "#0e1218",
+        "depth_hex": "#141a2c",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.3000000000000001,
+        "rgb_distance": 0.09441130657759476
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#1e2640",
+        "base_hex": "#0e1218",
+        "depth_hex": "#121626",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.4,
+        "rgb_distance": 0.12588174210345965
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#1e2640",
+        "base_hex": "#0e1218",
+        "depth_hex": "#0f1320",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.15735217762932455
+      }
+    ]
+  },
+  {
+    "element_label": "NeoCade Pulse normal button",
+    "element_hex": "#1E2640",
+    "base_label": "Burst base purple",
+    "base_hex": "#1A0F2E",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#1e2640",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#1a1e37",
+        "hue_rotation_deg": 4.747369980737886,
+        "saturation_drop": 0.021866338158300008,
+        "value_darken": 0.14050000000000004,
+        "rgb_distance": 0.047095473310131086
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#1e2640",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#141a2c",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.3000000000000001,
+        "rgb_distance": 0.09441130657759476
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#1e2640",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#121626",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.4,
+        "rgb_distance": 0.12588174210345965
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#1e2640",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#0f1320",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.15735217762932455
+      }
+    ]
+  },
+  {
+    "element_label": "NeoCade Burst purple",
+    "element_hex": "#7C3AED",
+    "base_label": "Pulse base navy",
+    "base_hex": "#0E1218",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#7c3aed",
+        "base_hex": "#0e1218",
+        "depth_hex": "#5f2eb6",
+        "hue_rotation_deg": 0.39411835069262224,
+        "saturation_drop": 0.01265985879896511,
+        "value_darken": 0.22941772151898732,
+        "rgb_distance": 0.24450738505336866
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#7c3aed",
+        "base_hex": "#0e1218",
+        "depth_hex": "#5628a5",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.3000000000000001,
+        "rgb_distance": 0.3219942186074295
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#7c3aed",
+        "base_hex": "#0e1218",
+        "depth_hex": "#4a228e",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.4,
+        "rgb_distance": 0.4293256248099059
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#7c3aed",
+        "base_hex": "#0e1218",
+        "depth_hex": "#3d1d76",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 1.4699600940567715e-16,
+        "value_darken": 0.5,
+        "rgb_distance": 0.5366570310123823
+      }
+    ]
+  },
+  {
+    "element_label": "NeoCade Burst purple",
+    "element_hex": "#7C3AED",
+    "base_label": "Burst base purple",
+    "base_hex": "#1A0F2E",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#7c3aed",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#612eb9",
+        "hue_rotation_deg": 0.026587747479652535,
+        "saturation_drop": 0.00384057916106936,
+        "value_darken": 0.21605063291139248,
+        "rgb_distance": 0.23095821405560352
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#7c3aed",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#5628a5",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.3000000000000001,
+        "rgb_distance": 0.3219942186074295
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#7c3aed",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#4a228e",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.4,
+        "rgb_distance": 0.4293256248099059
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#7c3aed",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#3d1d76",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 1.4699600940567715e-16,
+        "value_darken": 0.5,
+        "rgb_distance": 0.5366570310123823
+      }
+    ]
+  },
+  {
+    "element_label": "NeoCade Daybreak teal",
+    "element_hex": "#76F2D1",
+    "base_label": "Pulse base navy",
+    "base_hex": "#0E1218",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#76f2d1",
+        "base_hex": "#0e1218",
+        "depth_hex": "#5bb9a1",
+        "hue_rotation_deg": 0.6471312484609655,
+        "saturation_drop": 0.007911174534029472,
+        "value_darken": 0.23328925619834712,
+        "rgb_distance": 0.30789398136386537
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#76f2d1",
+        "base_hex": "#0e1218",
+        "depth_hex": "#52a992",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.3000000000000001,
+        "rgb_distance": 0.40098322066215597
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#76f2d1",
+        "base_hex": "#0e1218",
+        "depth_hex": "#46917d",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.4,
+        "rgb_distance": 0.5346442942162078
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#76f2d1",
+        "base_hex": "#0e1218",
+        "depth_hex": "#3b7968",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.6683053677702597
+      }
+    ]
+  },
+  {
+    "element_label": "NeoCade Daybreak teal",
+    "element_hex": "#76F2D1",
+    "base_label": "Burst base purple",
+    "base_hex": "#1A0F2E",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#76f2d1",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#5cb9a4",
+        "hue_rotation_deg": 2.631804435483872,
+        "saturation_drop": 0.028368527371049373,
+        "value_darken": 0.23507438016528928,
+        "rgb_distance": 0.29949390175043267
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#76f2d1",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#52a992",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.3000000000000001,
+        "rgb_distance": 0.40098322066215597
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#76f2d1",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#46917d",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.4,
+        "rgb_distance": 0.5346442942162078
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#76f2d1",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#3b7968",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.6683053677702597
+      }
+    ]
+  },
+  {
+    "element_label": "Crimson danger",
+    "element_hex": "#E2474A",
+    "base_label": "Pulse base navy",
+    "base_hex": "#0E1218",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#e2474a",
+        "base_hex": "#0e1218",
+        "depth_hex": "#ac383b",
+        "hue_rotation_deg": 0.4503181985678566,
+        "saturation_drop": 0.016519998387768464,
+        "value_darken": 0.23507964601769907,
+        "rgb_distance": 0.22365927455782467
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#e2474a",
+        "base_hex": "#0e1218",
+        "depth_hex": "#9e3133",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.3,
+        "rgb_distance": 0.29197573013800193
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#e2474a",
+        "base_hex": "#0e1218",
+        "depth_hex": "#872a2c",
+        "hue_rotation_deg": 5.684341886080802e-14,
+        "saturation_drop": 1.6187767971953897e-16,
+        "value_darken": 0.4,
+        "rgb_distance": 0.389300973517336
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#e2474a",
+        "base_hex": "#0e1218",
+        "depth_hex": "#712325",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.48662621689667
+      }
+    ]
+  },
+  {
+    "element_label": "Crimson danger",
+    "element_hex": "#E2474A",
+    "base_label": "Burst base purple",
+    "base_hex": "#1A0F2E",
+    "results": [
+      {
+        "formula": "current (gd:800-806)",
+        "element_hex": "#e2474a",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#ae373e",
+        "hue_rotation_deg": 2.23974029275729,
+        "saturation_drop": 0.008215497173262351,
+        "value_darken": 0.22743362831858405,
+        "rgb_distance": 0.21488612794116227
+      },
+      {
+        "formula": "hsv-darken 30%",
+        "element_hex": "#e2474a",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#9e3133",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.3,
+        "rgb_distance": 0.29197573013800193
+      },
+      {
+        "formula": "hsv-darken 40%",
+        "element_hex": "#e2474a",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#872a2c",
+        "hue_rotation_deg": 5.684341886080802e-14,
+        "saturation_drop": 1.6187767971953897e-16,
+        "value_darken": 0.4,
+        "rgb_distance": 0.389300973517336
+      },
+      {
+        "formula": "hsv-darken 50%",
+        "element_hex": "#e2474a",
+        "base_hex": "#1a0f2e",
+        "depth_hex": "#712325",
+        "hue_rotation_deg": 0.0,
+        "saturation_drop": 0.0,
+        "value_darken": 0.5,
+        "rgb_distance": 0.48662621689667
+      }
+    ]
+  }
+]
