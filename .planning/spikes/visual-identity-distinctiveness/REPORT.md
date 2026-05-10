@@ -102,7 +102,7 @@ C5 (lift thickness bump) lacks evidence that the current lifts are too thin in p
 | # | Move | Default? | Effort | Wins on |
 |---|---|---|---|---|
 | **C2'** *(new, replaces C2)* | Accent expansion in idle chrome: rebind selected TabBar indicator, selected ItemList/Tree row left-stripe, kicker text color, active section indicators, slider/range value labels, section-header underlines to use `accent_color` | Yes (rebinds existing BINDING_TABLE rows) | 2-3h | **HEADLINE FIX** — addresses "accent appears practically never" without introducing new hues |
-| **C6** | Per-direction signature moves (Pulse uppercase-tracked kicker / Slate 1px hairlines / Bubble forced ≥26 radius / Daybreak 4px soft halo / Burst oversized 56-64px primary CTAs) | Yes (per-direction `STYLE_PERSONALITY` edits) | 4-6h | 5 directions read uniquely beyond color+radius |
+| **C6** | Per-direction signature moves (Pulse uppercase-tracked kicker / Slate 1px hairlines / Bubble forced ≥26 radius / Daybreak 1px outer mint outline + generous primary padding / Burst oversized 56-64px primary CTAs) | Yes (per-direction `STYLE_PERSONALITY` edits) | 4-6h | 5 directions read uniquely beyond color+radius |
 | **C4** | HSV value-darken depth formula at strength `0.20 + 0.10 × raised_strength` | Yes (replaces `_raised_depth_color`) | ~30 min | Same-hue darker shadow strips on colored buttons (accent fills, role-colored CTAs). Does NOT help dark-tonal neutral buttons (face and depth converge into base_color — but those are quiet UI and don't need strong depth) |
 | **C1** *(refined)* | Generic role Label type variations: `SuccessLabel` / `WarningLabel` / `DangerLabel` / `InfoLabel` | **Opt-in only** — consumer applies via `theme_type_variation`, never bound to widget defaults | 1.5h | Available semantic chrome when consumer needs it; showcase demos them |
 | **C3** *(refined)* | Generic role Panel type variations: `AccentPanel` / `InfoPanel` / `WarningPanel` / `DangerPanel` / `SuccessPanel` | **Opt-in only** — consumer applies via `theme_type_variation`, never bound to widget defaults | 2-3h | Available role-tinted panels when consumer needs them; showcase demos them |
@@ -118,7 +118,7 @@ Per-candidate rationale, references, feasibility analysis, aesthetic-risk assess
 | Pulse | C1, C2, C3 | C4, C5 | C6 (uppercase-tracked kicker) | **6** |
 | Slate | C1, C2, C3 | C4 | C6 (1px hairline borders) | **5** |
 | Bubble | C1, C2, C3 | C4, C5 | C6 (forced pillow ≥26 radius) | **6** |
-| Daybreak | C1, C2, C3 | C4 | C6 (4px soft halo on primary CTAs) | **5** |
+| Daybreak | C1, C2, C3 | C4 | C6 (1px outer mint outline + generous primary padding) | **5** |
 | Burst | C1, C2, C3 | C4, C5 | C6 (oversized 56-64px primary CTAs) | **6** |
 
 Every direction served by ≥5 moves. Every BRIEF mandate item addressed. Every candidate passes the constraint filter (no shaders, no textures, no gradients, no animations, no public-export breakage).
@@ -134,7 +134,7 @@ Six sections:
 2. **All 5 directions current vs proposed.** Each direction in a mini showcase. Confirms uniqueness — even at thumbnail scale, each proposed cell reads distinctly.
 3. **C2 MD3 palette derivation.** Per-direction `accent → secondary → tertiary` swatches. All 5 default tertiaries look deliberate — visually resolved the OPEN flag toward ADOPT.
 4. **C3 panel tinting demo.** 5 role-coded panels (LobbyPanel, MatchPanel, DangerPanel, WarningPanel, SuccessPanel) on Pulse base. The 6%-mix tint reads unambiguously without changing the dark identity.
-5. **C6 per-direction signature isolation.** Daybreak halo reads as soft welcoming decoration, not as focus state — visually resolved that OPEN flag toward ADOPT.
+5. **C6 per-direction signature isolation.** Original Daybreak halo (validated in spike-004) was reverted by 2026-05-10 user constraint: `raised=false` must show ZERO 3D elements + PROJECT.md no-glow-halos rule. Replaced with 1px outer mint outline + generous primary padding (flat-compatible, same airy personality).
 6. **Recommendation footer.**
 
 The mockup uses real Pulse / Slate / Bubble / Daybreak / Burst base + accent + panel tones (sourced from `addons/neocade_theme/scripts/neocade_theme.gd:913-1156`), not approximations. The HSV value-darken math (C4) and the panel tint mix (C3) are reproduced in CSS using `colorsys.rgb_to_hsv` so the cells render the proposed math exactly.

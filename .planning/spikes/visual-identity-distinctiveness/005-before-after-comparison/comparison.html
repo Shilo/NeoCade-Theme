@@ -89,6 +89,14 @@
   <div class="status-row"><span class="label">Re-capture command</span><span style="font-family:ui-monospace,monospace;color:#c9d2e0;font-size:12px;">godot --script .planning/spikes/visual-identity-distinctiveness/005-before-after-comparison/capture_screenshots.gd -- phase=before|after</span></div>
 </div>
 
+<div class="status-card" style="border-left: 3px solid #FFD166;">
+  <h3 style="color:#FFD166;">Locked invariants for Phase 12</h3>
+  <div class="status-row"><span class="label"><code>raised=false</code></span><span><b>ZERO 3D elements</b> anywhere. No depth strips, no halos, no glows, no bevels.</span></div>
+  <div class="status-row"><span class="label"><code>raised=true</code></span><span>partial subset raised — panels and buttons where it makes sense. Tabs stay flat. Current subset is the contract; Phase 12 does not change it.</span></div>
+  <div class="status-row"><span class="label">No glow halos</span><span>Forbidden in any state per PROJECT.md. Daybreak signature uses a flat 1px outer outline + generous padding (not a halo).</span></div>
+  <div class="status-row"><span class="label">No new hues</span><span>C2' redistributes the existing <code>accent_color</code>; does not introduce secondary/tertiary colors per direction. Same palette as today.</span></div>
+</div>
+
 <!-- ─── PULSE ─────────────────────────────────────────────────────────────── -->
 <div class="direction-block">
   <div class="direction-header">
@@ -121,10 +129,10 @@
   </div>
 
   <div class="annotation">
-    <b>What you should see change after Phase 12:</b><br>
-    • <b>C2' accent expansion:</b> "Buttons / Text Inputs / ..." section labels gain lime accent · selected tab "Buttons" gets a lime underline · OptionButton "Prize Pop Plaza" selected row would gain a lime left-stripe · LinkButton "Open release notes" stays lime (unchanged).<br>
-    • <b>C4 HSV value-darken depth:</b> "Start Match" PrimaryButton (when raised=true) gets a darker-lime same-hue depth strip beneath it instead of the current pull-toward-navy edge.<br>
-    • <b>C6 Pulse signature:</b> Section kicker labels ("PrimaryButton", "DangerButton", "OptionButton" etc.) become uppercase-tracked (0.24em letter-spacing) for arcade-marquee feel.
+    <b>What you should see change after Phase 12 (note raised=false=zero invariant applies — no 3D elements appear in flat mode):</b><br>
+    • <b>C2' accent expansion (both flat and raised):</b> "Buttons / Text Inputs / ..." section labels gain lime accent · selected tab "Buttons" gets a lime underline · OptionButton "Prize Pop Plaza" selected row would gain a lime left-stripe · LinkButton "Open release notes" stays lime (unchanged).<br>
+    • <b>C4 HSV value-darken depth (raised=true only):</b> "Start Match" PrimaryButton gets a darker-lime same-hue depth strip when raised=true. In raised=false, no depth strip appears anywhere.<br>
+    • <b>C6 Pulse signature (both flat and raised):</b> Section kicker labels ("PrimaryButton", "DangerButton", "OptionButton" etc.) become uppercase-tracked (0.24em letter-spacing) for arcade-marquee feel.
   </div>
 </div>
 
@@ -213,7 +221,7 @@
     <h2 style="color:#76F2D1;">Daybreak</h2>
     <span style="font-size:12px; color:#98a3b6;">airy-welcoming lobby · base #0B2420 · accent #76F2D1 · radius 8</span>
   </div>
-  <div class="direction-desc">Daybreak is the friendliest direction. BEFORE: mint accent appears on PrimaryButton + LinkButton + a few state indicators; otherwise dark forest-teal. After: accent in kicker, selected tab, row stripes; C6 signature adds a soft mint halo around primary CTAs for welcoming-lobby softness.</div>
+  <div class="direction-desc">Daybreak is the friendliest direction. BEFORE: mint accent appears on PrimaryButton + LinkButton + a few state indicators; otherwise dark forest-teal. After: accent in kicker, selected tab, row stripes; C6 signature adds a flat 1px mint outer outline + generous horizontal padding on primary CTAs (welcoming-lobby openness, fully compatible with raised=false=zero invariant — no halos, no glows).</div>
 
   <div class="variant-row flat-row">
     <div class="variant-cell">
@@ -240,8 +248,8 @@
   <div class="annotation">
     <b>What you should see change after Phase 12:</b><br>
     • <b>C2' accent expansion:</b> kicker labels gain mint tint · selected tab gets mint underline + mint text · selected ItemList rows gain mint left-stripe.<br>
-    • <b>C4 HSV value-darken depth:</b> "Start Match" raised primary gets a clearly darker-mint depth strip.<br>
-    • <b>C6 Daybreak signature:</b> Primary CTAs gain a 4px soft mint halo (box-shadow-style outer glow) for welcoming-lobby softness — distinct from the focus ring.
+    • <b>C4 HSV value-darken depth:</b> "Start Match" gets a clearly darker-mint depth strip <i>only when raised=true</i>. In raised=false, no depth strip appears (consistent with raised=false=zero invariant).<br>
+    • <b>C6 Daybreak signature:</b> Primary CTAs gain a flat 1px mint outer outline (3px offset) + extra horizontal padding for welcoming openness. Applies in both raised=false and raised=true (no halo, no glow — fully flat).
   </div>
 </div>
 

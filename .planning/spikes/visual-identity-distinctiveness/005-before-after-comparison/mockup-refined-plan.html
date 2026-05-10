@@ -181,8 +181,11 @@
   /* Bubble: forced pillow radius */
   .after.bubble-frame .card { border-radius: 22px; }
   .after.bubble-frame .hud { border-radius: 16px; }
-  /* Daybreak: 4px soft halo on primary CTA */
-  .after.daybreak-frame .btn.cta { box-shadow: 0 0 0 4px rgba(118, 242, 209, 0.18); }
+  /* Daybreak: 1px outer mint outline on primary CTA + generous horizontal padding.
+     Original "4px soft halo" was rejected 2026-05-10 by user constraint:
+     raised=false must show ZERO 3D elements + PROJECT.md no-glow-halos rule.
+     Outline + padding delivers the same airy/welcoming personality, fully flat. */
+  .after.daybreak-frame .btn.cta { outline: 1px solid #76F2D1; outline-offset: 3px; padding-left: 22px; padding-right: 22px; }
   /* Burst: oversized primary CTA */
   .after.burst-frame .btn.cta { padding: 14px 28px; font-size: 15px; border-radius: 28px; }
   .after.burst-frame .btn.cta::after { height: 6px; border-radius: 0 0 28px 28px; bottom: -6px; }
@@ -219,7 +222,7 @@
   <span class="legend-pill"><b>C6 Pulse</b> uppercase-tracked kicker</span>
   <span class="legend-pill"><b>C6 Slate</b> 1px hairlines + quiet-pill CTA</span>
   <span class="legend-pill"><b>C6 Bubble</b> forced pillow radius</span>
-  <span class="legend-pill"><b>C6 Daybreak</b> soft halo</span>
+  <span class="legend-pill"><b>C6 Daybreak</b> 1px outer outline + generous CTA padding</span>
   <span class="legend-pill"><b>C6 Burst</b> oversized CTA</span>
 </div>
 
@@ -499,9 +502,9 @@
 <div class="direction-block daybreak-bg">
   <div class="direction-title">
     <span class="kicker">DIRECTION</span><h2 class="daybreak-accent">DAYBREAK</h2>
-    <span class="daybreak-text-muted" style="font-size:12px;">airy-welcoming lobby · radius 8 · soft halo on CTAs signature</span>
+    <span class="daybreak-text-muted" style="font-size:12px;">airy-welcoming lobby · radius 8 · outer outline + generous padding signature (flat-only, no halo)</span>
   </div>
-  <div class="direction-desc">Daybreak base #0B2420 (dark forest-teal) + accent #76F2D1 (fresh mint). After: accent surfaces in kicker, selected tab, row stripe, active nav. C6 signature: 4px soft inner halo around primary CTAs (welcoming-lobby softness).</div>
+  <div class="direction-desc">Daybreak base #0B2420 (dark forest-teal) + accent #76F2D1 (fresh mint). After: accent surfaces in kicker, selected tab, row stripe, active nav. C6 signature: 1px outer mint outline + generous horizontal padding on primary CTAs (welcoming-lobby openness, fully flat — works in raised=false as well as raised=true, no glow halos per PROJECT.md).</div>
   <div class="direction-tokens">
     <div class="swatch" style="background:#0B2420"></div><span>base #0B2420</span>
     <div class="swatch" style="background:#76F2D1"></div><span>accent #76F2D1</span>
@@ -576,7 +579,7 @@
       </div>
     </div>
   </div>
-  <div class="annotation"><b>What changed:</b> kicker "LOBBY" now mint · selected tab "Quests" gets mint underline + mint text · Continue button gains 4px soft mint halo around it (C6 Daybreak signature) + same-hue darker mint depth strip (C4) · selected row "Defeat 5 enemies" gets mint left-stripe · level number mint.</div>
+  <div class="annotation"><b>What changed:</b> kicker "LOBBY" now mint · selected tab "Quests" gets mint underline + mint text · Continue button gains a 1px mint outer outline (3px offset) + extra horizontal padding for welcoming openness (C6 Daybreak signature — fully flat, no halo) · same-hue darker mint depth strip only appears when raised=true (C4) · selected row "Defeat 5 enemies" gets mint left-stripe · level number mint.</div>
 </div>
 
 <!-- ─── BURST ─────────────────────────────────────────────────────────────── -->
