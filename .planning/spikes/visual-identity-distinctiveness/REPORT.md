@@ -70,18 +70,44 @@ The mockup (`004/mockup-signature-moves.html`) renders Pulse current vs proposed
 
 ## 3. Catalogued candidate signature moves (BRIEF Definition-of-Done #3)
 
-**Source:** Spike 003 — `003-per-direction-signature-move-catalog/`. **Visual confirmation:** Spike 004 — `004-signature-moves-html-mockups/mockup-signature-moves.html`.
+**Source:** Spike 003 — `003-per-direction-signature-move-catalog/`. **Visual confirmation:** Spike 004 — `004-signature-moves-html-mockups/mockup-signature-moves.html`. **User refinement:** see "User Refinement (2026-05-10)" section below.
 
-### Six candidates
+### Original six candidates (as catalogued by spike 003)
 
-| # | Move | Bucket | Verdict | Hue Δ | Effort | Risk |
-|---|---|---|---|---|---|---|
-| **C1** | Wire `role_success / warning / danger / info` into normal-state chrome | hue-lift | ADOPT | +2 | S | Low |
-| **C2** | MD3 secondary/tertiary palette derivation from accent_color | hue-lift | ADOPT (was OPEN; visually confirmed in 004) | +1-2 | M | Medium |
-| **C3** | Per-section panel-tinting type variations (Lobby / Match / Danger / Warning / Success) | hue-lift | ADOPT | +2-4 in consumer UIs | S-M | Low |
-| **C4** | HSV value-darken depth formula (= 002b winner) | raised-fidelity | ADOPT | 0 | XS (6 lines) | Low |
-| **C5** | Per-direction lift thickness scaling (Pulse 2→4, Bubble 3→5, Burst 3→6; Slate, Daybreak unchanged) | raised-fidelity | ADOPT | 0 | XS | Low-Medium |
-| **C6** | Per-direction non-color/non-radius signature (kicker / hairline / forced-pillow / halo / oversized) | uniqueness | ADOPT — Daybreak halo OPEN→ADOPT confirmed in 004 | 0 | M | Mixed |
+| # | Move | Bucket | Original Verdict | Refined Verdict |
+|---|---|---|---|---|
+| **C1** | Wire `role_success / warning / danger / info` into normal-state chrome | hue-lift | ADOPT (default) | **OPT-IN only via type variation** |
+| **C2** | MD3 secondary/tertiary palette derivation from accent_color | hue-lift | ADOPT | **DEFERRED** — user prefers existing accent surface more first; revisit as opt-in export |
+| **C3** | Per-section panel-tinting type variations | hue-lift | ADOPT — semantic names (Lobby/Match/Danger/Warning/Success) | **ADOPT but GENERIC names only** — `AccentPanel` / `InfoPanel` / `WarningPanel` / `DangerPanel` / `SuccessPanel`; opt-in via type variation, never default |
+| **C4** | HSV value-darken depth formula (= 002b winner) | raised-fidelity | ADOPT | ADOPT — but scoped: helps colored-button affordance only; does NOT fix Pulse mono-tint |
+| **C5** | Per-direction lift thickness scaling | raised-fidelity | ADOPT | **DEFERRED** — re-evaluate after C2'+C6 ship; current lifts are already sizable |
+| **C6** | Per-direction non-color/non-radius signature | uniqueness | ADOPT | ADOPT — unchanged |
+
+### User Refinement (2026-05-10)
+
+User reviewed the catalog + mockup and refined scope based on three principles:
+
+1. **MD3-Expressive alignment over MD3-strict.** "MD3 Expressive does extremely well on adding expressive colors while being very purposeful and not excessive." → Color expansion must be PURPOSEFUL, not blanket.
+2. **Accent appears too rarely in idle state.** The user's primary complaint reframes the headline diagnosis: the issue is not "we need more semantic colors" but "the existing accent_color is practically never visible unless there's a confirm button". Fix: make the EXISTING accent surface in more idle-state chrome (selected tabs, active section indicators, kicker text, ItemList row stripes, etc.) — NOT introduce new hues.
+3. **Role colors must be purposeful and consumer-driven.** "Those states should be used with purpose only" — they should be opt-in via type variation, never auto-bound to widget defaults.
+
+The original C1 framing of "wire role colors into normal-state chrome" was misleading; in practice it would have meant binding role hues to existing widget defaults (e.g., a hypothetical "DangerButton normal bg" auto-tinted red) — that violates the purposeful-color principle and would also be an accessibility risk. The refined C1 is opt-in type variations only.
+
+C2 (MD3 secondary/tertiary derivation) introduces 2 new hues per direction with no consumer control, risking palette inconsistency. Deferred until user can opt in via a future `use_md3_extended_palette` export.
+
+C5 (lift thickness bump) lacks evidence that the current lifts are too thin in practice — the perceived "lack of 3D feel" is more plausibly about lack of accent presence than depth-strip thickness. Deferred for follow-up spike after C2'+C6 ship.
+
+### Refined candidate set
+
+| # | Move | Default? | Effort | Wins on |
+|---|---|---|---|---|
+| **C2'** *(new, replaces C2)* | Accent expansion in idle chrome: rebind selected TabBar indicator, selected ItemList/Tree row left-stripe, kicker text color, active section indicators, slider/range value labels, section-header underlines to use `accent_color` | Yes (rebinds existing BINDING_TABLE rows) | 2-3h | **HEADLINE FIX** — addresses "accent appears practically never" without introducing new hues |
+| **C6** | Per-direction signature moves (Pulse uppercase-tracked kicker / Slate 1px hairlines / Bubble forced ≥26 radius / Daybreak 4px soft halo / Burst oversized 56-64px primary CTAs) | Yes (per-direction `STYLE_PERSONALITY` edits) | 4-6h | 5 directions read uniquely beyond color+radius |
+| **C4** | HSV value-darken depth formula at strength `0.20 + 0.10 × raised_strength` | Yes (replaces `_raised_depth_color`) | ~30 min | Same-hue darker shadow strips on colored buttons (accent fills, role-colored CTAs). Does NOT help dark-tonal neutral buttons (face and depth converge into base_color — but those are quiet UI and don't need strong depth) |
+| **C1** *(refined)* | Generic role Label type variations: `SuccessLabel` / `WarningLabel` / `DangerLabel` / `InfoLabel` | **Opt-in only** — consumer applies via `theme_type_variation`, never bound to widget defaults | 1.5h | Available semantic chrome when consumer needs it; showcase demos them |
+| **C3** *(refined)* | Generic role Panel type variations: `AccentPanel` / `InfoPanel` / `WarningPanel` / `DangerPanel` / `SuccessPanel` | **Opt-in only** — consumer applies via `theme_type_variation`, never bound to widget defaults | 2-3h | Available role-tinted panels when consumer needs them; showcase demos them |
+| ~~C2~~ | MD3 secondary/tertiary auto-derivation | **DEFERRED** | — | — |
+| ~~C5~~ | Lift thickness bump | **DEFERRED** | — | — |
 
 Per-candidate rationale, references, feasibility analysis, aesthetic-risk assessment, and Phase 12 implementation snippets are documented in detail at `003-per-direction-signature-move-catalog/README.md` (one section per candidate).
 
@@ -117,22 +143,22 @@ The mockup uses real Pulse / Slate / Bubble / Daybreak / Burst base + accent + p
 
 ## 5. Recommendation (BRIEF Definition-of-Done #5)
 
-**Phase 12 scope: ADOPT all six candidates (C1, C2, C3, C4, C5, C6).**
+**Phase 12 scope (refined by user 2026-05-10): adopt C2'+C6+C4 as default behavior; C1+C3 as opt-in type variations; defer C2 and C5.**
 
-Both OPEN flags resolved toward ADOPT in spike 004:
-- **C2** — All 5 default-palette tertiary derivations look deliberate and on-brand.
-- **C6 Daybreak halo** — Reads as soft welcoming decoration; does not clash with the focus state.
+**Phase 12 implementation order:**
 
-**Phase 12 implementation order (per spike 003 effort estimates):**
+1. **C4** — XS, ~6 lines replacing `_raised_depth_color`. Helps colored-button affordance. (~30 min)
+2. **C2'** — S, rebind existing BINDING_TABLE rows to use `accent_color` in more idle-state slots: selected TabBar indicator, selected ItemList/Tree row left-stripe, kicker color, active section indicators, slider/range value labels, section-header underlines. The HEADLINE FIX. (~2-3h)
+3. **C6** — M, 5 mini-features (one per direction). Seals direction uniqueness. (~4-6h)
+4. **C1** — S, register 4 generic Label type variations (`SuccessLabel` / `WarningLabel` / `DangerLabel` / `InfoLabel`) with role-color bindings. Opt-in only. Showcase demos them. (~1.5h)
+5. **C3** — S-M, register 5 generic Panel type variations (`AccentPanel` / `InfoPanel` / `WarningPanel` / `DangerPanel` / `SuccessPanel`) with role-tint bindings. Opt-in only. Showcase demos them. (~2-3h)
 
-1. **C4** — XS, ~6 lines replacing `_raised_depth_color`. Closes the raised-fidelity defect cheaply. (≤30 min)
-2. **C5** — XS, 5 dictionary value edits in `STYLE_PERSONALITY`. Pairs with C4 to make the affordance bold. (≤30 min)
-3. **C1** — S, ~14 new BINDING_TABLE rows for role-coded type variations. Lifts the headline hue number. (~2-3h)
-4. **C3** — S-M, 5 new type variations on Panel/PanelContainer + per-direction tint calibration + README addition for consumer use. (~2-3h)
-5. **C6** — M, 5 mini-features (one per direction). Seals direction uniqueness. (~4-6h)
-6. **C2** — M, palette helper + per-direction rotation calibration + 6 BINDING_TABLE rows + safety hatch (`STYLE_PERSONALITY` per-direction `md3_extension_disabled` override for problem palettes). (~3-4h)
+**Total estimate: 10-13 hours focused implementation.** Plus ~2 hours of showcase scene additions to demonstrate the new chrome (accent now visible in idle state via C2'; opt-in role labels/panels in a "Role Variations" showcase section).
 
-**Total estimate: 12-16 hours focused implementation.** Plus ~2-3 hours of showcase scene additions to demonstrate the new chrome (severity badges, tinted info panel, kicker chrome).
+**Deferred to follow-up spikes:**
+- **C2 (MD3 secondary/tertiary auto-derivation)** — introduces 2 new hues per direction; user prefers existing accent to surface more often first. Revisit as opt-in export (e.g., `use_md3_extended_palette: bool`) after Phase 12 ships and the accent-expansion fix is validated in practice.
+- **C5 (lift thickness bump)** — no evidence current lifts are too thin once C2' lifts accent presence and C6 differentiates directions. Re-evaluate visually after Phase 12 ships; only re-open if the "3D game UI" feel still doesn't land.
+- **Surface tonal range expansion** (user idea: "HSV value range with more brightness also") — separate spike. Would lift face brightness across the 5-stop ramp so dark themes like Pulse have more contrast between panel and button. Higher risk than C4 because it touches every surface stop.
 
 ### Public API impact
 
@@ -145,11 +171,12 @@ Existing consumer code that uses `Style.PULSE` / `Style.SLATE` / etc. with defau
 ### Showcase scene additions
 
 The current `showcase/showcase.tscn` does not currently exercise:
-- Role-coded badges as steady-state chrome (C1)
-- Tinted role panels (C3)
+- Accent in idle-state chrome (selected tabs, ItemList stripes, kicker text) — needed to demo C2'
 - Section kickers (C6 Pulse signature)
+- Opt-in role labels (`SuccessLabel` / `WarningLabel` / `DangerLabel` / `InfoLabel` — C1)
+- Opt-in role panels (`AccentPanel` / `InfoPanel` / `WarningPanel` / `DangerPanel` / `SuccessPanel` — C3)
 
-These need to be added to the showcase so the new moves are visible in the user-facing demo. Showcase additions are part of the Phase 12 scope, not separate work.
+The role labels and panels should be shown in a dedicated "Role Variations" showcase section so consumers see they exist without forcing them into the baseline chrome. Showcase additions are part of the Phase 12 scope, not separate work.
 
 ### What this report does NOT decide
 
