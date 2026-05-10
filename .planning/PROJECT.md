@@ -34,7 +34,7 @@ If everything else fails, this single deliverable must work: a polished, feature
 
 ### Active
 
-- [ ] **Visual identity distinctiveness initiative (post-v1)**: production-readiness audit on 2026-05-10 confirmed v1 is mechanically ship-ready, but the user flagged that the rendered output reads as a "generic dark Godot theme with an accent color" rather than a unique NeoCade identity in the lineage of LDtk. A spike + dedicated phase are scoped in ROADMAP.md "Visual Identity Distinctiveness" section. They run after v1 cut so the shipped foundation is not destabilized.
+- [ ] **Phase 12 — Signature Visual Moves (post-v1)**: Visual Identity Distinctiveness spike completed 2026-05-10 with 5 sub-spikes (001-005). Refined scope locked through 6+ revision rounds: C2' accent expansion (default) + C4 HSV value-darken depth (default) + C6 per-direction signature moves (default) + C1 opt-in role Labels + C3 opt-in role Panels. ~10-13h focused implementation, zero public-export changes, no new hues introduced. Run `/gsd-phase add "Signature Visual Moves"` to begin planning. Scope authority: `.planning/spikes/visual-identity-distinctiveness/REPORT.md` + `.planning/spikes/MANIFEST.md`.
 - [ ] **Release dispatch (owner action)**: confirm GitHub Pages source and release workflow permissions, then manually trigger `release.yml`. Phase 11 UAT for this is closed by user attestation 2026-05-10; the dispatch itself is a repository-side owner action and out of autonomous scope.
 
 ### Out of Scope (v1)

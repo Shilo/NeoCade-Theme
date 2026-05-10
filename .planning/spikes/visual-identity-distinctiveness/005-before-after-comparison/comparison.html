@@ -6,15 +6,16 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #0a0c12; color: #e8ecf3; line-height: 1.5; }
-  body { padding: 32px 24px 80px; max-width: 1600px; margin: 0 auto; }
+  body { padding: 32px 24px 80px; margin: 0 auto; }  /* removed max-width: 1600px so images fill viewport */
   h1.page-title { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
   p.page-sub { color: #98a3b6; max-width: 1100px; margin-bottom: 16px; font-size: 14px; }
 
-  .toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 32px; flex-wrap: wrap; padding: 12px 16px; background: #11162A; border: 1px solid #1f2638; border-radius: 8px; }
+  .toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 32px; flex-wrap: wrap; padding: 12px 16px; background: #11162A; border: 1px solid #1f2638; border-radius: 8px; position: sticky; top: 0; z-index: 50; backdrop-filter: blur(6px); }
   .toolbar label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #98a3b6; cursor: pointer; }
   .toolbar input[type="radio"], .toolbar input[type="checkbox"] { margin-right: 6px; }
   .toolbar a { color: #6ce5a0; text-decoration: none; font-size: 12px; margin-left: auto; }
   .toolbar a:hover { text-decoration: underline; }
+  .toolbar .hint { color: #6e7a90; font-size: 11px; font-style: italic; }
 
   .direction-block { margin-bottom: 56px; border-top: 1px solid #1f2638; padding-top: 24px; }
   .direction-block:first-of-type { border-top: 0; padding-top: 0; }
@@ -22,35 +23,70 @@
   .direction-header h2 { font-size: 22px; font-weight: 700; }
   .direction-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #6e7a90; padding: 3px 8px; border: 1px solid #2a3148; border-radius: 4px; }
   .direction-desc { color: #98a3b6; font-size: 13px; margin-bottom: 16px; max-width: 1100px; }
-  .annotation { color: #c9d2e0; font-size: 12px; margin-top: 12px; line-height: 1.6; background: #11162A; border-left: 3px solid #6ce5a0; padding: 10px 14px; border-radius: 4px; }
+  .annotation { color: #c9d2e0; font-size: 13px; margin-top: 16px; line-height: 1.6; background: #11162A; border-left: 3px solid #6ce5a0; padding: 12px 16px; border-radius: 4px; }
   .annotation b { color: #6ce5a0; }
 
-  .variant-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  .variant-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6e7a90; margin-bottom: 8px; padding: 4px 8px; background: #1b2030; border-radius: 4px; display: inline-block; }
+  /* DEFAULT: side-by-side at full viewport width (no max-width on body) */
+  .variant-row { margin-bottom: 24px; }
+  .variant-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6e7a90; margin-bottom: 10px; padding: 4px 10px; background: #1b2030; border-radius: 4px; display: inline-block; }
   .variant-cell { display: flex; flex-direction: column; }
-  .frame { border-radius: 8px; overflow: hidden; aspect-ratio: 16/10; background: #0d1018; position: relative; }
+  .pair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .frame { border-radius: 8px; overflow: hidden; aspect-ratio: 16/10; background: #0d1018; position: relative; cursor: zoom-in; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .frame:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
   .frame img { width: 100%; height: 100%; display: block; object-fit: cover; }
-  .placeholder { display: flex; align-items: center; justify-content: center; color: #6e7a90; font-size: 13px; text-align: center; padding: 24px; height: 100%; }
-  .placeholder .big { font-size: 18px; font-weight: 700; color: #98a3b6; margin-bottom: 8px; }
+  .frame.has-placeholder { cursor: default; }
+  .frame.has-placeholder:hover { transform: none; box-shadow: none; }
+  .placeholder { display: flex; align-items: center; justify-content: center; color: #6e7a90; font-size: 14px; text-align: center; padding: 24px; height: 100%; }
+  .placeholder .big { font-size: 20px; font-weight: 700; color: #98a3b6; margin-bottom: 10px; }
   .placeholder a { color: #6ce5a0; text-decoration: underline; }
 
-  .pair-header { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px; }
-  .pair-header .col-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  .pair-header { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 10px; }
+  .pair-header .col-label { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
   .pair-header .before { color: #ff8090; }
   .pair-header .after { color: #6ce5a0; }
 
-  /* slider-overlay mode */
-  body.slider-mode .variant-row { display: block; }
-  body.slider-mode .pair-header { display: none; }
-  body.slider-mode .variant-cell + .variant-cell { display: none; }
-  body.slider-mode .frame { aspect-ratio: 16/10; }
-  body.slider-mode .frame::after {
-    content: 'After-shots not yet captured. Open mockup-refined-plan.html for forward-looking preview.';
-    position: absolute; left: 50%; transform: translateX(-50%); bottom: 12px;
-    background: rgba(0,0,0,0.75); color: #6ce5a0; padding: 6px 12px; border-radius: 4px;
-    font-size: 11px;
+  /* STACKED MODE: BEFORE and AFTER stacked vertically, each at full content width */
+  body.stacked-mode .pair-grid { grid-template-columns: 1fr; gap: 12px; }
+  body.stacked-mode .pair-header { grid-template-columns: 1fr; }
+  body.stacked-mode .pair-header .col-label { padding: 6px 10px; background: #11162A; border-radius: 4px; text-align: center; }
+  body.stacked-mode .pair-grid > *:first-child::before {
+    content: 'BEFORE'; display: block; padding: 6px 12px; background: rgba(255,128,144,0.12); color: #ff8090;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    border-top-left-radius: 8px; border-top-right-radius: 8px;
   }
-  body.slider-mode .variant-tag::before { content: 'BEFORE-only mode — '; color: #ff8090; }
+  body.stacked-mode .pair-grid > *:nth-child(2)::before {
+    content: 'AFTER (Phase 12)'; display: block; padding: 6px 12px; background: rgba(108,229,160,0.12); color: #6ce5a0;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    border-top-left-radius: 8px; border-top-right-radius: 8px;
+  }
+  body.stacked-mode .pair-grid > .frame { border-top-left-radius: 0; border-top-right-radius: 0; }
+  body.stacked-mode .pair-header { display: none; }
+
+  /* BEFORE-only mode */
+  body.before-only-mode .pair-grid { grid-template-columns: 1fr; }
+  body.before-only-mode .pair-grid > *:nth-child(2) { display: none; }
+  body.before-only-mode .pair-header { display: none; }
+
+  /* Click-to-zoom modal */
+  .zoom-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 100;
+    display: none; align-items: center; justify-content: center; padding: 32px;
+    cursor: zoom-out;
+  }
+  .zoom-modal.visible { display: flex; }
+  .zoom-modal img {
+    max-width: 100%; max-height: 100%; display: block;
+    border: 2px solid rgba(108,229,160,0.4); border-radius: 4px;
+    box-shadow: 0 0 60px rgba(0,0,0,0.8);
+  }
+  .zoom-modal .caption {
+    position: absolute; top: 16px; left: 24px; right: 24px;
+    color: #e8ecf3; font-size: 14px; display: flex; justify-content: space-between; align-items: center;
+    pointer-events: none;
+  }
+  .zoom-modal .caption .close-hint {
+    color: #98a3b6; font-size: 12px;
+  }
 
   /* raised filter */
   body.filter-flat .raised-row { display: none; }
@@ -72,12 +108,14 @@
 <p class="page-sub">Real Godot rendering of <code>showcase/showcase.tscn</code> with each direction × flat/raised, captured automatically by <code>capture_screenshots.gd</code>. BEFORE = current production code. AFTER = will be populated after Phase 12 ships the refined plan (C2' accent expansion + C4 HSV value-darken depth + C6 per-direction signature moves). Until then, AFTER cells link to the forward-looking HTML mockup that simulates the expected result.</p>
 
 <div class="toolbar">
-  <label><input type="radio" name="layout" value="side-by-side" checked> Side-by-side</label>
-  <label><input type="radio" name="layout" value="slider"> BEFORE only</label>
+  <label><input type="radio" name="layout" value="side-by-side" checked> Side-by-side (default)</label>
+  <label><input type="radio" name="layout" value="stacked"> Stacked (each image full width)</label>
+  <label><input type="radio" name="layout" value="before-only"> BEFORE only (no placeholder)</label>
   <span style="color:#1f2638;">|</span>
   <label><input type="radio" name="filter" value="all" checked> Flat + Raised</label>
   <label><input type="radio" name="filter" value="flat"> Flat only</label>
   <label><input type="radio" name="filter" value="raised"> Raised only</label>
+  <span class="hint">Click any image to zoom to native 1280×800</span>
   <a href="mockup-refined-plan.html">Open forward-looking AFTER mockup →</a>
 </div>
 
@@ -111,9 +149,9 @@
     <div class="variant-cell">
       <span class="variant-tag">flat</span>
       <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="pair-grid">
         <div class="frame"><img src="screenshots/before/pulse-flat.png" alt="Pulse flat BEFORE"></div>
-        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+        <div class="frame has-placeholder"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
       </div>
     </div>
   </div>
@@ -122,9 +160,9 @@
     <div class="variant-cell">
       <span class="variant-tag raised-tag">raised</span>
       <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="pair-grid">
         <div class="frame"><img src="screenshots/before/pulse-raised.png" alt="Pulse raised BEFORE"></div>
-        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+        <div class="frame has-placeholder"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
       </div>
     </div>
   </div>
@@ -150,9 +188,9 @@
     <div class="variant-cell">
       <span class="variant-tag">flat</span>
       <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="pair-grid">
         <div class="frame"><img src="screenshots/before/slate-flat.png" alt="Slate flat BEFORE"></div>
-        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+        <div class="frame has-placeholder"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
       </div>
     </div>
   </div>
@@ -161,9 +199,9 @@
     <div class="variant-cell">
       <span class="variant-tag raised-tag">raised</span>
       <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="pair-grid">
         <div class="frame"><img src="screenshots/before/slate-raised.png" alt="Slate raised BEFORE"></div>
-        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+        <div class="frame has-placeholder"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
       </div>
     </div>
   </div>
@@ -189,9 +227,9 @@
     <div class="variant-cell">
       <span class="variant-tag">flat</span>
       <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="pair-grid">
         <div class="frame"><img src="screenshots/before/bubble-flat.png" alt="Bubble flat BEFORE"></div>
-        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+        <div class="frame has-placeholder"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
       </div>
     </div>
   </div>
@@ -200,9 +238,9 @@
     <div class="variant-cell">
       <span class="variant-tag raised-tag">raised</span>
       <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="pair-grid">
         <div class="frame"><img src="screenshots/before/bubble-raised.png" alt="Bubble raised BEFORE"></div>
-        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+        <div class="frame has-placeholder"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
       </div>
     </div>
   </div>
@@ -228,9 +266,9 @@
     <div class="variant-cell">
       <span class="variant-tag">flat</span>
       <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="pair-grid">
         <div class="frame"><img src="screenshots/before/daybreak-flat.png" alt="Daybreak flat BEFORE"></div>
-        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+        <div class="frame has-placeholder"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
       </div>
     </div>
   </div>
@@ -239,9 +277,9 @@
     <div class="variant-cell">
       <span class="variant-tag raised-tag">raised</span>
       <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="pair-grid">
         <div class="frame"><img src="screenshots/before/daybreak-raised.png" alt="Daybreak raised BEFORE"></div>
-        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+        <div class="frame has-placeholder"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
       </div>
     </div>
   </div>
@@ -267,9 +305,9 @@
     <div class="variant-cell">
       <span class="variant-tag">flat</span>
       <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="pair-grid">
         <div class="frame"><img src="screenshots/before/burst-flat.png" alt="Burst flat BEFORE"></div>
-        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+        <div class="frame has-placeholder"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
       </div>
     </div>
   </div>
@@ -278,9 +316,9 @@
     <div class="variant-cell">
       <span class="variant-tag raised-tag">raised</span>
       <div class="pair-header"><span class="col-label before">BEFORE</span><span class="col-label after">AFTER (refined plan)</span></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="pair-grid">
         <div class="frame"><img src="screenshots/before/burst-raised.png" alt="Burst raised BEFORE"></div>
-        <div class="frame"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
+        <div class="frame has-placeholder"><div class="placeholder"><div><div class="big">AFTER</div>captured after Phase 12 ships<br><a href="mockup-refined-plan.html">→ preview the spirit</a></div></div></div>
       </div>
     </div>
   </div>
@@ -303,11 +341,19 @@
   </ul>
 </div>
 
+<!-- Click-to-zoom modal -->
+<div class="zoom-modal" id="zoomModal">
+  <div class="caption"><span id="zoomCaption"></span><span class="close-hint">Click anywhere or press ESC to close</span></div>
+  <img id="zoomImage" alt="">
+</div>
+
 <script>
   // Layout toggle
   const layoutRadios = document.querySelectorAll('input[name="layout"]');
   layoutRadios.forEach(r => r.addEventListener('change', e => {
-    document.body.classList.toggle('slider-mode', e.target.value === 'slider');
+    document.body.classList.remove('stacked-mode', 'before-only-mode');
+    if (e.target.value === 'stacked') document.body.classList.add('stacked-mode');
+    if (e.target.value === 'before-only') document.body.classList.add('before-only-mode');
   }));
 
   // Filter toggle
@@ -317,6 +363,26 @@
     if (e.target.value === 'flat') document.body.classList.add('filter-flat');
     if (e.target.value === 'raised') document.body.classList.add('filter-raised');
   }));
+
+  // Click-to-zoom modal
+  const modal = document.getElementById('zoomModal');
+  const modalImg = document.getElementById('zoomImage');
+  const modalCaption = document.getElementById('zoomCaption');
+  document.body.addEventListener('click', e => {
+    const frame = e.target.closest('.frame:not(.has-placeholder)');
+    if (frame && frame.querySelector('img')) {
+      const img = frame.querySelector('img');
+      modalImg.src = img.src;
+      modalImg.alt = img.alt;
+      modalCaption.textContent = img.alt;
+      modal.classList.add('visible');
+    } else if (e.target.closest('.zoom-modal')) {
+      modal.classList.remove('visible');
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') modal.classList.remove('visible');
+  });
 
   // Attempt to load AFTER manifest if present, swap placeholders for real shots.
   fetch('screenshots/after/manifest.json')

@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 
 ## Current Position
 
-Phase: 11 (closed)
-Plan: Complete
-Next: (1) Owner action — dispatch `release.yml` for v1 cut. (2) Run `/gsd-spike visual-identity-distinctiveness` then `/gsd-phase` for "Signature Visual Moves" before declaring NeoCade visually unique to LDtk's bar.
-Status: v1 mechanically ship-ready. UAT items closed by user attestation 2026-05-10. Visual-identity distinctiveness flagged for post-v1 work.
-Last activity: 2026-05-10 -- Production-readiness audit performed via /gsd-progress; UATs closed; visual-identity initiative scoped.
+Phase: 11 (closed) · Visual Identity Distinctiveness spike (closed 2026-05-10)
+Plan: Complete + spike series delivered
+Next: (1) Owner action — dispatch `release.yml` for v1 cut. (2) Run `/gsd-phase add "Signature Visual Moves"` to plan Phase 12 against the locked spike scope (REPORT.md + MANIFEST.md). All spike sub-deliverables validated; refined scope locked through 6+ revision rounds with user.
+Status: v1 mechanically ship-ready. UAT items closed by user attestation 2026-05-10. Visual-identity spike complete; Phase 12 ready to plan.
+Last activity: 2026-05-10 -- Visual Identity Distinctiveness spike completed (001-005); Phase 12 scope locked with 5 success criteria including per-direction uniqueness thumbnail gate.
 
 Progress: [████████████████████] 67/67 plans (100%; redirected Phase 3 historical partial preserved)
 
