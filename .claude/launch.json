@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "spike-mockup-server",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8765", "--directory", ".planning/spikes/visual-identity-distinctiveness/004-signature-moves-html-mockups"],
+      "port": 8765
+    }
+  ]
+}
