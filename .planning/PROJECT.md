@@ -34,7 +34,8 @@ If everything else fails, this single deliverable must work: a polished, feature
 
 ### Active
 
-- [ ] **Manual release/UAT before archive**: confirm GitHub Pages/source and release workflow permissions, manually trigger the release workflow when ready, and decide which deferred screenshot/device checks must be performed before `$gsd-complete-milestone`.
+- [ ] **Visual identity distinctiveness initiative (post-v1)**: production-readiness audit on 2026-05-10 confirmed v1 is mechanically ship-ready, but the user flagged that the rendered output reads as a "generic dark Godot theme with an accent color" rather than a unique NeoCade identity in the lineage of LDtk. A spike + dedicated phase are scoped in ROADMAP.md "Visual Identity Distinctiveness" section. They run after v1 cut so the shipped foundation is not destabilized.
+- [ ] **Release dispatch (owner action)**: confirm GitHub Pages source and release workflow permissions, then manually trigger `release.yml`. Phase 11 UAT for this is closed by user attestation 2026-05-10; the dispatch itself is a repository-side owner action and out of autonomous scope.
 
 ### Out of Scope (v1)
 

@@ -34,6 +34,91 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Optional buffer:** Cross-Platform Hardening Spike (4-8 hours, inserted as Phase 10.1 only if Phase 10 surfaces real-device regressions).
 
+## Visual Identity Distinctiveness (post-v1, scoped 2026-05-10)
+
+**Trigger:** /gsd-progress production-readiness audit on 2026-05-10. The user
+flagged that the rendered theme reads as a "generic dark Godot theme with an
+accent color" rather than a unique identity in the lineage of LDtk. The
+underlying engine (single concrete `NeoCadeTheme`, 12-export contract, 79 SVG
+icons, 5 styles with real shape language) is solid; what's missing is the
+visible signature. Per user instruction, the v1 ship sequence is not gated on
+this work — these run after the v1 cut so the shipped foundation stays
+stable.
+
+### Spike — Visual Identity Distinctiveness Audit (proposed)
+
+**Trigger command:** `/gsd-spike visual-identity-distinctiveness`
+
+**Frame:** Given the locked constraints (flat MD3 / MD3 Expressive,
+anti-cyberpunk, anti-texture, anti-gradient on chrome, HD-only, dark-first
+v1, single concrete `NeoCadeTheme` class), identify the signature visual
+moves that would make NeoCade feel unique and "in the lineage of LDtk"
+rather than a generic Godot theme.
+
+**Inputs:**
+- `.planning/research/LDTK-UI-MINING.md` — already catalogues 14+ adopt-candidate
+  patterns (HAXE-01..HAXE-14+) that were studied but never translated into
+  visual identity. Many were tagged "Inspiration sketch — Phase 3 mockup or
+  Phase 5+ designer's call" and the call was never made.
+- `.planning/mockups/3.4/concepts/*-finalist-*.png` — the user-approved Phase
+  3.4 mockups, against which the spike measures the "uniqueness gap".
+- The actual rendered showcase scene against the same scorecard.
+- LDtk's icon library (~121 SVGs at `C:\Programming_Files\ldtk-master\app\assets\icons\`)
+  and font choice (`Noto Sans Display Semicondensed`) for distinctiveness contrast.
+
+**Deliverable:** `.planning/spikes/visual-identity-distinctiveness/REPORT.md`
+that:
+1. Articulates the "uniqueness gap" between the approved Phase 3.4 mockups
+   and the LDtk-bar polish target — concrete, evidence-grade, not vibes.
+2. Proposes 3-6 candidate signature moves that satisfy the locked
+   constraints, each with a Godot 4.6 feasibility note (StyleBox primitives
+   only, no shaders, no GDExtension).
+3. Records 1-2 throwaway HTML mockups demonstrating the candidate moves
+   against the showcase layout.
+4. Marks each candidate as adopt / reject / open. The phase below consumes
+   the adopt set.
+
+### Phase 12 — Signature Visual Moves (proposed)
+
+**Trigger command:** `/gsd-phase 12 add` (after spike closes)
+
+**Goal:** Translate the spike's adopted candidate moves into the live
+`NeoCadeTheme` engine so the rendered output reads as distinctly NeoCade,
+not a generic dark Godot theme.
+
+**Likely candidate moves (subject to spike outcome — do NOT implement
+without spike approval):**
+1. **Section/role color tinting on Panels and TabContainers** — LDtk's
+   signature sidebar tinting per layer adapted to NeoCade's surface ramp.
+   Add a `panel_role` type-variation family (`InfoPanel`, `WarnPanel`,
+   `DangerPanel`, `SuccessPanel`) so consumers tag panels semantically and
+   receive a distinct hue overlay tied to `role_*` tokens.
+2. **Severity-coded notification/banner system** — translate LDtk HAXE-03
+   and HAXE-19 patterns into a `NeoCadeNotificationBanner` reusable Control
+   under `addons/neocade_theme/scripts/`, parallel to the option-button
+   helper. Pure Theme/StyleBox primitives.
+3. **Distinctive selected-row treatment** — Tree and ItemList rows currently
+   use a tonal accent fill. Add a left-edge color stripe + selected tick
+   chip pattern derived from the active style's accent so selection reads
+   visually as NeoCade, not a generic accent fill.
+4. **Branded icon pass** — current 79 SVGs are functional Godot-slot
+   mirrors. Add a small (≈10–15) brand-personality icon set (marquee,
+   ticket, scoreboard, prize, attract-mode, score-bump) for showcase use
+   and consumer reuse, monochrome single-color per ICON-03.
+5. **Header / kicker treatment with stronger character** — the existing
+   `kicker_style` enum in `STYLE_PERSONALITY.shape` is wired but mostly
+   defers to content. Implement the full per-style kicker (uppercase-tracked,
+   small-caps, sentence-case, bold-larger-scale) as actual rendered chrome
+   on `Kicker` and `HeaderLarge` variations.
+6. **Optional opt-in display font slot** — without bundling, expose a
+   documented `display_font` override pattern for headings so consumers can
+   add character without theme bundle bloat (FONT-09 lineage).
+
+**Out-of-scope guardrails:** any move that would require a custom shader,
+a `plugin.cfg`, motion/animation, GDExtension, or breaking the 12-export
+public contract is rejected at the phase planning gate, not the
+implementation gate.
+
 ## Phase Details
 
 ### Phase 1: Source-Dive — godot-minimal-theme `.tres` Dissection

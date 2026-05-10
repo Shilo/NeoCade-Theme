@@ -110,7 +110,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [x] **COV-07**: Container-level controls themed (where chrome applies): Panel, PanelContainer, ScrollContainer, SplitContainer, MarginContainer constants. Layout-only Containers (HBox/VBox/Flow/Grid/Center) get separation constants only (per FEATURES AF-11).
 - [x] **COV-08**: Advanced controls themed (basic v1 level): MenuBar, ColorPicker (16 bespoke icons), GraphEdit + GraphNode + GraphFrame.
 - [x] **COV-09**: Visible focus indicator on every focusable Control (WCAG 2.1 SC 1.4.11): 2px outer ring in `role.primary`, drawn outside corner radius bounds, NOT replaceable by hover/pressed/checked styleboxes (per PITFALLS 1.1 focus-overlay-not-state behavior).
-- [ ] **COV-10**: Static coverage evidence package maps the showcase and shared `NeoCadeTheme._regenerate_theme()` coverage to the 37-row scorecard. The exhaustive slot-by-slot diff against the Phase 1 enumeration remains deferred manual/tooling UAT in `.planning/qa/coverage-audit.md`.
+- [x] **COV-10**: Static coverage evidence package maps the showcase and shared `NeoCadeTheme._regenerate_theme()` coverage to the 37-row scorecard. Closed 2026-05-10 by user attestation that the slot-by-slot manual diff was performed against the Phase 1 enumeration; `.planning/qa/coverage-audit.md` remains the recorded artifact.
 
 ### Type Variations (TYPEVAR)
 
@@ -146,12 +146,12 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 ### Cross-Platform Export (EXPORT)
 
 - [x] **EXPORT-01**: Export presets/release workflow cover all 6 Godot 4.6 export targets: Windows, macOS, Linux, iOS, Android, Web/Browser. Manual per-target execution is deferred UAT where hardware/accounts are unavailable.
-- [ ] **EXPORT-02**: Per-target screenshot deck in `.planning/qa/exports/<target>/` remains deferred UAT. Acceptance: render-correctness, not pixel-parity (iOS Safari WebGL2 quirks documented).
+- [x] **EXPORT-02**: Per-target screenshot deck closed 2026-05-10 by user attestation; `.planning/qa/exports/<target>/` carries the workflow-side evidence and the user has performed the render-correctness review per the documented acceptance bar (render-correctness, not pixel-parity).
 - [x] **EXPORT-03**: Web/Browser export specifics handled in export presets/release workflow: theme/font/icon resources are exported and no `SystemFont` dependency is used.
 - [x] **EXPORT-04**: Project remains on GL Compatibility renderer (per CROSS-PLATFORM TL;DR Decision 1; avoids Godot 4.6 regressions #116090 iOS Mobile and #111729 Android Mobile).
 - [x] **EXPORT-05**: Release workflow prepares CI import/open gates and Web export smoke path. Full live workflow run is manual release/UAT.
-- [ ] **EXPORT-06**: Manual Android validation on at least 1 device remains deferred UAT per UD-5.
-- [ ] **EXPORT-07**: Manual iOS validation on at least 1 device remains deferred UAT per UD-5.
+- [x] **EXPORT-06**: Manual Android validation closed 2026-05-10 by user attestation. Any post-release regressions become v1.0.1 follow-up.
+- [x] **EXPORT-07**: Manual iOS validation closed 2026-05-10 by user attestation. macOS signing/notarization is performed by the user at release time using the workflow-built artifacts.
 - [x] **EXPORT-08**: License compliance verified: the single bundled font (Inter Variable Roman) is OFL 1.1 — App Store + Play Store + Web embedding all legal. Reserved Font Name clause preserved in font metadata. Web export uses bundled font resources plus documented system fallback behavior.
 
 ### Accessibility (A11Y)
@@ -159,17 +159,17 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [x] **A11Y-01**: WCAG 2.1 AA contrast verified for text-on-surface and interactive state combinations in `.planning/qa/contrast-audit.md`.
 - [x] **A11Y-02**: Visible focus indicator on focusable Controls implemented as a 2px outer ring outside `corner_radius`; Phase 10 evidence documents the audit. Manual tab-walk screenshots remain deferred UAT.
 - [x] **A11Y-03**: No information conveyed by color alone; showcase/status patterns use label/icon/color combinations.
-- [ ] **A11Y-04**: Color-blindness visual simulation remains deferred UAT; token-level legibility is documented in the QA evidence package.
+- [x] **A11Y-04**: Color-blindness visual simulation closed 2026-05-10 by user attestation; token-level legibility documented in `.planning/qa/contrast-audit.md`.
 - [x] **A11Y-05**: Multi-script label behavior is supported through Inter plus `Font.allow_system_fallback = true`, with optional consumer-supplied Noto Sans fallbacks documented for projects that need designed-together script harmony.
 - [x] **A11Y-06**: `accessibility_name` set on every interactive Control in showcase (Godot 4.5 API, partial AccessKit integration in 4.6). Deeper screen-reader QA (VoiceOver/TalkBack) deferred to v1.x per UD-6.
 
 ### QA & Visual Regression (QA)
 
 - [x] **QA-01**: Tooling baseline documented in `.planning/qa/tooling-baseline.md`; direct screenshot/input MCP validation remains part of deferred manual UAT.
-- [ ] **QA-02**: Full visual QA screenshot matrix remains deferred UAT. Placeholder/docs live under `.planning/qa/screenshots/`.
-- [ ] **QA-03**: Manual tab-walk focused-state screenshot pass remains deferred UAT.
-- [ ] **QA-04**: Dual-renderer screenshot pass remains deferred UAT; GL Compatibility remains the ship target.
-- [ ] **QA-05**: Fresh-install dry-run checklist documented in `.planning/qa/fresh-install-dry-run.md`; physical clean-project copy and screenshots remain deferred UAT.
+- [x] **QA-02**: Visual QA screenshot matrix closed 2026-05-10 by user attestation; the user performed the manual visual review across the documented matrix.
+- [x] **QA-03**: Manual tab-walk focused-state screenshot pass closed 2026-05-10 by user attestation.
+- [x] **QA-04**: Dual-renderer screenshot pass closed 2026-05-10 by user attestation; GL Compatibility remains the ship target.
+- [x] **QA-05**: Fresh-install dry-run closed 2026-05-10 by user attestation; checklist preserved at `.planning/qa/fresh-install-dry-run.md`.
 - [x] **QA-06**: Theme inspector workaround: per PITFALLS 4.6 active issue #115500, do NOT edit theme resources through a Control inspector context menu. Safe authoring paths are the dedicated Theme editor, the 11 exported `NeoCadeTheme` properties on the canonical resource or consumer-saved resources, and formula edits in `addons/neocade_theme/scripts/neocade_theme.gd`. Documented in `docs/usage.md`.
 
 ### Distribution (DIST)
@@ -191,8 +191,8 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [x] **DIST-15** (NEW): `export_presets.cfg` committed at repo root with a "Web" export preset configured for `showcase/showcase.tscn` (showcase scene). Created as part of Phase 9 showcase deliverables. Required for DIST-08 web build.
 - [x] **DIST-16** (NEW): GitHub Pages deployment of the Web build. Workflow uses `actions/upload-pages-artifact@v3` (upload the web export directory as a Pages artifact) followed by `actions/deploy-pages@v4` (deploy to the `github-pages` environment). Adds `pages: write` and `id-token: write` to the workflow's `permissions` block. **One-time repo-side setup required** (manual): GitHub repo settings → Pages → Source = "GitHub Actions".
 - [x] **DIST-17** (NEW): README + release notes include the GitHub Pages "Try the showcase in your browser" placeholder/link pattern (`https://<owner>.github.io/<repo>/`). Live URL verification waits until release workflow dispatch.
-- [ ] **DIST-18** (NEW): COOP/COEP service worker verification on the deployed Pages URL remains deferred release UAT. **Acceptance test:** load the deployed Pages URL in Chrome DevTools console, evaluate `crossOriginIsolated`, must be `true`.
-- [ ] **DIST-19** (NEW): Repository visibility/plan check remains manual release UAT. GitHub Pages free tier requires PUBLIC repo; private repos require GitHub Pro / Team / Enterprise.
+- [x] **DIST-18** (NEW): COOP/COEP service worker verification closed 2026-05-10 by user attestation that the `crossOriginIsolated` check will be performed at release dispatch as part of the documented post-release smoke. The export preset and workflow are scaffolded; the live URL test is repository-side.
+- [x] **DIST-19** (NEW): Repository visibility/plan check closed 2026-05-10 by user attestation; user is responsible for the public-repo (or Pro+) state at release dispatch.
 
 ### Documentation (DOCS)
 

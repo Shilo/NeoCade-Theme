@@ -19,7 +19,7 @@ this phase.
 |---|---:|---|
 | Release workflow exists | PASS | `.github/workflows/release.yml` |
 | Manual trigger, no inputs | PASS | `workflow_dispatch` only |
-| Version source | PASS | `addons/neocade_theme/VERSION` |
+| Version source | PASS | root `VERSION` (single-line `MAJOR.MINOR.PATCH` per DIST-11) |
 | Version is semver | PASS | `0.9.0` |
 | Godot CI gates | PASS | workflow imports project and opens `showcase/showcase.tscn` |
 | Web showcase build | PASS | workflow exports preset `Web` |

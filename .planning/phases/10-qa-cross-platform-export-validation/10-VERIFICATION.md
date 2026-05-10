@@ -24,7 +24,7 @@ deferred.
 | Coverage audit | PASS | `.planning/qa/coverage-audit.md` |
 | Export target presets | PASS | `export_presets.cfg` + `.planning/qa/export-validation.md` |
 | Fresh install checklist | PASS | `.planning/qa/fresh-install-dry-run.md` |
-| Theme inspector workaround | PASS | `CONTRIBUTING.md` |
+| Theme inspector workaround | PASS | `docs/usage.md` (CONTRIBUTING.md was removed during the 2026-05-08 cleanup; QA-06 workaround now lives in usage docs) |
 | Deferred UAT matrix | PASS | `.planning/qa/deferred-uat-matrix.md` |
 
 ## Deferred UAT

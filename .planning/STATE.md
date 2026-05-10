@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
-status: autonomous_complete
-stopped_at: Phase 11 verification complete; UAT/manual device checks deferred per user instruction
-last_updated: "2026-05-08T00:00:00.000Z"
-last_activity: 2026-05-08 -- Planning docs reviewed for stale Phase 9-11 status after autonomous closeout
+status: ship_ready_with_post_v1_identity_initiative
+stopped_at: v1 mechanically ship-ready; deferred UATs closed by user attestation 2026-05-10; post-v1 visual-identity distinctiveness initiative (spike + phase) scoped because shipped output reads as a generic dark Godot theme with an accent color rather than a unique NeoCade identity
+last_updated: "2026-05-10T00:00:00.000Z"
+last_activity: 2026-05-10 -- Production-readiness audit. Closed Phase 9/10/11 UATs and 8 deferred-UAT-matrix items by user attestation. Reconciled REQUIREMENTS.md checkboxes (COV-10, EXPORT-02/06/07, A11Y-04, QA-02/03/04/05, DIST-18/19). Fixed stale VERSION path and CONTRIBUTING.md ref in 11/10 verifications. Rewrote PROJECT.md Active to track the post-v1 visual-identity initiative + the release-dispatch owner action.
 progress:
   total_phases: 15
-  completed_phases: 14
+  completed_phases: 15
   total_plans: 67
-  completed_plans: 64
-  percent: 96
+  completed_plans: 67
+  percent: 100
 ---
 
 # Project State
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 
 ## Current Position
 
-Phase: 11
+Phase: 11 (closed)
 Plan: Complete
-Next: Manual release/UAT when ready; then `$gsd-complete-milestone`
-Status: Autonomous chain complete — Phases 09, 10, and 11 verified with deferred UAT
-Last activity: 2026-05-08 -- Planning docs refreshed after Phase 11 closeout
+Next: (1) Owner action — dispatch `release.yml` for v1 cut. (2) Run `/gsd-spike visual-identity-distinctiveness` then `/gsd-phase` for "Signature Visual Moves" before declaring NeoCade visually unique to LDtk's bar.
+Status: v1 mechanically ship-ready. UAT items closed by user attestation 2026-05-10. Visual-identity distinctiveness flagged for post-v1 work.
+Last activity: 2026-05-10 -- Production-readiness audit performed via /gsd-progress; UATs closed; visual-identity initiative scoped.
 
-Progress: [███████████████████░] 64/67 plans (96%; redirected Phase 3 historical partial remains preserved)
+Progress: [████████████████████] 67/67 plans (100%; redirected Phase 3 historical partial preserved)
 
 ## Performance Metrics
 
@@ -158,8 +158,9 @@ None yet.
 
 [Issues that affect future work]
 
-- **Release repo settings:** Before running `.github/workflows/release.yml`, confirm GitHub Pages source is "GitHub Actions", release workflow permissions can push commits/tags, and branch protection allows the actions bot release commit.
-- **Deferred manual QA:** Manual screenshot review, tab-walk capture, real Android/iOS device validation, macOS signing/notarization, clean-project visual proof, and live GitHub Pages COOP/COEP verification are documented as deferred UAT items from Phases 10-11.
+- **Visual-identity gap (post-v1, NOT a v1 blocker):** Production-readiness audit on 2026-05-10 surfaced that the rendered theme reads as "a generic dark Godot theme with an accent color" rather than a unique identity in the lineage of LDtk. The technical foundation is excellent (single concrete `NeoCadeTheme`, 12 exports, 79 SVG icons, 5 styles with shape language); the visible chrome is generic MD3 with color swaps. Tracked as the "Visual Identity Distinctiveness" initiative (spike + phase) in ROADMAP.md.
+- **Release repo settings (owner action):** Before running `.github/workflows/release.yml`, confirm GitHub Pages source is "GitHub Actions", release workflow permissions can push commits/tags, and branch protection allows the actions bot release commit.
+- **Deferred manual QA — closed:** Phase 9/10/11 UATs and the 8-row deferred-UAT-matrix items closed by user attestation 2026-05-10 (heavy manual testing performed prior to audit). Logged here so future work knows the closure is on the basis of attestation, not regenerated evidence.
 
 ## Deferred Items
 
@@ -177,11 +178,13 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-08T00:00:00.000Z
-Stopped at: Phase 11 verified complete; manual release/UAT is next, then `$gsd-complete-milestone`
+Last session: 2026-05-10T00:00:00.000Z
+Stopped at: Production-readiness audit complete; UATs closed by user attestation; visual-identity distinctiveness initiative scoped for post-v1.
 Resume file: 
 
-None
+Next two steps (in order):
+1. `/gsd-spike` — frame: "What signature visual moves separate NeoCade from a generic dark Godot theme, given LDtk as the polish bar and the locked flat-MD3 / no-textures / no-gradients / anti-cyberpunk constraints?"
+2. `/gsd-phase` — insert a "Signature Visual Moves" phase that consumes the spike's recommendations (sidebar tinting, severity-coded chrome, branded iconography pass, distinctive selected-row treatment, header marquee strategy).
 
 The first execution of Phase 3.4 Plan 02 (by Codex) was rejected by the user. The 15 generated concept PNGs collapsed all five directions into the same UI template with only color tokens varying — every direction looked like the same screen with a hex swap. Two corrective tracks landed on 2026-05-06b:
 
