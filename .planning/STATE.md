@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
-status: ship_ready_with_post_v1_identity_initiative
-stopped_at: v1 mechanically ship-ready; deferred UATs closed by user attestation 2026-05-10; post-v1 visual-identity distinctiveness initiative (spike + phase) scoped because shipped output reads as a generic dark Godot theme with an accent color rather than a unique NeoCade identity
-last_updated: "2026-05-10T00:00:00.000Z"
-last_activity: 2026-05-10 -- Production-readiness audit. Closed Phase 9/10/11 UATs and 8 deferred-UAT-matrix items by user attestation. Reconciled REQUIREMENTS.md checkboxes (COV-10, EXPORT-02/06/07, A11Y-04, QA-02/03/04/05, DIST-18/19). Fixed stale VERSION path and CONTRIBUTING.md ref in 11/10 verifications. Rewrote PROJECT.md Active to track the post-v1 visual-identity initiative + the release-dispatch owner action.
+status: executing
+stopped_at: Production-readiness audit complete; UATs closed by user attestation; visual-identity distinctiveness initiative scoped for post-v1.
+last_updated: "2026-05-10T23:13:47.842Z"
+last_activity: 2026-05-10 -- Phase 12 planning complete
 progress:
-  total_phases: 15
-  completed_phases: 15
-  total_plans: 67
-  completed_plans: 67
-  percent: 100
+  total_phases: 16
+  completed_phases: 14
+  total_plans: 71
+  completed_plans: 64
+  percent: 90
 ---
 
 # Project State
@@ -28,8 +28,8 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 Phase: 11 (closed) · Visual Identity Distinctiveness spike (closed 2026-05-10) · Phase 12+13 split locked 2026-05-10
 Plan: Complete + spike series delivered + 2-phase split locked
 Next: (1) Owner action — dispatch `release.yml` for v1 cut. (2) Run `/gsd-phase add "Signature Visual Moves"` to plan Phase 12 (defaults: C4+C2'+C6, ~7-10h). Phase 13 (opt-ins: C1+C3, ~5-6h) runs after Phase 12 ships, independently. Split into two phases per user request to respect token-window limits and produce cleaner commit boundaries.
-Status: v1 mechanically ship-ready. UAT items closed by user attestation 2026-05-10. Visual-identity spike complete; Phase 12 + 13 scope locked with 5 success criteria including per-direction uniqueness thumbnail gate.
-Last activity: 2026-05-10 -- Visual Identity Distinctiveness spike completed (001-005); refined scope locked through 8+ revision rounds; split into Phase 12 (defaults, ~7-10h, headline fix) and Phase 13 (opt-in role variations, ~5-6h, additive toolkit).
+Status: Ready to execute
+Last activity: 2026-05-10 -- Phase 12 planning complete
 
 Progress: [████████████████████] 67/67 plans (100%; redirected Phase 3 historical partial preserved)
 
@@ -148,6 +148,10 @@ Recent decisions affecting current work:
 - [Phase 07-05]: Phase 7 full verification now treats the canonical 37 Control scorecard, GraphNode and GraphFrame extras, and style-backed canonical resource invariant as closure gates. — Makes the final Phase 7 verifier match the plan's success criteria under the current no-plugin architecture.
 - [Phase 07-05]: Graph stack bindings are limited to official Godot 4.6 GraphEdit, GraphNode, and GraphFrame slots, including GraphFrame.resizer_color. — Keeps Phase 7 converged with the revised slot freeze and prevents stale Graph* slot names from entering BINDING_TABLE.
 
+### Roadmap Evolution
+
+- Phase 12 added: Signature Visual Moves (formalized in Phase Details; rich scope already documented in overview lines 81-143 from the 2026-05-10 split commit)
+
 ### Pending Todos
 
 [From .planning/todos/pending/ — ideas captured during sessions]
@@ -183,6 +187,7 @@ Stopped at: Production-readiness audit complete; UATs closed by user attestation
 Resume file: 
 
 Next two steps (in order):
+
 1. `/gsd-spike` — frame: "What signature visual moves separate NeoCade from a generic dark Godot theme, given LDtk as the polish bar and the locked flat-MD3 / no-textures / no-gradients / anti-cyberpunk constraints?"
 2. `/gsd-phase` — insert a "Signature Visual Moves" phase that consumes the spike's recommendations (sidebar tinting, severity-coded chrome, branded iconography pass, distinctive selected-row treatment, header marquee strategy).
 

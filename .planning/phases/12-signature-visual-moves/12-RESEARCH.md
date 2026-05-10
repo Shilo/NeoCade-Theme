@@ -840,22 +840,22 @@ The single security-adjacent surface is `_load_icon()` (line 5557) and `_make_*_
 | A4 | The Daybreak outline can be implemented as a single StyleBoxFlat with `expand_margin_*` and `border_width_*` (no second wrapping stylebox needed) | Per-direction implementation specifics | Low -- verified against docs.godotengine.org/en/4.6/classes/class_styleboxflat.html `expand_margin_*` semantics: "Useful in combination with border_width_* to draw a border outside the control rect". This is exactly the intended use case. |
 | A5 | The C2' rebind for "section-header underlines" maps to the existing `HSeparator.separator` stylebox (currently rendered via `_apply_separator_styleboxes()` at line 746-757 using `outline_color`) | C2' specifics | Medium -- if the spike's intent was a dedicated "section-header underline" Control distinct from HSeparator, then this rebind has nothing to bind. The showcase scene does not currently use HSeparator (per grep). The planner may rebind `_apply_separator_styleboxes` to use `accent_offset` instead of `outline_color`, or skip this rebind entirely if the showcase doesn't exercise it. **OPEN: planner decides whether to ship this rebind in Wave 2.** |
 
-## Open Questions
+## Open Questions (RESOLVED 2026-05-10 during planning)
 
 1. **Should the C6 Pulse signature be a new `SectionKicker` variation or a reuse of the existing `Kicker`?**
    - What we know: The existing `Kicker` is already accent-colored uppercase-tracked-accent for Pulse (`kicker_style: &"uppercase-tracked-accent"` -> `_apply_kicker_style` -> `role_primary` -> `accent_color`). 12 Kicker labels exist in the showcase. The "tracked" feel is content-side per Godot 4.6 Label having no letter-spacing slot.
    - What's unclear: Whether the planner wants a visually-distinct Kicker (smaller, accent-colored differently) for "section headers" specifically.
-   - Recommendation: Reuse existing `Kicker`. Add one new Kicker label to the showcase "Buttons" section to demo the chrome. If a visual distinction is desired post-implementation, register `SectionKicker` in a future phase.
+   - **RESOLVED:** Reuse existing `Kicker` (no new TYPE_VARIATIONS entry). Plan 04 Task 5 adds one Kicker Label to `showcase/showcase.tscn` above the "Buttons" section using `theme_type_variation = &"Kicker"`. If a visual distinction is desired post-implementation, register `SectionKicker` in a future phase.
 
 2. **Should the C2' section-header underline rebind ship in Wave 2, or be deferred?**
    - What we know: The showcase does not currently exercise HSeparator. `_apply_separator_styleboxes()` (line 746) sets HSeparator's separator stylebox to `outline_color` (line 747).
    - What's unclear: Whether changing `outline_color` to `accent_offset` for HSeparator would have collateral impact (PopupMenu separators ALSO use the same `h_line` stylebox via line 755-757 -- those are intentionally neutral).
-   - Recommendation: Skip this rebind for Phase 12. The other 5 C2' rebinds (tabs, items, trees, kickers, slider value labels) cover the headline fix. Document this in the plan as "deferred to a separate spike on section-header treatment".
+   - **RESOLVED:** DEFERRED to a follow-up spike. Plan 03 Task 3 documents the deferral in code comment with `RESEARCH OQ2` anchor. The other 5 C2' rebinds (tabs, items, trees, kickers, slider value labels) cover the headline fix.
 
 3. **What's the exact mobile scaling rule for Daybreak's outline (1px) and offset (3px)?**
    - What we know: `tokens.densityScale = 1.5` on MOBILE scales padding 1.5x. Border width and expand_margin are NOT currently scaled.
    - What's unclear: Whether the outline should look "1px tall" on hi-DPI mobile (sharper, thinner) or "1.5px tall" (same visual size as desktop after density scaling).
-   - Recommendation: Stay at 1px (no density scaling on outline). The spike's literal spec says "1px outline at 3px offset"; the visual mockup-refined-plan.html does not differentiate desktop vs mobile outline width.
+   - **RESOLVED:** Stay at literal 1px and 3px on both DESKTOP and MOBILE (no density scaling on outline). Plan 04 Task 3 uses constant integer values without `densityScale` multiplication. The spike's literal spec says "1px outline at 3px offset"; `mockup-refined-plan.html` does not differentiate desktop vs mobile outline width.
 
 ## Sources
 
