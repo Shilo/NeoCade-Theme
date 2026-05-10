@@ -184,6 +184,16 @@ The role labels and panels should be shown in a dedicated "Role Variations" show
 - Light-color-mode variants — still v2 deferred per PROJECT.md.
 - Whether to add a `secondary_color` public export — explicitly *not* recommended; C2 derives secondary from `accent_color` instead, preserving the 12-export contract.
 
+### Locked Phase 12 success criteria
+
+User locked these as binding gates on 2026-05-10:
+
+1. **`raised=false` MUST show ZERO 3D elements.** No depth strips, no halos, no glows, no bevels, no offset duplicates. C4 HSV value-darken only fires when raised=true (existing gate is correct).
+2. **`raised=true` MUST keep the current subset of which controls lift.** Panels and buttons where it makes sense; tabs stay flat. Phase 12 does not change this subset.
+3. **No glow halos in any state**, per PROJECT.md Out-of-Scope. The original C6 Daybreak halo was reverted to a flat outline + padding signature to comply.
+4. **Every direction MUST have a signature move strong enough to identify it at thumbnail scale, without color cues.** Verified via greyscale thumbnail render at Phase 12 verification gate. Current audit: Bubble + Burst + Slate strong, Pulse + Daybreak moderate (proposed secondary moves flagged in MANIFEST.md for Phase 12 to validate or reject via mockup).
+5. **No new hues introduced by default.** C2 (MD3 secondary/tertiary derivation) is deferred; C2' redistributes the existing `accent_color`. Each direction's palette is the same after Phase 12 as today.
+
 ---
 
 ## 6. Hand-off
