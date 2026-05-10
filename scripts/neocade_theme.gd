@@ -5670,12 +5670,17 @@ func _make_color_hue_texture() -> Texture2D:
 	var cached: Texture2D = _active_generated_texture_cache.get(CACHE_KEY)
 	if cached != null:
 		return cached
-	var image := Image.create(WIDTH, HEIGHT, false, Image.FORMAT_RGBA8)
+	# Compute one 800x1 row, then blit it into each of HEIGHT rows of the target
+	# image via Image.blit_rect (one same-format memcpy per row in the engine).
+	# Replaces a 800x6 nested set_pixel loop where 5 of every 6 writes copied an
+	# identical RGBA8 value to a different Y. Pixel output is byte-identical
+	# (verified via Image.get_data() comparison).
+	var row := Image.create(WIDTH, 1, false, Image.FORMAT_RGBA8)
 	for x in range(WIDTH):
-		var hue := float(x) / float(WIDTH - 1)
-		var color := Color.from_hsv(hue, 1.0, 1.0)
-		for y in range(HEIGHT):
-			image.set_pixel(x, y, color)
+		row.set_pixel(x, 0, Color.from_hsv(float(x) / float(WIDTH - 1), 1.0, 1.0))
+	var image := Image.create(WIDTH, HEIGHT, false, Image.FORMAT_RGBA8)
+	for y in range(HEIGHT):
+		image.blit_rect(row, Rect2i(0, 0, WIDTH, 1), Vector2i(0, y))
 	var texture := ImageTexture.create_from_image(image)
 	_active_generated_texture_cache[CACHE_KEY] = texture
 	return texture
