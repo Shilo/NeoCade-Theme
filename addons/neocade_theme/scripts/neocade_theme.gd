@@ -5604,30 +5604,18 @@ func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, 
 
 	var image := Image.create(width, height, false, Image.FORMAT_RGBA8)
 	image.fill(Color(0, 0, 0, 0))
-	# Hoist r/g/b/base_a outside the loop so the per-pixel write doesn't rebuild
-	# `Color(c.r, c.g, c.b, c.a*coverage)` 288 times per generation. Only alpha
-	# varies per pixel. fill_core (used in _fill_round_rect for square shapes) is
-	# intentionally skipped here — for thin bars (6×48 r=3) the inner solid block
-	# collapses to zero width, so the per-pixel pass already covers everything.
-	# Coverage math is byte-identical to the prior implementation.
-	var cr := grabber_color.r
-	var cg := grabber_color.g
-	var cb := grabber_color.b
-	var ca := grabber_color.a
-	var max_x := float(width) - radius
-	var max_y := float(height) - radius
 	for y in range(height):
 		for x in range(width):
 			var coverage := 1.0
 			if radius > 0.0:
 				var px := float(x) + 0.5
 				var py := float(y) + 0.5
-				var nearest_x := clampf(px, radius, max_x)
-				var nearest_y := clampf(py, radius, max_y)
+				var nearest_x := clampf(px, radius, float(width) - radius)
+				var nearest_y := clampf(py, radius, float(height) - radius)
 				var dist := Vector2(px - nearest_x, py - nearest_y).length() - radius
 				coverage = clampf(1.0 - dist, 0.0, 1.0)
 			if coverage > 0.0:
-				image.set_pixel(x, y, Color(cr, cg, cb, ca * coverage))
+				image.set_pixel(x, y, Color(grabber_color.r, grabber_color.g, grabber_color.b, grabber_color.a * coverage))
 	var texture := ImageTexture.create_from_image(image)
 	_active_generated_texture_cache[cache_key] = texture
 	return texture
@@ -5683,12 +5671,17 @@ func _make_color_hue_texture() -> Texture2D:
 	if cached != null:
 		return cached
 	# Compute one HSV row, then blit it `HEIGHT - 1` more times via Image.blit_rect.
-	# Verified 2026-05-10 by 3-way A/B/C bisect (.planning/tmp/bench/bench_bisect.gd):
-	# this commit's image-gen wins net -3.84% at the noise floor and -3.19% at median
-	# vs the pre-optimization baseline. The previous `for x in W: for y in H: set_pixel`
-	# double-loop did 4,800 set_pixel calls when 4,800 of those wrote identical bytes
-	# to the same X but a different Y (color_hue is a horizontal gradient — every Y
-	# row is byte-identical). Now: 800 set_pixel calls + H-1 blit_rect calls.
+	# This is the only image-gen optimization that survived strict per-line
+	# benchmark scrutiny (4-of-4 percentile criteria + bootstrap 95% CI).
+	# The previous `for x in W: for y in H: set_pixel` double-loop did 4,800
+	# set_pixel calls when 4,800 of those wrote identical bytes to the same X
+	# but a different Y (color_hue is a horizontal gradient — every Y row is
+	# byte-identical). Now: 800 set_pixel calls + (H-1) blit_rect calls.
+	# Pixel output is byte-identical to the prior implementation (verified via
+	# Image.get_data() comparison). Other image-gen variants (round_rect
+	# fill_core/hoist, split_grabber hoist) were tested and rejected — they
+	# only showed measurable gains when bundled together with the color_hue
+	# change, suggesting their individual signal was within noise.
 	var row := Image.create(WIDTH, 1, false, Image.FORMAT_RGBA8)
 	for x in range(WIDTH):
 		row.set_pixel(x, 0, Color.from_hsv(float(x) / float(WIDTH - 1), 1.0, 1.0))
@@ -5763,43 +5756,17 @@ func _color_to_svg_hex(color: Color) -> String:
 
 
 func _fill_round_rect(image: Image, rect: Rect2i, radius: float, color: Color) -> void:
-	# Optimized 2026-05-10 (verified by .planning/tmp/bench/bench_bisect.gd, 3-way A/B/C
-	# bisect across 1,800 samples). Two changes, both pixel-identical to the prior
-	# implementation (verified by Image.get_data() byte-equality across 7 size/radius
-	# cases including the radius=0 fast-path):
-	#   (1) `Image.fill_rect` covers the always-opaque interior in a single C++ call;
-	#       the per-pixel set_pixel loop only touches the AA band along the rounded
-	#       edge. Mobile 48x48 r=8 saves ~1024 of 2304 set_pixel calls.
-	#   (2) Hoist r/g/b/base_a out of the loop so we don't rebuild
-	#       `Color(c.r, c.g, c.b, c.a*coverage)` per pixel — only alpha varies.
-	# Net effect on full theme regen: -3.84% at noise floor, -3.19% at median vs
-	# pre-optimization baseline.
-	if radius <= 0.0:
-		image.fill_rect(rect, color)
-		return
-	var inner_x_start := rect.position.x + int(ceil(radius))
-	var inner_x_end := rect.position.x + rect.size.x - int(ceil(radius))
-	var inner_y_start := rect.position.y + int(ceil(radius))
-	var inner_y_end := rect.position.y + rect.size.y - int(ceil(radius))
-	if inner_x_end > inner_x_start and inner_y_end > inner_y_start:
-		image.fill_rect(Rect2i(inner_x_start, inner_y_start,
-				inner_x_end - inner_x_start, inner_y_end - inner_y_start), color)
-	var cr := color.r
-	var cg := color.g
-	var cb := color.b
-	var ca := color.a
-	var max_x := float(rect.size.x) - radius
-	var max_y := float(rect.size.y) - radius
 	for y in range(rect.position.y, rect.position.y + rect.size.y):
 		for x in range(rect.position.x, rect.position.x + rect.size.x):
-			# Skip pixels already covered by the interior fill_rect.
-			if x >= inner_x_start and x < inner_x_end and y >= inner_y_start and y < inner_y_end:
-				continue
-			var px := float(x - rect.position.x) + 0.5
-			var py := float(y - rect.position.y) + 0.5
-			var nearest_x := clampf(px, radius, max_x)
-			var nearest_y := clampf(py, radius, max_y)
-			var dist := Vector2(px - nearest_x, py - nearest_y).length() - radius
-			var coverage := clampf(1.0 - dist, 0.0, 1.0)
+			var coverage := 1.0
+			if radius > 0.0:
+				var px := float(x - rect.position.x) + 0.5
+				var py := float(y - rect.position.y) + 0.5
+				var max_x := float(rect.size.x) - radius
+				var max_y := float(rect.size.y) - radius
+				var nearest_x := clampf(px, radius, max_x)
+				var nearest_y := clampf(py, radius, max_y)
+				var dist := Vector2(px - nearest_x, py - nearest_y).length() - radius
+				coverage = clampf(1.0 - dist, 0.0, 1.0)
 			if coverage > 0.0:
-				image.set_pixel(x, y, Color(cr, cg, cb, ca * coverage))
+				image.set_pixel(x, y, Color(color.r, color.g, color.b, color.a * coverage))
