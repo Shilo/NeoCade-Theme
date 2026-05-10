@@ -5670,18 +5670,11 @@ func _make_color_hue_texture() -> Texture2D:
 	var cached: Texture2D = _active_generated_texture_cache.get(CACHE_KEY)
 	if cached != null:
 		return cached
-	# Compute one HSV row, then blit it `HEIGHT - 1` more times via Image.blit_rect.
-	# This is the only image-gen optimization that survived strict per-line
-	# benchmark scrutiny (4-of-4 percentile criteria + bootstrap 95% CI).
-	# The previous `for x in W: for y in H: set_pixel` double-loop did 4,800
-	# set_pixel calls when 4,800 of those wrote identical bytes to the same X
-	# but a different Y (color_hue is a horizontal gradient — every Y row is
-	# byte-identical). Now: 800 set_pixel calls + (H-1) blit_rect calls.
-	# Pixel output is byte-identical to the prior implementation (verified via
-	# Image.get_data() comparison). Other image-gen variants (round_rect
-	# fill_core/hoist, split_grabber hoist) were tested and rejected — they
-	# only showed measurable gains when bundled together with the color_hue
-	# change, suggesting their individual signal was within noise.
+	# Compute one 800x1 row, then blit it into each of HEIGHT rows of the target
+	# image via Image.blit_rect (one same-format memcpy per row in the engine).
+	# Replaces a 800x6 nested set_pixel loop where 5 of every 6 writes copied an
+	# identical RGBA8 value to a different Y. Pixel output is byte-identical
+	# (verified via Image.get_data() comparison).
 	var row := Image.create(WIDTH, 1, false, Image.FORMAT_RGBA8)
 	for x in range(WIDTH):
 		row.set_pixel(x, 0, Color.from_hsv(float(x) / float(WIDTH - 1), 1.0, 1.0))
