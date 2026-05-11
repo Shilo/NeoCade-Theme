@@ -5559,14 +5559,19 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 				sb.border_width_right = outline_width_resolved
 				sb.border_width_bottom = outline_width_resolved
 				# Push the border outside the control rect via expand_margin (3px offset).
-				var outline_offset_v: Variant = _lookup_shape(style_personality, "shape.primary_outline_offset")
-				var outline_offset_resolved: int = 0
-				if outline_offset_v != null and (typeof(outline_offset_v) == TYPE_INT or typeof(outline_offset_v) == TYPE_FLOAT):
-					outline_offset_resolved = int(outline_offset_v)
-				sb.expand_margin_left = outline_offset_resolved
-				sb.expand_margin_top = outline_offset_resolved
-				sb.expand_margin_right = outline_offset_resolved
-				sb.expand_margin_bottom = outline_offset_resolved
+				# CR-01: skip this overwrite when the recipe itself supplied `expand_margins`;
+				# composing both would silently replace recipe-author intent. No current
+				# primary-strategy recipe carries expand_margins, but guard prevents future
+				# silent regression. See REVIEW.md CR-01 (2026-05-11).
+				if not recipe.has("expand_margins"):
+					var outline_offset_v: Variant = _lookup_shape(style_personality, "shape.primary_outline_offset")
+					var outline_offset_resolved: int = 0
+					if outline_offset_v != null and (typeof(outline_offset_v) == TYPE_INT or typeof(outline_offset_v) == TYPE_FLOAT):
+						outline_offset_resolved = int(outline_offset_v)
+					sb.expand_margin_left = outline_offset_resolved
+					sb.expand_margin_top = outline_offset_resolved
+					sb.expand_margin_right = outline_offset_resolved
+					sb.expand_margin_bottom = outline_offset_resolved
 		if recipe.has("state_layer_role"):
 			var layer_role: String = recipe.get("state_layer_role", "role_primary")
 			var layer_color: Color = role_table.get(layer_role, role_table.role_primary)

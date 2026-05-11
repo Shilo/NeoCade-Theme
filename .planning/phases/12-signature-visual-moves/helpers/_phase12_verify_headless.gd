@@ -168,7 +168,9 @@ func _stage_sc2() -> void:
 					var sbf := sb as StyleBoxFlat
 					if sbf.shadow_size > 0:
 						_fail("sc2: %s/%s.tab_selected has shadow_size=%d at raised=true (tabs must stay flat)" % [NeoCadeTheme.style_label(style_value), type_name, sbf.shadow_size])
-	print("PHASE12_VERIFY: sc2 OK (tabs flat at raised=true across all selectable styles)")
+	# WR-01: only print OK when no failures were recorded in this stage.
+	if _failures.is_empty():
+		print("PHASE12_VERIFY: sc2 OK (tabs flat at raised=true across all selectable styles)")
 
 
 func _stage_sc3() -> void:
@@ -210,7 +212,9 @@ func _stage_sc3() -> void:
 						if a > 0.001 and a < 0.999:
 							_fail("sc3: %s/%s.%s has border_alpha=%.3f (halo risk; must be 0.0 or 1.0)" % [
 								NeoCadeTheme.style_label(style_value), theme_type, sb_name, a])
-	print("PHASE12_VERIFY: sc3 OK (%d styleboxes inspected, %d graph-type rows skipped)" % [inspected, skipped])
+	# WR-02: only print OK when no failures were recorded in this stage.
+	if _failures.is_empty():
+		print("PHASE12_VERIFY: sc3 OK (%d styleboxes inspected, %d graph-type rows skipped)" % [inspected, skipped])
 
 
 # ─── Helpers ────────────────────────────────────────────────────────────────────
