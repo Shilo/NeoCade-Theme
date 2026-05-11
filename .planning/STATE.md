@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Production-readiness audit complete; UATs closed by user attestation; visual-identity distinctiveness initiative scoped for post-v1.
-last_updated: "2026-05-11T09:44:00.601Z"
+stopped_at: Completed 12-03-wave-2-c2prime-accent-rebinds-PLAN.md
+last_updated: "2026-05-11T09:49:47.627Z"
 last_activity: 2026-05-11
 progress:
   total_phases: 17
   completed_phases: 14
   total_plans: 71
-  completed_plans: 66
-  percent: 93
+  completed_plans: 67
+  percent: 94
 ---
 
 # Project State
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 ## Current Position
 
 Phase: 12 (signature-visual-moves) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Next: Execute Plan 12-02 (Wave 1: C4 HSV depth formula rewrite).
 Status: Ready to execute
 Last activity: 2026-05-11
 
-Progress: [█████████░] 93%
+Progress: [█████████░] 94%
 
 ## Performance Metrics
 
@@ -93,6 +93,7 @@ Progress: [█████████░] 93%
 | Phase 07-dialogs-popups-advanced-window-popups-menubar-colorpicker-gr P05 | 10 min | 3 tasks | 20 files |
 | Phase 12 P12-01 | 25min | 4 tasks | 4 files |
 | Phase 12 P12-02-wave-1-c4-hsv-depth | 15min | 2 tasks | 1 files |
+| Phase 12 P12-03-wave-2-c2prime-accent-rebinds | 20min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -151,6 +152,9 @@ Recent decisions affecting current work:
 - [Phase 07-05]: Graph stack bindings are limited to official Godot 4.6 GraphEdit, GraphNode, and GraphFrame slots, including GraphFrame.resizer_color. — Keeps Phase 7 converged with the revised slot freeze and prevents stale Graph* slot names from entering BINDING_TABLE.
 - [Phase 12-01]: BINDING_TABLE.size()=140 at pre-Phase-12 baseline. The historical "37 rows" note in CONTEXT.md referred to the Phase 4 canonical Control scorecard count; subsequent phases (6, 7, 8, 9) grew the table to 140 top-level theme_type keys. Phase 12 verify helpers use 140 as the freeze constant.
 - [Phase 12-01]: SC#3 no-glow-halo verifier exempts GraphEditMinimap and GraphStateMachine from the border-alpha=1.0 check. These types use intentional semi-transparent borders for graph-canvas animated-state-node visual distinction (Phase 7 design). They are not new halos introduced by Phase 12.
+- [Phase ?]: C2' rebinds: role_primary token (not accent_color) for consistency with Phase 5-7 idiom
+- [Phase ?]: Section-header underline rebind DEFERRED (RESEARCH OQ2): HSeparator shares StyleBoxLine with PopupMenu separators
+- [Phase ?]: Mid-phase fallback D-12.20 achieved: Wave 1 + Wave 2 leave shippable Phase 12 state
 
 ### Roadmap Evolution
 
@@ -187,8 +191,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-11T09:44:00.592Z
-Stopped at: Production-readiness audit complete; UATs closed by user attestation; visual-identity distinctiveness initiative scoped for post-v1.
+Last session: 2026-05-11T09:49:47.617Z
+Stopped at: Completed 12-03-wave-2-c2prime-accent-rebinds-PLAN.md
 Resume file: 
 
 None
