@@ -78,8 +78,12 @@ func _run() -> void:
 			continue
 
 		# Resize then desaturate.
+		# Image.adjust_bcs(brightness, contrast, saturation) takes MULTIPLIERS where
+		# 1.0 = no change. The previous (0.0, 0.0, ...) zeroed brightness and contrast,
+		# producing solid mid-grey output regardless of source. Discovered 2026-05-11
+		# during SC#4 attestation; siblings _phase12_*_runtime.gd carry the same fix.
 		img.resize(THUMB_W, THUMB_H, Image.INTERPOLATE_BILINEAR)
-		img.adjust_bcs(0.0, 0.0, saturation)
+		img.adjust_bcs(1.0, 1.0, saturation)
 
 		var style_label := NeoCadeTheme.style_label(style_value).to_lower()
 		var out_path := "%s/%s-raised-true.png" % [OUTPUT_DIR, style_label]
