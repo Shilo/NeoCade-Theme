@@ -605,7 +605,7 @@ Plans:
 **Goal:** Add opt-in role-coded type variations (4 Role Labels + 5 Role Panels) consumers can apply via `theme_type_variation` when a widget semantically represents success/warning/danger/info/accent state. Zero auto-bindings; baseline chrome unchanged from Phase 12.
 **Requirements**: [SC-13-1, SC-13-2, SC-13-3] (Phase 13 has no REQUIREMENTS.md REQ-IDs; coverage is via 3 locked success criteria — see 13-RESEARCH.md and 13-VALIDATION.md)
 **Depends on:** Phase 12
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 **Wave 1**
@@ -616,7 +616,7 @@ Plans:
 - [x] 13-03-PLAN.md — Wave 2: add 9 BINDING_TABLE entries (4 single-key Role Label font_color recipes + 5 full Role Panel stylebox recipes with alpha=0.06).
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 13-04-PLAN.md — Wave 3: add 10th showcase section + README Role Variations (opt-in) docs + run full Phase 13 Nyquist suite for closeout evidence.
+- [x] 13-04-PLAN.md — Wave 3: add 10th showcase section + README Role Variations (opt-in) docs + run full Phase 13 Nyquist suite for closeout evidence. (completed 2026-05-11)
 
 ---
 *Roadmap authored: 2026-05-04 from SUMMARY.md 11-phase plan + REQUIREMENTS.md traceability*
