@@ -442,6 +442,12 @@ func _regenerate_theme() -> void:
 	set_font("font", "HeaderMedium", header_medium_font)
 	set_font("font", "HeaderSmall",  header_small_font)
 	set_font("font", "Caption",      body_font)
+	# Phase 13 § C1: explicit font binding for Role Label variations (PITFALLS 1.2 —
+	# type variations do NOT inherit fonts from their base type).
+	set_font("font", "SuccessLabel", body_font)
+	set_font("font", "WarningLabel", body_font)
+	set_font("font", "DangerLabel",  body_font)
+	set_font("font", "InfoLabel",    body_font)
 	set_font("font", "CodeLabel",    body_font)   # consumer can override to a mono per FONT-04 stricken
 	# Kicker (D-09 / Plan 05-04): Inter Variable Roman body weight per UD-4 Option D / D-17.
 	# Per PITFALLS 1.2 type variations DO NOT inherit fonts from Label, so this
@@ -502,6 +508,11 @@ func _regenerate_theme() -> void:
 	# scale like the built-in editor theme; HeaderMedium/Large carry display scale.
 	set_font_size("font_size", "HeaderSmall",  tokens.body)
 	set_font_size("font_size", "Caption",      tokens.label_)
+	# Phase 13 § C1: explicit font_size binding for Role Label variations.
+	set_font_size("font_size", "SuccessLabel", tokens.body)
+	set_font_size("font_size", "WarningLabel", tokens.body)
+	set_font_size("font_size", "DangerLabel",  tokens.body)
+	set_font_size("font_size", "InfoLabel",    tokens.body)
 	set_font_size("font_size", "CodeLabel",    tokens.label_)
 	# Kicker (D-09): tokens.kicker is 12 desktop / 13 mobile per DESIGN_TOKENS §10.1.
 	# Burst's "uppercase-bold-larger-scale" enum is owned by content/showcase since
