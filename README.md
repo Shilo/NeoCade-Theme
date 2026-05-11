@@ -66,7 +66,7 @@ been replaced by `neocade_theme.tres` plus the `style` export.
 
 Open `showcase/showcase.tscn` in Godot 4.6.2 to inspect:
 
-- 9 sections covering controls, dialogs, graph, tokens, and coverage.
+- 10 sections covering controls, dialogs, graph, tokens, coverage, and role variations.
 - `NeoCadeThemeOptionButton` dropdown in `addons/neocade_theme/scripts/`
   lists NeoCade styles alphabetically and appends `None` when allowed.
   `None` applies a null theme. It emits `theme_selected(theme, index)` after
@@ -77,6 +77,43 @@ Open `showcase/showcase.tscn` in Godot 4.6.2 to inspect:
 
 `export_presets.cfg` includes a Web preset for release builds and named
 desktop/mobile target presets for QA.
+
+## Role Variations (opt-in)
+
+NeoCade ships 9 opt-in type variations that consumers can apply when a widget
+semantically represents success / warning / danger / info / accent state. Default
+`Label` and `PanelContainer` chrome stay unchanged; the variations only activate
+when the consumer assigns `theme_type_variation`.
+
+**4 Role Labels** (extend `Label`) recolor `font_color` to the matching role token:
+
+| Variation       | Color token   |
+|-----------------|---------------|
+| `SuccessLabel`  | `role_success` |
+| `WarningLabel`  | `role_warning` |
+| `DangerLabel`   | `role_danger`  |
+| `InfoLabel`     | `role_info`    |
+
+**5 Role Panels** (extend `PanelContainer`) render a 6% tint of the matching role
+color over the per-direction panel chrome:
+
+| Variation       | Tint role      |
+|-----------------|----------------|
+| `AccentPanel`   | `role_primary` |
+| `InfoPanel`     | `role_info`    |
+| `WarningPanel`  | `role_warning` |
+| `DangerPanel`   | `role_danger`  |
+| `SuccessPanel`  | `role_success` |
+
+Apply via the Inspector's `Theme Type Variation` field or in code:
+
+```gdscript
+my_label.theme_type_variation = &"SuccessLabel"
+my_panel.theme_type_variation = &"AccentPanel"
+```
+
+The 10th showcase section in `showcase/showcase.tscn` ("Role Variations")
+demonstrates each one with consumer-style content.
 
 ## Design Rules
 
