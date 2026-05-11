@@ -798,10 +798,14 @@ func _state_layer_color(container: Color, foreground: Color, opacity: float) -> 
 
 
 func _raised_depth_color(element: Color, base_c: Color) -> Color:
-	var base_pull := 0.16 if not is_light else 0.10
-	var depth_amount := 0.10 if not is_light else 0.12
-	var result := _mix(element, base_c, base_pull)
-	result = _mix(result, Color.BLACK, depth_amount)
+	# Phase 12 C4 (D-12.02): HSV value-darken keeps depth in the element's hue family.
+	# `base_c` retained for callsite compatibility but unused — depth decouples from
+	# surface per the HCGames anchor (spike 002b iteration 5).
+	var strength: float = 0.20 + 0.10 * float(raised_strength)
+	var h: float = element.h
+	var s: float = element.s
+	var v: float = element.v * (1.0 - strength)
+	var result := Color.from_hsv(h, s, max(v, 0.04))
 	result.a = element.a
 	return result
 
