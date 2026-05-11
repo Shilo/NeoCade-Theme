@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Production-readiness audit complete; UATs closed by user attestation; visual-identity distinctiveness initiative scoped for post-v1.
-last_updated: "2026-05-10T23:13:47.842Z"
-last_activity: 2026-05-10 -- Phase 12 planning complete
+stopped_at: Phase 12 Plan 01 complete — Wave 0 verify helpers created and all 7 baseline checks green.
+last_updated: "2026-05-11T10:00:00.000Z"
+last_activity: 2026-05-11 -- Phase 12 Plan 01 (wave-0-verify-helpers) complete
 progress:
   total_phases: 16
   completed_phases: 14
   total_plans: 71
-  completed_plans: 64
-  percent: 90
+  completed_plans: 65
+  percent: 92
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-09)
 
 **Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships one canonical `neocade_theme.tres` resource of type `NeoCadeTheme`, plus one concrete `addons/neocade_theme/scripts/neocade_theme.gd` class and one reusable `NeoCadeThemeOptionButton` picker. Consumers choose `style` (Pulse, Slate, Bubble, Daybreak, Burst, or `CUSTOM`) and toggle `raised` / `platform` / `base_color` / `accent_color` exports for flat/raised × desktop/mobile/AUTO variations — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect). **Dynamic-theme architecture** feasibility-validated 2026-05-06 (Phase 3.2 strict gate 6/6 PASS in Godot 4.6.2), then consolidated 2026-05-08 and updated 2026-05-09: single concrete `@tool class_name NeoCadeTheme extends Theme`, 12 exports including `style` and the Advanced `use_runtime_popup_selection_icons` / `texture_cache` toggles, luminance-derived `is_light`, no subclasses, no `_dev/`, no `themes/`, no per-style `.tres`, no editor plugin, no `neocade_mobile_theme.tres`.
-**Current focus:** Milestone implementation complete through Phase 11. Remaining work is manual release/UAT: confirm GitHub repo settings, run the release workflow, and perform any deferred screenshot/device checks the user wants before milestone archive.
+**Current focus:** Phase 12 — signature-visual-moves
 
 ## Current Position
 
-Phase: 11 (closed) · Visual Identity Distinctiveness spike (closed 2026-05-10) · Phase 12+13 split locked 2026-05-10
-Plan: Complete + spike series delivered + 2-phase split locked
-Next: (1) Owner action — dispatch `release.yml` for v1 cut. (2) Run `/gsd-phase add "Signature Visual Moves"` to plan Phase 12 (defaults: C4+C2'+C6, ~7-10h). Phase 13 (opt-ins: C1+C3, ~5-6h) runs after Phase 12 ships, independently. Split into two phases per user request to respect token-window limits and produce cleaner commit boundaries.
-Status: Ready to execute
-Last activity: 2026-05-10 -- Phase 12 planning complete
+Phase: 12 (signature-visual-moves) — EXECUTING
+Plan: 2 of 4
+Next: Execute Plan 12-02 (Wave 1: C4 HSV depth formula rewrite).
+Status: Executing Phase 12
+Last activity: 2026-05-11 -- Phase 12 Plan 01 (wave-0-verify-helpers) complete
 
-Progress: [████████████████████] 67/67 plans (100%; redirected Phase 3 historical partial preserved)
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
@@ -91,6 +91,7 @@ Progress: [████████████████████] 67/67 p
 | Phase 07-dialogs-popups-advanced-window-popups-menubar-colorpicker-gr P03 | 8 min | 3 tasks | 42 files |
 | Phase 07-dialogs-popups-advanced-window-popups-menubar-colorpicker-gr P04 | 10 min | 3 tasks | 36 files |
 | Phase 07-dialogs-popups-advanced-window-popups-menubar-colorpicker-gr P05 | 10 min | 3 tasks | 20 files |
+| Phase 12 P12-01 | 25min | 4 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -147,6 +148,8 @@ Recent decisions affecting current work:
 - [Phase 07-05]: Graph icons are shipped as nine reusable graph_*.svg assets with import sidecars and are wired through BINDING_TABLE Texture2D icon slots. — Keeps graph chrome data-driven and preserves the single theme-engine script invariant.
 - [Phase 07-05]: Phase 7 full verification now treats the canonical 37 Control scorecard, GraphNode and GraphFrame extras, and style-backed canonical resource invariant as closure gates. — Makes the final Phase 7 verifier match the plan's success criteria under the current no-plugin architecture.
 - [Phase 07-05]: Graph stack bindings are limited to official Godot 4.6 GraphEdit, GraphNode, and GraphFrame slots, including GraphFrame.resizer_color. — Keeps Phase 7 converged with the revised slot freeze and prevents stale Graph* slot names from entering BINDING_TABLE.
+- [Phase 12-01]: BINDING_TABLE.size()=140 at pre-Phase-12 baseline. The historical "37 rows" note in CONTEXT.md referred to the Phase 4 canonical Control scorecard count; subsequent phases (6, 7, 8, 9) grew the table to 140 top-level theme_type keys. Phase 12 verify helpers use 140 as the freeze constant.
+- [Phase 12-01]: SC#3 no-glow-halo verifier exempts GraphEditMinimap and GraphStateMachine from the border-alpha=1.0 check. These types use intentional semi-transparent borders for graph-canvas animated-state-node visual distinction (Phase 7 design). They are not new halos introduced by Phase 12.
 
 ### Roadmap Evolution
 
@@ -182,11 +185,11 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-10T00:00:00.000Z
+Last session: 2026-05-11T09:39:53.967Z
 Stopped at: Production-readiness audit complete; UATs closed by user attestation; visual-identity distinctiveness initiative scoped for post-v1.
 Resume file: 
 
-Next two steps (in order):
+None
 
 1. `/gsd-spike` — frame: "What signature visual moves separate NeoCade from a generic dark Godot theme, given LDtk as the polish bar and the locked flat-MD3 / no-textures / no-gradients / anti-cyberpunk constraints?"
 2. `/gsd-phase` — insert a "Signature Visual Moves" phase that consumes the spike's recommendations (sidebar tinting, severity-coded chrome, branded iconography pass, distinctive selected-row treatment, header marquee strategy).
