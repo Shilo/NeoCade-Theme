@@ -5076,6 +5076,31 @@ const BINDING_TABLE: Dictionary = {
 			"font_color": {"role": "text_strong"},
 		},
 	},
+	# 55. SuccessLabel — Label variation (Phase 13 § C1). Opt-in only; default
+	#     Label.font_color remains text_strong at line 3147 — SC#3 invariant.
+	"SuccessLabel": {
+		"color": {
+			"font_color": {"role": "role_success"},
+		},
+	},
+	# 56. WarningLabel — Label variation (Phase 13 § C1).
+	"WarningLabel": {
+		"color": {
+			"font_color": {"role": "role_warning"},
+		},
+	},
+	# 57. DangerLabel — Label variation (Phase 13 § C1).
+	"DangerLabel": {
+		"color": {
+			"font_color": {"role": "role_danger"},
+		},
+	},
+	# 58. InfoLabel — Label variation (Phase 13 § C1).
+	"InfoLabel": {
+		"color": {
+			"font_color": {"role": "role_info"},
+		},
+	},
 }
 
 
