@@ -125,6 +125,12 @@ theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 14
 columns = 3
 
+[node name="ButtonsSectionKicker" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid" unique_id=2700000001]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"Kicker"
+text = "BUTTONS · IDENTITY"
+
 [node name="PrimaryPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid" unique_id=1547979300]
 layout_mode = 2
 size_flags_horizontal = 3
