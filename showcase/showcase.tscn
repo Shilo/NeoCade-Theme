@@ -1404,3 +1404,106 @@ text = "09  Marquee Sol       9,740 tickets"
 layout_mode = 2
 theme_type_variation = &"CodeLabel"
 text = "10  Slider Nia        8,690 tickets"
+
+[node name="Role Variations" type="ScrollContainer" parent="RootMargin/RootStack/ShowcaseTabs" unique_id=2700000010]
+visible = false
+layout_mode = 2
+horizontal_scroll_mode = 1
+metadata/_tab_index = 9
+
+[node name="Margin" type="MarginContainer" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations" unique_id=2700000011]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 24
+
+[node name="Stack" type="VBoxContainer" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin" unique_id=2700000012]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="RoleSectionKicker" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack" unique_id=2700000013]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"Kicker"
+text = "ROLE VARIATIONS · OPT-IN"
+
+[node name="LabelGrid" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack" unique_id=2700000014]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+[node name="SuccessLabel" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/LabelGrid" unique_id=2700000015]
+layout_mode = 2
+theme_type_variation = &"SuccessLabel"
+text = "Run uploaded successfully"
+
+[node name="WarningLabel" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/LabelGrid" unique_id=2700000016]
+layout_mode = 2
+theme_type_variation = &"WarningLabel"
+text = "Network is slow"
+
+[node name="DangerLabel" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/LabelGrid" unique_id=2700000017]
+layout_mode = 2
+theme_type_variation = &"DangerLabel"
+text = "Save failed"
+
+[node name="InfoLabel" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/LabelGrid" unique_id=2700000018]
+layout_mode = 2
+theme_type_variation = &"InfoLabel"
+text = "New season starts Friday"
+
+[node name="PanelGrid" type="GridContainer" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack" unique_id=2700000019]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 3
+
+[node name="AccentPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/PanelGrid" unique_id=2700000020]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"AccentPanel"
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/PanelGrid/AccentPanel" unique_id=2700000021]
+layout_mode = 2
+text = "AccentPanel — primary tinted surface"
+
+[node name="InfoPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/PanelGrid" unique_id=2700000022]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"InfoPanel"
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/PanelGrid/InfoPanel" unique_id=2700000023]
+layout_mode = 2
+text = "InfoPanel — informational callout"
+
+[node name="WarningPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/PanelGrid" unique_id=2700000024]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"WarningPanel"
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/PanelGrid/WarningPanel" unique_id=2700000025]
+layout_mode = 2
+text = "WarningPanel — review before continuing"
+
+[node name="DangerPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/PanelGrid" unique_id=2700000026]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"DangerPanel"
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/PanelGrid/DangerPanel" unique_id=2700000027]
+layout_mode = 2
+text = "DangerPanel — destructive action"
+
+[node name="SuccessPanel" type="PanelContainer" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/PanelGrid" unique_id=2700000028]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"SuccessPanel"
+
+[node name="Label" type="Label" parent="RootMargin/RootStack/ShowcaseTabs/Role Variations/Margin/Stack/PanelGrid/SuccessPanel" unique_id=2700000029]
+layout_mode = 2
+text = "SuccessPanel — confirmation banner"
