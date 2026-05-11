@@ -4,8 +4,8 @@ milestone: v1.0.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 12 Task 6 thumbnail attestation pending — see 12-04-wave-3-c6-per-direction-SUMMARY.md
-last_updated: "2026-05-11T11:10:38.611Z"
-last_activity: 2026-05-11 -- Phase 13 planning complete
+last_updated: "2026-05-11T11:14:43.086Z"
+last_activity: 2026-05-11 -- Phase 13 execution started
 progress:
   total_phases: 17
   completed_phases: 15
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-09)
 
 **Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships one canonical `neocade_theme.tres` resource of type `NeoCadeTheme`, plus one concrete `addons/neocade_theme/scripts/neocade_theme.gd` class and one reusable `NeoCadeThemeOptionButton` picker. Consumers choose `style` (Pulse, Slate, Bubble, Daybreak, Burst, or `CUSTOM`) and toggle `raised` / `platform` / `base_color` / `accent_color` exports for flat/raised × desktop/mobile/AUTO variations — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect). **Dynamic-theme architecture** feasibility-validated 2026-05-06 (Phase 3.2 strict gate 6/6 PASS in Godot 4.6.2), then consolidated 2026-05-08 and updated 2026-05-09: single concrete `@tool class_name NeoCadeTheme extends Theme`, 12 exports including `style` and the Advanced `use_runtime_popup_selection_icons` / `texture_cache` toggles, luminance-derived `is_light`, no subclasses, no `_dev/`, no `themes/`, no per-style `.tres`, no editor plugin, no `neocade_mobile_theme.tres`.
-**Current focus:** Phase 12 — signature-visual-moves
+**Current focus:** Phase 13 — role-variations
 
 ## Current Position
 
-Phase: 12 (signature-visual-moves) — EXECUTION COMPLETE (SC#4 attested 2026-05-11)
-Plan: 4 of 4
+Phase: 13 (role-variations) — EXECUTING
+Plan: 1 of 4
 Next: /gsd-verify-work 12 (phase-level goal verification), then /gsd-code-review 12, then archive or ship.
-Status: Ready to execute
-Last activity: 2026-05-11 -- Phase 13 planning complete
+Status: Executing Phase 13
+Last activity: 2026-05-11 -- Phase 13 execution started
 
 Progress: [██████████] 96%
 
