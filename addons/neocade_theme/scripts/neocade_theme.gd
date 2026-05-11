@@ -956,6 +956,9 @@ const STYLE_PERSONALITY: Dictionary = {
 			"kicker_style":  &"uppercase-tracked-accent",
 			"hairline_thickness":  0,
 			"min_radius_floor":    0,
+			"primary_outline_color":  &"role_primary",
+			"primary_outline_offset": 0,
+			"primary_outline_width":  0,
 		},
 	},
 	# ─── Slate — base=#111820, accent=#8BD3FF (DESIGN_TOKENS §5.2) ───
@@ -994,6 +997,9 @@ const STYLE_PERSONALITY: Dictionary = {
 			"kicker_style":  &"small-caps-subtle",
 			"hairline_thickness":  1,   # Phase 12 C6 Slate signature: 1px hairlines on interactive chrome.
 			"min_radius_floor":    0,
+			"primary_outline_color":  &"role_primary",
+			"primary_outline_offset": 0,
+			"primary_outline_width":  0,
 		},
 	},
 	# ─── Bubble — base=#241326, accent=#FFB3E6 (DESIGN_TOKENS §5.3) ───
@@ -1032,6 +1038,9 @@ const STYLE_PERSONALITY: Dictionary = {
 			"kicker_style":  &"uppercase-tracked-accent",
 			"hairline_thickness":  0,
 			"min_radius_floor":    26,   # Phase 12 C6 Bubble signature: floor every resolved radius to >= 26.
+			"primary_outline_color":  &"role_primary",
+			"primary_outline_offset": 0,
+			"primary_outline_width":  0,
 		},
 	},
 	# ─── Daybreak — base=#0B2420, accent=#76F2D1 (DESIGN_TOKENS §5.4) ───
@@ -1042,7 +1051,7 @@ const STYLE_PERSONALITY: Dictionary = {
 		"spread_factor": 1.0, "hover_pct": 6.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
 		"shape": {
 			"primary_radius":        8,
-			"primary_padding":       Vector2i(15, 9),
+			"primary_padding":       Vector2i(20, 14),   # Phase 12 C6 Daybreak: generous primary padding.
 			"primary_strategy":      &"friendly-generous",
 			"ghost_strategy":        &"soft-outline",
 			"secondary_radius":      8,
@@ -1070,6 +1079,9 @@ const STYLE_PERSONALITY: Dictionary = {
 			"kicker_style":  &"sentence-case-accent",
 			"hairline_thickness":  0,
 			"min_radius_floor":    0,
+			"primary_outline_color":  &"role_primary",   # Phase 12 C6 Daybreak: token name; resolved through role_table.
+			"primary_outline_offset": 3,                 # Phase 12 C6 Daybreak: px outside button edge.
+			"primary_outline_width":  1,                 # Phase 12 C6 Daybreak: 1px flat outline (NO halo per SC#3).
 		},
 	},
 	# ─── Burst — base=#20112E, accent=#FFD166 (DESIGN_TOKENS §5.5) ───
@@ -1108,6 +1120,9 @@ const STYLE_PERSONALITY: Dictionary = {
 			"kicker_style":  &"uppercase-bold-larger-scale",
 			"hairline_thickness":  0,
 			"min_radius_floor":    0,
+			"primary_outline_color":  &"role_primary",
+			"primary_outline_offset": 0,
+			"primary_outline_width":  0,
 		},
 	},
 }
@@ -1206,6 +1221,9 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 		"kicker_style":  &"sentence-case-accent",
 		"hairline_thickness":  0,
 		"min_radius_floor":    0,
+		"primary_outline_color":  &"role_primary",
+		"primary_outline_offset": 0,
+		"primary_outline_width":  0,
 	},
 }
 
@@ -5498,6 +5516,35 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 					_apply_ghost_strategy(sb, strat_name, role_table, style_personality)
 				# Other strategy paths (kicker_style etc.) are NOT dispatched on stylebox;
 				# they're color-recipe territory handled below.
+		# Phase 12 C6 Daybreak: 1px flat accent outline at 3px offset for primary buttons,
+		# gated on raised=true (SC#1) and primary-strategy recipes only.
+		# Pitfall 3: full alpha mandatory (no border_alpha < 1.0); GL Compat over-renders intermediate alpha.
+		if raised and strategy_raw != null and typeof(strategy_raw) == TYPE_STRING and (strategy_raw as String).ends_with(".primary_strategy"):
+			var outline_width_v: Variant = _lookup_shape(style_personality, "shape.primary_outline_width")
+			var outline_width_resolved: int = 0
+			if outline_width_v != null and (typeof(outline_width_v) == TYPE_INT or typeof(outline_width_v) == TYPE_FLOAT):
+				outline_width_resolved = int(outline_width_v)
+			if outline_width_resolved > 0:
+				var outline_color_key_v: Variant = _lookup_shape(style_personality, "shape.primary_outline_color")
+				var outline_color_key: String = "role_primary"
+				if outline_color_key_v != null:
+					outline_color_key = String(outline_color_key_v)
+				var outline_color_c: Color = role_table.get(outline_color_key, role_table.role_primary)
+				# Override the strategy-applied border with the outline (full alpha — Pitfall 3).
+				sb.border_color = outline_color_c
+				sb.border_width_left = outline_width_resolved
+				sb.border_width_top = outline_width_resolved
+				sb.border_width_right = outline_width_resolved
+				sb.border_width_bottom = outline_width_resolved
+				# Push the border outside the control rect via expand_margin (3px offset).
+				var outline_offset_v: Variant = _lookup_shape(style_personality, "shape.primary_outline_offset")
+				var outline_offset_resolved: int = 0
+				if outline_offset_v != null and (typeof(outline_offset_v) == TYPE_INT or typeof(outline_offset_v) == TYPE_FLOAT):
+					outline_offset_resolved = int(outline_offset_v)
+				sb.expand_margin_left = outline_offset_resolved
+				sb.expand_margin_top = outline_offset_resolved
+				sb.expand_margin_right = outline_offset_resolved
+				sb.expand_margin_bottom = outline_offset_resolved
 		if recipe.has("state_layer_role"):
 			var layer_role: String = recipe.get("state_layer_role", "role_primary")
 			var layer_color: Color = role_table.get(layer_role, role_table.role_primary)
