@@ -971,6 +971,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
 			"primary_min_height":  0,
+			"primary_min_height_mobile":  0,
 		},
 	},
 	# ─── Slate — base=#111820, accent=#8BD3FF (DESIGN_TOKENS §5.2) ───
@@ -1013,6 +1014,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
 			"primary_min_height":  0,
+			"primary_min_height_mobile":  0,
 		},
 	},
 	# ─── Bubble — base=#241326, accent=#FFB3E6 (DESIGN_TOKENS §5.3) ───
@@ -1055,6 +1057,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
 			"primary_min_height":  0,
+			"primary_min_height_mobile":  0,
 		},
 	},
 	# ─── Daybreak — base=#0B2420, accent=#76F2D1 (DESIGN_TOKENS §5.4) ───
@@ -1095,8 +1098,9 @@ const STYLE_PERSONALITY: Dictionary = {
 			"min_radius_floor":    0,
 			"primary_outline_color":  &"role_primary",   # Phase 12 C6 Daybreak: token name; resolved through role_table.
 			"primary_outline_offset": 3,                 # Phase 12 C6 Daybreak: px outside button edge.
-			"primary_outline_width":  1,                 # Phase 12 C6 Daybreak: 1px flat outline (NO halo per SC#3).
+			"primary_outline_width":  2,                 # Phase 12 C6 Daybreak: 2px flat outline (NO halo per SC#3). Bumped from 1→2 per SC#4 protocol (MANIFEST 2026-05-11) to clear thumbnail-scale identifiability.
 			"primary_min_height":  0,
+			"primary_min_height_mobile":  0,
 		},
 	},
 	# ─── Burst — base=#20112E, accent=#FFD166 (DESIGN_TOKENS §5.5) ───
@@ -1138,7 +1142,8 @@ const STYLE_PERSONALITY: Dictionary = {
 			"primary_outline_color":  &"role_primary",
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
-			"primary_min_height":  56,   # Phase 12 C6 Burst signature: oversized primary CTAs (56 desktop / 64 mobile via density).
+			"primary_min_height":  64,   # Phase 12 C6 Burst signature: oversized primary CTAs (bumped 56→64 desktop per SC#4 protocol, MANIFEST 2026-05-11).
+			"primary_min_height_mobile":  72,   # Phase 12 C6 Burst: 72 mobile (bumped 64→72 to preserve mobile delta over desktop); resolved on densityScale > 1.0.
 		},
 	},
 }
@@ -1241,6 +1246,7 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 		"primary_outline_offset": 0,
 		"primary_outline_width":  0,
 		"primary_min_height":  0,
+		"primary_min_height_mobile":  0,
 	},
 }
 
@@ -5617,12 +5623,20 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			_set_content_margin_from_padding(sb, Vector2i.ZERO)
 		# Phase 12 C6 Burst: floor primary-button content_margin sum to shape.primary_min_height
 		# when set; gated on strategy ending in .primary_strategy so only primary buttons grow.
-		# Mobile path uses the density-scaled tokens.body for content height proxy (RESEARCH § Burst specifics).
+		# D-12.11 spec: 56 desktop / 64 mobile. Mobile override via primary_min_height_mobile,
+		# resolved when densityScale > 1.0 (per _platform_tokens MOBILE path).
 		if recipe.has("strategy") and String(recipe.get("strategy", "")).ends_with(".primary_strategy"):
 			var min_h_raw: Variant = _lookup_shape(style_personality, "shape.primary_min_height")
 			var min_h_resolved: int = 0
 			if min_h_raw != null and (typeof(min_h_raw) == TYPE_INT or typeof(min_h_raw) == TYPE_FLOAT):
 				min_h_resolved = int(min_h_raw)
+			# Apply mobile override (D-12.11): use primary_min_height_mobile when on mobile density.
+			if tokens.get("densityScale", 1.0) > 1.0:
+				var min_h_mobile_raw: Variant = _lookup_shape(style_personality, "shape.primary_min_height_mobile")
+				if min_h_mobile_raw != null and (typeof(min_h_mobile_raw) == TYPE_INT or typeof(min_h_mobile_raw) == TYPE_FLOAT):
+					var mobile_val: int = int(min_h_mobile_raw)
+					if mobile_val > 0:
+						min_h_resolved = mobile_val
 			if min_h_resolved > 0:
 				var content_h: int = int(tokens.get("body", 14))
 				var current_min: int = sb.content_margin_top + content_h + sb.content_margin_bottom
