@@ -602,13 +602,21 @@ Plans:
 
 ### Phase 13: Role Variations
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Add opt-in role-coded type variations (4 Role Labels + 5 Role Panels) consumers can apply via `theme_type_variation` when a widget semantically represents success/warning/danger/info/accent state. Zero auto-bindings; baseline chrome unchanged from Phase 12.
+**Requirements**: [SC-13-1, SC-13-2, SC-13-3] (Phase 13 has no REQUIREMENTS.md REQ-IDs; coverage is via 3 locked success criteria — see 13-RESEARCH.md and 13-VALIDATION.md)
 **Depends on:** Phase 12
-**Plans:** 0 plans
+**Plans:** 4 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 13 to break down)
+**Wave 1**
+- [ ] 13-01-PLAN.md — Wave 0: create three Phase 13 verifier helpers (Nyquist gate; ports of Phase 12 verifier/smoke/render with BT=149 / TV=56 constants).
+- [ ] 13-02-PLAN.md — Wave 1: add 9 TYPE_VARIATIONS entries (4 Role Labels + 5 Role Panels) and 8 explicit set_font/set_font_size calls for the Role Labels (PITFALLS 1.2).
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 13-03-PLAN.md — Wave 2: add 9 BINDING_TABLE entries (4 single-key Role Label font_color recipes + 5 full Role Panel stylebox recipes with alpha=0.06).
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 13-04-PLAN.md — Wave 3: add 10th showcase section + README Role Variations (opt-in) docs + run full Phase 13 Nyquist suite for closeout evidence.
 
 ---
 *Roadmap authored: 2026-05-04 from SUMMARY.md 11-phase plan + REQUIREMENTS.md traceability*

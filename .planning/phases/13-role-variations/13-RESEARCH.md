@@ -717,7 +717,7 @@ func _stage_default_chrome_unchanged() -> void:
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the 5 Role Panels use `tokens.body` `font_color` text bindings (so any Label inside reads cleanly)?**
    - What we know: CardPanel and HeroPanel both have `font_color: {"role": "text_strong"}` color bindings at lines 5031-5033 and 5053-5055. PanelContainer DOES expose a `font_color` slot via base Control inheritance even though PanelContainer doesn't directly render text — Labels inside the PanelContainer don't use this binding.
