@@ -182,8 +182,13 @@ func _stage_role_variations_in_showcase() -> void:
 
 func _stage_default_chrome_unchanged() -> void:
 	# SC#3: Default Label.font_color must NOT resolve to any role_* color.
-	# Default PanelContainer.panel.bg_color must NOT have a translucent alpha
-	# (would indicate the panel chrome was rebound to a role tint).
+	# Default PanelContainer.panel.bg_color must NOT resolve to a role_* color
+	# (this is what SC#3 actually mandates — NOT an alpha-band heuristic).
+	#
+	# DI-13-01 remediation (2026-05-11): the previous alpha-band check (0.05..0.99)
+	# false-RED-ed on Daybreak's pre-existing `shape.surface_alpha_panels = 0.96`
+	# (a Phase 12 baseline token, not a Phase 13 regression). Replaced with a
+	# direct role-equality check that matches the spec.
 	var theme: NeoCadeTheme = _fresh_theme()
 	if theme == null:
 		return
@@ -202,12 +207,18 @@ func _stage_default_chrome_unchanged() -> void:
 				or default_label_color.is_equal_approx(role_info) \
 				or default_label_color.is_equal_approx(theme.accent_color):
 			_fail("default-chrome-unchanged: style=%s Label.font_color resolves to a role color (%s) — SC#3 violation" % [NeoCadeTheme.style_label(style_value), default_label_color])
-		# Same check on PanelContainer.panel.bg_color — must remain opaque (Phase 12 baseline).
+		# Default PanelContainer.panel.bg_color must NOT equal any role color (rgb-only,
+		# ignoring alpha — the panel may legitimately carry `shape.surface_alpha_panels`).
 		var panel_sb: StyleBoxFlat = theme.get_stylebox("panel", "PanelContainer") as StyleBoxFlat
 		if panel_sb != null:
 			var panel_bg: Color = panel_sb.bg_color
-			if panel_bg.a > 0.05 and panel_bg.a < 0.99:
-				_fail("default-chrome-unchanged: style=%s PanelContainer.panel bg_color has translucent alpha %.3f — Phase 12 baseline was opaque" % [NeoCadeTheme.style_label(style_value), panel_bg.a])
+			var panel_rgb := Color(panel_bg.r, panel_bg.g, panel_bg.b, 1.0)
+			if panel_rgb.is_equal_approx(Color(role_success.r, role_success.g, role_success.b, 1.0)) \
+					or panel_rgb.is_equal_approx(Color(role_warning.r, role_warning.g, role_warning.b, 1.0)) \
+					or panel_rgb.is_equal_approx(Color(role_danger.r, role_danger.g, role_danger.b, 1.0)) \
+					or panel_rgb.is_equal_approx(Color(role_info.r, role_info.g, role_info.b, 1.0)) \
+					or panel_rgb.is_equal_approx(Color(theme.accent_color.r, theme.accent_color.g, theme.accent_color.b, 1.0)):
+				_fail("default-chrome-unchanged: style=%s PanelContainer.panel bg_color resolves to a role color (%s) — SC#3 violation" % [NeoCadeTheme.style_label(style_value), panel_bg])
 	# WR-01 gate: only print OK when no failures were recorded in this stage.
 	if _failures.is_empty():
 		print("PHASE13_VERIFY: default-chrome-unchanged OK across all selectable styles")

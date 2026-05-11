@@ -13,8 +13,9 @@ extends SceneTree
 
 const CANONICAL_TRES := "res://addons/neocade_theme/neocade_theme.tres"
 const EXPECTED_EXPORT_COUNT := 12
-## BINDING_TABLE.size() = 140 at pre-Phase-12 baseline (top-level theme_type keys).
-const EXPECTED_BINDING_TABLE_ROWS := 140
+## BINDING_TABLE.size() = 149 post-Phase-13 (140 pre-Phase-12 baseline + 9 Role Variations).
+## Updated 2026-05-11 to track post-Phase-13 state.
+const EXPECTED_BINDING_TABLE_ROWS := 149
 
 var _failures: Array[String] = []
 

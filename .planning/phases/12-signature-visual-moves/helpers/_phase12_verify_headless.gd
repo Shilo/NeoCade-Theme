@@ -20,7 +20,8 @@ const EXPECTED_EXPORT_COUNT := 12
 ## The historical "37 rows" note in CONTEXT.md referred to the Phase 4 scorecard Control count;
 ## subsequent phases (6, 7, 8, 9) added Editor types, TYPE_VARIATIONS-backed types, and
 ## additional Controls, growing the table to 140 by Phase 12.
-const EXPECTED_BINDING_TABLE_ROWS := 140
+## Updated 2026-05-11 post-Phase-13: BT grew from 140 → 149 (9 Role Variations).
+const EXPECTED_BINDING_TABLE_ROWS := 149
 
 const VALID_STAGES := [
 	"architecture",
