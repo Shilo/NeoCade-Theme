@@ -955,6 +955,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"focus_offset":  0,
 			"kicker_style":  &"uppercase-tracked-accent",
 			"hairline_thickness":  0,
+			"min_radius_floor":    0,
 		},
 	},
 	# ─── Slate — base=#111820, accent=#8BD3FF (DESIGN_TOKENS §5.2) ───
@@ -992,6 +993,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"focus_offset":  2,
 			"kicker_style":  &"small-caps-subtle",
 			"hairline_thickness":  1,   # Phase 12 C6 Slate signature: 1px hairlines on interactive chrome.
+			"min_radius_floor":    0,
 		},
 	},
 	# ─── Bubble — base=#241326, accent=#FFB3E6 (DESIGN_TOKENS §5.3) ───
@@ -1029,6 +1031,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"focus_offset":  2,
 			"kicker_style":  &"uppercase-tracked-accent",
 			"hairline_thickness":  0,
+			"min_radius_floor":    26,   # Phase 12 C6 Bubble signature: floor every resolved radius to >= 26.
 		},
 	},
 	# ─── Daybreak — base=#0B2420, accent=#76F2D1 (DESIGN_TOKENS §5.4) ───
@@ -1066,6 +1069,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"focus_offset":  2,
 			"kicker_style":  &"sentence-case-accent",
 			"hairline_thickness":  0,
+			"min_radius_floor":    0,
 		},
 	},
 	# ─── Burst — base=#20112E, accent=#FFD166 (DESIGN_TOKENS §5.5) ───
@@ -1103,6 +1107,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"focus_offset":  1,
 			"kicker_style":  &"uppercase-bold-larger-scale",
 			"hairline_thickness":  0,
+			"min_radius_floor":    0,
 		},
 	},
 }
@@ -1200,6 +1205,7 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 		"focus_offset":  2,
 		"kicker_style":  &"sentence-case-accent",
 		"hairline_thickness":  0,
+		"min_radius_floor":    0,
 	},
 }
 
@@ -5393,6 +5399,13 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 					resolved_radius = int(r_lookup)
 			elif typeof(radius_raw) == TYPE_INT or typeof(radius_raw) == TYPE_FLOAT:
 				resolved_radius = int(radius_raw)
+		# Phase 12 C6 Bubble: floor (not clamp) every resolved radius to >= min_radius_floor.
+		# Pitfall 4: use maxi, NOT mini — Bubble's primary_radius=999 must remain 999.
+		var min_floor_raw: Variant = _lookup_shape(style_personality, "shape.min_radius_floor")
+		if min_floor_raw != null and (typeof(min_floor_raw) == TYPE_INT or typeof(min_floor_raw) == TYPE_FLOAT):
+			var floor_v: int = int(min_floor_raw)
+			if floor_v > 0:
+				resolved_radius = maxi(resolved_radius, floor_v)
 		_set_radius_all(sb, resolved_radius)
 		var corner_profile: String = str(recipe.get("corner_profile", ""))
 		if corner_profile == "tab_connected":
