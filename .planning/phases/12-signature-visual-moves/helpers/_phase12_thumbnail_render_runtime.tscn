@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://b12phase12thumbruntime"]
+
+[ext_resource type="Script" path="res://.planning/phases/12-signature-visual-moves/helpers/_phase12_thumbnail_render_runtime.gd" id="1_runtime"]
+
+[node name="ThumbnailRunner" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_runtime")
