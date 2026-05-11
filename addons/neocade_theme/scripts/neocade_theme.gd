@@ -954,6 +954,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			},
 			"focus_offset":  0,
 			"kicker_style":  &"uppercase-tracked-accent",
+			"hairline_thickness":  0,
 		},
 	},
 	# ─── Slate — base=#111820, accent=#8BD3FF (DESIGN_TOKENS §5.2) ───
@@ -990,6 +991,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			},
 			"focus_offset":  2,
 			"kicker_style":  &"small-caps-subtle",
+			"hairline_thickness":  1,   # Phase 12 C6 Slate signature: 1px hairlines on interactive chrome.
 		},
 	},
 	# ─── Bubble — base=#241326, accent=#FFB3E6 (DESIGN_TOKENS §5.3) ───
@@ -1026,6 +1028,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			},
 			"focus_offset":  2,
 			"kicker_style":  &"uppercase-tracked-accent",
+			"hairline_thickness":  0,
 		},
 	},
 	# ─── Daybreak — base=#0B2420, accent=#76F2D1 (DESIGN_TOKENS §5.4) ───
@@ -1062,6 +1065,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			},
 			"focus_offset":  2,
 			"kicker_style":  &"sentence-case-accent",
+			"hairline_thickness":  0,
 		},
 	},
 	# ─── Burst — base=#20112E, accent=#FFD166 (DESIGN_TOKENS §5.5) ───
@@ -1098,6 +1102,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			},
 			"focus_offset":  1,
 			"kicker_style":  &"uppercase-bold-larger-scale",
+			"hairline_thickness":  0,
 		},
 	},
 }
@@ -1194,6 +1199,7 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 		},
 		"focus_offset":  2,
 		"kicker_style":  &"sentence-case-accent",
+		"hairline_thickness":  0,
 	},
 }
 
@@ -5410,6 +5416,16 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			sb.border_width_right = maxi(0, widths.z)
 			sb.border_width_bottom = maxi(0, widths.w)
 		else:
+			# Phase 12 C6 Slate: when shape.hairline_thickness > 0, force border_width to it
+			# for any recipe carrying a border_role (= chrome-with-border, not structural empty).
+			# Pitfall 5: shape.hairline_thickness defaults to 0 for non-Slate directions, so
+			# this is a no-op everywhere except Style.SLATE.
+			var hairline_raw: Variant = _lookup_shape(style_personality, "shape.hairline_thickness")
+			var hairline_resolved: int = 0
+			if hairline_raw != null and (typeof(hairline_raw) == TYPE_INT or typeof(hairline_raw) == TYPE_FLOAT):
+				hairline_resolved = int(hairline_raw)
+			if hairline_resolved > 0 and recipe.has("border_role"):
+				border_width = hairline_resolved
 			_apply_outline_border(sb, border_color, maxi(0, border_width))
 		# Plan 05-02 Task 2 (D-03): padding may be a `shape.<key>` Vector2i lookup
 		# or an explicit Vector2i. Unspecified padding is zero; structural styleboxes must
