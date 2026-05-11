@@ -743,6 +743,11 @@ func _apply_editor_theme_runtime_settings(role_table: Dictionary) -> void:
 	set_stylebox("focus", "RichTextLabel", StyleBoxEmpty.new())
 
 
+# Phase 12 C2' note (RESEARCH OQ2 / D-12.07 item 6): the section-header underline
+# accent rebind was DEFERRED. HSeparator's stylebox is shared with PopupMenu
+# separators (Phase 7 convention); rebinding here would surface accent inside
+# dropdown menu separators — wrong visual. Re-evaluate after Wave 3 ships if
+# accent airtime in headings still feels under-served.
 func _apply_separator_styleboxes(role_table: Dictionary) -> void:
 	var separator_color: Color = role_table.get("outline_color", Color.WHITE)
 	separator_color = Color(separator_color.r, separator_color.g, separator_color.b, separator_color.a * 0.62)
