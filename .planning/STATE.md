@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 12 Task 6 thumbnail attestation pending — see 12-04-wave-3-c6-per-direction-SUMMARY.md
-last_updated: "2026-05-11T11:48:06.268Z"
+status: ship_ready
+stopped_at: Phase 12 + 13 complete; post-audit remediation applied (WR-04/05/01, DI-13-01, SC#4 secondary signatures)
+last_updated: "2026-05-11T18:00:00.000Z"
 last_activity: 2026-05-11
 progress:
   total_phases: 17
-  completed_phases: 16
+  completed_phases: 17
   total_plans: 75
-  completed_plans: 72
-  percent: 96
+  completed_plans: 75
+  percent: 100
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-09)
 
 **Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships one canonical `neocade_theme.tres` resource of type `NeoCadeTheme`, plus one concrete `addons/neocade_theme/scripts/neocade_theme.gd` class and one reusable `NeoCadeThemeOptionButton` picker. Consumers choose `style` (Pulse, Slate, Bubble, Daybreak, Burst, or `CUSTOM`) and toggle `raised` / `platform` / `base_color` / `accent_color` exports for flat/raised × desktop/mobile/AUTO variations — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect). **Dynamic-theme architecture** feasibility-validated 2026-05-06 (Phase 3.2 strict gate 6/6 PASS in Godot 4.6.2), then consolidated 2026-05-08 and updated 2026-05-09: single concrete `@tool class_name NeoCadeTheme extends Theme`, 12 exports including `style` and the Advanced `use_runtime_popup_selection_icons` / `texture_cache` toggles, luminance-derived `is_light`, no subclasses, no `_dev/`, no `themes/`, no per-style `.tres`, no editor plugin, no `neocade_mobile_theme.tres`.
-**Current focus:** Phase 13 — role-variations
+**Current focus:** Post-audit remediation complete (2026-05-11); branch ship-ready pending push to origin + release dispatch.
 
 ## Current Position
 
-Phase: 13 (role-variations) — EXECUTING
-Plan: 4 of 4
-Next: /gsd-verify-work 12 (phase-level goal verification), then /gsd-code-review 12, then archive or ship.
-Status: Phase complete — ready for verification
+Phase: 13 (role-variations) — COMPLETE; Phase 12 — COMPLETE
+Plan: 4/4 complete (Phase 12) + 4/4 complete (Phase 13)
+Next: push 47+ commits to origin (`git push`), then dispatch release.yml workflow when ready. Optional: re-render SC#4 greyscale thumbnails to confirm Daybreak 2px outline + Burst 64/72 floor clear thumbnail-scale identifiability.
+Status: Ship-ready — all locked success criteria met; post-audit gaps closed.
 Last activity: 2026-05-11
 
 Progress: [██████████] 96%
