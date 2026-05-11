@@ -3444,8 +3444,11 @@ const BINDING_TABLE: Dictionary = {
 			"button_pressed":   {"role": "button_pressed", "border_role": "button_border_pressed",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "mobile_padding": Vector2i(8, 14)},
-			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
-									"raised_intensity": 0, "border_width": 0,
+			# Phase 12 C2' (D-12.06/07): 2px top accent stripe via role_primary border_role.
+			# Vector4i layout = (left, top, right, bottom) per _resolve_recipe lines 5386-5389.
+			"tab_selected":     {"role": "button_pressed", "border_role": "role_primary",
+									"raised_intensity": 0,
+									"border_widths": Vector4i(0, 2, 0, 0),
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 6), "mobile_padding": Vector2i(18, 14)},
 			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
@@ -3496,8 +3499,10 @@ const BINDING_TABLE: Dictionary = {
 	# 29. TabContainer — shared TabBar tab_* recipes plus content panel and menu icons.
 	"TabContainer": {
 		"stylebox": {
-			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
-									"raised_intensity": 0, "border_width": 0,
+			# Phase 12 C2' (D-12.06/07): 2px top accent stripe (matches TabBar tab_selected idiom).
+			"tab_selected":     {"role": "button_pressed", "border_role": "role_primary",
+									"raised_intensity": 0,
+									"border_widths": Vector4i(0, 2, 0, 0),
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 6), "mobile_padding": Vector2i(18, 14)},
 			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
