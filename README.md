@@ -94,8 +94,11 @@ when the consumer assigns `theme_type_variation`.
 | `DangerLabel`   | `role_danger`  |
 | `InfoLabel`     | `role_info`    |
 
-**5 Role Panels** (extend `PanelContainer`) render a 6% tint of the matching role
-color over the per-direction panel chrome:
+**5 Role Panels** (extend `PanelContainer`) replace the panel face with a 6%
+opacity wash of the matching role color so the underlying surface shows through.
+When `raised = true`, the panel additionally picks up a darker role-tinted edge
+from the `raised_face_edge` treatment (consistent with every other raised panel
+chrome); keep `raised` off for a flat translucent banner.
 
 | Variation       | Tint role      |
 |-----------------|----------------|
