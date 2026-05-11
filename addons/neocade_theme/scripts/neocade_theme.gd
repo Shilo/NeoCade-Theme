@@ -1314,6 +1314,17 @@ const TYPE_VARIATIONS: Dictionary = {
 	# Editor dock scroll-body wrappers used after toolbar stacks.
 	"NoBorderHorizontal":       "MarginContainer",
 	"NoBorderHorizontalBottom": "NoBorderHorizontal",
+	# Phase 13 § C1: Role Label opt-in type variations (4)
+	"SuccessLabel": "Label",
+	"WarningLabel": "Label",
+	"DangerLabel":  "Label",
+	"InfoLabel":    "Label",
+	# Phase 13 § C3: Role Panel opt-in type variations (5)
+	"AccentPanel":  "PanelContainer",
+	"InfoPanel":    "PanelContainer",
+	"WarningPanel": "PanelContainer",
+	"DangerPanel":  "PanelContainer",
+	"SuccessPanel": "PanelContainer",
 }
 
 
