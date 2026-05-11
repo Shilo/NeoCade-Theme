@@ -5101,6 +5101,78 @@ const BINDING_TABLE: Dictionary = {
 			"font_color": {"role": "role_info"},
 		},
 	},
+	# 59. AccentPanel — PanelContainer variation (Phase 13 § C3). 6%-mix tint
+	#     of role_primary over the per-direction panel chrome. Opt-in only;
+	#     default PanelContainer.panel at lines 5011-5022 stays unchanged — SC#3.
+	"AccentPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "role_primary",
+				"alpha":            0.06,
+				"border_role":      "surface_panel_edge",
+				"radius":           "shape.card_radius",
+				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
+				"padding":          Vector2i(12, 10),
+			},
+		},
+	},
+	# 60. InfoPanel — PanelContainer variation (Phase 13 § C3).
+	"InfoPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "role_info",
+				"alpha":            0.06,
+				"border_role":      "surface_panel_edge",
+				"radius":           "shape.card_radius",
+				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
+				"padding":          Vector2i(12, 10),
+			},
+		},
+	},
+	# 61. WarningPanel — PanelContainer variation (Phase 13 § C3).
+	"WarningPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "role_warning",
+				"alpha":            0.06,
+				"border_role":      "surface_panel_edge",
+				"radius":           "shape.card_radius",
+				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
+				"padding":          Vector2i(12, 10),
+			},
+		},
+	},
+	# 62. DangerPanel — PanelContainer variation (Phase 13 § C3).
+	"DangerPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "role_danger",
+				"alpha":            0.06,
+				"border_role":      "surface_panel_edge",
+				"radius":           "shape.card_radius",
+				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
+				"padding":          Vector2i(12, 10),
+			},
+		},
+	},
+	# 63. SuccessPanel — PanelContainer variation (Phase 13 § C3).
+	"SuccessPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "role_success",
+				"alpha":            0.06,
+				"border_role":      "surface_panel_edge",
+				"radius":           "shape.card_radius",
+				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
+				"padding":          Vector2i(12, 10),
+			},
+		},
+	},
 }
 
 
