@@ -959,6 +959,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"primary_outline_color":  &"role_primary",
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
+			"primary_min_height":  0,
 		},
 	},
 	# ─── Slate — base=#111820, accent=#8BD3FF (DESIGN_TOKENS §5.2) ───
@@ -1000,6 +1001,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"primary_outline_color":  &"role_primary",
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
+			"primary_min_height":  0,
 		},
 	},
 	# ─── Bubble — base=#241326, accent=#FFB3E6 (DESIGN_TOKENS §5.3) ───
@@ -1041,6 +1043,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"primary_outline_color":  &"role_primary",
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
+			"primary_min_height":  0,
 		},
 	},
 	# ─── Daybreak — base=#0B2420, accent=#76F2D1 (DESIGN_TOKENS §5.4) ───
@@ -1082,6 +1085,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"primary_outline_color":  &"role_primary",   # Phase 12 C6 Daybreak: token name; resolved through role_table.
 			"primary_outline_offset": 3,                 # Phase 12 C6 Daybreak: px outside button edge.
 			"primary_outline_width":  1,                 # Phase 12 C6 Daybreak: 1px flat outline (NO halo per SC#3).
+			"primary_min_height":  0,
 		},
 	},
 	# ─── Burst — base=#20112E, accent=#FFD166 (DESIGN_TOKENS §5.5) ───
@@ -1123,6 +1127,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"primary_outline_color":  &"role_primary",
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
+			"primary_min_height":  56,   # Phase 12 C6 Burst signature: oversized primary CTAs (56 desktop / 64 mobile via density).
 		},
 	},
 }
@@ -1224,6 +1229,7 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 		"primary_outline_color":  &"role_primary",
 		"primary_outline_offset": 0,
 		"primary_outline_width":  0,
+		"primary_min_height":  0,
 	},
 }
 
@@ -5490,6 +5496,22 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			applied_padding = true
 		if not applied_padding:
 			_set_content_margin_from_padding(sb, Vector2i.ZERO)
+		# Phase 12 C6 Burst: floor primary-button content_margin sum to shape.primary_min_height
+		# when set; gated on strategy ending in .primary_strategy so only primary buttons grow.
+		# Mobile path uses the density-scaled tokens.body for content height proxy (RESEARCH § Burst specifics).
+		if recipe.has("strategy") and String(recipe.get("strategy", "")).ends_with(".primary_strategy"):
+			var min_h_raw: Variant = _lookup_shape(style_personality, "shape.primary_min_height")
+			var min_h_resolved: int = 0
+			if min_h_raw != null and (typeof(min_h_raw) == TYPE_INT or typeof(min_h_raw) == TYPE_FLOAT):
+				min_h_resolved = int(min_h_raw)
+			if min_h_resolved > 0:
+				var content_h: int = int(tokens.get("body", 14))
+				var current_min: int = sb.content_margin_top + content_h + sb.content_margin_bottom
+				if current_min < min_h_resolved:
+					var extra: int = min_h_resolved - current_min
+					var half_extra: int = extra / 2
+					sb.content_margin_top += half_extra
+					sb.content_margin_bottom += (extra - half_extra)
 		var expand_margins_raw: Variant = recipe.get("expand_margins", null)
 		if expand_margins_raw != null and typeof(expand_margins_raw) == TYPE_VECTOR4I:
 			var expand_density: float = tokens.get("densityScale", 1.0)
