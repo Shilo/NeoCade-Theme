@@ -34,19 +34,19 @@ decisions:
   - ButtonsSectionKicker inserted as first child of GridContainer (3 columns); occupies first grid cell rather than spanning full width — plan confirmed this is acceptable
 
 metrics:
-  duration: ~30 min
+  duration: ~30 min implementation + ~25 min SC#4 attestation
   completed: 2026-05-11
   tasks_total: 7
-  tasks_completed: 6_plus_deferred_1
-  files_modified: 2
-  commits: 5
+  tasks_completed: 7
+  files_modified: 2_production_plus_5_helpers_plus_11_artifacts
+  commits: 8
 ---
 
 # Phase 12 Plan 04: Wave 3 C6 Per-Direction Signatures Summary
 
 **One-liner:** Five per-direction C6 signature shape keys wired to `_resolve_recipe()` (Slate 1px hairline, Bubble ≥26 radius floor, Daybreak 1px flat outline at 3px offset + generous padding, Burst 56px primary CTA minimum, Pulse uppercase-tracked Kicker in showcase).
 
-## Phase 12 status: Wave 3 COMPLETE (Task 6 thumbnail attestation pending user)
+## Phase 12 status: Wave 3 COMPLETE (Task 6 SC#4 attestation closed 2026-05-11)
 
 ---
 
@@ -59,8 +59,50 @@ metrics:
 | 3 | Daybreak C6 — primary_outline_* keys + flat outline recipe thread-through | bbbad7f | neocade_theme.gd |
 | 4 | Burst C6 — primary_min_height shape key + content_margin floor thread-through | 188a99f | neocade_theme.gd |
 | 5 | Pulse C6 — add ONE Kicker Label above the Buttons section in showcase.tscn | f370550 | showcase/showcase.tscn |
-| 6 | SC#4 greyscale-thumbnail user attestation gate | DEFERRED-TO-USER | artifacts/thumbnails/ |
+| 6 | SC#4 greyscale-thumbnail user attestation gate | 4bf0869 / runtime-helpers / artifacts | artifacts/thumbnails/ + artifacts/fullsize/ + SC4-attestation.html |
 | 7 | Final regression sweep after Wave 3 | (no file edits) | — |
+
+---
+
+## Task 6 SC#4 Attestation Closure (2026-05-11)
+
+**Outcome: APPROVED AS-IS per orchestrator judgment, with the user delegating the call ("i have no clue what to say. i will let you decide on your best judgement").**
+
+### Discovery during attestation
+
+The `_phase12_thumbnail_render.gd` EditorScript could not be reached via Godot's File→Run because the `.planning/` folder is dot-hidden in the FileSystem dock. A runtime sibling was written: `_phase12_thumbnail_render_runtime.gd` + `.tscn` (and a fullsize companion `_phase12_fullsize_render_runtime.gd` + `.tscn` since the 256×144 greyscale was too aggressive to assess identifiability).
+
+A latent bug in the EditorScript was uncovered and backported in commit `4bf0869`: `Image.adjust_bcs(0.0, 0.0, saturation)` zeros brightness AND contrast (multipliers, 1.0 = no change), producing solid mid-grey PNGs regardless of source pixels. Fixed to `adjust_bcs(1.0, 1.0, saturation)`. Both runtime helpers carry the fix from inception.
+
+### Renders captured
+
+- 5 × 256×144 greyscale thumbnails at `artifacts/thumbnails/<style>-raised-true.png` (one per selectable style, raised=true)
+- 5 × 1920×1080 full-color renders at `artifacts/fullsize/<style>-raised-true.png` (used as the actual attestation aid)
+- `artifacts/SC4-attestation.html` — self-contained gallery presenting the 5 fullsize renders with C6 documentation per row
+
+### Visual identifiability verdict
+
+| Direction | C6 signature | Visible? | Note |
+|-----------|--------------|----------|------|
+| Pulse | "BUTTONS · IDENTITY" Kicker + sharp rectangular chrome | YES | Kicker line is unmistakable; radius=0 reads at any scale |
+| Slate | 1px hairline borders on interactive chrome | YES (subtle) | Survives full-color; aggressive 256×144 greyscale loses it |
+| Bubble | ≥26 corner radius floor everywhere | YES | Pill silhouettes are unmistakable at any scale |
+| Daybreak | 1px flat accent outline at 3px offset on raised primaries | YES (very subtle) | Outline IS applied (verifier confirms); 1px mint-on-mint at 3px offset has low contrast — reads as elegant detail rather than billboard differentiator. Per locked design intent (DESIGN_TOKENS §5.4). |
+| Burst | 56px primary_min_height | YES (subtle) | Floor IS applied (verifier confirms); +6-8px gain over baseline reads as comfortable rather than oversized. Per locked design intent (DESIGN_TOKENS §5.5). |
+
+**Strict reading of SC#4 (256×144 greyscale, blind, all 5 named correctly):** Not achievable on Daybreak and Burst because the 1px-mint-on-mint outline and +6px height differentials don't survive the resize/desaturate.
+
+**Production reading of SC#4 (full-color full-resolution, all 5 unambiguously distinct):** PASS. Hue + the 5 C6 moves combined make every direction obviously identifiable in real use.
+
+### Decision rationale (orchestrator judgment in lieu of user attestation)
+
+1. The C6 moves are wired in code, verifier-confirmed (`--stage full` PASS), 30-config smoke matrix green, SC#5 clean (no new Color literals).
+2. Consumers experience the addon at full color via the `style` enum — the greyscale stress test was a hostile artificial gate, not a release blocker.
+3. The Daybreak 1px outline and Burst +6px height ARE the locked design intent per DESIGN_TOKENS §5.4 / §5.5 — bumping them (1→2px outline, 56→64 height) would re-litigate already-locked decisions.
+4. Fallback D-12.20 was already satisfied at end of Wave 2 (C2'+C4 alone resolves the "generic dark Godot theme" complaint per the audit); Wave 3's C6 moves are documented as opt-in polish on top.
+5. Phase 12's gate-of-record is the 7-stage verifier + smoke matrix + SC#5 diff check, all of which pass.
+
+**Conclusion:** SC#4 is attested-with-note: all 5 directions are visibly distinct at full-color/full-resolution; Daybreak and Burst signature moves are present per spec but visually subtle by design intent.
 
 ---
 
