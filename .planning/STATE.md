@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 12-03-wave-2-c2prime-accent-rebinds-PLAN.md
-last_updated: "2026-05-11T09:49:47.627Z"
+status: verifying
+stopped_at: "Phase 12 Task 6 thumbnail attestation pending — see 12-04-wave-3-c6-per-direction-SUMMARY.md"
+last_updated: "2026-05-11T10:01:52.166Z"
 last_activity: 2026-05-11
 progress:
   total_phases: 17
-  completed_phases: 14
+  completed_phases: 15
   total_plans: 71
-  completed_plans: 67
-  percent: 94
+  completed_plans: 68
+  percent: 96
 ---
 
 # Project State
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 
 ## Current Position
 
-Phase: 12 (signature-visual-moves) — EXECUTING
+Phase: 12 (signature-visual-moves) — COMPLETE (SC#4 thumbnail attestation pending user)
 Plan: 4 of 4
-Next: Execute Plan 12-02 (Wave 1: C4 HSV depth formula rewrite).
-Status: Ready to execute
+Next: User runs _phase12_thumbnail_render.gd in Godot Editor; attests 5 greyscale thumbnails; then /gsd-complete-phase 12.
+Status: Wave 3 complete; awaiting SC#4 thumbnail attestation
 Last activity: 2026-05-11
 
-Progress: [█████████░] 94%
+Progress: [██████████] 96%
 
 ## Performance Metrics
 
@@ -94,6 +94,8 @@ Progress: [█████████░] 94%
 | Phase 12 P12-01 | 25min | 4 tasks | 4 files |
 | Phase 12 P12-02-wave-1-c4-hsv-depth | 15min | 2 tasks | 1 files |
 | Phase 12 P12-03-wave-2-c2prime-accent-rebinds | 20min | 3 tasks | 1 files |
+| Phase 12 P12-04-wave-3-c6-per-direction | 30min | 7 tasks (6 done, 1 deferred-to-user) | 2 files |
+| Phase 12 P12-04 | 30min | 7 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -155,6 +157,7 @@ Recent decisions affecting current work:
 - [Phase ?]: C2' rebinds: role_primary token (not accent_color) for consistency with Phase 5-7 idiom
 - [Phase ?]: Section-header underline rebind DEFERRED (RESEARCH OQ2): HSeparator shares StyleBoxLine with PopupMenu separators
 - [Phase ?]: Mid-phase fallback D-12.20 achieved: Wave 1 + Wave 2 leave shippable Phase 12 state
+- [Phase 12-04]: Per-direction C6 shape keys wired (Slate hairline_thickness=1, Bubble min_radius_floor=26, Daybreak primary_outline_width=1/offset=3, Burst primary_min_height=56, Pulse Kicker showcase); Pitfall 5 mirror invariant applied; SC#1..SC#3+SC#6 all green; SC#4 thumbnail attestation deferred to user; Daybreak primary_padding bumped Vector2i(15,9)→Vector2i(20,14)
 
 ### Roadmap Evolution
 
@@ -191,8 +194,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-11T09:49:47.617Z
-Stopped at: Completed 12-03-wave-2-c2prime-accent-rebinds-PLAN.md
+Last session: 2026-05-11T10:01:52.156Z
+Stopped at: Phase 12 Task 6 thumbnail attestation pending — see 12-04-wave-3-c6-per-direction-SUMMARY.md
 Resume file: 
 
 None
