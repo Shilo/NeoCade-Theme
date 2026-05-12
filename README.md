@@ -105,11 +105,112 @@ Inter Variable Roman is licensed under SIL OFL 1.1 via
 `addons/neocade_theme/fonts/inter_ofl.txt`, which ships inside the addon zip
 because the font binary ships there too.
 
-## Subtree Consumers
+## Subtree Integration
 
-Dependent projects can consume the generated addon branch:
+Dependent Godot projects should keep the shared files at
+`addons/neocade_theme/` and pull from the generated `addon` branch, which
+contains only the files that belong inside a consumer project's addon
+directory. The `addon` branch is auto-published from `main` by the
+`.github/workflows/sync-addon-branch.yml` workflow whenever
+`addons/neocade_theme/` changes.
+
+Git subtree is preferred over submodules here because the consumer repo
+gets real committed files — the project still opens normally in Godot
+with no extra clone step.
+
+### Initialize
+
+From the root of the consuming repo:
 
 ```powershell
 git subtree add --prefix=addons/neocade_theme https://github.com/Shilo/NeoCade-Theme.git addon --squash
+```
+
+### Update
+
+```powershell
 git subtree pull --prefix=addons/neocade_theme https://github.com/Shilo/NeoCade-Theme.git addon --squash
 ```
+
+If Git reports conflicts, resolve them like a normal merge, then commit.
+
+### VS Code Task
+
+Add `.vscode/tasks.json` in the consumer repo so updates are one command
+from the editor:
+
+```json
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Update NeoCade Theme subtree",
+      "type": "shell",
+      "command": "git",
+      "args": [
+        "subtree",
+        "pull",
+        "--prefix=addons/neocade_theme",
+        "https://github.com/Shilo/NeoCade-Theme.git",
+        "addon",
+        "--squash"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}
+```
+
+Run via Command Palette (`Ctrl+Shift+P`) → `Tasks: Run Task` →
+`Update NeoCade Theme subtree`. Optional shortcut in `keybindings.json`:
+
+```json
+{
+  "key": "ctrl+alt+u",
+  "command": "workbench.action.tasks.runTask",
+  "args": "Update NeoCade Theme subtree"
+}
+```
+
+### Maintainer: Republish the Addon Branch Manually
+
+The CI workflow is the normal path, but to repair or bootstrap `addon`
+from the repo root:
+
+```powershell
+$addonDir = "addons/neocade_theme"
+git fetch origin "+refs/heads/addon:refs/remotes/origin/addon" 2>$null
+$addonTree = git rev-parse "main:$addonDir"
+$currentTree = git rev-parse "origin/addon^{tree}" 2>$null
+
+if ($LASTEXITCODE -eq 0 -and $addonTree -eq $currentTree) {
+  "addon branch already up to date"
+} else {
+  $parent = git rev-parse --verify origin/addon 2>$null
+  if ($LASTEXITCODE -eq 0) {
+    $newCommit = git commit-tree $addonTree -p $parent -m "chore: sync addon branch from $(git rev-parse --short main)"
+  } else {
+    $newCommit = git commit-tree $addonTree -m "chore: sync addon branch from $(git rev-parse --short main)"
+  }
+  git push origin "${newCommit}:refs/heads/addon"
+}
+```
+
+The `addon` branch is a generated one-way publish branch — make source
+changes under `addons/neocade_theme/` on `main`, never on `addon`.
+
+## Dependencies
+
+None.
+
+## Used By
+
+- [Tyle Map Editor](https://github.com/Shilo/tyle-map-editor) — uses
+  NeoCade Theme as a child subtree at
+  `addons/tyle_map_editor/neocade_theme`.
+- [PentaTile](https://github.com/Shilo/PentaTile) — receives NeoCade
+  Theme recursively through Tyle Map Editor at
+  `addons/penta_tile/tyle_map_editor/neocade_theme`.
+- [VirtuMap](https://github.com/Shilo/VirtuMap) — receives NeoCade Theme
+  recursively through PentaTile and Tyle Map Editor at
+  `addons/virtumap/penta_tile/tyle_map_editor/neocade_theme`.
