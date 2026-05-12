@@ -34,7 +34,8 @@ no separate `neocade_mobile_theme.tres`. Mobile is handled by the exported
 See [docs/usage.md](docs/usage.md) for style details, custom theme authoring,
 and font fallback patterns.
 
-Apply NeoCade to a root `Control`:
+Apply NeoCade to a root `Control` — either via the editor inspector
+(set the Control's `Theme` property to `neocade_theme.tres`) or in code:
 
 ```gdscript
 extends Control
@@ -44,6 +45,12 @@ const NEOCADE_THEME := preload("res://addons/neocade_theme/neocade_theme.tres")
 func _ready() -> void:
     theme = NEOCADE_THEME
 ```
+
+> **Do not** set NeoCade via the project setting `[gui] theme/custom` in
+> `project.godot`. Doing so triggers an open Godot engine bug
+> ([godotengine/godot#111656](https://github.com/godotengine/godot/issues/111656))
+> that prints 10 non-fatal `SceneTree::get_singleton() is null` errors at
+> launch and breaks editor scene live-sync. See **Known Issues** below.
 
 For runtime style or variant toggles, duplicate before mutating:
 
@@ -61,6 +68,40 @@ automatically reflects that style in the inspector.
 
 Migration note: older per-style files such as `pulse_neocade_theme.tres` have
 been replaced by `neocade_theme.tres` plus the `style` export.
+
+## Known Issues
+
+### Project `[gui] theme/custom` triggers Godot debugger spam
+
+Setting `neocade_theme.tres` (or any `class_name`'d resource subclass with
+properties) as the project GUI theme triggers an open Godot engine bug —
+[godotengine/godot#111656](https://github.com/godotengine/godot/issues/111656),
+regression since 4.4. At launch, 10 non-fatal errors print:
+
+```
+E 0:00:00:455   neocade_theme.gd:49 @ @implicit_new(): Parameter "SceneTree::get_singleton()" is null.
+  <C++ Source>  scene/debugger/scene_debugger.cpp:521 @ parse_message()
+  <Stack Trace> neocade_theme.gd:49 @ @implicit_new()
+```
+
+The trace points at `@implicit_new` and a `var` / `@export` declaration line,
+but those are *symptoms* — the real source is engine-internal property
+registration sending `live_*` debugger messages before `SceneTree` is set as
+the main loop. The runtime's `parse_message()` then hits a null
+`SceneTree::get_singleton()` and fires `ERR_FAIL_NULL_V` once per inbound
+message. Per Godot maintainer YuriSizov, the trigger is the script having
+*"any properties defined (which creates implicit_new in GDScript)"* — no
+setter, no `@export`, no `class_name` required individually; the bug
+reproduces with godot-minimal-theme, custom `StyleBoxFlat`, custom
+`Texture2D`, custom `AudioEffect`. It is unfixable from the addon's side.
+
+Side effect beyond the log spam: editor scene live-sync needs a manual
+scene re-select after each launch.
+
+**Workaround:** apply the theme on your main scene's root `Control` (editor
+inspector or `_ready()`) — see **Usage** above. The theme then loads during
+normal scene-load time when `SceneTree` is live, sidestepping the buggy code
+path. Fully resolved when Godot patches the engine.
 
 ## Showcase
 
