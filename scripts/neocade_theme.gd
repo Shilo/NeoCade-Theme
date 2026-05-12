@@ -165,6 +165,14 @@ var _persistent_icon_cache: Dictionary = {}
 var _persistent_generated_texture_cache: Dictionary = {}
 
 func _init() -> void:
+	# Skip during @implicit_new class-scan: SceneTree isn't up yet, and
+	# _regenerate_theme() pumps debugger messages that hit a null guard
+	# in scene_debugger.cpp's parse_message(). Real loads, duplicate(),
+	# and .new() all happen after SceneTree exists and regenerate normally;
+	# any .tres setters that fire after this point will re-regenerate with
+	# the deserialized values.
+	if not (Engine.get_main_loop() is SceneTree):
+		return
 	_regenerate_theme()
 
 
