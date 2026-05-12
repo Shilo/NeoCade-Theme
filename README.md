@@ -55,10 +55,12 @@ autoload, or want a customized theme):
 ```gdscript
 func _ready() -> void:
     NeoCadeTheme.apply_to_root_viewport()             # canonical theme
-    # — or —
+
+# — or, for a customized theme, assign root.theme directly —
+func _ready() -> void:
     var t: NeoCadeTheme = preload("res://addons/neocade_theme/neocade_theme.tres").duplicate(true)
     t.style = NeoCadeTheme.Style.BUBBLE
-    NeoCadeTheme.apply_to_root_viewport(t)            # custom theme
+    get_tree().root.theme = t
 ```
 
 Scene-local alternative — set the theme on a single `Control` (via the
