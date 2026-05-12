@@ -217,29 +217,52 @@ If Git reports conflicts, resolve them like a normal merge, then commit.
 ### VS Code Task
 
 Add `.vscode/tasks.json` in the consumer repo so updates are one command
-from the editor:
+from the editor. The recommended definition includes a pre-flight check
+that catches a common pitfall: if an editor buffer for any file under
+`addons/neocade_theme/` is stale (still showing pre-pull content), an
+auto-save can write that older content back to disk *after* `git subtree
+pull` succeeds — leaving the working tree dirty and producing the
+cryptic `fatal: working tree has modifications. Cannot add` error on the
+next run. The check turns that into an actionable message.
 
-```json
+```jsonc
 {
   "version": "2.0.0",
   "tasks": [
+    {
+      "label": "_check-subtree-clean",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "$d = git status --porcelain addons/neocade_theme/; if ($d) { Write-Host ''; Write-Host 'ERROR: addons/neocade_theme has uncommitted changes:' -ForegroundColor Red; Write-Host $d; Write-Host ''; Write-Host 'Common cause: a stale IDE buffer auto-saved its older content over the freshly-pulled file.' -ForegroundColor Yellow; Write-Host 'Fix: close the file(s) in your editor (or Ctrl+Shift+P > Revert File to discard the buffer and reload from disk),' -ForegroundColor Yellow; Write-Host '     then re-run this task.' -ForegroundColor Yellow; exit 1 }"
+      ],
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": []
+    },
     {
       "label": "Update NeoCade Theme subtree",
       "type": "shell",
       "command": "git",
       "args": [
-        "subtree",
-        "pull",
+        "subtree", "pull",
         "--prefix=addons/neocade_theme",
         "https://github.com/Shilo/NeoCade-Theme.git",
-        "addon",
-        "--squash"
+        "addon", "--squash"
       ],
+      "dependsOn": "_check-subtree-clean",
+      "presentation": { "reveal": "always", "panel": "shared" },
       "problemMatcher": []
     }
   ]
 }
 ```
+
+If you don't use PowerShell, replace the `command`/`args` of
+`_check-subtree-clean` with an equivalent bash/sh check, or drop the
+pre-flight task entirely (you'll just see the raw git error on a dirty
+working tree).
 
 Run via Command Palette (`Ctrl+Shift+P`) → `Tasks: Run Task` →
 `Update NeoCade Theme subtree`. Optional shortcut in `keybindings.json`:
