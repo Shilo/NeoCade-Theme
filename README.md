@@ -20,6 +20,7 @@ addons/neocade_theme/
   neocade_theme.tres            # canonical Theme resource
   scripts/neocade_theme.gd      # @tool class_name NeoCadeTheme extends Theme
   scripts/neocade_theme_option_button.gd
+  scripts/neocade_theme_autoload.gd  # drop-in autoload — global theme without theme/custom
   fonts/inter_variable.ttf
   fonts/inter_ofl.txt
   icons/*.svg
@@ -34,8 +35,34 @@ no separate `neocade_mobile_theme.tres`. Mobile is handled by the exported
 See [docs/usage.md](docs/usage.md) for style details, custom theme authoring,
 and font fallback patterns.
 
-Apply NeoCade to a root `Control` — either via the editor inspector
-(set the Control's `Theme` property to `neocade_theme.tres`) or in code:
+**Recommended (global, hassle-free):** register the bundled autoload at
+`Project Settings > AutoLoad`:
+
+| Field | Value |
+|---|---|
+| Path | `res://addons/neocade_theme/scripts/neocade_theme_autoload.gd` |
+| Node Name | `NeoCadeThemeLoader` (or any name) |
+| Global Variable | ✓ enabled |
+
+That's it. NeoCade is applied to the SceneTree's root viewport on the
+first frame, and every Control — main scene, other autoloads, popups,
+error dialogs — inherits it. Same global reach as `[gui] theme/custom`,
+no engine bug (see **Known Issues**).
+
+To apply manually from any node's `_ready()` (e.g. if you don't want an
+autoload, or want a customized theme):
+
+```gdscript
+func _ready() -> void:
+    NeoCadeTheme.apply_to_root_viewport()             # canonical theme
+    # — or —
+    var t: NeoCadeTheme = preload("res://addons/neocade_theme/neocade_theme.tres").duplicate(true)
+    t.style = NeoCadeTheme.Style.BUBBLE
+    NeoCadeTheme.apply_to_root_viewport(t)            # custom theme
+```
+
+Scene-local alternative — set the theme on a single `Control` (via the
+editor inspector or in code) when global inheritance isn't desired:
 
 ```gdscript
 extends Control
@@ -50,7 +77,8 @@ func _ready() -> void:
 > `project.godot`. Doing so triggers an open Godot engine bug
 > ([godotengine/godot#111656](https://github.com/godotengine/godot/issues/111656))
 > that prints 10 non-fatal `SceneTree::get_singleton() is null` errors at
-> launch and breaks editor scene live-sync. See **Known Issues** below.
+> launch and breaks editor scene live-sync. The autoload above is the
+> drop-in equivalent — see **Known Issues** below.
 
 For runtime style or variant toggles, duplicate before mutating:
 
@@ -98,10 +126,19 @@ reproduces with godot-minimal-theme, custom `StyleBoxFlat`, custom
 Side effect beyond the log spam: editor scene live-sync needs a manual
 scene re-select after each launch.
 
-**Workaround:** apply the theme on your main scene's root `Control` (editor
-inspector or `_ready()`) — see **Usage** above. The theme then loads during
-normal scene-load time when `SceneTree` is live, sidestepping the buggy code
-path. Fully resolved when Godot patches the engine.
+**Workaround — drop-in autoload (recommended):** register
+`res://addons/neocade_theme/scripts/neocade_theme_autoload.gd` at
+*Project Settings > AutoLoad*. The autoload calls
+`NeoCadeTheme.apply_to_root_viewport()` from its `_ready()`, setting the
+SceneTree root viewport's `theme` at runtime — past the buggy boot window,
+with the same global inheritance as `theme/custom`. See **Usage** above.
+
+**Alternative — scene-scoped:** assign the theme on a single root `Control`
+via inspector or `_ready()`. Avoids the bug but only inherits to that
+scene's subtree (not other autoloads).
+
+Both go away the day Godot patches `scene_debugger.cpp:521`'s `ERR_FAIL_NULL_V`
+to silently early-return when `SceneTree::get_singleton()` is null.
 
 ## Showcase
 
