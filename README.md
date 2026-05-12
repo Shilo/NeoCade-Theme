@@ -214,3 +214,5 @@ None.
 - [VirtuMap](https://github.com/Shilo/VirtuMap) — receives NeoCade Theme
   recursively through PentaTile and Tyle Map Editor at
   `addons/virtumap/penta_tile/tyle_map_editor/neocade_theme`.
+- [VirtuCade Prototype](https://github.com/Shilo/VirtuCadePrototype) —
+  direct subtree consumer at `addons/neocade_theme`.
