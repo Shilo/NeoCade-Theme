@@ -38,7 +38,7 @@ func _run() -> void:
 			_check_tab_radius(theme, label)
 			_check_tab_side_margin(theme, label)
 			_check_tab_separation(theme, label)
-			_check_tab_separator_borders(theme, label)
+			_check_tab_border_contract(theme, label)
 			_check_default_tabbar_background(theme, label)
 			_check_dialog_panel_radius(theme, label)
 			_check_button_radius_and_padding(theme, label)
@@ -113,27 +113,37 @@ func _check_tab_side_margin(theme: NeoCadeTheme, label: String) -> void:
 func _check_tab_separation(theme: NeoCadeTheme, label: String) -> void:
 	for theme_type in [&"TabBar", &"TabContainer"]:
 		var actual_separation := theme.get_constant(&"tab_separation", theme_type)
-		if actual_separation != 0:
-			_fail("%s %s.tab_separation expected 0 because separators are tab borders, got %d" % [
+		if actual_separation != 1:
+			_fail("%s %s.tab_separation expected 1px gap between tab faces, got %d" % [
 				label,
 				theme_type,
 				actual_separation,
 			])
 
 
-func _check_tab_separator_borders(theme: NeoCadeTheme, label: String) -> void:
-	var button_normal := theme.get_stylebox(&"normal", &"Button") as StyleBoxFlat
-	if button_normal == null:
-		_fail("%s missing Button.normal for tab separator border check" % label)
-		return
+func _check_tab_border_contract(theme: NeoCadeTheme, label: String) -> void:
 	for theme_type in [&"TabBar", &"TabContainer"]:
+		var selected := theme.get_stylebox(&"tab_selected", theme_type) as StyleBoxFlat
+		if selected == null:
+			_fail("%s missing %s.tab_selected for border contract check" % [label, theme_type])
+		elif selected.border_width_left != 0 or selected.border_width_top != 2 or selected.border_width_right != 0 or selected.border_width_bottom != 0:
+			_fail("%s %s.tab_selected expected only 2px top accent, got %d/%d/%d/%d" % [
+				label,
+				theme_type,
+				selected.border_width_left,
+				selected.border_width_top,
+				selected.border_width_right,
+				selected.border_width_bottom,
+			])
+
 		for slot_name in [&"tab_unselected", &"tab_hovered", &"tab_disabled"]:
 			var tab := theme.get_stylebox(slot_name, theme_type) as StyleBoxFlat
 			if tab == null:
-				_fail("%s missing %s.%s for tab separator border check" % [label, theme_type, slot_name])
+				_fail("%s missing %s.%s for border contract check" % [label, theme_type, slot_name])
 				continue
-			if tab.border_width_left != 1 or tab.border_width_right != 1 or tab.border_width_top != 0 or tab.border_width_bottom != 0:
-				_fail("%s %s.%s separator borders expected 1/0/1/0 got %d/%d/%d/%d" % [
+			var max_border: int = maxi(tab.border_width_left, maxi(tab.border_width_top, maxi(tab.border_width_right, tab.border_width_bottom)))
+			if max_border != 0:
+				_fail("%s %s.%s should use the 1px layout gap, not painted borders, got %d/%d/%d/%d" % [
 					label,
 					theme_type,
 					slot_name,
@@ -141,14 +151,6 @@ func _check_tab_separator_borders(theme: NeoCadeTheme, label: String) -> void:
 					tab.border_width_top,
 					tab.border_width_right,
 					tab.border_width_bottom,
-				])
-			if not tab.border_color.is_equal_approx(button_normal.border_color):
-				_fail("%s %s.%s separator color should match Button.normal border: tab=%s button=%s" % [
-					label,
-					theme_type,
-					slot_name,
-					tab.border_color.to_html(false),
-					button_normal.border_color.to_html(false),
 				])
 
 

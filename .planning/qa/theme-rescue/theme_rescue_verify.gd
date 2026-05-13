@@ -603,8 +603,8 @@ func _expect_tab_state_chrome(theme: Theme, label: String) -> void:
 			{"name": &"tab_disabled", "stylebox": disabled},
 		]:
 			var state_stylebox := state["stylebox"] as StyleBoxFlat
-			if state_stylebox.border_width_left != 1 or state_stylebox.border_width_right != 1 or state_stylebox.border_width_top != 0 or state_stylebox.border_width_bottom != 0:
-				_fail("%s %s.%s should draw only 1px side separators, got %s/%s/%s/%s" % [
+			if _max_border_width(state_stylebox) != 0:
+				_fail("%s %s.%s should rely on tab_separation gap, not painted side borders, got %s/%s/%s/%s" % [
 					label,
 					theme_type,
 					state["name"],
@@ -612,14 +612,6 @@ func _expect_tab_state_chrome(theme: Theme, label: String) -> void:
 					state_stylebox.border_width_top,
 					state_stylebox.border_width_right,
 					state_stylebox.border_width_bottom,
-				])
-			if not state_stylebox.border_color.is_equal_approx(button_normal.border_color):
-				_fail("%s %s.%s separator should match Button.normal chrome border: tab=%s button=%s" % [
-					label,
-					theme_type,
-					state["name"],
-					state_stylebox.border_color.to_html(false),
-					button_normal.border_color.to_html(false),
 				])
 
 
@@ -651,8 +643,8 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 	_expect_equal(theme.get_constant("v_separation", "GridContainer"), 4, "%s GridContainer.v_separation" % label)
 	var expected_tab_side_margin := (theme as NeoCadeTheme).corner_radius if theme is NeoCadeTheme else 0
 	_expect_equal(theme.get_constant("side_margin", "TabContainer"), expected_tab_side_margin, "%s TabContainer.side_margin" % label)
-	_expect_equal(theme.get_constant("tab_separation", "TabBar"), 0, "%s TabBar.tab_separation" % label)
-	_expect_equal(theme.get_constant("tab_separation", "TabContainer"), 0, "%s TabContainer.tab_separation" % label)
+	_expect_equal(theme.get_constant("tab_separation", "TabBar"), 1, "%s TabBar.tab_separation" % label)
+	_expect_equal(theme.get_constant("tab_separation", "TabContainer"), 1, "%s TabContainer.tab_separation" % label)
 	_expect_equal(theme.get_constant("icon_max_width", "TabBar"), 0, "%s TabBar.icon_max_width" % label)
 	_expect_equal(theme.get_constant("icon_max_width", "TabContainer"), 0, "%s TabContainer.icon_max_width" % label)
 
