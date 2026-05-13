@@ -1371,6 +1371,11 @@ const TYPE_VARIATIONS: Dictionary = {
 	"TabContainerOdd": "TabContainer",
 	"TabContainerInner": "TabContainer",
 	"TabBarInner": "TabBar",
+	# Opt-in TabContainer variation that restores a filled tabbar_background
+	# (surface_base) for cases where the unused area beside the tab strip
+	# should read as part of the container chrome. Default TabContainer ships
+	# transparent so the parent surface shows through.
+	"FilledTabContainer": "TabContainer",
 	"BottomPanel": "TabContainer",
 	"MainMenuBar": "FlatMenuButton",
 	"PanelBackgroundButton": "Button",
@@ -3648,8 +3653,11 @@ const BINDING_TABLE: Dictionary = {
 									"corner_profile": "tab_connected"},
 			"panel":            {"role": "surface_panel", "border_role": "surface_panel_edge",
 								  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true},
-			"tabbar_background":{"role": "surface_base",  "raised_intensity": 0,
-								  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
+			# Transparent tabbar_background so the area beside the tab strip
+			# lets the parent surface show through. Opt-in FilledTabContainer
+			# variation restores the surface_base fill for callers that want
+			# the chrome to extend across the full tab strip width.
+			"tabbar_background":{"empty": true},
 		},
 		"color": {
 			"font_selected_color":   {"role": "text_strong"},
@@ -4476,7 +4484,11 @@ const BINDING_TABLE: Dictionary = {
 			"close_h_offset":    {"value": 18, "mobile_value": 36},
 			"close_v_offset":    {"value": 24, "mobile_value": 40},
 			"resize_margin":     {"value": 4},
-			"title_height":      {"value": 36, "mobile_value": 48},
+			# title_height must match the embedded_border.expand_margin_top so the
+			# title text (which Godot centers within title_height) lands in the
+			# vertical center of the *visible* chrome instead of riding 4 px high.
+			# Desktop expand_margin_top = 32; mobile = 32 * densityScale (1.5) = 48.
+			"title_height":      {"value": 32, "mobile_value": 48},
 			"title_outline_size":{"value": 0},
 		},
 		"icon": {
@@ -5233,6 +5245,18 @@ const BINDING_TABLE: Dictionary = {
 			},
 		},
 	},
+	# 64. FilledTabContainer — TabContainer variation that restores a filled
+	#     tabbar_background (surface_base) for the area beside the tab strip.
+	#     Default TabContainer ships transparent; opt into this variation when
+	#     the chrome should read as part of the container. All other slots
+	#     (tab_*, panel, colors, icons) inherit from TabContainer via Godot's
+	#     variation lookup.
+	"FilledTabContainer": {
+		"stylebox": {
+			"tabbar_background": {"role": "surface_base", "raised_intensity": 0,
+									"border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
+		},
+	},
 }
 
 
@@ -5866,6 +5890,29 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 	return null
 
 
+# Per-icon `svg/scale` from the matching .svg.import file. Used by _load_icon's
+# export-build fallback to compute the pixel-resize ratio from the baked .ctex
+# to the requested SVG render scale. Keep in sync with the .import files when
+# either side changes; the verifier should flag drift in a future pass.
+const _IMPORT_SVG_SCALE: Dictionary = {
+	"arrow_down":                    0.5,
+	"checkbox_checked":              0.75,
+	"checkbox_unchecked":            0.75,
+	"radio_checked":                 0.75,
+	"radio_unchecked":               0.75,
+	"checkbutton_checked":           1.0,
+	"checkbutton_unchecked":         1.0,
+	"close":                         0.5,
+	"clear":                         0.5,
+	"disclosure_expanded":           0.5,
+	"disclosure_collapsed":          0.5,
+	"disclosure_expanded_mirrored":  0.5,
+	"disclosure_collapsed_mirrored": 0.5,
+	"tab_increment":                 0.5,
+	"tab_decrement":                 0.5,
+}
+
+
 func _load_icon(icon_name: String, svg_scale: float = 0.0) -> Texture2D:
 	var cache_key := "%s@%.3f" % [icon_name, svg_scale] if svg_scale > 0.0 else icon_name
 	var cached: Texture2D = _active_icon_cache.get(cache_key)
@@ -5873,6 +5920,11 @@ func _load_icon(icon_name: String, svg_scale: float = 0.0) -> Texture2D:
 		return cached
 	var path := "res://addons/neocade_theme/icons/" + icon_name + ".svg"
 	if svg_scale > 0.0:
+		# Editor path: re-render the SVG from its raw source at the requested
+		# scale. Highest fidelity, but raw .svg files are stripped from the PCK
+		# in exported builds (Godot's texture importer keeps only the baked
+		# .ctex), so FileAccess returns an empty string there and we fall
+		# through to the pixel-resize fallback below.
 		var svg := FileAccess.get_file_as_string(path)
 		if not svg.is_empty():
 			var image := Image.new()
@@ -5882,6 +5934,25 @@ func _load_icon(icon_name: String, svg_scale: float = 0.0) -> Texture2D:
 				_active_icon_cache[cache_key] = texture
 				return texture
 	var icon := load(path) as Texture2D
+	if icon != null and svg_scale > 0.0:
+		# Export-build fallback: re-render via SVG isn't possible (no raw
+		# source), so pixel-resize the baked .ctex from its imported svg/scale
+		# up/down to the requested mobile_svg_scale. Lower fidelity than the
+		# editor path on upscales (~1.5–2x typical), but visually correct so
+		# mobile-platform sizing matches editor behavior in exported builds.
+		var import_scale: float = _IMPORT_SVG_SCALE.get(icon_name, 0.75)
+		var ratio: float = svg_scale / import_scale
+		if not is_equal_approx(ratio, 1.0):
+			var img := icon.get_image()
+			if img != null:
+				if img.is_compressed():
+					img.decompress()
+				img.resize(
+					maxi(1, int(round(img.get_width() * ratio))),
+					maxi(1, int(round(img.get_height() * ratio))),
+					Image.INTERPOLATE_LANCZOS
+				)
+				icon = ImageTexture.create_from_image(img)
 	if icon != null:
 		_active_icon_cache[cache_key] = icon
 	return icon
