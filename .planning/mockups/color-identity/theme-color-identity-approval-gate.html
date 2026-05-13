@@ -104,6 +104,85 @@
       text-decoration: none;
     }
 
+    .source-lab {
+      display: grid;
+      gap: 12px;
+      max-width: 1020px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--panel-2);
+    }
+
+    .source-lab label {
+      display: grid;
+      gap: 6px;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .source-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .source-controls input[type="color"] {
+      width: 64px;
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 3px;
+      background: var(--page);
+    }
+
+    .source-controls input[type="text"] {
+      width: 126px;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: var(--page);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .source-preview {
+      display: grid;
+      place-items: center;
+      min-width: 138px;
+      min-height: 42px;
+      border-radius: 8px;
+      background: var(--source-preview);
+      color: var(--source-preview-fg);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .preset-button {
+      min-height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 5px 10px;
+      background: var(--preset-color);
+      color: var(--preset-fg);
+      font-size: 12px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
     main {
       display: grid;
       gap: 28px;
@@ -202,26 +281,6 @@
       color: var(--c-muted);
     }
 
-    .current-button {
-      display: grid;
-      align-content: center;
-      min-height: 38px;
-      border: 1px solid var(--current-line);
-      border-bottom: 3px solid var(--current-accent);
-      border-radius: calc(var(--c-radius) * 0.55);
-      background: var(--current-fill);
-      color: var(--c-text);
-      padding: 7px 9px;
-      font-size: 12px;
-      font-weight: 750;
-    }
-
-    .current-note {
-      color: var(--c-muted);
-      font-size: 11px;
-      line-height: 1.35;
-    }
-
     .swatches {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -314,6 +373,7 @@
 
     .ui-button,
     .ui-option,
+    .ui-positive,
     .ui-danger,
     .ui-state {
       min-height: 38px;
@@ -335,6 +395,12 @@
       background: var(--role-menu);
       color: var(--on-menu);
       box-shadow: 0 var(--flat-depth) 0 var(--edge-menu);
+    }
+
+    .ui-positive {
+      background: var(--role-positive);
+      color: var(--on-positive);
+      box-shadow: 0 var(--flat-depth) 0 var(--edge-positive);
     }
 
     .ui-danger {
@@ -587,6 +653,7 @@
       font-size: 10px;
     }
 
+    .algorithm-grid,
     .gate-grid,
     .slot-matrix {
       display: grid;
@@ -594,6 +661,7 @@
       gap: 12px;
     }
 
+    .algorithm-card,
     .gate-card,
     .slot-matrix article {
       display: grid;
@@ -604,18 +672,37 @@
       background: var(--panel);
     }
 
+    .algorithm-card h3,
     .gate-card h3,
     .slot-matrix h3 {
       margin: 0;
       font-size: 15px;
     }
 
+    .algorithm-card p,
     .gate-card p,
     .slot-matrix p {
       margin: 0;
       color: var(--muted);
       font-size: 13px;
       line-height: 1.45;
+    }
+
+    .algorithm-roles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .algorithm-roles span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 7px;
+      background: var(--panel-2);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 10px;
     }
 
     @media (max-width: 980px) {
@@ -650,16 +737,43 @@
     <h1>NeoCade built-in style color identity</h1>
     <p>This board tests whether Pulse, Daybreak, Slate, Burst, and Bubble can feel distinct out of the box without requiring Button variations or custom control variations. Every visible move below must map to normal Godot Theme slots.</p>
     <nav class="jump-strip" aria-label="Sections">
+      <a class="pill" href="#source">Source color</a>
+      <a class="pill" href="#algorithm">Algorithms</a>
       <a class="pill" href="#themes">All themes</a>
       <a class="pill" href="#slots">Slot map</a>
       <a class="pill" href="#gates">Decision gates</a>
     </nav>
+    <section class="source-lab" id="source" aria-label="Source color test controls">
+      <div class="source-controls">
+        <label for="source-color">source_color
+          <input id="source-color" type="color" value="#57c7ff">
+        </label>
+        <label for="source-hex">Hex
+          <input id="source-hex" type="text" value="#57C7FF" inputmode="text" autocomplete="off" spellcheck="false">
+        </label>
+        <div class="source-preview" id="source-preview" style="--source-preview:#57c7ff;--source-preview-fg:#101521">#57C7FF</div>
+      </div>
+      <div class="preset-row" aria-label="Source color presets">
+        <button class="preset-button" data-source="#57c7ff" style="--preset-color:#57c7ff;--preset-fg:#101521">Sky</button>
+        <button class="preset-button" data-source="#8bff6a" style="--preset-color:#8bff6a;--preset-fg:#101521">Lime</button>
+        <button class="preset-button" data-source="#ffd166" style="--preset-color:#ffd166;--preset-fg:#101521">Gold</button>
+        <button class="preset-button" data-source="#967cff" style="--preset-color:#967cff;--preset-fg:#101521">Violet</button>
+        <button class="preset-button" data-source="#ff5f6f" style="--preset-color:#ff5f6f;--preset-fg:#ffffff">Red stress</button>
+      </div>
+      <p>One source is fed into all five style strategies. Every visible role below should move, but ordinary controls are guarded away from red, rose, coral, and hot-pink danger territory.</p>
+    </section>
   </header>
 
   <main>
+    <section class="section" id="algorithm">
+      <h2>Theme Algorithms</h2>
+      <p>The mockup uses HSL as a lightweight stand-in for a future Godot implementation. The important rule is not the exact color space: each role has an identity anchor, a controlled pull toward <code>source_color</code>, its own saturation/tone target, and a red-family guardrail.</p>
+      <div class="algorithm-grid" id="algorithm-grid"></div>
+    </section>
+
     <section class="section" id="themes">
-      <h2>Current vs Proposed</h2>
-      <p>The first comparison block in each card shows the current base/accent problem: default chrome mostly comes from base-derived surfaces. The second block shows the proposed role palette: default Button, OptionButton/MenuButton, inputs, selected rows/tabs, range controls, dialogs, and danger all get authored roles.</p>
+      <h2>Dynamic Source Proposal</h2>
+      <p>Each card shows the dynamic role palette generated from <code>source_color</code>: default Button, OptionButton/MenuButton, inputs, selected rows/tabs, range controls, dialogs, and danger all get roles without type variations.</p>
       <div class="theme-grid" id="theme-grid"></div>
     </section>
 
@@ -706,8 +820,8 @@
           <p>Bubble only hits the mobile-game reference if cream/sky panels are allowed inside a dark outer shell. Rejecting light islands means Bubble needs a different, less faithful identity.</p>
         </article>
         <article class="gate-card">
-          <h3>Keep base plus accent exports</h3>
-          <p>The public API should stay stable for v1. Built-ins get hidden authored role palettes; <code>CUSTOM</code> derives roles from <code>base_color</code> and <code>accent_color</code>.</p>
+          <h3>Use source_color workflow</h3>
+          <p>The normal color workflow should be <code>style + source_color</code>. This mockup intentionally tests only that model.</p>
         </article>
         <article class="gate-card">
           <h3>Default Button becomes colored</h3>
@@ -718,146 +832,165 @@
   </main>
 
   <script>
-    const currentPalettes = {
-      pulse: { base: "#151A2E", accent: "#8BFF6A" },
-      daybreak: { base: "#0B2420", accent: "#76F2D1" },
-      slate: { base: "#111820", accent: "#8BD3FF" },
-      burst: { base: "#20112E", accent: "#FFD166" },
-      bubble: { base: "#241326", accent: "#FFB3E6" }
-    };
-
-    const themes = [
+    const themeBlueprints = [
       {
         id: "pulse",
         name: "Pulse",
         goal: "LDtk-inspired flat arcade editor taxonomy.",
         fail: "Fails if it still reads as navy plus green accent.",
+        algorithm: "Wide taxonomic palette. Source nudges five different control families, but action remains amber-safe, menu/input stay blue-safe, range stays green-safe, and selection stays yellow-safe.",
+        anchors: ["action 42", "menu 208", "select 50", "range 118", "surface 224"],
         radius: 0,
         tabRadius: 0,
         dialogRadius: 0,
         depth: 2,
-        surface: "#151a2e",
-        shell: "#101622",
-        panel: "#20283a",
-        panel2: "#2b3548",
-        mobile: "#171d2a",
-        line: "#43516a",
-        text: "#f7f8fb",
-        muted: "#b9c1d0",
-        action: ["#eeb23d", "#101521", "#965b12"],
-        menu: ["#2a77b9", "#ffffff", "#17476f"],
-        input: ["#2f425b", "#f7f8fb", "#58b9ff"],
-        select: ["#ffd84d", "#101521", "#a66b14"],
-        range: ["#79df5d", "#101521", "#347b30"],
-        danger: ["#bf3442", "#ffffff", "#78202a"],
-        head: ["#ffd84d", "#101521", "#a66b14"],
-        dialog: ["#171d2a", "#f7f8fb", "#080b12"]
+        darkText: "#101521",
+        lightText: "#f7f8fb",
+        edgeBase: "#050812",
+        roles: {
+          surface: { h: 224, s: 0.34, l: 0.13, pull: 0.16, max: 22, si: 0.08, li: 0.04, edge: 0.72 },
+          shell: { h: 220, s: 0.32, l: 0.10, pull: 0.14, max: 18, si: 0.08, li: 0.03, edge: 0.75 },
+          panel: { h: 220, s: 0.29, l: 0.19, pull: 0.18, max: 24, si: 0.09, li: 0.04, edge: 0.65 },
+          panel2: { h: 216, s: 0.28, l: 0.24, pull: 0.20, max: 26, si: 0.10, li: 0.04, edge: 0.58 },
+          mobile: { h: 219, s: 0.31, l: 0.15, pull: 0.16, max: 22, si: 0.08, li: 0.04, edge: 0.72 },
+          action: { h: 42, s: 0.82, l: 0.60, pull: 0.15, max: 16, safe: 42, si: 0.16, li: 0.06, edge: 0.43 },
+          menu: { h: 208, s: 0.63, l: 0.44, pull: 0.24, max: 30, safe: 208, si: 0.16, li: 0.04, edge: 0.44 },
+          input: { h: 212, s: 0.34, l: 0.28, pull: 0.18, max: 24, safe: 212, si: 0.12, li: 0.04, edge: 0.28 },
+          select: { h: 50, s: 0.91, l: 0.64, pull: 0.12, max: 12, safe: 50, si: 0.14, li: 0.05, edge: 0.43 },
+          range: { h: 118, s: 0.68, l: 0.62, pull: 0.18, max: 22, safe: 118, si: 0.16, li: 0.05, edge: 0.47 },
+          positive: { h: 134, s: 0.66, l: 0.55, pull: 0.16, max: 20, safe: 134, si: 0.14, li: 0.05, edge: 0.46 },
+          danger: { h: 354, s: 0.58, l: 0.48, pull: 0.05, max: 7, danger: true, si: 0.06, li: 0.03, edge: 0.42 },
+          head: { h: 50, s: 0.91, l: 0.64, pull: 0.12, max: 12, safe: 50, si: 0.14, li: 0.05, edge: 0.43 },
+          dialog: { h: 220, s: 0.31, l: 0.15, pull: 0.16, max: 22, si: 0.08, li: 0.04, edge: 0.75 }
+        }
       },
       {
         id: "daybreak",
         name: "Daybreak",
         goal: "Fresh morning community lobby translated to dark teal.",
         fail: "Fails if it becomes brown, nostalgic, or Boardwalk-like.",
+        algorithm: "Teal morning environment with sun and mint roles. Source warms or cools the palette, but surfaces remain pine/teal, actions remain golden, and selected/navigation roles stay mint-forward.",
+        anchors: ["surface 166", "action 42", "select 156", "range 186", "input 164"],
         radius: 4,
         tabRadius: 4,
         dialogRadius: 8,
         depth: 3,
-        surface: "#0b2420",
-        shell: "#092a24",
-        panel: "#143a32",
-        panel2: "#1c4b40",
-        mobile: "#102f29",
-        line: "#3a7165",
-        text: "#f7fff8",
-        muted: "#b6d7cf",
-        action: ["#f3bf5d", "#101a18", "#9f6421"],
-        menu: ["#65daba", "#101a18", "#2a8b75"],
-        input: ["#234d42", "#f7fff8", "#e2c37a"],
-        select: ["#8ff0ce", "#101a18", "#328f74"],
-        range: ["#58d7e6", "#101a18", "#247c87"],
-        danger: ["#b83a45", "#ffffff", "#78202a"],
-        head: ["#f3bf5d", "#101a18", "#9f6421"],
-        dialog: ["#102f29", "#f7fff8", "#061712"]
+        darkText: "#101a18",
+        lightText: "#f7fff8",
+        edgeBase: "#041411",
+        roles: {
+          surface: { h: 166, s: 0.53, l: 0.09, pull: 0.18, max: 24, si: 0.07, li: 0.04, edge: 0.72 },
+          shell: { h: 166, s: 0.57, l: 0.10, pull: 0.18, max: 24, si: 0.07, li: 0.04, edge: 0.72 },
+          panel: { h: 163, s: 0.50, l: 0.16, pull: 0.20, max: 26, si: 0.08, li: 0.04, edge: 0.62 },
+          panel2: { h: 160, s: 0.45, l: 0.22, pull: 0.22, max: 28, si: 0.08, li: 0.04, edge: 0.56 },
+          mobile: { h: 164, s: 0.49, l: 0.14, pull: 0.20, max: 26, si: 0.08, li: 0.04, edge: 0.66 },
+          action: { h: 42, s: 0.82, l: 0.66, pull: 0.13, max: 14, safe: 42, si: 0.14, li: 0.06, edge: 0.43 },
+          menu: { h: 158, s: 0.62, l: 0.62, pull: 0.22, max: 28, safe: 158, si: 0.15, li: 0.05, edge: 0.43 },
+          input: { h: 164, s: 0.37, l: 0.23, pull: 0.20, max: 26, safe: 164, si: 0.10, li: 0.04, edge: 0.26 },
+          select: { h: 156, s: 0.74, l: 0.75, pull: 0.20, max: 24, safe: 156, si: 0.14, li: 0.05, edge: 0.43 },
+          range: { h: 186, s: 0.73, l: 0.62, pull: 0.22, max: 28, safe: 186, si: 0.14, li: 0.05, edge: 0.45 },
+          positive: { h: 143, s: 0.60, l: 0.57, pull: 0.18, max: 22, safe: 143, si: 0.12, li: 0.05, edge: 0.45 },
+          danger: { h: 354, s: 0.52, l: 0.47, pull: 0.05, max: 7, danger: true, si: 0.06, li: 0.03, edge: 0.42 },
+          head: { h: 42, s: 0.82, l: 0.66, pull: 0.13, max: 14, safe: 42, si: 0.14, li: 0.06, edge: 0.43 },
+          dialog: { h: 164, s: 0.48, l: 0.14, pull: 0.20, max: 26, si: 0.08, li: 0.04, edge: 0.72 }
+        }
       },
       {
         id: "slate",
         name: "Slate",
         goal: "Premium futuristic utility with slight iOS calm.",
         fail: "Fails if it is just generic dark mode with blue focus.",
+        algorithm: "Low-chroma precision palette. Source influences hue subtly and mainly through cool steel roles; hot sources are translated into restrained blue/steel rather than ordinary red controls.",
+        anchors: ["surface 214", "action 205", "menu 236", "select 200", "range 194"],
         radius: 8,
         tabRadius: 8,
         dialogRadius: 12,
         depth: 2,
-        surface: "#111820",
-        shell: "#101820",
-        panel: "#1a242d",
-        panel2: "#202d37",
-        mobile: "#151e27",
-        line: "#455666",
-        text: "#f7f8fb",
-        muted: "#b8c2cc",
-        action: ["#6ea7c8", "#0b1117", "#2d617f"],
-        menu: ["#424967", "#ffffff", "#252a40"],
-        input: ["#151f28", "#f7f8fb", "#67839a"],
-        select: ["#8bd3ff", "#0d151d", "#2c6e91"],
-        range: ["#69bfe8", "#0d151d", "#245f7e"],
-        danger: ["#b94a56", "#ffffff", "#742a35"],
-        head: ["#8bd3ff", "#0d151d", "#2c6e91"],
-        dialog: ["#151e27", "#f7f8fb", "#080d12"]
+        darkText: "#0b1117",
+        lightText: "#f7f8fb",
+        edgeBase: "#05090d",
+        roles: {
+          surface: { h: 214, s: 0.30, l: 0.10, pull: 0.10, max: 14, si: 0.05, li: 0.03, edge: 0.70 },
+          shell: { h: 212, s: 0.31, l: 0.10, pull: 0.10, max: 14, si: 0.05, li: 0.03, edge: 0.70 },
+          panel: { h: 210, s: 0.27, l: 0.14, pull: 0.12, max: 16, si: 0.05, li: 0.03, edge: 0.64 },
+          panel2: { h: 207, s: 0.26, l: 0.17, pull: 0.12, max: 16, si: 0.05, li: 0.03, edge: 0.58 },
+          mobile: { h: 210, s: 0.28, l: 0.12, pull: 0.10, max: 14, si: 0.05, li: 0.03, edge: 0.68 },
+          action: { h: 205, s: 0.42, l: 0.61, pull: 0.14, max: 16, safe: 205, si: 0.08, li: 0.04, edge: 0.43 },
+          menu: { h: 236, s: 0.23, l: 0.35, pull: 0.10, max: 16, safe: 236, si: 0.06, li: 0.03, edge: 0.44 },
+          input: { h: 210, s: 0.25, l: 0.12, pull: 0.10, max: 14, safe: 210, si: 0.05, li: 0.03, edge: 0.22 },
+          select: { h: 200, s: 0.78, l: 0.76, pull: 0.12, max: 16, safe: 200, si: 0.08, li: 0.04, edge: 0.45 },
+          range: { h: 194, s: 0.70, l: 0.65, pull: 0.12, max: 16, safe: 194, si: 0.08, li: 0.04, edge: 0.45 },
+          positive: { h: 156, s: 0.46, l: 0.60, pull: 0.10, max: 14, safe: 156, si: 0.06, li: 0.04, edge: 0.44 },
+          danger: { h: 354, s: 0.44, l: 0.51, pull: 0.04, max: 6, danger: true, si: 0.04, li: 0.02, edge: 0.40 },
+          head: { h: 200, s: 0.78, l: 0.76, pull: 0.12, max: 16, safe: 200, si: 0.08, li: 0.04, edge: 0.45 },
+          dialog: { h: 210, s: 0.28, l: 0.12, pull: 0.10, max: 14, si: 0.05, li: 0.03, edge: 0.70 }
+        }
       },
       {
         id: "burst",
         name: "Burst",
         goal: "MD3 Expressive celebration and reward UI.",
         fail: "Fails if color becomes random or Bubble painted purple.",
+        algorithm: "Maximum expression with role discipline. Source gets the strongest pull, especially menu/input/selection roles, while gold action and lime/cyan status roles stay semantically readable.",
+        anchors: ["surface 274", "action 48", "menu 264", "select 188", "range 105"],
         radius: 12,
         tabRadius: 14,
         dialogRadius: 16,
         depth: 5,
-        surface: "#20112e",
-        shell: "#21112f",
-        panel: "#301c42",
-        panel2: "#3b2353",
-        mobile: "#2b173d",
-        line: "#644083",
-        text: "#fbf7ff",
-        muted: "#d0bee0",
-        action: ["#ffd34d", "#171012", "#a96f11"],
-        menu: ["#9b72ff", "#171012", "#5735a0"],
-        input: ["#4431a4", "#ffffff", "#8f83ff"],
-        select: ["#43e6ff", "#171012", "#157d92"],
-        range: ["#94f05c", "#171012", "#4d8f25"],
-        danger: ["#c92849", "#ffffff", "#7c1930"],
-        head: ["#9b72ff", "#171012", "#5735a0"],
-        dialog: ["#2b173d", "#fbf7ff", "#11061b"]
+        darkText: "#171012",
+        lightText: "#fbf7ff",
+        edgeBase: "#0d0515",
+        roles: {
+          surface: { h: 274, s: 0.46, l: 0.13, pull: 0.24, max: 30, si: 0.10, li: 0.04, edge: 0.74 },
+          shell: { h: 274, s: 0.47, l: 0.13, pull: 0.24, max: 30, si: 0.10, li: 0.04, edge: 0.74 },
+          panel: { h: 274, s: 0.42, l: 0.18, pull: 0.26, max: 34, si: 0.10, li: 0.04, edge: 0.66 },
+          panel2: { h: 274, s: 0.40, l: 0.23, pull: 0.28, max: 36, si: 0.10, li: 0.04, edge: 0.58 },
+          mobile: { h: 274, s: 0.45, l: 0.17, pull: 0.26, max: 34, si: 0.10, li: 0.04, edge: 0.66 },
+          action: { h: 48, s: 0.96, l: 0.64, pull: 0.16, max: 18, safe: 48, si: 0.12, li: 0.05, edge: 0.44 },
+          menu: { h: 264, s: 0.91, l: 0.72, pull: 0.28, max: 38, safe: 264, si: 0.10, li: 0.04, edge: 0.44 },
+          input: { h: 245, s: 0.54, l: 0.42, pull: 0.28, max: 36, safe: 245, si: 0.10, li: 0.04, edge: 0.26 },
+          select: { h: 188, s: 0.96, l: 0.62, pull: 0.26, max: 34, safe: 188, si: 0.10, li: 0.04, edge: 0.44 },
+          range: { h: 105, s: 0.82, l: 0.64, pull: 0.22, max: 30, safe: 105, si: 0.12, li: 0.04, edge: 0.46 },
+          positive: { h: 133, s: 0.72, l: 0.55, pull: 0.18, max: 24, safe: 133, si: 0.10, li: 0.04, edge: 0.46 },
+          danger: { h: 348, s: 0.67, l: 0.47, pull: 0.06, max: 8, danger: true, si: 0.06, li: 0.02, edge: 0.42 },
+          head: { h: 264, s: 0.91, l: 0.72, pull: 0.28, max: 38, safe: 264, si: 0.10, li: 0.04, edge: 0.44 },
+          dialog: { h: 274, s: 0.45, l: 0.17, pull: 0.26, max: 34, si: 0.10, li: 0.04, edge: 0.74 }
+        }
       },
       {
         id: "bubble",
         name: "Bubble",
         goal: "Flat 3D mobile-game UI with dark shell and light islands.",
         fail: "Fails if it stays dark berry plus pink accent only.",
+        algorithm: "Flat mobile-game palette. Source harmonizes blue action, lavender headers, cream/sky islands, yellow rewards, and green confirms. Pink sources are translated away from ordinary controls.",
+        anchors: ["action 199", "head 258", "panel 39", "select 47", "range 132"],
         radius: 24,
         tabRadius: 18,
         dialogRadius: 28,
         depth: 6,
-        surface: "#1a315b",
-        shell: "#2b67a5",
-        panel: "#fff1dc",
-        panel2: "#ffdea7",
-        mobile: "#caecff",
-        line: "#9d7bba",
-        text: "#17233c",
-        muted: "#52647d",
-        action: ["#2eaee9", "#17233c", "#12699b"],
-        menu: ["#967cff", "#17233c", "#6447bd"],
-        input: ["#f7fbff", "#17233c", "#86a9cf"],
-        select: ["#ffc21d", "#17233c", "#b17200"],
-        range: ["#45d96a", "#17233c", "#1f8a3b"],
-        danger: ["#c62842", "#ffffff", "#821626"],
-        head: ["#967cff", "#17233c", "#6447bd"],
-        dialog: ["#fff5e8", "#17233c", "#6447bd"]
+        darkText: "#17233c",
+        lightText: "#ffffff",
+        edgeBase: "#15223e",
+        roles: {
+          surface: { h: 214, s: 0.56, l: 0.25, pull: 0.18, max: 24, si: 0.08, li: 0.04, edge: 0.64 },
+          shell: { h: 207, s: 0.58, l: 0.41, pull: 0.20, max: 26, si: 0.08, li: 0.04, edge: 0.60 },
+          panel: { h: 39, s: 0.96, l: 0.93, pull: 0.08, max: 10, safe: 39, si: 0.04, li: 0.03, edge: 0.30 },
+          panel2: { h: 38, s: 0.96, l: 0.82, pull: 0.08, max: 10, safe: 38, si: 0.04, li: 0.03, edge: 0.34 },
+          mobile: { h: 199, s: 0.98, l: 0.90, pull: 0.18, max: 22, safe: 199, si: 0.05, li: 0.03, edge: 0.34 },
+          action: { h: 199, s: 0.80, l: 0.56, pull: 0.22, max: 26, safe: 199, si: 0.12, li: 0.04, edge: 0.42 },
+          menu: { h: 258, s: 0.93, l: 0.75, pull: 0.20, max: 26, safe: 258, si: 0.08, li: 0.04, edge: 0.40 },
+          input: { h: 210, s: 0.82, l: 0.98, pull: 0.12, max: 18, safe: 210, si: 0.04, li: 0.02, edge: 0.24 },
+          select: { h: 47, s: 0.98, l: 0.56, pull: 0.12, max: 14, safe: 47, si: 0.10, li: 0.04, edge: 0.44 },
+          range: { h: 132, s: 0.72, l: 0.56, pull: 0.18, max: 22, safe: 132, si: 0.10, li: 0.04, edge: 0.44 },
+          positive: { h: 128, s: 0.68, l: 0.54, pull: 0.16, max: 20, safe: 128, si: 0.10, li: 0.04, edge: 0.44 },
+          danger: { h: 350, s: 0.66, l: 0.47, pull: 0.05, max: 7, danger: true, si: 0.06, li: 0.02, edge: 0.42 },
+          head: { h: 258, s: 0.93, l: 0.75, pull: 0.20, max: 26, safe: 258, si: 0.08, li: 0.04, edge: 0.40 },
+          dialog: { h: 39, s: 0.96, l: 0.96, pull: 0.08, max: 10, safe: 39, si: 0.04, li: 0.02, edge: 0.34 }
+        }
       }
     ];
+
+    const DEFAULT_SOURCE = "#57c7ff";
 
     function hexToRgb(hex) {
       const value = hex.replace("#", "");
@@ -866,6 +999,60 @@
         g: parseInt(value.slice(2, 4), 16),
         b: parseInt(value.slice(4, 6), 16)
       };
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function wrapHue(value) {
+      return ((value % 360) + 360) % 360;
+    }
+
+    function shortestHueDelta(from, to) {
+      return ((to - from + 540) % 360) - 180;
+    }
+
+    function rgbToHsl(hex) {
+      const { r, g, b } = hexToRgb(hex);
+      const rn = r / 255;
+      const gn = g / 255;
+      const bn = b / 255;
+      const max = Math.max(rn, gn, bn);
+      const min = Math.min(rn, gn, bn);
+      const l = (max + min) / 2;
+      if (max === min) return { h: 0, s: 0, l };
+      const d = max - min;
+      const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      let h = 0;
+      if (max === rn) h = (gn - bn) / d + (gn < bn ? 6 : 0);
+      if (max === gn) h = (bn - rn) / d + 2;
+      if (max === bn) h = (rn - gn) / d + 4;
+      return { h: h * 60, s, l };
+    }
+
+    function hslToHex(h, s, l) {
+      const hue = wrapHue(h) / 360;
+      if (s === 0) {
+        const v = l * 255;
+        return rgbToHex({ r: v, g: v, b: v });
+      }
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      const hueToRgb = t => {
+        let tt = t;
+        if (tt < 0) tt += 1;
+        if (tt > 1) tt -= 1;
+        if (tt < 1 / 6) return p + (q - p) * 6 * tt;
+        if (tt < 1 / 2) return q;
+        if (tt < 2 / 3) return p + (q - p) * (2 / 3 - tt) * 6;
+        return p;
+      };
+      return rgbToHex({
+        r: hueToRgb(hue + 1 / 3) * 255,
+        g: hueToRgb(hue) * 255,
+        b: hueToRgb(hue - 1 / 3) * 255
+      });
     }
 
     function rgbToHex(rgb) {
@@ -900,11 +1087,102 @@
       return (high + 0.05) / (low + 0.05);
     }
 
+    function normalizeHex(value) {
+      const match = String(value).trim().match(/^#?([0-9a-f]{6})$/i);
+      return match ? "#" + match[1].toLowerCase() : null;
+    }
+
+    function readableOn(bg, theme) {
+      const dark = theme?.darkText || "#101521";
+      const light = theme?.lightText || "#ffffff";
+      return contrast(bg, dark) >= contrast(bg, light) ? dark : light;
+    }
+
+    function mutedOn(bg, fg) {
+      let muted = mix(fg, bg, 0.35);
+      if (contrast(bg, muted) < 4.5) muted = mix(fg, bg, 0.20);
+      return muted;
+    }
+
+    function isRedFamilyHue(hue) {
+      const h = wrapHue(hue);
+      return h >= 315 || h <= 28;
+    }
+
+    function safeOrdinaryHue(hue, safeHue, sourceHue) {
+      if (!isRedFamilyHue(hue)) return wrapHue(hue);
+      const sourceNudge = Math.sin(sourceHue * Math.PI / 180) * 8;
+      let candidate = wrapHue((safeHue ?? 205) + sourceNudge);
+      if (isRedFamilyHue(candidate)) candidate = wrapHue((safeHue ?? 205) + 58);
+      return candidate;
+    }
+
+    function roleColor(blueprint, sourceHsl, spec) {
+      const delta = shortestHueDelta(spec.h, sourceHsl.h);
+      const max = spec.max ?? 24;
+      let h = wrapHue(spec.h + Math.sign(delta) * Math.min(Math.abs(delta) * (spec.pull ?? 0.18), max));
+      if (!spec.danger) h = safeOrdinaryHue(h, spec.safe ?? spec.h, sourceHsl.h);
+      const s = clamp(
+        spec.s + (sourceHsl.s - 0.58) * (spec.si ?? 0.12),
+        spec.smin ?? 0.06,
+        spec.smax ?? 0.98
+      );
+      let l = clamp(
+        spec.l + (sourceHsl.l - 0.52) * (spec.li ?? 0.04),
+        spec.lmin ?? 0.05,
+        spec.lmax ?? 0.98
+      );
+      let fill = hslToHex(h, s, l);
+      let fg = readableOn(fill, blueprint);
+      for (let i = 0; i < 12 && contrast(fill, fg) < 4.5; i++) {
+        const lightIsBetter = contrast(fill, blueprint.lightText || "#ffffff") >= contrast(fill, blueprint.darkText || "#101521");
+        l = clamp(l + (lightIsBetter ? -0.035 : 0.035), spec.lmin ?? 0.05, spec.lmax ?? 0.98);
+        fill = hslToHex(h, s, l);
+        fg = readableOn(fill, blueprint);
+      }
+      const edge = mix(fill, blueprint.edgeBase || "#000000", spec.edge ?? 0.42);
+      return [fill, fg, edge, h];
+    }
+
+    function buildTheme(blueprint, sourceHex) {
+      const sourceHsl = rgbToHsl(sourceHex);
+      const roles = {};
+      for (const [name, spec] of Object.entries(blueprint.roles)) {
+        roles[name] = roleColor(blueprint, sourceHsl, spec);
+      }
+      const text = readableOn(roles.panel[0], blueprint);
+      const muted = mutedOn(roles.panel[0], text);
+      const lineSource = blueprint.id === "bubble" ? roles.head[0] : roles.panel2[0];
+      return {
+        ...blueprint,
+        source: sourceHex,
+        sourceHsl,
+        surface: roles.surface[0],
+        shell: roles.shell[0],
+        panel: roles.panel[0],
+        panel2: roles.panel2[0],
+        mobile: roles.mobile[0],
+        line: mix(lineSource, text, blueprint.id === "bubble" ? 0.26 : 0.22),
+        text,
+        muted,
+        action: roles.action,
+        menu: roles.menu,
+        input: roles.input,
+        select: roles.select,
+        range: roles.range,
+        positive: roles.positive,
+        danger: roles.danger,
+        head: roles.head,
+        dialog: roles.dialog
+      };
+    }
+
     function roleStyle(name, role) {
       const ratio = contrast(role[0], role[1]);
       const label = ratio >= 4.5 ? "AA" : "LOW";
       return `<div class="swatch" style="--swatch-bg:${role[0]};--swatch-fg:${role[1]}">
         <strong>${name}</strong>
+        <span>${role[0].toUpperCase()}</span>
         <span class="contrast-badge">${ratio.toFixed(1)} ${label}</span>
       </div>`;
     }
@@ -913,8 +1191,6 @@
       const stateHover = mix(theme.action[0], "#ffffff", theme.id === "bubble" ? 0.08 : 0.1);
       const statePressed = mix(theme.action[0], "#000000", theme.id === "bubble" ? 0.18 : 0.16);
       const stateDisabled = mix(theme.panel2, theme.surface, 0.52);
-      const current = currentPalettes[theme.id];
-      const currentFill = mix(current.base, "#ffffff", 0.12);
       const shellText = contrast(theme.shell, theme.text) >= 4.5 ? theme.text : "#ffffff";
       const shellMuted = contrast(theme.shell, theme.muted) >= 4.5 ? theme.muted : mix("#ffffff", theme.shell, 0.22);
       return [
@@ -947,6 +1223,9 @@
         `--role-range:${theme.range[0]}`,
         `--on-range:${theme.range[1]}`,
         `--edge-range:${theme.range[2]}`,
+        `--role-positive:${theme.positive[0]}`,
+        `--on-positive:${theme.positive[1]}`,
+        `--edge-positive:${theme.positive[2]}`,
         `--role-danger:${theme.danger[0]}`,
         `--on-danger:${theme.danger[1]}`,
         `--edge-danger:${theme.danger[2]}`,
@@ -959,16 +1238,29 @@
         `--state-pressed:${statePressed}`,
         `--state-disabled:${stateDisabled}`,
         `--state-disabled-fg:${mix(theme.muted, theme.panel2, 0.28)}`,
-        `--current-fill:${currentFill}`,
-        `--current-accent:${current.accent}`,
-        `--current-line:${mix(current.base, "#ffffff", 0.25)}`,
         `--tool-bg:${theme.menu[0]}`,
         `--tool-fg:${theme.menu[1]}`
       ].join(";");
     }
 
+    function algorithmCard(theme) {
+      const chips = [
+        ["action", theme.action],
+        ["menu", theme.menu],
+        ["input", theme.input],
+        ["select", theme.select],
+        ["range", theme.range],
+        ["positive", theme.positive]
+      ].map(([name, role]) => `<span style="background:${role[0]};color:${role[1]}">${name}</span>`).join("");
+      return `<article class="algorithm-card">
+        <h3>${theme.name}</h3>
+        <p>${theme.algorithm}</p>
+        <p><code>anchors:</code> ${theme.anchors.join(", ")}</p>
+        <div class="algorithm-roles">${chips}</div>
+      </article>`;
+    }
+
     function themeCard(theme) {
-      const current = currentPalettes[theme.id];
       return `<article class="theme-card" style="${vars(theme)}">
         <header class="theme-head">
           <h3>${theme.name}</h3>
@@ -978,22 +1270,15 @@
 
         <div class="compare">
           <div class="compare-box">
-            <h4>Current base/accent</h4>
+            <h4>source_color generated roles</h4>
             <div class="swatches">
-              ${roleStyle("base", [current.base, theme.text])}
-              ${roleStyle("accent", [current.accent, current.base])}
-            </div>
-            <div class="current-button">Default Button</div>
-            <div class="current-note">Mostly base-derived chrome, with accent appearing as focus, edge, or opt-in variation color.</div>
-          </div>
-          <div class="compare-box">
-            <h4>Proposed default roles</h4>
-            <div class="swatches">
+              ${roleStyle("source", [theme.source, readableOn(theme.source, theme)])}
               ${roleStyle("button", theme.action)}
               ${roleStyle("menu", theme.menu)}
               ${roleStyle("input", theme.input)}
               ${roleStyle("select", theme.select)}
               ${roleStyle("range", theme.range)}
+              ${roleStyle("positive", theme.positive)}
               ${roleStyle("danger", theme.danger)}
               ${roleStyle("head", theme.head)}
               ${roleStyle("dialog", theme.dialog)}
@@ -1020,8 +1305,9 @@
               <button class="ui-option">OptionButton</button>
               <button class="ui-state hover">Button.hover</button>
               <button class="ui-state pressed">Button.pressed</button>
-              <button class="ui-state disabled">Button.disabled</button>
+              <button class="ui-positive">Positive</button>
               <button class="ui-danger">Danger only</button>
+              <button class="ui-state disabled">Button.disabled</button>
             </div>
             <div class="input">LineEdit.focus</div>
             <div class="tabs">
@@ -1054,7 +1340,7 @@
               <div class="row selected"><span class="rail"></span><span class="icon">S</span><span>Selected menu item</span></div>
               <div class="control-row">
                 <button class="ui-button">Raised save</button>
-                <button class="ui-option">Secondary</button>
+                <button class="ui-positive">OK confirm</button>
               </div>
             </div>
           </div>
@@ -1076,6 +1362,7 @@
               <li><code>input_fill</code><span>LineEdit, TextEdit, SpinBox, TreeLineEdit.</span></li>
               <li><code>selection_fill</code><span>TabBar selected, ItemList selected, Tree selected.</span></li>
               <li><code>range_fill</code><span>Progress, sliders, scrollbars, checks, toggles.</span></li>
+              <li><code>positive_fill</code><span>Success, valid, enabled/confirmed, and explicit positive actions.</span></li>
               <li><code>danger_fill</code><span>Only destructive and error states.</span></li>
             </ul>
           </div>
@@ -1083,7 +1370,42 @@
       </article>`;
     }
 
-    document.getElementById("theme-grid").innerHTML = themes.map(themeCard).join("");
+    function setSource(sourceHex, pushHistory = false) {
+      const normalized = normalizeHex(sourceHex) || DEFAULT_SOURCE;
+      const sourceColor = document.getElementById("source-color");
+      const sourceHexInput = document.getElementById("source-hex");
+      const preview = document.getElementById("source-preview");
+      sourceColor.value = normalized;
+      sourceHexInput.value = normalized.toUpperCase();
+      preview.textContent = normalized.toUpperCase();
+      preview.style.setProperty("--source-preview", normalized);
+      preview.style.setProperty("--source-preview-fg", readableOn(normalized));
+      const builtThemes = themeBlueprints.map(blueprint => buildTheme(blueprint, normalized));
+      document.getElementById("algorithm-grid").innerHTML = builtThemes.map(algorithmCard).join("");
+      document.getElementById("theme-grid").innerHTML = builtThemes.map(themeCard).join("");
+      if (pushHistory) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("source", normalized);
+        window.history.replaceState(null, "", url);
+      }
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const initialSource = normalizeHex(params.get("source")) || DEFAULT_SOURCE;
+    setSource(initialSource);
+
+    document.getElementById("source-color").addEventListener("input", event => {
+      setSource(event.target.value, true);
+    });
+
+    document.getElementById("source-hex").addEventListener("input", event => {
+      const normalized = normalizeHex(event.target.value);
+      if (normalized) setSource(normalized, true);
+    });
+
+    document.querySelectorAll("[data-source]").forEach(button => {
+      button.addEventListener("click", () => setSource(button.dataset.source, true));
+    });
   </script>
 </body>
 </html>

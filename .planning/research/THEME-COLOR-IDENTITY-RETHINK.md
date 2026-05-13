@@ -1,7 +1,7 @@
 # Theme Color Identity Rethink
 
 Date: 2026-05-13
-Status: research plus approval-gate mockup draft
+Status: research plus dynamic source-color plan
 Scope: built-in theme color identity, default control mappings, and pre-implementation mockup plan.
 
 ## Why This Exists
@@ -61,6 +61,39 @@ Source references:
 - [CorePalette source](https://raw.githubusercontent.com/material-foundation/material-color-utilities/main/typescript/palettes/core_palette.ts)
 - [Dynamic color variants](https://raw.githubusercontent.com/material-foundation/material-color-utilities/main/typescript/dynamiccolor/variant.ts)
 - [Material Web theming guide](https://material-web.dev/theming/material-theming/)
+
+## Material Dynamic Source Color Review
+
+The named `m3.material.io` pages currently require JavaScript in text-fetch tools, so this pass cross-checked them through official Android, Material Theme Builder, Material Color Utilities, and Material Web sources.
+
+Source-backed findings:
+
+- Material 3 starts from key colors. Each key color relates to a tonal palette, and specific tones become UI roles. Material Theme Builder says Primary should be set first because it behaves like the dynamic source color and can override other key colors.
+- Android Compose documentation describes five key colors, each with 13 tones, and notes that dynamic color derives custom colors from wallpaper as the starting point for light and dark schemes.
+- Material Color Utilities `themeFromSourceColor()` builds light and dark schemes plus `primary`, `secondary`, `tertiary`, `neutral`, `neutralVariant`, and `error` tonal palettes from a source.
+- The older `CorePalette.of(source)` formula is instructive: primary keeps source hue with stronger chroma, secondary keeps hue with lower chroma, tertiary shifts hue, neutral palettes keep very low chroma, and error is a fixed red-family palette.
+- Newer `DynamicScheme` adds more context than "one color": source HCT, variant, dark/light, contrast level, platform, spec version, and the generated palettes. Variants such as expressive, vibrant, tonal spot, and neutral are how Material changes palette personality from the same seed.
+- Material Web confirms the important implementation pattern: components consume system roles. A filled button maps its container to `primary` and label to `on-primary`; checkbox selected state maps to `primary`; error states map to `error`.
+
+References:
+
+- [Android Compose Material 3 color scheme](https://developer.android.com/develop/ui/compose/designsystems/material3)
+- [Material Theme Builder README](https://github.com/material-foundation/material-theme-builder#how-to-use---web)
+- [Material Web color tokens guide](https://material-web.dev/theming/color/)
+- [Material Color Utilities README](https://github.com/material-foundation/material-color-utilities)
+- [Material Color Utilities `theme_utils.ts`](https://raw.githubusercontent.com/material-foundation/material-color-utilities/main/typescript/utils/theme_utils.ts)
+- [Material Color Utilities `core_palette.ts`](https://raw.githubusercontent.com/material-foundation/material-color-utilities/main/typescript/palettes/core_palette.ts)
+- [Material Color Utilities `dynamic_scheme.ts`](https://raw.githubusercontent.com/material-foundation/material-color-utilities/main/typescript/dynamiccolor/dynamic_scheme.ts)
+- [Material Web filled button tokens](https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-comp-filled-button.scss)
+- [Material Web checkbox tokens](https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-comp-checkbox.scss)
+
+Conclusion for NeoCade:
+
+- Copy the role-palette architecture.
+- Copy the idea that one source can regenerate a full accessible system.
+- Do not copy Material's exact role assignments or generic hue behavior.
+- Do not make every role a tint of the same source. That would recreate the current sameness problem in a new form.
+- Use one public source color as the workflow, but each built-in style needs its own palette strategy, role mapping, and semantic guardrails.
 
 ## Godot Theme Feasibility
 
@@ -250,18 +283,108 @@ This is what the HTML mockup should test. It intentionally uses default controls
 
 ## Export Strategy Recommendation
 
-Recommendation: keep `base_color` and `accent_color` for v1 compatibility, but reinterpret them internally.
+Revised recommendation after the Material dynamic color review: make the normal NeoCade workflow `style + source_color`, where changing `source_color` regenerates every color role.
 
-Proposed meaning:
+This is a workflow decision, not a promise to copy Material exactly.
 
-- `base_color`: surface and environment source.
-- `accent_color`: interactive palette source.
+Why this is better for NeoCade's current problem:
 
-Do not remove `accent_color` yet. Removing it creates public API churn and makes dark themes harder to control because one source must define both environment and interaction. Instead, built-in styles should get richer authored palette personalities, while `CUSTOM` can derive a role palette from `base_color` plus `accent_color`.
+- Users should not have to understand why `accent_color` barely affects default controls.
+- Users should not have to tune `base_color` and `accent_color` together just to get a coherent theme.
+- The built-in styles should remain recognizable while still being personalizable from one color.
+- A source color can feed all roles if the roles are generated through a real palette system instead of direct color reuse.
 
-Future option:
+Subagent challenge:
 
-- A later breaking version could introduce a single `source_color` or `palette_source_color` export with MD3-like generated roles. That should be a separate API decision, not a prerequisite for fixing the built-in styles now.
+- The independent review argued for keeping `base_color + accent_color` because NeoCade needs separate control over "world color" and "action color."
+- That warning is valid if the one-source algorithm is generic.
+- The answer is not to keep the awkward two-color workflow. The answer is to make each style own a color strategy that derives the world, action, navigation, input, selection, range, and semantic roles differently from the same source.
+
+Compatibility path:
+
+- In the rework branch, introduce `source_color` as the canonical public color knob.
+- Retire `base_color` and `accent_color` from the normal user workflow.
+- If serialized-resource compatibility is needed, keep old values only as migration/advanced fields and derive `source_color` from `accent_color` for old resources.
+- `CUSTOM` can remain the escape hatch for manually authored palettes later, but built-in styles should never become `CUSTOM` just because the user changes the source color.
+- Update `AGENTS.md`, `.planning/PROJECT.md`, `.planning/REQUIREMENTS.md`, `.planning/DESIGN_TOKENS.md`, and the canonical resource export list when implementation begins.
+
+## One-Source Dynamic Role Algorithm
+
+Do not use simple tinting. Use a style-specific anchored dynamic palette.
+
+Inputs:
+
+- `style`
+- `source_color`
+- `raised`
+- `platform`
+- shape/spacing exports
+
+Internal steps:
+
+1. Convert `source_color` into a perceptual-ish working model.
+   - Preferred long-term model: HCT/CAM16-like hue, chroma, tone.
+   - Practical Godot implementation can start with HSV plus luminance/contrast helpers if full HCT is too much for this rework.
+
+2. Load the active style's color strategy.
+   - Each style defines anchor hues, chroma bands, tone targets, and role mappings.
+   - Anchors are not final fixed colors. They are the style's identity compass.
+
+3. Harmonize each anchor toward the source.
+   - Every visible role changes when `source_color` changes.
+   - Each role moves by a controlled amount so Pulse stays taxonomic, Daybreak stays morning/teal, Slate stays restrained, Burst stays expressive, and Bubble stays game-UI playful.
+   - This is different from tinting: roles have independent hue, chroma, and tone formulas.
+
+4. Generate tonal ramps for each family.
+   - `surface`
+   - `surface_variant`
+   - `action`
+   - `navigation`
+   - `input`
+   - `selection`
+   - `range`
+   - `positive`
+   - `success`
+   - `warning`
+   - `danger`
+   - `info`
+
+5. Resolve component aliases from those ramps.
+   - `action_fill`
+   - `menu_fill`
+   - `input_fill`
+   - `selection_fill`
+   - `tab_selected_fill`
+   - `range_fill`
+   - `toggle_fill`
+   - `positive_fill`
+   - `focus_ring`
+   - `popup_shell`
+   - `dialog_header`
+   - `raised_offset_*`
+
+6. Compute foregrounds per role.
+   - Never reuse one global text color for every component.
+   - Use `on_action`, `on_menu`, `on_input`, `on_selection`, `on_surface`, and `on_danger` pairs.
+   - Use `on_action`, `on_menu`, `on_input`, `on_selection`, `on_positive`, `on_surface`, and `on_danger` pairs.
+   - Enforce at least 4.5:1 for normal UI text where possible, with explicit exceptions only for disabled states.
+
+7. Apply semantic guardrails.
+   - `danger/error` remains red-family and is never used for ordinary default controls.
+   - If a generated ordinary role lands in a red, rose, coral, or hot-pink danger-adjacent range, shift it through that style's safe route.
+   - Bubble's pink reference should translate to lavender/blue/yellow by default, with red reserved for destructive UI.
+
+8. Generate explicit state colors.
+   - Normal, hover, pressed, focus, selected, checked, and disabled should be real role colors in the table.
+   - Do not rely on CSS-like brightness/filter tricks or Godot fallback state layering.
+
+9. Bind Godot controls to aliases.
+   - Default controls must carry the palette without variations.
+   - Variations remain optional semantic tools, not the only way to see color.
+
+Core rule:
+
+`style + source_color` should produce an identifiable theme, not just a recolored theme.
 
 ## Proposed Internal Role Layer
 
@@ -299,11 +422,41 @@ Component aliases:
 - `selection_fill`
 - `range_fill`
 - `toggle_fill`
+- `positive_fill`
 - `menu_hover_fill`
 - `focus_ring`
 - `panel_mark`
 
 Each built-in style can map these aliases differently. This is the key change: Pulse, Daybreak, Slate, Burst, and Bubble should not share the same component color mapping.
+
+## Control Coverage Rule
+
+The role system must cover every themeable user-facing Control class, but not every `Control` subclass receives a fill. Some Controls paint content supplied by the scene or are layout-only. Implementation must update the existing 35/37-control coverage matrix and the live `BINDING_TABLE`, not just the representative mockup controls.
+
+Coverage contract:
+
+| Control family | Role mapping |
+| --- | --- |
+| `BaseButton` family: `Button`, `OptionButton`, `MenuButton`, `CheckBox`, `CheckButton`, `ColorPickerButton`, `LinkButton` | Default `Button` uses `action_fill`; option/menu controls use `menu_fill`; checked/toggled states use `positive_fill` or `toggle_fill`; link text uses link/info role; danger/positive remain explicit semantic roles where Godot cannot infer intent. |
+| `LineEdit`, `TextEdit`, `CodeEdit`, `SpinBox`, `TreeLineEdit` | `input_fill`, `input_border`, caret, selection, placeholder, read-only, focus, and disabled roles. |
+| `ItemList`, `Tree`, `TabBar`, `TabContainer` | `selection_fill`, `navigation_fill`, row hover, selected focus, cursor, guide/drop-mark, and selected text roles. |
+| `Range` family: `ProgressBar`, sliders, scrollbars, texture progress | `range_fill`, range track, range grabber, disabled range, and raised offsets. |
+| `Panel`, `PanelContainer`, `ScrollContainer`, `PopupPanel`, dialogs/windows, `FoldableContainer`, `GraphEdit`, `GraphNode`, `GraphFrame` | Surface/panel/popup/dialog roles, with selected/active graph states mapped to selection or action roles. |
+| `MenuBar`, `PopupMenu`, tooltip types | `menu_fill`, `menu_hover_fill`, popup shell, menu text, menu disabled, check/radio icon colors. |
+| `Label`, `RichTextLabel` | Text roles only by default. No visible fill unless a documented variation or editor-specific wrapper has a panel. |
+| `Container` layout subclasses, `ColorRect`, `TextureRect`, `NinePatchRect`, `ReferenceRect`, `VideoStreamPlayer` | No default fill from the Theme. Layout containers get constants; texture/content/debug controls are content-driven or have no useful Theme fill slots. |
+| `Separator` | Outline/separator roles, not action/menu/input colors. |
+
+Important limitation:
+
+- Godot Theme cannot know that an arbitrary `Button` whose text says "OK" is a confirm button. Default `Button` should use `action_fill`.
+- `positive_fill` is still needed for success/valid/enabled states, check/toggle active states, success panels/labels, and optional explicit positive button variations or showcase examples.
+- Built-in dialogs that expose only ordinary `Button` controls will inherit `action_fill` unless Godot exposes a specific type/variation or NeoCade adds a targeted scene-side helper.
+
+Implementation gate:
+
+- Add a role-coverage verifier that enumerates the generated Theme entries for the canonical scorecard and fails if any themeable visible stylebox still resolves through old base/accent-only roles.
+- Add a semantic verifier that ordinary roles avoid red-family hues while `danger/error` stays red-family.
 
 ## Theme Goals
 
@@ -407,13 +560,85 @@ Reference:
 
 This is the proposed "no variations required" mapping. Exact values should be tested in mockups before implementation.
 
-| Theme | Button | Option/Menu | Input | Selected Tab | List/Tree Selection | Range/Progress | Toggle/Check | Popup/Dialog |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Pulse | amber/orange fill | blue/steel | dark blue with bright border | yellow/gold filled or strong strip | gold or role-coded row with colored rail | green or cyan | green | dark panels with colored category headers |
-| Daybreak | amber fill | mint/teal | pine/cream-tinted input | mint selected state | mint/amber selected container | aqua or mint | mint | amber/aqua highlights on warm dark panels |
-| Slate | icy blue quiet fill or outline | steel/lavender | graphite with blue-gray border | icy blue selected state | blue-gray selected container | cyan/blue | mint/blue | graphite panels with cool blue accents |
-| Burst | gold fill | violet/blue | violet/blue | cyan or violet selected state | gold/cyan selected container | lime/cyan | lime/cyan | plum panels with violet/cyan statement headers |
-| Bubble | blue chunky fill | lavender/sky blue | cream/sky input island | yellow or lavender selected tab | blue/yellow/lavender selected tile | yellow/green | green | cream panels with lavender headers |
+| Theme | Button | Option/Menu | Input | Selected Tab | List/Tree Selection | Range/Progress | Toggle/Check | Positive/Success | Popup/Dialog |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Pulse | amber/orange fill | blue/steel | dark blue with bright border | yellow/gold filled or strong strip | gold or role-coded row with colored rail | green or cyan | green | distinct success green | dark panels with colored category headers |
+| Daybreak | amber fill | mint/teal | pine/cream-tinted input | mint selected state | mint/amber selected container | aqua or mint | mint | fresh green/mint | amber/aqua highlights on warm dark panels |
+| Slate | icy blue quiet fill or outline | steel/lavender | graphite with blue-gray border | icy blue selected state | blue-gray selected container | cyan/blue | mint/blue | restrained mint | graphite panels with cool blue accents |
+| Burst | gold fill | violet/blue | violet/blue | cyan or violet selected state | gold/cyan selected container | lime/cyan | lime/cyan | high-confidence green | plum panels with violet/cyan statement headers |
+| Bubble | blue chunky fill | lavender/sky blue | cream/sky input island | yellow or lavender selected tab | blue/yellow/lavender selected tile | yellow/green | green | bright confirm green | cream panels with lavender headers |
+
+## Dynamic Source Behavior By Theme
+
+These strategies answer the key workflow question: what changes when the user changes `source_color`?
+
+All themes:
+
+- Surfaces change through a low-chroma harmonized surface ramp.
+- Default buttons change through an action ramp.
+- Option/Menu controls change through a menu/navigation ramp.
+- Inputs change through an input/container ramp.
+- Tabs, selected rows, and popup hovers change through selection/navigation ramps.
+- Progress, sliders, checkboxes, and checkbuttons change through range/toggle ramps.
+- Positive/success controls change through a dedicated positive ramp instead of borrowing danger, warning, or default action.
+- Focus rings change through a high-contrast focus role.
+- Raised lower edges change from the final role colors, not from fixed hard-coded shadows.
+- Danger/error stays red-family; warning stays amber-family; success stays green-family, with only controlled harmonization.
+
+Theme-specific behavior:
+
+| Theme | Source-color behavior | Identity guardrail |
+| --- | --- | --- |
+| Pulse | Source shifts a wide arcade control taxonomy: action, menu, selection, input, and range roles move independently around the source. | Must keep at least four visibly different default control families. Never collapse into source plus darker source. |
+| Daybreak | Source harmonizes pine/teal surfaces, sun action, mint selection, and aqua info roles. | Must feel fresh and morning-like even from a cool or purple source. Avoid brown/orange monotone. |
+| Slate | Source subtly cools graphite surfaces and icy/steel controls with low chroma and tight tone spread. | Must stay restrained. A hot source should become an elegant cool-accent Slate, not a loud red/pink UI. |
+| Burst | Source drives the largest hue/chroma spread: statement action, vivid navigation, cyan-like selection, and lime/cool range roles. | Must be expressive but organized. No random rainbow and no ordinary red controls. |
+| Bubble | Source harmonizes blue action, lavender headers, cream/sky panels, yellow rewards, and green confirms. | Must read as flat mobile game UI. Pink reference energy becomes safe lavender/blue/yellow unless the role is danger. |
+
+Recommended implementation model:
+
+```text
+role_hue = harmonize_anchor_toward_source(anchor_hue, source_hue, role_weight, max_degrees)
+role_chroma = clamp(style_chroma_target * source_chroma_factor, min_chroma, max_chroma)
+role_tone = style_tone_target_for_mode_and_role
+role_color = from_hue_chroma_tone_or_hsv(role_hue, role_chroma, role_tone)
+on_role = choose_readable_foreground(role_color)
+```
+
+This means a blue source and a green source both change every role, but Pulse still feels like Pulse and Bubble still feels like Bubble.
+
+## Approval Mockup Algorithm Draft
+
+The approval-gate HTML now tests this as a live source-color algorithm. It uses HSL for speed and browser portability; production can either keep a similar Godot-local model or replace the internals with HCT/CAM16-style helpers later.
+
+Shared formula:
+
+```text
+source = rgb_to_hsl(source_color)
+role_hue = anchor_hue + clamp(shortest_hue_delta(anchor_hue, source.hue) * pull, -max_shift, max_shift)
+role_hue = avoid_red_family(role_hue, safe_hue) unless role is danger/error
+role_saturation = clamp(anchor_saturation + (source.saturation - 0.58) * saturation_influence)
+role_lightness = clamp(anchor_lightness + (source.lightness - 0.52) * lightness_influence)
+role_fill = hsl(role_hue, role_saturation, role_lightness)
+role_foreground = whichever of light/dark ink gives better contrast
+role_edge = mix(role_fill, style_edge_base, edge_amount)
+```
+
+Theme anchors in the mockup:
+
+| Theme | Surface anchor | Action anchor | Menu/input anchor | Selection anchor | Range/toggle anchor | Positive anchor | Strategy |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Pulse | 224 navy | 42 amber | 208/212 blue | 50 yellow | 118 green | 134 green | Wide LDtk-like taxonomy; source nudges each family but ordinary roles stay non-red. |
+| Daybreak | 166 pine/teal | 42 sunrise | 158/164 seafoam | 156 mint | 186 aqua | 143 green | Morning teal environment with sun action and mint selection. |
+| Slate | 214 graphite-blue | 205 icy blue | 236/210 steel | 200 cyan-blue | 194 cyan | 156 mint | Low-chroma and restrained; hot sources become cool accents, not hot controls. |
+| Burst | 274 plum/violet | 48 gold | 264/245 violet-blue | 188 cyan | 105 lime | 133 green | Strongest source pull and highest chroma spread, but still role-disciplined. |
+| Bubble | 214 dark shell / 39 light islands | 199 blue | 258/210 lavender/sky | 47 yellow | 132 green | 128 green | Mobile-game palette; pink source energy translates to lavender/blue/yellow unless danger. |
+
+Red-family guardrail:
+
+- Ordinary roles are prevented from landing in roughly red, rose, coral, and hot-pink hue space.
+- If a generated ordinary role enters that band, it is moved back toward the role's safe hue with a tiny source-dependent nudge so the color still responds to the source.
+- `danger/error` is the only family allowed to remain red-family.
 
 ## Independent Reviewer Pass
 
@@ -426,7 +651,13 @@ Confirmed:
 - The diagnosis is right: production default controls are still mostly base-derived, while stronger color identity lives in opt-in variations.
 - Pulse should be a control-family color taxonomy, not a green-accent arcade dark theme.
 - Godot Theme can support out-of-box variety at the control-family level, but cannot infer arbitrary LDtk-like per-entity/content colors without custom item drawing, custom controls, item metadata, or variations.
-- Keeping `base_color` plus `accent_color` is still the safest v1 public API choice, but built-in styles need hidden authored role palettes.
+- Keeping `base_color` plus `accent_color` is the lowest-risk compatibility choice, but it does not solve the user's desired one-knob workflow by itself.
+
+Decision after challenge:
+
+- Adopt one public `source_color` for the color rework.
+- Treat the reviewer's `base_color + accent_color` warning as a requirement for stronger internal style strategies, not as the final public workflow.
+- Preserve or migrate old `base_color`/`accent_color` only if needed for resource compatibility.
 
 Warnings:
 
@@ -507,8 +738,10 @@ Remaining caveats:
 
 Likely production changes:
 
+- Replace the normal public color workflow with `source_color`.
+- Keep `base_color` and `accent_color` only as migration/advanced compatibility fields if needed.
 - Add per-style authored palette data to `STYLE_PERSONALITY` or a new adjacent constant.
-- Generate richer role tokens from `base_color`, `accent_color`, and style palette overrides.
+- Generate richer role tokens from `source_color` and the active style's color strategy.
 - Replace global static semantic colors with per-style semantic colors.
 - Change default `Button` bindings to use `action_fill` instead of `button_normal`.
 - Change default `OptionButton`/`MenuButton` bindings to use a distinct menu/control role.
@@ -519,8 +752,8 @@ Likely production changes:
 
 ## Open Decisions
 
-1. Keep `base_color` plus `accent_color` for v1, or introduce a single source-color model now?
-   - Recommendation: keep both for v1 and use them as sources for richer internal roles.
+1. Use one source color or keep base plus accent?
+   - Recommendation: use one public `source_color` for the rework. Keep old fields only for migration or advanced compatibility if required.
 
 2. Should Bubble be allowed to use light cream/sky panels inside a dark outer shell?
    - Recommendation: yes, if contrast passes. Otherwise Bubble cannot fully hit the mobile-game reference.
@@ -533,3 +766,6 @@ Likely production changes:
 
 5. Should LDtk-like per-item colors be supported automatically?
    - Recommendation: no for v1 global Theme. Emulate the feeling through control-family color mapping. Document app-specific per-item color as requiring custom controls, item metadata, custom drawing, or optional variations.
+
+6. Should NeoCade implement full Material HCT/CAM16 immediately?
+   - Recommendation: not as a blocker. Start with deterministic Godot-local hue/chroma/tone-style helpers plus contrast checks, then consider a fuller HCT port only if HSV/luminance results fail the mockup and probe gates.

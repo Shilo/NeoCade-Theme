@@ -7,7 +7,12 @@ Open:
 - `theme-color-identity-mockups.html`
 - `theme-color-identity-approval-gate.html`
 
-Use `theme-color-identity-approval-gate.html` as the implementation approval artifact. It includes current-vs-proposed comparison, side-by-side cards for all five themes, Godot slot labels, state examples, flat raised offsets, mobile density, and contrast badges.
+Use `theme-color-identity-approval-gate.html` as the implementation approval artifact. It includes a live `source_color` picker, side-by-side cards for all five themes, Godot slot labels, state examples, flat raised offsets, mobile density, and contrast badges.
+
+The approval-gate mockup includes a live `source_color` picker. You can also set it from the URL:
+
+- `theme-color-identity-approval-gate.html?source=%2357c7ff`
+- `theme-color-identity-approval-gate.html?source=%23ff5f6f`
 
 Direct theme URLs:
 
