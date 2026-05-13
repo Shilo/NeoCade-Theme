@@ -84,6 +84,18 @@ func _ready() -> void:
 > it mutates `ThemeDB.default_theme` (the deepest fallback every Control
 > hits) at runtime, past the buggy boot window. See **Known Issues**.
 
+When dogfooding NeoCade as the Godot editor custom theme, avoid also saving
+the same `neocade_theme.tres` as a scene-root `theme` on showcase/sample
+scenes. Prefer runtime-only assignment:
+
+```gdscript
+func _ready() -> void:
+    NeoCadeTheme.apply_to_control(self)
+```
+
+`apply_to_control()` no-ops in the editor and only assigns the canonical theme
+when the target `Control` has no theme yet.
+
 For runtime style or variant toggles, duplicate before mutating:
 
 ```gdscript
@@ -188,6 +200,39 @@ scene's subtree (not other autoloads, popups, dialogs).
 All of this goes away the day Godot patches `scene_debugger.cpp:521`'s
 `ERR_FAIL_NULL_V` to silently early-return when `SceneTree::get_singleton()`
 is null.
+
+### Editor custom theme plus scene-root theme can freeze scene switching
+
+NeoCade supports use as a Godot editor custom theme via
+*Editor Settings > Interface > Theme > Custom Theme*. A separate trap appears
+when the same canonical `res://addons/neocade_theme/neocade_theme.tres`
+resource is also serialized onto the root `Control.theme` of a scene being
+edited, such as the Showcase scene. In Godot 4.6.2 this can make switching
+back to that scene freeze the editor for minutes, especially after creating or
+switching through another scene. Empty scenes do not reproduce it.
+
+The observed freeze was not caused by recursive NeoCade regeneration: the
+theme has a `_regenerating` guard, diagnostic logs showed one regeneration per
+theme instance, and raw generation measured in milliseconds
+(about 25ms uncached, about 4ms with the persistent texture cache warmed).
+The expensive path was the editor applying/inspecting a live scene root theme
+that referenced the same dynamic theme resource already merged into the editor
+UI.
+
+**Workaround:** do not serialize the canonical NeoCade theme onto showcase or
+sample scene roots while also using NeoCade as the editor custom theme. Apply
+it at runtime instead:
+
+```gdscript
+func _ready() -> void:
+    NeoCadeTheme.apply_to_control(self)
+```
+
+`apply_to_control()` returns immediately in editor mode, so the `.tscn` stays
+clean while the running game/showcase still gets the canonical Pulse theme.
+If a scene includes `NeoCadeThemeOptionButton`, it should refresh after the
+runtime assignment so stale editor-serialized picker state cannot clear the
+runtime theme.
 
 ## Showcase
 
