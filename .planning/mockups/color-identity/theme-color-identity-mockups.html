@@ -1,0 +1,1204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NeoCade Color Identity Mockups</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "Cascadia Mono", "JetBrains Mono", Consolas, monospace;
+      --page: #101317;
+      --text: #f7f8fb;
+      --muted: #b9c1d0;
+      --line: #313b47;
+      --radius: 8px;
+      --radius-tab: 8px;
+      --radius-dialog: 8px;
+      --gap: 14px;
+      --depth: 0px;
+      --bg: #151a2e;
+      --shell: #101622;
+      --panel: #20283a;
+      --panel-2: #2a3448;
+      --panel-3: #354158;
+      --on-panel: #f7f8fb;
+      --on-color: #111621;
+      --on-action: #111621;
+      --on-menu: #ffffff;
+      --on-select: #111621;
+      --on-range: #111621;
+      --on-danger: #111621;
+      --on-head: #111621;
+      --action: #e8642f;
+      --action-edge: #9f351d;
+      --menu: #2b76b7;
+      --menu-edge: #19456f;
+      --input: #304259;
+      --input-edge: #55b7ff;
+      --select: #ffd64a;
+      --select-edge: #b88319;
+      --range: #6ce27a;
+      --range-edge: #2b8c45;
+      --danger: #ff5b50;
+      --danger-edge: #9c2729;
+      --info: #49b7ff;
+      --dialog: #161d2b;
+      --dialog-head: #ffd64a;
+      --dialog-edge: #0b0f18;
+      --inactive: #748094;
+      --field-text: #f7f8fb;
+    }
+
+    body.theme-pulse {
+      --page: #0d111b;
+      --bg: #151a2e;
+      --shell: #111722;
+      --panel: #20283a;
+      --panel-2: #2b3548;
+      --panel-3: #354158;
+      --line: #43516a;
+      --radius: 0px;
+      --radius-tab: 0px;
+      --radius-dialog: 0px;
+      --gap: 10px;
+      --action: #e85d2a;
+      --action-edge: #8f2f19;
+      --menu: #2a77b9;
+      --menu-edge: #17476f;
+      --input: #2f425b;
+      --input-edge: #58b9ff;
+      --select: #ffd84d;
+      --select-edge: #a66b14;
+      --range: #79df5d;
+      --range-edge: #347b30;
+      --danger: #ff5a4f;
+      --danger-edge: #9a2728;
+      --info: #56b8ff;
+      --dialog: #171d2a;
+      --dialog-head: #ffd84d;
+      --dialog-edge: #080b12;
+      --on-color: #101521;
+      --on-action: #101521;
+      --on-menu: #ffffff;
+      --on-select: #101521;
+      --on-range: #101521;
+      --on-danger: #101521;
+      --on-head: #101521;
+    }
+
+    body.theme-daybreak {
+      --page: #061d19;
+      --bg: #0b2420;
+      --shell: #092a24;
+      --panel: #143a32;
+      --panel-2: #1c4b40;
+      --panel-3: #255d4f;
+      --line: #3a7165;
+      --radius: 4px;
+      --radius-tab: 4px;
+      --radius-dialog: 8px;
+      --gap: 16px;
+      --action: #f7b94c;
+      --action-edge: #9f6421;
+      --menu: #6ee0bc;
+      --menu-edge: #2a8b75;
+      --input: #234d42;
+      --input-edge: #eed08a;
+      --select: #86edc9;
+      --select-edge: #328f74;
+      --range: #58d7e6;
+      --range-edge: #247c87;
+      --danger: #ff7969;
+      --danger-edge: #a13a32;
+      --info: #58d7e6;
+      --dialog: #102f29;
+      --dialog-head: #ff8a6f;
+      --dialog-edge: #061712;
+      --on-color: #101a18;
+      --on-action: #101a18;
+      --on-menu: #101a18;
+      --on-select: #101a18;
+      --on-range: #101a18;
+      --on-danger: #101a18;
+      --on-head: #101a18;
+    }
+
+    body.theme-slate {
+      --page: #0b1117;
+      --bg: #111820;
+      --shell: #101820;
+      --panel: #1a242d;
+      --panel-2: #202d37;
+      --panel-3: #283744;
+      --line: #455666;
+      --radius: 8px;
+      --radius-tab: 8px;
+      --radius-dialog: 12px;
+      --gap: 14px;
+      --action: #2c5268;
+      --action-edge: #173241;
+      --menu: #343b58;
+      --menu-edge: #20243a;
+      --input: #151f28;
+      --input-edge: #67839a;
+      --select: #8bd3ff;
+      --select-edge: #2c6e91;
+      --range: #69bfe8;
+      --range-edge: #245f7e;
+      --danger: #e9787b;
+      --danger-edge: #78333b;
+      --info: #8bd3ff;
+      --dialog: #151e27;
+      --dialog-head: #8bd3ff;
+      --dialog-edge: #080d12;
+      --on-color: #f7f8fb;
+      --on-action: #f7f8fb;
+      --on-menu: #f7f8fb;
+      --on-select: #0d151d;
+      --on-range: #0d151d;
+      --on-danger: #0d151d;
+      --on-head: #0d151d;
+      --field-text: #f7f8fb;
+    }
+
+    body.theme-burst {
+      --page: #170b23;
+      --bg: #20112e;
+      --shell: #21112f;
+      --panel: #301c42;
+      --panel-2: #3b2353;
+      --panel-3: #4b2a6c;
+      --line: #644083;
+      --radius: 12px;
+      --radius-tab: 14px;
+      --radius-dialog: 16px;
+      --gap: 14px;
+      --action: #ffd34d;
+      --action-edge: #a96f11;
+      --menu: #ff5790;
+      --menu-edge: #a52257;
+      --input: #4431a4;
+      --input-edge: #8f83ff;
+      --select: #ff6f4b;
+      --select-edge: #a9311f;
+      --range: #50e8ff;
+      --range-edge: #147e8b;
+      --danger: #ff556b;
+      --danger-edge: #9b2436;
+      --info: #50e8ff;
+      --dialog: #2b173d;
+      --dialog-head: #ff5790;
+      --dialog-edge: #11061b;
+      --on-color: #171012;
+      --on-action: #171012;
+      --on-menu: #171012;
+      --on-select: #171012;
+      --on-range: #171012;
+      --on-danger: #171012;
+      --on-head: #171012;
+    }
+
+    body.theme-bubble {
+      color-scheme: light;
+      --page: #162b55;
+      --text: #17233c;
+      --muted: #52647d;
+      --bg: #1a315b;
+      --shell: #2b67a5;
+      --panel: #fff1dc;
+      --panel-2: #ffdea7;
+      --panel-3: #caecff;
+      --line: #9d7bba;
+      --radius: 24px;
+      --radius-tab: 18px;
+      --radius-dialog: 28px;
+      --gap: 16px;
+      --action: #f34683;
+      --action-edge: #a71f53;
+      --menu: #2eaee9;
+      --menu-edge: #12699b;
+      --input: #f7fbff;
+      --input-edge: #86a9cf;
+      --select: #f34683;
+      --select-edge: #a71f53;
+      --range: #ffc21d;
+      --range-edge: #b17200;
+      --danger: #f34683;
+      --danger-edge: #a71f53;
+      --info: #2eaee9;
+      --dialog: #fff5e8;
+      --dialog-head: #f34683;
+      --dialog-edge: #7a5ca0;
+      --on-color: #ffffff;
+      --field-text: #17233c;
+      --inactive: #7f9abd;
+      --on-action: #ffffff;
+      --on-menu: #ffffff;
+      --on-select: #ffffff;
+      --on-range: #17233c;
+      --on-danger: #ffffff;
+      --on-head: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--page);
+      color: var(--text);
+      font-family: var(--font);
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: color-mix(in srgb, var(--shell), #000 18%);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 240px;
+      margin-right: auto;
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    body.theme-bubble .brand {
+      color: #ffffff;
+    }
+
+    body.theme-slate .brand-mark,
+    body.theme-slate .theme-tab.active,
+    body.theme-slate .mode-button.active,
+    body.theme-slate .tab.active,
+    body.theme-slate .layer-row.active,
+    body.theme-slate .tree-row.selected,
+    body.theme-slate .panel-title,
+    body.theme-slate .tool.yellow,
+    body.theme-slate .tool.green {
+      color: #0d151d;
+    }
+
+    body.theme-pulse .menu-btn,
+    body.theme-pulse .row-pill,
+    body.theme-pulse .dropdown button:hover,
+    body.theme-pulse .tool.blue {
+      color: #ffffff;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: var(--select);
+      color: var(--on-color);
+      box-shadow: 0 var(--depth) 0 var(--select-edge);
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .theme-tab,
+    .mode-button,
+    .ghost-action {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 8px 11px;
+      min-height: 36px;
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .theme-tab:hover,
+    .mode-button:hover,
+    .ghost-action:hover { transform: translateY(-1px); }
+
+    .theme-tab.active,
+    .mode-button.active {
+      background: var(--select);
+      color: var(--on-color);
+      border-color: var(--select-edge);
+      box-shadow: 0 var(--depth) 0 var(--select-edge);
+      font-weight: 800;
+    }
+
+    .page {
+      width: min(1440px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 18px 0 40px;
+    }
+
+    .identity-strip {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) minmax(300px, 0.9fr);
+      gap: var(--gap);
+      margin-bottom: var(--gap);
+    }
+
+    .identity-card,
+    .challenge-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-dialog);
+      background: var(--panel);
+      padding: 16px;
+    }
+
+    body.theme-bubble .identity-card,
+    body.theme-bubble .challenge-card {
+      color: var(--text);
+    }
+
+    .eyebrow {
+      margin: 0 0 7px;
+      color: var(--select);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1;
+      font-weight: 850;
+    }
+
+    h2,
+    h3,
+    p { margin-top: 0; }
+
+    .goal,
+    .challenge-card p {
+      color: var(--muted);
+      margin-bottom: 0;
+      line-height: 1.45;
+    }
+
+    .mock-shell {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-dialog);
+      background: var(--bg);
+    }
+
+    .mock-toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 8px;
+      background: var(--shell);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tool-groups {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .tool {
+      width: 38px;
+      height: 34px;
+      border: 1px solid color-mix(in srgb, currentColor, #000 30%);
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      color: var(--on-color);
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: 0 var(--depth) 0 color-mix(in srgb, currentColor, #000 70%);
+    }
+
+    .tool.blue { background: var(--menu); }
+    .tool.orange { background: var(--action); }
+    .tool.yellow { background: var(--select); }
+    .tool.green { background: var(--range); }
+    .tool.red { background: var(--danger); }
+    .tool.neutral {
+      background: var(--panel-2);
+      color: var(--text);
+    }
+
+    .toolbar-status {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      border-radius: var(--radius);
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      min-height: 680px;
+    }
+
+    .dock {
+      border-right: 1px solid var(--line);
+      background: color-mix(in srgb, var(--shell), var(--bg) 30%);
+      padding: 10px;
+      display: grid;
+      align-content: start;
+      gap: 12px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      align-items: end;
+    }
+
+    .tab {
+      min-height: 34px;
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-tab) var(--radius-tab) 0 0;
+      background: var(--panel-2);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--select);
+      color: var(--on-color);
+      border-color: var(--select-edge);
+      font-weight: 850;
+      box-shadow: 0 var(--depth) 0 var(--select-edge);
+    }
+
+    .layer-list,
+    .inspector,
+    .dialog {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      overflow: hidden;
+    }
+
+    .layer-row,
+    .tree-row {
+      min-height: 42px;
+      display: grid;
+      grid-template-columns: 6px 28px 1fr auto;
+      gap: 9px;
+      align-items: center;
+      padding: 7px 10px 7px 0;
+      border-bottom: 1px solid color-mix(in srgb, var(--line), transparent 40%);
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    .layer-row:last-child,
+    .tree-row:last-child { border-bottom: 0; }
+
+    .layer-row.active {
+      background: var(--select);
+      color: var(--on-color);
+      font-weight: 850;
+    }
+
+    .row-rail { align-self: stretch; background: var(--rail, var(--select)); }
+    .rail-action { --rail: var(--action); }
+    .rail-menu { --rail: var(--menu); }
+    .rail-range { --rail: var(--range); }
+    .rail-danger { --rail: var(--danger); }
+    .rail-select { --rail: var(--select); }
+
+    .row-icon {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: max(2px, calc(var(--radius) * 0.55));
+      background: var(--panel-3);
+      border: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .row-pill {
+      min-height: 26px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      padding: 3px 8px;
+      background: var(--menu);
+      color: var(--on-color);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .shortcut-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 8px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .chip.hot {
+      background: var(--range);
+      color: var(--on-color);
+      border-color: var(--range-edge);
+    }
+
+    .main-area {
+      padding: var(--gap);
+      display: grid;
+      gap: var(--gap);
+      align-content: start;
+      background: var(--bg);
+    }
+
+    .control-rack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+
+    .btn,
+    .menu-btn,
+    .danger-btn {
+      min-height: 40px;
+      border-radius: var(--radius);
+      border: 1px solid var(--action-edge);
+      padding: 9px 14px;
+      background: var(--action);
+      color: var(--on-color);
+      box-shadow: 0 var(--depth) 0 var(--action-edge);
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform 0.12s ease, filter 0.12s ease;
+    }
+
+    .btn:hover,
+    .menu-btn:hover,
+    .danger-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+
+    .btn:active,
+    .menu-btn:active,
+    .danger-btn:active { transform: translateY(1px); box-shadow: none; }
+
+    .menu-wrap { position: relative; }
+
+    .menu-btn {
+      background: var(--menu);
+      border-color: var(--menu-edge);
+      box-shadow: 0 var(--depth) 0 var(--menu-edge);
+    }
+
+    .danger-btn {
+      background: var(--danger);
+      border-color: var(--danger-edge);
+      box-shadow: 0 var(--depth) 0 var(--danger-edge);
+    }
+
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 180px;
+      z-index: 20;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--dialog);
+      overflow: hidden;
+      display: none;
+    }
+
+    .dropdown.open { display: block; }
+
+    .dropdown button {
+      width: 100%;
+      min-height: 36px;
+      border: 0;
+      border-bottom: 1px solid color-mix(in srgb, var(--line), transparent 40%);
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .dropdown button:hover {
+      background: var(--menu);
+      color: var(--on-color);
+    }
+
+    .input-box {
+      min-height: 40px;
+      min-width: min(220px, 100%);
+      border-radius: var(--radius);
+      border: 1px solid var(--input-edge);
+      background: var(--input);
+      color: var(--field-text);
+      padding: 9px 11px;
+      outline: none;
+    }
+
+    .input-box:focus {
+      box-shadow: 0 0 0 2px var(--select);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
+      gap: var(--gap);
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 12px;
+      background: var(--dialog-head);
+      color: var(--on-color);
+      font-weight: 900;
+    }
+
+    .panel-body {
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+    }
+
+    .form-row label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .slider {
+      display: grid;
+      grid-template-columns: 1fr 52px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--range);
+    }
+
+    .progress {
+      height: 18px;
+      border: 1px solid var(--range-edge);
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--range), var(--panel) 78%);
+      overflow: hidden;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: var(--progress, 66%);
+      background: var(--range);
+      box-shadow: 0 var(--depth) 0 var(--range-edge);
+    }
+
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .toggle,
+    .check {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .switch {
+      width: 48px;
+      height: 26px;
+      padding: 3px;
+      border-radius: 999px;
+      background: var(--inactive);
+      border: 1px solid color-mix(in srgb, var(--inactive), #000 20%);
+    }
+
+    .switch::after {
+      content: "";
+      display: block;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--panel);
+      transition: transform 0.15s ease;
+    }
+
+    .toggle.on .switch {
+      background: var(--range);
+      border-color: var(--range-edge);
+    }
+
+    .toggle.on .switch::after {
+      transform: translateX(20px);
+    }
+
+    .box {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: max(2px, calc(var(--radius) * 0.4));
+      border: 2px solid var(--range);
+      background: var(--panel);
+      color: var(--on-color);
+      font-weight: 900;
+    }
+
+    .check.on .box {
+      background: var(--range);
+      border-color: var(--range-edge);
+    }
+
+    .tree-row.selected {
+      background: var(--select);
+      color: var(--on-color);
+      font-weight: 850;
+    }
+
+    .tree-row.muted {
+      opacity: 0.72;
+    }
+
+    .mini-popup {
+      align-self: start;
+      border: 1px solid var(--dialog-edge);
+      border-radius: var(--radius-dialog);
+      background: var(--dialog);
+      overflow: hidden;
+      box-shadow: 0 var(--depth) 0 var(--dialog-edge);
+    }
+
+    .popup-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 4px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 100;
+      min-width: 220px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--dialog);
+      color: var(--text);
+      padding: 10px 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.16s ease, transform 0.16s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    body.raised { --depth: 4px; }
+    body.raised.theme-pulse { --depth: 2px; }
+    body.raised.theme-slate { --depth: 2px; }
+    body.raised.theme-bubble { --depth: 6px; }
+    body.raised.theme-daybreak { --depth: 3px; }
+    body.raised.theme-burst { --depth: 5px; }
+
+    @media (max-width: 980px) {
+      .identity-strip,
+      .workbench,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dock { border-right: 0; border-bottom: 1px solid var(--line); }
+      .form-row { grid-template-columns: 1fr; }
+      .brand { min-width: 100%; }
+    }
+  </style>
+</head>
+<body class="theme-pulse">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">NC</span>
+      <span>NeoCade color identity mockups</span>
+    </div>
+    <button class="theme-tab active" data-theme="pulse">Pulse</button>
+    <button class="theme-tab" data-theme="daybreak">Daybreak</button>
+    <button class="theme-tab" data-theme="slate">Slate</button>
+    <button class="theme-tab" data-theme="burst">Burst</button>
+    <button class="theme-tab" data-theme="bubble">Bubble</button>
+    <button class="mode-button" id="raised-toggle">Raised</button>
+  </header>
+
+  <main class="page">
+    <section class="identity-strip">
+      <article class="identity-card">
+        <p class="eyebrow" id="identity-eyebrow">LDtk-inspired arcade editor taxonomy</p>
+        <h1 id="identity-title">Pulse</h1>
+        <p class="goal" id="identity-goal">Dense, sharp, flat control panel where color separates jobs: actions, tabs, inputs, list selections, toggles, and danger states.</p>
+      </article>
+      <aside class="challenge-card">
+        <p class="eyebrow">What this mockup challenges</p>
+        <p id="identity-challenge">If Pulse still reads as just a navy/green theme, it failed. It must show several default control-family colors without type variations.</p>
+      </aside>
+    </section>
+
+    <section class="mock-shell">
+      <div class="mock-toolbar">
+        <div class="tool-groups" aria-label="Toolbar sample">
+          <span class="tool blue">F</span>
+          <span class="tool blue">P</span>
+          <span class="tool orange">L</span>
+          <span class="tool orange">E</span>
+          <span class="tool yellow">T</span>
+          <span class="tool green">?</span>
+          <span class="tool red">!</span>
+          <span class="tool neutral">S</span>
+        </div>
+        <div class="toolbar-status"><span id="status-dot">Ready</span></div>
+      </div>
+
+      <div class="workbench">
+        <aside class="dock">
+          <nav class="tabs" aria-label="Tab sample">
+            <button class="tab active" data-preview-tab="layers">Layers</button>
+            <button class="tab" data-preview-tab="theme">Theme</button>
+            <button class="tab" data-preview-tab="output">Output</button>
+          </nav>
+
+          <div class="layer-list" id="layers-panel">
+            <div class="layer-row active">
+              <span class="row-rail rail-select"></span>
+              <span class="row-icon">1</span>
+              <span id="row-one">Entities</span>
+              <span class="row-pill">ON</span>
+            </div>
+            <div class="layer-row">
+              <span class="row-rail rail-menu"></span>
+              <span class="row-icon">2</span>
+              <span>Collisions</span>
+              <span class="row-pill">Rules</span>
+            </div>
+            <div class="layer-row">
+              <span class="row-rail rail-range"></span>
+              <span class="row-icon">3</span>
+              <span>Water</span>
+              <span class="row-pill">Map</span>
+            </div>
+          </div>
+
+          <div class="shortcut-row">
+            <span class="chip hot">Alt Pick</span>
+            <span class="chip">Ctrl Copy</span>
+            <span class="chip">Shift Paint</span>
+          </div>
+
+          <div class="layer-list">
+            <div class="tree-row selected">
+              <span class="row-rail rail-select"></span>
+              <span class="row-icon">A</span>
+              <span>Selected row</span>
+              <span class="row-pill">Edit</span>
+            </div>
+            <div class="tree-row">
+              <span class="row-rail rail-menu"></span>
+              <span class="row-icon">B</span>
+              <span>Input family</span>
+              <span></span>
+            </div>
+            <div class="tree-row">
+              <span class="row-rail rail-action"></span>
+              <span class="row-icon">C</span>
+              <span>Action family</span>
+              <span></span>
+            </div>
+            <div class="tree-row muted">
+              <span class="row-rail"></span>
+              <span class="row-icon">D</span>
+              <span>Disabled item</span>
+              <span></span>
+            </div>
+          </div>
+        </aside>
+
+        <section class="main-area">
+          <div class="control-rack">
+            <button class="btn" data-toast="Default Button clicked">Default Button</button>
+            <div class="menu-wrap">
+              <button class="menu-btn" id="menu-button">Option Button</button>
+              <div class="dropdown" id="dropdown">
+                <button data-choice="Default">Default</button>
+                <button data-choice="Compact">Compact</button>
+                <button data-choice="Mobile">Mobile</button>
+              </div>
+            </div>
+            <button class="danger-btn" data-toast="Danger action previewed">Danger Button</button>
+            <input class="input-box" id="search-input" value="Default LineEdit">
+          </div>
+
+          <div class="grid">
+            <div class="inspector">
+              <div class="panel-title">
+                <span>Default Controls</span>
+                <span id="choice-label">Default</span>
+              </div>
+              <div class="panel-body">
+                <div class="form-row">
+                  <label for="name-input">LineEdit</label>
+                  <input class="input-box" id="name-input" value="NeoCadeTheme">
+                </div>
+                <div class="form-row">
+                  <label for="mode-input">TextEdit</label>
+                  <input class="input-box" id="mode-input" value="No variations required">
+                </div>
+                <div class="form-row">
+                  <label>Slider</label>
+                  <div class="slider">
+                    <input type="range" id="range" min="0" max="100" value="66">
+                    <output id="range-value">66%</output>
+                  </div>
+                </div>
+                <div class="progress" aria-label="Progress sample"><span id="progress-fill"></span></div>
+                <div class="toggle-row">
+                  <span class="toggle on" id="switch-one"><span class="switch"></span><span>Toggle</span></span>
+                  <span class="check on" id="check-one"><span class="box">OK</span><span>CheckBox</span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mini-popup">
+              <div class="panel-title">
+                <span>Popup / Dialog</span>
+                <span>Theme</span>
+              </div>
+              <div class="panel-body">
+                <p class="goal" id="dialog-copy">Dark solid shell, colored category header, and controls that use several families by default.</p>
+                <div class="layer-list" id="filter-list">
+                  <div class="tree-row selected" data-filter-item>
+                    <span class="row-rail rail-select"></span>
+                    <span class="row-icon">S</span>
+                    <span>Selected menu item</span>
+                    <span></span>
+                  </div>
+                  <div class="tree-row" data-filter-item>
+                    <span class="row-rail rail-range"></span>
+                    <span class="row-icon">P</span>
+                    <span>Progress role</span>
+                    <span></span>
+                  </div>
+                  <div class="tree-row" data-filter-item>
+                    <span class="row-rail rail-danger"></span>
+                    <span class="row-icon">D</span>
+                    <span>Danger role</span>
+                    <span></span>
+                  </div>
+                </div>
+                <div class="popup-actions">
+                  <button class="btn" data-toast="Saved">Save</button>
+                  <button class="menu-btn" data-toast="Secondary action">Secondary</button>
+                  <button class="danger-btn" data-toast="Removed">Remove</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast">Ready</div>
+
+  <script>
+    const identities = {
+      pulse: {
+        eyebrow: "LDtk-inspired arcade editor taxonomy",
+        title: "Pulse",
+        goal: "Dense, sharp, flat control panel where color separates jobs: actions, tabs, inputs, list selections, toggles, and danger states.",
+        challenge: "If Pulse still reads as just a navy/green theme, it failed. It must show several default control-family colors without type variations.",
+        dialog: "A Pulse dialog should feel like a workbench panel: dark shell, yellow category header, orange actions, blue menus, and green status controls."
+      },
+      daybreak: {
+        eyebrow: "Fresh morning community lobby",
+        title: "Daybreak",
+        goal: "Warm, clean, social UI on dark pine/teal surfaces with amber actions, mint navigation, coral highlights, and aqua feedback.",
+        challenge: "If Daybreak feels like Boardwalk Sunset returning as brown/orange nostalgia, it failed. It should feel fresh, not old-fashioned.",
+        dialog: "A Daybreak dialog should feel like a bright kiosk at dawn: amber action, mint selection, coral header, teal panels, and soft readable rhythm."
+      },
+      slate: {
+        eyebrow: "Premium futuristic utility",
+        title: "Slate",
+        goal: "Calm, precise, professional controls with graphite surfaces, icy blue action, steel/lavender secondary roles, and mint/amber semantics.",
+        challenge: "If Slate is only generic dark mode with blue focus rings, it failed. It needs restraint plus a real cool role palette.",
+        dialog: "A Slate dialog should feel like a precise utility panel: cool graphite, quiet blue action, steel menu chrome, and low-drama selected rows."
+      },
+      burst: {
+        eyebrow: "MD3 Expressive celebration and reward",
+        title: "Burst",
+        goal: "High-energy event UI with gold actions, coral/pink navigation, violet inputs, cyan/lime progress, and strong familiar structure.",
+        challenge: "If Burst becomes random rainbow or Bubble painted purple, it failed. Expressive color must guide attention, not scatter it.",
+        dialog: "A Burst dialog should feel like a reward moment: bright header, gold action, coral selection, violet controls, and cyan/lime progress."
+      },
+      bubble: {
+        eyebrow: "Flat 3D mobile game UI",
+        title: "Bubble",
+        goal: "Chunky, touch-first, candy-colored UI with cream/sky panels, pink and blue actions, yellow rewards, and green confirms.",
+        challenge: "If Bubble stays dark berry plus pink accent, it failed. This test intentionally uses light islands inside a dark shell to see if the reference can land.",
+        dialog: "A Bubble dialog should feel like a mobile game panel: cream body, pink header, blue secondary buttons, yellow rewards, and green confirmation states."
+      }
+    };
+
+    const body = document.body;
+    const toast = document.getElementById("toast");
+
+    function setTheme(name) {
+      body.classList.remove("theme-pulse", "theme-daybreak", "theme-slate", "theme-burst", "theme-bubble");
+      body.classList.add("theme-" + name);
+      document.querySelectorAll(".theme-tab").forEach(button => {
+        button.classList.toggle("active", button.dataset.theme === name);
+      });
+      const data = identities[name];
+      document.getElementById("identity-eyebrow").textContent = data.eyebrow;
+      document.getElementById("identity-title").textContent = data.title;
+      document.getElementById("identity-goal").textContent = data.goal;
+      document.getElementById("identity-challenge").textContent = data.challenge;
+      document.getElementById("dialog-copy").textContent = data.dialog;
+      document.getElementById("status-dot").textContent = data.title + " preview";
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 1200);
+    }
+
+    document.querySelectorAll(".theme-tab").forEach(button => {
+      button.addEventListener("click", () => setTheme(button.dataset.theme));
+    });
+
+    document.getElementById("raised-toggle").addEventListener("click", event => {
+      body.classList.toggle("raised");
+      event.currentTarget.classList.toggle("active", body.classList.contains("raised"));
+    });
+
+    document.querySelectorAll("[data-toast]").forEach(button => {
+      button.addEventListener("click", () => showToast(button.dataset.toast));
+    });
+
+    const dropdown = document.getElementById("dropdown");
+    document.getElementById("menu-button").addEventListener("click", () => {
+      dropdown.classList.toggle("open");
+    });
+    dropdown.querySelectorAll("button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.getElementById("choice-label").textContent = button.dataset.choice;
+        dropdown.classList.remove("open");
+        showToast("Option selected: " + button.dataset.choice);
+      });
+    });
+
+    document.querySelectorAll("[data-preview-tab]").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll("[data-preview-tab]").forEach(item => item.classList.remove("active"));
+        tab.classList.add("active");
+        showToast("Preview tab: " + tab.textContent);
+      });
+    });
+
+    const range = document.getElementById("range");
+    const rangeValue = document.getElementById("range-value");
+    const progressFill = document.getElementById("progress-fill");
+    range.addEventListener("input", () => {
+      rangeValue.textContent = range.value + "%";
+      progressFill.style.setProperty("--progress", range.value + "%");
+    });
+
+    document.querySelectorAll(".toggle, .check").forEach(control => {
+      control.addEventListener("click", () => control.classList.toggle("on"));
+    });
+
+    const searchInput = document.getElementById("search-input");
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.toLowerCase();
+      document.querySelectorAll("[data-filter-item]").forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(query) || query.length < 3 ? "" : "none";
+      });
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const initialTheme = identities[params.get("theme")] ? params.get("theme") : "pulse";
+    setTheme(initialTheme);
+    if (params.get("raised") === "1") {
+      body.classList.add("raised");
+      document.getElementById("raised-toggle").classList.add("active");
+    }
+  </script>
+</body>
+</html>

@@ -388,6 +388,10 @@ This is the proposed "no variations required" mapping. Exact values should be te
 
 Before changing production code, create Godot-feasible mockups.
 
+Current first-pass artifact:
+
+- `.planning/mockups/color-identity/theme-color-identity-mockups.html`
+
 1. Finalize this research doc with user edits.
 2. Build a scratch mockup pack under `.planning/mockups/color-identity/`.
 3. Use the same control families NeoCade styles today: buttons, option buttons, line edits, text edits, tab bars, lists, trees, sliders, progress bars, checkboxes, radio buttons, popup/menu states, and dialogs.
