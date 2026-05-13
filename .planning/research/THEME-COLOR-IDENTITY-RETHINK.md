@@ -1,7 +1,7 @@
 # Theme Color Identity Rethink
 
 Date: 2026-05-13
-Status: research and planning draft
+Status: research plus approval-gate mockup draft
 Scope: built-in theme color identity, default control mappings, and pre-implementation mockup plan.
 
 ## Why This Exists
@@ -450,9 +450,21 @@ Required before implementation:
 
 Before changing production code, create Godot-feasible mockups.
 
-Current first-pass artifact:
+Current artifacts:
 
 - `.planning/mockups/color-identity/theme-color-identity-mockups.html`
+- `.planning/mockups/color-identity/theme-color-identity-approval-gate.html`
+
+The first file is the experiential sketch. The approval-gate file is the stricter review artifact and should be used for the implementation decision because it includes:
+
+- Current base/accent comparison against proposed authored roles.
+- Side-by-side cards for all five built-in themes.
+- Default-control examples only: Button, OptionButton/MenuButton, LineEdit, TabBar, ItemList/Tree rows, Progress/Slider, CheckBox/CheckButton, Popup/Dialog.
+- Flat raised-offset examples using solid darker lower edges.
+- Desktop and mobile density samples.
+- Visible state samples for normal, hover, pressed, disabled, selected, checked, and danger.
+- Contrast badges for the proposed role foreground/background pairs.
+- Labels mapping visual roles to real Godot Theme slots and internal component aliases.
 
 1. Finalize this research doc with user edits.
 2. Build a scratch mockup pack under `.planning/mockups/color-identity/`.
@@ -470,6 +482,26 @@ Current first-pass artifact:
    - Does any style rely on textures, patterns, gradients on chrome, or pixel art?
 8. After approval, update production token generation and binding table mappings.
 9. Update `DESIGN_TOKENS.md`, `THEME-DIRECTIONS.md`, and showcase notes to match the approved direction.
+
+## Approval-Gate Mockup Findings
+
+The approval-gate mockup currently supports the direction, with caveats.
+
+Findings:
+
+- Pulse reads much closer to the LDtk reference when default control families are separated: amber actions, blue menus, yellow selection, green range/status, dark blue inputs, and red only for danger.
+- Daybreak gains a clearer identity as pine/teal plus amber/mint/aqua. It still needs amber to remain visible in production so it does not collapse into "green Slate."
+- Slate can stay restrained without becoming generic if icy action/select roles, steel menu roles, graphite inputs, and mint/amber semantic states are all authored separately.
+- Burst reads distinct from Bubble when gold is the action role, violet is the menu/navigation family, cyan is selection, and lime is range/status.
+- Bubble only becomes faithful to the mobile-game reference when cream/sky panels and a blue action family are allowed. This requires shell-local and component-local foreground roles; a single global dark-theme text color is not enough.
+- The proposed role foreground/background pairs pass AA contrast in the current mockup data. A local contrast audit found the lowest proposed role pair at 4.73:1 (`Pulse.menu`), above the 4.5:1 target.
+- A rendered Chromium smoke test succeeded for the approval-gate file. The Codex in-app browser tool could not launch because its configured Chrome path is missing, so verification used the locally installed Playwright Chromium instead.
+
+Remaining caveats:
+
+- The HTML is still a target mockup, not production proof. Implementation must replace CSS layout conveniences with actual Godot `Theme` slots, styleboxes, constants, icon modulation, and generated textures.
+- Hover and pressed states in production should be authored or deterministically derived as explicit colors, not CSS brightness/filter effects.
+- Bubble's light islands are a product decision, not just an implementation detail. Approving this mockup approves that exception to the older dark-first interpretation.
 
 ## Implementation Direction After Mockup Approval
 

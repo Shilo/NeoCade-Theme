@@ -1,0 +1,1089 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NeoCade Color Identity Approval Gate</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #0d1118;
+      --ink: #f7f8fb;
+      --muted: #b7bfcd;
+      --line: #2d3744;
+      --panel: #151b24;
+      --panel-2: #1d2530;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "Cascadia Mono", "JetBrains Mono", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: var(--font);
+      letter-spacing: 0;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    button,
+    input {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    .masthead {
+      display: grid;
+      gap: 18px;
+      padding: 28px clamp(18px, 4vw, 48px);
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      width: 100vw;
+      max-width: 100vw;
+      min-width: 0;
+    }
+
+    .masthead h1 {
+      margin: 0;
+      max-width: 980px;
+      font-size: clamp(28px, 5vw, 56px);
+      line-height: 0.96;
+      overflow-wrap: anywhere;
+    }
+
+    .masthead p {
+      margin: 0;
+      max-width: 1020px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .meta-strip,
+    .jump-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-width: 0;
+      max-width: 100%;
+      min-height: 30px;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 750;
+      text-transform: uppercase;
+      overflow-wrap: anywhere;
+      white-space: normal;
+      line-height: 1.2;
+    }
+
+    .jump-strip a {
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    main {
+      display: grid;
+      gap: 28px;
+      padding: 28px clamp(18px, 4vw, 48px) 52px;
+      width: 100vw;
+      max-width: 100vw;
+      min-width: 0;
+    }
+
+    .section {
+      display: grid;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .section h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .section p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(320px, 1fr));
+      gap: 16px;
+      align-items: start;
+      overflow-x: auto;
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      padding-bottom: 6px;
+    }
+
+    .theme-card {
+      min-width: 320px;
+      border: 1px solid var(--c-line);
+      border-radius: var(--c-radius);
+      background: var(--c-surface);
+      color: var(--c-text);
+      overflow: hidden;
+    }
+
+    .theme-head {
+      display: grid;
+      gap: 8px;
+      padding: 16px;
+      border-bottom: 1px solid var(--c-line);
+      background: var(--c-shell);
+      color: var(--shell-text);
+    }
+
+    .theme-head h3 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1;
+    }
+
+    .theme-head p {
+      margin: 0;
+      color: var(--shell-muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 12px;
+      border-bottom: 1px solid var(--c-line);
+      background: var(--c-panel);
+    }
+
+    .compare-box {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+      min-height: 154px;
+      border: 1px solid var(--c-line);
+      border-radius: calc(var(--c-radius) * 0.7);
+      padding: 10px;
+      background: var(--c-panel-2);
+    }
+
+    .compare-box h4,
+    .preview-title h4,
+    .mapping-card h4 {
+      margin: 0;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--c-muted);
+    }
+
+    .current-button {
+      display: grid;
+      align-content: center;
+      min-height: 38px;
+      border: 1px solid var(--current-line);
+      border-bottom: 3px solid var(--current-accent);
+      border-radius: calc(var(--c-radius) * 0.55);
+      background: var(--current-fill);
+      color: var(--c-text);
+      padding: 7px 9px;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .current-note {
+      color: var(--c-muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+
+    .swatch {
+      display: grid;
+      gap: 2px;
+      min-height: 38px;
+      border: 1px solid rgb(0 0 0 / 0.28);
+      border-radius: calc(var(--c-radius) * 0.45);
+      padding: 5px;
+      background: var(--swatch-bg);
+      color: var(--swatch-fg);
+      font-size: 10px;
+      line-height: 1;
+    }
+
+    .contrast-badge {
+      justify-self: start;
+      border-radius: 999px;
+      padding: 2px 5px;
+      background: rgb(0 0 0 / 0.18);
+      color: inherit;
+      font-family: var(--mono);
+      font-size: 9px;
+    }
+
+    .theme-body {
+      display: grid;
+      gap: 12px;
+      padding: 12px;
+      background: var(--c-panel);
+    }
+
+    .preview-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .slot {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 3px 6px;
+      border: 1px solid var(--c-line);
+      border-radius: 6px;
+      color: var(--c-muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sample {
+      display: grid;
+      gap: 9px;
+      padding: 10px;
+      border: 1px solid var(--c-line);
+      border-radius: calc(var(--c-radius) * 0.8);
+      background: var(--c-surface);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+    }
+
+    .tool {
+      display: grid;
+      place-items: center;
+      min-height: 26px;
+      border-radius: calc(var(--c-radius) * 0.45);
+      background: var(--tool-bg);
+      color: var(--tool-fg);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .ui-button,
+    .ui-option,
+    .ui-danger,
+    .ui-state {
+      min-height: 38px;
+      border: 0;
+      border-radius: calc(var(--c-radius) * 0.65);
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 850;
+      text-align: center;
+    }
+
+    .ui-button {
+      background: var(--role-action);
+      color: var(--on-action);
+      box-shadow: 0 var(--flat-depth) 0 var(--edge-action);
+    }
+
+    .ui-option {
+      background: var(--role-menu);
+      color: var(--on-menu);
+      box-shadow: 0 var(--flat-depth) 0 var(--edge-menu);
+    }
+
+    .ui-danger {
+      background: var(--role-danger);
+      color: var(--on-danger);
+      box-shadow: 0 var(--flat-depth) 0 var(--edge-danger);
+    }
+
+    .ui-state.hover {
+      background: var(--state-hover);
+      color: var(--on-action);
+    }
+
+    .ui-state.pressed {
+      background: var(--state-pressed);
+      color: var(--on-action);
+    }
+
+    .ui-state.disabled {
+      background: var(--state-disabled);
+      color: var(--state-disabled-fg);
+    }
+
+    .input {
+      display: grid;
+      align-content: center;
+      min-height: 38px;
+      border: 1px solid var(--edge-input);
+      border-radius: calc(var(--c-radius) * 0.55);
+      background: var(--role-input);
+      color: var(--on-input);
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+
+    .tab {
+      min-height: 32px;
+      border-radius: var(--tab-radius);
+      padding: 7px 8px;
+      background: var(--c-panel-2);
+      color: var(--c-muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .tab.active {
+      background: var(--role-select);
+      color: var(--on-select);
+      box-shadow: inset 0 -3px 0 var(--edge-select);
+    }
+
+    .list {
+      display: grid;
+      gap: 4px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 5px 24px 1fr;
+      gap: 8px;
+      align-items: center;
+      min-height: 34px;
+      border-radius: calc(var(--c-radius) * 0.5);
+      background: var(--c-panel-2);
+      color: var(--c-text);
+      overflow: hidden;
+      font-size: 12px;
+    }
+
+    .row.selected {
+      background: var(--role-select);
+      color: var(--on-select);
+    }
+
+    .row.disabled {
+      color: var(--state-disabled-fg);
+    }
+
+    .rail {
+      width: 100%;
+      height: 100%;
+      background: var(--role-menu);
+    }
+
+    .row.selected .rail {
+      background: var(--edge-select);
+    }
+
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: calc(var(--c-radius) * 0.35);
+      background: var(--role-input);
+      color: var(--on-input);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .range {
+      display: grid;
+      gap: 5px;
+    }
+
+    .track {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--c-panel-2);
+      overflow: hidden;
+    }
+
+    .track span {
+      display: block;
+      width: 68%;
+      height: 100%;
+      background: var(--role-range);
+      box-shadow: inset 0 -2px 0 var(--edge-range);
+    }
+
+    .toggle-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 32px;
+      border-radius: calc(var(--c-radius) * 0.55);
+      padding: 5px 8px;
+      background: var(--c-panel-2);
+      color: var(--c-text);
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .box {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: calc(var(--c-radius) * 0.35);
+      background: var(--role-range);
+      color: var(--on-range);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .dialog {
+      overflow: hidden;
+      border: 1px solid var(--c-line);
+      border-radius: var(--dialog-radius);
+      background: var(--dialog-bg);
+      color: var(--dialog-fg);
+      box-shadow: 0 var(--flat-depth) 0 var(--dialog-edge);
+    }
+
+    .dialog-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 36px;
+      padding: 8px 10px;
+      background: var(--dialog-head);
+      color: var(--on-head);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .dialog-body {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .mobile {
+      display: grid;
+      gap: 8px;
+      max-width: 210px;
+      min-height: 280px;
+      margin: 0 auto;
+      border: 5px solid var(--c-shell);
+      border-radius: calc(var(--c-radius) + 14px);
+      padding: 12px;
+      background: var(--mobile-bg);
+    }
+
+    .mobile-title {
+      min-height: 34px;
+      border-radius: calc(var(--c-radius) * 0.75);
+      background: var(--dialog-head);
+      color: var(--on-head);
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .mobile .ui-button,
+    .mobile .ui-option {
+      min-height: 46px;
+      font-size: 13px;
+    }
+
+    .mapping-card {
+      display: grid;
+      gap: 8px;
+      border: 1px solid var(--c-line);
+      border-radius: calc(var(--c-radius) * 0.8);
+      padding: 10px;
+      background: var(--c-surface);
+    }
+
+    .mapping-list {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .mapping-list li {
+      display: grid;
+      gap: 2px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--c-line);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .mapping-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .mapping-list code,
+    .slot-matrix code {
+      color: var(--c-text);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .gate-grid,
+    .slot-matrix {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .gate-card,
+    .slot-matrix article {
+      display: grid;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--panel);
+    }
+
+    .gate-card h3,
+    .slot-matrix h3 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .gate-card p,
+    .slot-matrix p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 980px) {
+      .theme-grid {
+        grid-template-columns: minmax(0, 1fr);
+        overflow: visible;
+      }
+
+      .theme-card {
+        min-width: 0;
+      }
+
+      .swatches {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .compare,
+      .control-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="meta-strip">
+      <span class="pill">Approval gate</span>
+      <span class="pill">Default controls only</span>
+      <span class="pill">Godot Theme feasible</span>
+      <span class="pill">No red for ordinary actions</span>
+    </div>
+    <h1>NeoCade built-in style color identity</h1>
+    <p>This board tests whether Pulse, Daybreak, Slate, Burst, and Bubble can feel distinct out of the box without requiring Button variations or custom control variations. Every visible move below must map to normal Godot Theme slots.</p>
+    <nav class="jump-strip" aria-label="Sections">
+      <a class="pill" href="#themes">All themes</a>
+      <a class="pill" href="#slots">Slot map</a>
+      <a class="pill" href="#gates">Decision gates</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="section" id="themes">
+      <h2>Current vs Proposed</h2>
+      <p>The first comparison block in each card shows the current base/accent problem: default chrome mostly comes from base-derived surfaces. The second block shows the proposed role palette: default Button, OptionButton/MenuButton, inputs, selected rows/tabs, range controls, dialogs, and danger all get authored roles.</p>
+      <div class="theme-grid" id="theme-grid"></div>
+    </section>
+
+    <section class="section" id="slots">
+      <h2>Godot Slot Map</h2>
+      <p>These are the implementation targets the mockup is allowed to use. If a visual move cannot be expressed through these Theme items, it does not belong in the default out-of-box contract.</p>
+      <div class="slot-matrix">
+        <article>
+          <h3>Default action</h3>
+          <p><code>Button.normal</code>, <code>Button.hover</code>, <code>Button.pressed</code>, <code>Button.disabled</code>, plus font and icon colors. This is the biggest behavioral change.</p>
+        </article>
+        <article>
+          <h3>Menus and popups</h3>
+          <p><code>OptionButton.normal</code>, <code>MenuButton</code> inherited Button slots, <code>PopupMenu.panel</code>, <code>PopupMenu.hover</code>, check/radio icon modulation.</p>
+        </article>
+        <article>
+          <h3>Inputs</h3>
+          <p><code>LineEdit.normal</code>, <code>LineEdit.focus</code>, <code>TextEdit.normal</code>, <code>SpinBox.normal</code>, caret color, selection color, and field font color.</p>
+        </article>
+        <article>
+          <h3>Navigation and rows</h3>
+          <p><code>TabBar.tab_selected</code>, <code>TabBar.tab_hovered</code>, <code>ItemList.selected</code>, <code>Tree.selected</code>, row hover, guide colors, and selected text colors.</p>
+        </article>
+        <article>
+          <h3>Range and toggles</h3>
+          <p><code>ProgressBar.fill</code>, slider track and grabber items, scrollbar grabbers, <code>CheckBox.checkbox_checked_color</code>, <code>CheckButton.button_checked_color</code>.</p>
+        </article>
+        <article>
+          <h3>Dialogs and raised mode</h3>
+          <p><code>PopupPanel.panel</code>, embedded <code>Window</code> borders, dialog content margins, and solid bottom offset colors. No shadows, textures, or gradient chrome.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="gates">
+      <h2>Decision Gates Before Implementation</h2>
+      <div class="gate-grid">
+        <article class="gate-card">
+          <h3>Supersede old palette lock</h3>
+          <p><code>DESIGN_TOKENS.md</code> currently says built-ins must not be recolored or rederived. Approval of this board means that lock must be replaced by authored role palettes per style.</p>
+        </article>
+        <article class="gate-card">
+          <h3>Allow Bubble light islands</h3>
+          <p>Bubble only hits the mobile-game reference if cream/sky panels are allowed inside a dark outer shell. Rejecting light islands means Bubble needs a different, less faithful identity.</p>
+        </article>
+        <article class="gate-card">
+          <h3>Keep base plus accent exports</h3>
+          <p>The public API should stay stable for v1. Built-ins get hidden authored role palettes; <code>CUSTOM</code> derives roles from <code>base_color</code> and <code>accent_color</code>.</p>
+        </article>
+        <article class="gate-card">
+          <h3>Default Button becomes colored</h3>
+          <p>If ordinary <code>Button</code> stays base-derived, the root problem survives. Semantic variations remain useful extras, but identity must exist without them.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const currentPalettes = {
+      pulse: { base: "#151A2E", accent: "#8BFF6A" },
+      daybreak: { base: "#0B2420", accent: "#76F2D1" },
+      slate: { base: "#111820", accent: "#8BD3FF" },
+      burst: { base: "#20112E", accent: "#FFD166" },
+      bubble: { base: "#241326", accent: "#FFB3E6" }
+    };
+
+    const themes = [
+      {
+        id: "pulse",
+        name: "Pulse",
+        goal: "LDtk-inspired flat arcade editor taxonomy.",
+        fail: "Fails if it still reads as navy plus green accent.",
+        radius: 0,
+        tabRadius: 0,
+        dialogRadius: 0,
+        depth: 2,
+        surface: "#151a2e",
+        shell: "#101622",
+        panel: "#20283a",
+        panel2: "#2b3548",
+        mobile: "#171d2a",
+        line: "#43516a",
+        text: "#f7f8fb",
+        muted: "#b9c1d0",
+        action: ["#eeb23d", "#101521", "#965b12"],
+        menu: ["#2a77b9", "#ffffff", "#17476f"],
+        input: ["#2f425b", "#f7f8fb", "#58b9ff"],
+        select: ["#ffd84d", "#101521", "#a66b14"],
+        range: ["#79df5d", "#101521", "#347b30"],
+        danger: ["#bf3442", "#ffffff", "#78202a"],
+        head: ["#ffd84d", "#101521", "#a66b14"],
+        dialog: ["#171d2a", "#f7f8fb", "#080b12"]
+      },
+      {
+        id: "daybreak",
+        name: "Daybreak",
+        goal: "Fresh morning community lobby translated to dark teal.",
+        fail: "Fails if it becomes brown, nostalgic, or Boardwalk-like.",
+        radius: 4,
+        tabRadius: 4,
+        dialogRadius: 8,
+        depth: 3,
+        surface: "#0b2420",
+        shell: "#092a24",
+        panel: "#143a32",
+        panel2: "#1c4b40",
+        mobile: "#102f29",
+        line: "#3a7165",
+        text: "#f7fff8",
+        muted: "#b6d7cf",
+        action: ["#f3bf5d", "#101a18", "#9f6421"],
+        menu: ["#65daba", "#101a18", "#2a8b75"],
+        input: ["#234d42", "#f7fff8", "#e2c37a"],
+        select: ["#8ff0ce", "#101a18", "#328f74"],
+        range: ["#58d7e6", "#101a18", "#247c87"],
+        danger: ["#b83a45", "#ffffff", "#78202a"],
+        head: ["#f3bf5d", "#101a18", "#9f6421"],
+        dialog: ["#102f29", "#f7fff8", "#061712"]
+      },
+      {
+        id: "slate",
+        name: "Slate",
+        goal: "Premium futuristic utility with slight iOS calm.",
+        fail: "Fails if it is just generic dark mode with blue focus.",
+        radius: 8,
+        tabRadius: 8,
+        dialogRadius: 12,
+        depth: 2,
+        surface: "#111820",
+        shell: "#101820",
+        panel: "#1a242d",
+        panel2: "#202d37",
+        mobile: "#151e27",
+        line: "#455666",
+        text: "#f7f8fb",
+        muted: "#b8c2cc",
+        action: ["#6ea7c8", "#0b1117", "#2d617f"],
+        menu: ["#424967", "#ffffff", "#252a40"],
+        input: ["#151f28", "#f7f8fb", "#67839a"],
+        select: ["#8bd3ff", "#0d151d", "#2c6e91"],
+        range: ["#69bfe8", "#0d151d", "#245f7e"],
+        danger: ["#b94a56", "#ffffff", "#742a35"],
+        head: ["#8bd3ff", "#0d151d", "#2c6e91"],
+        dialog: ["#151e27", "#f7f8fb", "#080d12"]
+      },
+      {
+        id: "burst",
+        name: "Burst",
+        goal: "MD3 Expressive celebration and reward UI.",
+        fail: "Fails if color becomes random or Bubble painted purple.",
+        radius: 12,
+        tabRadius: 14,
+        dialogRadius: 16,
+        depth: 5,
+        surface: "#20112e",
+        shell: "#21112f",
+        panel: "#301c42",
+        panel2: "#3b2353",
+        mobile: "#2b173d",
+        line: "#644083",
+        text: "#fbf7ff",
+        muted: "#d0bee0",
+        action: ["#ffd34d", "#171012", "#a96f11"],
+        menu: ["#9b72ff", "#171012", "#5735a0"],
+        input: ["#4431a4", "#ffffff", "#8f83ff"],
+        select: ["#43e6ff", "#171012", "#157d92"],
+        range: ["#94f05c", "#171012", "#4d8f25"],
+        danger: ["#c92849", "#ffffff", "#7c1930"],
+        head: ["#9b72ff", "#171012", "#5735a0"],
+        dialog: ["#2b173d", "#fbf7ff", "#11061b"]
+      },
+      {
+        id: "bubble",
+        name: "Bubble",
+        goal: "Flat 3D mobile-game UI with dark shell and light islands.",
+        fail: "Fails if it stays dark berry plus pink accent only.",
+        radius: 24,
+        tabRadius: 18,
+        dialogRadius: 28,
+        depth: 6,
+        surface: "#1a315b",
+        shell: "#2b67a5",
+        panel: "#fff1dc",
+        panel2: "#ffdea7",
+        mobile: "#caecff",
+        line: "#9d7bba",
+        text: "#17233c",
+        muted: "#52647d",
+        action: ["#2eaee9", "#17233c", "#12699b"],
+        menu: ["#967cff", "#17233c", "#6447bd"],
+        input: ["#f7fbff", "#17233c", "#86a9cf"],
+        select: ["#ffc21d", "#17233c", "#b17200"],
+        range: ["#45d96a", "#17233c", "#1f8a3b"],
+        danger: ["#c62842", "#ffffff", "#821626"],
+        head: ["#967cff", "#17233c", "#6447bd"],
+        dialog: ["#fff5e8", "#17233c", "#6447bd"]
+      }
+    ];
+
+    function hexToRgb(hex) {
+      const value = hex.replace("#", "");
+      return {
+        r: parseInt(value.slice(0, 2), 16),
+        g: parseInt(value.slice(2, 4), 16),
+        b: parseInt(value.slice(4, 6), 16)
+      };
+    }
+
+    function rgbToHex(rgb) {
+      const part = value => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, "0");
+      return "#" + part(rgb.r) + part(rgb.g) + part(rgb.b);
+    }
+
+    function mix(a, b, amount) {
+      const ca = hexToRgb(a);
+      const cb = hexToRgb(b);
+      return rgbToHex({
+        r: ca.r + (cb.r - ca.r) * amount,
+        g: ca.g + (cb.g - ca.g) * amount,
+        b: ca.b + (cb.b - ca.b) * amount
+      });
+    }
+
+    function luminance(hex) {
+      const rgb = hexToRgb(hex);
+      const channel = value => {
+        const s = value / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      return 0.2126 * channel(rgb.r) + 0.7152 * channel(rgb.g) + 0.0722 * channel(rgb.b);
+    }
+
+    function contrast(a, b) {
+      const l1 = luminance(a);
+      const l2 = luminance(b);
+      const high = Math.max(l1, l2);
+      const low = Math.min(l1, l2);
+      return (high + 0.05) / (low + 0.05);
+    }
+
+    function roleStyle(name, role) {
+      const ratio = contrast(role[0], role[1]);
+      const label = ratio >= 4.5 ? "AA" : "LOW";
+      return `<div class="swatch" style="--swatch-bg:${role[0]};--swatch-fg:${role[1]}">
+        <strong>${name}</strong>
+        <span class="contrast-badge">${ratio.toFixed(1)} ${label}</span>
+      </div>`;
+    }
+
+    function vars(theme) {
+      const stateHover = mix(theme.action[0], "#ffffff", theme.id === "bubble" ? 0.08 : 0.1);
+      const statePressed = mix(theme.action[0], "#000000", theme.id === "bubble" ? 0.18 : 0.16);
+      const stateDisabled = mix(theme.panel2, theme.surface, 0.52);
+      const current = currentPalettes[theme.id];
+      const currentFill = mix(current.base, "#ffffff", 0.12);
+      const shellText = contrast(theme.shell, theme.text) >= 4.5 ? theme.text : "#ffffff";
+      const shellMuted = contrast(theme.shell, theme.muted) >= 4.5 ? theme.muted : mix("#ffffff", theme.shell, 0.22);
+      return [
+        `--c-radius:${theme.radius}px`,
+        `--tab-radius:${theme.tabRadius}px`,
+        `--dialog-radius:${theme.dialogRadius}px`,
+        `--flat-depth:${theme.depth}px`,
+        `--c-surface:${theme.surface}`,
+        `--c-shell:${theme.shell}`,
+        `--c-panel:${theme.panel}`,
+        `--c-panel-2:${theme.panel2}`,
+        `--c-line:${theme.line}`,
+        `--c-text:${theme.text}`,
+        `--c-muted:${theme.muted}`,
+        `--shell-text:${shellText}`,
+        `--shell-muted:${shellMuted}`,
+        `--mobile-bg:${theme.mobile}`,
+        `--role-action:${theme.action[0]}`,
+        `--on-action:${theme.action[1]}`,
+        `--edge-action:${theme.action[2]}`,
+        `--role-menu:${theme.menu[0]}`,
+        `--on-menu:${theme.menu[1]}`,
+        `--edge-menu:${theme.menu[2]}`,
+        `--role-input:${theme.input[0]}`,
+        `--on-input:${theme.input[1]}`,
+        `--edge-input:${theme.input[2]}`,
+        `--role-select:${theme.select[0]}`,
+        `--on-select:${theme.select[1]}`,
+        `--edge-select:${theme.select[2]}`,
+        `--role-range:${theme.range[0]}`,
+        `--on-range:${theme.range[1]}`,
+        `--edge-range:${theme.range[2]}`,
+        `--role-danger:${theme.danger[0]}`,
+        `--on-danger:${theme.danger[1]}`,
+        `--edge-danger:${theme.danger[2]}`,
+        `--dialog-head:${theme.head[0]}`,
+        `--on-head:${theme.head[1]}`,
+        `--dialog-bg:${theme.dialog[0]}`,
+        `--dialog-fg:${theme.dialog[1]}`,
+        `--dialog-edge:${theme.dialog[2]}`,
+        `--state-hover:${stateHover}`,
+        `--state-pressed:${statePressed}`,
+        `--state-disabled:${stateDisabled}`,
+        `--state-disabled-fg:${mix(theme.muted, theme.panel2, 0.28)}`,
+        `--current-fill:${currentFill}`,
+        `--current-accent:${current.accent}`,
+        `--current-line:${mix(current.base, "#ffffff", 0.25)}`,
+        `--tool-bg:${theme.menu[0]}`,
+        `--tool-fg:${theme.menu[1]}`
+      ].join(";");
+    }
+
+    function themeCard(theme) {
+      const current = currentPalettes[theme.id];
+      return `<article class="theme-card" style="${vars(theme)}">
+        <header class="theme-head">
+          <h3>${theme.name}</h3>
+          <p>${theme.goal}</p>
+          <p>${theme.fail}</p>
+        </header>
+
+        <div class="compare">
+          <div class="compare-box">
+            <h4>Current base/accent</h4>
+            <div class="swatches">
+              ${roleStyle("base", [current.base, theme.text])}
+              ${roleStyle("accent", [current.accent, current.base])}
+            </div>
+            <div class="current-button">Default Button</div>
+            <div class="current-note">Mostly base-derived chrome, with accent appearing as focus, edge, or opt-in variation color.</div>
+          </div>
+          <div class="compare-box">
+            <h4>Proposed default roles</h4>
+            <div class="swatches">
+              ${roleStyle("button", theme.action)}
+              ${roleStyle("menu", theme.menu)}
+              ${roleStyle("input", theme.input)}
+              ${roleStyle("select", theme.select)}
+              ${roleStyle("range", theme.range)}
+              ${roleStyle("danger", theme.danger)}
+              ${roleStyle("head", theme.head)}
+              ${roleStyle("dialog", theme.dialog)}
+            </div>
+          </div>
+        </div>
+
+        <div class="theme-body">
+          <div class="preview-title">
+            <h4>Desktop default Controls</h4>
+            <span class="slot">Button / OptionButton / LineEdit / TabBar</span>
+          </div>
+          <div class="sample">
+            <div class="toolbar">
+              <span class="tool" style="--tool-bg:${theme.menu[0]};--tool-fg:${theme.menu[1]}">M</span>
+              <span class="tool" style="--tool-bg:${theme.action[0]};--tool-fg:${theme.action[1]}">A</span>
+              <span class="tool" style="--tool-bg:${theme.select[0]};--tool-fg:${theme.select[1]}">S</span>
+              <span class="tool" style="--tool-bg:${theme.range[0]};--tool-fg:${theme.range[1]}">R</span>
+              <span class="tool" style="--tool-bg:${theme.input[0]};--tool-fg:${theme.input[1]}">I</span>
+              <span class="tool" style="--tool-bg:${theme.danger[0]};--tool-fg:${theme.danger[1]}">D</span>
+            </div>
+            <div class="control-row">
+              <button class="ui-button">Button.normal</button>
+              <button class="ui-option">OptionButton</button>
+              <button class="ui-state hover">Button.hover</button>
+              <button class="ui-state pressed">Button.pressed</button>
+              <button class="ui-state disabled">Button.disabled</button>
+              <button class="ui-danger">Danger only</button>
+            </div>
+            <div class="input">LineEdit.focus</div>
+            <div class="tabs">
+              <div class="tab active">Tab selected</div>
+              <div class="tab">Tab hover</div>
+              <div class="tab">Tab idle</div>
+            </div>
+            <div class="list">
+              <div class="row selected"><span class="rail"></span><span class="icon">1</span><span>ItemList.selected</span></div>
+              <div class="row"><span class="rail"></span><span class="icon">2</span><span>Tree row hover</span></div>
+              <div class="row disabled"><span class="rail"></span><span class="icon">3</span><span>Disabled row</span></div>
+            </div>
+            <div class="range">
+              <span class="slot">ProgressBar.fill / HSlider.grabber</span>
+              <div class="track"><span></span></div>
+            </div>
+            <div class="toggle-line">
+              <span class="check"><span class="box">OK</span>CheckBox.checked</span>
+              <span class="check"><span class="box">ON</span>CheckButton.on</span>
+            </div>
+          </div>
+
+          <div class="preview-title">
+            <h4>Popup, raised, and mobile density</h4>
+            <span class="slot">PopupPanel / Window / mobile platform</span>
+          </div>
+          <div class="dialog">
+            <div class="dialog-head"><span>PopupMenu.hover</span><span>Window title</span></div>
+            <div class="dialog-body">
+              <div class="row selected"><span class="rail"></span><span class="icon">S</span><span>Selected menu item</span></div>
+              <div class="control-row">
+                <button class="ui-button">Raised save</button>
+                <button class="ui-option">Secondary</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mobile">
+            <div class="mobile-title">Mobile ${theme.name}</div>
+            <button class="ui-button">Default Button</button>
+            <button class="ui-option">OptionButton</button>
+            <div class="input">LineEdit</div>
+            <div class="track"><span></span></div>
+            <span class="check"><span class="box">OK</span>Toggle</span>
+          </div>
+
+          <div class="mapping-card">
+            <h4>Implementation labels</h4>
+            <ul class="mapping-list">
+              <li><code>action_fill</code><span>Default Button face and raised offset.</span></li>
+              <li><code>menu_fill</code><span>OptionButton, MenuButton, popup hover.</span></li>
+              <li><code>input_fill</code><span>LineEdit, TextEdit, SpinBox, TreeLineEdit.</span></li>
+              <li><code>selection_fill</code><span>TabBar selected, ItemList selected, Tree selected.</span></li>
+              <li><code>range_fill</code><span>Progress, sliders, scrollbars, checks, toggles.</span></li>
+              <li><code>danger_fill</code><span>Only destructive and error states.</span></li>
+            </ul>
+          </div>
+        </div>
+      </article>`;
+    }
+
+    document.getElementById("theme-grid").innerHTML = themes.map(themeCard).join("");
+  </script>
+</body>
+</html>
