@@ -411,17 +411,17 @@
 
     .ui-state.hover {
       background: var(--state-hover);
-      color: var(--on-action);
+      color: var(--on-hover);
     }
 
     .ui-state.pressed {
       background: var(--state-pressed);
-      color: var(--on-action);
+      color: var(--on-pressed);
     }
 
     .ui-state.disabled {
       background: var(--state-disabled);
-      color: var(--state-disabled-fg);
+      color: var(--on-disabled);
     }
 
     .input {
@@ -1093,9 +1093,10 @@
     }
 
     function readableOn(bg, theme) {
-      const dark = theme?.darkText || "#101521";
-      const light = theme?.lightText || "#ffffff";
-      return contrast(bg, dark) >= contrast(bg, light) ? dark : light;
+      const candidates = [theme?.darkText || "#101521", theme?.lightText || "#ffffff", "#000000", "#ffffff"];
+      return candidates.reduce((best, candidate) => (
+        contrast(bg, candidate) > contrast(bg, best) ? candidate : best
+      ), candidates[0]);
     }
 
     function mutedOn(bg, fg) {
@@ -1106,7 +1107,7 @@
 
     function isRedFamilyHue(hue) {
       const h = wrapHue(hue);
-      return h >= 315 || h <= 28;
+      return h >= 310 || h <= 38;
     }
 
     function safeOrdinaryHue(hue, safeHue, sourceHue) {
@@ -1118,12 +1119,13 @@
     }
 
     function roleColor(blueprint, sourceHsl, spec) {
+      const sourceInfluence = clamp((sourceHsl.s - 0.12) / 0.42, 0, 1);
       const delta = shortestHueDelta(spec.h, sourceHsl.h);
       const max = spec.max ?? 24;
-      let h = wrapHue(spec.h + Math.sign(delta) * Math.min(Math.abs(delta) * (spec.pull ?? 0.18), max));
+      let h = wrapHue(spec.h + Math.sign(delta) * Math.min(Math.abs(delta) * (spec.pull ?? 0.18) * sourceInfluence, max));
       if (!spec.danger) h = safeOrdinaryHue(h, spec.safe ?? spec.h, sourceHsl.h);
       const s = clamp(
-        spec.s + (sourceHsl.s - 0.58) * (spec.si ?? 0.12),
+        spec.s + (sourceHsl.s - 0.58) * (spec.si ?? 0.12) * sourceInfluence,
         spec.smin ?? 0.06,
         spec.smax ?? 0.98
       );
@@ -1191,6 +1193,7 @@
       const stateHover = mix(theme.action[0], "#ffffff", theme.id === "bubble" ? 0.08 : 0.1);
       const statePressed = mix(theme.action[0], "#000000", theme.id === "bubble" ? 0.18 : 0.16);
       const stateDisabled = mix(theme.panel2, theme.surface, 0.52);
+      const disabledFg = readableOn(stateDisabled, theme);
       const shellText = contrast(theme.shell, theme.text) >= 4.5 ? theme.text : "#ffffff";
       const shellMuted = contrast(theme.shell, theme.muted) >= 4.5 ? theme.muted : mix("#ffffff", theme.shell, 0.22);
       return [
@@ -1235,9 +1238,11 @@
         `--dialog-fg:${theme.dialog[1]}`,
         `--dialog-edge:${theme.dialog[2]}`,
         `--state-hover:${stateHover}`,
+        `--on-hover:${readableOn(stateHover, theme)}`,
         `--state-pressed:${statePressed}`,
+        `--on-pressed:${readableOn(statePressed, theme)}`,
         `--state-disabled:${stateDisabled}`,
-        `--state-disabled-fg:${mix(theme.muted, theme.panel2, 0.28)}`,
+        `--on-disabled:${disabledFg}`,
         `--tool-bg:${theme.menu[0]}`,
         `--tool-fg:${theme.menu[1]}`
       ].join(";");

@@ -599,8 +599,9 @@ Theme-specific behavior:
 Recommended implementation model:
 
 ```text
-role_hue = harmonize_anchor_toward_source(anchor_hue, source_hue, role_weight, max_degrees)
-role_chroma = clamp(style_chroma_target * source_chroma_factor, min_chroma, max_chroma)
+source_strength = clamp((source_chroma_or_saturation - gray_floor) / usable_chroma_span, 0, 1)
+role_hue = harmonize_anchor_toward_source(anchor_hue, source_hue, role_weight * source_strength, max_degrees)
+role_chroma = clamp(style_chroma_target + source_chroma_delta * role_chroma_influence * source_strength, min_chroma, max_chroma)
 role_tone = style_tone_target_for_mode_and_role
 role_color = from_hue_chroma_tone_or_hsv(role_hue, role_chroma, role_tone)
 on_role = choose_readable_foreground(role_color)
@@ -616,13 +617,15 @@ Shared formula:
 
 ```text
 source = rgb_to_hsl(source_color)
-role_hue = anchor_hue + clamp(shortest_hue_delta(anchor_hue, source.hue) * pull, -max_shift, max_shift)
-role_hue = avoid_red_family(role_hue, safe_hue) unless role is danger/error
-role_saturation = clamp(anchor_saturation + (source.saturation - 0.58) * saturation_influence)
+source_strength = clamp((source.saturation - 0.12) / 0.42, 0, 1)
+role_hue = anchor_hue + clamp(shortest_hue_delta(anchor_hue, source.hue) * pull * source_strength, -max_shift, max_shift)
+role_hue = avoid_danger_adjacent_red_family(role_hue, safe_hue) unless role is danger/error
+role_saturation = clamp(anchor_saturation + (source.saturation - 0.58) * saturation_influence * source_strength)
 role_lightness = clamp(anchor_lightness + (source.lightness - 0.52) * lightness_influence)
 role_fill = hsl(role_hue, role_saturation, role_lightness)
-role_foreground = whichever of light/dark ink gives better contrast
+role_foreground = best accessible foreground from theme dark ink, theme light ink, pure black, or pure white
 role_edge = mix(role_fill, style_edge_base, edge_amount)
+state_foregrounds = recompute foreground per hover/pressed/selected state, not reuse normal text blindly
 ```
 
 Theme anchors in the mockup:
@@ -638,8 +641,12 @@ Theme anchors in the mockup:
 Red-family guardrail:
 
 - Ordinary roles are prevented from landing in roughly red, rose, coral, and hot-pink hue space.
+- The mockup currently models that danger-adjacent band as hue `310..360` or `0..38`; production may tune the exact band after visual tests, but it must include red-orange/coral and hot-pink, not only pure red.
 - If a generated ordinary role enters that band, it is moved back toward the role's safe hue with a tiny source-dependent nudge so the color still responds to the source.
 - `danger/error` is the only family allowed to remain red-family.
+- Achromatic or nearly achromatic source colors use source-strength gating so white, gray, and black do not behave like red just because HSL hue resolves to `0`.
+- Hover, pressed, selected, and disabled samples need their own foreground contrast checks; production must not assume the normal-state foreground still works after state color mixing.
+- If a stylized per-theme foreground cannot pass contrast on a generated role, the algorithm may fall back to pure black or pure white for that role. Accessibility wins over palette purism.
 
 ## Independent Reviewer Pass
 
@@ -667,9 +674,24 @@ Warnings:
 - The first HTML mockup is a hypothesis board, not an approval artifact.
 - CSS-only hover filters should not be treated as implementation evidence. The final mockup needs authored state colors that map to Godot Theme slots.
 
+### Skeptical Review Gate
+
+A follow-up read-only subagent review returned **NOT READY** before implementation. The plan direction was considered much stronger and feasible, but not merge-ready without tightening the dynamic color contract.
+
+Reviewer blockers and resolution in this document/mockup:
+
+| Blocker | Resolution |
+| --- | --- |
+| Gray/white/black sources resolve to HSL hue `0`, making achromatic source colors behave like red. | Added source-strength/saturation gating so near-gray sources do not pull role hue/chroma strongly. |
+| Red guardrail was too narrow; coral/red-orange/hot-pink could leak into ordinary roles. | Broadened danger-adjacent guardrail to include `310..360` and `0..38` in the mockup. |
+| Hover/pressed samples reused normal foregrounds after state color mixing. | Mockup now recomputes state foregrounds for hover/pressed/disabled samples and falls back to black/white when stylized ink fails contrast. Production must do the same per state. |
+| `PositiveButton` role was ambiguous. | `positive_fill` is explicitly for `PositiveButton` / explicit positive variations; `DangerButton` uses `danger_fill`; no text/intent inference. |
+| Bubble light islands require local foreground roles. | Kept Bubble as a dark shell with light islands, but marked this as an explicit product decision requiring component-local `on_*` roles. |
+| `DESIGN_TOKENS.md` old direction integrity lock conflicts with this rework. | Added a pending rework note to `DESIGN_TOKENS.md` that this research supersedes the old color lock if approved. |
+
 Required before implementation:
 
-- One approval-grade mockup pass with current-vs-proposed comparison.
+- One approval-grade mockup pass focused on `source_color` dynamic roles, not old base/accent comparison.
 - One side-by-side board showing all five themes together.
 - Exact role palette swatches with contrast badges.
 - Flat and raised states.
@@ -689,12 +711,12 @@ Current artifacts:
 
 The first file is the experiential sketch. The approval-gate file is the stricter review artifact and should be used for the implementation decision because it includes:
 
-- Current base/accent comparison against proposed authored roles.
+- A live `source_color` picker and source-stress presets.
 - Side-by-side cards for all five built-in themes.
 - Default-control examples only: Button, OptionButton/MenuButton, LineEdit, TabBar, ItemList/Tree rows, Progress/Slider, CheckBox/CheckButton, Popup/Dialog.
 - Flat raised-offset examples using solid darker lower edges.
 - Desktop and mobile density samples.
-- Visible state samples for normal, hover, pressed, disabled, selected, checked, and danger.
+- Visible state samples for normal, hover, pressed, disabled, selected, checked, `PositiveButton`, and `DangerButton`.
 - Contrast badges for the proposed role foreground/background pairs.
 - Labels mapping visual roles to real Godot Theme slots and internal component aliases.
 
@@ -726,13 +748,13 @@ Findings:
 - Slate can stay restrained without becoming generic if icy action/select roles, steel menu roles, graphite inputs, and mint/amber semantic states are all authored separately.
 - Burst reads distinct from Bubble when gold is the action role, violet is the menu/navigation family, cyan is selection, and lime is range/status.
 - Bubble only becomes faithful to the mobile-game reference when cream/sky panels and a blue action family are allowed. This requires shell-local and component-local foreground roles; a single global dark-theme text color is not enough.
-- The proposed role foreground/background pairs pass AA contrast in the current mockup data. A local contrast audit found the lowest proposed role pair at 4.73:1 (`Pulse.menu`), above the 4.5:1 target.
-- A rendered Chromium smoke test succeeded for the approval-gate file. The Codex in-app browser tool could not launch because its configured Chrome path is missing, so verification used the locally installed Playwright Chromium instead.
+- The proposed role foreground/background pairs pass AA contrast in the current mockup data. A local script verified ten source colors across all five theme strategies, including hover/pressed/disabled state pairs, with no low-contrast role badges and no ordinary role leakage into the broadened red-family guardrail.
+- Browser screenshot verification is intentionally not required for this review pass. Script-level mockup verification is enough until the implementation branch needs rendered Godot proof.
 
 Remaining caveats:
 
 - The HTML is still a target mockup, not production proof. Implementation must replace CSS layout conveniences with actual Godot `Theme` slots, styleboxes, constants, icon modulation, and generated textures.
-- Hover and pressed states in production should be authored or deterministically derived as explicit colors, not CSS brightness/filter effects.
+- Hover and pressed states in production should be authored or deterministically derived as explicit colors, with foreground recomputed per state.
 - Bubble's light islands are a product decision, not just an implementation detail. Approving this mockup approves that exception to the older dark-first interpretation.
 
 ## Implementation Direction After Mockup Approval

@@ -8,6 +8,8 @@
 
 This document is the **single source of truth** for token values, formulas, and the `NeoCadeTheme` class contract. It reflects the current implementation as of 2026-05-13: 12 public exports, one canonical resource, five built-in styles, and additive Phase 12/13 visual-role work. Historical Phase 4 text that referred to five peer `.tres` files is superseded here.
 
+**Pending color-identity rework note (2026-05-13):** user review reopened the built-in style color lock because the current base/accent model does not create enough out-of-box identity. `.planning/research/THEME-COLOR-IDENTITY-RETHINK.md` is the active planning artifact for the proposed `style + source_color` role-palette rework. If that rework is approved for implementation, the §2 direction integrity rule below is superseded for color generation only; shape, spacing, flat/raised constraints, no-texture rules, and single-resource architecture remain binding until explicitly changed.
+
 ---
 
 ## §1 Provenance and approval gate
