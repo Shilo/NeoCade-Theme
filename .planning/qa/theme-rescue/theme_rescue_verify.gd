@@ -21,6 +21,10 @@ func _run() -> void:
 		_fail("canonical theme did not load as NeoCadeTheme")
 		_finish()
 		return
+	if _has_property(canonical, "source_color"):
+		print("THEME_RESCUE_VERIFY: SKIP legacy base/accent style matrix superseded by Phase 14 source-color role palette; run theme_source_color_roles_probe.gd")
+		_finish()
+		return
 
 	for style_value in NeoCadeTheme.selectable_styles():
 		var desktop := _theme_variant(canonical, style_value, false, NeoCadeTheme.Platform.DESKTOP)
@@ -46,8 +50,7 @@ func _check_new_theme_defaults() -> void:
 	_expect_equal(theme.style, NeoCadeTheme.Style.PULSE, "NeoCadeTheme.new style")
 	_expect_equal(theme.raised, false, "NeoCadeTheme.new raised")
 	_expect_equal(theme.platform, NeoCadeTheme.Platform.AUTO, "NeoCadeTheme.new platform")
-	_expect_color_equal(theme.base_color, Color("#151A2E"), "NeoCadeTheme.new base_color")
-	_expect_color_equal(theme.accent_color, Color("#8BFF6A"), "NeoCadeTheme.new accent_color")
+	_expect_color_equal(theme.source_color, Color("#3AA8FF"), "NeoCadeTheme.new source_color")
 	_expect_equal(theme.corner_radius, 0, "NeoCadeTheme.new corner_radius")
 	_expect_equal(theme.spacing, 14, "NeoCadeTheme.new spacing")
 	_expect_equal(theme.raised_strength, 2, "NeoCadeTheme.new raised_strength")
@@ -762,7 +765,7 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 			])
 		if _max_border_width(hover) != 0:
 			_fail("%s %s.hover should not draw an outline border" % [label, theme_type])
-		var expected_accent := (theme as NeoCadeTheme).accent_color
+		var expected_accent := theme.get_color(&"accent_color", &"Editor")
 		if not theme.get_color("icon_pressed_color", theme_type).is_equal_approx(expected_accent):
 			_fail("%s %s.icon_pressed_color should use accent for toggled editor buttons" % [label, theme_type])
 		if not theme.get_color("icon_hover_pressed_color", theme_type).is_equal_approx(expected_accent):
@@ -1009,12 +1012,13 @@ func _expect_create_dialog_chrome(theme: Theme, label: String) -> void:
 		if dialog_panel == null:
 			_fail("%s missing %s.panel for editor dialog shell" % [label, dialog_type])
 			continue
-		if neocade != null and not dialog_panel.bg_color.is_equal_approx(neocade.base_color):
-			_fail("%s %s.panel should use base color, not button fill: panel=%s base=%s" % [
+		var expected_dialog_base := theme.get_color(&"base_color", &"Editor")
+		if neocade != null and not dialog_panel.bg_color.is_equal_approx(expected_dialog_base):
+			_fail("%s %s.panel should use generated surface base, not button fill: panel=%s base=%s" % [
 				label,
 				dialog_type,
 				dialog_panel.bg_color.to_html(false),
-				neocade.base_color.to_html(false),
+				expected_dialog_base.to_html(false),
 			])
 		if dialog_panel.corner_radius_top_left != 0 or dialog_panel.corner_radius_top_right != 0 or dialog_panel.corner_radius_bottom_left != 0 or dialog_panel.corner_radius_bottom_right != 0:
 			_fail("%s %s.panel should stay square inside Window.embedded_border chrome, got radius=%s/%s/%s/%s" % [
@@ -1683,6 +1687,13 @@ func _relative_luminance(c: Color) -> float:
 
 func _srgb_to_linear(channel: float) -> float:
 	return channel / 12.92 if channel <= 0.03928 else pow((channel + 0.055) / 1.055, 2.4)
+
+
+func _has_property(object: Object, property_name: String) -> bool:
+	for prop in object.get_property_list():
+		if String(prop.name) == property_name:
+			return true
+	return false
 
 
 func _fail(message: String) -> void:

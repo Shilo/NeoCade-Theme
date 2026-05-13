@@ -120,8 +120,9 @@ been replaced by `neocade_theme.tres` plus the `style` export.
 NeoCade can be loaded into the Godot editor itself via
 *Editor Settings > Interface > Theme > Custom Theme*, but Godot still
 generates its built-in editor theme before merging the custom theme.
-That means `interface/theme/base_color` and `interface/theme/accent_color`
-can affect generated `EditorIcons` even though NeoCade overrides its own
+That means Godot's editor settings `interface/theme/base_color` and
+`interface/theme/accent_color` can affect generated `EditorIcons` even though
+NeoCade's own public color API is `source_color` and NeoCade overrides its own
 surfaces and colors.
 
 The most visible case is `interface/theme/base_color = #ffffff` while

@@ -8,7 +8,7 @@
 
 This document is the **single source of truth** for token values, formulas, and the `NeoCadeTheme` class contract. It reflects the current implementation as of 2026-05-13: 12 public exports, one canonical resource, five built-in styles, and additive Phase 12/13 visual-role work. Historical Phase 4 text that referred to five peer `.tres` files is superseded here.
 
-**Approved color-identity rework note (2026-05-13):** user review reopened the built-in style color lock because the current base/accent model does not create enough out-of-box identity. `.planning/research/THEME-COLOR-IDENTITY-RETHINK.md` is the active authority for the next `style + source_color` role-palette implementation. That rework supersedes the §2 direction integrity rule for color generation and preset source colors only; shape, spacing, flat/raised constraints, no-texture rules, and single-resource architecture remain binding until explicitly changed.
+**Implemented color-identity rework note (2026-05-13):** the public color contract is now `style + source_color`. The old `base_color` / `accent_color` public API was removed intentionally without backwards compatibility. `.planning/research/THEME-COLOR-IDENTITY-RETHINK.md` and `.planning/phases/14-source-color-role-palette-rework/14-IMPLEMENTATION-PLAN.md` are the active authorities for color generation, preset `source_color` values, fill roles, and contrast-safe `on_*` foregrounds. Older base/accent tables and formulas in this document are historical unless explicitly restated in the Phase 14 source-color materials. Shape, spacing, flat/raised constraints, no-texture rules, and single-resource architecture remain binding until explicitly changed.
 
 ---
 
@@ -84,7 +84,7 @@ CONTEXT.md D-16/D-17 originally said the Phase 3.4 user pick "becomes `NeoCadeTh
 
 ### Class default policy
 
-`NeoCadeTheme` class `@export` defaults now match the canonical starter state: `style = PULSE`, `raised = false`, `platform = AUTO`, `base_color = Color("#151A2E")`, `accent_color = Color("#8BFF6A")`, `corner_radius = 0`, `spacing = 14`, `raised_strength = 2`, `focus_thickness = 2`, `outline_width = 1`, `use_runtime_popup_selection_icons = true`, and `texture_cache = false`.
+`NeoCadeTheme` class `@export` defaults now match the canonical starter state: `style = PULSE`, `raised = false`, `platform = AUTO`, `source_color = Color("#3AA8FF")`, `corner_radius = 0`, `spacing = 14`, `raised_strength = 2`, `focus_thickness = 2`, `outline_width = 1`, `use_runtime_popup_selection_icons = true`, and `texture_cache = false`.
 
 ---
 
@@ -92,7 +92,7 @@ CONTEXT.md D-16/D-17 originally said the Phase 3.4 user pick "becomes `NeoCadeTh
 
 `addons/neocade_theme/scripts/neocade_theme.gd` is the **single, concrete, instantiable** `@tool class_name NeoCadeTheme extends Theme`. Users can duplicate the canonical resource or `NeoCadeTheme.new()` to author custom themes. Built-in direction values are applied through `NeoCadeTheme.Style` and the internal `STYLE_EXPORTS` / `STYLE_PERSONALITY` tables. **No `@abstract`, no per-direction `.gd` subclasses, no per-style `.tres` files, no class hierarchy.**
 
-### 4.1 The 12 `@export` properties (current 2026-05-13)
+### 4.1 The 11 `@export` properties (current 2026-05-13)
 
 The export set is **intentionally minimal** — limited to values consumers should be able to tune across the entire theme. Per-direction unique mood lives in internal style/personality tables, not in additional public exports.
 
@@ -101,15 +101,14 @@ The export set is **intentionally minimal** — limited to values consumers shou
 | 1 | `style` | `Style` enum | Top level | `Style.PULSE` | `{BUBBLE, BURST, DAYBREAK, PULSE, SLATE, CUSTOM}`; built-in styles apply export values and hidden personality. |
 | 2 | `raised` | `bool` | Top level | `false` | `false` = flat MD3, `true` = extruded-flat where recipes opt in. |
 | 3 | `platform` | `Platform` enum | Top level | `Platform.AUTO` | `{DESKTOP=0, MOBILE=1, AUTO=2}`; AUTO resolves via `OS.has_feature("mobile")`. |
-| 4 | `base_color` | `Color` | Style Overrides | `#151A2E` | Any color; setter triggers regeneration and may switch to `CUSTOM` if it no longer matches a built-in style. |
-| 5 | `accent_color` | `Color` | Style Overrides | `#8BFF6A` | Any color; setter triggers regeneration and may switch to `CUSTOM`. |
-| 6 | `corner_radius` | `int` | Style Overrides | `0` | px; integer pixels only. Built-in styles overwrite this through `STYLE_EXPORTS`. |
-| 7 | `spacing` | `int` | Style Overrides | `14` | px; base spacing value; mobile branch scales through platform tokens. |
-| 8 | `raised_strength` | `int` | Style Overrides | `2` | px multiplier for raised offsets when `raised=true`. |
-| 9 | `focus_thickness` | `int` | Style Overrides | `2` | px; outer focus-ring thickness. |
-| 10 | `outline_width` | `int` | Style Overrides | `1` | px; default outline/hairline width. |
-| 11 | `use_runtime_popup_selection_icons` | `bool` | Advanced | `true` | Generates tiny PopupMenu check/radio icons at runtime so selection fills match current colors. |
-| 12 | `texture_cache` | `bool` | Advanced | `false` | Keeps loaded/generated textures across regenerations when enabled; a temporary per-pass cache is still used when disabled. |
+| 4 | `source_color` | `Color` | Style Overrides | `#3AA8FF` | Single public color input; setter regenerates the per-style role palette and may switch to `CUSTOM` if it no longer matches a built-in style. |
+| 5 | `corner_radius` | `int` | Style Overrides | `0` | px; integer pixels only. Built-in styles overwrite this through `STYLE_EXPORTS`. |
+| 6 | `spacing` | `int` | Style Overrides | `14` | px; base spacing value; mobile branch scales through platform tokens. |
+| 7 | `raised_strength` | `int` | Style Overrides | `2` | px multiplier for raised offsets when `raised=true`. |
+| 8 | `focus_thickness` | `int` | Style Overrides | `2` | px; outer focus-ring thickness. |
+| 9 | `outline_width` | `int` | Style Overrides | `1` | px; default outline/hairline width. |
+| 10 | `use_runtime_popup_selection_icons` | `bool` | Advanced | `true` | Generates tiny PopupMenu check/radio icons at runtime so selection fills match current colors. |
+| 11 | `texture_cache` | `bool` | Advanced | `false` | Keeps loaded/generated textures across regenerations when enabled; a temporary per-pass cache is still used when disabled. |
 
 ### 4.2 Naming discipline (current)
 
@@ -117,6 +116,7 @@ The export set is **intentionally minimal** — limited to values consumers shou
 - `base_spacing` → `spacing` (no redundant `base_` prefix).
 - `raised_offset` → `raised_strength` (intuitive verb; "strength" implies the scalar from which regular offsets derive).
 - Group label is `"Style Overrides"` for user-facing tunables. The older `"Shape"` group name is historical.
+- `base_color` / `accent_color` were removed in Phase 14. Use `source_color`.
 - `Vector2i` convention for any future paired x/y `@export` values (none currently).
 
 ### 4.3 The `is_light` flag (forward-compat for v2 light mode)
@@ -125,14 +125,14 @@ The export set is **intentionally minimal** — limited to values consumers shou
 var is_light: bool
 
 func _regenerate_theme() -> void:
-    is_light = base_color.get_luminance() >= 0.5
+    is_light = surface_fill.get_luminance() >= 0.5
     # ... rest of regeneration ...
 ```
 
 - **NOT a `@export`.** Computed internally on every regeneration.
 - **Dark is the project default**; `is_light` flags the deviation. (Renamed/inverted from godot-minimal-theme's `dark_theme` — semantically clearer for project-default-dark.)
 - All conditional formulas in `_regenerate_theme()` branch on `is_light` (godot-minimal-theme line-56 pattern).
-- v1 ships dark-first built-in styles — all 5 built-in style `base_color` values are dark (luminance < 0.5 → `is_light = false`). The flag is forward-compat: v2 can plug in light styles or consumers can use `Style.CUSTOM` with a light `base_color` without changing the public export contract.
+- v1 ships dark-first built-in styles, with Bubble intentionally using a dark shell plus light island surfaces. The flag is forward-compat: v2 can plug in formal light variants without changing the role-palette shape.
 - Phase 3.4 Override C (`pulse-finalist-override-light.png`) demonstrates the flag wiring works in the renderer today; **Phase 4 MUST carry the same `is_light` branch into GDScript** so production matches the demo. See §6 (color formula contract) for the conditional formulas.
 
 ### 4.4 `_regenerate_theme()` lifecycle
@@ -140,9 +140,9 @@ func _regenerate_theme() -> void:
 Setters on every `@export` property trigger `_regenerate_theme()`:
 
 ```gdscript
-@export var base_color: Color = Color("#111820"):
+@export var source_color: Color = Color("#3AA8FF"):
     set(value):
-        base_color = value
+        source_color = value
         _regenerate_theme()
 # ... same pattern for exported properties that affect generated entries ...
 ```
@@ -153,7 +153,7 @@ Setters on every `@export` property trigger `_regenerate_theme()`:
 
 - Per-direction unique mood (rounded chip shape, primary button color strategy, tab indicator behavior, surface alpha policy, kicker style, raised lifts list, etc.) — lives in `STYLE_PERSONALITY` and related internal recipes.
 - Type scale font sizes — derived from `platform` branch in `_regenerate_theme()`, not exported.
-- WCAG-driven text colors — derived from `is_light` + `base_color` in `_regenerate_theme()`, not exported.
+- WCAG-driven text colors — derived per fill through contrast-safe `on_*` roles in `_regenerate_theme()`, not exported.
 - State-layer overlay opacities — fixed M3 values (hover 8%, focus 12%, pressed 12%, dragged 16%, disabled 38%) hard-coded in `_regenerate_theme()`, not exported.
 
 ---
@@ -707,7 +707,8 @@ The implementation is considered current when:
 | 7 | Popup-class theming + ColorPicker icons + Graph theming (§7 role tokens + §8 typography) |
 | 8 | Mobile branch validation against §10 platform tokens; tap-target audit against §11.2 |
 | 9 | Showcase scene applies canonical starter (§3); theme picker cycles all 5 built-in styles + `None` |
-| 12 | Signature visual moves and raised-depth tuning while preserving the 12-export contract |
+| 12 | Signature visual moves and raised-depth tuning; export contract superseded by Phase 14 |
+| 14 | Source-color role palette rework; public color API is `style + source_color` |
 | 13 | Opt-in role Label/Panel variations and the 10th showcase tab |
 
 ---

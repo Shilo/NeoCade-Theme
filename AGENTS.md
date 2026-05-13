@@ -8,13 +8,13 @@ The theme is built primarily to power the author's upcoming game, codename Virtu
 
 **Current architecture, updated 2026-05-09:** one concrete `@tool class_name NeoCadeTheme extends Theme` script at `res://addons/neocade_theme/scripts/neocade_theme.gd` plus one canonical resource at `res://addons/neocade_theme/neocade_theme.tres`. There are no production subclasses, no per-direction `.gd` files, no per-style `.tres` files, no `themes/` folder, no `_dev/` folder, and no separate mobile theme resource.
 
-`NeoCadeTheme` has 12 exports:
+`NeoCadeTheme` has 11 exports:
 
 - Top level: `style`, `raised`, `platform`
-- Style Overrides group: `base_color`, `accent_color`, `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`
+- Style Overrides group: `source_color`, `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`
 - Advanced group: `use_runtime_popup_selection_icons`, `texture_cache`
 
-`style` selects the built-in direction (`BUBBLE`, `BURST`, `DAYBREAK`, `PULSE`, `SLATE`, `CUSTOM`). Built-in styles apply the exported direction values and explicit direction personality; `CUSTOM` is the manual/custom mode. Setters regenerate theme entries dynamically. `platform=AUTO` auto-detects mobile with `OS.has_feature("mobile")`; `DESKTOP` and `MOBILE` force sizing. `use_runtime_popup_selection_icons` controls the tiny generated PopupMenu check/radio icons used to keep menu selection colors consistent. `texture_cache` controls whether loaded/generated textures are retained across regenerations; it defaults off, while regeneration still uses a temporary per-pass cache. Light/dark behavior is luminance-derived from `base_color`; v1 ships dark-first styles, while formal light variants are future work.
+`style` selects the built-in direction (`BUBBLE`, `BURST`, `DAYBREAK`, `PULSE`, `SLATE`, `CUSTOM`). Built-in styles apply the exported direction values and explicit direction personality; `source_color` is the single public color input, and each style maps it through its own role-palette strategy into action/menu/input/selection/range/toggle/positive/danger/surface fills plus contrast-safe `on_*` text colors. `CUSTOM` is the manual/custom mode. Setters regenerate theme entries dynamically. `platform=AUTO` auto-detects mobile with `OS.has_feature("mobile")`; `DESKTOP` and `MOBILE` force sizing. `use_runtime_popup_selection_icons` controls the tiny generated PopupMenu check/radio icons used to keep menu selection colors consistent. `texture_cache` controls whether loaded/generated textures are retained across regenerations; it defaults off, while regeneration still uses a temporary per-pass cache. Light/dark behavior is luminance-derived from the generated `surface_fill`; formal light variants are future work. The old `base_color` / `accent_color` public API was intentionally removed without backwards compatibility on 2026-05-13.
 
 **Current v1 resource:** one canonical `NeoCadeTheme` resource at `res://addons/neocade_theme/neocade_theme.tres`. Pulse is the recommended starter and showcase default style, but it has no architectural privilege.
 

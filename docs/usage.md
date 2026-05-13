@@ -60,18 +60,17 @@ been replaced by `neocade_theme.tres` plus the `style` export.
 ## Custom Themes
 
 Set `style = NeoCadeTheme.Style.CUSTOM` to make the direction exports manual.
-Changing direction-defining exports such as `base_color`, `accent_color`,
-`corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, or
+Changing direction-defining exports such as `source_color`, `corner_radius`,
+`spacing`, `raised_strength`, `focus_thickness`, or
 `outline_width` will update the style back to a matching built-in style when
 the values match one exactly; otherwise it falls back to `CUSTOM`.
 `Style.CUSTOM` uses NeoCade's neutral fallback personality rather than
-inferring one from `base_color`.
+inferring one from the source color.
 
 ```gdscript
 var custom_theme := NeoCadeTheme.new()
 custom_theme.style = NeoCadeTheme.Style.CUSTOM
-custom_theme.base_color = Color("#080A1E")
-custom_theme.accent_color = Color("#FF66AA")
+custom_theme.source_color = Color("#6EE7FF")
 custom_theme.corner_radius = 10
 theme = custom_theme
 ```
