@@ -3413,9 +3413,13 @@ const BINDING_TABLE: Dictionary = {
 			"item_end_padding":       {"value": 8},
 			"item_start_padding":     {"value": 8},
 			"outline_size":           {"value": 0},
-			"search_bar_separation":  {"value": 4, "mobile_value": 29},
+			# v_separation and search_bar_separation stay at the desktop value on
+			# mobile — item height should grow from icon/font scaling only, not
+			# from inflated padding. With v_separation=4 and the mobile radio
+			# icon at 40px, each item reads 48px tall (= MD3 tap target).
+			"search_bar_separation":  {"value": 4},
 			"separator_outline_size": {"value": 0},
-			"v_separation":           {"value": 4, "mobile_value": 29},
+			"v_separation":           {"value": 4},
 		},
 		"icon": {
 			"checked":                  {"generated_icon": "popup_selection_checkbox", "checked": true, "mobile_svg_scale": 1.25},
