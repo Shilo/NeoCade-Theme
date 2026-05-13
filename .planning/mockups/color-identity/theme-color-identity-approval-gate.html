@@ -859,6 +859,14 @@
           <p>Bubble only hits the mobile-game reference if cream/sky panels are allowed inside a dark outer shell. Rejecting light islands means Bubble needs a different, less faithful identity.</p>
         </article>
         <article class="gate-card">
+          <h3>Require surface-local labels</h3>
+          <p>Free <code>Label</code> and <code>RichTextLabel</code> nodes cannot infer their parent fill. Bubble cream islands need explicit panel/dialog label roles; composite controls compute their own <code>on_*</code> colors.</p>
+        </article>
+        <article class="gate-card">
+          <h3>Accept Pulse action migration</h3>
+          <p>Pulse moves from a lime-accent read to an LDtk-like taxonomy: amber actions, blue menus, yellow selections, green ranges/positive states, and red only for danger.</p>
+        </article>
+        <article class="gate-card">
           <h3>Use source_color workflow</h3>
           <p>The normal color workflow should be <code>style + source_color</code>. This mockup intentionally tests only that model.</p>
         </article>
@@ -1176,9 +1184,21 @@
       return 205;
     }
 
+    function guardrailNudge(safeHue, sourceHue) {
+      const safe = wrapHue(safeHue ?? 205);
+      const source = wrapHue(sourceHue);
+      if (isRedFamilyHue(source)) {
+        if (safe > 38 && safe <= 60) return clamp((safe - 38) * 0.2, 3, 8);
+        if (safe >= 280 && safe < 310) return -clamp((310 - safe) * 0.2, 3, 8);
+      }
+      const delta = shortestHueDelta(safe, source);
+      const direction = delta === 0 ? (safe < 180 ? 1 : -1) : Math.sign(delta);
+      return direction * clamp(Math.abs(delta) * 0.08, 2, 8);
+    }
+
     function safeOrdinaryHue(hue, safeHue, sourceHue, saturation, lightness) {
       if (!isDangerAdjacentRed(hue, saturation, lightness)) return wrapHue(hue);
-      const sourceNudge = Math.sin(sourceHue * Math.PI / 180) * 8;
+      const sourceNudge = guardrailNudge(safeHue, sourceHue);
       let candidate = wrapHue((safeHue ?? 205) + sourceNudge);
       if (isDangerAdjacentRed(candidate, saturation, lightness)) candidate = nearestNonRedHue(candidate, safeHue);
       return candidate;

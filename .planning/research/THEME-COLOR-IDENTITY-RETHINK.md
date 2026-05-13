@@ -553,7 +553,8 @@ Label/RichTextLabel exception:
 
 - `Label` and `RichTextLabel` are usually free-floating content. A global Theme cannot inspect the actual parent/background color at runtime, so it cannot always know what background the text sits on.
 - Default `Label`/`RichTextLabel` should use the best `on_surface` value for the normal NeoCade content surface.
-- For labels intentionally placed on colored fills, implementation should provide explicit text/icon role variations or documented local overrides such as future `OnActionLabel`, `OnSelectionLabel`, `OnPositiveLabel`, and `OnDangerLabel` if needed.
+- For labels intentionally placed on colored fills, v1 of this rework should provide explicit text/icon role variations or documented local overrides such as `PanelLabel`, `PopupLabel`, `DialogLabel`, `DialogHeaderLabel`, `OnActionLabel`, `OnSelectionLabel`, `OnPositiveLabel`, and `OnDangerLabel`.
+- Bubble's dark shell plus light cream/sky islands makes this non-optional for panel/dialog surfaces: a free `Label` on Bubble's cream island cannot safely reuse the global dark-shell `on_surface` text color. Composite controls still get automatic `on_*` colors from their own fill roles; free Labels need an explicit surface variation when they are moved off the default content surface.
 - Theme-owned composite controls such as Buttons, Tabs, Trees, ItemLists, PopupMenus, LineEdits, and dialogs are not free-floating; their text/icon colors must be computed from their own generated fill roles.
 
 ## Theme Goals
@@ -797,15 +798,16 @@ Reviewer blockers and resolution in this document/mockup:
 | Red guardrail was too narrow; coral/red-orange/hot-pink could leak into ordinary roles. | Broadened danger-adjacent guardrail to include `310..360` and `0..38` in the mockup, then made it chroma/tone aware so warm cream islands are not incorrectly treated as destructive controls. |
 | Hover/pressed samples reused normal foregrounds after state color mixing. | Mockup now recomputes state foregrounds for hover/pressed/disabled samples and falls back to black/white when stylized ink fails contrast. Production must do the same per state. |
 | `PositiveButton` role was ambiguous. | `positive_fill` is explicitly for `PositiveButton` / explicit positive variations; `DangerButton` uses `danger_fill`; no text/intent inference. |
-| Bubble light islands require local foreground roles. | Kept Bubble as a dark shell with light islands, but marked this as an explicit product decision requiring component-local `on_*` roles. |
-| `DESIGN_TOKENS.md` old direction integrity lock conflicts with this rework. | Added a pending rework note to `DESIGN_TOKENS.md` that this research supersedes the old color lock if approved. |
+| Bubble light islands require local foreground roles. | Kept Bubble as a dark shell with light islands and made panel/dialog Label foreground variations a v1 rework requirement, not a future stretch. |
+| `DESIGN_TOKENS.md` old direction integrity lock conflicts with this rework. | Updated `DESIGN_TOKENS.md` so this approved research supersedes the old color lock for color generation and preset `source_color` values only. |
 
 Additional 2026-05-13 heavy-review findings:
 
 - Claude and Codex subagent review both found the old hue-only guardrail overcorrected Bubble cream panels and Daybreak's warm action role under some stress sources.
 - The mockup now evaluates ordinary red-family risk with hue plus HSL chroma/lightness. Saturated coral/hot-pink/red still escapes to a safe hue; low-chroma or very light cream/ivory remains allowed for Bubble panels and dialogs.
 - The arbitrary `safe_hue + 58` fallback was removed from the mockup. If a warm safe hue is near the danger band, the fallback now returns to the role's safe hue or the nearest non-red warm boundary instead of jumping to green.
-- OpenCode/DeepSeek did not complete the requested design-review brief reliably, but its pure-mode pass correctly flagged stale state docs: this rework is not reflected in `STATE.md`, `PROJECT.md`, or `ROADMAP.md` yet. That update belongs to the implementation branch after approval, not to the current mockup proof.
+- Claude's final design-only review returned **READY WITH MINOR FIXES**. Accepted fixes: make Bubble free Label foreground variations a v1 requirement, add an explicit Pulse default-action migration gate, and fix the stress-source guardrail nudge. Rejected/deferred as implementation-plan work: full HCT/CAM16 is not required before the Godot-local model has verifier evidence.
+- OpenCode/DeepSeek's plan-only review returned **READY WITH MINOR FIXES**. Accepted fixes: update `DESIGN_TOKENS.md` supersession language and make color-space / BINDING_TABLE alias migration explicit in the implementation plan. Deferred fixes: stale `STATE.md`, `PROJECT.md`, and `ROADMAP.md` belong to the implementation branch once code changes begin.
 
 Required before implementation:
 
@@ -817,6 +819,8 @@ Required before implementation:
 - Disabled, hover, pressed, focus, and selected states.
 - Labels mapping every visible role to real Godot slots such as `Button.normal`, `OptionButton.normal`, `LineEdit.normal`, `TabBar.tab_selected`, `ItemList.selected`, `Tree.selected`, and `PopupMenu.hover`.
 - Explicit decision on whether Bubble may use light islands inside a dark-shell v1 theme.
+- Explicit approval that Pulse's default action identity migrates from the older lime accent read to amber action + blue menu + yellow selection + green range/status, so Pulse becomes a multi-family LDtk-style taxonomy instead of a single green-accent dark theme.
+- Explicit implementation decision that the first production pass uses deterministic Godot-local HSV/HSL-style hue/chroma/tone helpers plus WCAG contrast checks, with HCT/CAM16 deferred unless verifier evidence shows the local model cannot match the approved identity.
 
 ## Mockup Plan
 
@@ -874,6 +878,7 @@ Remaining caveats:
 - The HTML is still a target mockup, not production proof. Implementation must replace CSS layout conveniences with actual Godot `Theme` slots, styleboxes, constants, icon modulation, and generated textures.
 - Hover and pressed states in production should be authored or deterministically derived as explicit colors, with foreground recomputed per state.
 - Bubble's light islands are a product decision, not just an implementation detail. Approving this mockup approves that exception to the older dark-first interpretation.
+- Pulse's role migration is also a product decision: approving this mockup approves the amber default action family as part of Pulse's LDtk-inspired role taxonomy.
 
 ## Implementation Direction After Mockup Approval
 
