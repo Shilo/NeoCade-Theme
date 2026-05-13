@@ -128,16 +128,15 @@ Default `Label` / `RichTextLabel` still use `on_surface`.
 
 ### 5. Positive vs Success
 
-- `positive_fill` is for affirmative actions: `PositiveButton`, confirm/apply/save actions where the consumer explicitly opts in.
+- `positive_fill` is for affirmative actions, but it is exposed through the existing `PrimaryButton` variation rather than a second public positive button type.
 - `success_fill` is for feedback state: valid/saved/completed/healthy status surfaces and explicit `Success*` variations.
 - `DangerButton` remains destructive/error only.
 
-Add `PositiveButton` as a real Button type variation. Keep `PrimaryButton` as an existing high-emphasis action variation, but pin it to a distinct role:
+Do not add `PositiveButton` or `NegativeButton`. Keep the public semantic button set small:
 
-- `PrimaryButton` uses `primary_action_fill`, a derived stronger sibling of `action_fill`.
-- `primary_action_fill` is not part of the default-control alias vocabulary and does not replace `positive_fill`.
+- `PrimaryButton` uses `primary_action_fill`, which aliases the theme's `positive_fill` ramp for confirm/apply/save/high-emphasis actions.
 - `PrimaryButton` must differ visually from default `Button` through fill and/or stylebox emphasis.
-- `PositiveButton` remains the affirmative semantic variant and must not be collapsed into `PrimaryButton`.
+- `DangerButton` uses `danger_fill` and is the only destructive/negative Button variation.
 
 ### 6. Review Findings Accepted / Rejected
 
@@ -145,7 +144,7 @@ Accepted from Claude/OpenCode/Codex reviews:
 
 - `is_light` must derive from generated `surface_fill`.
 - `PrimaryButton` needs a precise high-emphasis role and must differ from default `Button`.
-- `PositiveButton` must be planned with full type-variation plumbing, not just named conceptually.
+- `PrimaryButton` must be the single public affirmative/high-emphasis Button variation; a separate `PositiveButton` is rejected as redundant.
 - Slot coverage must enumerate actual `BINDING_TABLE.keys()` and `TYPE_VARIATIONS`, not only a hand-picked representative list.
 - Gate checks must include icon/glyph foregrounds, radio/check slots, PopupMenu generated check/radio icons, `SplitContainer`, `ScrollContainer`, `RichTextLabel`, and dialog types.
 
@@ -326,12 +325,12 @@ Use:
 
 Use:
 
-- `PositiveButton`: `positive_fill` / `on_positive`.
+- `PrimaryButton`: `primary_action_fill` / `text_on_primary_button`; `primary_action_fill` aliases the affirmative `positive_fill` ramp in this rework.
 - `DangerButton`: `danger_fill` / `on_danger`.
 - `SuccessLabel`, `WarningLabel`, `DangerLabel`, `InfoLabel`: `success_fill`, `warning_fill`, `danger_fill`, `info_fill` or their text roles as appropriate.
 - `SuccessPanel`, `WarningPanel`, `DangerPanel`, `InfoPanel`, `AccentPanel`: semantic fill roles with local foregrounds.
 
-Existing `PrimaryButton` remains as a distinct high-emphasis action variant using `primary_action_fill`. It should not be required to see identity; default `Button` already carries `action_fill`.
+No `PositiveButton` or `NegativeButton` variation ships in v1. Default `Button` still carries `action_fill`, so the theme's core identity is visible without any type variation.
 
 ### Links / Passive Text
 
@@ -432,7 +431,6 @@ The following representative controls and variations must receive explicit asser
 
 - `Button`
 - `PrimaryButton`
-- `PositiveButton`
 - `DangerButton`
 - `OptionButton`
 - `MenuButton`
@@ -608,23 +606,21 @@ Files:
 
 Tasks:
 
-1. Add `PositiveButton`.
-2. Add `PositiveButton` to `TYPE_VARIATIONS`.
-3. Add explicit `set_font` and `set_font_size` entries for `PositiveButton`.
-4. Add full Button-family stylebox/color/icon state rows for `PositiveButton`, matching the existing `PrimaryButton`/`DangerButton` plumbing pattern.
-5. Pin `PrimaryButton` to `primary_action_fill` and verify it differs from default `Button`.
-6. Keep `DangerButton` mapped to `danger_fill`.
-7. Reconcile `SuccessLabel`, `WarningLabel`, `DangerLabel`, `InfoLabel`.
-8. Reconcile `AccentPanel`, `InfoPanel`, `WarningPanel`, `DangerPanel`, `SuccessPanel`.
-9. Add surface-context Label/RichTextLabel variations required by Bubble light islands.
-10. Add showcase examples for source-color picker and Label-on-panel/Label-on-dialog contrast.
+1. Remove the redundant planned `PositiveButton` variation and do not add `NegativeButton`.
+2. Keep `PrimaryButton` in `TYPE_VARIATIONS` as the single affirmative/high-emphasis action variation.
+3. Pin `PrimaryButton` to `primary_action_fill`, with `primary_action_fill` mapped to the style's affirmative `positive_fill` ramp.
+4. Keep `DangerButton` mapped to `danger_fill`.
+5. Reconcile `SuccessLabel`, `WarningLabel`, `DangerLabel`, `InfoLabel`.
+6. Reconcile `AccentPanel`, `InfoPanel`, `WarningPanel`, `DangerPanel`, `SuccessPanel`.
+7. Add surface-context Label/RichTextLabel variations required by Bubble light islands.
+8. Add showcase examples for source-color picker and Label-on-panel/Label-on-dialog contrast.
 
 Exit criteria:
 
 - semantic variations are optional and do not carry the default theme identity alone;
 - Bubble label-on-cream case is visibly/readably covered;
-- `PositiveButton` and `DangerButton` are distinct and semantically correct.
-- `PrimaryButton` remains a useful high-emphasis action variant but does not steal positive/success semantics.
+- `PrimaryButton` and `DangerButton` are distinct and semantically correct.
+- `PrimaryButton` is the only public positive/affirmative button variation; `success_fill` remains feedback/state semantics.
 
 ### Wave 5 - Documentation and Resource Sync
 
@@ -681,7 +677,7 @@ Exit criteria:
 2. Pulse, Daybreak, Slate, Burst, and Bubble remain recognizable and mood-distinct under preset source colors.
 3. Default controls show role variety without variations:
    - Button != OptionButton/MenuButton != input != selection != range/toggle.
-4. `PositiveButton` and `DangerButton` exist for explicit semantic intent.
+4. `PrimaryButton` and `DangerButton` exist for explicit semantic intent; `PositiveButton` and `NegativeButton` do not ship.
 5. `success_fill` is not confused with `positive_fill`.
 6. No ordinary default control uses saturated red/coral/hot-pink unless it is danger/error.
 7. Every generated fill has a state-appropriate foreground with verified contrast.
@@ -707,7 +703,7 @@ Exit criteria:
 3. Does the plan overfit to the HTML mockup instead of Godot Theme realities?
 4. Are any Controls or slot families missing from the binding migration map?
 5. Are the verifier gates strong enough to catch wrong `on_*` foregrounds, red ordinary roles, and accidental base/accent regressions?
-6. Is `PrimaryButton` sufficiently pinned as a separate high-emphasis `primary_action_fill` role while `PositiveButton` owns affirmative semantics?
+6. Is `PrimaryButton` sufficiently pinned as the single high-emphasis affirmative `primary_action_fill` role while `DangerButton` owns destructive semantics?
 7. Are there any remaining accidental compatibility assumptions that should be removed before implementation?
 
 ## Next Action After Review

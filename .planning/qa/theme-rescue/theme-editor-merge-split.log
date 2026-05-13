@@ -1,19 +1,19 @@
 SPLIT SplitContainer custom_has_bg=true editor_has_bg=true custom_sep=6 editor_sep=6 custom_min=6 editor_min=6 custom_autohide=1 editor_autohide=1
 SPLIT_ICON SplitContainer.grabber custom=false editor=false custom_size=<missing> editor_size=<missing>
-SPLIT_ICON SplitContainer.h_grabber custom=true editor=true custom_size=(6.0, 32.0) editor_size=(6.0, 32.0)
-SPLIT_ICON SplitContainer.v_grabber custom=true editor=true custom_size=(32.0, 6.0) editor_size=(32.0, 6.0)
+SPLIT_ICON SplitContainer.h_grabber custom=true editor=true custom_size=(6.0, 48.0) editor_size=(6.0, 48.0)
+SPLIT_ICON SplitContainer.v_grabber custom=true editor=true custom_size=(48.0, 6.0) editor_size=(48.0, 6.0)
 SPLIT_ICON SplitContainer.touch_dragger custom=false editor=false custom_size=<missing> editor_size=<missing>
 SPLIT_ICON SplitContainer.h_touch_dragger custom=true editor=true custom_size=(16.0, 16.0) editor_size=(16.0, 16.0)
 SPLIT_ICON SplitContainer.v_touch_dragger custom=true editor=true custom_size=(16.0, 16.0) editor_size=(16.0, 16.0)
 SPLIT HSplitContainer custom_has_bg=true editor_has_bg=true custom_sep=6 editor_sep=6 custom_min=6 editor_min=6 custom_autohide=1 editor_autohide=1
-SPLIT_ICON HSplitContainer.grabber custom=true editor=true custom_size=(6.0, 32.0) editor_size=(6.0, 32.0)
+SPLIT_ICON HSplitContainer.grabber custom=true editor=true custom_size=(6.0, 48.0) editor_size=(6.0, 48.0)
 SPLIT_ICON HSplitContainer.h_grabber custom=false editor=false custom_size=<missing> editor_size=<missing>
 SPLIT_ICON HSplitContainer.v_grabber custom=false editor=false custom_size=<missing> editor_size=<missing>
 SPLIT_ICON HSplitContainer.touch_dragger custom=true editor=true custom_size=(16.0, 16.0) editor_size=(16.0, 16.0)
 SPLIT_ICON HSplitContainer.h_touch_dragger custom=false editor=false custom_size=<missing> editor_size=<missing>
 SPLIT_ICON HSplitContainer.v_touch_dragger custom=false editor=false custom_size=<missing> editor_size=<missing>
 SPLIT VSplitContainer custom_has_bg=true editor_has_bg=true custom_sep=6 editor_sep=6 custom_min=6 editor_min=6 custom_autohide=1 editor_autohide=1
-SPLIT_ICON VSplitContainer.grabber custom=true editor=true custom_size=(32.0, 6.0) editor_size=(32.0, 6.0)
+SPLIT_ICON VSplitContainer.grabber custom=true editor=true custom_size=(48.0, 6.0) editor_size=(48.0, 6.0)
 SPLIT_ICON VSplitContainer.h_grabber custom=false editor=false custom_size=<missing> editor_size=<missing>
 SPLIT_ICON VSplitContainer.v_grabber custom=false editor=false custom_size=<missing> editor_size=<missing>
 SPLIT_ICON VSplitContainer.touch_dragger custom=true editor=true custom_size=(16.0, 16.0) editor_size=(16.0, 16.0)

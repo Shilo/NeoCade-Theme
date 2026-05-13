@@ -20,6 +20,7 @@ func _init() -> void:
 		_assert_color_close(theme.source_color, STYLE_PRESETS[style_value], "preset source_color for %s" % NeoCadeTheme.style_label(style_value))
 		_assert_role_distinctness(theme, NeoCadeTheme.style_label(style_value))
 		_assert_role_contrast(theme, NeoCadeTheme.style_label(style_value))
+		_assert_primary_button_semantics(theme, NeoCadeTheme.style_label(style_value))
 
 	theme.style = NeoCadeTheme.Style.PULSE
 	var dynamic_fill_slots := [
@@ -28,7 +29,7 @@ func _init() -> void:
 		["LineEdit", "normal"],
 		["ItemList", "selected"],
 		["ProgressBar", "fill"],
-		["PositiveButton", "normal"],
+		["PrimaryButton", "normal"],
 	]
 	var before_fills := []
 	for slot in dynamic_fill_slots:
@@ -55,7 +56,10 @@ func _assert_export_contract(theme: NeoCadeTheme) -> void:
 	_assert(props.has("source_color"), "source_color export exists")
 	_assert(not props.has("base_color"), "base_color export removed")
 	_assert(not props.has("accent_color"), "accent_color export removed")
-	_assert(theme.get_type_variation_base(&"PositiveButton") == &"Button", "PositiveButton type variation exists")
+	_assert(theme.get_type_variation_base(&"PrimaryButton") == &"Button", "PrimaryButton type variation exists")
+	_assert(theme.get_type_variation_base(&"PositiveButton") == &"", "PositiveButton type variation is intentionally absent")
+	_assert(theme.get_type_variation_base(&"DangerButton") == &"Button", "DangerButton type variation exists")
+	_assert(theme.get_type_variation_base(&"NegativeButton") == &"", "NegativeButton type variation is intentionally absent")
 	_assert(theme.get_type_variation_base(&"PanelLabel") == &"Label", "PanelLabel type variation exists")
 	_assert(theme.get_type_variation_base(&"DialogLabel") == &"Label", "DialogLabel type variation exists")
 	_assert(theme.get_type_variation_base(&"PanelRichTextLabel") == &"RichTextLabel", "PanelRichTextLabel type variation exists")
@@ -69,7 +73,7 @@ func _assert_role_distinctness(theme: NeoCadeTheme, label: String) -> void:
 		_flat_bg(theme, "LineEdit", "normal"),
 		_flat_bg(theme, "ItemList", "selected"),
 		_flat_bg(theme, "ProgressBar", "fill"),
-		_flat_bg(theme, "PositiveButton", "normal"),
+		_flat_bg(theme, "PrimaryButton", "normal"),
 		_flat_bg(theme, "DangerButton", "normal"),
 	]
 	var unique_count := 0
@@ -97,12 +101,27 @@ func _assert_role_contrast(theme: NeoCadeTheme, label: String) -> void:
 	_assert_contrast(theme, label, "PopupMenu", "panel", "font_color")
 	_assert_contrast(theme, label, "PopupMenu", "hover", "font_hover_color")
 	_assert_progress_contrast(theme, label)
-	_assert_contrast(theme, label, "PositiveButton", "normal", "font_color")
+	_assert_contrast(theme, label, "PrimaryButton", "normal", "font_color")
 	_assert_contrast(theme, label, "DangerButton", "normal", "font_color")
 	_assert_text_over_surface(theme, label, "Panel", "panel", "PanelLabel", "font_color")
 	_assert_text_over_surface(theme, label, "PopupPanel", "panel", "DialogLabel", "font_color")
 	_assert_rich_text_over_surface(theme, label, "Panel", "panel", "PanelRichTextLabel")
 	_assert_rich_text_over_surface(theme, label, "PopupPanel", "panel", "DialogRichTextLabel")
+
+
+func _assert_primary_button_semantics(theme: NeoCadeTheme, label: String) -> void:
+	var primary := theme.get_stylebox("normal", "PrimaryButton") as StyleBoxFlat
+	var button := theme.get_stylebox("normal", "Button") as StyleBoxFlat
+	var danger := theme.get_stylebox("normal", "DangerButton") as StyleBoxFlat
+	_assert(primary != null, "%s PrimaryButton normal stylebox exists" % label)
+	_assert(button != null, "%s Button normal stylebox exists" % label)
+	_assert(danger != null, "%s DangerButton normal stylebox exists" % label)
+	if primary == null or button == null or danger == null:
+		return
+	_assert(_color_distance(primary.bg_color, button.bg_color) > 0.08, "%s PrimaryButton does not collapse to Button action fill" % label)
+	_assert(_color_distance(primary.bg_color, danger.bg_color) > 0.18, "%s PrimaryButton does not collapse to DangerButton fill" % label)
+	_assert(_color_distance(primary.border_color, danger.border_color) > 0.18, "%s PrimaryButton border does not borrow danger edge" % label)
+	_assert(_contrast_ratio(primary.bg_color, theme.get_color("font_color", "PrimaryButton")) >= MIN_CONTRAST, "%s PrimaryButton foreground follows actual background" % label)
 
 
 func _assert_contrast(theme: NeoCadeTheme, label: String, theme_type: String, stylebox_name: String, color_name: String) -> void:
@@ -150,6 +169,10 @@ func _assert(condition: bool, message: String) -> void:
 func _assert_color_close(actual: Color, expected: Color, message: String) -> void:
 	if not actual.is_equal_approx(expected):
 		_fail("%s expected=%s actual=%s" % [message, expected.to_html(), actual.to_html()])
+
+
+func _color_distance(a: Color, b: Color) -> float:
+	return absf(a.r - b.r) + absf(a.g - b.g) + absf(a.b - b.b) + absf(a.a - b.a)
 
 
 func _fail(message: String) -> void:

@@ -147,7 +147,7 @@ Setters on every `@export` property trigger `_regenerate_theme()`:
 # ... same pattern for exported properties that affect generated entries ...
 ```
 
-`_regenerate_theme()` clears and repopulates derived theme entry color/state/sizing values for the canonical 37 Control scorecard plus additive runtime/editor integration types. As of the Phase 14 source-color sync, the live implementation has `BINDING_TABLE.size() == 155` and `TYPE_VARIATIONS.size() == 67`.
+`_regenerate_theme()` clears and repopulates derived theme entry color/state/sizing values for the canonical 37 Control scorecard plus additive runtime/editor integration types. As of the Phase 14 source-color sync, the live implementation has `BINDING_TABLE.size() == 154` and `TYPE_VARIATIONS.size() == 66`.
 
 ### 4.5 What does NOT live in `@export`
 
@@ -414,19 +414,20 @@ var state_pressed: Color = _mix(base_color, Color.BLACK, abs(pressed_pct) / 100.
 
 ## §7 Accent, semantic role, and state-layer contract
 
-### 7.1 Semantic role tokens (TOKEN-02 baseline)
+### 7.1 Semantic role tokens
 
 | Role | Source | Notes |
 |---|---|---|
-| `role.primary` | `accent_color` (per-direction) | Drives primary buttons, focus rings, selected tabs/rows, caret, progress fill |
+| `role.primary` | generated from `source_color` as `selection_fill` / `role_primary` | Drives focus rings, selected tabs/rows, caret, links, and selection accents |
+| `role.positive` | generated from `source_color` as `positive_fill` / `primary_action_fill` | Drives the single affirmative/high-emphasis `PrimaryButton` role |
 | `role.success` | derived green | Default `Color("#5CC971")`; styles may override internally |
 | `role.warning` | derived amber | Default `Color("#FFD166")`; directions may override |
 | `role.danger` | derived red | Default `Color("#FF6E6E")`; directions may override |
 | `role.info` | derived cyan/blue | Default `Color("#5FE3FF")`; directions may override |
 
-`accent_offset`, `accent_rim` (= `_mix(accent_color, Color.WHITE, 0.5)`), and per-role raised depth offsets are derived in `_regenerate_theme()` for raised-mode Control authoring.
+`accent_offset`, `accent_rim`, `primary_button_border`, and per-role raised depth offsets are derived in `_regenerate_theme()` from generated role fills, not from public `base_color` / `accent_color`.
 
-**Pending source-color rework token additions:** if `.planning/research/THEME-COLOR-IDENTITY-RETHINK.md` is approved, the semantic layer expands beyond the TOKEN-02 baseline. Add explicit `role.positive` / `role.positive_container` for affirmative action controls, keep `role.success` for feedback state, and use a small control-facing alias vocabulary instead of one token per Godot slot: `surface_fill`, `panel_fill`, `popup_shell`, `dialog_header`, `action_fill`, `menu_fill`, `input_fill`, `selection_fill`, `tab_selected_fill`, `range_fill`, `toggle_fill`, `positive_fill`, `danger_fill`, `separator_fill`, `link_text`, `focus_ring`, `raised_offset_*`, and conditional `success_fill`, `warning_fill`, `info_fill`. Slot-specific hover/pressed/disabled/read-only/scrollbar/check states derive from those aliases unless visual tests prove a new alias is necessary. These are pending rework tokens, not current shipped TOKEN-02 values.
+The active source-color role vocabulary is: `surface_fill`, `panel_fill`, `popup_shell`, `dialog_header`, `action_fill`, `menu_fill`, `input_fill`, `selection_fill`, `tab_selected_fill`, `range_fill`, `toggle_fill`, `positive_fill`, `danger_fill`, `separator_fill`, `link_text`, `focus_ring`, `raised_offset_*`, and conditional `success_fill`, `warning_fill`, `info_fill`. Slot-specific hover/pressed/disabled/read-only/scrollbar/check states derive from those aliases unless visual tests prove a new alias is necessary.
 
 ### 7.2 M3 state-layer constants
 

@@ -466,7 +466,7 @@ Use the conditional semantic aliases only for explicit semantic states/variation
 
 Each built-in style can map these aliases differently. This is the key change: Pulse, Daybreak, Slate, Burst, and Bubble should not share the same component color mapping.
 
-`role_positive` is intentionally separate from `role_success`. Positive is an explicit affirmative action role (`PositiveButton`, confirm/apply/save variants); success is a feedback/state role (valid, completed, healthy, successful). They may share a ramp in v1, but they should stay named separately so action semantics and result semantics do not get welded together.
+`role_positive` is intentionally separate from `role_success`. Positive is an explicit affirmative action role exposed through the existing `PrimaryButton` variation for confirm/apply/save/high-emphasis actions; success is a feedback/state role (valid, completed, healthy, successful). They may share a ramp in v1, but they should stay named separately so action semantics and result semantics do not get welded together.
 
 ## Control Coverage Rule
 
@@ -476,7 +476,7 @@ Coverage contract:
 
 | Control family | Role mapping |
 | --- | --- |
-| `Button`, `OptionButton`, `MenuButton` | Default `Button` uses `action_fill`; option/menu controls use `menu_fill`; pressed/open states derive from the same alias; `PositiveButton` uses `positive_fill`; `DangerButton` uses `danger_fill`. |
+| `Button`, `OptionButton`, `MenuButton` | Default `Button` uses `action_fill`; option/menu controls use `menu_fill`; pressed/open states derive from the same alias; `PrimaryButton` uses `primary_action_fill`/`positive_fill`; `DangerButton` uses `danger_fill`. |
 | `CheckBox`, `CheckButton` | Do not blindly inherit the chunky default Button fill. Text remains on the surrounding surface; indicator/track slots derive from `toggle_fill`, with checked/hover/disabled foregrounds recomputed. |
 | `ColorPickerButton` | Treat as a swatch/input control, not a normal action button. Use restrained `input_fill` or `panel_fill` chrome and keep the checker `bg` texture usable; do not inflate margins until the swatch disappears. |
 | `LinkButton` | No filled background by default. Use `link_text`/info role plus focus ring and hover/pressed text colors. |
@@ -510,7 +510,7 @@ Verified fill/background ownership notes from Godot 4.6 class docs/local class X
 Important limitation:
 
 - Godot Theme cannot know that an arbitrary `Button` whose text says "OK" is a confirm button. Default `Button` should use `action_fill`.
-- `positive_fill` is for the explicit `PositiveButton` variation and any future explicit positive-role variations. It should not be applied automatically to ordinary buttons or inferred from button text.
+- `positive_fill` is exposed through the explicit `PrimaryButton` variation and any future explicit positive-role non-button variations. It should not be applied automatically to ordinary buttons or inferred from button text.
 - `danger_fill` is for the explicit `DangerButton` variation and destructive/error states.
 - Built-in dialogs that expose only ordinary `Button` controls will inherit `action_fill` unless Godot exposes a specific type/variation or NeoCade adds a targeted scene-side helper.
 
@@ -536,7 +536,7 @@ Required foreground pairs:
 | `selection_fill`, `tab_selected_fill` | `on_selection`, `on_tab_selected` | `TabBar.tab_selected`, `ItemList.selected`, `Tree.selected`, selected popup rows, list/tree hover derived from selection. |
 | `range_fill` | `on_range` | Progress labels, slider tracks/grabbers, scrollbars. |
 | `toggle_fill` | `on_toggle` | CheckButton tracks/knobs, CheckBox/radio/check glyphs and active/inactive state colors. |
-| `positive_fill` | `on_positive` | Explicit `PositiveButton` variation. |
+| `positive_fill` | `on_positive` | Explicit `PrimaryButton` affirmative/high-emphasis action role. |
 | `danger_fill` | `on_danger` | Explicit `DangerButton`, errors, destructive states. |
 | `success_fill`, `warning_fill`, `info_fill` | `on_success`, `on_warning`, `on_info` | Explicit semantic states/variations and status UI only. |
 | `separator_fill` | `on_separator` when a visible label/glyph sits on it | Separators, split bars, graph grid/guide lines. |
@@ -659,7 +659,7 @@ Reference:
 
 This is the proposed "no variations required" mapping. Exact values should be tested in mockups before implementation.
 
-| Theme | Button | Option/Menu | Input | Selected Tab | List/Tree Selection | Range/Progress | Toggle/Check | PositiveButton | DangerButton | Popup/Dialog |
+| Theme | Button | Option/Menu | Input | Selected Tab | List/Tree Selection | Range/Progress | Toggle/Check | PrimaryButton | DangerButton | Popup/Dialog |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Pulse | amber/orange fill | blue/steel | dark blue with bright border | yellow/gold filled or strong strip | gold or role-coded row with colored rail | green or cyan | green | distinct green | red only | dark panels with colored category headers |
 | Daybreak | amber fill | mint/teal | pine/cream-tinted input | mint selected state | mint/amber selected container | aqua or mint | mint | fresh green/mint | red only | amber/aqua highlights on warm dark panels |
@@ -691,7 +691,7 @@ All themes:
 - Inputs change through an input/container ramp.
 - Tabs, selected rows, and popup hovers change through selection/navigation ramps.
 - Progress, sliders, checkboxes, and checkbuttons change through range/toggle ramps.
-- `PositiveButton` changes through a dedicated positive ramp instead of borrowing danger, warning, or default action.
+- `PrimaryButton` changes through a dedicated positive/affirmative ramp instead of borrowing danger, warning, or default action.
 - Focus rings change through a high-contrast focus role.
 - Raised lower edges change from the final role colors, not from fixed hard-coded shadows.
 - Danger/error stays red-family; warning stays amber-family; success stays green-family, with only controlled harmonization.
@@ -797,7 +797,7 @@ Reviewer blockers and resolution in this document/mockup:
 | Gray/white/black sources resolve to HSL hue `0`, making achromatic source colors behave like red. | Added source-strength/saturation gating so near-gray sources do not pull role hue/chroma strongly. |
 | Red guardrail was too narrow; coral/red-orange/hot-pink could leak into ordinary roles. | Broadened danger-adjacent guardrail to include `310..360` and `0..38` in the mockup, then made it chroma/tone aware so warm cream islands are not incorrectly treated as destructive controls. |
 | Hover/pressed samples reused normal foregrounds after state color mixing. | Mockup now recomputes state foregrounds for hover/pressed/disabled samples and falls back to black/white when stylized ink fails contrast. Production must do the same per state. |
-| `PositiveButton` role was ambiguous. | `positive_fill` is explicitly for `PositiveButton` / explicit positive variations; `DangerButton` uses `danger_fill`; no text/intent inference. |
+| `PositiveButton` role was ambiguous. | Do not ship `PositiveButton`; `PrimaryButton` is the single affirmative/high-emphasis Button variation using `primary_action_fill`/`positive_fill`; `DangerButton` uses `danger_fill`; no text/intent inference. |
 | Bubble light islands require local foreground roles. | Kept Bubble as a dark shell with light islands and made panel/dialog Label foreground variations a v1 rework requirement, not a future stretch. |
 | `DESIGN_TOKENS.md` old direction integrity lock conflicts with this rework. | Updated `DESIGN_TOKENS.md` so this approved research supersedes the old color lock for color generation and preset `source_color` values only. |
 
@@ -838,7 +838,7 @@ The first file is the experiential sketch. The approval-gate file is the stricte
 - Default-control examples only: Button, OptionButton/MenuButton, LineEdit, TabBar, ItemList/Tree rows, Progress/Slider, CheckBox/CheckButton, Popup/Dialog.
 - Flat raised-offset examples using solid darker lower edges.
 - Desktop and mobile density samples.
-- Visible state samples for normal, hover, pressed, disabled, selected, checked, `PositiveButton`, and `DangerButton`.
+- Visible state samples for normal, hover, pressed, disabled, selected, checked, `PrimaryButton`, and `DangerButton`.
 - Contrast badges for the proposed role foreground/background pairs.
 - Labels mapping visual roles to real Godot Theme slots and internal component aliases.
 

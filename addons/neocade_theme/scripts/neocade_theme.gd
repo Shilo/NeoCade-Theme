@@ -343,7 +343,7 @@ func _regenerate_theme() -> void:
 	var danger_fill: Color     = _role_color(color_strategy, "danger", source_hsl, source_influence)
 	var dialog_header: Color   = _role_color(color_strategy, "head", source_hsl, source_influence)
 	var popup_shell: Color     = surface_overlay
-	var primary_action_fill: Color = selection_fill
+	var primary_action_fill: Color = positive_fill
 	var success_fill: Color = positive_fill
 	var warning_fill: Color = action_fill
 	var info_fill: Color = menu_fill
@@ -384,16 +384,16 @@ func _regenerate_theme() -> void:
 
 	var button_normal: Color = action_fill
 	var button_disabled: Color = _mix(action_fill, surface_panel, 0.62)
-	var selection_control_off: Color = _mix(toggle_fill, surface_panel, 0.74)
+	var selection_control_off: Color = _visible_non_text_color(_mix(toggle_fill, surface_panel, 0.62), surface_panel, preferred_dark, preferred_light, 2.0)
 
-	var role_primary: Color = primary_action_fill
-	var accent_rim: Color = _role_edge_color(color_strategy, "select", primary_action_fill)
+	var role_primary: Color = selection_fill
+	var accent_rim: Color = _role_edge_color(color_strategy, "select", selection_fill)
 
 	var surface_high_offset: Color    = _raised_depth_color(surface_high, surface_base, raised_depth_darken)
 	var surface_panel_offset: Color   = _raised_depth_color(surface_panel, surface_base, raised_depth_darken)
 	var surface_overlay_offset: Color = _raised_depth_color(surface_overlay, surface_base, raised_depth_darken)
 	var surface_low_offset: Color     = _raised_depth_color(surface_low, surface_base, raised_depth_darken)
-	var accent_offset: Color          = _raised_depth_color(primary_action_fill, surface_base, raised_depth_darken)
+	var accent_offset: Color          = _raised_depth_color(selection_fill, surface_base, raised_depth_darken)
 
 	var editor_hint := Engine.is_editor_hint()
 
@@ -404,7 +404,7 @@ func _regenerate_theme() -> void:
 	var role_success_offset: Color = _raised_depth_color(role_success, surface_base, raised_depth_darken)
 	var role_warning_offset: Color = _raised_depth_color(role_warning, surface_base, raised_depth_darken)
 	var role_info_offset: Color = _raised_depth_color(role_info, surface_base, raised_depth_darken)
-	var text_on_primary: Color = on_selection
+	var text_on_primary: Color = _best_text_color(primary_action_fill, preferred_dark, preferred_light)
 	var text_on_accent_offset: Color = _best_text_color(accent_offset, preferred_dark, preferred_light)
 	var progress_text_color: Color = text_strong
 	var progress_text_outline: Color = _best_text_color(range_fill, preferred_dark, preferred_light)
@@ -413,7 +413,6 @@ func _regenerate_theme() -> void:
 	var text_on_warning: Color = _best_text_color(role_warning, preferred_dark, preferred_light)
 	var text_on_info: Color = _best_text_color(role_info, preferred_dark, preferred_light)
 	var primary_strategy_value: Variant = _lookup_shape(style_personality, "shape.primary_strategy")
-	var text_on_primary_button: Color = text_strong if String(primary_strategy_value) == "quiet-pill" else text_on_primary
 
 	var button_hover: Color = _state_layer_color(button_normal, on_action, neutral_hover_layer)
 	var button_pressed: Color = _state_layer_color(button_normal, on_action, neutral_pressed_layer)
@@ -430,11 +429,13 @@ func _regenerate_theme() -> void:
 	var surface_high_edge: Color = _role_edge_color(color_strategy, "panel2", surface_high)
 	var surface_overlay_edge: Color = _role_edge_color(color_strategy, "dialog", surface_overlay)
 
-	var primary_button_normal: Color = button_normal if String(primary_strategy_value) == "quiet-pill" else role_primary
-	text_on_primary_button = on_action if String(primary_strategy_value) == "quiet-pill" else _best_text_color(primary_button_normal, preferred_dark, preferred_light)
-	var primary_button_hover: Color = _state_layer_color(primary_button_normal, text_on_primary_button, semantic_hover_layer)
-	var primary_button_pressed: Color = _state_layer_color(primary_button_normal, text_on_primary_button, semantic_pressed_layer)
-	var primary_button_border: Color = _role_edge_color(color_strategy, "select", primary_button_normal)
+	var quiet_primary: bool = String(primary_strategy_value) == "quiet-pill"
+	var primary_button_normal: Color = surface_panel if quiet_primary else primary_action_fill
+	var text_on_primary_button: Color = _best_text_color(primary_button_normal, preferred_dark, preferred_light)
+	var primary_state_layer: Color = primary_action_fill if quiet_primary else text_on_primary_button
+	var primary_button_hover: Color = _state_layer_color(primary_button_normal, primary_state_layer, semantic_hover_layer)
+	var primary_button_pressed: Color = _state_layer_color(primary_button_normal, primary_state_layer, semantic_pressed_layer)
+	var primary_button_border: Color = _role_edge_color(color_strategy, "positive", primary_action_fill)
 	var primary_button_border_hover: Color = _state_layer_color(primary_button_hover, text_on_primary_button, button_edge_layer)
 	var primary_button_border_pressed: Color = _state_layer_color(primary_button_pressed, text_on_primary_button, button_edge_layer)
 	var primary_button_disabled: Color = primary_button_normal
@@ -447,14 +448,6 @@ func _regenerate_theme() -> void:
 	var danger_button_border_pressed: Color = _state_layer_color(danger_button_pressed, text_on_danger, button_edge_layer)
 	var danger_button_disabled: Color = danger_button_normal
 
-	var positive_button_normal: Color = positive_fill
-	var positive_button_hover: Color = _state_layer_color(positive_button_normal, on_positive, semantic_hover_layer)
-	var positive_button_pressed: Color = _state_layer_color(positive_button_normal, on_positive, semantic_pressed_layer)
-	var positive_button_border: Color = _role_edge_color(color_strategy, "positive", positive_button_normal)
-	var positive_button_border_hover: Color = _state_layer_color(positive_button_hover, on_positive, button_edge_layer)
-	var positive_button_border_pressed: Color = _state_layer_color(positive_button_pressed, on_positive, button_edge_layer)
-	var positive_button_disabled: Color = positive_button_normal
-
 	var button_normal_offset: Color = _raised_depth_color(button_normal, surface_base, raised_depth_darken)
 	var button_hover_offset: Color = _raised_depth_color(button_hover, surface_base, raised_depth_darken)
 	var button_pressed_offset: Color = _raised_depth_color(button_pressed, surface_base, raised_depth_darken)
@@ -463,9 +456,6 @@ func _regenerate_theme() -> void:
 	var primary_button_hover_offset: Color = _raised_depth_color(primary_button_hover, surface_base, raised_depth_darken)
 	var primary_button_pressed_offset: Color = _raised_depth_color(primary_button_pressed, surface_base, raised_depth_darken)
 	var role_primary_offset: Color = _raised_depth_color(role_primary, surface_base, raised_depth_darken)
-	var positive_button_offset: Color = _raised_depth_color(positive_button_normal, surface_base, raised_depth_darken)
-	var positive_button_hover_offset: Color = _raised_depth_color(positive_button_hover, surface_base, raised_depth_darken)
-	var positive_button_pressed_offset: Color = _raised_depth_color(positive_button_pressed, surface_base, raised_depth_darken)
 	var danger_button_offset: Color = _raised_depth_color(danger_button_normal, surface_base, raised_depth_darken)
 	var danger_button_hover_offset: Color = _raised_depth_color(danger_button_hover, surface_base, raised_depth_darken)
 	var danger_button_pressed_offset: Color = _raised_depth_color(danger_button_pressed, surface_base, raised_depth_darken)
@@ -530,7 +520,6 @@ func _regenerate_theme() -> void:
 	set_font("normal_font", "PanelRichTextLabel", body_font)
 	set_font("normal_font", "DialogRichTextLabel", body_font)
 	set_font("font", "PrimaryButton",   body_font)
-	set_font("font", "PositiveButton",  body_font)
 	set_font("font", "GhostButton",     body_font)
 	set_font("font", "DangerButton",    body_font)
 	set_font("font", "IconButton",      body_font)
@@ -607,7 +596,6 @@ func _regenerate_theme() -> void:
 	set_font_size("normal_font_size", "PanelRichTextLabel", tokens.body)
 	set_font_size("normal_font_size", "DialogRichTextLabel", tokens.body)
 	set_font_size("font_size", "PrimaryButton",   tokens.body)
-	set_font_size("font_size", "PositiveButton",  tokens.body)
 	set_font_size("font_size", "GhostButton",     tokens.body)
 	set_font_size("font_size", "DangerButton",    tokens.body)
 	set_font_size("font_size", "IconButton",      tokens.body)
@@ -657,7 +645,7 @@ func _regenerate_theme() -> void:
 		"input_edge":             _role_edge_color(color_strategy, "input", input_fill),
 		"selection_edge":         _role_edge_color(color_strategy, "select", selection_fill),
 		"range_edge":             _role_edge_color(color_strategy, "range", range_fill),
-		"positive_edge":          positive_button_border,
+		"positive_edge":          _role_edge_color(color_strategy, "positive", positive_fill),
 		"danger_edge":            danger_button_border,
 		"on_surface":             text_strong,
 		"on_panel":               on_panel,
@@ -699,13 +687,6 @@ func _regenerate_theme() -> void:
 		"primary_button_border":  primary_button_border,
 		"primary_button_border_hover": primary_button_border_hover,
 		"primary_button_border_pressed": primary_button_border_pressed,
-		"positive_button_normal": positive_button_normal,
-		"positive_button_hover":  positive_button_hover,
-		"positive_button_pressed": positive_button_pressed,
-		"positive_button_disabled": positive_button_disabled,
-		"positive_button_border": positive_button_border,
-		"positive_button_border_hover": positive_button_border_hover,
-		"positive_button_border_pressed": positive_button_border_pressed,
 		"danger_button_normal":   danger_button_normal,
 		"danger_button_hover":    danger_button_hover,
 		"danger_button_pressed":  danger_button_pressed,
@@ -725,9 +706,6 @@ func _regenerate_theme() -> void:
 		"primary_button_offset":  primary_button_offset,
 		"primary_button_hover_offset": primary_button_hover_offset,
 		"primary_button_pressed_offset": primary_button_pressed_offset,
-		"positive_button_offset": positive_button_offset,
-		"positive_button_hover_offset": positive_button_hover_offset,
-		"positive_button_pressed_offset": positive_button_pressed_offset,
 		"danger_button_offset":   danger_button_offset,
 		"danger_button_hover_offset": danger_button_hover_offset,
 		"danger_button_pressed_offset": danger_button_pressed_offset,
@@ -1104,6 +1082,18 @@ func _state_layer_color(container: Color, foreground: Color, opacity: float) -> 
 	return result
 
 
+func _visible_non_text_color(seed: Color, bg: Color, dark_text: Color, light_text: Color, min_ratio: float) -> Color:
+	if _contrast_ratio(seed, bg) >= min_ratio:
+		return seed
+	var target: Color = light_text if bg.get_luminance() < 0.5 else dark_text
+	var steps := [0.16, 0.28, 0.40, 0.52, 0.64, 0.76, 0.88, 1.0]
+	for amount in steps:
+		var candidate := _mix(seed, target, amount)
+		if _contrast_ratio(candidate, bg) >= min_ratio:
+			return candidate
+	return target
+
+
 func _raised_depth_color(element: Color, base_c: Color, strength_override: float = -1.0) -> Color:
 	# Phase 12 C4+ follow-up: HSV value-darken keeps depth in the element's hue
 	# family. `base_c` stays for callsite compatibility; built-in styles now pass
@@ -1307,7 +1297,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"kicker_style":  &"uppercase-tracked-accent",
 			"hairline_thickness":  0,
 			"min_radius_floor":    0,
-			"primary_outline_color":  &"role_primary",
+			"primary_outline_color":  &"primary_button_border",
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
 			"primary_min_height":  0,
@@ -1354,7 +1344,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"kicker_style":  &"small-caps-subtle",
 			"hairline_thickness":  1,   # Phase 12 C6 Slate signature: 1px hairlines on interactive chrome.
 			"min_radius_floor":    0,
-			"primary_outline_color":  &"role_primary",
+			"primary_outline_color":  &"primary_button_border",
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
 			"primary_min_height":  0,
@@ -1401,7 +1391,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"kicker_style":  &"uppercase-tracked-accent",
 			"hairline_thickness":  0,
 			"min_radius_floor":    0,
-			"primary_outline_color":  &"role_primary",
+			"primary_outline_color":  &"primary_button_border",
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
 			"primary_min_height":  0,
@@ -1448,7 +1438,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"kicker_style":  &"sentence-case-accent",
 			"hairline_thickness":  0,
 			"min_radius_floor":    0,
-			"primary_outline_color":  &"role_primary",   # Phase 12 C6 Daybreak: token name; resolved through role_table.
+			"primary_outline_color":  &"primary_button_border",   # Phase 12 C6 Daybreak: token name; resolved through role_table.
 			"primary_outline_offset": 3,                 # Phase 12 C6 Daybreak: px outside button edge.
 			"primary_outline_width":  2,                 # Phase 12 C6 Daybreak: 2px flat outline (NO halo per SC#3). Bumped from 1→2 per SC#4 protocol (MANIFEST 2026-05-11) to clear thumbnail-scale identifiability.
 			"primary_min_height":  0,
@@ -1495,7 +1485,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"kicker_style":  &"uppercase-bold-larger-scale",
 			"hairline_thickness":  0,
 			"min_radius_floor":    0,
-			"primary_outline_color":  &"role_primary",
+			"primary_outline_color":  &"primary_button_border",
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
 			"primary_min_height":  0,
@@ -1700,7 +1690,7 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 		"kicker_style":  &"sentence-case-accent",
 		"hairline_thickness":  0,
 		"min_radius_floor":    0,
-		"primary_outline_color":  &"role_primary",
+		"primary_outline_color":  &"primary_button_border",
 		"primary_outline_offset": 0,
 		"primary_outline_width":  0,
 		"primary_min_height":  0,
@@ -1730,9 +1720,8 @@ func _resolve_style_personality() -> Dictionary:
 ## release exposes such a constant, the wiring can be added with a documented
 ## docs URL plus a precise has_constant assertion in the verifier.
 const TYPE_VARIATIONS: Dictionary = {
-	# Button family (TYPEVAR-01) plus editor flat-menu variation — 7
+	# Button family (TYPEVAR-01) plus editor flat-menu variation.
 	"PrimaryButton":   "Button",
-	"PositiveButton":  "Button",
 	"GhostButton":     "Button",
 	"DangerButton":    "Button",
 	"IconButton":      "Button",
@@ -4942,11 +4931,13 @@ const BINDING_TABLE: Dictionary = {
 								"raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
 								"mobile_padding": Vector2i(18, 14),
+								"strategy": "shape.primary_strategy",
 								"offset_role": "primary_button_offset", "raised_face_edge": true},
 			"hover":         {"role": "primary_button_hover", "border_role": "primary_button_border_hover",
 								"raised_intensity": "shape.raised_lifts.primary",
 								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
 								"mobile_padding": Vector2i(18, 14),
+								"strategy": "shape.primary_strategy",
 								"offset_role": "primary_button_hover_offset", "raised_face_edge": true},
 			"pressed":       {"role": "primary_button_pressed", "border_role": "primary_button_border_pressed",
 								"raised_intensity": 0,
@@ -4978,56 +4969,6 @@ const BINDING_TABLE: Dictionary = {
 			"icon_focus_color":        {"role": "text_on_primary_button"},
 			"icon_disabled_color":     {"role": "text_on_primary_button", "disabled": true},
 			"icon_hover_pressed_color":{"role": "text_on_primary_button"},
-		},
-		"constant": {
-			"h_separation": {"value": "tokens.tapPadding"},
-		},
-	},
-	# 38b. PositiveButton — affirmative/confirm action; intentionally distinct from
-	# PrimaryButton so OK/confirm can use positive_fill without teaching users to
-	# overload ordinary primary action color.
-	"PositiveButton": {
-		"stylebox": {
-			"normal":        {"role": "positive_button_normal", "border_role": "positive_button_border",
-								"raised_intensity": "shape.raised_lifts.primary",
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 14),
-								"offset_role": "positive_button_offset", "raised_face_edge": true},
-			"hover":         {"role": "positive_button_hover", "border_role": "positive_button_border_hover",
-								"raised_intensity": "shape.raised_lifts.primary",
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 14),
-								"offset_role": "positive_button_hover_offset", "raised_face_edge": true},
-			"pressed":       {"role": "positive_button_pressed", "border_role": "positive_button_border_pressed",
-								"raised_intensity": 0,
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 14),
-								"offset_role": "positive_button_pressed_offset"},
-			"focus":         {"role": "focus_ring",
-								"radius": "shape.primary_radius"},
-			"disabled":      {"role": "positive_button_disabled", "disabled": true, "raised_intensity": 0,
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 14),
-								"border_width": 0},
-			"hover_pressed":{"role": "positive_button_pressed", "border_role": "positive_button_border_pressed",
-								"raised_intensity": 0,
-								"radius": "shape.primary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 14),
-								"offset_role": "positive_button_pressed_offset"},
-		},
-		"color": {
-			"font_color":              {"role": "on_positive"},
-			"font_hover_color":        {"role": "on_positive"},
-			"font_pressed_color":      {"role": "on_positive"},
-			"font_focus_color":        {"role": "on_positive"},
-			"font_disabled_color":     {"role": "on_positive", "disabled": true},
-			"font_hover_pressed_color":{"role": "on_positive"},
-			"icon_normal_color":       {"role": "on_positive"},
-			"icon_hover_color":        {"role": "on_positive"},
-			"icon_pressed_color":      {"role": "on_positive"},
-			"icon_focus_color":        {"role": "on_positive"},
-			"icon_disabled_color":     {"role": "on_positive", "disabled": true},
-			"icon_hover_pressed_color":{"role": "on_positive"},
 		},
 		"constant": {
 			"h_separation": {"value": "tokens.tapPadding"},
@@ -5892,13 +5833,13 @@ func _apply_raised_depth_border(sb: StyleBoxFlat, offset_color: Color, intensity
 ## the primary-button bg. Plan 05-02 Task 2 (D-04 first-class enum dispatch).
 ##
 ## Strategies are sourced VERBATIM from DESIGN_TOKENS §5.1-§5.5:
-##   "bold-accent-fill"        — Pulse: bg=role_primary (accent), thin outline matches accent.
-##   "quiet-pill"              — Slate: bg=surface_panel, thin role_primary border (1px).
-##   "pillowy-rounded"         — Bubble: bg=role_primary with shape.primary_radius preserved
+##   "bold-accent-fill"        — Pulse: bg=primary_action_fill, thin outline matches action.
+##   "quiet-pill"              — Slate: bg=surface_panel, thin primary-action border (1px).
+##   "pillowy-rounded"         — Bubble: bg=primary_action_fill with shape.primary_radius preserved
 ##                               so rounded buttons stay generous without becoming full pills.
-##   "friendly-generous"       — Daybreak: bg=role_primary, generous padding already applied
+##   "friendly-generous"       — Daybreak: bg=primary_action_fill, generous padding already applied
 ##                               by `padding: shape.primary_padding` recipe row.
-##   "oversized-statement"     — Burst: bg=role_primary with statement color/state behavior.
+##   "oversized-statement"     — Burst: bg=primary_action_fill with statement color/state behavior.
 ##
 ## Strategies are CLOSED enums — adding a 6th approved direction in v2 = adding a strategy
 ## entry HERE, not editing 14 BINDING_TABLE recipe rows (D-04). Unknown strategy = no-op
@@ -5908,29 +5849,24 @@ func _apply_primary_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_t
 	# per direction (sourced verbatim from DESIGN_TOKENS §5.1-§5.5 "primary_strategy" rows).
 	match String(strategy_name):
 		"bold-accent-fill":
-			# Pulse: solid accent fill, accent-tinted outline.
-			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
-			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
+			# Pulse: solid primary-action fill with matching role edge.
+			sb.border_color = role_table.get("primary_button_border", role_table.outline_color)
 		"quiet-pill":
-			# Slate: muted surface bg + thin accent border (the "iOS quiet pill" read).
-			sb.bg_color = role_table.get("surface_panel", role_table.surface_panel)
-			sb.border_color = role_table.get("role_primary", role_table.outline_color)
+			# Slate: muted surface bg + thin primary-action border (the "iOS quiet pill" read).
+			sb.border_color = role_table.get("primary_button_border", role_table.outline_color)
 			sb.border_width_left = 1
 			sb.border_width_top = 1
 			sb.border_width_right = 1
 			sb.border_width_bottom = 1
 		"pillowy-rounded":
-			# Bubble: accent fill; radius already applied by shape.primary_radius.
-			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
-			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
+			# Bubble: primary-action fill; radius already applied by shape.primary_radius.
+			sb.border_color = role_table.get("primary_button_border", role_table.outline_color)
 		"friendly-generous":
-			# Daybreak: accent fill; padding/radius already applied by shape.* recipe rows.
-			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
-			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
+			# Daybreak: primary-action fill; padding/radius already applied by shape.* recipe rows.
+			sb.border_color = role_table.get("primary_button_border", role_table.outline_color)
 		"oversized-statement":
-			# Burst: accent fill; radius already applied via shape.primary_radius.
-			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
-			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
+			# Burst: primary-action fill; radius already applied via shape.primary_radius.
+			sb.border_color = role_table.get("primary_button_border", role_table.outline_color)
 		_:
 			# Unknown strategy — Phase 5 verifier flags this as a typo; no mutation here
 			# so the bg from the recipe's `role` lookup stays in place (D-04 escape hatch).
@@ -6260,7 +6196,7 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 				outline_width_resolved = int(outline_width_v)
 			if outline_width_resolved > 0:
 				var outline_color_key_v: Variant = _lookup_shape(style_personality, "shape.primary_outline_color")
-				var outline_color_key: String = "role_primary"
+				var outline_color_key: String = "primary_button_border"
 				if outline_color_key_v != null:
 					outline_color_key = String(outline_color_key_v)
 				var outline_color_c: Color = role_table.get(outline_color_key, role_table.role_primary)
@@ -6588,7 +6524,7 @@ func _make_search_icon(svg_scale: float = 0.75) -> Texture2D:
 
 
 func _popup_selection_fill(checked: bool, disabled: bool, role_table: Dictionary) -> Color:
-	var fill: Color = role_table.get("role_primary", Color.WHITE) if checked else role_table.get("selection_control_off", Color(0.70, 0.74, 0.86))
+	var fill: Color = role_table.get("toggle_fill", Color.WHITE) if checked else role_table.get("selection_control_off", Color(0.70, 0.74, 0.86))
 	if disabled:
 		fill = _mix(fill, role_table.get("surface_base", Color.BLACK), 0.58)
 	return fill
