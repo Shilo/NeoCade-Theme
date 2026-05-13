@@ -18,6 +18,8 @@ class_name NeoCadeTheme extends Theme
 ##
 ## See: .planning/DESIGN_TOKENS.md, .planning/phases/04-.../04-RESEARCH.md, .planning/phases/04-.../04-CONTEXT.md.
 
+const CANONICAL_THEME_PATH := "res://addons/neocade_theme/neocade_theme.tres"
+
 ## Sizing mode used when regenerating NeoCade theme entries.
 enum Platform {
 	## Uses desktop control density and spacing.
@@ -211,6 +213,14 @@ static func apply_globally() -> void:
 		_do_apply_globally.call_deferred()
 
 
+## Apply the canonical NeoCade Theme to one Control at runtime, while leaving
+## editor-owned scene state untouched.
+static func apply_to_control(control: Control) -> void:
+	if Engine.is_editor_hint() or control == null or control.theme != null:
+		return
+	control.theme = load(CANONICAL_THEME_PATH) as Theme
+
+
 # Returns true if the merge happened, false if `SceneTree` wasn't the
 # main loop yet. The deferred caller invokes this once and won't re-defer
 # even if it fails again (e.g. a custom `MainLoop` that never becomes
@@ -218,7 +228,7 @@ static func apply_globally() -> void:
 static func _do_apply_globally() -> bool:
 	if not (Engine.get_main_loop() is SceneTree):
 		return false
-	ThemeDB.get_default_theme().merge_with(load("res://addons/neocade_theme/neocade_theme.tres") as Theme)
+	ThemeDB.get_default_theme().merge_with(load(CANONICAL_THEME_PATH) as Theme)
 	return true
 
 
@@ -348,6 +358,7 @@ func _regenerate_theme() -> void:
 	var surface_panel_offset: Color   = _tint_toward_base(surface_panel, base_color)
 	var surface_overlay_offset: Color = _tint_toward_base(surface_overlay, base_color)
 	var surface_low_offset: Color     = _tint_toward_base(surface_low, base_color)
+	var raised_depth_darken: float = _resolve_raised_depth_darken(style_personality)
 
 	# ── Text colors with is_light flip (DESIGN_TOKENS §6.4) ──
 	var text_strong: Color
@@ -394,9 +405,9 @@ func _regenerate_theme() -> void:
 	var role_warning: Color = Color("#FFD166")
 	var role_danger:  Color = Color("#FF6E6E")
 	var role_info:    Color = Color("#5FE3FF")
-	var role_success_offset: Color = _raised_depth_color(role_success, base_color)
-	var role_warning_offset: Color = _raised_depth_color(role_warning, base_color)
-	var role_info_offset: Color = _raised_depth_color(role_info, base_color)
+	var role_success_offset: Color = _raised_depth_color(role_success, base_color, raised_depth_darken)
+	var role_warning_offset: Color = _raised_depth_color(role_warning, base_color, raised_depth_darken)
+	var role_info_offset: Color = _raised_depth_color(role_info, base_color, raised_depth_darken)
 	var text_on_primary: Color = _readable_text_color(role_primary)
 	var text_on_accent_offset: Color = _readable_text_color(accent_offset)
 	var progress_text_color: Color = text_strong
@@ -445,18 +456,18 @@ func _regenerate_theme() -> void:
 	var danger_button_border_pressed: Color = _state_layer_color(danger_button_pressed, text_on_danger, button_edge_layer)
 	var danger_button_disabled: Color = danger_button_normal
 
-	var button_normal_offset: Color = _raised_depth_color(button_normal, base_color)
-	var button_hover_offset: Color = _raised_depth_color(button_hover, base_color)
-	var button_pressed_offset: Color = _raised_depth_color(button_pressed, base_color)
-	var button_disabled_offset: Color = _raised_depth_color(button_disabled, base_color)
-	var primary_button_offset: Color = _raised_depth_color(primary_button_normal, base_color)
-	var primary_button_hover_offset: Color = _raised_depth_color(primary_button_hover, base_color)
-	var primary_button_pressed_offset: Color = _raised_depth_color(primary_button_pressed, base_color)
-	var role_primary_offset: Color = _raised_depth_color(role_primary, base_color)
-	var danger_button_offset: Color = _raised_depth_color(danger_button_normal, base_color)
-	var danger_button_hover_offset: Color = _raised_depth_color(danger_button_hover, base_color)
-	var danger_button_pressed_offset: Color = _raised_depth_color(danger_button_pressed, base_color)
-	var role_danger_offset: Color = _raised_depth_color(role_danger, base_color)
+	var button_normal_offset: Color = _raised_depth_color(button_normal, base_color, raised_depth_darken)
+	var button_hover_offset: Color = _raised_depth_color(button_hover, base_color, raised_depth_darken)
+	var button_pressed_offset: Color = _raised_depth_color(button_pressed, base_color, raised_depth_darken)
+	var button_disabled_offset: Color = _raised_depth_color(button_disabled, base_color, raised_depth_darken)
+	var primary_button_offset: Color = _raised_depth_color(primary_button_normal, base_color, raised_depth_darken)
+	var primary_button_hover_offset: Color = _raised_depth_color(primary_button_hover, base_color, raised_depth_darken)
+	var primary_button_pressed_offset: Color = _raised_depth_color(primary_button_pressed, base_color, raised_depth_darken)
+	var role_primary_offset: Color = _raised_depth_color(role_primary, base_color, raised_depth_darken)
+	var danger_button_offset: Color = _raised_depth_color(danger_button_normal, base_color, raised_depth_darken)
+	var danger_button_hover_offset: Color = _raised_depth_color(danger_button_hover, base_color, raised_depth_darken)
+	var danger_button_pressed_offset: Color = _raised_depth_color(danger_button_pressed, base_color, raised_depth_darken)
+	var role_danger_offset: Color = _raised_depth_color(role_danger, base_color, raised_depth_darken)
 
 	# ── BINDING_TABLE walk lands here (Plan 04-05). ──
 	# The locals above are the precomputed inputs every entry-population path consumes.
@@ -496,6 +507,12 @@ func _regenerate_theme() -> void:
 	set_font("font", "HeaderMedium", header_medium_font)
 	set_font("font", "HeaderSmall",  header_small_font)
 	set_font("font", "Caption",      body_font)
+	# Phase 13 § C1: explicit font binding for Role Label variations (PITFALLS 1.2 —
+	# type variations do NOT inherit fonts from their base type).
+	set_font("font", "SuccessLabel", body_font)
+	set_font("font", "WarningLabel", body_font)
+	set_font("font", "DangerLabel",  body_font)
+	set_font("font", "InfoLabel",    body_font)
 	set_font("font", "CodeLabel",    body_font)   # consumer can override to a mono per FONT-04 stricken
 	# Kicker (D-09 / Plan 05-04): Inter Variable Roman body weight per UD-4 Option D / D-17.
 	# Per PITFALLS 1.2 type variations DO NOT inherit fonts from Label, so this
@@ -556,6 +573,11 @@ func _regenerate_theme() -> void:
 	# scale like the built-in editor theme; HeaderMedium/Large carry display scale.
 	set_font_size("font_size", "HeaderSmall",  tokens.body)
 	set_font_size("font_size", "Caption",      tokens.label_)
+	# Phase 13 § C1: explicit font_size binding for Role Label variations.
+	set_font_size("font_size", "SuccessLabel", tokens.body)
+	set_font_size("font_size", "WarningLabel", tokens.body)
+	set_font_size("font_size", "DangerLabel",  tokens.body)
+	set_font_size("font_size", "InfoLabel",    tokens.body)
 	set_font_size("font_size", "CodeLabel",    tokens.label_)
 	# Kicker (D-09): tokens.kicker is 12 desktop / 13 mobile per DESIGN_TOKENS §10.1.
 	# Burst's "uppercase-bold-larger-scale" enum is owned by content/showcase since
@@ -797,6 +819,11 @@ func _apply_editor_theme_runtime_settings(role_table: Dictionary) -> void:
 	set_stylebox("focus", "RichTextLabel", StyleBoxEmpty.new())
 
 
+# Phase 12 C2' note (RESEARCH OQ2 / D-12.07 item 6): the section-header underline
+# accent rebind was DEFERRED. HSeparator's stylebox is shared with PopupMenu
+# separators (Phase 7 convention); rebinding here would surface accent inside
+# dropdown menu separators — wrong visual. Re-evaluate after Wave 3 ships if
+# accent airtime in headings still feels under-served.
 func _apply_separator_styleboxes(role_table: Dictionary) -> void:
 	var separator_color: Color = role_table.get("outline_color", Color.WHITE)
 	separator_color = Color(separator_color.r, separator_color.g, separator_color.b, separator_color.a * 0.62)
@@ -851,13 +878,27 @@ func _state_layer_color(container: Color, foreground: Color, opacity: float) -> 
 	return result
 
 
-func _raised_depth_color(element: Color, base_c: Color) -> Color:
-	var base_pull := 0.16 if not is_light else 0.10
-	var depth_amount := 0.10 if not is_light else 0.12
-	var result := _mix(element, base_c, base_pull)
-	result = _mix(result, Color.BLACK, depth_amount)
+func _raised_depth_color(element: Color, base_c: Color, strength_override: float = -1.0) -> Color:
+	# Phase 12 C4+ follow-up: HSV value-darken keeps depth in the element's hue
+	# family. `base_c` stays for callsite compatibility; built-in styles now pass
+	# a per-direction strength so Bubble can stay candy-like instead of near-black.
+	var strength: float = strength_override
+	if strength < 0.0:
+		strength = 0.20 + 0.10 * float(raised_strength)
+	strength = clampf(strength, 0.0, 0.75)
+	var h: float = element.h
+	var s: float = element.s
+	var v: float = element.v * (1.0 - strength)
+	var result := Color.from_hsv(h, s, max(v, 0.04))
 	result.a = element.a
 	return result
+
+
+func _resolve_raised_depth_darken(style_personality: Dictionary) -> float:
+	var raw: Variant = _lookup_shape(style_personality, "shape.raised_depth_darken")
+	if raw != null and (typeof(raw) == TYPE_INT or typeof(raw) == TYPE_FLOAT):
+		return clampf(float(raw), 0.0, 0.75)
+	return clampf(0.20 + 0.10 * float(raised_strength), 0.0, 0.75)
 
 
 func _readable_text_color(bg: Color) -> Color:
@@ -937,6 +978,9 @@ func _platform_tokens(p: Platform) -> Dictionary:
 
 # ─── Raised stylebox helper (DESIGN_TOKENS §9) ──────────────────────────────────────────────
 
+const TAB_RADIUS_MAX := 12
+const POPUP_RADIUS_MAX := 12
+
 ## Construct a StyleBoxFlat base for flat or raised mode.
 ## Raised depth is applied later as a hard bottom extrusion, never a StyleBoxFlat shadow.
 func _make_raised_stylebox(bg: Color, _offset_color: Color, _intensity: int) -> StyleBoxFlat:
@@ -946,6 +990,28 @@ func _make_raised_stylebox(bg: Color, _offset_color: Color, _intensity: int) -> 
 	sb.shadow_size = 0
 	sb.shadow_offset = Vector2.ZERO
 	return sb
+
+
+func _resolve_raised_depth(intensity: int, style_personality: Dictionary) -> int:
+	if not raised or raised_strength <= 0 or intensity <= 0:
+		return 0
+	# shape.raised_lifts is a 0-3 family-emphasis scale. The per-style scale
+	# makes Bubble the chunkiest HCGames-style candy underside, keeps Burst bold
+	# but shallower, and lets Daybreak stay gentle without adding a public export.
+	var scale := 1.0
+	var scale_raw: Variant = _lookup_shape(style_personality, "shape.raised_depth_scale")
+	if scale_raw != null and (typeof(scale_raw) == TYPE_INT or typeof(scale_raw) == TYPE_FLOAT):
+		scale = maxf(0.0, float(scale_raw))
+	var style_depth: float = float(raised_strength) * scale
+	return maxi(1, ceili(style_depth * float(intensity) / 3.0))
+
+
+func _constrain_shape_radius(radius: int, radius_path: String) -> int:
+	if radius_path == "shape.tab_radius":
+		return mini(radius, TAB_RADIUS_MAX)
+	if radius_path == "shape.popup_radius":
+		return mini(radius, POPUP_RADIUS_MAX)
+	return radius
 
 
 # ─── Style personality (DESIGN_TOKENS §5/§6, directions.json axis_8/axis_9) ─────────────────
@@ -973,11 +1039,12 @@ const STYLE_PERSONALITY: Dictionary = {
 		"spread_factor": 1.3, "hover_pct": 6.0, "pressed_pct": -10.0, "disabled_opacity": 0.42,
 		"shape": {
 			"primary_radius":        0,
-			"primary_padding":       Vector2i(12, 8),
+			"primary_padding":       Vector2i(14, 9),
 			"primary_strategy":      &"bold-accent-fill",
 			"ghost_strategy":        &"accent-outlined-accent-text",
-			"secondary_radius":      0,
+			"regular_radius":      0,
 			"tab_radius":            0,
+			"popup_radius":          0,
 			"chip_radius":           0,
 			"card_radius":           0,
 			"hero_radius":           0,
@@ -985,8 +1052,8 @@ const STYLE_PERSONALITY: Dictionary = {
 			"surface_alpha_popup":   1.00,
 			"surface_alpha_buttons": 1.00,
 			"raised_lifts": {
-				"primary":         2,
-				"secondary":       2,
+				"primary":         3,
+				"regular":       2,
 				"ghost":           1,
 				"selected_tab":    2,
 				"unselected_tab":  2,
@@ -997,32 +1064,43 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    0,  # Pulse rows do NOT lift (§5.1 raised lifts line)
 				"chip":            2,
 			},
+			"raised_depth_scale":  1.50,
+			"raised_depth_darken": 0.38,
+			"regular_raised_face_edge": true,
 			"focus_offset":  0,
 			"kicker_style":  &"uppercase-tracked-accent",
+			"hairline_thickness":  0,
+			"min_radius_floor":    0,
+			"primary_outline_color":  &"role_primary",
+			"primary_outline_offset": 0,
+			"primary_outline_width":  0,
+			"primary_min_height":  0,
+			"primary_min_height_mobile":  0,
 		},
 	},
 	# ─── Slate — base=#111820, accent=#8BD3FF (DESIGN_TOKENS §5.2) ───
-	# Personality: iOS-premium-quiet; radius=14 rounded-pill; ios-style-offset focus (offset=2).
-	# Buttons rounded (radius 14), padding 16×11 desktop, primary strategy = quiet-pill.
-	# Tabs/chips full pill (radius 999). Surface alpha popup 0.92 (iOS NavigationBar bleed).
+	# Personality: iOS-premium-quiet; radius=8 rounded chrome; ios-style-offset focus (offset=2).
+	# Buttons use the shared desktop padding; primary strategy = quiet-pill.
+	# Tabs follow the base radius under TAB_RADIUS_MAX. Surface alpha popup 0.92.
 	Style.SLATE: {
 		"spread_factor": 0.7, "hover_pct": 4.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
 		"shape": {
-			"primary_radius":        14,
+			"primary_radius":        8,
 			"primary_padding":       Vector2i(14, 9),
 			"primary_strategy":      &"quiet-pill",
 			"ghost_strategy":        &"thin-accent-outline",
-			"secondary_radius":      14,
-			"tab_radius":            999,
-			"chip_radius":           999,
-			"card_radius":           14,
-			"hero_radius":           14,
+			"regular_radius":      8,
+			"tab_radius":            8,
+			"popup_radius":          8,
+			"chip_radius":           8,
+			"card_radius":           8,
+			"hero_radius":           8,
 			"surface_alpha_panels":  1.00,
 			"surface_alpha_popup":   0.92,
 			"surface_alpha_buttons": 1.00,
 			"raised_lifts": {
 				"primary":         2,
-				"secondary":       1,
+				"regular":       1,
 				"ghost":           1,
 				"selected_tab":    1,
 				"unselected_tab":  1,
@@ -1033,32 +1111,43 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    1,
 				"chip":            2,
 			},
+			"raised_depth_scale":  1.60,
+			"raised_depth_darken": 0.30,
+			"regular_raised_face_edge": true,
 			"focus_offset":  2,
 			"kicker_style":  &"small-caps-subtle",
+			"hairline_thickness":  1,   # Phase 12 C6 Slate signature: 1px hairlines on interactive chrome.
+			"min_radius_floor":    0,
+			"primary_outline_color":  &"role_primary",
+			"primary_outline_offset": 0,
+			"primary_outline_width":  0,
+			"primary_min_height":  0,
+			"primary_min_height_mobile":  0,
 		},
 	},
 	# ─── Bubble — base=#241326, accent=#FFB3E6 (DESIGN_TOKENS §5.3) ───
-	# Personality: candy-pillowy; base radius 26 / primary radius 999 (pill on primary
-	# specifically per §5.3); cheerful-chunky focus (offset=2). Padding 20×14 desktop.
-	# Tabs/chips fully-rounded pill (radius 999). Surface alpha all 1.00 (candy is opaque).
+	# Personality: candy-pillowy; base radius 24 with compact tabs and popups capped.
+	# Cheerful-chunky focus (offset=2). Shared desktop padding keeps layout stable.
+	# Surface alpha all 1.00 (candy is opaque).
 	Style.BUBBLE: {
 		"spread_factor": 1.0, "hover_pct": 8.0, "pressed_pct": -10.0, "disabled_opacity": 0.45,
 		"shape": {
-			"primary_radius":        999,
-			"primary_padding":       Vector2i(16, 10),
-			"primary_strategy":      &"pillowy-fully-rounded",
+			"primary_radius":        24,
+			"primary_padding":       Vector2i(14, 9),
+			"primary_strategy":      &"pillowy-rounded",
 			"ghost_strategy":        &"rounded-ghost-thicker-outline",
-			"secondary_radius":      26,
-			"tab_radius":            999,
-			"chip_radius":           999,
-			"card_radius":           26,
-			"hero_radius":           26,
+			"regular_radius":      24,
+			"tab_radius":            24,
+			"popup_radius":          24,
+			"chip_radius":           24,
+			"card_radius":           24,
+			"hero_radius":           24,
 			"surface_alpha_panels":  1.00,
 			"surface_alpha_popup":   1.00,
 			"surface_alpha_buttons": 1.00,
 			"raised_lifts": {
 				"primary":         3,
-				"secondary":       2,
+				"regular":       2,
 				"ghost":           1,
 				"selected_tab":    2,
 				"unselected_tab":  2,
@@ -1069,32 +1158,43 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    1,
 				"chip":            2,
 			},
+			"raised_depth_scale":  1.52,
+			"raised_depth_darken": 0.32,
+			"regular_raised_face_edge": true,
 			"focus_offset":  2,
 			"kicker_style":  &"uppercase-tracked-accent",
+			"hairline_thickness":  0,
+			"min_radius_floor":    0,
+			"primary_outline_color":  &"role_primary",
+			"primary_outline_offset": 0,
+			"primary_outline_width":  0,
+			"primary_min_height":  0,
+			"primary_min_height_mobile":  0,
 		},
 	},
 	# ─── Daybreak — base=#0B2420, accent=#76F2D1 (DESIGN_TOKENS §5.4) ───
-	# Personality: airy-welcoming-lobby; radius=8 gently rounded; airy-mint focus (offset=2).
-	# Buttons radius 8, padding 18×12 desktop, primary strategy = friendly-generous.
+	# Personality: airy-welcoming-lobby; radius=4 gently rounded; airy-mint focus (offset=2).
+	# Buttons use the shared desktop padding; primary strategy = friendly-generous.
 	# Surface alpha popup 0.90 + panels 0.96 (airy bleed) but buttons 1.00 (tappability).
 	Style.DAYBREAK: {
 		"spread_factor": 1.0, "hover_pct": 6.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
 		"shape": {
-			"primary_radius":        8,
-			"primary_padding":       Vector2i(15, 9),
+			"primary_radius":        4,
+			"primary_padding":       Vector2i(14, 9),
 			"primary_strategy":      &"friendly-generous",
 			"ghost_strategy":        &"soft-outline",
-			"secondary_radius":      8,
-			"tab_radius":            8,
-			"chip_radius":           8,
-			"card_radius":           8,
-			"hero_radius":           8,
+			"regular_radius":      4,
+			"tab_radius":            4,
+			"popup_radius":          4,
+			"chip_radius":           4,
+			"card_radius":           4,
+			"hero_radius":           4,
 			"surface_alpha_panels":  0.96,
 			"surface_alpha_popup":   0.90,
 			"surface_alpha_buttons": 1.00,
 			"raised_lifts": {
 				"primary":         3,
-				"secondary":       1,
+				"regular":       1,
 				"ghost":           1,
 				"selected_tab":    2,
 				"unselected_tab":  2,
@@ -1105,32 +1205,43 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    1,
 				"chip":            3,
 			},
+			"raised_depth_scale":  0.66,
+			"raised_depth_darken": 0.34,
+			"regular_raised_face_edge": false,
 			"focus_offset":  2,
 			"kicker_style":  &"sentence-case-accent",
+			"hairline_thickness":  0,
+			"min_radius_floor":    0,
+			"primary_outline_color":  &"role_primary",   # Phase 12 C6 Daybreak: token name; resolved through role_table.
+			"primary_outline_offset": 3,                 # Phase 12 C6 Daybreak: px outside button edge.
+			"primary_outline_width":  2,                 # Phase 12 C6 Daybreak: 2px flat outline (NO halo per SC#3). Bumped from 1→2 per SC#4 protocol (MANIFEST 2026-05-11) to clear thumbnail-scale identifiability.
+			"primary_min_height":  0,
+			"primary_min_height_mobile":  0,
 		},
 	},
 	# ─── Burst — base=#20112E, accent=#FFD166 (DESIGN_TOKENS §5.5) ───
-	# Personality: event-celebration-statement; base radius 18 / primary radius 28 (oversized
-	# per §5.5); dramatic-event focus (offset=1). Padding 20×14 desktop. Tabs radius 16.
+	# Personality: event-celebration-statement; base radius 12 and dramatic-event focus (offset=1).
+	# Shared desktop padding keeps style changes from moving layout. Primary strategy = oversized-statement.
 	# Surface alpha all 1.00 (celebration posters solid). Primary strategy = oversized-statement.
 	Style.BURST: {
 		"spread_factor": 1.3, "hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.45,
 		"shape": {
-			"primary_radius":        28,
-			"primary_padding":       Vector2i(16, 10),
+			"primary_radius":        12,
+			"primary_padding":       Vector2i(14, 9),
 			"primary_strategy":      &"oversized-statement",
 			"ghost_strategy":        &"normal-accent-ghost",
-			"secondary_radius":      18,
-			"tab_radius":            16,
-			"chip_radius":           16,
-			"card_radius":           18,
-			"hero_radius":           18,
+			"regular_radius":      12,
+			"tab_radius":            12,
+			"popup_radius":          12,
+			"chip_radius":           12,
+			"card_radius":           12,
+			"hero_radius":           12,
 			"surface_alpha_panels":  1.00,
 			"surface_alpha_popup":   1.00,
 			"surface_alpha_buttons": 1.00,
 			"raised_lifts": {
 				"primary":         3,
-				"secondary":       2,
+				"regular":       2,
 				"ghost":           2,
 				"selected_tab":    3,
 				"unselected_tab":  3,
@@ -1141,8 +1252,18 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    2,
 				"chip":            2,
 			},
+			"raised_depth_scale":  1.32,
+			"raised_depth_darken": 0.42,
+			"regular_raised_face_edge": true,
 			"focus_offset":  1,
 			"kicker_style":  &"uppercase-bold-larger-scale",
+			"hairline_thickness":  0,
+			"min_radius_floor":    0,
+			"primary_outline_color":  &"role_primary",
+			"primary_outline_offset": 0,
+			"primary_outline_width":  0,
+			"primary_min_height":  0,
+			"primary_min_height_mobile":  0,
 		},
 	},
 }
@@ -1160,7 +1281,7 @@ const STYLE_EXPORTS: Dictionary = {
 	Style.BUBBLE: {
 		"base_color": Color("#241326"),
 		"accent_color": Color("#FFB3E6"),
-		"corner_radius": 26,
+		"corner_radius": 24,
 		"spacing": 16,
 		"raised_strength": 3,
 		"focus_thickness": 3,
@@ -1169,7 +1290,7 @@ const STYLE_EXPORTS: Dictionary = {
 	Style.BURST: {
 		"base_color": Color("#20112E"),
 		"accent_color": Color("#FFD166"),
-		"corner_radius": 18,
+		"corner_radius": 12,
 		"spacing": 16,
 		"raised_strength": 3,
 		"focus_thickness": 3,
@@ -1178,7 +1299,7 @@ const STYLE_EXPORTS: Dictionary = {
 	Style.DAYBREAK: {
 		"base_color": Color("#0B2420"),
 		"accent_color": Color("#76F2D1"),
-		"corner_radius": 8,
+		"corner_radius": 4,
 		"spacing": 16,
 		"raised_strength": 3,
 		"focus_thickness": 2,
@@ -1196,7 +1317,7 @@ const STYLE_EXPORTS: Dictionary = {
 	Style.SLATE: {
 		"base_color": Color("#111820"),
 		"accent_color": Color("#8BD3FF"),
-		"corner_radius": 14,
+		"corner_radius": 8,
 		"spacing": 16,
 		"raised_strength": 2,
 		"focus_thickness": 2,
@@ -1216,8 +1337,9 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 		"primary_padding":       Vector2i(16, 11),
 		"primary_strategy":      &"friendly-generous",
 		"ghost_strategy":        &"soft-outline",
-		"secondary_radius":      8,
+		"regular_radius":      8,
 		"tab_radius":            8,
+		"popup_radius":          8,
 		"chip_radius":           8,
 		"card_radius":           8,
 		"hero_radius":           8,
@@ -1226,7 +1348,7 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 		"surface_alpha_buttons": 1.00,
 		"raised_lifts": {
 			"primary":         3,
-			"secondary":       1,
+			"regular":       1,
 			"ghost":           1,
 			"selected_tab":    2,
 			"unselected_tab":  2,
@@ -1237,8 +1359,18 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 			"selected_row":    1,
 			"chip":            3,
 		},
+		"raised_depth_scale":  1.00,
+		"raised_depth_darken": 0.36,
+		"regular_raised_face_edge": true,
 		"focus_offset":  2,
 		"kicker_style":  &"sentence-case-accent",
+		"hairline_thickness":  0,
+		"min_radius_floor":    0,
+		"primary_outline_color":  &"role_primary",
+		"primary_outline_offset": 0,
+		"primary_outline_width":  0,
+		"primary_min_height":  0,
+		"primary_min_height_mobile":  0,
 	},
 }
 
@@ -1309,6 +1441,11 @@ const TYPE_VARIATIONS: Dictionary = {
 	"TabContainerOdd": "TabContainer",
 	"TabContainerInner": "TabContainer",
 	"TabBarInner": "TabBar",
+	# Opt-in TabContainer variation that restores a filled tabbar_background
+	# (surface_base) for cases where the unused area beside the tab strip
+	# should read as part of the container chrome. Default TabContainer ships
+	# transparent so the parent surface shows through.
+	"FilledTabContainer": "TabContainer",
 	"BottomPanel": "TabContainer",
 	"MainMenuBar": "FlatMenuButton",
 	"PanelBackgroundButton": "Button",
@@ -1323,6 +1460,17 @@ const TYPE_VARIATIONS: Dictionary = {
 	# Editor dock scroll-body wrappers used after toolbar stacks.
 	"NoBorderHorizontal":       "MarginContainer",
 	"NoBorderHorizontalBottom": "NoBorderHorizontal",
+	# Phase 13 § C1: Role Label opt-in type variations (4)
+	"SuccessLabel": "Label",
+	"WarningLabel": "Label",
+	"DangerLabel":  "Label",
+	"InfoLabel":    "Label",
+	# Phase 13 § C3: Role Panel opt-in type variations (5)
+	"AccentPanel":  "PanelContainer",
+	"InfoPanel":    "PanelContainer",
+	"WarningPanel": "PanelContainer",
+	"DangerPanel":  "PanelContainer",
+	"SuccessPanel": "PanelContainer",
 }
 
 
@@ -1667,22 +1815,22 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 		"font_size": ["font_size"],
 		"icon": ["scroll_hint"],
 	},
-	# TabBar — official Godot 4.6.2 slot freeze. Legacy tab-separation notes
-	# are absent in the local probe and must not be bound without new evidence.
+	# TabBar — official Godot 4.6.2 slot freeze. tab_separation is the
+	# Godot-owned inter-tab gap used to keep adjacent rounded tabs legible.
 	"TabBar": {
 		"stylebox": ["button_highlight", "button_pressed", "tab_disabled", "tab_focus",
 					 "tab_hovered", "tab_selected", "tab_unselected"],
 		"color": ["drop_mark_color", "font_disabled_color", "font_hovered_color", "font_outline_color",
 				  "font_selected_color", "font_unselected_color", "icon_disabled_color",
 				  "icon_hovered_color", "icon_selected_color", "icon_unselected_color"],
-		"constant": ["h_separation", "hover_switch_wait_msec", "icon_max_width", "outline_size"],
+		"constant": ["h_separation", "hover_switch_wait_msec", "icon_max_width", "outline_size", "tab_separation"],
 		"font": ["font"],
 		"font_size": ["font_size"],
 		"icon": ["close", "decrement", "decrement_highlight", "drop_mark",
 				 "increment", "increment_highlight"],
 	},
-	# TabContainer — official Godot 4.6.2 slot freeze. Legacy tab-separation
-	# notes are absent in the local probe and must not be bound without new evidence.
+	# TabContainer — official Godot 4.6.2 slot freeze. Its tab_separation is
+	# forwarded to the internal TabBar and creates the gap between tab faces.
 	"TabContainer": {
 		"stylebox": ["tab_selected", "tab_unselected", "tab_hovered", "tab_disabled", "tab_focus",
 					 "panel", "tabbar_background"],
@@ -1838,19 +1986,19 @@ const BINDING_TABLE: Dictionary = {
 				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
 				"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 				"border_alpha": 0.0,
-				"radius": "shape.secondary_radius", "padding": Vector2i(6, 2)
+				"radius": "shape.regular_radius", "padding": Vector2i(6, 2)
 			},
 			"prop_subsection_stylebox_left": {
 				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
 				"raised_intensity": 0, "border_widths": Vector4i(1, 0, 0, 0),
 				"border_alpha": 0.0,
-				"radius": "shape.secondary_radius", "padding": Vector2i(6, 2)
+				"radius": "shape.regular_radius", "padding": Vector2i(6, 2)
 			},
 			"prop_subsection_stylebox_right": {
 				"role": "editor_prop_subsection", "border_role": "editor_prop_subsection",
 				"raised_intensity": 0, "border_widths": Vector4i(0, 0, 1, 0),
 				"border_alpha": 0.0,
-				"radius": "shape.secondary_radius", "padding": Vector2i(6, 2)
+				"radius": "shape.regular_radius", "padding": Vector2i(6, 2)
 			},
 		},
 		"color": {
@@ -1975,14 +2123,14 @@ const BINDING_TABLE: Dictionary = {
 			"bg":            {"empty": true},
 			"bg_selected":   {"role": "button_pressed", "border_role": "button_pressed",
 							  "raised_intensity": 0, "alpha": 0.32, "border_width": 0,
-							  "radius": "shape.secondary_radius"},
+							  "radius": "shape.regular_radius"},
 			"child_bg":      {"role": "button_normal", "border_role": "button_border",
 							  "raised_face_edge": true,
-							  "raised_intensity": "shape.raised_lifts.secondary",
-							  "radius": "shape.secondary_radius", "border_width": 1},
+							  "raised_intensity": "shape.raised_lifts.regular",
+							  "radius": "shape.regular_radius", "border_width": 1},
 			"bg_group_note": {"role": "role_primary", "alpha": 0.10,
 							  "raised_intensity": 0, "border_width": 0,
-							  "radius": "shape.secondary_radius",
+							  "radius": "shape.regular_radius",
 							  "content_margins": Vector4i(8, 6, 8, 6)},
 		},
 		"color": {
@@ -2020,8 +2168,8 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"label_bg": {"role": "button_normal", "border_role": "button_border",
 						 "raised_face_edge": true,
-						 "raised_intensity": "shape.raised_lifts.secondary",
-						 "radius": "shape.secondary_radius", "border_width": 1,
+						 "raised_intensity": "shape.raised_lifts.regular",
+						 "radius": "shape.regular_radius", "border_width": 1,
 						 "padding": Vector2i(8, 4)},
 		},
 		"color": {
@@ -2041,46 +2189,46 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":                 {"role": "button_normal", "border_role": "button_border",
 									   "raised_face_edge": true,
-									   "raised_intensity": "shape.raised_lifts.secondary",
-									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4),
+									   "raised_intensity": "shape.raised_lifts.regular",
+									   "radius": "shape.regular_radius", "padding": Vector2i(8, 4),
 									   "mobile_padding": Vector2i(8, 16)},
 			"normal_mirrored":        {"role": "button_normal", "border_role": "button_border",
 									   "raised_face_edge": true,
-									   "raised_intensity": "shape.raised_lifts.secondary",
-									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4),
+									   "raised_intensity": "shape.raised_lifts.regular",
+									   "radius": "shape.regular_radius", "padding": Vector2i(8, 4),
 									   "mobile_padding": Vector2i(8, 16)},
 			"hover":                  {"role": "button_hover", "border_role": "button_border_hover",
 									   "raised_face_edge": true,
-									   "raised_intensity": "shape.raised_lifts.secondary",
-									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4),
+									   "raised_intensity": "shape.raised_lifts.regular",
+									   "radius": "shape.regular_radius", "padding": Vector2i(8, 4),
 									   "mobile_padding": Vector2i(8, 16)},
 			"hover_mirrored":         {"role": "button_hover", "border_role": "button_border_hover",
 									   "raised_face_edge": true,
-									   "raised_intensity": "shape.raised_lifts.secondary",
-									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4),
+									   "raised_intensity": "shape.raised_lifts.regular",
+									   "radius": "shape.regular_radius", "padding": Vector2i(8, 4),
 									   "mobile_padding": Vector2i(8, 16)},
 			"pressed":                {"role": "button_pressed", "border_role": "button_border_pressed",
 									   "raised_intensity": 0,
-									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4),
+									   "radius": "shape.regular_radius", "padding": Vector2i(8, 4),
 									   "mobile_padding": Vector2i(8, 16)},
 			"pressed_mirrored":       {"role": "button_pressed", "border_role": "button_border_pressed",
 									   "raised_intensity": 0,
-									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4),
+									   "radius": "shape.regular_radius", "padding": Vector2i(8, 4),
 									   "mobile_padding": Vector2i(8, 16)},
 			"hover_pressed":          {"role": "button_pressed", "border_role": "button_border_pressed",
 									   "raised_intensity": 0,
-									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4),
+									   "radius": "shape.regular_radius", "padding": Vector2i(8, 4),
 									   "mobile_padding": Vector2i(8, 16)},
 			"hover_pressed_mirrored": {"role": "button_pressed", "border_role": "button_border_pressed",
 									   "raised_intensity": 0,
-									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4),
+									   "radius": "shape.regular_radius", "padding": Vector2i(8, 4),
 									   "mobile_padding": Vector2i(8, 16)},
 			"disabled":               {"role": "button_disabled", "raised_intensity": 0,
-									   "border_width": 0, "radius": "shape.secondary_radius",
+									   "border_width": 0, "radius": "shape.regular_radius",
 									   "padding": Vector2i(8, 4),
 									   "mobile_padding": Vector2i(8, 16)},
 			"disabled_mirrored":      {"role": "button_disabled", "raised_intensity": 0,
-									   "border_width": 0, "radius": "shape.secondary_radius",
+									   "border_width": 0, "radius": "shape.regular_radius",
 									   "padding": Vector2i(8, 4),
 									   "mobile_padding": Vector2i(8, 16)},
 		},
@@ -2102,11 +2250,12 @@ const BINDING_TABLE: Dictionary = {
 			"h_separation": {"value": 4},
 		},
 	},
-	# 1. AcceptDialog — explicit popup shell plus official button-container spacing.
+	# 1. AcceptDialog — content panel stays square because Window.embedded_border
+	# owns the rounded title-bearing shell; this avoids nested clipped corners.
 	"AcceptDialog": {
 		"stylebox": {
 			"panel": {"role": "surface_base", "border_role": "surface_panel_edge",
-					  "offset_role": "surface_low_offset", "radius": "shape.secondary_radius",
+					  "offset_role": "surface_low_offset", "radius": 0,
 					  "raised_face_edge": true,
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
@@ -2116,53 +2265,53 @@ const BINDING_TABLE: Dictionary = {
 		},
 	},
 	# 2. Button — 6 styleboxes + font colors + h_separation (PITFALLS 10.3 clean states)
-	# Plan 05-03 Task 2 polish: pull per-direction shape via shape.secondary_radius +
-	# shape.primary_padding + shape.raised_lifts.secondary so base Button chrome reads
+	# Plan 05-03 Task 2 polish: pull per-direction shape via shape.regular_radius +
+	# shape.primary_padding + shape.raised_lifts.regular so base Button chrome reads
 	# the same per-direction language as the TYPEVAR-01 variations. The base Button
-	# uses the SECONDARY family (not primary) — primary chrome is reserved for the
+	# uses the REGULAR family (not primary) — primary chrome is reserved for the
 	# PrimaryButton variation per TYPEVAR-01 / DESIGN_TOKENS §5.
 	"Button": {
 		"stylebox": {
-			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
-								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 18)},
-			"normal_mirrored":{"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
-								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 18)},
-			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
-								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 18)},
-			"hover_mirrored": {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
-								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 18)},
+			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": "shape.regular_raised_face_edge",
+								"raised_intensity": "shape.raised_lifts.regular",
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
+			"normal_mirrored":{"role": "button_normal", "border_role": "button_border", "raised_face_edge": "shape.regular_raised_face_edge",
+								"raised_intensity": "shape.raised_lifts.regular",
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": "shape.regular_raised_face_edge",
+								"raised_intensity": "shape.raised_lifts.regular",
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
+			"hover_mirrored": {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": "shape.regular_raised_face_edge",
+								"raised_intensity": "shape.raised_lifts.regular",
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 18)},  # pressed sinks; never lifted
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},  # pressed sinks; never lifted
 			"pressed_mirrored":{"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 18)},
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 			"focus":          {"role": "focus_ring",
-								"radius": "shape.secondary_radius"},
+								"radius": "shape.regular_radius"},
 			"disabled":       {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 18)},  # Cycle 2 C2: per-direction alpha
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},  # Cycle 2 C2: per-direction alpha
 			"disabled_mirrored":{"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 18)},
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 			"hover_pressed":  {"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 18)},
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 			"hover_pressed_mirrored":{"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
-								"mobile_padding": Vector2i(18, 18)},
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
+								"mobile_padding": Vector2i(18, 14)},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -2186,26 +2335,26 @@ const BINDING_TABLE: Dictionary = {
 	"CheckBox": {
 		"stylebox": {
 			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"normal_mirrored":{"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"hover":          {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"hover_mirrored": {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"pressed":        {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"pressed_mirrored":{"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"focus":          {"role": "focus_ring"},
 			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"disabled_mirrored":{"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"hover_pressed_mirrored":{"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -2239,26 +2388,26 @@ const BINDING_TABLE: Dictionary = {
 	"CheckButton": {
 		"stylebox": {
 			"normal":         {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"normal_mirrored":{"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"hover":          {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"hover_mirrored": {"role": "state_hover",   "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"pressed":        {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"pressed_mirrored":{"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"focus":          {"role": "focus_ring"},
 			"disabled":       {"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"disabled_mirrored":{"role": "surface_panel", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"hover_pressed":  {"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 			"hover_pressed_mirrored":{"role": "state_pressed", "raised_intensity": 0, "alpha": 0.0,
-								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(12, 14)},
+								"border_width": 0, "padding": Vector2i(6, 2), "mobile_padding": Vector2i(6, 2)},
 		},
 		"color": {
 			"font_color":              {"role": "text_strong"},
@@ -2305,15 +2454,15 @@ const BINDING_TABLE: Dictionary = {
 	"CodeEdit": {
 		"stylebox": {
 			"normal":    {"role": "code_background", "border_role": "code_background",
-						  "radius": "shape.secondary_radius", "raised_intensity": 0,
+						  "radius": "shape.regular_radius", "raised_intensity": 0,
 						  "border_width": 0,
 						  "padding": Vector2i(10, 7)},
 			"focus":     {"role": "focus_ring"},
 			"read_only": {"role": "button_disabled", "disabled": true,
-						  "radius": "shape.secondary_radius", "border_width": 0,
+						  "radius": "shape.regular_radius", "border_width": 0,
 						  "padding": Vector2i(10, 7)},
 			"completion": {"role": "code_background", "border_role": "surface_low_edge",
-						   "radius": "shape.secondary_radius", "raised_intensity": 0,
+						   "radius": "shape.regular_radius", "raised_intensity": 0,
 						   "border_width": 1, "padding": Vector2i(0, 0)},
 		},
 		"color": {
@@ -2364,7 +2513,7 @@ const BINDING_TABLE: Dictionary = {
 			"picker_focus_circle":    {"role": "focus_ring", "radius": 999},
 			"picker_focus_rectangle": {"role": "focus_ring", "radius": 2},
 			"sample_focus":           {"role": "focus_ring",
-										"radius": "shape.secondary_radius"},
+										"radius": "shape.regular_radius"},
 		},
 		"color": {
 			"focused_not_editing_cursor_color": {"role": "role_primary"},
@@ -2401,18 +2550,18 @@ const BINDING_TABLE: Dictionary = {
 	"ColorPickerButton": {
 		"stylebox": {
 			"normal":   {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
-							"raised_intensity": "shape.raised_lifts.secondary",
-							"radius": "shape.secondary_radius", "padding": Vector2i(1, 1)},
+							"raised_intensity": "shape.raised_lifts.regular",
+							"radius": "shape.regular_radius", "padding": Vector2i(1, 1)},
 			"hover":    {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
-							"raised_intensity": "shape.raised_lifts.secondary",
-							"radius": "shape.secondary_radius", "padding": Vector2i(1, 1)},
+							"raised_intensity": "shape.raised_lifts.regular",
+							"radius": "shape.regular_radius", "padding": Vector2i(1, 1)},
 			"pressed":  {"role": "button_pressed", "border_role": "button_border_pressed",
 							"raised_intensity": 0,
-							"radius": "shape.secondary_radius", "padding": Vector2i(1, 1)},
+							"radius": "shape.regular_radius", "padding": Vector2i(1, 1)},
 			"focus":    {"role": "focus_ring",
-							"radius": "shape.secondary_radius"},
+							"radius": "shape.regular_radius"},
 			"disabled": {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
-							"radius": "shape.secondary_radius", "padding": Vector2i(1, 1)},
+							"radius": "shape.regular_radius", "padding": Vector2i(1, 1)},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -2434,8 +2583,8 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"preset_fg": {"role": "button_normal", "border_role": "button_border",
 						  "raised_intensity": 0, "border_width": 1,
-						  "radius": "shape.secondary_radius", "padding": Vector2i(0, 0)},
-			"preset_focus": {"role": "focus_ring", "radius": "shape.secondary_radius"},
+						  "radius": "shape.regular_radius", "padding": Vector2i(0, 0)},
+			"preset_focus": {"role": "focus_ring", "radius": "shape.regular_radius"},
 		},
 		"icon": {
 			"preset_bg": {"icon": "colorpicker_sample_bg"},
@@ -2487,43 +2636,43 @@ const BINDING_TABLE: Dictionary = {
 	"RunBarButton": {
 		"stylebox": {
 			"normal": {"role": "surface_panel", "raised_intensity": 0,
-					  "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+					  "alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 					  "content_margins": Vector4i(6, 4, 6, 4),
 					  "mobile_padding": Vector2i(16, 16)},
 			"normal_mirrored": {"role": "surface_panel", "raised_intensity": 0,
-								"alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+								"alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 								"content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 16)},
 			"hover": {"role": "button_hover", "border_role": "button_hover",
 					  "raised_intensity": 0, "border_width": 0, "alpha": 0.10,
-					  "radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+					  "radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 					  "mobile_padding": Vector2i(16, 16)},
 			"hover_mirrored": {"role": "button_hover", "border_role": "button_hover",
 							   "raised_intensity": 0, "border_width": 0, "alpha": 0.10,
-							   "radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+							   "radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 							   "mobile_padding": Vector2i(16, 16)},
 			"pressed": {"role": "surface_panel", "raised_intensity": 0,
-						"alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+						"alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 						"content_margins": Vector4i(6, 4, 6, 4),
 						"mobile_padding": Vector2i(16, 16)},
 			"pressed_mirrored": {"role": "surface_panel", "raised_intensity": 0,
-								 "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+								 "alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 								 "content_margins": Vector4i(6, 4, 6, 4),
 								 "mobile_padding": Vector2i(16, 16)},
 			"hover_pressed": {"role": "surface_panel", "raised_intensity": 0,
-							  "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+							  "alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 							  "content_margins": Vector4i(6, 4, 6, 4),
 							  "mobile_padding": Vector2i(16, 16)},
 			"hover_pressed_mirrored": {"role": "surface_panel", "raised_intensity": 0,
-									   "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+									   "alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 									   "content_margins": Vector4i(6, 4, 6, 4),
 									   "mobile_padding": Vector2i(16, 16)},
 			"disabled": {"role": "surface_panel", "raised_intensity": 0,
-						 "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+						 "alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 						 "content_margins": Vector4i(6, 4, 6, 4),
 						 "mobile_padding": Vector2i(16, 16)},
 			"disabled_mirrored": {"role": "surface_panel", "raised_intensity": 0,
-								  "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+								  "alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 								  "content_margins": Vector4i(6, 4, 6, 4),
 								  "mobile_padding": Vector2i(16, 16)},
 		},
@@ -2544,11 +2693,11 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"hover": {"role": "button_hover", "border_role": "button_hover",
 					  "raised_intensity": 0, "border_width": 0,
-					  "radius": "shape.secondary_radius", "padding": Vector2i(6, 4),
+					  "radius": "shape.regular_radius", "padding": Vector2i(6, 4),
 					  "mobile_padding": Vector2i(16, 16)},
 			"hover_pressed": {"role": "button_pressed", "border_role": "button_pressed",
 							  "raised_intensity": 0, "border_width": 0,
-							  "radius": "shape.secondary_radius", "padding": Vector2i(6, 4),
+							  "radius": "shape.regular_radius", "padding": Vector2i(6, 4),
 							  "mobile_padding": Vector2i(16, 16)},
 		},
 		"color": {
@@ -2561,28 +2710,28 @@ const BINDING_TABLE: Dictionary = {
 	"TopBarOptionButton": {
 		"stylebox": {
 			"normal": {"role": "surface_panel", "raised_intensity": 0,
-					   "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+					   "alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 					   "content_margins": Vector4i(6, 4, 6, 4)},
 			"normal_mirrored": {"role": "surface_panel", "raised_intensity": 0,
-								"alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+								"alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 								"content_margins": Vector4i(6, 4, 6, 4)},
 			"hover": {"role": "button_hover", "raised_intensity": 0,
-					  "alpha": 0.10, "border_width": 0, "radius": "shape.secondary_radius",
+					  "alpha": 0.10, "border_width": 0, "radius": "shape.regular_radius",
 					  "content_margins": Vector4i(6, 4, 6, 4)},
 			"hover_mirrored": {"role": "button_hover", "raised_intensity": 0,
-							   "alpha": 0.10, "border_width": 0, "radius": "shape.secondary_radius",
+							   "alpha": 0.10, "border_width": 0, "radius": "shape.regular_radius",
 							   "content_margins": Vector4i(6, 4, 6, 4)},
 			"pressed": {"role": "surface_panel", "raised_intensity": 0,
-						"alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+						"alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 						"content_margins": Vector4i(6, 4, 6, 4)},
 			"pressed_mirrored": {"role": "surface_panel", "raised_intensity": 0,
-								 "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+								 "alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 								 "content_margins": Vector4i(6, 4, 6, 4)},
 			"hover_pressed": {"role": "surface_panel", "raised_intensity": 0,
-							  "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+							  "alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 							  "content_margins": Vector4i(6, 4, 6, 4)},
 			"hover_pressed_mirrored": {"role": "surface_panel", "raised_intensity": 0,
-									   "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+									   "alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 									   "content_margins": Vector4i(6, 4, 6, 4)},
 		},
 	},
@@ -2612,7 +2761,7 @@ const BINDING_TABLE: Dictionary = {
 	"ConfirmationDialog": {
 		"stylebox": {
 			"panel": {"role": "surface_base", "border_role": "surface_panel_edge",
-					  "offset_role": "surface_low_offset", "radius": "shape.secondary_radius",
+					  "offset_role": "surface_low_offset", "radius": 0,
 					  "raised_face_edge": true,
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
@@ -2625,7 +2774,7 @@ const BINDING_TABLE: Dictionary = {
 	"PopupDialog": {
 		"stylebox": {
 			"panel": {"role": "surface_base", "border_role": "surface_panel_edge",
-					  "offset_role": "surface_low_offset", "radius": "shape.secondary_radius",
+					  "offset_role": "surface_low_offset", "radius": 0,
 					  "raised_face_edge": true,
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
@@ -2635,42 +2784,42 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"panel": {"role": "surface_base", "border_role": "surface_base",
 					  "raised_intensity": 0, "border_width": 0,
-					  "radius": "shape.secondary_radius", "padding": Vector2i(12, 10)},
+					  "radius": "shape.regular_radius", "padding": Vector2i(12, 10)},
 		},
 	},
 	"ProjectSettingsEditor": {
 		"stylebox": {
 			"panel": {"role": "surface_base", "border_role": "surface_base",
 					  "raised_intensity": 0, "border_width": 0,
-					  "radius": "shape.secondary_radius", "padding": Vector2i(12, 10)},
+					  "radius": "shape.regular_radius", "padding": Vector2i(12, 10)},
 		},
 	},
 	"ProjectExportDialog": {
 		"stylebox": {
 			"panel": {"role": "surface_base", "border_role": "surface_base",
 					  "raised_intensity": 0, "border_width": 0,
-					  "radius": "shape.secondary_radius", "padding": Vector2i(12, 10)},
+					  "radius": "shape.regular_radius", "padding": Vector2i(12, 10)},
 		},
 	},
 	"SceneImportSettingsDialog": {
 		"stylebox": {
 			"panel": {"role": "surface_base", "border_role": "surface_base",
 					  "raised_intensity": 0, "border_width": 0,
-					  "radius": "shape.secondary_radius", "padding": Vector2i(12, 10)},
+					  "radius": "shape.regular_radius", "padding": Vector2i(12, 10)},
 		},
 	},
 	"EditorAbout": {
 		"stylebox": {
 			"panel": {"role": "surface_base", "border_role": "surface_base",
 					  "raised_intensity": 0, "border_width": 0,
-					  "radius": "shape.secondary_radius", "padding": Vector2i(12, 10)},
+					  "radius": "shape.regular_radius", "padding": Vector2i(12, 10)},
 		},
 	},
 	"ThemeItemEditorDialog": {
 		"stylebox": {
 			"panel": {"role": "surface_base", "border_role": "surface_base",
 					  "raised_intensity": 0, "border_width": 0,
-					  "radius": "shape.secondary_radius", "padding": Vector2i(12, 10)},
+					  "radius": "shape.regular_radius", "padding": Vector2i(12, 10)},
 		},
 	},
 	# 9. FileDialog — official Godot 4.6.2 colors, thumbnail metric, and icon surface.
@@ -2747,10 +2896,10 @@ const BINDING_TABLE: Dictionary = {
 	"GraphEdit": {
 		"stylebox": {
 			"panel":       {"role": "surface_low",   "raised_intensity": 0,
-							"radius": "shape.secondary_radius", "padding": Vector2i(0, 0)},
+							"radius": "shape.regular_radius", "padding": Vector2i(0, 0)},
 			"menu_panel":  {"role": "surface_panel", "raised_intensity": 0,
-							"radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
-			"panel_focus": {"role": "focus_ring",    "radius": "shape.secondary_radius"},
+							"radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
+			"panel_focus": {"role": "focus_ring",    "radius": "shape.regular_radius"},
 		},
 		"color": {
 			"activity":                           {"role": "role_primary",  "alpha": 0.95},
@@ -2782,7 +2931,7 @@ const BINDING_TABLE: Dictionary = {
 			"panel": {"role": "code_background", "border_role": "surface_high_edge",
 					  "raised_intensity": 0, "alpha": 0.72,
 					  "border_alpha": 0.55, "border_width": 1,
-					  "radius": "shape.secondary_radius", "padding": Vector2i(4, 4)},
+					  "radius": "shape.regular_radius", "padding": Vector2i(4, 4)},
 			"node": {"role": "surface_high", "border_role": "surface_high_edge",
 					 "raised_intensity": 0, "border_width": 1,
 					 "radius": 0, "padding": Vector2i(0, 0)},
@@ -2828,25 +2977,25 @@ const BINDING_TABLE: Dictionary = {
 			"error_panel": {"role": "role_danger", "border_role": "role_danger",
 							"raised_intensity": 0, "alpha": 0.16,
 							"border_alpha": 0.55, "border_width": 1,
-							"radius": "shape.secondary_radius"},
+							"radius": "shape.regular_radius"},
 			"node_frame": {"role": "surface_high", "border_role": "surface_high_edge",
 						   "raised_intensity": 0, "border_width": 1,
-						   "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+						   "radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
 			"node_frame_selected": {"role": "surface_high", "border_role": "role_primary",
 									"raised_intensity": 0, "border_width": 1,
-									"radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+									"radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
 			"node_frame_start": {"role": "role_success", "border_role": "role_success",
 								 "raised_intensity": 0, "alpha": 0.20,
 								 "border_alpha": 0.85, "border_width": 1,
-								 "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+								 "radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
 			"node_frame_end": {"role": "role_danger", "border_role": "role_danger",
 							   "raised_intensity": 0, "alpha": 0.20,
 							   "border_alpha": 0.85, "border_width": 1,
-							   "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+							   "radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
 			"node_frame_playing": {"role": "role_warning", "border_role": "role_warning",
 								   "raised_intensity": 0, "alpha": 0.22,
 								   "border_alpha": 0.85, "border_width": 1,
-								   "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+								   "radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
 		},
 		"color": {
 			"focus_color": {"role": "role_primary", "alpha": 0.80},
@@ -2914,13 +3063,13 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"hovered": {"role": "button_hover", "border_role": "button_hover",
 						"raised_intensity": 0, "border_width": 0,
-						"radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+						"radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
 			"selected": {"role": "button_pressed", "border_role": "button_pressed",
 						 "raised_intensity": 0, "border_width": 0,
-						 "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+						 "radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
 			"hover_pressed": {"role": "button_pressed", "border_role": "button_pressed",
 							  "raised_intensity": 0, "border_width": 0,
-							  "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+							  "radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
 			"focus": {"role": "focus_ring"},
 		},
 		"color": {
@@ -2932,14 +3081,14 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"panel": {"role": "surface_panel", "border_role": "surface_panel_edge",
 					  "raised_intensity": 0, "border_width": 1,
-					  "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+					  "radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
 			"panel_selected": {"role": "surface_high", "border_role": "role_primary",
 							   "raised_intensity": 0, "border_width": 1,
-							   "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+							   "radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
 			"titlebar": {"role": "surface_high", "raised_intensity": 0,
-						 "border_width": 0, "radius": "shape.secondary_radius"},
+						 "border_width": 0, "radius": "shape.regular_radius"},
 			"titlebar_selected": {"role": "accent_offset", "raised_intensity": 0,
-								  "border_width": 0, "radius": "shape.secondary_radius"},
+								  "border_width": 0, "radius": "shape.regular_radius"},
 			"slot": {"empty": true},
 		},
 		"color": {
@@ -2958,14 +3107,14 @@ const BINDING_TABLE: Dictionary = {
 								  "padding": Vector2i(0, 4), "mobile_padding": Vector2i(0, 3)},
 			"grabber":           {"role": "text_muted", "raised_intensity": 0,
 								  "alpha": 0.32, "border_width": 0,
-								  "radius": "shape.secondary_radius",
+								  "radius": "shape.regular_radius",
 								  "padding": Vector2i(4, 4), "mobile_padding": Vector2i(3, 3)},
 			"grabber_highlight": {"role": "text_strong", "raised_intensity": 0,
-								  "alpha": 0.50, "radius": "shape.secondary_radius",
+								  "alpha": 0.50, "radius": "shape.regular_radius",
 								  "padding": Vector2i(4, 4), "mobile_padding": Vector2i(3, 3),
 								  "border_width": 0},
 			"grabber_pressed":   {"role": "text_strong", "raised_intensity": 0,
-								  "alpha": 0.50, "radius": "shape.secondary_radius",
+								  "alpha": 0.50, "radius": "shape.regular_radius",
 								  "padding": Vector2i(4, 4), "mobile_padding": Vector2i(3, 3),
 								  "border_width": 0},
 		},
@@ -3070,10 +3219,14 @@ const BINDING_TABLE: Dictionary = {
 										"alpha": 0.46, "border_width": 0},
 			"hovered":                {"role": "button_hover",  "raised_intensity": 0,
 										"border_width": 0},
-			"selected":               {"role": "button_pressed", "border_role": "button_pressed",
-										"raised_intensity": 0, "border_width": 0},
-			"selected_focus":         {"role": "button_pressed", "border_role": "button_pressed",
-										"raised_intensity": 0, "border_width": 0},
+			# Phase 12 C2' (D-12.06/07): 3px left accent stripe via role_primary border_role.
+			"selected":               {"role": "button_pressed", "border_role": "role_primary",
+										"raised_intensity": 0,
+										"border_widths": Vector4i(3, 0, 0, 0)},
+			# Phase 12 C2' (D-12.06/07): 3px left accent stripe (matches ItemList.selected).
+			"selected_focus":         {"role": "button_pressed", "border_role": "role_primary",
+										"raised_intensity": 0,
+										"border_widths": Vector4i(3, 0, 0, 0)},
 			"hovered_selected":       {"role": "button_pressed", "border_role": "button_pressed",
 										"raised_intensity": 0, "border_width": 0},
 			"hovered_selected_focus": {"role": "button_pressed", "border_role": "button_pressed",
@@ -3156,11 +3309,11 @@ const BINDING_TABLE: Dictionary = {
 	"LineEdit": {
 		"stylebox": {
 			"normal":    {"role": "button_normal", "border_role": "button_border",
-						  "radius": "shape.secondary_radius", "raised_intensity": 0,
+						  "radius": "shape.regular_radius", "raised_intensity": 0,
 						  "padding": Vector2i(10, 6), "mobile_padding": Vector2i(15, 14)},
 			"focus":     {"role": "focus_ring"},
 			"read_only": {"role": "button_disabled", "disabled": true,
-						  "radius": "shape.secondary_radius", "border_width": 0,
+						  "radius": "shape.regular_radius", "border_width": 0,
 						  "padding": Vector2i(10, 6), "mobile_padding": Vector2i(15, 14)},
 		},
 		"color": {
@@ -3195,16 +3348,16 @@ const BINDING_TABLE: Dictionary = {
 	"MenuBar": {
 		"stylebox": {
 			"normal":   {"role": "surface_base", "raised_intensity": 0, "alpha": 0.0,
-						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3),
+						 "radius": "shape.regular_radius", "padding": Vector2i(8, 3),
 						 "mobile_padding": Vector2i(14, 14)},
 			"hover":    {"role": "button_hover", "raised_intensity": 0,
-						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3),
+						 "radius": "shape.regular_radius", "padding": Vector2i(8, 3),
 						 "mobile_padding": Vector2i(14, 14), "border_width": 0},
 			"pressed":  {"role": "button_pressed", "raised_intensity": 0,
-						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3),
+						 "radius": "shape.regular_radius", "padding": Vector2i(8, 3),
 						 "mobile_padding": Vector2i(14, 14), "border_width": 0},
 			"disabled": {"role": "surface_base", "disabled": true, "raised_intensity": 0,
-						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 3),
+						 "radius": "shape.regular_radius", "padding": Vector2i(8, 3),
 						 "mobile_padding": Vector2i(14, 14)},
 		},
 		"color": {
@@ -3222,25 +3375,25 @@ const BINDING_TABLE: Dictionary = {
 		},
 	},
 	# 20. MenuButton — Button-family states
-	# Plan 05-03 Task 2 polish: shape.secondary_radius + shape.primary_padding +
-	# shape.raised_lifts.secondary so the per-direction shape language flows.
+	# Plan 05-03 Task 2 polish: shape.regular_radius + shape.primary_padding +
+	# shape.raised_lifts.regular so the per-direction shape language flows.
 	"MenuButton": {
 		"stylebox": {
-			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
-								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
-			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
-								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
+			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": "shape.regular_raised_face_edge",
+								"raised_intensity": "shape.raised_lifts.regular",
+								"radius": "shape.regular_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": "shape.regular_raised_face_edge",
+								"raised_intensity": "shape.raised_lifts.regular",
+								"radius": "shape.regular_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
 			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
+								"radius": "shape.regular_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
 			"focus":          {"role": "focus_ring",
-								"radius": "shape.secondary_radius"},
+								"radius": "shape.regular_radius"},
 			"disabled":       {"role": "button_disabled", "border_width": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
+								"radius": "shape.regular_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
 			"hover_pressed":  {"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
+								"radius": "shape.regular_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -3258,21 +3411,21 @@ const BINDING_TABLE: Dictionary = {
 	# tighter than game CTA buttons while sharing the same button-state colors.
 	"OptionButton": {
 		"stylebox": {
-			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
-								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 16)},
-			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
-								"raised_intensity": "shape.raised_lifts.secondary",
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 16)},
+			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": "shape.regular_raised_face_edge",
+								"raised_intensity": "shape.raised_lifts.regular",
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 14)},
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": "shape.regular_raised_face_edge",
+								"raised_intensity": "shape.raised_lifts.regular",
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 14)},
 			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 16)},
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 14)},
 			"focus":          {"role": "focus_ring",
-								"radius": "shape.secondary_radius"},
+								"radius": "shape.regular_radius"},
 			"disabled":       {"role": "button_disabled", "border_width": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 16)},
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 14)},
 			"hover_pressed":  {"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 16)},
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 14)},
 		},
 		"color": {
 			"font_color":          {"role": "text_strong"},
@@ -3302,11 +3455,11 @@ const BINDING_TABLE: Dictionary = {
 			"panel":                 {"role": "button_normal", "border_role": "button_border",
 									  "offset_role": "button_normal_offset",
 									  "raised_intensity": "shape.raised_lifts.dialog",
-									  "radius": "shape.secondary_radius",
+									  "radius": "shape.popup_radius",
 									  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(0, 0)},
 			"hover":                 {"role": "button_hover",   "raised_intensity": 0,
 									  "border_role": "button_border_hover",
-									  "radius": "shape.secondary_radius", "border_width": 0},
+									  "radius": "shape.popup_radius", "border_width": 0},
 			"separator":             {"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
 									  "padding": Vector2i(0, 0)},
 			"labeled_separator_left":{"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
@@ -3331,9 +3484,13 @@ const BINDING_TABLE: Dictionary = {
 			"item_end_padding":       {"value": 8},
 			"item_start_padding":     {"value": 8},
 			"outline_size":           {"value": 0},
-			"search_bar_separation":  {"value": 4, "mobile_value": 29},
+			# v_separation and search_bar_separation stay at the desktop value on
+			# mobile — item height should grow from icon/font scaling only, not
+			# from inflated padding. With v_separation=4 and the mobile radio
+			# icon at 40px, each item reads 48px tall (= MD3 tap target).
+			"search_bar_separation":  {"value": 4},
 			"separator_outline_size": {"value": 0},
-			"v_separation":           {"value": 4, "mobile_value": 29},
+			"v_separation":           {"value": 4},
 		},
 		"icon": {
 			"checked":                  {"generated_icon": "popup_selection_checkbox", "checked": true, "mobile_svg_scale": 1.25},
@@ -3355,7 +3512,7 @@ const BINDING_TABLE: Dictionary = {
 			"panel": {"role": "button_normal", "border_role": "button_border",
 					  "offset_role": "button_normal_offset",
 					  "raised_intensity": "shape.raised_lifts.dialog",
-					  "radius": "shape.secondary_radius",
+					  "radius": "shape.regular_radius",
 					  "raised_face_edge": true, "padding": Vector2i(8, 6)},
 		},
 	},
@@ -3409,7 +3566,7 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal": {"role": "surface_low", "border_role": "surface_low_edge",
 					   "raised_intensity": 0, "border_width": 0,
-					   "radius": "shape.secondary_radius", "corner_profile": "top_only",
+					   "radius": "shape.regular_radius", "corner_profile": "top_only",
 					   "padding": Vector2i(8, 4)},
 		},
 	},
@@ -3417,7 +3574,7 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal": {"role": "surface_low", "border_role": "surface_low_edge",
 					   "raised_intensity": 0, "border_width": 0,
-					   "radius": "shape.secondary_radius", "corner_profile": "bottom_only",
+					   "radius": "shape.regular_radius", "corner_profile": "bottom_only",
 					   "padding": Vector2i(8, 4)},
 		},
 	},
@@ -3456,16 +3613,16 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"up_background_hovered":   {"role": "button_hover", "border_role": "button_hover",
 										"raised_intensity": 0, "border_width": 0,
-										"radius": "shape.secondary_radius"},
+										"radius": "shape.regular_radius"},
 			"up_background_pressed":   {"role": "button_pressed", "border_role": "button_pressed",
 										"raised_intensity": 0, "border_width": 0,
-										"radius": "shape.secondary_radius"},
+										"radius": "shape.regular_radius"},
 			"down_background_hovered": {"role": "button_hover", "border_role": "button_hover",
 										"raised_intensity": 0, "border_width": 0,
-										"radius": "shape.secondary_radius"},
+										"radius": "shape.regular_radius"},
 			"down_background_pressed": {"role": "button_pressed", "border_role": "button_pressed",
 										"raised_intensity": 0, "border_width": 0,
-										"radius": "shape.secondary_radius"},
+										"radius": "shape.regular_radius"},
 		},
 		"constant": {
 			"buttons_vertical_separation": {"value": 2},
@@ -3490,24 +3647,27 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"button_highlight": {"role": "button_hover", "border_role": "button_border_hover",
 									"raised_intensity": 0, "border_width": 0,
-									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "mobile_padding": Vector2i(8, 14)},
+									"radius": "shape.regular_radius", "padding": Vector2i(4, 4), "mobile_padding": Vector2i(8, 14)},
 			"button_pressed":   {"role": "button_pressed", "border_role": "button_border_pressed",
 									"raised_intensity": 0, "border_width": 0,
-									"radius": "shape.secondary_radius", "padding": Vector2i(4, 4), "mobile_padding": Vector2i(8, 14)},
-			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
-									"raised_intensity": 0, "border_width": 0,
+									"radius": "shape.regular_radius", "padding": Vector2i(4, 4), "mobile_padding": Vector2i(8, 14)},
+			# Phase 12 C2' (D-12.06/07): 2px top accent stripe via role_primary border_role.
+			# Vector4i layout = (left, top, right, bottom) per _resolve_recipe lines 5386-5389.
+			"tab_selected":     {"role": "button_pressed", "border_role": "role_primary",
+									"raised_intensity": 0,
+									"border_widths": Vector4i(0, 2, 0, 0),
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 6), "mobile_padding": Vector2i(18, 14)},
-			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
+			"tab_unselected":   {"role": "button_normal",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
-			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
+			"tab_hovered":      {"role": "button_hover",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
-			"tab_disabled":     {"role": "button_disabled", "disabled": true, "border_width": 0,
-									"raised_intensity": 0,
+			"tab_disabled":     {"role": "button_disabled",
+									"disabled": true, "border_width": 0, "raised_intensity": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
 			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
@@ -3530,6 +3690,7 @@ const BINDING_TABLE: Dictionary = {
 			"hover_switch_wait_msec": {"value": 180},
 			"icon_max_width":         {"value": 0},
 			"outline_size":           {"value": 0},
+			"tab_separation":         {"value": 1},
 		},
 		"font_size": {
 			"font_size": {"value": "tokens.body"},
@@ -3546,28 +3707,32 @@ const BINDING_TABLE: Dictionary = {
 	# 29. TabContainer — shared TabBar tab_* recipes plus content panel and menu icons.
 	"TabContainer": {
 		"stylebox": {
-			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
-									"raised_intensity": 0, "border_width": 0,
+			# Phase 12 C2' (D-12.06/07): 2px top accent stripe (matches TabBar tab_selected idiom).
+			"tab_selected":     {"role": "button_pressed", "border_role": "role_primary",
+									"raised_intensity": 0,
+									"border_widths": Vector4i(0, 2, 0, 0),
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 6), "mobile_padding": Vector2i(18, 14)},
-			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
+			"tab_unselected":   {"role": "button_normal",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
-			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
+			"tab_hovered":      {"role": "button_hover",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
-			"tab_disabled":     {"role": "button_disabled", "disabled": true, "border_width": 0,
-									"raised_intensity": 0,
+			"tab_disabled":     {"role": "button_disabled",
+									"disabled": true, "border_width": 0, "raised_intensity": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
 			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
 									"corner_profile": "tab_connected"},
 			"panel":            {"role": "surface_panel", "border_role": "surface_panel_edge",
 								  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true},
-			"tabbar_background":{"role": "surface_base",  "raised_intensity": 0,
-								  "border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
+			# Transparent tabbar_background so the tab rail never paints a fill.
+			# Opt-in FilledTabContainer restores a filled strip for callers that
+			# explicitly want the chrome to extend across the full tab header.
+			"tabbar_background":{"empty": true},
 		},
 		"color": {
 			"font_selected_color":   {"role": "text_strong"},
@@ -3585,8 +3750,8 @@ const BINDING_TABLE: Dictionary = {
 			"icon_max_width":   {"value": 0},
 			"icon_separation":  {"value": 6},
 			"outline_size":     {"value": 0},
-			"side_margin":      {"value": 0},
-			"tab_separation":   {"value": 0},
+			"side_margin":      {"value": "corner_radius"},
+			"tab_separation":   {"value": 1},
 		},
 		"font_size": {
 			"font_size": {"value": "tokens.body"},
@@ -3603,20 +3768,20 @@ const BINDING_TABLE: Dictionary = {
 	},
 	"TabContainerOdd": {
 		"stylebox": {
-			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
+			"tab_selected":     {"role": "button_pressed",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 6)},
-			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
+			"tab_unselected":   {"role": "button_normal",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5)},
-			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
+			"tab_hovered":      {"role": "button_hover",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5)},
-			"tab_disabled":     {"role": "button_disabled", "disabled": true, "border_width": 0,
-									"raised_intensity": 0,
+			"tab_disabled":     {"role": "button_disabled",
+									"disabled": true, "border_width": 0, "raised_intensity": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5)},
 			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
@@ -3642,8 +3807,8 @@ const BINDING_TABLE: Dictionary = {
 			"icon_max_width":   {"value": 0},
 			"icon_separation":  {"value": 6},
 			"outline_size":     {"value": 0},
-			"side_margin":      {"value": 0},
-			"tab_separation":   {"value": 0},
+			"side_margin":      {"value": "corner_radius"},
+			"tab_separation":   {"value": 1},
 		},
 		"font_size": {
 			"font_size": {"value": "tokens.body"},
@@ -3660,15 +3825,15 @@ const BINDING_TABLE: Dictionary = {
 	},
 	"TabContainerInner": {
 		"stylebox": {
-			"tab_selected":     {"role": "button_pressed", "border_role": "button_pressed",
+			"tab_selected":     {"role": "button_pressed",
 								 "raised_intensity": 0, "border_width": 0,
 								 "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 								 "padding": Vector2i(10, 5), "mobile_padding": Vector2i(14, 14)},
-			"tab_unselected":   {"role": "surface_base", "border_role": "surface_base",
+			"tab_unselected":   {"role": "surface_base",
 								 "raised_intensity": 0, "border_width": 0,
 								 "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 								 "padding": Vector2i(10, 4), "mobile_padding": Vector2i(14, 14)},
-			"tab_hovered":      {"role": "button_hover", "border_role": "button_hover",
+			"tab_hovered":      {"role": "button_hover",
 								 "raised_intensity": 0, "border_width": 0,
 								 "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 								 "padding": Vector2i(10, 4), "mobile_padding": Vector2i(14, 14)},
@@ -3686,15 +3851,15 @@ const BINDING_TABLE: Dictionary = {
 	},
 	"TabBarInner": {
 		"stylebox": {
-			"tab_selected":   {"role": "button_pressed", "border_role": "button_pressed",
+			"tab_selected":   {"role": "button_pressed",
 							   "raised_intensity": 0, "border_width": 0,
 							   "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 							   "padding": Vector2i(10, 5), "mobile_padding": Vector2i(14, 14)},
-			"tab_unselected": {"role": "surface_base", "border_role": "surface_base",
+			"tab_unselected": {"role": "surface_base",
 							   "raised_intensity": 0, "border_width": 0,
 							   "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 							   "padding": Vector2i(10, 4), "mobile_padding": Vector2i(14, 14)},
-			"tab_hovered":    {"role": "button_hover", "border_role": "button_hover",
+			"tab_hovered":    {"role": "button_hover",
 							   "raised_intensity": 0, "border_width": 0,
 							   "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 							   "padding": Vector2i(10, 4), "mobile_padding": Vector2i(14, 14)},
@@ -3708,15 +3873,15 @@ const BINDING_TABLE: Dictionary = {
 	},
 	"BottomPanel": {
 		"stylebox": {
-			"tab_selected":     {"role": "button_pressed", "border_role": "button_border_pressed",
+			"tab_selected":     {"role": "button_pressed",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "bottom_only",
 									"padding": Vector2i(12, 6)},
-			"tab_unselected":   {"role": "surface_base", "border_role": "surface_base",
+			"tab_unselected":   {"role": "surface_base",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "bottom_only",
 									"padding": Vector2i(12, 5)},
-			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
+			"tab_hovered":      {"role": "button_hover",
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "bottom_only",
 									"padding": Vector2i(12, 5)},
@@ -3736,8 +3901,8 @@ const BINDING_TABLE: Dictionary = {
 			"icon_hover_pressed_color": {"role": "role_primary"},
 		},
 		"constant": {
-			"tab_separation": {"value": 0},
-			"side_margin": {"value": 0},
+			"tab_separation": {"value": 1},
+			"side_margin": {"value": "corner_radius"},
 			"outline_size": {"value": 0},
 		},
 	},
@@ -3768,23 +3933,23 @@ const BINDING_TABLE: Dictionary = {
 									  "border_alpha": 0.70, "border_width": 1},
 			"MovieWriterButtonNormal": {"role": "surface_panel", "raised_intensity": 0,
 										"alpha": 0.0, "border_width": 0,
-										"radius": "shape.secondary_radius", "padding": Vector2i(0, 0)},
+										"radius": "shape.regular_radius", "padding": Vector2i(0, 0)},
 			"MovieWriterButtonPressed": {"role": "role_primary", "border_role": "role_primary",
 										 "raised_intensity": 0, "alpha": 0.80,
-										 "border_width": 0, "radius": "shape.secondary_radius",
+										 "border_width": 0, "radius": "shape.regular_radius",
 										 "padding": Vector2i(0, 0)},
 			"ObjectDBContentWrapper": {"role": "surface_low", "border_role": "surface_low_edge",
 									   "raised_intensity": 0, "border_width": 0,
-									   "radius": "shape.secondary_radius", "padding": Vector2i(8, 6)},
+									   "radius": "shape.regular_radius", "padding": Vector2i(8, 6)},
 			"ObjectDBTitle": {"role": "surface_high", "border_role": "surface_high_edge",
 							  "raised_intensity": 0, "border_width": 0,
-							  "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+							  "radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
 			"PanelForeground": {"role": "surface_panel", "border_role": "surface_panel_edge",
 								"raised_intensity": 0, "border_width": 0},
 			"RecoveryModeButton": {"role": "role_warning", "border_role": "role_warning",
 								   "raised_intensity": 0, "alpha": 0.18,
 								   "border_alpha": 0.70, "border_width": 1,
-								   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+								   "radius": "shape.regular_radius", "padding": Vector2i(8, 4)},
 			"TextureRegionPreviewBG": {"role": "code_background", "border_role": "surface_high_edge",
 									   "raised_intensity": 0, "alpha": 0.72,
 									   "border_alpha": 0.55, "border_width": 1},
@@ -3867,7 +4032,7 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"preview_picker_label": {"role": "surface_panel", "border_role": "surface_panel_edge",
 									 "raised_intensity": 0, "border_width": 0,
-									 "radius": "shape.secondary_radius", "padding": Vector2i(6, 4)},
+									 "radius": "shape.regular_radius", "padding": Vector2i(6, 4)},
 			"preview_picker_overlay": {"role": "surface_overlay", "border_role": "role_primary",
 									   "raised_intensity": 0, "alpha": 0.26,
 									   "border_alpha": 0.70, "border_width": 1},
@@ -3937,23 +4102,23 @@ const BINDING_TABLE: Dictionary = {
 	"EditorInspectorFlatButton": {
 		"stylebox": {
 			"normal": {"role": "surface_panel", "raised_intensity": 0,
-					  "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+					  "alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 					  "content_margins": Vector4i(6, 4, 6, 4),
 					  "mobile_padding": Vector2i(16, 16)},
 			"hover": {"role": "button_hover", "raised_intensity": 0,
-					  "radius": "shape.secondary_radius",
+					  "radius": "shape.regular_radius",
 					  "content_margins": Vector4i(6, 4, 6, 4),
 					  "mobile_padding": Vector2i(16, 16), "border_width": 0},
 			"pressed": {"role": "button_pressed", "raised_intensity": 0,
-						"radius": "shape.secondary_radius",
+						"radius": "shape.regular_radius",
 						"content_margins": Vector4i(6, 4, 6, 4),
 						"mobile_padding": Vector2i(16, 16), "border_width": 0},
 			"hover_pressed": {"role": "button_pressed", "raised_intensity": 0,
-							  "radius": "shape.secondary_radius",
+							  "radius": "shape.regular_radius",
 							  "content_margins": Vector4i(6, 4, 6, 4),
 							  "mobile_padding": Vector2i(16, 16), "border_width": 0},
 			"disabled": {"role": "surface_panel", "raised_intensity": 0,
-						 "alpha": 0.0, "border_width": 0, "radius": "shape.secondary_radius",
+						 "alpha": 0.0, "border_width": 0, "radius": "shape.regular_radius",
 						 "content_margins": Vector4i(6, 4, 6, 4),
 						 "mobile_padding": Vector2i(16, 16)},
 		},
@@ -3986,7 +4151,7 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal": {"role": "button_normal", "border_role": "button_border",
 					   "raised_intensity": 0, "border_width": 0,
-					   "radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+					   "radius": "shape.regular_radius", "padding": Vector2i(8, 4)},
 			"focus": {"role": "focus_ring"},
 		},
 	},
@@ -4025,11 +4190,11 @@ const BINDING_TABLE: Dictionary = {
 	"TextEdit": {
 		"stylebox": {
 			"normal":    {"role": "button_normal", "border_role": "button_border",
-						  "radius": "shape.secondary_radius", "raised_intensity": 0,
+						  "radius": "shape.regular_radius", "raised_intensity": 0,
 						  "padding": Vector2i(10, 7)},
 			"focus":     {"role": "focus_ring"},
 			"read_only": {"role": "button_disabled", "disabled": true,
-						  "radius": "shape.secondary_radius", "border_width": 0,
+						  "radius": "shape.regular_radius", "border_width": 0,
 						  "padding": Vector2i(10, 7)},
 		},
 		"color": {
@@ -4061,7 +4226,7 @@ const BINDING_TABLE: Dictionary = {
 			"panel": {"role": "button_normal", "border_role": "button_border",
 					  "offset_role": "button_normal_offset",
 					  "raised_intensity": "shape.raised_lifts.dialog",
-					  "radius": "shape.secondary_radius",
+					  "radius": "shape.regular_radius",
 					  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(4, 2),
 					  "mobile_padding": Vector2i(8, 6)},
 		},
@@ -4091,10 +4256,14 @@ const BINDING_TABLE: Dictionary = {
 										"border_role": "button_hover", "border_width": 0},
 			"hovered_dimmed":         {"role": "button_hover",  "raised_intensity": 0,
 										"border_role": "button_hover", "alpha": 0.55, "border_width": 0},
+			# Phase 12 C2' (D-12.06/07): 3px left accent stripe (matches ItemList.selected idiom).
 			"selected":               {"role": "button_pressed", "raised_intensity": 0,
-										"border_role": "button_pressed", "border_width": 0},
+										"border_role": "role_primary",
+										"border_widths": Vector4i(3, 0, 0, 0)},
+			# Phase 12 C2' (D-12.06/07): 3px left accent stripe.
 			"selected_focus":         {"role": "button_pressed", "raised_intensity": 0,
-										"border_role": "button_pressed", "border_width": 0},
+										"border_role": "role_primary",
+										"border_widths": Vector4i(3, 0, 0, 0)},
 			"hovered_selected":       {"role": "button_pressed", "raised_intensity": 0,
 										"border_role": "button_pressed", "border_width": 0},
 			"hovered_selected_focus": {"role": "button_pressed", "raised_intensity": 0,
@@ -4242,14 +4411,14 @@ const BINDING_TABLE: Dictionary = {
 								  "padding": Vector2i(4, 0), "mobile_padding": Vector2i(3, 0)},
 			"grabber":           {"role": "text_muted", "raised_intensity": 0,
 								  "alpha": 0.32, "border_width": 0,
-								  "radius": "shape.secondary_radius",
+								  "radius": "shape.regular_radius",
 								  "padding": Vector2i(4, 4), "mobile_padding": Vector2i(3, 3)},
 			"grabber_highlight": {"role": "text_strong", "raised_intensity": 0,
-								  "alpha": 0.50, "radius": "shape.secondary_radius",
+								  "alpha": 0.50, "radius": "shape.regular_radius",
 								  "padding": Vector2i(4, 4), "mobile_padding": Vector2i(3, 3),
 								  "border_width": 0},
 			"grabber_pressed":   {"role": "text_strong", "raised_intensity": 0,
-								  "alpha": 0.50, "radius": "shape.secondary_radius",
+								  "alpha": 0.50, "radius": "shape.regular_radius",
 								  "padding": Vector2i(4, 4), "mobile_padding": Vector2i(3, 3),
 								  "border_width": 0},
 		},
@@ -4370,14 +4539,14 @@ const BINDING_TABLE: Dictionary = {
 			"embedded_border":          {"role": "button_normal", "border_role": "button_border",
 										 "offset_role": "button_normal_offset",
 										 "raised_intensity": "shape.raised_lifts.dialog",
-										 "radius": "shape.secondary_radius",
+										 "radius": "shape.regular_radius",
 										 "border_width": 1, "raised_face_edge": true,
 										 "content_margins": Vector4i(10, 28, 10, 8),
 										 "expand_margins": Vector4i(8, 32, 8, 6)},
 			"embedded_unfocused_border":{"role": "button_normal", "border_role": "button_border",
 										 "offset_role": "button_normal_offset",
 										 "raised_intensity": "shape.raised_lifts.dialog",
-										 "radius": "shape.secondary_radius",
+										 "radius": "shape.regular_radius",
 										 "border_width": 1, "raised_face_edge": true,
 										 "content_margins": Vector4i(10, 28, 10, 8),
 										 "expand_margins": Vector4i(8, 32, 8, 6)},
@@ -4390,7 +4559,11 @@ const BINDING_TABLE: Dictionary = {
 			"close_h_offset":    {"value": 18, "mobile_value": 36},
 			"close_v_offset":    {"value": 24, "mobile_value": 40},
 			"resize_margin":     {"value": 4},
-			"title_height":      {"value": 36, "mobile_value": 48},
+			# title_height must match the embedded_border.expand_margin_top so the
+			# title text (which Godot centers within title_height) lands in the
+			# vertical center of the *visible* chrome instead of riding 4 px high.
+			# Desktop expand_margin_top = 32; mobile = 32 * densityScale (1.5) = 48.
+			"title_height":      {"value": 32, "mobile_value": 48},
 			"title_outline_size":{"value": 0},
 		},
 		"icon": {
@@ -4412,13 +4585,14 @@ const BINDING_TABLE: Dictionary = {
 	# 38. PrimaryButton — primary brand action, accent fill via shape.primary_strategy.
 	#
 	# Per-direction recipe data wiring:
-	#   - radius:           shape.primary_radius     (Pulse 0 / Slate 14 / Bubble 999 pill /
-	#                                                 Daybreak 8 / Burst 28 oversized)
-	#   - padding:          shape.primary_padding    (Vector2i per FOUND-02; Pulse 14×10 /
-	#                                                 Slate 16×11 / Bubble 20×14 / Daybreak
-	#                                                 18×12 / Burst 20×14)
-	#   - raised_intensity: shape.raised_lifts.primary (Pulse 3 / Slate 2 / Bubble 6 /
-	#                                                   Daybreak 3 / Burst 5)
+	#   - radius:           shape.primary_radius     (Pulse 0 / Daybreak 4 / Slate 8 /
+	#                                                 Burst 12 / Bubble 24)
+	#   - padding:          shape.primary_padding    (Vector2i per FOUND-02; shared
+	#                                                 desktop padding so style swaps do
+	#                                                 not move layouts)
+	#   - raised_intensity: shape.raised_lifts.primary (Pulse 3 / Slate 2 / Bubble 3 /
+	#                                                   Daybreak 3 / Burst 3), then scaled
+	#                                                   by shape.raised_depth_scale.
 	#   - strategy:         shape.primary_strategy   (5 closed-enum dispatchers in
 	#                                                 _apply_primary_strategy)
 	# `pressed` and `disabled` skip strategy dispatch (sink/disable states stay literal so
@@ -4473,34 +4647,34 @@ const BINDING_TABLE: Dictionary = {
 	# 39. GhostButton — outlined / transparent bg via shape.ghost_strategy.
 	# Surface_panel as the recipe `role` provides a non-null bg_color to start from; the ghost
 	# strategy overrides bg_color = TRANSPARENT and applies the per-direction outline
-	# (Pulse 2px accent / Slate 1px accent / Bubble 2px accent + radius 999 / Daybreak 1px
+	# (Pulse 2px accent / Slate 1px accent / Bubble 2px accent / Daybreak 1px
 	# outline_color / Burst 2px accent). Padding mirrors PrimaryButton for visual rhythm.
 	"GhostButton": {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
 								"mobile_padding": Vector2i(18, 14),
 								"strategy": "shape.ghost_strategy",
 								"offset_role": "role_primary_offset", "raised_face_edge": true},
 			"hover":         {"role": "surface_panel", "raised_intensity": "shape.raised_lifts.ghost",
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
 								"mobile_padding": Vector2i(18, 14),
 								"strategy": "shape.ghost_strategy", "state_layer_role": "role_primary",
 								"state_layer_alpha": 0.08,
 								"offset_role": "role_primary_offset", "raised_face_edge": true},
 			"pressed":       {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
 								"mobile_padding": Vector2i(18, 14),
 								"strategy": "shape.ghost_strategy", "state_layer_role": "role_primary",
 								"state_layer_alpha": 0.12},
 			"focus":         {"role": "focus_ring",
-								"radius": "shape.secondary_radius"},
+								"radius": "shape.regular_radius"},
 			"disabled":      {"role": "surface_panel", "disabled": true, "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
 								"mobile_padding": Vector2i(18, 14),
 								"strategy": "shape.ghost_strategy"},
 			"hover_pressed":{"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": "shape.primary_padding",
+								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
 								"mobile_padding": Vector2i(18, 14),
 								"strategy": "shape.ghost_strategy", "state_layer_role": "role_primary",
 								"state_layer_alpha": 0.12},
@@ -4577,31 +4751,31 @@ const BINDING_TABLE: Dictionary = {
 	},
 	# 42. IconButton — compact, borderless square chrome optimised for an icon glyph.
 	# Uses tokens.tapPadding directly (NOT shape.primary_padding) so the icon stays
-	# centered in a square hit area regardless of direction. Shape.secondary_radius
-	# provides the per-direction corner softness (Pulse 0 rectangular / Slate 14 / Bubble 26 /
-	# Daybreak 8 / Burst 18). Lifts at shape.raised_lifts.ghost so it reads as a "subtle"
+	# centered in a square hit area regardless of direction. Shape.regular_radius
+	# provides the per-direction corner softness (Pulse 0 rectangular / Daybreak 4 /
+	# Slate 8 / Burst 12 / Bubble 24). Lifts at shape.raised_lifts.ghost so it reads as a "subtle"
 	# affordance compared to primary chrome.
 	"IconButton": {
 		"stylebox": {
 			"normal":        {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.ghost",
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8),
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 8),
 								"mobile_padding": Vector2i(16, 16)},
 			"hover":         {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
 								"raised_intensity": "shape.raised_lifts.ghost",
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8),
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 8),
 								"mobile_padding": Vector2i(16, 16)},
 			"pressed":       {"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8),
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 8),
 								"mobile_padding": Vector2i(16, 16)},
 			"focus":         {"role": "focus_ring",
-								"radius": "shape.secondary_radius"},
+								"radius": "shape.regular_radius"},
 			"disabled":      {"role": "button_disabled", "border_width": 0, "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8),
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 8),
 								"mobile_padding": Vector2i(16, 16)},
 			"hover_pressed":{"role": "button_pressed", "border_role": "button_border_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 8),
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 8),
 								"mobile_padding": Vector2i(16, 16)},
 		},
 		"color": {
@@ -4631,45 +4805,45 @@ const BINDING_TABLE: Dictionary = {
 	"FlatButton": {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"alpha": 0.0, "border_width": 0},
 			"normal_mirrored":{"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"alpha": 0.0, "border_width": 0},
 			"hover":         {"role": "button_hover", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"border_width": 0},
 			"hover_mirrored":{"role": "button_hover", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"border_width": 0},
 			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"border_width": 0},
 			"pressed_mirrored":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"border_width": 0},
 			"focus":         {"role": "focus_ring",
-								"radius": "shape.secondary_radius"},
+								"radius": "shape.regular_radius"},
 			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"alpha": 0.0, "border_width": 0},
 			"disabled_mirrored":{"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"alpha": 0.0, "border_width": 0},
 			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"border_width": 0},
 			"hover_pressed_mirrored":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"border_width": 0},
 		},
@@ -4697,47 +4871,47 @@ const BINDING_TABLE: Dictionary = {
 	"FlatMenuButton": {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"alpha": 0.0, "border_width": 0},
 			"normal_mirrored":{"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"alpha": 0.0, "border_width": 0},
 			"hover":         {"role": "button_hover", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"border_width": 0},
 			"hover_mirrored":{"role": "button_hover", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"border_width": 0},
 			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"border_width": 0},
 			"pressed_mirrored":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"border_width": 0},
 			"focus":         {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"alpha": 0.0, "border_width": 0},
 			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"alpha": 0.0, "border_width": 0},
 			"disabled_mirrored":{"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"alpha": 0.0, "border_width": 0},
 			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"border_width": 0},
 			"hover_pressed_mirrored":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 4, 6, 4),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 4, 6, 4),
 								"mobile_padding": Vector2i(16, 18),
 								"border_width": 0},
 		},
@@ -4762,19 +4936,19 @@ const BINDING_TABLE: Dictionary = {
 	"MainMenuBar": {
 		"stylebox": {
 			"normal":        {"role": "surface_base", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 3, 6, 2),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 3, 6, 2),
 								"mobile_padding": Vector2i(14, 14),
 								"alpha": 0.0, "border_width": 0},
 			"hover":         {"role": "button_hover", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 3, 6, 2),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 3, 6, 2),
 								"mobile_padding": Vector2i(14, 14),
 								"border_width": 0},
 			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 3, 6, 2),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 3, 6, 2),
 								"mobile_padding": Vector2i(14, 14),
 								"border_width": 0},
 			"hover_pressed": {"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(6, 3, 6, 2),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(6, 3, 6, 2),
 								"mobile_padding": Vector2i(14, 14),
 								"border_width": 0},
 		},
@@ -4783,18 +4957,18 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":   {"role": "button_normal", "border_role": "button_border",
 						 "raised_intensity": 0, "border_width": 1,
-						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 4),
+						 "radius": "shape.regular_radius", "padding": Vector2i(8, 4),
 						 "mobile_padding": Vector2i(12, 16)},
 			"hover":    {"role": "button_hover", "border_role": "button_border_hover",
 						 "raised_intensity": 0, "border_width": 1,
-						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 4),
+						 "radius": "shape.regular_radius", "padding": Vector2i(8, 4),
 						 "mobile_padding": Vector2i(12, 16)},
 			"pressed":  {"role": "button_pressed", "border_role": "button_border_pressed",
 						 "raised_intensity": 0, "border_width": 1,
-						 "radius": "shape.secondary_radius", "padding": Vector2i(8, 4),
+						 "radius": "shape.regular_radius", "padding": Vector2i(8, 4),
 						 "mobile_padding": Vector2i(12, 16)},
 			"disabled": {"role": "button_disabled", "raised_intensity": 0,
-						 "border_width": 0, "radius": "shape.secondary_radius",
+						 "border_width": 0, "radius": "shape.regular_radius",
 						 "padding": Vector2i(8, 4), "mobile_padding": Vector2i(12, 16)},
 		},
 	},
@@ -4802,39 +4976,39 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":  {"role": "button_normal", "border_role": "button_border",
 						"raised_intensity": 0, "border_width": 1,
-						"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+						"radius": "shape.regular_radius", "padding": Vector2i(8, 4)},
 			"hover":   {"role": "button_hover", "border_role": "button_border_hover",
 						"raised_intensity": 0, "border_width": 1,
-						"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+						"radius": "shape.regular_radius", "padding": Vector2i(8, 4)},
 			"pressed": {"role": "button_pressed", "border_role": "button_border_pressed",
 						"raised_intensity": 0, "border_width": 1,
-						"radius": "shape.secondary_radius", "padding": Vector2i(8, 4)},
+						"radius": "shape.regular_radius", "padding": Vector2i(8, 4)},
 		},
 	},
 	"BottomPanelButton": {
 		"stylebox": {
 			"normal":        {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(8, 5, 8, 5),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(8, 5, 8, 5),
 								"mobile_padding": Vector2i(14, 14),
 								"alpha": 0.0, "border_width": 0},
 			"hover":         {"role": "button_hover", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(8, 5, 8, 5),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(8, 5, 8, 5),
 								"mobile_padding": Vector2i(14, 14),
 								"border_width": 0},
 			"pressed":       {"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(8, 5, 8, 5),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(8, 5, 8, 5),
 								"mobile_padding": Vector2i(14, 14),
 								"border_width": 0},
 			"focus":         {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(8, 5, 8, 5),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(8, 5, 8, 5),
 								"mobile_padding": Vector2i(14, 14),
 								"alpha": 0.0, "border_width": 0},
 			"disabled":      {"role": "surface_panel", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(8, 5, 8, 5),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(8, 5, 8, 5),
 								"mobile_padding": Vector2i(14, 14),
 								"alpha": 0.0, "border_width": 0},
 			"hover_pressed":{"role": "button_pressed", "raised_intensity": 0,
-								"radius": "shape.secondary_radius", "content_margins": Vector4i(8, 5, 8, 5),
+								"radius": "shape.regular_radius", "content_margins": Vector4i(8, 5, 8, 5),
 								"mobile_padding": Vector2i(14, 14),
 								"border_width": 0},
 		},
@@ -4860,24 +5034,24 @@ const BINDING_TABLE: Dictionary = {
 		"stylebox": {
 			"normal":        {"role": "button_normal", "border_role": "button_border",
 								"raised_intensity": 0, "border_width": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 5),
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 5),
 								"mobile_padding": Vector2i(12, 14)},
 			"hover":         {"role": "button_hover", "border_role": "button_border_hover",
 								"raised_intensity": 0, "border_width": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 5),
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 5),
 								"mobile_padding": Vector2i(12, 14)},
 			"pressed":       {"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0, "border_width": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 5),
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 5),
 								"mobile_padding": Vector2i(12, 14)},
-			"focus":         {"role": "focus_ring", "radius": "shape.secondary_radius"},
+			"focus":         {"role": "focus_ring", "radius": "shape.regular_radius"},
 			"disabled":      {"role": "button_disabled", "disabled": true,
 								"raised_intensity": 0, "border_width": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 5),
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 5),
 								"mobile_padding": Vector2i(12, 14)},
 			"hover_pressed":{"role": "button_pressed", "border_role": "button_border_pressed",
 								"raised_intensity": 0, "border_width": 0,
-								"radius": "shape.secondary_radius", "padding": Vector2i(8, 5),
+								"radius": "shape.regular_radius", "padding": Vector2i(8, 5),
 								"mobile_padding": Vector2i(12, 14)},
 		},
 		"color": {
@@ -4932,7 +5106,7 @@ const BINDING_TABLE: Dictionary = {
 	},
 	# 47. Caption — Label variation (TYPEVAR-02). Caption is the small-body
 	#     supporting label; uses text_default (one tonal step softer than
-	#     text_strong) to read as secondary content.
+	#     text_strong) to read as supporting content.
 	"Caption": {
 		"color": {
 			"font_color": {"role": "text_default"},
@@ -5010,7 +5184,7 @@ const BINDING_TABLE: Dictionary = {
 	},
 	# 53. CardPanel — PanelContainer variation (TYPEVAR-04). Uses
 	#     shape.card_radius for per-direction radius personality (Pulse 0,
-	#     Slate 14, Bubble 26, Daybreak 8, Burst 18) plus the panel
+	#     Daybreak 4, Slate 8, Burst 12, Bubble 24) plus the panel
 	#     surface_alpha and raised lift.
 	"CardPanel": {
 		"stylebox": {
@@ -5048,6 +5222,115 @@ const BINDING_TABLE: Dictionary = {
 		},
 		"color": {
 			"font_color": {"role": "text_strong"},
+		},
+	},
+	# 55. SuccessLabel — Label variation (Phase 13 § C1). Opt-in only; default
+	#     Label.font_color remains text_strong at line 3147 — SC#3 invariant.
+	"SuccessLabel": {
+		"color": {
+			"font_color": {"role": "role_success"},
+		},
+	},
+	# 56. WarningLabel — Label variation (Phase 13 § C1).
+	"WarningLabel": {
+		"color": {
+			"font_color": {"role": "role_warning"},
+		},
+	},
+	# 57. DangerLabel — Label variation (Phase 13 § C1).
+	"DangerLabel": {
+		"color": {
+			"font_color": {"role": "role_danger"},
+		},
+	},
+	# 58. InfoLabel — Label variation (Phase 13 § C1).
+	"InfoLabel": {
+		"color": {
+			"font_color": {"role": "role_info"},
+		},
+	},
+	# 59. AccentPanel — PanelContainer variation (Phase 13 § C3). 6%-mix tint
+	#     of role_primary over the per-direction panel chrome. Opt-in only;
+	#     default PanelContainer.panel at lines 5011-5022 stays unchanged — SC#3.
+	"AccentPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "role_primary",
+				"alpha":            0.06,
+				"border_role":      "surface_panel_edge",
+				"radius":           "shape.card_radius",
+				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
+				"padding":          Vector2i(12, 10),
+			},
+		},
+	},
+	# 60. InfoPanel — PanelContainer variation (Phase 13 § C3).
+	"InfoPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "role_info",
+				"alpha":            0.06,
+				"border_role":      "surface_panel_edge",
+				"radius":           "shape.card_radius",
+				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
+				"padding":          Vector2i(12, 10),
+			},
+		},
+	},
+	# 61. WarningPanel — PanelContainer variation (Phase 13 § C3).
+	"WarningPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "role_warning",
+				"alpha":            0.06,
+				"border_role":      "surface_panel_edge",
+				"radius":           "shape.card_radius",
+				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
+				"padding":          Vector2i(12, 10),
+			},
+		},
+	},
+	# 62. DangerPanel — PanelContainer variation (Phase 13 § C3).
+	"DangerPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "role_danger",
+				"alpha":            0.06,
+				"border_role":      "surface_panel_edge",
+				"radius":           "shape.card_radius",
+				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
+				"padding":          Vector2i(12, 10),
+			},
+		},
+	},
+	# 63. SuccessPanel — PanelContainer variation (Phase 13 § C3).
+	"SuccessPanel": {
+		"stylebox": {
+			"panel": {
+				"role":             "role_success",
+				"alpha":            0.06,
+				"border_role":      "surface_panel_edge",
+				"radius":           "shape.card_radius",
+				"raised_intensity": "shape.raised_lifts.panel",
+				"raised_face_edge": true,
+				"padding":          Vector2i(12, 10),
+			},
+		},
+	},
+	# 64. FilledTabContainer — TabContainer variation that restores a filled
+	#     tabbar_background (surface_base) for the area beside the tab strip.
+	#     Default TabContainer ships transparent; opt into this variation when
+	#     the chrome should read as part of the container. All other slots
+	#     (tab_*, panel, colors, icons) inherit from TabContainer via Godot's
+	#     variation lookup.
+	"FilledTabContainer": {
+		"stylebox": {
+			"tabbar_background": {"role": "surface_base", "raised_intensity": 0,
+									"border_width": 0, "radius": 0, "padding": Vector2i(0, 0)},
 		},
 	},
 }
@@ -5185,12 +5468,11 @@ func _apply_raised_depth_border(sb: StyleBoxFlat, offset_color: Color, intensity
 ## Strategies are sourced VERBATIM from DESIGN_TOKENS §5.1-§5.5:
 ##   "bold-accent-fill"        — Pulse: bg=role_primary (accent), thin outline matches accent.
 ##   "quiet-pill"              — Slate: bg=surface_panel, thin role_primary border (1px).
-##   "pillowy-fully-rounded"   — Bubble: bg=role_primary, radius forced to 999 (pill) AFTER
-##                               any prior radius set so shape.primary_radius=999 wins.
+##   "pillowy-rounded"         — Bubble: bg=role_primary with shape.primary_radius preserved
+##                               so rounded buttons stay generous without becoming full pills.
 ##   "friendly-generous"       — Daybreak: bg=role_primary, generous padding already applied
 ##                               by `padding: shape.primary_padding` recipe row.
-##   "oversized-statement"     — Burst: bg=role_primary, larger radius applied via shape
-##                               (28 vs base 18); padding already 20×14 from shape.
+##   "oversized-statement"     — Burst: bg=role_primary with statement color/state behavior.
 ##
 ## Strategies are CLOSED enums — adding a 6th approved direction in v2 = adding a strategy
 ## entry HERE, not editing 14 BINDING_TABLE recipe rows (D-04). Unknown strategy = no-op
@@ -5211,17 +5493,16 @@ func _apply_primary_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_t
 			sb.border_width_top = 1
 			sb.border_width_right = 1
 			sb.border_width_bottom = 1
-		"pillowy-fully-rounded":
-			# Bubble: accent fill + radius locked to 999 regardless of prior radius set.
+		"pillowy-rounded":
+			# Bubble: accent fill; radius already applied by shape.primary_radius.
 			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
-			_set_radius_all(sb, 999)
 			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
 		"friendly-generous":
 			# Daybreak: accent fill; padding/radius already applied by shape.* recipe rows.
 			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
 			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
 		"oversized-statement":
-			# Burst: accent fill; oversized radius (28) applied via shape.primary_radius.
+			# Burst: accent fill; radius already applied via shape.primary_radius.
 			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
 			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
 		_:
@@ -5236,7 +5517,7 @@ func _apply_primary_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_t
 ## Strategies are sourced VERBATIM from DESIGN_TOKENS §5.1-§5.5:
 ##   "accent-outlined-accent-text"   — Pulse: transparent bg + 2px accent border.
 ##   "thin-accent-outline"           — Slate: transparent bg + 1px accent border.
-##   "rounded-ghost-thicker-outline" — Bubble: transparent bg + 2px accent border + radius 999.
+##   "rounded-ghost-thicker-outline" — Bubble: transparent bg + 2px accent border.
 ##   "soft-outline"                  — Daybreak / DEFAULT: transparent bg + 1px outline_color.
 ##   "normal-accent-ghost"           — Burst: transparent bg + 2px accent border.
 func _apply_ghost_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_table: Dictionary, style_personality: Dictionary) -> void:
@@ -5258,14 +5539,12 @@ func _apply_ghost_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_tab
 			sb.border_width_right = 1
 			sb.border_width_bottom = 1
 		"rounded-ghost-thicker-outline":
-			# Bubble ghost: 2px accent + force radius 999 (pill) to read with the
-			# pillowy primary nearby.
+			# Bubble ghost: 2px accent; radius already comes from shape.regular_radius.
 			sb.border_color = role_table.get("role_primary", role_table.outline_color)
 			sb.border_width_left = 2
 			sb.border_width_top = 2
 			sb.border_width_right = 2
 			sb.border_width_bottom = 2
-			_set_radius_all(sb, 999)
 		"soft-outline":
 			# Daybreak / DEFAULT ghost: 1px outline_color (calmer than accent).
 			sb.border_color = role_table.get("outline_color", role_table.outline_color)
@@ -5373,9 +5652,11 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			var fr_radius: int = corner_radius
 			var fr_radius_raw: Variant = recipe.get("radius", null)
 			if fr_radius_raw != null and typeof(fr_radius_raw) == TYPE_STRING and (fr_radius_raw as String).begins_with("shape."):
-				var fr_r_lookup: Variant = _lookup_shape(style_personality, fr_radius_raw)
+				var fr_radius_path := fr_radius_raw as String
+				var fr_r_lookup: Variant = _lookup_shape(style_personality, fr_radius_path)
 				if fr_r_lookup != null and (typeof(fr_r_lookup) == TYPE_INT or typeof(fr_r_lookup) == TYPE_FLOAT):
 					fr_radius = int(fr_r_lookup)
+					fr_radius = _constrain_shape_radius(fr_radius, fr_radius_path)
 			elif fr_radius_raw != null and (typeof(fr_radius_raw) == TYPE_INT or typeof(fr_radius_raw) == TYPE_FLOAT):
 				fr_radius = int(fr_radius_raw)
 			var focus_corner_profile: String = str(recipe.get("corner_profile", ""))
@@ -5404,7 +5685,7 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		# Pick the matching offset color (per §6.3) for the bg's family.
 		var offset_role: String = recipe.get("offset_role", role + "_offset")
 		var offset_color: Color = role_table.get(offset_role, role_table.get(role + "_offset", role_table.surface_panel_offset))
-		var sb_intensity: int = (raised_strength * raised_intensity) if raised else 0
+		var sb_intensity: int = _resolve_raised_depth(raised_intensity, style_personality)
 		var sb := _make_raised_stylebox(bg_color, offset_color, sb_intensity)
 		# Plan 05-02 Task 2 (D-03): radius may be either the @export `corner_radius` baseline
 		# (no recipe override), an int literal, or a `shape.<key>` lookup. _set_radius_all
@@ -5412,13 +5693,23 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		# recipes opting into shape.* pin to per-direction values from DESIGN_TOKENS §5.1-§5.5.
 		var radius_raw: Variant = recipe.get("radius", null)
 		var resolved_radius: int = corner_radius
+		var radius_path := ""
 		if radius_raw != null:
 			if typeof(radius_raw) == TYPE_STRING and (radius_raw as String).begins_with("shape."):
-				var r_lookup: Variant = _lookup_shape(style_personality, radius_raw)
+				radius_path = radius_raw as String
+				var r_lookup: Variant = _lookup_shape(style_personality, radius_path)
 				if r_lookup != null and (typeof(r_lookup) == TYPE_INT or typeof(r_lookup) == TYPE_FLOAT):
 					resolved_radius = int(r_lookup)
 			elif typeof(radius_raw) == TYPE_INT or typeof(radius_raw) == TYPE_FLOAT:
 				resolved_radius = int(radius_raw)
+		# Optional floor for a style family that wants consistently rounded chrome.
+		var min_floor_raw: Variant = _lookup_shape(style_personality, "shape.min_radius_floor")
+		if min_floor_raw != null and (typeof(min_floor_raw) == TYPE_INT or typeof(min_floor_raw) == TYPE_FLOAT):
+			var floor_v: int = int(min_floor_raw)
+			if floor_v > 0:
+				resolved_radius = maxi(resolved_radius, floor_v)
+		if radius_path != "":
+			resolved_radius = _constrain_shape_radius(resolved_radius, radius_path)
 		_set_radius_all(sb, resolved_radius)
 		var corner_profile: String = str(recipe.get("corner_profile", ""))
 		if corner_profile == "tab_connected":
@@ -5442,6 +5733,16 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			sb.border_width_right = maxi(0, widths.z)
 			sb.border_width_bottom = maxi(0, widths.w)
 		else:
+			# Phase 12 C6 Slate: when shape.hairline_thickness > 0, force border_width to it
+			# for any recipe carrying a border_role (= chrome-with-border, not structural empty).
+			# Pitfall 5: shape.hairline_thickness defaults to 0 for non-Slate directions, so
+			# this is a no-op everywhere except Style.SLATE.
+			var hairline_raw: Variant = _lookup_shape(style_personality, "shape.hairline_thickness")
+			var hairline_resolved: int = 0
+			if hairline_raw != null and (typeof(hairline_raw) == TYPE_INT or typeof(hairline_raw) == TYPE_FLOAT):
+				hairline_resolved = int(hairline_raw)
+			if hairline_resolved > 0 and recipe.has("border_role"):
+				border_width = hairline_resolved
 			_apply_outline_border(sb, border_color, maxi(0, border_width))
 		# Plan 05-02 Task 2 (D-03): padding may be a `shape.<key>` Vector2i lookup
 		# or an explicit Vector2i. Unspecified padding is zero; structural styleboxes must
@@ -5475,6 +5776,28 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			applied_padding = true
 		if not applied_padding:
 			_set_content_margin_from_padding(sb, Vector2i.ZERO)
+		# Optional primary-button min-height hook. Built-in styles keep this at 0 so sizing
+		# is controlled by platform tokens, not by visual direction.
+		if recipe.has("strategy") and String(recipe.get("strategy", "")).ends_with(".primary_strategy"):
+			var min_h_raw: Variant = _lookup_shape(style_personality, "shape.primary_min_height")
+			var min_h_resolved: int = 0
+			if min_h_raw != null and (typeof(min_h_raw) == TYPE_INT or typeof(min_h_raw) == TYPE_FLOAT):
+				min_h_resolved = int(min_h_raw)
+			# Apply mobile override (D-12.11): use primary_min_height_mobile when on mobile density.
+			if tokens.get("densityScale", 1.0) > 1.0:
+				var min_h_mobile_raw: Variant = _lookup_shape(style_personality, "shape.primary_min_height_mobile")
+				if min_h_mobile_raw != null and (typeof(min_h_mobile_raw) == TYPE_INT or typeof(min_h_mobile_raw) == TYPE_FLOAT):
+					var mobile_val: int = int(min_h_mobile_raw)
+					if mobile_val > 0:
+						min_h_resolved = mobile_val
+			if min_h_resolved > 0:
+				var content_h: int = int(tokens.get("body", 14))
+				var current_min: int = sb.content_margin_top + content_h + sb.content_margin_bottom
+				if current_min < min_h_resolved:
+					var extra: int = min_h_resolved - current_min
+					var half_extra: int = extra / 2
+					sb.content_margin_top += half_extra
+					sb.content_margin_bottom += (extra - half_extra)
 		var expand_margins_raw: Variant = recipe.get("expand_margins", null)
 		if expand_margins_raw != null and typeof(expand_margins_raw) == TYPE_VECTOR4I:
 			var expand_density: float = tokens.get("densityScale", 1.0)
@@ -5501,13 +5824,53 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 					_apply_ghost_strategy(sb, strat_name, role_table, style_personality)
 				# Other strategy paths (kicker_style etc.) are NOT dispatched on stylebox;
 				# they're color-recipe territory handled below.
+		# Phase 12 C6 Daybreak: 1px flat accent outline at 3px offset for primary buttons,
+		# gated on raised=true (SC#1) and primary-strategy recipes only.
+		# Pitfall 3: full alpha mandatory (no border_alpha < 1.0); GL Compat over-renders intermediate alpha.
+		if raised and strategy_raw != null and typeof(strategy_raw) == TYPE_STRING and (strategy_raw as String).ends_with(".primary_strategy"):
+			var outline_width_v: Variant = _lookup_shape(style_personality, "shape.primary_outline_width")
+			var outline_width_resolved: int = 0
+			if outline_width_v != null and (typeof(outline_width_v) == TYPE_INT or typeof(outline_width_v) == TYPE_FLOAT):
+				outline_width_resolved = int(outline_width_v)
+			if outline_width_resolved > 0:
+				var outline_color_key_v: Variant = _lookup_shape(style_personality, "shape.primary_outline_color")
+				var outline_color_key: String = "role_primary"
+				if outline_color_key_v != null:
+					outline_color_key = String(outline_color_key_v)
+				var outline_color_c: Color = role_table.get(outline_color_key, role_table.role_primary)
+				# Override the strategy-applied border with the outline (full alpha — Pitfall 3).
+				sb.border_color = outline_color_c
+				sb.border_width_left = outline_width_resolved
+				sb.border_width_top = outline_width_resolved
+				sb.border_width_right = outline_width_resolved
+				sb.border_width_bottom = outline_width_resolved
+				# Push the border outside the control rect via expand_margin (3px offset).
+				# CR-01: skip this overwrite when the recipe itself supplied `expand_margins`;
+				# composing both would silently replace recipe-author intent. No current
+				# primary-strategy recipe carries expand_margins, but guard prevents future
+				# silent regression. See REVIEW.md CR-01 (2026-05-11).
+				if not recipe.has("expand_margins"):
+					var outline_offset_v: Variant = _lookup_shape(style_personality, "shape.primary_outline_offset")
+					var outline_offset_resolved: int = 0
+					if outline_offset_v != null and (typeof(outline_offset_v) == TYPE_INT or typeof(outline_offset_v) == TYPE_FLOAT):
+						outline_offset_resolved = int(outline_offset_v)
+					sb.expand_margin_left = outline_offset_resolved
+					sb.expand_margin_top = outline_offset_resolved
+					sb.expand_margin_right = outline_offset_resolved
+					sb.expand_margin_bottom = outline_offset_resolved
 		if recipe.has("state_layer_role"):
 			var layer_role: String = recipe.get("state_layer_role", "role_primary")
 			var layer_color: Color = role_table.get(layer_role, role_table.role_primary)
 			var layer_alpha := clampf(float(recipe.get("state_layer_alpha", 0.0)), 0.0, 1.0)
 			sb.bg_color = Color(layer_color.r, layer_color.g, layer_color.b, layer_alpha)
 		if sb_intensity > 0:
-			var keep_face_edge: bool = bool(recipe.get("raised_face_edge", false))
+			var keep_face_edge_raw: Variant = recipe.get("raised_face_edge", false)
+			var keep_face_edge: bool = false
+			if typeof(keep_face_edge_raw) == TYPE_STRING:
+				var resolved_face_edge: Variant = _lookup_shape(style_personality, keep_face_edge_raw)
+				keep_face_edge = bool(resolved_face_edge)
+			else:
+				keep_face_edge = bool(keep_face_edge_raw)
 			var reserve_height: bool = bool(recipe.get("reserve_raised_depth", true))
 			_apply_raised_depth_border(sb, offset_color, sb_intensity, keep_face_edge, reserve_height)
 		return sb
@@ -5549,6 +5912,8 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		if typeof(value_ref) == TYPE_STRING and (value_ref as String).begins_with("tokens."):
 			var key: String = (value_ref as String).substr(7)
 			return tokens.get(key, 0)
+		if typeof(value_ref) == TYPE_STRING and value_ref == "corner_radius":
+			return corner_radius
 		# Plan 05-02 Task 2 (D-03): constants/font_sizes can also pull from shape.* (e.g.,
 		# `value: "shape.focus_offset"` for outline widths or focus expand metadata).
 		if typeof(value_ref) == TYPE_STRING and (value_ref as String).begins_with("shape."):
@@ -5608,6 +5973,29 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 	return null
 
 
+# Per-icon `svg/scale` from the matching .svg.import file. Used by _load_icon's
+# export-build fallback to compute the pixel-resize ratio from the baked .ctex
+# to the requested SVG render scale. Keep in sync with the .import files when
+# either side changes; the verifier should flag drift in a future pass.
+const _IMPORT_SVG_SCALE: Dictionary = {
+	"arrow_down":                    0.5,
+	"checkbox_checked":              0.75,
+	"checkbox_unchecked":            0.75,
+	"radio_checked":                 0.75,
+	"radio_unchecked":               0.75,
+	"checkbutton_checked":           1.0,
+	"checkbutton_unchecked":         1.0,
+	"close":                         0.5,
+	"clear":                         0.5,
+	"disclosure_expanded":           0.5,
+	"disclosure_collapsed":          0.5,
+	"disclosure_expanded_mirrored":  0.5,
+	"disclosure_collapsed_mirrored": 0.5,
+	"tab_increment":                 0.5,
+	"tab_decrement":                 0.5,
+}
+
+
 func _load_icon(icon_name: String, svg_scale: float = 0.0) -> Texture2D:
 	var cache_key := "%s@%.3f" % [icon_name, svg_scale] if svg_scale > 0.0 else icon_name
 	var cached: Texture2D = _active_icon_cache.get(cache_key)
@@ -5615,6 +6003,11 @@ func _load_icon(icon_name: String, svg_scale: float = 0.0) -> Texture2D:
 		return cached
 	var path := "res://addons/neocade_theme/icons/" + icon_name + ".svg"
 	if svg_scale > 0.0:
+		# Editor path: re-render the SVG from its raw source at the requested
+		# scale. Highest fidelity, but raw .svg files are stripped from the PCK
+		# in exported builds (Godot's texture importer keeps only the baked
+		# .ctex), so FileAccess returns an empty string there and we fall
+		# through to the pixel-resize fallback below.
 		var svg := FileAccess.get_file_as_string(path)
 		if not svg.is_empty():
 			var image := Image.new()
@@ -5624,6 +6017,25 @@ func _load_icon(icon_name: String, svg_scale: float = 0.0) -> Texture2D:
 				_active_icon_cache[cache_key] = texture
 				return texture
 	var icon := load(path) as Texture2D
+	if icon != null and svg_scale > 0.0:
+		# Export-build fallback: re-render via SVG isn't possible (no raw
+		# source), so pixel-resize the baked .ctex from its imported svg/scale
+		# up/down to the requested mobile_svg_scale. Lower fidelity than the
+		# editor path on upscales (~1.5–2x typical), but visually correct so
+		# mobile-platform sizing matches editor behavior in exported builds.
+		var import_scale: float = _IMPORT_SVG_SCALE.get(icon_name, 0.75)
+		var ratio: float = svg_scale / import_scale
+		if not is_equal_approx(ratio, 1.0):
+			var img := icon.get_image()
+			if img != null:
+				if img.is_compressed():
+					img.decompress()
+				img.resize(
+					maxi(1, int(round(img.get_width() * ratio))),
+					maxi(1, int(round(img.get_height() * ratio))),
+					Image.INTERPOLATE_LANCZOS
+				)
+				icon = ImageTexture.create_from_image(img)
 	if icon != null:
 		_active_icon_cache[cache_key] = icon
 	return icon
@@ -5645,7 +6057,7 @@ func _make_split_grabber_icon(vertical_indicator: bool, role_table: Dictionary, 
 	var width := THICKNESS if vertical_indicator else LENGTH
 	var height := LENGTH if vertical_indicator else THICKNESS
 	var shape_radius: int = corner_radius
-	var radius_lookup: Variant = _lookup_shape(style_personality, "shape.secondary_radius")
+	var radius_lookup: Variant = _lookup_shape(style_personality, "shape.regular_radius")
 	if radius_lookup != null and (typeof(radius_lookup) == TYPE_INT or typeof(radius_lookup) == TYPE_FLOAT):
 		shape_radius = int(radius_lookup)
 	var radius: float = float(clampi(shape_radius, 0, int(THICKNESS / 2)))
@@ -5679,7 +6091,7 @@ func _make_slider_grabber_icon(highlight: bool, role_table: Dictionary, style_pe
 	var mobile: bool = tokens.get("densityScale", 1.0) > 1.0
 	var size := 48 if mobile else 16
 	var shape_radius: int = corner_radius
-	var radius_lookup: Variant = _lookup_shape(style_personality, "shape.secondary_radius")
+	var radius_lookup: Variant = _lookup_shape(style_personality, "shape.regular_radius")
 	if radius_lookup != null and (typeof(radius_lookup) == TYPE_INT or typeof(radius_lookup) == TYPE_FLOAT):
 		shape_radius = int(radius_lookup)
 	var outer_radius := float(clampi(shape_radius, 0, 8 if mobile else 5))

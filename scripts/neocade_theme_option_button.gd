@@ -82,11 +82,19 @@ func refresh_theme_list() -> void:
 		select(-1)
 		return
 
-	if requested_selected == -1:
-		_refresh_should_mirror_target = false
-		if _should_sync_selected_from_target() and _select_current_target_style(target):
+	if Engine.is_editor_hint():
+		if target != null and target.theme != null and _select_current_target_style(target):
 			return
 
+		select(-1)
+		return
+
+	if _should_sync_selected_from_target() and _select_current_target_style(target):
+		_refresh_should_mirror_target = false
+		return
+
+	if requested_selected == -1:
+		_refresh_should_mirror_target = false
 		select(-1)
 		return
 
@@ -108,10 +116,16 @@ func refresh_theme_list() -> void:
 
 
 func _on_item_selected(index: int) -> void:
+	if Engine.is_editor_hint():
+		return
+
 	_apply_theme(index)
 
 
 func _apply_theme(index: int) -> void:
+	if Engine.is_editor_hint():
+		return
+
 	var target := _theme_target()
 	if target == null or index < 0 or index >= _item_styles.size():
 		return
@@ -267,7 +281,7 @@ func _queue_refresh() -> void:
 
 
 func _queue_selected_apply() -> void:
-	if not _is_ready or not is_inside_tree() or _selected_apply_queued:
+	if Engine.is_editor_hint() or not _is_ready or not is_inside_tree() or _selected_apply_queued:
 		return
 
 	_selected_apply_queued = true
@@ -276,6 +290,9 @@ func _queue_selected_apply() -> void:
 
 func _apply_selected_change() -> void:
 	_selected_apply_queued = false
+	if Engine.is_editor_hint():
+		return
+
 	if selected == -1:
 		if _should_sync_selected_from_target():
 			var target := _theme_target()
