@@ -96,12 +96,13 @@ of the 5 directions a non-color/non-radius signature move (C6).
 **Scope (3 default-behavior candidates):**
 
 1. **C4 — HSV value-darken depth formula.** Replace `_raised_depth_color`
-   at `addons/neocade_theme/scripts/neocade_theme.gd:800-806` with
-   `Color.from_hsv(h, s, v * (1.0 - strength))` at
-   `strength = 0.20 + 0.10 * raised_strength`. Hue/saturation preserved,
-   depth strip stays in same hue family ~40% darker. Helps colored
-   buttons (accent fills, role-colored CTAs); naturally no-op on dark
-   neutral buttons where face and depth converge. ~30 min.
+   with `Color.from_hsv(h, s, v * (1.0 - strength))` so hue/saturation
+   are preserved and colored buttons keep a same-family hard underside.
+   Follow-up tuning allows built-in styles to set hidden
+   `shape.raised_depth_darken` and `shape.raised_depth_scale` values:
+   Bubble keeps a chunkier but softer candy-game underside, Burst becomes
+   deliberately bolder, and Slate stays restrained. No public exports
+   added. ~30 min.
 
 2. **C2' — Accent expansion in idle chrome.** Rebind ~6-8 existing
    BINDING_TABLE slots to use `accent_color` in idle state:
@@ -584,7 +585,7 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 
 ### Phase 12: Signature Visual Moves
 
-**Goal:** Resolve the "generic dark Godot theme with an accent color" complaint by adopting the three default-behavior signature moves locked by the Visual Identity Distinctiveness spike (C4 + C2' + C6) so the rendered theme reads as a unique flat-MD3 game-UI identity. (1) C4 replaces `_raised_depth_color` with HSV value-darken at `0.20 + 0.10 * raised_strength` to fix colored-button affordance. (2) C2' rebinds existing BINDING_TABLE slots (selected TabBar indicator, selected ItemList/Tree row left-stripe, kicker text color, active section indicators, slider value labels, section-header underlines) to use the existing `accent_color` in idle chrome — the headline fix, zero new hues. (3) C6 gives each of the 5 directions one non-color/non-radius signature: Pulse uppercase-tracked kicker, Slate 1px hairline borders + quiet-pill primary, Bubble forced ≥26 corner radius across all chrome, Daybreak 1px outer mint outline + generous primary padding, Burst oversized 56-64px primary CTAs with thicker depth strip. Locked success criteria (binding): `raised=false` shows ZERO 3D elements, no glow halos anywhere, every direction identifiable at thumbnail scale via greyscale render without color cues, no new hues introduced, zero public-export changes (12-export contract preserved).
+**Goal:** Resolve the "generic dark Godot theme with an accent color" complaint by adopting the three default-behavior signature moves locked by the Visual Identity Distinctiveness spike (C4 + C2' + C6) so the rendered theme reads as a unique flat-MD3 game-UI identity. (1) C4 replaces `_raised_depth_color` with HSV value-darken and follow-up per-style hidden depth scale/darken values to fix colored-button affordance without making Bubble's candy-game underside too dark. (2) C2' rebinds existing BINDING_TABLE slots (selected TabBar indicator, selected ItemList/Tree row left-stripe, kicker text color, active section indicators, slider value labels, section-header underlines) to use the existing `accent_color` in idle chrome — the headline fix, zero new hues. (3) C6 gives each of the 5 directions one non-color/non-radius signature: Pulse uppercase-tracked kicker, Slate 1px hairline borders + quiet-pill primary, Bubble forced ≥26 corner radius across all chrome, Daybreak 1px outer mint outline + generous primary padding, Burst oversized 56-64px primary CTAs with thicker depth strip. Locked success criteria (binding): `raised=false` shows ZERO 3D elements, no glow halos anywhere, every direction identifiable at thumbnail scale via greyscale render without color cues, no new hues introduced, zero public-export changes (12-export contract preserved).
 **Requirements**: TBD (Phase 12 is post-v1 visual-identity work; no REQUIREMENTS.md REQ-IDs map to it — coverage is via the 6 locked success criteria above)
 **Depends on:** Phase 11
 **Plans:** 4/4 plans complete
@@ -592,7 +593,7 @@ Phases execute in numeric order: 1 → 2 → 3.1 → 3.2 → 3.3 → 3.4 → 4 �
 Plans:
 **Wave 1**
 - [x] 12-01-wave-0-verify-helpers-PLAN.md — Wave 0: create the 4 Phase 12 verification helpers (architecture, SC#1..SC#6 stages, 30-config smoke, greyscale thumbnail render).
-- [x] 12-02-wave-1-c4-hsv-depth-PLAN.md — Wave 1: rewrite _raised_depth_color body with the D-12.02 HSV value-darken formula (atomic, signature preserved).
+- [x] 12-02-wave-1-c4-hsv-depth-PLAN.md — Wave 1: rewrite _raised_depth_color body with the D-12.02 HSV value-darken formula; follow-up tuning adds hidden per-style depth scale/darken values while preserving the public signature/export contract.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [x] 12-03-wave-2-c2prime-accent-rebinds-PLAN.md — Wave 2: rebind 6 BINDING_TABLE rows (TabBar/TabContainer tab_selected, ItemList/Tree selected/selected_focus) to role_primary accent stripes — the headline fix (mid-phase fallback boundary per D-12.20).

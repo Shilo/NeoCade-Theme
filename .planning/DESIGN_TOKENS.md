@@ -348,9 +348,9 @@ var outline_color: Color   = _mix(base_color, elevate_target, 0.24 * spread_fact
 
 **Friendlier aliases (5-stop M3 tonal ramp per TOKEN-01):** `surface_base` = M3 surface; `surface_low` = surface-container-low; `surface_panel` = surface-container; `surface_high` = surface-container-high; `surface_overlay` = surface-container-highest.
 
-### 6.3 Per-color tinted offset tokens (raised mode)
+### 6.3 Raised depth-edge color tokens (raised mode)
 
-When `raised = true`, every raised element's bottom-edge shadow is the SAME hue as the element bg, just shifted toward `base_color` — **never near-black**. This is the rev-3 fix (handoff at `MOCKUP-REVISION-3-HANDOFF.md`) for the rev-2 darken-floored-at-0 bug.
+When `raised = true`, raised elements use a hard bottom extrusion, not a soft shadow. Neutral/surface elements keep the rev-3 tinted-offset behavior: same family as the face, shifted toward `base_color` so panels and quiet chrome never collapse to near-black.
 
 ```gdscript
 var accent_offset: Color          = _tint_toward_base(accent_color, base_color)
@@ -360,7 +360,15 @@ var surface_overlay_offset: Color = _tint_toward_base(surface_overlay, base_colo
 var surface_low_offset: Color     = _tint_toward_base(surface_low, base_color)
 ```
 
-These offset colors back the StyleBoxFlat shadow on raised elements (see §9 raised variation contract). Each raised Control's offset stylebox uses the matching offset color: a primary button (accent fill) uses `accent_offset` for its bottom edge; a panel (surface_panel fill) uses `surface_panel_offset`.
+Colored interactive and semantic faces use HSV value-darken for the raised depth edge instead of tinting toward the page base. Hue/saturation stay fixed while value is reduced by `shape.raised_depth_darken`; this preserves the candy-flat button read from the HCGames-style reference without producing black/muddy undersides.
+
+```gdscript
+var raised_depth_darken: float = shape.raised_depth_darken
+var primary_button_offset: Color = _raised_depth_color(primary_button_normal, base_color, raised_depth_darken)
+var role_danger_offset: Color = _raised_depth_color(role_danger, base_color, raised_depth_darken)
+```
+
+These offset colors back the StyleBoxFlat bottom border on raised elements (see §9 raised variation contract). A panel (surface_panel fill) uses `surface_panel_offset`; a colored primary/danger/semantic button uses the HSV-darkened offset for its depth edge.
 
 ### 6.4 Text colors with `is_light` flip
 
@@ -411,7 +419,7 @@ var state_pressed: Color = _mix(base_color, Color.BLACK, abs(pressed_pct) / 100.
 | `role.danger` | derived red | Default `Color("#FF6E6E")`; directions may override |
 | `role.info` | derived cyan/blue | Default `Color("#5FE3FF")`; directions may override |
 
-`accent_offset`, `accent_rim` (= `_mix(accent_color, Color.WHITE, 0.5)`), and `accent_offset` are derived in `_regenerate_theme()` for raised-mode Control authoring.
+`accent_offset`, `accent_rim` (= `_mix(accent_color, Color.WHITE, 0.5)`), and per-role raised depth offsets are derived in `_regenerate_theme()` for raised-mode Control authoring.
 
 ### 7.2 M3 state-layer constants
 
@@ -516,8 +524,8 @@ Translates the mockup CSS `box-shadow: 0 raised_strength 0 0 var(--{element}-off
 # For each raised-eligible Control's stylebox:
 sb.shadow_size = 0
 sb.shadow_offset = Vector2.ZERO
-depth_width = ceil(raised_strength * shape.raised_lifts.<family> / 3.0)
-sb.border_color = element_offset_color  # per §6.3
+depth_width = ceil(raised_strength * shape.raised_depth_scale * shape.raised_lifts.<family> / 3.0)
+sb.border_color = element_offset_color  # per §6.3; surface tint or HSV depth-darken
 sb.border_width_bottom = max(depth_width, face_edge_width + 1)
 sb.content_margin_bottom += max(0, sb.border_width_bottom - face_edge_width)
 
@@ -531,7 +539,7 @@ Raised intensity by Control family per FLAT-3D-UI-RESEARCH.md + per-direction `a
 
 | Family | Raised behavior |
 |---|---|
-| Buttons (primary/secondary/ghost) | strongest — normalized from the 0-3 family lift scale; built-in primary/danger bottoms cap at a crisp 3px |
+| Buttons (primary/secondary/ghost) | strongest — normalized from the 0-3 family lift scale, then multiplied by per-direction `shape.raised_depth_scale` so each style gets an intentional underside thickness |
 | Selected tabs / chips | medium or flat; tabs do not gain extra bottom depth because they must stay connected to the panel |
 | Range handles (slider grabber, scrollbar grabber) | subtle — small hard offset only |
 | Panels / dialogs | subtle — normalized from the 0-3 family lift scale (panels lift to convey card-like depth, but flat fill content) |
@@ -540,6 +548,18 @@ Raised intensity by Control family per FLAT-3D-UI-RESEARCH.md + per-direction `a
 | Passive labels / separators | NEVER lift (passive elements have no affordance) |
 
 Per-direction lift list is in §5 (each direction's "Theme Editor override intent" → "Raised lifts" line).
+
+Built-in raised depth-edge tuning for common button chrome:
+
+| Direction | Primary/danger bottom edge | Secondary/OptionButton bottom edge | Depth darken |
+|---|---:|---:|---:|
+| Pulse | 3px | 2px | 38% |
+| Slate | 2px | 2px | 30% |
+| Bubble | 4px | 3px | 32% |
+| Daybreak | 3px | 2px | 34% |
+| Burst | 5px | 4px | 42% |
+
+Bubble intentionally gets a chunkier 4px/3px candy-game underside, but the 32% value darken is softer than Pulse/Burst so it stays playful rather than heavy.
 
 ### 9.4 Optional top rim highlight (raised primary buttons)
 

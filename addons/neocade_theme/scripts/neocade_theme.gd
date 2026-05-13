@@ -358,6 +358,7 @@ func _regenerate_theme() -> void:
 	var surface_panel_offset: Color   = _tint_toward_base(surface_panel, base_color)
 	var surface_overlay_offset: Color = _tint_toward_base(surface_overlay, base_color)
 	var surface_low_offset: Color     = _tint_toward_base(surface_low, base_color)
+	var raised_depth_darken: float = _resolve_raised_depth_darken(style_personality)
 
 	# ── Text colors with is_light flip (DESIGN_TOKENS §6.4) ──
 	var text_strong: Color
@@ -404,9 +405,9 @@ func _regenerate_theme() -> void:
 	var role_warning: Color = Color("#FFD166")
 	var role_danger:  Color = Color("#FF6E6E")
 	var role_info:    Color = Color("#5FE3FF")
-	var role_success_offset: Color = _raised_depth_color(role_success, base_color)
-	var role_warning_offset: Color = _raised_depth_color(role_warning, base_color)
-	var role_info_offset: Color = _raised_depth_color(role_info, base_color)
+	var role_success_offset: Color = _raised_depth_color(role_success, base_color, raised_depth_darken)
+	var role_warning_offset: Color = _raised_depth_color(role_warning, base_color, raised_depth_darken)
+	var role_info_offset: Color = _raised_depth_color(role_info, base_color, raised_depth_darken)
 	var text_on_primary: Color = _readable_text_color(role_primary)
 	var text_on_accent_offset: Color = _readable_text_color(accent_offset)
 	var progress_text_color: Color = text_strong
@@ -455,18 +456,18 @@ func _regenerate_theme() -> void:
 	var danger_button_border_pressed: Color = _state_layer_color(danger_button_pressed, text_on_danger, button_edge_layer)
 	var danger_button_disabled: Color = danger_button_normal
 
-	var button_normal_offset: Color = _raised_depth_color(button_normal, base_color)
-	var button_hover_offset: Color = _raised_depth_color(button_hover, base_color)
-	var button_pressed_offset: Color = _raised_depth_color(button_pressed, base_color)
-	var button_disabled_offset: Color = _raised_depth_color(button_disabled, base_color)
-	var primary_button_offset: Color = _raised_depth_color(primary_button_normal, base_color)
-	var primary_button_hover_offset: Color = _raised_depth_color(primary_button_hover, base_color)
-	var primary_button_pressed_offset: Color = _raised_depth_color(primary_button_pressed, base_color)
-	var role_primary_offset: Color = _raised_depth_color(role_primary, base_color)
-	var danger_button_offset: Color = _raised_depth_color(danger_button_normal, base_color)
-	var danger_button_hover_offset: Color = _raised_depth_color(danger_button_hover, base_color)
-	var danger_button_pressed_offset: Color = _raised_depth_color(danger_button_pressed, base_color)
-	var role_danger_offset: Color = _raised_depth_color(role_danger, base_color)
+	var button_normal_offset: Color = _raised_depth_color(button_normal, base_color, raised_depth_darken)
+	var button_hover_offset: Color = _raised_depth_color(button_hover, base_color, raised_depth_darken)
+	var button_pressed_offset: Color = _raised_depth_color(button_pressed, base_color, raised_depth_darken)
+	var button_disabled_offset: Color = _raised_depth_color(button_disabled, base_color, raised_depth_darken)
+	var primary_button_offset: Color = _raised_depth_color(primary_button_normal, base_color, raised_depth_darken)
+	var primary_button_hover_offset: Color = _raised_depth_color(primary_button_hover, base_color, raised_depth_darken)
+	var primary_button_pressed_offset: Color = _raised_depth_color(primary_button_pressed, base_color, raised_depth_darken)
+	var role_primary_offset: Color = _raised_depth_color(role_primary, base_color, raised_depth_darken)
+	var danger_button_offset: Color = _raised_depth_color(danger_button_normal, base_color, raised_depth_darken)
+	var danger_button_hover_offset: Color = _raised_depth_color(danger_button_hover, base_color, raised_depth_darken)
+	var danger_button_pressed_offset: Color = _raised_depth_color(danger_button_pressed, base_color, raised_depth_darken)
+	var role_danger_offset: Color = _raised_depth_color(role_danger, base_color, raised_depth_darken)
 
 	# ── BINDING_TABLE walk lands here (Plan 04-05). ──
 	# The locals above are the precomputed inputs every entry-population path consumes.
@@ -877,17 +878,27 @@ func _state_layer_color(container: Color, foreground: Color, opacity: float) -> 
 	return result
 
 
-func _raised_depth_color(element: Color, base_c: Color) -> Color:
-	# Phase 12 C4 (D-12.02): HSV value-darken keeps depth in the element's hue family.
-	# `base_c` retained for callsite compatibility but unused — depth decouples from
-	# surface per the HCGames anchor (spike 002b iteration 5).
-	var strength: float = 0.20 + 0.10 * float(raised_strength)
+func _raised_depth_color(element: Color, base_c: Color, strength_override: float = -1.0) -> Color:
+	# Phase 12 C4+ follow-up: HSV value-darken keeps depth in the element's hue
+	# family. `base_c` stays for callsite compatibility; built-in styles now pass
+	# a per-direction strength so Bubble can stay candy-like instead of near-black.
+	var strength: float = strength_override
+	if strength < 0.0:
+		strength = 0.20 + 0.10 * float(raised_strength)
+	strength = clampf(strength, 0.0, 0.75)
 	var h: float = element.h
 	var s: float = element.s
 	var v: float = element.v * (1.0 - strength)
 	var result := Color.from_hsv(h, s, max(v, 0.04))
 	result.a = element.a
 	return result
+
+
+func _resolve_raised_depth_darken(style_personality: Dictionary) -> float:
+	var raw: Variant = _lookup_shape(style_personality, "shape.raised_depth_darken")
+	if raw != null and (typeof(raw) == TYPE_INT or typeof(raw) == TYPE_FLOAT):
+		return clampf(float(raw), 0.0, 0.75)
+	return clampf(0.20 + 0.10 * float(raised_strength), 0.0, 0.75)
 
 
 func _readable_text_color(bg: Color) -> Color:
@@ -981,12 +992,18 @@ func _make_raised_stylebox(bg: Color, _offset_color: Color, _intensity: int) -> 
 	return sb
 
 
-func _resolve_raised_depth(intensity: int) -> int:
+func _resolve_raised_depth(intensity: int, style_personality: Dictionary) -> int:
 	if not raised or raised_strength <= 0 or intensity <= 0:
 		return 0
-	# shape.raised_lifts is a 0-3 family-emphasis scale. Normalize it against
-	# raised_strength so built-in styles top out at a crisp 1-3px hard edge.
-	return maxi(1, ceili(float(raised_strength) * float(intensity) / 3.0))
+	# shape.raised_lifts is a 0-3 family-emphasis scale. The per-style scale
+	# gives Bubble/Burst the chunkier HCGames-style underside while Slate stays
+	# restrained, without adding another public export.
+	var scale := 1.0
+	var scale_raw: Variant = _lookup_shape(style_personality, "shape.raised_depth_scale")
+	if scale_raw != null and (typeof(scale_raw) == TYPE_INT or typeof(scale_raw) == TYPE_FLOAT):
+		scale = maxf(0.0, float(scale_raw))
+	var style_depth: float = float(raised_strength) * scale
+	return maxi(1, ceili(style_depth * float(intensity) / 3.0))
 
 
 func _constrain_shape_radius(radius: int, radius_path: String) -> int:
@@ -1035,7 +1052,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"surface_alpha_popup":   1.00,
 			"surface_alpha_buttons": 1.00,
 			"raised_lifts": {
-				"primary":         2,
+				"primary":         3,
 				"secondary":       2,
 				"ghost":           1,
 				"selected_tab":    2,
@@ -1047,6 +1064,8 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    0,  # Pulse rows do NOT lift (§5.1 raised lifts line)
 				"chip":            2,
 			},
+			"raised_depth_scale":  1.50,
+			"raised_depth_darken": 0.38,
 			"focus_offset":  0,
 			"kicker_style":  &"uppercase-tracked-accent",
 			"hairline_thickness":  0,
@@ -1091,6 +1110,8 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    1,
 				"chip":            2,
 			},
+			"raised_depth_scale":  1.50,
+			"raised_depth_darken": 0.30,
 			"focus_offset":  2,
 			"kicker_style":  &"small-caps-subtle",
 			"hairline_thickness":  1,   # Phase 12 C6 Slate signature: 1px hairlines on interactive chrome.
@@ -1135,6 +1156,8 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    1,
 				"chip":            2,
 			},
+			"raised_depth_scale":  1.32,
+			"raised_depth_darken": 0.32,
 			"focus_offset":  2,
 			"kicker_style":  &"uppercase-tracked-accent",
 			"hairline_thickness":  0,
@@ -1179,6 +1202,8 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    1,
 				"chip":            3,
 			},
+			"raised_depth_scale":  1.00,
+			"raised_depth_darken": 0.34,
 			"focus_offset":  2,
 			"kicker_style":  &"sentence-case-accent",
 			"hairline_thickness":  0,
@@ -1223,6 +1248,8 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    2,
 				"chip":            2,
 			},
+			"raised_depth_scale":  1.66,
+			"raised_depth_darken": 0.42,
 			"focus_offset":  1,
 			"kicker_style":  &"uppercase-bold-larger-scale",
 			"hairline_thickness":  0,
@@ -1327,6 +1354,8 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 			"selected_row":    1,
 			"chip":            3,
 		},
+		"raised_depth_scale":  1.00,
+		"raised_depth_darken": 0.36,
 		"focus_offset":  2,
 		"kicker_style":  &"sentence-case-accent",
 		"hairline_thickness":  0,
@@ -5649,7 +5678,7 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		# Pick the matching offset color (per §6.3) for the bg's family.
 		var offset_role: String = recipe.get("offset_role", role + "_offset")
 		var offset_color: Color = role_table.get(offset_role, role_table.get(role + "_offset", role_table.surface_panel_offset))
-		var sb_intensity: int = _resolve_raised_depth(raised_intensity)
+		var sb_intensity: int = _resolve_raised_depth(raised_intensity, style_personality)
 		var sb := _make_raised_stylebox(bg_color, offset_color, sb_intensity)
 		# Plan 05-02 Task 2 (D-03): radius may be either the @export `corner_radius` baseline
 		# (no recipe override), an int literal, or a `shape.<key>` lookup. _set_radius_all

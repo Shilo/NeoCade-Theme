@@ -23,6 +23,28 @@ const EXPECTED_CORNER_RADIUS := {
 	NeoCadeTheme.Style.BUBBLE: 24,
 }
 const EXPECTED_DESKTOP_BUTTON_PADDING := Vector2(14, 9)
+const EXPECTED_PRIMARY_DEPTH := {
+	NeoCadeTheme.Style.PULSE: 3,
+	NeoCadeTheme.Style.DAYBREAK: 3,
+	NeoCadeTheme.Style.SLATE: 2,
+	NeoCadeTheme.Style.BURST: 5,
+	NeoCadeTheme.Style.BUBBLE: 4,
+}
+const EXPECTED_SECONDARY_DEPTH := {
+	NeoCadeTheme.Style.PULSE: 2,
+	NeoCadeTheme.Style.DAYBREAK: 2,
+	NeoCadeTheme.Style.SLATE: 2,
+	NeoCadeTheme.Style.BURST: 4,
+	NeoCadeTheme.Style.BUBBLE: 3,
+}
+const EXPECTED_DEPTH_DARKEN := {
+	NeoCadeTheme.Style.PULSE: 0.38,
+	NeoCadeTheme.Style.DAYBREAK: 0.34,
+	NeoCadeTheme.Style.SLATE: 0.30,
+	NeoCadeTheme.Style.BURST: 0.42,
+	NeoCadeTheme.Style.BUBBLE: 0.32,
+}
+const DEPTH_DARKEN_TOLERANCE := 0.02
 
 var _failures: PackedStringArray = []
 
@@ -264,13 +286,17 @@ func _check_button_radius_and_padding(theme: NeoCadeTheme, label: String) -> voi
 
 
 func _check_raised_depth(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:
+	var expected_primary_depth: int = int(EXPECTED_PRIMARY_DEPTH.get(theme.style, 3))
+	var expected_secondary_depth: int = int(EXPECTED_SECONDARY_DEPTH.get(theme.style, 2))
+	var expected_darken: float = float(EXPECTED_DEPTH_DARKEN.get(theme.style, 0.36))
 	for theme_type in [&"PrimaryButton", &"DangerButton"]:
 		var stylebox := theme.get_stylebox(&"normal", theme_type) as StyleBoxFlat
 		if stylebox == null:
 			_fail("%s missing %s.normal" % [label, theme_type])
 			continue
 		if expect_raised:
-			_expect_depth_cap(stylebox, label, theme_type, 3, 2)
+			_expect_depth_width(stylebox, label, theme_type, expected_primary_depth)
+			_expect_depth_darken(stylebox, label, theme_type, expected_darken)
 		else:
 			_expect_flat_edge(stylebox, label, theme_type)
 
@@ -279,7 +305,8 @@ func _check_raised_depth(theme: NeoCadeTheme, label: String, expect_raised: bool
 		_fail("%s missing OptionButton.normal" % label)
 		return
 	if expect_raised:
-		_expect_depth_cap(option, label, &"OptionButton", 2, 1)
+		_expect_depth_width(option, label, &"OptionButton", expected_secondary_depth)
+		_expect_depth_darken(option, label, &"OptionButton", expected_darken)
 		var primary := theme.get_stylebox(&"normal", &"PrimaryButton") as StyleBoxFlat
 		if primary != null and primary.border_width_bottom < option.border_width_bottom:
 			_fail("%s PrimaryButton bottom edge should be at least OptionButton: primary=%d option=%d" % [
@@ -291,9 +318,8 @@ func _check_raised_depth(theme: NeoCadeTheme, label: String, expect_raised: bool
 		_expect_flat_edge(option, label, &"OptionButton")
 
 
-func _expect_depth_cap(stylebox: StyleBoxFlat, label: String, theme_type: StringName, max_bottom_width: int, max_extra_depth: int) -> void:
+func _expect_depth_width(stylebox: StyleBoxFlat, label: String, theme_type: StringName, expected_bottom_width: int) -> void:
 	var face_width := _face_width(stylebox)
-	var extra_depth := maxi(0, stylebox.border_width_bottom - face_width)
 	if stylebox.border_width_bottom <= face_width:
 		_fail("%s raised %s should have a visible bottom depth edge: face=%d bottom=%d" % [
 			label,
@@ -301,19 +327,24 @@ func _expect_depth_cap(stylebox: StyleBoxFlat, label: String, theme_type: String
 			face_width,
 			stylebox.border_width_bottom,
 		])
-	if stylebox.border_width_bottom > max_bottom_width:
-		_fail("%s raised %s bottom border too deep: got %d max %d" % [
+	if stylebox.border_width_bottom != expected_bottom_width:
+		_fail("%s raised %s bottom border expected %d got %d" % [
 			label,
 			theme_type,
+			expected_bottom_width,
 			stylebox.border_width_bottom,
-			max_bottom_width,
 		])
-	if extra_depth > max_extra_depth:
-		_fail("%s raised %s extra bottom depth too large: got %d max %d" % [
+
+
+func _expect_depth_darken(stylebox: StyleBoxFlat, label: String, theme_type: StringName, expected_darken: float) -> void:
+	var face_value: float = maxf(stylebox.bg_color.v, 0.001)
+	var actual_darken: float = 1.0 - (stylebox.border_color.v / face_value)
+	if absf(actual_darken - expected_darken) > DEPTH_DARKEN_TOLERANCE:
+		_fail("%s raised %s depth darken expected %.2f got %.2f" % [
 			label,
 			theme_type,
-			extra_depth,
-			max_extra_depth,
+			expected_darken,
+			actual_darken,
 		])
 
 

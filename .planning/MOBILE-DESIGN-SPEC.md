@@ -57,7 +57,7 @@ Android density buckets are handled by Godot project scaling and stretch configu
 | CheckButton | interactive | Mobile toggle/text proxy reaches at least 48px. |
 | CodeEdit | interactive | Mobile input proxy uses 16px body text and input minimum. |
 | ColorPicker | interactive | Picker constants and cursor/bar proxies remain above 48px. |
-| ColorPickerButton | interactive | LIMITED: Godot exposes only `normal` stylebox + `bg` icon for this class; a theme-only 48px min-size would consume the swatch draw rect, so consuming scenes should give standalone swatch buttons a mobile custom minimum size when needed. |
+| ColorPickerButton | interactive | LIMITED: Godot exposes only `normal` stylebox + `bg` icon for this class; a theme-only 48px min-size would consume the swatch draw rect, and the swatch fill itself is drawn as a square `draw_rect`. Consuming scenes should give standalone swatch buttons a mobile custom minimum size when needed; see `.planning/qa/theme-rescue/colorpickerbutton-radius-finding.md` for the radius limitation. |
 | ConfirmationDialog | display | Shell delegates tap targets to child Buttons. |
 | FileDialog | display | Thumbnail proxy grows from 96 to 128; shell buttons inherit Button formulas. |
 | FoldableContainer | interactive | Title row and arrow proxy pass the 48px floor. |
@@ -93,7 +93,7 @@ Android density buckets are handled by Godot project scaling and stretch configu
 
 Evidence lives at `.planning/phases/08-mobile-variant-token-block-tap-target-audit-updated-for-dyna/logs/08-tap-target-audit.log`.
 
-The Phase 8 audit runs all five directions with `platform=MOBILE`, `raised=false`, and `raised=true`. Current result: 250 PASS, 10 LIMITED, 110 N/A, 0 FAIL. Follow-up runtime probing in 2026-05-09 added `theme_mobile_tap_target_probe.gd`, which verifies actual `get_combined_minimum_size()` for common controls, button variations, icon/flat buttons, MenuButton, Tree/ItemList row height, PopupMenu row/icon sizing, and embedded Window title/close chrome. It also verifies mobile-readable icons for CheckBox, RadioButton, CheckButton, PopupMenu check/radio items, LineEdit clear, and TabBar arrows. ColorPickerButton remains source-limited for theme-only minimum size, so the theme keeps its chrome margins small and consuming mobile layouts should assign a 48x48 minimum where the swatch is standalone. Scrollbars remain intentionally compact. Mobile metrics are 1920x1080 design-space units that the project scales to device resolution, not raw physical device pixels.
+The Phase 8 audit runs all five directions with `platform=MOBILE`, `raised=false`, and `raised=true`. Current result: 250 PASS, 10 LIMITED, 110 N/A, 0 FAIL. Follow-up runtime probing in 2026-05-09 added `theme_mobile_tap_target_probe.gd`, which verifies actual `get_combined_minimum_size()` for common controls, button variations, icon/flat buttons, MenuButton, Tree/ItemList row height, PopupMenu row/icon sizing, and embedded Window title/close chrome. It also verifies mobile-readable icons for CheckBox, RadioButton, CheckButton, PopupMenu check/radio items, LineEdit clear, and TabBar arrows. ColorPickerButton remains source-limited for theme-only minimum size and true swatch radius, so the theme keeps its chrome margins small and consuming mobile layouts should assign a 48x48 minimum where the swatch is standalone. Scrollbars remain intentionally compact. Mobile metrics are 1920x1080 design-space units that the project scales to device resolution, not raw physical device pixels.
 
 ## Limitations
 
