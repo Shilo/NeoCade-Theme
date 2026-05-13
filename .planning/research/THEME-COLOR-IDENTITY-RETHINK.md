@@ -437,7 +437,7 @@ Coverage contract:
 
 | Control family | Role mapping |
 | --- | --- |
-| `BaseButton` family: `Button`, `OptionButton`, `MenuButton`, `CheckBox`, `CheckButton`, `ColorPickerButton`, `LinkButton` | Default `Button` uses `action_fill`; option/menu controls use `menu_fill`; checked/toggled states use `positive_fill` or `toggle_fill`; link text uses link/info role; danger/positive remain explicit semantic roles where Godot cannot infer intent. |
+| `BaseButton` family: `Button`, `OptionButton`, `MenuButton`, `CheckBox`, `CheckButton`, `ColorPickerButton`, `LinkButton` | Default `Button` uses `action_fill`; option/menu controls use `menu_fill`; check/toggle controls use their own `toggle_fill` or range-family role; link text uses link/info role; `PositiveButton` uses `positive_fill`; `DangerButton` uses `danger_fill`. |
 | `LineEdit`, `TextEdit`, `CodeEdit`, `SpinBox`, `TreeLineEdit` | `input_fill`, `input_border`, caret, selection, placeholder, read-only, focus, and disabled roles. |
 | `ItemList`, `Tree`, `TabBar`, `TabContainer` | `selection_fill`, `navigation_fill`, row hover, selected focus, cursor, guide/drop-mark, and selected text roles. |
 | `Range` family: `ProgressBar`, sliders, scrollbars, texture progress | `range_fill`, range track, range grabber, disabled range, and raised offsets. |
@@ -450,7 +450,8 @@ Coverage contract:
 Important limitation:
 
 - Godot Theme cannot know that an arbitrary `Button` whose text says "OK" is a confirm button. Default `Button` should use `action_fill`.
-- `positive_fill` is still needed for success/valid/enabled states, check/toggle active states, success panels/labels, and optional explicit positive button variations or showcase examples.
+- `positive_fill` is for the explicit `PositiveButton` variation and any future explicit positive-role variations. It should not be applied automatically to ordinary buttons or inferred from button text.
+- `danger_fill` is for the explicit `DangerButton` variation and destructive/error states.
 - Built-in dialogs that expose only ordinary `Button` controls will inherit `action_fill` unless Godot exposes a specific type/variation or NeoCade adds a targeted scene-side helper.
 
 Implementation gate:
@@ -560,13 +561,13 @@ Reference:
 
 This is the proposed "no variations required" mapping. Exact values should be tested in mockups before implementation.
 
-| Theme | Button | Option/Menu | Input | Selected Tab | List/Tree Selection | Range/Progress | Toggle/Check | Positive/Success | Popup/Dialog |
+| Theme | Button | Option/Menu | Input | Selected Tab | List/Tree Selection | Range/Progress | Toggle/Check | PositiveButton | DangerButton | Popup/Dialog |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Pulse | amber/orange fill | blue/steel | dark blue with bright border | yellow/gold filled or strong strip | gold or role-coded row with colored rail | green or cyan | green | distinct success green | dark panels with colored category headers |
-| Daybreak | amber fill | mint/teal | pine/cream-tinted input | mint selected state | mint/amber selected container | aqua or mint | mint | fresh green/mint | amber/aqua highlights on warm dark panels |
-| Slate | icy blue quiet fill or outline | steel/lavender | graphite with blue-gray border | icy blue selected state | blue-gray selected container | cyan/blue | mint/blue | restrained mint | graphite panels with cool blue accents |
-| Burst | gold fill | violet/blue | violet/blue | cyan or violet selected state | gold/cyan selected container | lime/cyan | lime/cyan | high-confidence green | plum panels with violet/cyan statement headers |
-| Bubble | blue chunky fill | lavender/sky blue | cream/sky input island | yellow or lavender selected tab | blue/yellow/lavender selected tile | yellow/green | green | bright confirm green | cream panels with lavender headers |
+| Pulse | amber/orange fill | blue/steel | dark blue with bright border | yellow/gold filled or strong strip | gold or role-coded row with colored rail | green or cyan | green | distinct green | red only | dark panels with colored category headers |
+| Daybreak | amber fill | mint/teal | pine/cream-tinted input | mint selected state | mint/amber selected container | aqua or mint | mint | fresh green/mint | red only | amber/aqua highlights on warm dark panels |
+| Slate | icy blue quiet fill or outline | steel/lavender | graphite with blue-gray border | icy blue selected state | blue-gray selected container | cyan/blue | mint/blue | restrained mint | red only | graphite panels with cool blue accents |
+| Burst | gold fill | violet/blue | violet/blue | cyan or violet selected state | gold/cyan selected container | lime/cyan | lime/cyan | high-confidence green | red only | plum panels with violet/cyan statement headers |
+| Bubble | blue chunky fill | lavender/sky blue | cream/sky input island | yellow or lavender selected tab | blue/yellow/lavender selected tile | yellow/green | green | bright confirm green | red only | cream panels with lavender headers |
 
 ## Dynamic Source Behavior By Theme
 
@@ -580,7 +581,7 @@ All themes:
 - Inputs change through an input/container ramp.
 - Tabs, selected rows, and popup hovers change through selection/navigation ramps.
 - Progress, sliders, checkboxes, and checkbuttons change through range/toggle ramps.
-- Positive/success controls change through a dedicated positive ramp instead of borrowing danger, warning, or default action.
+- `PositiveButton` changes through a dedicated positive ramp instead of borrowing danger, warning, or default action.
 - Focus rings change through a high-contrast focus role.
 - Raised lower edges change from the final role colors, not from fixed hard-coded shadows.
 - Danger/error stays red-family; warning stays amber-family; success stays green-family, with only controlled harmonization.
