@@ -55,6 +55,11 @@ func _assert_export_contract(theme: NeoCadeTheme) -> void:
 	_assert(props.has("source_color"), "source_color export exists")
 	_assert(not props.has("base_color"), "base_color export removed")
 	_assert(not props.has("accent_color"), "accent_color export removed")
+	_assert(theme.get_type_variation_base(&"PositiveButton") == &"Button", "PositiveButton type variation exists")
+	_assert(theme.get_type_variation_base(&"PanelLabel") == &"Label", "PanelLabel type variation exists")
+	_assert(theme.get_type_variation_base(&"DialogLabel") == &"Label", "DialogLabel type variation exists")
+	_assert(theme.get_type_variation_base(&"PanelRichTextLabel") == &"RichTextLabel", "PanelRichTextLabel type variation exists")
+	_assert(theme.get_type_variation_base(&"DialogRichTextLabel") == &"RichTextLabel", "DialogRichTextLabel type variation exists")
 
 
 func _assert_role_distinctness(theme: NeoCadeTheme, label: String) -> void:
@@ -94,6 +99,10 @@ func _assert_role_contrast(theme: NeoCadeTheme, label: String) -> void:
 	_assert_progress_contrast(theme, label)
 	_assert_contrast(theme, label, "PositiveButton", "normal", "font_color")
 	_assert_contrast(theme, label, "DangerButton", "normal", "font_color")
+	_assert_text_over_surface(theme, label, "Panel", "panel", "PanelLabel", "font_color")
+	_assert_text_over_surface(theme, label, "PopupPanel", "panel", "DialogLabel", "font_color")
+	_assert_rich_text_over_surface(theme, label, "Panel", "panel", "PanelRichTextLabel")
+	_assert_rich_text_over_surface(theme, label, "PopupPanel", "panel", "DialogRichTextLabel")
 
 
 func _assert_contrast(theme: NeoCadeTheme, label: String, theme_type: String, stylebox_name: String, color_name: String) -> void:
@@ -112,6 +121,17 @@ func _assert_progress_contrast(theme: NeoCadeTheme, label: String) -> void:
 	var fill_outline_ratio := _contrast_ratio(fill, outline)
 	_assert(track_ratio >= MIN_CONTRAST, "%s ProgressBar text vs empty track contrast %.2f" % [label, track_ratio])
 	_assert(fill_outline_ratio >= MIN_CONTRAST, "%s ProgressBar outline vs fill contrast %.2f" % [label, fill_outline_ratio])
+
+
+func _assert_text_over_surface(theme: NeoCadeTheme, label: String, surface_type: String, stylebox_name: String, text_type: String, color_name: String) -> void:
+	var bg := _flat_bg(theme, surface_type, stylebox_name)
+	var fg := theme.get_color(color_name, text_type)
+	var ratio := _contrast_ratio(bg, fg)
+	_assert(ratio >= MIN_CONTRAST, "%s %s over %s.%s contrast %.2f" % [label, text_type, surface_type, stylebox_name, ratio])
+
+
+func _assert_rich_text_over_surface(theme: NeoCadeTheme, label: String, surface_type: String, stylebox_name: String, text_type: String) -> void:
+	_assert_text_over_surface(theme, label, surface_type, stylebox_name, text_type, "default_color")
 
 
 func _flat_bg(theme: NeoCadeTheme, theme_type: String, stylebox_name: String) -> Color:

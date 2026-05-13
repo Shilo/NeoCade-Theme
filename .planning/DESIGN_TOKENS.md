@@ -147,7 +147,7 @@ Setters on every `@export` property trigger `_regenerate_theme()`:
 # ... same pattern for exported properties that affect generated entries ...
 ```
 
-`_regenerate_theme()` clears and repopulates derived theme entry color/state/sizing values for the canonical 37 Control scorecard plus additive runtime/editor integration types. As of the 2026-05-13 docs sync, the live implementation has `BINDING_TABLE.size() == 150` and `TYPE_VARIATIONS.size() == 62`.
+`_regenerate_theme()` clears and repopulates derived theme entry color/state/sizing values for the canonical 37 Control scorecard plus additive runtime/editor integration types. As of the Phase 14 source-color sync, the live implementation has `BINDING_TABLE.size() == 155` and `TYPE_VARIATIONS.size() == 67`.
 
 ### 4.5 What does NOT live in `@export`
 
@@ -670,7 +670,7 @@ The anti-cyberpunk discipline is preserved (Phase 3 redirect 2026-05-04). The ea
 
 ### 12.1 Files that exist now
 
-1. `addons/neocade_theme/scripts/neocade_theme.gd` — `@tool class_name NeoCadeTheme extends Theme` with the 12 `@export` properties, setters → `_regenerate_theme()`, `is_light` derivation, `STYLE_EXPORTS`, `STYLE_PERSONALITY`, `TYPE_VARIATIONS`, and `BINDING_TABLE`.
+1. `addons/neocade_theme/scripts/neocade_theme.gd` — `@tool class_name NeoCadeTheme extends Theme` with the 11 `@export` properties, setters → `_regenerate_theme()`, `is_light` derivation, `STYLE_EXPORTS`, `STYLE_PERSONALITY`, source-color role strategies, `TYPE_VARIATIONS`, and `BINDING_TABLE`.
 2. `addons/neocade_theme/neocade_theme.tres` — canonical `NeoCadeTheme` resource with `style = PULSE` and the 12 serialized exports.
 3. `addons/neocade_theme/scripts/neocade_theme_option_button.gd` — reusable style picker that duplicates the canonical resource, sets `style`, applies it to a target Control, and can emit `null` for the `None` entry.
 4. `addons/neocade_theme/scripts/neocade_theme_autoload.gd` — optional drop-in autoload that calls `NeoCadeTheme.apply_globally()` and merges the canonical theme into `ThemeDB.default_theme`.

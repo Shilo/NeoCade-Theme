@@ -223,6 +223,16 @@ INTENTIONAL_AUTHORED DangerLabel.color.font_color default=<missing> neocade=#c63
 INTENTIONAL_AUTHORED DangerLabel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED DangerLabel.font_size.font_size default=16 neocade=14
 INTENTIONAL_AUTHORED DangerPanel.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#c631510f border=1/1/1/1 border_color=#0f1523ff radius=0/0/0/0 margin=12.0/10.0/12.0/10.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED DialogLabel.color.font_color default=<missing> neocade=#ffffffff
+INTENTIONAL_AUTHORED DialogLabel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED DialogLabel.font_size.font_size default=16 neocade=14
+INTENTIONAL_AUTHORED DialogRichTextLabel.stylebox.focus default=<missing> neocade=StyleBoxFlat(bg=#151e2f00 border=0/0/0/0 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED DialogRichTextLabel.stylebox.normal default=<missing> neocade=StyleBoxFlat(bg=#151e2f00 border=0/0/0/0 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED DialogRichTextLabel.color.default_color default=<missing> neocade=#ffffffff
+INTENTIONAL_AUTHORED DialogRichTextLabel.color.font_selected_color default=<missing> neocade=#000000ff
+INTENTIONAL_AUTHORED DialogRichTextLabel.color.selection_color default=<missing> neocade=#f6fc4dff
+INTENTIONAL_AUTHORED DialogRichTextLabel.font.normal_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED DialogRichTextLabel.font_size.normal_font_size default=16 neocade=14
 INTENTIONAL_AUTHORED FileDialog.color.file_disabled_color default=#ffffff40 neocade=#abaeb46b
 INTENTIONAL_AUTHORED FileDialog.color.folder_icon_color default=#ffffffff neocade=#999c30ff
 INTENTIONAL_AUTHORED FileDialog.constant.thumbnail_size default=64 neocade=96
@@ -607,6 +617,16 @@ INTENTIONAL_AUTHORED OptionButton.font_size.font_size default=16 neocade=14
 INTENTIONAL_AUTHORED OptionButton.icon.arrow default=Texture2D(size=(12.0, 12.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/arrow_down.svg)
 INTENTIONAL_AUTHORED Panel.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#212e42ff border=1/1/1/1 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED PanelContainer.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#212e42ff border=1/1/1/1 border_color=#0f1523ff radius=0/0/0/0 margin=10.0/8.0/10.0/8.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED PanelLabel.color.font_color default=<missing> neocade=#ffffffff
+INTENTIONAL_AUTHORED PanelLabel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED PanelLabel.font_size.font_size default=16 neocade=14
+INTENTIONAL_AUTHORED PanelRichTextLabel.stylebox.focus default=<missing> neocade=StyleBoxFlat(bg=#151e2f00 border=0/0/0/0 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED PanelRichTextLabel.stylebox.normal default=<missing> neocade=StyleBoxFlat(bg=#151e2f00 border=0/0/0/0 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED PanelRichTextLabel.color.default_color default=<missing> neocade=#ffffffff
+INTENTIONAL_AUTHORED PanelRichTextLabel.color.font_selected_color default=<missing> neocade=#000000ff
+INTENTIONAL_AUTHORED PanelRichTextLabel.color.selection_color default=<missing> neocade=#f6fc4dff
+INTENTIONAL_AUTHORED PanelRichTextLabel.font.normal_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED PanelRichTextLabel.font_size.normal_font_size default=16 neocade=14
 INTENTIONAL_AUTHORED PopupDialog.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#151e2fff border=1/1/1/1 border_color=#0f1523ff radius=0/0/0/0 margin=12.0/10.0/12.0/10.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED PopupMenu.stylebox.hover default=StyleBoxFlat(bg=#666666ff border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3080c4ff border=0/0/0/0 border_color=#154674ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED PopupMenu.stylebox.panel default=StyleBoxFlat(bg=#404040ff border=2/2/2/2 border_color=#2d2d2dff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#1a2435ff border=1/1/1/1 border_color=#0a0f1bff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -1171,6 +1191,16 @@ INTENTIONAL_AUTHORED DangerLabel.color.font_color default=<missing> neocade=#c63
 INTENTIONAL_AUTHORED DangerLabel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED DangerLabel.font_size.font_size default=16 neocade=14
 INTENTIONAL_AUTHORED DangerPanel.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#c631510f border=1/1/1/2 border_color=#7b1e32ff radius=0/0/0/0 margin=12.0/10.0/12.0/11.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED DialogLabel.color.font_color default=<missing> neocade=#ffffffff
+INTENTIONAL_AUTHORED DialogLabel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED DialogLabel.font_size.font_size default=16 neocade=14
+INTENTIONAL_AUTHORED DialogRichTextLabel.stylebox.focus default=<missing> neocade=StyleBoxFlat(bg=#151e2f00 border=0/0/0/0 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED DialogRichTextLabel.stylebox.normal default=<missing> neocade=StyleBoxFlat(bg=#151e2f00 border=0/0/0/0 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED DialogRichTextLabel.color.default_color default=<missing> neocade=#ffffffff
+INTENTIONAL_AUTHORED DialogRichTextLabel.color.font_selected_color default=<missing> neocade=#000000ff
+INTENTIONAL_AUTHORED DialogRichTextLabel.color.selection_color default=<missing> neocade=#f6fc4dff
+INTENTIONAL_AUTHORED DialogRichTextLabel.font.normal_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED DialogRichTextLabel.font_size.normal_font_size default=16 neocade=14
 INTENTIONAL_AUTHORED FileDialog.color.file_disabled_color default=#ffffff40 neocade=#abaeb46b
 INTENTIONAL_AUTHORED FileDialog.color.folder_icon_color default=#ffffffff neocade=#999c30ff
 INTENTIONAL_AUTHORED FileDialog.constant.thumbnail_size default=64 neocade=96
@@ -1555,6 +1585,16 @@ INTENTIONAL_AUTHORED OptionButton.font_size.font_size default=16 neocade=14
 INTENTIONAL_AUTHORED OptionButton.icon.arrow default=Texture2D(size=(12.0, 12.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/arrow_down.svg)
 INTENTIONAL_AUTHORED Panel.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#212e42ff border=1/1/1/2 border_color=#151c29ff radius=0/0/0/0 margin=0.0/0.0/0.0/1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED PanelContainer.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#212e42ff border=1/1/1/2 border_color=#151c29ff radius=0/0/0/0 margin=10.0/8.0/10.0/9.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED PanelLabel.color.font_color default=<missing> neocade=#ffffffff
+INTENTIONAL_AUTHORED PanelLabel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED PanelLabel.font_size.font_size default=16 neocade=14
+INTENTIONAL_AUTHORED PanelRichTextLabel.stylebox.focus default=<missing> neocade=StyleBoxFlat(bg=#151e2f00 border=0/0/0/0 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED PanelRichTextLabel.stylebox.normal default=<missing> neocade=StyleBoxFlat(bg=#151e2f00 border=0/0/0/0 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED PanelRichTextLabel.color.default_color default=<missing> neocade=#ffffffff
+INTENTIONAL_AUTHORED PanelRichTextLabel.color.font_selected_color default=<missing> neocade=#000000ff
+INTENTIONAL_AUTHORED PanelRichTextLabel.color.selection_color default=<missing> neocade=#f6fc4dff
+INTENTIONAL_AUTHORED PanelRichTextLabel.font.normal_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED PanelRichTextLabel.font_size.normal_font_size default=16 neocade=14
 INTENTIONAL_AUTHORED PopupDialog.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#151e2fff border=1/1/1/2 border_color=#0b0f16ff radius=0/0/0/0 margin=12.0/10.0/12.0/11.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED PopupMenu.stylebox.hover default=StyleBoxFlat(bg=#666666ff border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3080c4ff border=0/0/0/0 border_color=#154674ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED PopupMenu.stylebox.panel default=StyleBoxFlat(bg=#404040ff border=2/2/2/2 border_color=#2d2d2dff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#1a2435ff border=1/1/1/2 border_color=#101621ff radius=0/0/0/0 margin=0.0/0.0/0.0/1.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2113,6 +2153,14 @@ INTENTIONAL_AUTHORED DangerButton.font.font default=Font(path=) neocade=Font(pat
 INTENTIONAL_AUTHORED DangerLabel.color.font_color default=<missing> neocade=#c63151ff
 INTENTIONAL_AUTHORED DangerLabel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED DangerPanel.stylebox.panel default=<missing> neocade=StyleBoxFlat(bg=#c631510f border=1/1/1/1 border_color=#0f1523ff radius=0/0/0/0 margin=18.0/15.0/18.0/15.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED DialogLabel.color.font_color default=<missing> neocade=#ffffffff
+INTENTIONAL_AUTHORED DialogLabel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED DialogRichTextLabel.stylebox.focus default=<missing> neocade=StyleBoxFlat(bg=#151e2f00 border=0/0/0/0 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED DialogRichTextLabel.stylebox.normal default=<missing> neocade=StyleBoxFlat(bg=#151e2f00 border=0/0/0/0 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED DialogRichTextLabel.color.default_color default=<missing> neocade=#ffffffff
+INTENTIONAL_AUTHORED DialogRichTextLabel.color.font_selected_color default=<missing> neocade=#000000ff
+INTENTIONAL_AUTHORED DialogRichTextLabel.color.selection_color default=<missing> neocade=#f6fc4dff
+INTENTIONAL_AUTHORED DialogRichTextLabel.font.normal_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED FileDialog.color.file_disabled_color default=#ffffff40 neocade=#abaeb46b
 INTENTIONAL_AUTHORED FileDialog.color.folder_icon_color default=#ffffffff neocade=#999c30ff
 INTENTIONAL_AUTHORED FileDialog.constant.thumbnail_size default=64 neocade=128
@@ -2485,6 +2533,14 @@ INTENTIONAL_AUTHORED OptionButton.font.font default=Font(path=) neocade=Font(pat
 INTENTIONAL_AUTHORED OptionButton.icon.arrow default=Texture2D(size=(12.0, 12.0) path=) neocade=Texture2D(size=(16.0, 16.0) path=res://addons/neocade_theme/icons/arrow_down.svg)
 INTENTIONAL_AUTHORED Panel.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#212e42ff border=1/1/1/1 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED PanelContainer.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#212e42ff border=1/1/1/1 border_color=#0f1523ff radius=0/0/0/0 margin=15.0/12.0/15.0/12.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED PanelLabel.color.font_color default=<missing> neocade=#ffffffff
+INTENTIONAL_AUTHORED PanelLabel.font.font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
+INTENTIONAL_AUTHORED PanelRichTextLabel.stylebox.focus default=<missing> neocade=StyleBoxFlat(bg=#151e2f00 border=0/0/0/0 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED PanelRichTextLabel.stylebox.normal default=<missing> neocade=StyleBoxFlat(bg=#151e2f00 border=0/0/0/0 border_color=#0f1523ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
+INTENTIONAL_AUTHORED PanelRichTextLabel.color.default_color default=<missing> neocade=#ffffffff
+INTENTIONAL_AUTHORED PanelRichTextLabel.color.font_selected_color default=<missing> neocade=#000000ff
+INTENTIONAL_AUTHORED PanelRichTextLabel.color.selection_color default=<missing> neocade=#f6fc4dff
+INTENTIONAL_AUTHORED PanelRichTextLabel.font.normal_font default=Font(path=) neocade=Font(path=res://addons/neocade_theme/fonts/inter_variable.ttf)
 INTENTIONAL_AUTHORED PopupDialog.stylebox.panel default=StyleBoxFlat(bg=#1a1a1a99 border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#151e2fff border=1/1/1/1 border_color=#0f1523ff radius=0/0/0/0 margin=18.0/15.0/18.0/15.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED PopupMenu.stylebox.hover default=StyleBoxFlat(bg=#666666ff border=0/0/0/0 border_color=#ccccccff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#3080c4ff border=0/0/0/0 border_color=#154674ff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
 INTENTIONAL_AUTHORED PopupMenu.stylebox.panel default=StyleBoxFlat(bg=#404040ff border=2/2/2/2 border_color=#2d2d2dff radius=3/3/3/3 margin=4.0/4.0/4.0/4.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0)) neocade=StyleBoxFlat(bg=#1a2435ff border=1/1/1/1 border_color=#0a0f1bff radius=0/0/0/0 margin=0.0/0.0/0.0/0.0 expand=0.0/0.0/0.0/0.0 shadow=0 offset=(0.0, 0.0))
@@ -2819,9 +2875,9 @@ INTENTIONAL_AUTHORED WindowContentPanel.stylebox.panel default=<missing> neocade
 
 
 Summary:
-- SAME=341
+- SAME=345
 - FALLS_BACK=0
-- INTENTIONAL_AUTHORED=2476
+- INTENTIONAL_AUTHORED=2532
 - UNINTENTIONAL_EXTRA=0
 - UNINTENTIONAL_STYLE=0
 - NEOCADE_ONLY=0

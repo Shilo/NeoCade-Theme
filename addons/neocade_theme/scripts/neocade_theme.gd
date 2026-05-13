@@ -515,6 +515,8 @@ func _regenerate_theme() -> void:
 	set_font("font", "WarningLabel", body_font)
 	set_font("font", "DangerLabel",  body_font)
 	set_font("font", "InfoLabel",    body_font)
+	set_font("font", "PanelLabel",   body_font)
+	set_font("font", "DialogLabel",  body_font)
 	set_font("font", "CodeLabel",    body_font)   # consumer can override to a mono per FONT-04 stricken
 	# Kicker (D-09 / Plan 05-04): Inter Variable Roman body weight per UD-4 Option D / D-17.
 	# Per PITFALLS 1.2 type variations DO NOT inherit fonts from Label, so this
@@ -525,6 +527,8 @@ func _regenerate_theme() -> void:
 	# The matching size slot is `normal_font_size` (set below); using `font_size`
 	# instead would similarly be silently ignored.
 	set_font("normal_font", "InfoText", body_font)
+	set_font("normal_font", "PanelRichTextLabel", body_font)
+	set_font("normal_font", "DialogRichTextLabel", body_font)
 	set_font("font", "PrimaryButton",   body_font)
 	set_font("font", "PositiveButton",  body_font)
 	set_font("font", "GhostButton",     body_font)
@@ -581,6 +585,8 @@ func _regenerate_theme() -> void:
 	set_font_size("font_size", "WarningLabel", tokens.body)
 	set_font_size("font_size", "DangerLabel",  tokens.body)
 	set_font_size("font_size", "InfoLabel",    tokens.body)
+	set_font_size("font_size", "PanelLabel",   tokens.body)
+	set_font_size("font_size", "DialogLabel",  tokens.body)
 	set_font_size("font_size", "CodeLabel",    tokens.label_)
 	# Kicker (D-09): tokens.kicker is 12 desktop / 13 mobile per DESIGN_TOKENS §10.1.
 	# Burst's "uppercase-bold-larger-scale" enum is owned by content/showcase since
@@ -598,6 +604,8 @@ func _regenerate_theme() -> void:
 	# slot name — Godot silently ignores the wrong slot and falls back to
 	# default_font_size.
 	set_font_size("normal_font_size", "InfoText", tokens.body)
+	set_font_size("normal_font_size", "PanelRichTextLabel", tokens.body)
+	set_font_size("normal_font_size", "DialogRichTextLabel", tokens.body)
 	set_font_size("font_size", "PrimaryButton",   tokens.body)
 	set_font_size("font_size", "PositiveButton",  tokens.body)
 	set_font_size("font_size", "GhostButton",     tokens.body)
@@ -1787,11 +1795,15 @@ const TYPE_VARIATIONS: Dictionary = {
 	# Editor dock scroll-body wrappers used after toolbar stacks.
 	"NoBorderHorizontal":       "MarginContainer",
 	"NoBorderHorizontalBottom": "NoBorderHorizontal",
-	# Phase 13 § C1: Role Label opt-in type variations (4)
+	# Role and surface-local Label/RichTextLabel opt-in type variations (8)
 	"SuccessLabel": "Label",
 	"WarningLabel": "Label",
 	"DangerLabel":  "Label",
 	"InfoLabel":    "Label",
+	"PanelLabel":   "Label",
+	"DialogLabel":  "Label",
+	"PanelRichTextLabel":  "RichTextLabel",
+	"DialogRichTextLabel": "RichTextLabel",
 	# Phase 13 § C3: Role Panel opt-in type variations (5)
 	"AccentPanel":  "PanelContainer",
 	"InfoPanel":    "PanelContainer",
@@ -5624,6 +5636,43 @@ const BINDING_TABLE: Dictionary = {
 	"InfoLabel": {
 		"color": {
 			"font_color": {"role": "role_info"},
+		},
+	},
+	# 58b. Surface-local text variations for controls that sit on explicit panels/dialogs.
+	"PanelLabel": {
+		"color": {
+			"font_color": {"role": "on_panel"},
+		},
+	},
+	"DialogLabel": {
+		"color": {
+			"font_color": {"role": "on_dialog"},
+		},
+	},
+	"PanelRichTextLabel": {
+		"stylebox": {
+			"normal": {"role": "surface_base", "raised_intensity": 0, "alpha": 0.0,
+					   "border_width": 0, "padding": Vector2i(0, 0)},
+			"focus":  {"role": "surface_base", "raised_intensity": 0, "alpha": 0.0,
+					   "border_width": 0, "padding": Vector2i(0, 0)},
+		},
+		"color": {
+			"default_color":       {"role": "on_panel"},
+			"selection_color":     {"role": "selection_fill"},
+			"font_selected_color": {"role": "on_selection"},
+		},
+	},
+	"DialogRichTextLabel": {
+		"stylebox": {
+			"normal": {"role": "surface_base", "raised_intensity": 0, "alpha": 0.0,
+					   "border_width": 0, "padding": Vector2i(0, 0)},
+			"focus":  {"role": "surface_base", "raised_intensity": 0, "alpha": 0.0,
+					   "border_width": 0, "padding": Vector2i(0, 0)},
+		},
+		"color": {
+			"default_color":       {"role": "on_dialog"},
+			"selection_color":     {"role": "selection_fill"},
+			"font_selected_color": {"role": "on_selection"},
 		},
 	},
 	# 59. AccentPanel — PanelContainer variation (Phase 13 § C3). 6%-mix tint
