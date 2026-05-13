@@ -646,6 +646,11 @@
       border-radius: calc(var(--c-radius) * 0.8);
       padding: 10px;
       background: var(--c-surface);
+      color: var(--on-surface);
+    }
+
+    .mapping-card h4 {
+      color: var(--surface-muted);
     }
 
     .mapping-list {
@@ -671,9 +676,16 @@
 
     .mapping-list code,
     .slot-matrix code {
-      color: var(--c-text);
       font-family: var(--mono);
       font-size: 10px;
+    }
+
+    .mapping-list code {
+      color: var(--on-surface);
+    }
+
+    .slot-matrix code {
+      color: var(--ink);
     }
 
     .algorithm-grid,
@@ -1138,16 +1150,37 @@
       return muted;
     }
 
+    function hslChroma(saturation, lightness) {
+      return saturation * (1 - Math.abs(2 * lightness - 1));
+    }
+
     function isRedFamilyHue(hue) {
       const h = wrapHue(hue);
       return h >= 310 || h <= 38;
     }
 
-    function safeOrdinaryHue(hue, safeHue, sourceHue) {
-      if (!isRedFamilyHue(hue)) return wrapHue(hue);
+    function isDangerAdjacentRed(hue, saturation, lightness) {
+      if (!isRedFamilyHue(hue)) return false;
+      const chroma = hslChroma(saturation, lightness);
+      const isWarmCream = lightness >= 0.78 && chroma <= 0.38;
+      const isNearWhiteTint = lightness >= 0.90 && chroma <= 0.22;
+      return !(isWarmCream || isNearWhiteTint);
+    }
+
+    function nearestNonRedHue(hue, safeHue) {
+      const safe = wrapHue(safeHue ?? 205);
+      if (!isRedFamilyHue(safe)) return safe;
+      const h = wrapHue(hue);
+      if (h <= 38) return 42;
+      if (h >= 310) return 304;
+      return 205;
+    }
+
+    function safeOrdinaryHue(hue, safeHue, sourceHue, saturation, lightness) {
+      if (!isDangerAdjacentRed(hue, saturation, lightness)) return wrapHue(hue);
       const sourceNudge = Math.sin(sourceHue * Math.PI / 180) * 8;
       let candidate = wrapHue((safeHue ?? 205) + sourceNudge);
-      if (isRedFamilyHue(candidate)) candidate = wrapHue((safeHue ?? 205) + 58);
+      if (isDangerAdjacentRed(candidate, saturation, lightness)) candidate = nearestNonRedHue(candidate, safeHue);
       return candidate;
     }
 
@@ -1156,7 +1189,6 @@
       const delta = shortestHueDelta(spec.h, sourceHsl.h);
       const max = spec.max ?? 24;
       let h = wrapHue(spec.h + Math.sign(delta) * Math.min(Math.abs(delta) * (spec.pull ?? 0.18) * sourceInfluence, max));
-      if (!spec.danger) h = safeOrdinaryHue(h, spec.safe ?? spec.h, sourceHsl.h);
       const s = clamp(
         spec.s + (sourceHsl.s - 0.58) * (spec.si ?? 0.12) * sourceInfluence,
         spec.smin ?? 0.06,
@@ -1167,6 +1199,7 @@
         spec.lmin ?? 0.05,
         spec.lmax ?? 0.98
       );
+      if (!spec.danger) h = safeOrdinaryHue(h, spec.safe ?? spec.h, sourceHsl.h, s, l);
       let fill = hslToHex(h, s, l);
       let fg = readableOn(fill, blueprint);
       for (let i = 0; i < 12 && contrast(fill, fg) < 4.5; i++) {
@@ -1229,12 +1262,15 @@
       const disabledFg = readableOn(stateDisabled, theme);
       const shellText = contrast(theme.shell, theme.text) >= 4.5 ? theme.text : "#ffffff";
       const shellMuted = contrast(theme.shell, theme.muted) >= 4.5 ? theme.muted : mix("#ffffff", theme.shell, 0.22);
+      const onSurface = readableOn(theme.surface, theme);
       return [
         `--c-radius:${theme.radius}px`,
         `--tab-radius:${theme.tabRadius}px`,
         `--dialog-radius:${theme.dialogRadius}px`,
         `--flat-depth:${theme.depth}px`,
         `--c-surface:${theme.surface}`,
+        `--on-surface:${onSurface}`,
+        `--surface-muted:${mutedOn(theme.surface, onSurface)}`,
         `--c-shell:${theme.shell}`,
         `--c-panel:${theme.panel}`,
         `--c-panel-2:${theme.panel2}`,

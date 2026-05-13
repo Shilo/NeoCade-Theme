@@ -8,7 +8,7 @@
 
 This document is the **single source of truth** for token values, formulas, and the `NeoCadeTheme` class contract. It reflects the current implementation as of 2026-05-13: 12 public exports, one canonical resource, five built-in styles, and additive Phase 12/13 visual-role work. Historical Phase 4 text that referred to five peer `.tres` files is superseded here.
 
-**Pending color-identity rework note (2026-05-13):** user review reopened the built-in style color lock because the current base/accent model does not create enough out-of-box identity. `.planning/research/THEME-COLOR-IDENTITY-RETHINK.md` is the active planning artifact for the proposed `style + source_color` role-palette rework. If that rework is approved for implementation, the §2 direction integrity rule below is superseded for color generation only; shape, spacing, flat/raised constraints, no-texture rules, and single-resource architecture remain binding until explicitly changed.
+**Pending color-identity rework note (2026-05-13):** user review reopened the built-in style color lock because the current base/accent model does not create enough out-of-box identity. `.planning/research/THEME-COLOR-IDENTITY-RETHINK.md` is the active planning artifact for the proposed `style + source_color` role-palette rework. If that rework is approved for implementation, the §2 direction integrity rule below is superseded for color generation and preset source colors only; shape, spacing, flat/raised constraints, no-texture rules, and single-resource architecture remain binding until explicitly changed.
 
 ---
 
@@ -61,7 +61,7 @@ All five candidate directions from Phase 3.3 (Revision Round 2/2 dark-only) are 
 
 The old "v1 ships N user-approved theme `.tres` files" wording is superseded: v1 ships **one** canonical `.tres` with **five** user-approved built-in styles.
 
-**Direction integrity rule:** implementation MUST NOT rename, recolor, or re-derive any of the five built-in styles. Their identity is locked here. Polish passes live in `STYLE_PERSONALITY` / `STYLE_EXPORTS` and BINDING_TABLE recipes, not as new public exports or palette swaps.
+**Direction integrity rule:** implementation MUST NOT rename, recolor, or re-derive any of the five built-in styles unless the 2026-05-13 color-identity rework is explicitly approved. Their current v1 identity is locked here for the existing implementation. If `.planning/research/THEME-COLOR-IDENTITY-RETHINK.md` is approved, that successor document owns color generation, preset `source_color` values, and role-palette identity while this rule continues to bind names, shapes, spacing, flat/raised behavior, no-texture constraints, and single-resource architecture. Polish passes live in `STYLE_PERSONALITY` / `STYLE_EXPORTS` and BINDING_TABLE recipes, not as new public exports or ad hoc palette swaps.
 
 ---
 

@@ -300,11 +300,12 @@ Subagent challenge:
 - That warning is valid if the one-source algorithm is generic.
 - The answer is not to keep the awkward two-color workflow. The answer is to make each style own a color strategy that derives the world, action, navigation, input, selection, range, and semantic roles differently from the same source.
 
-Compatibility path:
+Public API decision for the rework:
 
-- In the rework branch, introduce `source_color` as the canonical public color knob.
-- Retire `base_color` and `accent_color` from the normal user workflow.
-- If serialized-resource compatibility is needed, keep old values only as migration/advanced fields and derive `source_color` from `accent_color` for old resources.
+- In the implementation rework, introduce `source_color` as the canonical public color knob for built-in styles.
+- Retire `base_color` and `accent_color` from the normal user workflow. They should not remain the documented way to personalize built-in styles.
+- If serialized-resource compatibility is required, keep old values only as migration/advanced compatibility data and derive `source_color` from `accent_color` for old resources.
+- If pre-v1 compatibility is not required, remove the old exported color pair from the visible public contract instead of carrying confusing duplicate knobs forward.
 - `CUSTOM` can remain the escape hatch for manually authored palettes later, but built-in styles should never become `CUSTOM` just because the user changes the source color.
 - Update `AGENTS.md`, `.planning/PROJECT.md`, `.planning/REQUIREMENTS.md`, `.planning/DESIGN_TOKENS.md`, and the canonical resource export list when implementation begins.
 
@@ -682,10 +683,12 @@ Theme anchors in the mockup:
 Red-family guardrail:
 
 - Ordinary roles are prevented from landing in roughly red, rose, coral, and hot-pink hue space.
-- The mockup currently models that danger-adjacent band as hue `310..360` or `0..38`; production may tune the exact band after visual tests, but it must include red-orange/coral and hot-pink, not only pure red.
+- The mockup models the danger-adjacent hue band as hue `310..360` or `0..38`, but the final decision is not hue-only. It is chroma/tone aware so warm cream, ivory, and near-white peach islands do not get treated as destructive red.
+- Production may tune the exact thresholds after visual tests, but it must include saturated red-orange/coral and hot-pink, not only pure red.
 - If a generated ordinary role enters that band, it is moved back toward the role's safe hue with a tiny source-dependent nudge so the color still responds to the source.
 - `danger/error` is the only family allowed to remain red-family.
 - Achromatic or nearly achromatic source colors use source-strength gating so white, gray, and black do not behave like red just because HSL hue resolves to `0`.
+- Warm light islands, such as Bubble's cream panels and dialogs, are allowed only when their computed chroma/tone reads as cream rather than saturated danger. This is still paired with local `on_*` foreground checks.
 - Hover, pressed, selected, and disabled samples need their own foreground contrast checks; production must not assume the normal-state foreground still works after state color mixing.
 - If a stylized per-theme foreground cannot pass contrast on a generated role, the algorithm may fall back to pure black or pure white for that role. Accessibility wins over palette purism.
 
@@ -724,11 +727,18 @@ Reviewer blockers and resolution in this document/mockup:
 | Blocker | Resolution |
 | --- | --- |
 | Gray/white/black sources resolve to HSL hue `0`, making achromatic source colors behave like red. | Added source-strength/saturation gating so near-gray sources do not pull role hue/chroma strongly. |
-| Red guardrail was too narrow; coral/red-orange/hot-pink could leak into ordinary roles. | Broadened danger-adjacent guardrail to include `310..360` and `0..38` in the mockup. |
+| Red guardrail was too narrow; coral/red-orange/hot-pink could leak into ordinary roles. | Broadened danger-adjacent guardrail to include `310..360` and `0..38` in the mockup, then made it chroma/tone aware so warm cream islands are not incorrectly treated as destructive controls. |
 | Hover/pressed samples reused normal foregrounds after state color mixing. | Mockup now recomputes state foregrounds for hover/pressed/disabled samples and falls back to black/white when stylized ink fails contrast. Production must do the same per state. |
 | `PositiveButton` role was ambiguous. | `positive_fill` is explicitly for `PositiveButton` / explicit positive variations; `DangerButton` uses `danger_fill`; no text/intent inference. |
 | Bubble light islands require local foreground roles. | Kept Bubble as a dark shell with light islands, but marked this as an explicit product decision requiring component-local `on_*` roles. |
 | `DESIGN_TOKENS.md` old direction integrity lock conflicts with this rework. | Added a pending rework note to `DESIGN_TOKENS.md` that this research supersedes the old color lock if approved. |
+
+Additional 2026-05-13 heavy-review findings:
+
+- Claude and Codex subagent review both found the old hue-only guardrail overcorrected Bubble cream panels and Daybreak's warm action role under some stress sources.
+- The mockup now evaluates ordinary red-family risk with hue plus HSL chroma/lightness. Saturated coral/hot-pink/red still escapes to a safe hue; low-chroma or very light cream/ivory remains allowed for Bubble panels and dialogs.
+- The arbitrary `safe_hue + 58` fallback was removed from the mockup. If a warm safe hue is near the danger band, the fallback now returns to the role's safe hue or the nearest non-red warm boundary instead of jumping to green.
+- OpenCode/DeepSeek did not complete the requested design-review brief reliably, but its pure-mode pass correctly flagged stale state docs: this rework is not reflected in `STATE.md`, `PROJECT.md`, or `ROADMAP.md` yet. That update belongs to the implementation branch after approval, not to the current mockup proof.
 
 Required before implementation:
 
@@ -789,7 +799,7 @@ Findings:
 - Slate can stay restrained without becoming generic if icy action/select roles, steel menu roles, graphite inputs, and mint/amber semantic states are all authored separately.
 - Burst reads distinct from Bubble when gold is the action role, violet is the menu/navigation family, cyan is selection, and lime is range/status.
 - Bubble only becomes faithful to the mobile-game reference when cream/sky panels and a blue action family are allowed. This requires shell-local and component-local foreground roles; a single global dark-theme text color is not enough.
-- The proposed role foreground/background pairs pass AA contrast in the current mockup data. A local script verified ten source colors across all five theme strategies, including hover/pressed/disabled state pairs, with no low-contrast role badges and no ordinary role leakage into the broadened red-family guardrail.
+- The proposed role foreground/background pairs pass AA contrast in the current mockup data after the revised chroma/tone-aware guardrail. A local script should remain part of implementation planning and must verify white, black, gray, hot-pink/red, saturated orange, blue, green, and each preset source across all five theme strategies, including hover/pressed/disabled state pairs.
 - Browser screenshot verification is intentionally not required for this review pass. Script-level mockup verification is enough until the implementation branch needs rendered Godot proof.
 
 Remaining caveats:
