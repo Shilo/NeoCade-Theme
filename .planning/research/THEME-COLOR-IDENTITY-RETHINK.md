@@ -351,6 +351,10 @@ Internal steps:
    - `info`
 
 5. Resolve component aliases from those ramps.
+   - `surface_fill`
+   - `panel_fill`
+   - `popup_shell`
+   - `dialog_header`
    - `action_fill`
    - `menu_fill`
    - `input_fill`
@@ -359,10 +363,12 @@ Internal steps:
    - `range_fill`
    - `toggle_fill`
    - `positive_fill`
+   - `danger_fill`
+   - `separator_fill`
+   - `link_text`
    - `focus_ring`
-   - `popup_shell`
-   - `dialog_header`
    - `raised_offset_*`
+   - conditional `success_fill`, `warning_fill`, `info_fill`
 
 6. Compute foregrounds per role.
    - Never reuse one global text color for every component.
@@ -476,13 +482,18 @@ Coverage contract:
 | `LinkButton` | No filled background by default. Use `link_text`/info role plus focus ring and hover/pressed text colors. |
 | `TextureButton` | Texture-driven; Godot docs explicitly describe it as using sprites instead of the Theme resource. NeoCade should not promise an automatic fill for it beyond focus/accessibility if a usable slot exists. |
 | `LineEdit`, `TextEdit`, `CodeEdit`, `SpinBox`, `TreeLineEdit` | `input_fill`, caret, selection, placeholder, read-only, focus, disabled roles. Read-only and disabled input fills derive from `input_fill`. `SpinBox` steppers derive from `menu_fill`; `CodeEdit.completion` uses `popup_shell` plus `selection_fill`. |
-| `ItemList`, `Tree`, `TabBar`, `TabContainer` | `panel_fill` for the surrounding view, `selection_fill` for selected rows/items, `tab_selected_fill` for selected tabs, and derived hover/cursor/drop-mark/guide colors. |
-| `Range` family: `ProgressBar`, sliders, scrollbars, texture progress | `range_fill` for active progress/grabbers; tracks and disabled range states derive from `panel_fill`/`surface_fill`. `ScrollBar.scroll` and `grabber*` are slot recipes, not separate top-level aliases. |
-| `Panel`, `PanelContainer`, `ScrollContainer`, `PopupPanel`, dialogs/windows | Surface roles are intentional, not omitted: `surface_fill`, `panel_fill`, and `popup_shell` own these backgrounds. Dialog/window headers use `dialog_header`. |
+| `ItemList`, `Tree`, `TabBar`, `TabContainer` | `panel_fill` for the surrounding view, `selection_fill` for selected rows/items, `tab_selected_fill` for selected tabs, and derived hover/cursor/drop-mark/guide colors. `tab_selected_fill` may derive from `selection_fill` in v1; the alias exists so tab chrome can diverge later without renaming bindings. |
+| `Range` family: `ProgressBar`, sliders, scrollbars | `range_fill` for active progress/grabbers; tracks and disabled range states derive from `panel_fill`/`surface_fill`. `ScrollBar.scroll` and `grabber*` are slot recipes, not separate top-level aliases. |
+| `TextureProgressBar` | Texture/content-driven like `TextureButton`; do not promise automatic flat fills unless NeoCade provides generated fallback textures or explicit texture modulation. |
+| `Panel`, `PanelContainer`, `PopupPanel`, dialogs/windows | Surface roles are intentional, not omitted: `surface_fill`, `panel_fill`, and `popup_shell` own these backgrounds. Dialog/window headers use `dialog_header`. |
+| `ScrollContainer` | Default can remain visually empty or very subtle so child content owns the surface. Use `panel_fill` only for explicit visible scroll shells/variations. |
 | `FoldableContainer` | `panel` uses `panel_fill`; title styleboxes use `dialog_header` or a style-derived header fill; focus uses `focus_ring`; title text uses matching `on_*`. |
 | `GraphEdit`, `GraphNode`, `GraphFrame`, `GraphElement` | `GraphEdit.panel` uses `surface_fill` or `panel_fill`; `menu_panel` uses `menu_fill`/`panel_fill`; grid/split/guide lines use `separator_fill`; selection fill/stroke use `selection_fill`. `GraphNode`/`GraphFrame` panels use `panel_fill`, title bars use `dialog_header`, selected panels use `selection_fill`. `GraphElement` itself only exposes a resizer icon, so it does not get a background fill except through its subclasses. |
 | `SplitContainer` | Not a page background. Only the split bar/handle uses `separator_fill` through `split_bar_background` and dragger colors. Prefer subtle or empty split bars unless a style explicitly needs visible handles. |
 | `MenuBar`, `PopupMenu`, tooltip types | `menu_fill`, derived menu hover/pressed states, `popup_shell`, popup text, menu disabled, check/radio icon colors. |
+| `TooltipPanel`, `TooltipLabel` | Covered by tooltip/popup roles: `popup_shell` plus `on_popup`. |
+| `FileDialog` | Covered by dialog/window, popup/menu, input, tree/list, and button aliases; no special top-level fill alias unless source tracing proves a missing slot. |
+| `ColorPicker`, `ColorPresetButton` | Covered by input/panel/swatch behavior. Preserve picker ramps/checker textures; do not recolor content that represents user-selected colors. |
 | `Label`, `RichTextLabel` | Text roles only by default. No visible fill unless a documented variation or editor-specific wrapper has a panel. |
 | `Container` layout subclasses, `ColorRect`, `TextureRect`, `NinePatchRect`, `ReferenceRect`, `VideoStreamPlayer` | No default fill from the Theme. Layout containers get constants; texture/content/debug controls are content-driven or have no useful Theme fill slots. `TextureRect`/`NinePatchRect` backgrounds come from assigned textures, not NeoCade role fills. |
 | `Separator` | `separator_fill`, not action/menu/input colors. |
@@ -516,7 +527,7 @@ Required foreground pairs:
 
 | Fill role | Foreground role | Godot examples |
 | --- | --- | --- |
-| `surface_base`, `surface_panel`, `surface_overlay` | `on_surface`, `on_panel`, `on_overlay` | Panel text, dialog body, tooltip body, unfilled content. |
+| `surface_fill` | `on_surface` | Root shell, graph canvas, broad page backgrounds, unfilled content. |
 | `panel_fill`, `popup_shell` | `on_panel`, `on_popup` | `Panel`, `PanelContainer`, `PopupPanel`, dialog/window body text and icons. |
 | `dialog_header` | `on_dialog_header` | Dialog headers, `FoldableContainer` title rows, `GraphNode`/`GraphFrame` title bars. |
 | `action_fill` | `on_action` | Default `Button` font/icon states. |
@@ -527,6 +538,7 @@ Required foreground pairs:
 | `toggle_fill` | `on_toggle` | CheckButton tracks/knobs, CheckBox/radio/check glyphs and active/inactive state colors. |
 | `positive_fill` | `on_positive` | Explicit `PositiveButton` variation. |
 | `danger_fill` | `on_danger` | Explicit `DangerButton`, errors, destructive states. |
+| `success_fill`, `warning_fill`, `info_fill` | `on_success`, `on_warning`, `on_info` | Explicit semantic states/variations and status UI only. |
 | `separator_fill` | `on_separator` when a visible label/glyph sits on it | Separators, split bars, graph grid/guide lines. |
 | `link_text` | `on_surface` background pairing, not `on_link_text` over a fill | `LinkButton` text; contrast is measured against the surrounding surface/panel. |
 
@@ -654,7 +666,7 @@ This is the proposed "no variations required" mapping. Exact values should be te
 | Burst | gold fill | violet/blue | violet/blue | cyan or violet selected state | gold/cyan selected container | lime/cyan | lime/cyan | high-confidence green | red only | plum panels with violet/cyan statement headers |
 | Bubble | blue chunky fill | lavender/sky blue | cream/sky input island | yellow or lavender selected tab | blue/yellow/lavender selected tile | yellow/green | green | bright confirm green | red only | cream panels with lavender headers |
 
-Background fills are intentional and must be generated, not inherited by accident. `surface_fill`, `panel_fill`, `panel_container_fill`, `popup_fill`, and `dialog_fill` own the visual world that Button/Input/List roles sit on. Bubble keeps the recommended dark outer shell plus light cream/sky islands; do not add light/dark mode variants during this rework.
+Background fills are intentional and must be generated, not inherited by accident. `surface_fill`, `panel_fill`, `popup_shell`, and `dialog_header` own the visual world that Button/Input/List roles sit on. Bubble keeps the recommended dark outer shell plus light cream/sky islands; do not add light/dark mode variants during this rework.
 
 ## Dynamic Source Behavior By Theme
 
