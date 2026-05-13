@@ -102,7 +102,7 @@ The export set is **intentionally minimal** — limited to values that should be
 | 4 | `platform` | `Platform` enum | Core | `Platform.AUTO` | `{ DESKTOP=0, MOBILE=1, AUTO=2 }`; AUTO resolves at runtime |
 | 5 | `corner_radius` | `int` | Shape | `12` | px; integer pixels only (PITFALLS 1.6 — no fractional widths under GL Compatibility) |
 | 6 | `spacing` | `int` | Shape | `4` | px; base spacing unit; mobile branch scales `space.4+` ×1.5 |
-| 7 | `raised_strength` | `int` | Shape | `3` | px; primary raised offset; secondary/tab/row offsets derive from this in `_regenerate_theme()` |
+| 7 | `raised_strength` | `int` | Shape | `3` | px; primary raised offset; regular/tab/row offsets derive from this in `_regenerate_theme()` |
 | 8 | `focus_thickness` | `int` | Shape | `2` | px; outer focus-ring thickness (PITFALLS 1.1 — focus is OUTSIDE corner radius bounds) |
 | 9 | `outline_width` | `int` | Shape | `1` | px; default StyleBoxFlat outline width; per-Control outline tuning lives in Theme Editor overrides |
 
@@ -110,7 +110,7 @@ The export set is **intentionally minimal** — limited to values that should be
 
 - `corner_radius_base` → `corner_radius` (no redundant `_base` suffix; the term IS the base radius).
 - `base_spacing` → `spacing` (no redundant `base_` prefix).
-- `raised_offset` → `raised_strength` (intuitive verb; "strength" implies the scalar from which secondary offsets derive).
+- `raised_offset` → `raised_strength` (intuitive verb; "strength" implies the scalar from which regular offsets derive).
 - Group label is `"Shape"` (not `"Shape Language"` — too verbose for the inspector).
 - `Vector2i` convention for any future paired x/y `@export` values (none currently).
 
@@ -161,7 +161,7 @@ The `@export` defaults below are translated from `.planning/mockups/3.4/data/dir
 - `base_color` / `accent_color` from §2 (locked palettes).
 - `corner_radius` = `axis_1_corner_radius_base_px` from `directions.json`.
 - `spacing` = `axis_5_density_padding_px` from `directions.json` (the per-direction density commit; the `_regenerate_theme()` mobile branch scales this for `space.4+` per platform).
-- `raised_strength` = `axis_10_raised_primary_offset_px` (the most prominent raised offset axis; secondary/tab/row offsets derive from this scalar in `_regenerate_theme()`).
+- `raised_strength` = `axis_10_raised_primary_offset_px` (the most prominent raised offset axis; regular/tab/row offsets derive from this scalar in `_regenerate_theme()`).
 - `focus_thickness` = `axis_6_focus_thickness_px`.
 - `outline_width` = `1` (universal v1 default; per-Control outline tuning is Theme Editor override territory, not `@export`).
 
@@ -187,7 +187,7 @@ The `@export` defaults below are translated from `.planning/mockups/3.4/data/dir
 - Density: 18px padding, 10px inter-control gap; "arcade-dense" feel.
 - Surface ramp: 4 stops, "wide" spread (`spreadFactor = 1.3`).
 - State-layer deltas: hover +6%, pressed −10%, disabled opacity 0.42.
-- Raised lifts (when `raised=true`): primary buttons (offset 3), secondary buttons (1), ghost buttons (1), selected tabs (2), unselected tabs (2), panels (3 × 1.0), dialogs, lists, brand mark, chips. Rows do NOT lift.
+- Raised lifts (when `raised=true`): primary buttons (offset 3), regular buttons (1), ghost buttons (1), selected tabs (2), unselected tabs (2), panels (3 × 1.0), dialogs, lists, brand mark, chips. Rows do NOT lift.
 - Surface alpha: all 1.00 (cabinet hardware is solid; translucency reads as glass UI = wrong personality).
 - Typography: H1 weight 800; H2 weight 740; kicker = "uppercase-tracked-accent".
 - Focus style: "tight-cabinet-ring" (`focus_offset = 0`).
@@ -216,7 +216,7 @@ The `@export` defaults below are translated from `.planning/mockups/3.4/data/dir
 - Density: 22px padding, 14px inter-control gap; "spacious-premium-quiet" feel.
 - Surface ramp: 3 stops, "narrow" spread (`spreadFactor = 0.7`).
 - State-layer deltas: hover +4%, pressed −6%, disabled opacity 0.50.
-- Raised lifts: primary (2), secondary (1), ghost (1), selected tabs (1), unselected tabs (1), panels (2 × 1.0), dialogs, lists, brand mark, selected rows (1), chips.
+- Raised lifts: primary (2), regular (1), ghost (1), selected tabs (1), unselected tabs (1), panels (2 × 1.0), dialogs, lists, brand mark, selected rows (1), chips.
 - Surface alpha: popup_surface 0.92, panels 1.00, buttons 1.00, chrome 1.00 (iOS-premium mood; 8% bleed-through on popup overlay matches iOS NavigationBar/Sheet/modal-backdrop translucency without sliding into glassmorphism).
 - Typography: H1 weight 720; H2 weight 640; kicker = "small-caps-subtle".
 - Focus style: "ios-style-offset" (`focus_offset = 2`).
@@ -243,7 +243,7 @@ The `@export` defaults below are translated from `.planning/mockups/3.4/data/dir
 - Density: 22px padding, 14px inter-control gap; "friendly-airy-generous" feel.
 - Surface ramp: 3 stops, "medium" spread (`spreadFactor = 1.0`).
 - State-layer deltas: hover +8%, pressed −10%, disabled opacity 0.45.
-- Raised lifts: primary (6), secondary (3), ghost (3), selected tabs (4), unselected tabs (4), panels (6 × 1.0), dialogs, lists, brand mark, selected rows (3), chips.
+- Raised lifts: primary (6), regular (3), ghost (3), selected tabs (4), unselected tabs (4), panels (6 × 1.0), dialogs, lists, brand mark, selected rows (3), chips.
 - Surface alpha: all 1.00 (candy is opaque; translucent candy reads as ice/gelatin = wrong personality).
 - Typography: H1 weight 800; H2 weight 760; kicker = "uppercase-tracked-accent".
 - Focus style: "cheerful-chunky-ring" (`focus_offset = 2`).
@@ -270,7 +270,7 @@ The `@export` defaults below are translated from `.planning/mockups/3.4/data/dir
 - Density: 24px padding, 16px inter-control gap; "airy-breathing" feel.
 - Surface ramp: 4 stops, "medium" spread.
 - State-layer deltas: hover +6%, pressed −6%, disabled opacity 0.50.
-- Raised lifts: primary (3), secondary (1), ghost (1), selected tabs (2), unselected tabs (2), panels (3 × 1.0), dialogs, lists, brand mark, selected rows (1), chips.
+- Raised lifts: primary (3), regular (1), ghost (1), selected tabs (2), unselected tabs (2), panels (3 × 1.0), dialogs, lists, brand mark, selected rows (1), chips.
 - Surface alpha: popup_surface 0.90, panels 0.96, buttons 1.00, chrome 1.00 (airy welcoming-lobby mood; 4% bleed on container panels + 10% on popup overlay = airy lift without visual weakness; buttons stay solid for tappability).
 - Typography: H1 weight 720; H2 weight 660; kicker = "sentence-case-accent".
 - Focus style: "airy-fresh-ring-with-mint-halo" (`focus_offset = 2`).
@@ -297,7 +297,7 @@ The `@export` defaults below are translated from `.planning/mockups/3.4/data/dir
 - Density: 22px padding, 14px inter-control gap; "event-spread-hierarchy-amplified" feel.
 - Surface ramp: 4 stops, "wide" spread.
 - State-layer deltas: hover +8%, pressed −12%, disabled opacity 0.45.
-- Raised lifts: primary (5), secondary (2), ghost (2), selected tabs (3), unselected tabs (3), panels (5 × 1.0), dialogs, lists, brand mark, selected rows (2), chips.
+- Raised lifts: primary (5), regular (2), ghost (2), selected tabs (3), unselected tabs (3), panels (5 × 1.0), dialogs, lists, brand mark, selected rows (2), chips.
 - Surface alpha: all 1.00 (celebration posters are solid; translucent achievement surfaces feel weak = wrong personality).
 - Typography: H1 weight 820; H2 weight 780; kicker = "uppercase-bold-larger-scale".
 - Focus style: "dramatic-event-ring" (`focus_offset = 1`).
@@ -539,7 +539,7 @@ Raised intensity by Control family per FLAT-3D-UI-RESEARCH.md + per-direction `a
 
 | Family | Raised behavior |
 |---|---|
-| Buttons (primary/secondary/ghost) | strongest — normalized from the 0-3 family lift scale, then multiplied by per-direction `shape.raised_depth_scale` so each style gets an intentional underside thickness |
+| Buttons (primary/regular/ghost) | strongest — normalized from the 0-3 family lift scale, then multiplied by per-direction `shape.raised_depth_scale` so each style gets an intentional underside thickness |
 | Selected tabs / chips | medium or flat; tabs do not gain extra bottom depth because they must stay connected to the panel |
 | Range handles (slider grabber, scrollbar grabber) | subtle — small hard offset only |
 | Panels / dialogs | subtle — normalized from the 0-3 family lift scale (panels lift to convey card-like depth, but flat fill content) |
@@ -551,7 +551,7 @@ Per-direction lift list is in §5 (each direction's "Theme Editor override inten
 
 Built-in raised depth-edge tuning for common button chrome:
 
-| Direction | Primary/danger bottom edge | Secondary/OptionButton bottom edge | Depth darken |
+| Direction | Primary/danger bottom edge | Regular/OptionButton bottom edge | Depth darken |
 |---|---:|---:|---:|
 | Pulse | 3px | 2px | 38% |
 | Slate | 2px | 2px | 30% |
@@ -579,7 +579,7 @@ Per MOCKUP-REVISION-2-HANDOFF.md Issue 2 optional recommendation, raised primary
 | `toggleMin` | 22 | 32 | Steam-comparable vs M3 Switch |
 | `checkboxSize` | 18 | 20 | (mobile: + tapPadding for full 48dp target) |
 | `body` | 14 | 16 | Steam/Discord vs M3 Body Large |
-| `label_` | 12 | 14 | secondary labels |
+| `label_` | 12 | 14 | supporting labels |
 | `h1` | 36 | 32 | (mobile slightly smaller — tighter screen) |
 | `h2` | 22 | 22 | (mobile keeps same H2 size) |
 | `kicker` | 12 | 13 | M3 Label Small floor |

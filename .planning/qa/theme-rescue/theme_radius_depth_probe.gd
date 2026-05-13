@@ -30,7 +30,7 @@ const EXPECTED_PRIMARY_DEPTH := {
 	NeoCadeTheme.Style.BURST: 5,
 	NeoCadeTheme.Style.BUBBLE: 4,
 }
-const EXPECTED_SECONDARY_DEPTH := {
+const EXPECTED_REGULAR_DEPTH := {
 	NeoCadeTheme.Style.PULSE: 2,
 	NeoCadeTheme.Style.DAYBREAK: 2,
 	NeoCadeTheme.Style.SLATE: 2,
@@ -287,7 +287,7 @@ func _check_button_radius_and_padding(theme: NeoCadeTheme, label: String) -> voi
 
 func _check_raised_depth(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:
 	var expected_primary_depth: int = int(EXPECTED_PRIMARY_DEPTH.get(theme.style, 3))
-	var expected_secondary_depth: int = int(EXPECTED_SECONDARY_DEPTH.get(theme.style, 2))
+	var expected_regular_depth: int = int(EXPECTED_REGULAR_DEPTH.get(theme.style, 2))
 	var expected_darken: float = float(EXPECTED_DEPTH_DARKEN.get(theme.style, 0.36))
 	for theme_type in [&"PrimaryButton", &"DangerButton"]:
 		var stylebox := theme.get_stylebox(&"normal", theme_type) as StyleBoxFlat
@@ -305,7 +305,7 @@ func _check_raised_depth(theme: NeoCadeTheme, label: String, expect_raised: bool
 		_fail("%s missing OptionButton.normal" % label)
 		return
 	if expect_raised:
-		_expect_depth_width(option, label, &"OptionButton", expected_secondary_depth)
+		_expect_depth_width(option, label, &"OptionButton", expected_regular_depth)
 		_expect_depth_darken(option, label, &"OptionButton", expected_darken)
 		var primary := theme.get_stylebox(&"normal", &"PrimaryButton") as StyleBoxFlat
 		if primary != null and primary.border_width_bottom < option.border_width_bottom:

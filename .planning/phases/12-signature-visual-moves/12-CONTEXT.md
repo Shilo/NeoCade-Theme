@@ -77,7 +77,7 @@ Phase 12 implements **three default-behavior signature visual moves** that resol
 |---|---|---|
 | **Pulse** | Tracked-uppercase kicker chrome on `SectionKicker` Label variation | `shape.kicker_style` already `&"uppercase-tracked-accent"` — bind via new `SectionKicker` type variation (10px, uppercase, ~+0.08em tracking, accent-colored). |
 | **Slate** | 1px hairline borders on every interactive surface + quiet-pill primary | Add `shape.hairline_thickness = 1` (others = 0); update stylebox borders to use this value when set. |
-| **Bubble** | Forced ≥26 corner radius across ALL chrome (pillow silhouette everywhere) | Floor `secondary_radius`, `tab_radius`, `chip_radius`, `card_radius`, `hero_radius`, and any other radius-bearing personality keys to `max(existing, 26)`; primary stays 999 pill. Sliders/scrollbars use 999 grabbers. |
+| **Bubble** | Forced ≥26 corner radius across ALL chrome (pillow silhouette everywhere) | Floor `regular_radius`, `tab_radius`, `chip_radius`, `card_radius`, `hero_radius`, and any other radius-bearing personality keys to `max(existing, 26)`; primary stays 999 pill. Sliders/scrollbars use 999 grabbers. |
 | **Daybreak** | 1px outer mint outline on primary buttons (3px offset) + generous primary padding | **NO halo, NO glow.** The 2026-05-10 user constraint reverted the original halo design. Use a flat 1px outline drawn 3px outside the primary stylebox edge (StyleBoxFlat outline; matches no-shadow rule) + bump primary_padding to a generous value (e.g., `Vector2i(20, 14)` vs current `Vector2i(15, 9)`). |
 | **Burst** | Oversized 56–64px primary CTAs with thicker depth strip | Add `shape.primary_min_height = 56` desktop / `64` mobile; bound to `Button.minimum_size.height` for primary slots only. Burst's existing `raised_lifts.primary = 3` stays. |
 
@@ -190,11 +190,11 @@ func _raised_depth_color(element: Color, base_c: Color) -> Color:
 
 **Slate** — add `hairline_thickness: 1` to `STYLE_PERSONALITY[Style.SLATE].shape`; update relevant `_make_stylebox` recipes to read this when set (others have it as 0 / absent). Adjust primary radius/strategy to "quiet-pill" if it isn't already — note Slate already uses `quiet-pill`, so this is a verification/no-op.
 
-**Bubble** — floor `secondary_radius`, `tab_radius`, `chip_radius`, `card_radius`, `hero_radius` to `max(existing, 26)`; current values already match (`secondary_radius: 26`, `tab_radius: 999`, `chip_radius: 999`, `card_radius: 26`, `hero_radius: 26`). The C6 edit is primarily ensuring sliders/scrollbar grabbers and any OptionButton/CheckBox shape also respect `≥26`. Add `min_radius_floor: 26` for Bubble; thread through stylebox builders.
+**Bubble** — floor `regular_radius`, `tab_radius`, `chip_radius`, `card_radius`, `hero_radius` to `max(existing, 26)`; current values already match (`regular_radius: 26`, `tab_radius: 999`, `chip_radius: 999`, `card_radius: 26`, `hero_radius: 26`). The C6 edit is primarily ensuring sliders/scrollbar grabbers and any OptionButton/CheckBox shape also respect `≥26`. Add `min_radius_floor: 26` for Bubble; thread through stylebox builders.
 
 **Daybreak** — bump `primary_padding` from `Vector2i(15, 9)` to `Vector2i(20, 14)` (generous primary padding). Add `shape.primary_outline_color: &"accent"` and `shape.primary_outline_offset: 3` + `shape.primary_outline_width: 1`. Thread through the primary-stylebox builder to draw a 1px flat accent outline at 3px outer offset. **Verify the outline is full-alpha and not blurred** (no halo, success criterion #3).
 
-**Burst** — add `shape.primary_min_height: 56` (desktop) / `64` (mobile). Thread through Button minimum_size resolver; ensure only `primary` slots (primary buttons) pick this up — not secondary/ghost/chip. Burst's existing thicker depth strip (`raised_lifts.primary = 3`) is preserved; C4 will automatically make it read more strongly via the new HSV darken.
+**Burst** — add `shape.primary_min_height: 56` (desktop) / `64` (mobile). Thread through Button minimum_size resolver; ensure only `primary` slots (primary buttons) pick this up — not regular/ghost/chip. Burst's existing thicker depth strip (`raised_lifts.primary = 3`) is preserved; C4 will automatically make it read more strongly via the new HSV darken.
 
 ### Existing patterns to follow
 - The `STYLE_PERSONALITY` per-direction shape dict was extended for Phase 6 (Tree/ItemList) and Phase 7 (Popup/Dialog) — new keys are added per direction; absent keys fall back to `STYLE_PERSONALITY_DEFAULT`. Phase 12 follows the same pattern.

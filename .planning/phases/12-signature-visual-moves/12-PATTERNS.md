@@ -102,7 +102,7 @@ Style.SLATE: {
         "primary_padding":       Vector2i(14, 9),
         "primary_strategy":      &"quiet-pill",
         "ghost_strategy":        &"thin-accent-outline",
-        "secondary_radius":      14,
+        "regular_radius":      14,
         "tab_radius":            999,
         "chip_radius":           999,
         "card_radius":           14,
@@ -112,7 +112,7 @@ Style.SLATE: {
         "surface_alpha_buttons": 1.00,
         "raised_lifts": {
             "primary":         2,
-            "secondary":       1,
+            "regular":       1,
             "ghost":           1,
             "selected_tab":    1,
             "unselected_tab":  1,
@@ -139,7 +139,7 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
         "primary_padding":       Vector2i(16, 11),
         "primary_strategy":      &"friendly-generous",
         "ghost_strategy":        &"soft-outline",
-        "secondary_radius":      8,
+        "regular_radius":      8,
         "tab_radius":            8,
         "chip_radius":           8,
         "card_radius":           8,
@@ -398,7 +398,7 @@ _set_radius_all(sb, resolved_radius)
 **Notes for planner:**
 - **`max`, not `min`** (Pitfall 4 in RESEARCH). Bubble's `primary_radius=999` must remain 999 — the floor only lifts small radii to 26.
 - **`corner_profile` paths at lines 5369–5374** (`_set_tab_connected_radius`, `_set_top_only_radius`, `_set_bottom_only_radius`) take `resolved_radius` after the floor. The floor must be applied BEFORE the corner-profile dispatch so it propagates through. Insert the floor block BEFORE line 5369 (the `var corner_profile := …` line).
-- **Bubble's existing values already satisfy the floor for chrome** (RESEARCH § Bubble specifics): `secondary_radius=26`, `tab_radius=999`, `chip_radius=999`, `card_radius=26`, `hero_radius=26`. The floor is *insurance* — but it must also cover recipes that hardcode small `radius:` integers and recipes that fall back to the @export `corner_radius` (which may be 0 for `Style.CUSTOM` users).
+- **Bubble's existing values already satisfy the floor for chrome** (RESEARCH § Bubble specifics): `regular_radius=26`, `tab_radius=999`, `chip_radius=999`, `card_radius=26`, `hero_radius=26`. The floor is *insurance* — but it must also cover recipes that hardcode small `radius:` integers and recipes that fall back to the @export `corner_radius` (which may be 0 for `Style.CUSTOM` users).
 
 ---
 
@@ -444,7 +444,7 @@ if recipe.has("strategy") and String(recipe.get("strategy", "")).ends_with(".pri
 ```
 
 **Notes for planner:**
-- **Primary-only trigger** uses the same condition as Daybreak's outline: `recipe.strategy ends with ".primary_strategy"`. This avoids over-applying min-height to secondary buttons / chips / tabs.
+- **Primary-only trigger** uses the same condition as Daybreak's outline: `recipe.strategy ends with ".primary_strategy"`. This avoids over-applying min-height to regular buttons / chips / tabs.
 - **Mobile path:** `tokens.body` on MOBILE = 16 (line 853); on DESKTOP = the desktop body token. The `tokens` Dictionary passed in already reflects the resolved platform — so `content_h` is platform-aware automatically.
 - **Mobile min_height vs desktop:** D-12.11 says "56 desktop / 64 mobile". The simplest approach is to read `tokens.primaryButtonMin` (which is 56 mobile / 44 desktop per lines 850, 867) as the floor, OR add a separate `primary_min_height_mobile` shape key. RESEARCH § Burst specifics recommends the `tokens.primaryButtonMin` approach but flags it as a discretion call. The plan should pick ONE path and document the trade-off.
 - **Even-split the extra padding** (top vs bottom) — uses `half = extra / 2; bottom = extra - half` to handle odd integer divisions without losing a pixel. Mirrors the focus_offset symmetric-application idiom at lines 5341–5344.

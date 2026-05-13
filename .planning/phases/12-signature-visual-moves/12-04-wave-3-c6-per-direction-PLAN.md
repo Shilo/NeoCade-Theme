@@ -441,7 +441,7 @@ Locate the closing of the strategy dispatch (likely after the `_apply_primary_st
 
 CRITICAL invariants:
 - `if raised and ...` is the SC#1 gate. When `raised=false`, the entire block is skipped → no outline, no expand_margin, no border_width change. Daybreak's flat-mode chrome is identical to other directions' flat-mode chrome.
-- The strategy-key check `(strategy_raw as String).ends_with(".primary_strategy")` scopes the outline to PRIMARY buttons only. Secondary, ghost, tab, list, panel chrome are NEVER touched.
+- The strategy-key check `(strategy_raw as String).ends_with(".primary_strategy")` scopes the outline to PRIMARY buttons only. Regular, ghost, tab, list, panel chrome are NEVER touched.
 - The `if outline_width_resolved > 0` disable sentinel skips ALL non-Daybreak directions (where the value is 0).
 - DO NOT set `border_alpha`. The default is 1.0 per recipe → the outline is full-alpha → no halo (SC#3 / Pitfall 3).
 - Use tab indentation matching the surrounding block (2 leading tabs inside `_resolve_recipe`'s stylebox branch).
@@ -468,7 +468,7 @@ Read lines 5438-5470 BEFORE editing to confirm exactly where the strategy dispat
     - SC#6: `grep -c '^@export ' addons/neocade_theme/scripts/neocade_theme.gd` returns 12 (no new @export var).
     - 30-config smoke matrix exits 0.
   </acceptance_criteria>
-  <done>Daybreak's 1px flat outline at 3px offset is wired; gated on `raised=true` (SC#1); full alpha (SC#3); primary-only (no leakage to secondary/ghost/tabs); smoke matrix green.</done>
+  <done>Daybreak's 1px flat outline at 3px offset is wired; gated on `raised=true` (SC#1); full alpha (SC#3); primary-only (no leakage to regular/ghost/tabs); smoke matrix green.</done>
 </task>
 
 <task type="auto">
@@ -528,7 +528,7 @@ Insert this block:
 ```
 
 CRITICAL invariants:
-- The strategy-key check `(strategy_raw as String).ends_with(".primary_strategy")` is the same gate Daybreak's outline uses. It scopes the min-height floor to PRIMARY buttons only — secondary/ghost/tab/chip/list chrome NEVER grows.
+- The strategy-key check `(strategy_raw as String).ends_with(".primary_strategy")` is the same gate Daybreak's outline uses. It scopes the min-height floor to PRIMARY buttons only — regular/ghost/tab/chip/list chrome NEVER grows.
 - The `if min_h_resolved > 0` disable sentinel skips all 4 non-Burst directions (where the value is 0).
 - Mobile path: `tokens.body` is already platform-resolved (16 mobile / desktop value from per-direction tokens). The `content_h` proxy uses it directly, so `current_min` already reflects the mobile content-height baseline. When Burst is on MOBILE and `primary_min_height: 56`, the mobile path's `tokens.primaryButtonMin` is also 56 — the floor lifts the desktop case to match the mobile baseline, and the mobile case naturally hits 64 via density-scaled padding plus the floor (per RESEARCH § Burst specifics: "Burst's desktop primary becomes 56px (vs. other directions' 44px) — a 1.27x scale factor"). This is intentional and matches the spike's "1.4x size of other directions" target.
 - Even-split (`half_extra` + `extra - half_extra`) handles odd integer division without losing a pixel. Mirrors the focus_offset symmetric-application idiom at lines 5341-5344.
@@ -548,7 +548,7 @@ CRITICAL invariants:
     - SC#1, SC#2, SC#3, SC#6 all green via `--stage full`.
     - 30-config smoke matrix exits 0.
   </acceptance_criteria>
-  <done>Burst's oversized primary CTA signature is wired; primary-only (no growth on secondary/ghost/chips/tabs); mobile path inherits the floor; smoke matrix green.</done>
+  <done>Burst's oversized primary CTA signature is wired; primary-only (no growth on regular/ghost/chips/tabs); mobile path inherits the floor; smoke matrix green.</done>
 </task>
 
 <task type="auto">
@@ -566,7 +566,7 @@ The strategy: insert the new Kicker as a child of the Grid that is itself a chil
 - `RootMargin/RootStack/ShowcaseTabs/Buttons` (ScrollContainer, line 108)
 - Inside Buttons there is a `Margin` MarginContainer
 - Inside Margin there is a `Grid` HBoxContainer (or VBoxContainer or GridContainer — read the file to confirm exact type and parent path)
-- Inside Grid there are panel children (PrimaryPanel, SecondaryPanel, etc.)
+- Inside Grid there are panel children (PrimaryPanel, RegularPanel, etc.)
 
 The Pulse C6 Kicker must visibly read as the section title for the entire Buttons tab. The cleanest insertion is as a VBox child wrapping the existing Grid, OR — if Buttons already has a Margin/VBox structure — as the FIRST child of that container so the Kicker sits above the panel grid.
 
@@ -577,7 +577,7 @@ Step 1 — Read `showcase/showcase.tscn` lines 100-160. Identify:
   - The `unique_id=` value range in use (existing IDs are in the billions; pick one above 2_700_000_000 to avoid collision).
   - The exact `[ext_resource ... id="1_xxxxx"]` line for the showcase's main theme resource (we will reference it).
 
-Step 2 — Insert a new Label node block. Place the block INSIDE the Buttons subtree but AS THE FIRST CHILD of the inner container that currently holds PrimaryPanel + SecondaryPanel + GhostPanel etc. The exact insertion point is just BEFORE the first existing child of that container.
+Step 2 — Insert a new Label node block. Place the block INSIDE the Buttons subtree but AS THE FIRST CHILD of the inner container that currently holds PrimaryPanel + RegularPanel + GhostPanel etc. The exact insertion point is just BEFORE the first existing child of that container.
 
 Use this EXACT node block (substitute the correct parent path verified in Step 1):
 

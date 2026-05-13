@@ -595,7 +595,7 @@ func _run() -> void:
 **Current Bubble shape values (line 992-1003):**
 - `primary_radius: 999` (pill)
 - `primary_padding: Vector2i(16, 10)`
-- `secondary_radius: 26`
+- `regular_radius: 26`
 - `tab_radius: 999` (pill)
 - `chip_radius: 999` (pill)
 - `card_radius: 26`
@@ -603,12 +603,12 @@ func _run() -> void:
 
 **Sub-components NOT in `STYLE_PERSONALITY.shape` (potential gaps):**
 - Slider grabber: rendered via `_make_slider_grabber_icon()` (line 5511); inspect for radius derivation.
-- ScrollBar grabber: BINDING_TABLE `VScrollBar.grabber.radius = "shape.secondary_radius"` (line 4191) -- Bubble's secondary_radius=26, so already >=26. **OK.**
+- ScrollBar grabber: BINDING_TABLE `VScrollBar.grabber.radius = "shape.regular_radius"` (line 4191) -- Bubble's regular_radius=26, so already >=26. **OK.**
 - OptionButton arrow icon: bound via `"arrow_down" SVG`, NOT a stylebox radius -- not affected by radius floor.
 - CheckBox shape: bound via `"checkbox_checked"/"checkbox_unchecked" SVG`, NOT a stylebox radius -- not affected.
-- `shape.secondary_radius`: already 26 for Bubble. **OK.**
+- `shape.regular_radius`: already 26 for Bubble. **OK.**
 
-**What Phase 12 changes for Bubble:** Likely **zero shape edits** because Bubble's existing radii (lines 993-1003) already meet the `>=26` floor for every key. The only addition is a defensive `min_radius_floor: 26` key in Bubble's shape (and `0` in default) plus a thread-through in `_resolve_recipe()` that does `resolved_radius = max(resolved_radius, min_radius_floor)` after the existing radius lookup. This is **insurance** for cases where a recipe hardcodes a small radius (e.g., the recipe at `Editor.prop_subsection_stylebox.radius = "shape.secondary_radius"` -- but Bubble's secondary_radius is 26, so safe).
+**What Phase 12 changes for Bubble:** Likely **zero shape edits** because Bubble's existing radii (lines 993-1003) already meet the `>=26` floor for every key. The only addition is a defensive `min_radius_floor: 26` key in Bubble's shape (and `0` in default) plus a thread-through in `_resolve_recipe()` that does `resolved_radius = max(resolved_radius, min_radius_floor)` after the existing radius lookup. This is **insurance** for cases where a recipe hardcodes a small radius (e.g., the recipe at `Editor.prop_subsection_stylebox.radius = "shape.regular_radius"` -- but Bubble's regular_radius is 26, so safe).
 
 **Slider grabber check:** the grabber icon is generated, not stylebox-driven. `_make_slider_grabber_icon` (line 5511) likely uses `tokens.thumbnailSize` and a fixed radius. **PLANNER MUST READ THIS HELPER** and confirm Bubble's slider grabber reads as "pillowy" (corner-radius >=8). If not, this is a separate per-direction tweak.
 
