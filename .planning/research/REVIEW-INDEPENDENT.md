@@ -2,6 +2,8 @@
 
 **Date:** 2026-05-04
 **Reviewer:** independent (no prior conversation context)
+
+**Current status note (2026-05-13):** This is a historical review snapshot from the early planning pass. Later architecture and docs-sync work superseded findings about separate mobile resources, per-direction `.tres` resources, and 9-section/35-control showcase scope. Use `.planning/PROJECT.md`, `.planning/REQUIREMENTS.md`, `.planning/ROADMAP.md`, `.planning/DESIGN_TOKENS.md`, and `.planning/MOBILE-DESIGN-SPEC.md` for current implementation truth.
 **Files reviewed:**
 
 | File | Lines |

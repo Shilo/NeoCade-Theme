@@ -279,7 +279,7 @@ ROADMAP success criteria audit:
 
 | SC | Roadmap success criterion | Evidence | Status |
 |---|---|---|---|
-| SC-01 | THEME-DIRECTIONS.md produced with 5 candidate directions, subclass-form names, base/accent hex values, WCAG AA contrast, personality summaries, target use cases, filter audit, and rationale. | Candidate Directions section and Filter Audit Summary. | PASS |
+| SC-01 | THEME-DIRECTIONS.md produced with 5 candidate directions, style selectors, base/accent hex values, WCAG AA contrast, personality summaries, target use cases, filter audit, and rationale. | Candidate Directions section and Filter Audit Summary. | PASS |
 | SC-02 | Names may keep, revise, or replace per fit; Boardwalk Sunset is hard-rejected. | v0 Feedback DNA Mapping and direction naming decisions. | PASS |
 | SC-03 | Five directions span personality space, not five similar themes. | Pulse, Slate, Bubble, Daybreak, and Burst cover the five D-06 anchors. | PASS |
 | SC-04 | Per-v0-direction reaction to DNA mapping table exists. | v0 Feedback DNA Mapping table names liked DNA, rejected traits, eligible use, and informed directions. | PASS |
@@ -321,9 +321,9 @@ Context decision audit:
 | D-11 | SOURCES.md Section 14 added. | PASS |
 | D-12 | Approval gate options were approve, revise, reject all; user chose a focused naming revision and approved the rest. | PASS |
 | D-13 | Approval is text-level only before mockups. | PASS |
-| D-14 | Candidate future subclass forms are PascalCase and end in NeoCadeTheme. | PASS |
+| D-14 | Candidate names are stable style names under `NeoCadeTheme.Style`; older future-subclass naming is superseded. | PASS |
 | D-15 | Names avoid forbidden cyber/synth/noir coding; Boardwalk Sunset absent as candidate. | PASS |
-| D-16 | Inter Variable Roman and dynamic `NeoCadeTheme` superclass compatibility are preserved. | PASS |
+| D-16 | Inter Variable Roman and dynamic `NeoCadeTheme` single-class compatibility are preserved. | PASS |
 
 Final no-forbidden-file audit: PASS. No mockup, image, addon, theme resource, font, icon, scene, project, production `.gd`, or `.tres` file was intentionally changed during Phase 3.3 execution.
 
@@ -333,7 +333,7 @@ Final no-forbidden-file audit: PASS. No mockup, image, addon, theme resource, fo
 |---|---|
 | user request | PASS: direction names changed to generic one-word names; rest of direction set approved. |
 | final approved names | PASS: Pulse, Slate, Bubble, Daybreak, Burst. |
-| future subclass names | PASS: PulseNeoCadeTheme, SlateNeoCadeTheme, BubbleNeoCadeTheme, DaybreakNeoCadeTheme, BurstNeoCadeTheme. |
+| style selector names | PASS: `PULSE`, `SLATE`, `BUBBLE`, `DAYBREAK`, `BURST`. |
 | copyright/name-risk reduction | PASS: names are generic dictionary-style words and do not reuse surveyed product names or v0 multiword concept labels. |
 | filter and contrast checks | PASS: naming-only revision does not alter palettes, behavior, or filter audit outcomes. |
 
@@ -352,7 +352,7 @@ Final no-forbidden-file audit: PASS. No mockup, image, addon, theme resource, fo
 | Bubble revised palette | PASS: `#241326` (dark berry-aubergine) + `#FFB3E6` (light bubblegum pink) — 10.74:1 WCAG AAA. |
 | Daybreak revised palette | PASS: `#0B2420` (dark forest teal) + `#76F2D1` (fresh mint) — 11.96:1 WCAG AAA. |
 | Pulse / Slate / Burst | UNCHANGED: already dark, no revision needed. |
-| direction identity preservation | PASS: names, future subclass forms, DNA inputs, target use cases, personality summaries (intent), and filter audit outcomes preserved; only base/accent hex values and palette description language changed. |
+| direction identity preservation | PASS: names, style selectors, DNA inputs, target use cases, personality summaries (intent), and filter audit outcomes preserved; only base/accent hex values and palette description language changed. |
 | five-direction visual distinguishability | PASS: bases span navy/slate/wine/forest-teal/plum (five distinct hue families); accents span lime/sky/pink/mint/gold (five distinct hue families). |
 | broader spread maintained | PASS: D-03 broad personality spread retained — saturated arcade (Pulse), modern minimal (Slate), playful (Bubble), welcoming (Daybreak), expressive statement (Burst). |
 | filter audit | PASS: anti-cyberpunk + anti-texture + universal-axes-still-work + no-base-preselection still hold for revised palettes. |

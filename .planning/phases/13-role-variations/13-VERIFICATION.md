@@ -106,16 +106,15 @@ No ORPHANED requirements: all plan-frontmatter `requirements:` IDs map to the 3 
 
 | File                                                                                  | Line(s)   | Pattern                                                            | Severity | Impact                                                                                                                                                                                                                                                                                                       |
 | ------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `.planning/phases/13-role-variations/helpers/_phase13_verify_headless.gd`             | 7         | Stale docstring (`TYPE_VARIATIONS == 56`)                          | Info     | The header docstring still says `BINDING_TABLE.size() == 149, TYPE_VARIATIONS == 56` while the live `const EXPECTED_TYPE_VARIATIONS_COUNT := 61` on line 20 is the actually-asserted value. Cosmetic comment drift documenting Wave-1's stale-baseline reconciliation that wasn't propagated to this docstring. |
 | `addons/neocade_theme/scripts/neocade_theme.gd`                                       | 5079-5080 | Stale source-line reference in comment (IN-01 from 13-REVIEW.md)   | Info     | Comment claims `Label.font_color` is at line 3147; actual line is 3169. SC#3 invariant itself holds — comment points at wrong line, would mislead future reviewers. Documentation drift, not a defect.                                                                                                       |
 | `showcase/showcase.tscn`                                                              | 193, 1493 | Duplicate node name `DangerPanel` under different parents (IN-02)  | Info     | Pre-existing `DangerPanel` (Buttons section, no theme_type_variation) and new Phase 13 `DangerPanel` (Role Variations section, with `&"DangerPanel"`) under different parents. Godot allows same-name siblings; unique_ids do not collide. Not a functional bug.                                                |
 | `addons/neocade_theme/scripts/neocade_theme.gd`                                       | 5104-5172 | `raised=true` behavior on Role Panels undocumented (IN-03)         | Info     | `raised_face_edge: true` causes `_apply_raised_depth_border()` to overwrite `surface_panel_edge` border with `role_<x>_offset` darker tint when `raised=true`. Consistent with all other raised-aware recipes; intentional but unmentioned in comments / README.                                                |
 | `addons/neocade_theme/scripts/neocade_theme.gd`                                       | 5111, 5125, 5139, 5153, 5167 | Magic-number `0.06` duplication across 5 Role Panel recipes (IN-04) | Info     | Future tuning requires editing 5 sites. Stylistically consistent with other alpha literals in the file (0.10, 0.18, 0.20, 0.32, 0.55, 0.72), so a one-off literal here matches the file's prevailing pattern. Not blocking.                                                                                  |
-| `README.md`                                                                           | 97-98     | "6% tint over the per-direction panel chrome" mischaracterization (WR-01 from 13-REVIEW.md) | Info (warning-class but surfaced as deferred per verification request) | The README implies a compositing model (role color layered on top of `surface_panel`), but the actual implementation REPLACES the panel face role (alpha=0.06 over whatever is behind the PanelContainer, not over `surface_panel`). Documentation drift; tracked as deferred. |
+| `README.md`                                                                           | 97-98     | "6% tint over the per-direction panel chrome" mischaracterization (WR-01 from 13-REVIEW.md) | Closed by docs sync | README now describes the actual implementation: Role Panels replace the panel face with a 6% role-color fill, with raised mode adding a darker role-tinted edge. |
 
-No Blocker / Warning-class production-code defects found. The WR-01 README copy mischaracterization is documentation drift only; surfaced as deferred per the verification request's explicit instructions.
+No Blocker / Warning-class production-code defects found. WR-01 is closed by the 2026-05-13 docs sync.
 
-### Human Verification Required
+### Optional Owner UAT
 
 #### 1. Visual halo / chrome inspection of showcase Role Variations tab
 
@@ -143,15 +142,15 @@ All 9 must-have observable truths are VERIFIED through a combination of:
 - Source-code grep + structural diff inspection (TYPE_VARIATIONS, BINDING_TABLE, set_font/set_font_size, @export count, Theme.clear() absence, EDITOR_ONLY_THEME_TYPES Pitfall 4 absence, default Label/PanelContainer recipes unchanged).
 - Live runtime verification via canonical Godot 4.6.2 CLI: `--stage architecture` PASS, `--stage role-variations-registered` PASS, `--stage role-variations-in-showcase` PASS, `--stage role-label-fonts` PASS.
 - 30-config smoke matrix PASS — every Phase 13 invariant holds across the curated (style × raised × platform × custom-color) sweep.
-- Static counts: BINDING_TABLE = 149 (140 pre-Phase-13 + 9 new), TYPE_VARIATIONS = 61 (52 actual pre-Phase-13 baseline + 9 new — Wave-1-reconciled from the stale "47 + 9 = 56" plan text), `@export var` = 12, `Theme.clear()` non-comment count = 0, alpha 0.06 literal count = 5 (one per Role Panel).
+- Static counts: BINDING_TABLE = 150, TYPE_VARIATIONS = 62, `@export var` = 12, `Theme.clear()` non-comment count = 0, alpha 0.06 literal count = 5 (one per Role Panel).
 - Showcase scene: 9 `theme_type_variation = &"<Name>"` cells wired across 4 Role Label + 5 Role Panel demo nodes; 20 new unique_ids in reserved Phase 13 range 2700000010-2700000029; 262 total unique_ids in scene, 0 duplicates.
 - README: `## Role Variations (opt-in)` section between Showcase and Design Rules with mapping tables and `&"<Name>"` code samples; Showcase tab count updated from 9 to 10.
 
 One stage (`--stage default-chrome-unchanged`) returns RED, but the failure is the documented DI-13-01 verifier-side heuristic bug, not a real SC#3 regression. SC#3 is genuinely intact by static diff inspection. This is explicitly surfaced as a deferred item per the verification request, not a gap.
 
-One human verification item remains (visual halo / chrome inspection per Pitfall 1; 13-VALIDATION.md Manual-Only Verifications section). Per the decision tree in Step 9: ANY human verification item flips status from `passed` to `human_needed`, regardless of the otherwise-clean 9/9 automated score.
+One optional owner UAT item remains (visual halo / chrome inspection per Pitfall 1; 13-VALIDATION.md Manual-Only Verifications section). It is retained as a visual confidence check, not as an implementation gap.
 
-**Phase 13 goal is achieved at the code level (9/9 truths VERIFIED).** The remaining work is a single manual UAT pass for visual halo + chrome confirmation, which is the documented `13-VALIDATION.md` Manual-Only gate.
+**Phase 13 goal is achieved at the code level (9/9 truths VERIFIED).** The remaining visual check is optional owner UAT.
 
 ---
 

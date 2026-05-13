@@ -46,7 +46,7 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 - **`#272727` base color** — too cool/neutral for arcade direction. Boardwalk Sunset uses `#1A1410` (warm near-black, brown undertone); Cabinet Chrome uses `#1E2229` (matches LDtk's `$bgDark` exactly, slightly warmer than minimal theme).
 - **`#569eff` accent** — too generic-cool-blue per ARCHITECTURE.md Section 7. Replaced with arcade-amber/orange for distinctive identity.
 - **Editor-only theme types** — minimal theme styles `FlatButton`/`MainScreenButton`/`BottomPanelButton`/`EditorInspector*` etc. NeoCade v1 scopes to user-facing public Control hierarchy only (FEATURES.md AF-6); editor parity is v1.x.
-- **`@tool extends Theme` + `EditorInterface.get_editor_settings()` + `EDSCALE` runtime pattern** — D-05 rejection re-confirmed by Phase 1 enumeration. Upstream's GDScript reads 9 `interface/theme/*` editor settings + uses `EditorInterface.get_editor_scale()`. NeoCade's `@tool` token-generator (Phase 4) reads from a hand-authored TokenSet resource, not from EditorSettings — runtime-first; works in shipped games on all 6 export targets. The 13 specific Editor-API touchpoints with line citations are documented in `MINIMAL-THEME-DISSECTION.md` `## Editor-API Touchpoints (Forbidden in NeoCade per D-05)`.
+- **`@tool extends Theme` + `EditorInterface.get_editor_settings()` + `EDSCALE` runtime pattern** — D-05 rejection re-confirmed by Phase 1 enumeration. Upstream's GDScript reads 9 `interface/theme/*` editor settings + uses `EditorInterface.get_editor_scale()`. NeoCade's production `@tool` Theme class reads exported values on `NeoCadeTheme`, not EditorSettings — runtime-first; works in shipped games on all 6 export targets. The 13 specific Editor-API touchpoints with line citations are documented in `MINIMAL-THEME-DISSECTION.md` `## Editor-API Touchpoints (Forbidden in NeoCade per D-05)`.
 
 **What's still open:**
 - **Accent application strategy** — partially resolved by Phase 1 enumeration (per-Control accent-using rows are now visible in DISSECTION.md). Synthesizing the cross-class accent pattern into a NeoCade design rule remains Phase 3 mockup-design work. Reduced from "open in initial pass" to "design synthesis pending Phase 3."
@@ -662,13 +662,13 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 - Dynamic scripted `Theme` architecture: `@tool extends Theme`, exported `base_color`, `accent_color`, `raised`, and `platform` values, deterministic `clear()` + regenerate flow.
 - Runtime `Theme.set_*` APIs as the production mechanism for styleboxes, colors, fonts, font sizes, constants, icons, and type variations.
 - Formula-derived tonal surfaces ported from passivestar-style `_get_base_color()` logic, but driven by NeoCade exports rather than editor settings.
-- Super-first subclass contract: direction subclasses call `super._regenerate()` before personality overrides.
+- Dynamic single-class contract: built-in styles call the shared regeneration path before style personality is applied.
 - `Theme.has_*` coverage verification to avoid fallback-masked missing entries.
 - Godot-only `AUTO` platform resolution with forced DESKTOP/MOBILE escape hatches, feature tags, `OS.get_name()` fallback, and mobile-preferred ambiguous Web behavior.
 
 **What NeoCade rejects:**
 - Shipped dependency on `EditorSettings`, `EditorInterface`, `DisplayServer` system theme colors, `EDSCALE`, or editor custom-theme merge flow.
-- Resource-level inheritance assumptions where a subclass `.tres` magically inherits generated entries without calling superclass code.
+- Resource-level inheritance assumptions where one `.tres` magically inherits generated entries from another `.tres`.
 - JavaScript bridge as a Phase 4 dependency for Web platform detection.
 - Soft shadow/elevation behavior for v1; `StyleBoxFlat.shadow_size` must remain zero in generated v1 chrome.
 - Visual acceptance based only on screenshots or default fallback appearance.
@@ -683,7 +683,7 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 - Godot source confirms runtime `Theme` APIs and fallback behavior align with the planned dynamic architecture.
 - Editor theme source confirms the formula/config pattern is useful but editor-bound; NeoCade must port the pattern, not the dependencies.
 - The dynamic spike confirms that saved scripted `.tres` resources can load, regenerate, apply to a Control tree, and roundtrip through `ResourceSaver`.
-- The negative subclass fixture confirms the critical failure mode: skipping `super._regenerate()` leaves detectable coverage gaps.
+- Historical note: the negative subclass fixture confirmed a failure mode in the earlier superclass/subclass hypothesis. Production later simplified to one concrete class and one canonical resource, so this risk no longer applies to shipped architecture.
 
 **strict feasibility outcome:**
 - Overall: PASS for Phase 3.2 representative subset.
@@ -728,7 +728,7 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 - Broad-spread personality model: dark saturated arcade, modern minimal dark, playful bubbly, friendly daylight, and expressive statement.
 - Inspiration-only survey discipline: commercial and asset-pack examples validate hierarchy, construction, and personality, but not artwork, exact values, names, or layouts.
 - Per-direction base/accent defaults with arithmetic WCAG AA checks at a stricter 4.5:1 floor for normal text/icons/focus affordances.
-- Universal export-axis language: every direction supports flat/raised and desktop/mobile through the dynamic `NeoCadeTheme` superclass.
+- Universal export-axis language: every direction supports flat/raised and desktop/mobile through the dynamic `NeoCadeTheme` single-class architecture.
 
 **What NeoCade rejects:**
 - Boardwalk Sunset as a direction identity; its only retained lesson is the already-universal flat/simple mandate.
@@ -739,14 +739,14 @@ These are surfaced for the roadmap planning phase to convert into open user deci
 **What remains open:**
 - Phase 3.3 user approval is complete after one naming revision to generic one-word names.
 - Phase 3.4 mockups must visualize the approved directions in both flat and raised modes before selecting finalists.
-- The Phase 3.4 gate still chooses which approved direction becomes the base `NeoCadeTheme` default.
-- Phase 4 converts approved direction recipes into subclass profiles only after Phase 3.4 approval.
+- The Phase 3.4 gate selected Pulse as the recommended starter/default style.
+- Phase 4 converted approved direction recipes into built-in `NeoCadeTheme.Style` profiles.
 
 **source agreement or conflict notes:**
 - User exemplars, asset-pack sources, and Flat-3D research agree on solid flat construction plus optional offset duplicate for tactile raised controls.
 - MD3/MD3 Expressive sources agree with using role colors, shape, hierarchy, and accessible pairing as the static design grammar.
 - Commercial examples validate energy and hierarchy but often include artwork/gradient/gloss effects that NeoCade explicitly rejects.
-- Phase 3.2 architecture confirms directions must be personality subclasses over a common dynamic superclass, not a matrix of static flat/raised/mobile files.
+- Phase 3.2 architecture confirmed the viability of dynamic generation; production later simplified direction personalities into `NeoCadeTheme.Style` profiles rather than subclasses or a matrix of static flat/raised/mobile files.
 
 **requirements / decision coverage:**
 - RES-NEW-06: covered by five documented candidate directions.

@@ -1,13 +1,15 @@
 # Godot Dynamic Theme Architecture Research
 
-Phase 03.2 validates whether NeoCade v1 can ship a dynamic Godot Theme architecture: one `@tool extends Theme` superclass with exported knobs, per-direction subclasses that call `super._regenerate()` first, and saved `.tres` instances users can edit without production addon changes during research.
+Phase 03.2 validated whether NeoCade v1 could ship a dynamic Godot Theme architecture. The research spike explored a superclass/subclass shape, then production simplified it to one concrete `@tool class_name NeoCadeTheme extends Theme` class plus one canonical `addons/neocade_theme/neocade_theme.tres` resource with built-in styles selected by `NeoCadeTheme.Style`.
+
+**Current implementation note (2026-05-13):** Treat subclass-specific findings below as historical feasibility evidence. The shipped architecture has no per-direction subclasses, no per-style `.tres` files, and no `neocade_mobile_theme.tres`.
 
 ## Scope and Non-Scope
 
 **Scope**
 
 - Verify export-driven `Theme` regeneration from `@export` properties.
-- Confirm subclass extension mechanics for base coverage plus personality overrides.
+- Confirm dynamic extension mechanics for base coverage plus personality overrides. The tested subclass path is historical; production uses built-in style profiles inside the single class.
 - Validate runtime application and saved `.tres` serialization behavior.
 - Define platform resolution for `DESKTOP`, `MOBILE`, and `AUTO`, including Web ambiguity.
 - Port the relevant passivestar editor-theme formula pattern into runtime-safe pseudocode.
@@ -16,7 +18,7 @@ Phase 03.2 validates whether NeoCade v1 can ship a dynamic Godot Theme architect
 **Non-Scope**
 
 - No production edits under `addons/neocade_theme/`.
-- No final `neocade_theme.tres`, `neocade_mobile_theme.tres`, fonts, icons, screenshots, or mockups.
+- No production `neocade_theme.tres`, fonts, icons, screenshots, or mockups were created during this research phase. The separate `neocade_mobile_theme.tres` idea was superseded before release.
 - No editor plugin dependency, JavaScript bridge, or `EditorInterface` runtime contract.
 - No final visual token decisions. Phase 3.4 remains the mockup approval gate.
 
