@@ -53,6 +53,15 @@ func _check_theme(theme: NeoCadeTheme, label: String) -> void:
 				panel.bg_color.to_html(false),
 				theme.base_color.to_html(false),
 			])
+		if panel.corner_radius_top_left != 0 or panel.corner_radius_top_right != 0 or panel.corner_radius_bottom_left != 0 or panel.corner_radius_bottom_right != 0:
+			_fail("%s %s.panel should stay square inside Window.embedded_border chrome, got radius=%s/%s/%s/%s" % [
+				label,
+				dialog_type,
+				panel.corner_radius_top_left,
+				panel.corner_radius_top_right,
+				panel.corner_radius_bottom_left,
+				panel.corner_radius_bottom_right,
+			])
 
 	var tree_panel := theme.get_stylebox(&"panel", &"Tree")
 	var tree_secondary_panel := theme.get_stylebox(&"panel", &"TreeSecondary") as StyleBoxFlat

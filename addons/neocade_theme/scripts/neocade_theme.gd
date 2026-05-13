@@ -18,6 +18,8 @@ class_name NeoCadeTheme extends Theme
 ##
 ## See: .planning/DESIGN_TOKENS.md, .planning/phases/04-.../04-RESEARCH.md, .planning/phases/04-.../04-CONTEXT.md.
 
+const CANONICAL_THEME_PATH := "res://addons/neocade_theme/neocade_theme.tres"
+
 ## Sizing mode used when regenerating NeoCade theme entries.
 enum Platform {
 	## Uses desktop control density and spacing.
@@ -211,6 +213,14 @@ static func apply_globally() -> void:
 		_do_apply_globally.call_deferred()
 
 
+## Apply the canonical NeoCade Theme to one Control at runtime, while leaving
+## editor-owned scene state untouched.
+static func apply_to_control(control: Control) -> void:
+	if Engine.is_editor_hint() or control == null or control.theme != null:
+		return
+	control.theme = load(CANONICAL_THEME_PATH) as Theme
+
+
 # Returns true if the merge happened, false if `SceneTree` wasn't the
 # main loop yet. The deferred caller invokes this once and won't re-defer
 # even if it fails again (e.g. a custom `MainLoop` that never becomes
@@ -218,7 +228,7 @@ static func apply_globally() -> void:
 static func _do_apply_globally() -> bool:
 	if not (Engine.get_main_loop() is SceneTree):
 		return false
-	ThemeDB.get_default_theme().merge_with(load("res://addons/neocade_theme/neocade_theme.tres") as Theme)
+	ThemeDB.get_default_theme().merge_with(load(CANONICAL_THEME_PATH) as Theme)
 	return true
 
 
@@ -449,6 +459,7 @@ func _regenerate_theme() -> void:
 	var button_hover_offset: Color = _raised_depth_color(button_hover, base_color)
 	var button_pressed_offset: Color = _raised_depth_color(button_pressed, base_color)
 	var button_disabled_offset: Color = _raised_depth_color(button_disabled, base_color)
+	var tab_separator: Color = button_normal_offset if raised and raised_strength > 0 else button_border
 	var primary_button_offset: Color = _raised_depth_color(primary_button_normal, base_color)
 	var primary_button_hover_offset: Color = _raised_depth_color(primary_button_hover, base_color)
 	var primary_button_pressed_offset: Color = _raised_depth_color(primary_button_pressed, base_color)
@@ -622,6 +633,7 @@ func _regenerate_theme() -> void:
 		"button_border":          button_border,
 		"button_border_hover":    button_border_hover,
 		"button_border_pressed":  button_border_pressed,
+		"tab_separator":          tab_separator,
 		"surface_low_edge":       surface_low_edge,
 		"surface_panel_edge":     surface_panel_edge,
 		"surface_high_edge":      surface_high_edge,
@@ -1761,22 +1773,22 @@ const CANONICAL_SLOT_NAMES: Dictionary = {
 		"font_size": ["font_size"],
 		"icon": ["scroll_hint"],
 	},
-	# TabBar — official Godot 4.6.2 slot freeze. Legacy tab-separation notes
-	# are absent in the local probe and must not be bound without new evidence.
+	# TabBar — official Godot 4.6.2 slot freeze. Inter-tab seams are drawn
+	# by tab side borders so the color can follow flat/raised chrome.
 	"TabBar": {
 		"stylebox": ["button_highlight", "button_pressed", "tab_disabled", "tab_focus",
 					 "tab_hovered", "tab_selected", "tab_unselected"],
 		"color": ["drop_mark_color", "font_disabled_color", "font_hovered_color", "font_outline_color",
 				  "font_selected_color", "font_unselected_color", "icon_disabled_color",
 				  "icon_hovered_color", "icon_selected_color", "icon_unselected_color"],
-		"constant": ["h_separation", "hover_switch_wait_msec", "icon_max_width", "outline_size"],
+		"constant": ["h_separation", "hover_switch_wait_msec", "icon_max_width", "outline_size", "tab_separation"],
 		"font": ["font"],
 		"font_size": ["font_size"],
 		"icon": ["close", "decrement", "decrement_highlight", "drop_mark",
 				 "increment", "increment_highlight"],
 	},
-	# TabContainer — official Godot 4.6.2 slot freeze. Legacy tab-separation
-	# notes are absent in the local probe and must not be bound without new evidence.
+	# TabContainer — official Godot 4.6.2 slot freeze. Keep tab_separation
+	# available, but use tab side borders for colored separators.
 	"TabContainer": {
 		"stylebox": ["tab_selected", "tab_unselected", "tab_hovered", "tab_disabled", "tab_focus",
 					 "panel", "tabbar_background"],
@@ -2196,11 +2208,12 @@ const BINDING_TABLE: Dictionary = {
 			"h_separation": {"value": 4},
 		},
 	},
-	# 1. AcceptDialog — explicit popup shell plus official button-container spacing.
+	# 1. AcceptDialog — content panel stays square because Window.embedded_border
+	# owns the rounded title-bearing shell; this avoids nested clipped corners.
 	"AcceptDialog": {
 		"stylebox": {
 			"panel": {"role": "surface_base", "border_role": "surface_panel_edge",
-					  "offset_role": "surface_low_offset", "radius": "shape.secondary_radius",
+					  "offset_role": "surface_low_offset", "radius": 0,
 					  "raised_face_edge": true,
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
@@ -2706,7 +2719,7 @@ const BINDING_TABLE: Dictionary = {
 	"ConfirmationDialog": {
 		"stylebox": {
 			"panel": {"role": "surface_base", "border_role": "surface_panel_edge",
-					  "offset_role": "surface_low_offset", "radius": "shape.secondary_radius",
+					  "offset_role": "surface_low_offset", "radius": 0,
 					  "raised_face_edge": true,
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
@@ -2719,7 +2732,7 @@ const BINDING_TABLE: Dictionary = {
 	"PopupDialog": {
 		"stylebox": {
 			"panel": {"role": "surface_base", "border_role": "surface_panel_edge",
-					  "offset_role": "surface_low_offset", "radius": "shape.secondary_radius",
+					  "offset_role": "surface_low_offset", "radius": 0,
 					  "raised_face_edge": true,
 					  "raised_intensity": "shape.raised_lifts.dialog",
 					  "padding": Vector2i(12, 10)},
@@ -3603,15 +3616,16 @@ const BINDING_TABLE: Dictionary = {
 									"border_widths": Vector4i(0, 2, 0, 0),
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 6), "mobile_padding": Vector2i(18, 14)},
-			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
-									"raised_intensity": 0, "border_width": 0,
+			"tab_unselected":   {"role": "button_normal", "border_role": "tab_separator",
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
-			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
-									"raised_intensity": 0, "border_width": 0,
+			"tab_hovered":      {"role": "button_hover", "border_role": "tab_separator",
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
-			"tab_disabled":     {"role": "button_disabled", "disabled": true, "border_width": 0,
+			"tab_disabled":     {"role": "button_disabled", "border_role": "tab_separator",
+									"disabled": true, "border_widths": Vector4i(1, 0, 1, 0),
 									"raised_intensity": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
@@ -3635,6 +3649,7 @@ const BINDING_TABLE: Dictionary = {
 			"hover_switch_wait_msec": {"value": 180},
 			"icon_max_width":         {"value": 0},
 			"outline_size":           {"value": 0},
+			"tab_separation":         {"value": 0},
 		},
 		"font_size": {
 			"font_size": {"value": "tokens.body"},
@@ -3657,15 +3672,16 @@ const BINDING_TABLE: Dictionary = {
 									"border_widths": Vector4i(0, 2, 0, 0),
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 6), "mobile_padding": Vector2i(18, 14)},
-			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
-									"raised_intensity": 0, "border_width": 0,
+			"tab_unselected":   {"role": "button_normal", "border_role": "tab_separator",
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
-			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
-									"raised_intensity": 0, "border_width": 0,
+			"tab_hovered":      {"role": "button_hover", "border_role": "tab_separator",
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
-			"tab_disabled":     {"role": "button_disabled", "disabled": true, "border_width": 0,
+			"tab_disabled":     {"role": "button_disabled", "border_role": "tab_separator",
+									"disabled": true, "border_widths": Vector4i(1, 0, 1, 0),
 									"raised_intensity": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5), "mobile_padding": Vector2i(18, 14)},
@@ -3673,10 +3689,9 @@ const BINDING_TABLE: Dictionary = {
 									"corner_profile": "tab_connected"},
 			"panel":            {"role": "surface_panel", "border_role": "surface_panel_edge",
 								  "raised_intensity": "shape.raised_lifts.panel", "raised_face_edge": true},
-			# Transparent tabbar_background so the area beside the tab strip
-			# lets the parent surface show through. Opt-in FilledTabContainer
-			# variation restores the surface_base fill for callers that want
-			# the chrome to extend across the full tab strip width.
+			# Transparent tabbar_background so the tab rail never paints a fill.
+			# Opt-in FilledTabContainer restores a filled strip for callers that
+			# explicitly want the chrome to extend across the full tab header.
 			"tabbar_background":{"empty": true},
 		},
 		"color": {
@@ -3717,15 +3732,16 @@ const BINDING_TABLE: Dictionary = {
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 6)},
-			"tab_unselected":   {"role": "button_normal", "border_role": "button_border",
-									"raised_intensity": 0, "border_width": 0,
+			"tab_unselected":   {"role": "button_normal", "border_role": "tab_separator",
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5)},
-			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
-									"raised_intensity": 0, "border_width": 0,
+			"tab_hovered":      {"role": "button_hover", "border_role": "tab_separator",
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5)},
-			"tab_disabled":     {"role": "button_disabled", "disabled": true, "border_width": 0,
+			"tab_disabled":     {"role": "button_disabled", "border_role": "tab_separator",
+									"disabled": true, "border_widths": Vector4i(1, 0, 1, 0),
 									"raised_intensity": 0,
 									"radius": "shape.tab_radius", "corner_profile": "tab_connected",
 									"padding": Vector2i(12, 5)},
@@ -3774,16 +3790,17 @@ const BINDING_TABLE: Dictionary = {
 								 "raised_intensity": 0, "border_width": 0,
 								 "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 								 "padding": Vector2i(10, 5), "mobile_padding": Vector2i(14, 14)},
-			"tab_unselected":   {"role": "surface_base", "border_role": "surface_base",
-								 "raised_intensity": 0, "border_width": 0,
+			"tab_unselected":   {"role": "surface_base", "border_role": "tab_separator",
+								 "raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 								 "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 								 "padding": Vector2i(10, 4), "mobile_padding": Vector2i(14, 14)},
-			"tab_hovered":      {"role": "button_hover", "border_role": "button_hover",
-								 "raised_intensity": 0, "border_width": 0,
+			"tab_hovered":      {"role": "button_hover", "border_role": "tab_separator",
+								 "raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 								 "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 								 "padding": Vector2i(10, 4), "mobile_padding": Vector2i(14, 14)},
 			"tab_disabled":     {"role": "button_disabled", "disabled": true,
-								 "raised_intensity": 0, "border_width": 0,
+								 "border_role": "tab_separator",
+								 "raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 								 "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 								 "padding": Vector2i(10, 4), "mobile_padding": Vector2i(14, 14)},
 			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",
@@ -3800,16 +3817,17 @@ const BINDING_TABLE: Dictionary = {
 							   "raised_intensity": 0, "border_width": 0,
 							   "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 							   "padding": Vector2i(10, 5), "mobile_padding": Vector2i(14, 14)},
-			"tab_unselected": {"role": "surface_base", "border_role": "surface_base",
-							   "raised_intensity": 0, "border_width": 0,
+			"tab_unselected": {"role": "surface_base", "border_role": "tab_separator",
+							   "raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 							   "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 							   "padding": Vector2i(10, 4), "mobile_padding": Vector2i(14, 14)},
-			"tab_hovered":    {"role": "button_hover", "border_role": "button_hover",
-							   "raised_intensity": 0, "border_width": 0,
+			"tab_hovered":    {"role": "button_hover", "border_role": "tab_separator",
+							   "raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 							   "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 							   "padding": Vector2i(10, 4), "mobile_padding": Vector2i(14, 14)},
 			"tab_disabled":   {"role": "button_disabled", "disabled": true,
-							   "raised_intensity": 0, "border_width": 0,
+							   "border_role": "tab_separator",
+							   "raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 							   "radius": "shape.tab_radius", "corner_profile": "tab_connected",
 							   "padding": Vector2i(10, 4), "mobile_padding": Vector2i(14, 14)},
 			"tab_focus":      {"role": "focus_ring", "radius": "shape.tab_radius",
@@ -3822,12 +3840,12 @@ const BINDING_TABLE: Dictionary = {
 									"raised_intensity": 0, "border_width": 0,
 									"radius": "shape.tab_radius", "corner_profile": "bottom_only",
 									"padding": Vector2i(12, 6)},
-			"tab_unselected":   {"role": "surface_base", "border_role": "surface_base",
-									"raised_intensity": 0, "border_width": 0,
+			"tab_unselected":   {"role": "surface_base", "border_role": "tab_separator",
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 									"radius": "shape.tab_radius", "corner_profile": "bottom_only",
 									"padding": Vector2i(12, 5)},
-			"tab_hovered":      {"role": "button_hover", "border_role": "button_border_hover",
-									"raised_intensity": 0, "border_width": 0,
+			"tab_hovered":      {"role": "button_hover", "border_role": "tab_separator",
+									"raised_intensity": 0, "border_widths": Vector4i(1, 0, 1, 0),
 									"radius": "shape.tab_radius", "corner_profile": "bottom_only",
 									"padding": Vector2i(12, 5)},
 			"tab_focus":        {"role": "focus_ring", "radius": "shape.tab_radius",

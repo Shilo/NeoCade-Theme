@@ -588,17 +588,39 @@ func _expect_tab_state_chrome(theme: Theme, label: String) -> void:
 			])
 		if _relative_luminance(selected.bg_color) <= _relative_luminance(unselected.bg_color):
 			_fail("%s %s.tab_selected should be brighter than tab_unselected" % [label, theme_type])
+		if selected.border_width_left != 0 or selected.border_width_top != 2 or selected.border_width_right != 0 or selected.border_width_bottom != 0:
+			_fail("%s %s.tab_selected should keep only its 2px top accent, got %s/%s/%s/%s" % [
+				label,
+				theme_type,
+				selected.border_width_left,
+				selected.border_width_top,
+				selected.border_width_right,
+				selected.border_width_bottom,
+			])
 		for state in [
-			{"name": &"tab_selected", "stylebox": selected},
 			{"name": &"tab_unselected", "stylebox": unselected},
 			{"name": &"tab_hovered", "stylebox": hovered},
 			{"name": &"tab_disabled", "stylebox": disabled},
 		]:
 			var state_stylebox := state["stylebox"] as StyleBoxFlat
-			if _max_border_width(state_stylebox) != 0:
-				_fail("%s %s.%s should not draw an outline border" % [label, theme_type, state["name"]])
-		if _max_border_width(disabled) != 0:
-			_fail("%s %s.tab_disabled should not keep an outline border" % [label, theme_type])
+			if state_stylebox.border_width_left != 1 or state_stylebox.border_width_right != 1 or state_stylebox.border_width_top != 0 or state_stylebox.border_width_bottom != 0:
+				_fail("%s %s.%s should draw only 1px side separators, got %s/%s/%s/%s" % [
+					label,
+					theme_type,
+					state["name"],
+					state_stylebox.border_width_left,
+					state_stylebox.border_width_top,
+					state_stylebox.border_width_right,
+					state_stylebox.border_width_bottom,
+				])
+			if not state_stylebox.border_color.is_equal_approx(button_normal.border_color):
+				_fail("%s %s.%s separator should match Button.normal chrome border: tab=%s button=%s" % [
+					label,
+					theme_type,
+					state["name"],
+					state_stylebox.border_color.to_html(false),
+					button_normal.border_color.to_html(false),
+				])
 
 
 func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
@@ -629,27 +651,34 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 	_expect_equal(theme.get_constant("v_separation", "GridContainer"), 4, "%s GridContainer.v_separation" % label)
 	var expected_tab_side_margin := (theme as NeoCadeTheme).corner_radius if theme is NeoCadeTheme else 0
 	_expect_equal(theme.get_constant("side_margin", "TabContainer"), expected_tab_side_margin, "%s TabContainer.side_margin" % label)
+	_expect_equal(theme.get_constant("tab_separation", "TabBar"), 0, "%s TabBar.tab_separation" % label)
 	_expect_equal(theme.get_constant("tab_separation", "TabContainer"), 0, "%s TabContainer.tab_separation" % label)
 	_expect_equal(theme.get_constant("icon_max_width", "TabBar"), 0, "%s TabBar.icon_max_width" % label)
 	_expect_equal(theme.get_constant("icon_max_width", "TabContainer"), 0, "%s TabContainer.icon_max_width" % label)
 
-	var tabbar_background := theme.get_stylebox("tabbar_background", "TabContainer") as StyleBoxFlat
+	var tabbar_background := theme.get_stylebox("tabbar_background", "TabContainer")
 	if tabbar_background == null:
 		_fail("%s missing TabContainer.tabbar_background" % label)
+	elif not (tabbar_background is StyleBoxEmpty):
+		_fail("%s TabContainer.tabbar_background should stay empty unless using FilledTabContainer" % label)
+
+	var filled_tabbar_background := theme.get_stylebox("tabbar_background", "FilledTabContainer") as StyleBoxFlat
+	if filled_tabbar_background == null:
+		_fail("%s missing FilledTabContainer.tabbar_background for opt-in filled rail" % label)
 	else:
-		if _max_border_width(tabbar_background) != 0:
-			_fail("%s TabContainer.tabbar_background should not draw an outline border" % label)
-		if tabbar_background.content_margin_left != 0 or tabbar_background.content_margin_right != 0:
+		if _max_border_width(filled_tabbar_background) != 0:
+			_fail("%s FilledTabContainer.tabbar_background should not draw an outline border" % label)
+		if filled_tabbar_background.content_margin_left != 0 or filled_tabbar_background.content_margin_right != 0:
 			_fail("%s TabContainer.tabbar_background should not add fake left/right toolbar margins, got %s/%s" % [
 				label,
-				tabbar_background.content_margin_left,
-				tabbar_background.content_margin_right,
+				filled_tabbar_background.content_margin_left,
+				filled_tabbar_background.content_margin_right,
 			])
-		if tabbar_background.content_margin_top != 0 or tabbar_background.content_margin_bottom != 0:
+		if filled_tabbar_background.content_margin_top != 0 or filled_tabbar_background.content_margin_bottom != 0:
 			_fail("%s TabContainer.tabbar_background should not own toolbar vertical inset, got %s/%s" % [
 				label,
-				tabbar_background.content_margin_top,
-				tabbar_background.content_margin_bottom,
+				filled_tabbar_background.content_margin_top,
+				filled_tabbar_background.content_margin_bottom,
 			])
 
 	for dock_type in [&"DockTabContainer", &"SideDockTabContainer", &"BottomSideDockTabContainer"]:
@@ -994,6 +1023,15 @@ func _expect_create_dialog_chrome(theme: Theme, label: String) -> void:
 				dialog_type,
 				dialog_panel.bg_color.to_html(false),
 				neocade.base_color.to_html(false),
+			])
+		if dialog_panel.corner_radius_top_left != 0 or dialog_panel.corner_radius_top_right != 0 or dialog_panel.corner_radius_bottom_left != 0 or dialog_panel.corner_radius_bottom_right != 0:
+			_fail("%s %s.panel should stay square inside Window.embedded_border chrome, got radius=%s/%s/%s/%s" % [
+				label,
+				dialog_type,
+				dialog_panel.corner_radius_top_left,
+				dialog_panel.corner_radius_top_right,
+				dialog_panel.corner_radius_bottom_left,
+				dialog_panel.corner_radius_bottom_right,
 			])
 
 	var tree_panel := theme.get_stylebox(&"panel", &"Tree")

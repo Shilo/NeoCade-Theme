@@ -28,7 +28,9 @@ var _syncing_theme_controls := false
 
 
 func _ready() -> void:
+	NeoCadeTheme.apply_to_control(self)
 	_populate_platform_options()
+	theme_option_button.refresh_theme_list()
 	_populate_menu_button_popup()
 	accept_dialog_button.pressed.connect(_on_accept_dialog_button_pressed)
 	confirmation_dialog_button.pressed.connect(_on_confirmation_dialog_button_pressed)

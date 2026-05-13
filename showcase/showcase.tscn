@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://beivemw6fcnld"]
 
-[ext_resource type="Theme" uid="uid://cgd7xydn3yu7t" path="res://addons/neocade_theme/neocade_theme.tres" id="1_lisp0"]
 [ext_resource type="Script" uid="uid://dky0m3dm07i6g" path="res://addons/neocade_theme/scripts/neocade_theme_option_button.gd" id="2_theme_option_button"]
 [ext_resource type="Script" uid="uid://dxu534volcw5j" path="res://showcase/showcase.gd" id="3_showcase"]
 
@@ -12,7 +11,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_lisp0")
 script = ExtResource("3_showcase")
 
 [node name="RootMargin" type="MarginContainer" parent="." unique_id=2104122416]
