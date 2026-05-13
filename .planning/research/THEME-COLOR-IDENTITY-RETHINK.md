@@ -415,6 +415,37 @@ This is the proposed "no variations required" mapping. Exact values should be te
 | Burst | gold fill | violet/blue | violet/blue | cyan or violet selected state | gold/cyan selected container | lime/cyan | lime/cyan | plum panels with violet/cyan statement headers |
 | Bubble | blue chunky fill | lavender/sky blue | cream/sky input island | yellow or lavender selected tab | blue/yellow/lavender selected tile | yellow/green | green | cream panels with lavender headers |
 
+## Independent Reviewer Pass
+
+Read-only subagent review completed after Research Round 2 and the first HTML mockup.
+
+Verdict: **partially on track**.
+
+Confirmed:
+
+- The diagnosis is right: production default controls are still mostly base-derived, while stronger color identity lives in opt-in variations.
+- Pulse should be a control-family color taxonomy, not a green-accent arcade dark theme.
+- Godot Theme can support out-of-box variety at the control-family level, but cannot infer arbitrary LDtk-like per-entity/content colors without custom item drawing, custom controls, item metadata, or variations.
+- Keeping `base_color` plus `accent_color` is still the safest v1 public API choice, but built-in styles need hidden authored role palettes.
+
+Warnings:
+
+- Current `DESIGN_TOKENS.md` locks the old palettes and says built-in styles must not be recolored/rederived. This rethink must explicitly supersede that lock before implementation.
+- Bubble is the riskiest theme because light cream/sky islands inside a dark v1 style need component-local text roles instead of the current global dark-theme text model.
+- The first HTML mockup is a hypothesis board, not an approval artifact.
+- CSS-only hover filters should not be treated as implementation evidence. The final mockup needs authored state colors that map to Godot Theme slots.
+
+Required before implementation:
+
+- One approval-grade mockup pass with current-vs-proposed comparison.
+- One side-by-side board showing all five themes together.
+- Exact role palette swatches with contrast badges.
+- Flat and raised states.
+- Desktop and mobile density.
+- Disabled, hover, pressed, focus, and selected states.
+- Labels mapping every visible role to real Godot slots such as `Button.normal`, `OptionButton.normal`, `LineEdit.normal`, `TabBar.tab_selected`, `ItemList.selected`, `Tree.selected`, and `PopupMenu.hover`.
+- Explicit decision on whether Bubble may use light islands inside a dark-shell v1 theme.
+
 ## Mockup Plan
 
 Before changing production code, create Godot-feasible mockups.

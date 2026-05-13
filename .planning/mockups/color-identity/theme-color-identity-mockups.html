@@ -217,29 +217,29 @@
       --gap: 16px;
       --action: #2eaee9;
       --action-edge: #12699b;
-      --menu: #8a6cff;
-      --menu-edge: #5b3fba;
+      --menu: #967cff;
+      --menu-edge: #6447bd;
       --input: #f7fbff;
       --input-edge: #86a9cf;
       --select: #ffc21d;
       --select-edge: #b17200;
       --range: #45d96a;
       --range-edge: #1f8a3b;
-      --danger: #f34683;
-      --danger-edge: #a71f53;
+      --danger: #c62842;
+      --danger-edge: #821626;
       --info: #2eaee9;
       --dialog: #fff5e8;
-      --dialog-head: #8a6cff;
-      --dialog-edge: #5b3fba;
+      --dialog-head: #967cff;
+      --dialog-edge: #6447bd;
       --on-color: #ffffff;
       --field-text: #17233c;
       --inactive: #7f9abd;
-      --on-action: #ffffff;
-      --on-menu: #ffffff;
+      --on-action: #17233c;
+      --on-menu: #17233c;
       --on-select: #17233c;
       --on-range: #17233c;
       --on-danger: #ffffff;
-      --on-head: #ffffff;
+      --on-head: #17233c;
     }
 
     * { box-sizing: border-box; }
@@ -313,7 +313,7 @@
       place-items: center;
       border-radius: var(--radius);
       background: var(--select);
-      color: var(--on-color);
+      color: var(--on-select);
       box-shadow: 0 var(--depth) 0 var(--select-edge);
       font-family: var(--mono);
       font-size: 13px;
@@ -340,7 +340,7 @@
     .theme-tab.active,
     .mode-button.active {
       background: var(--select);
-      color: var(--on-color);
+      color: var(--on-select);
       border-color: var(--select-edge);
       box-shadow: 0 var(--depth) 0 var(--select-edge);
       font-weight: 800;
@@ -429,7 +429,7 @@
       border-radius: var(--radius);
       display: grid;
       place-items: center;
-      color: var(--on-color);
+      color: var(--on-action);
       font-family: var(--mono);
       font-size: 13px;
       font-weight: 900;
@@ -441,6 +441,11 @@
     .tool.yellow { background: var(--select); }
     .tool.green { background: var(--range); }
     .tool.red { background: var(--danger); }
+    .tool.blue { color: var(--on-menu); }
+    .tool.orange { color: var(--on-action); }
+    .tool.yellow { color: var(--on-select); }
+    .tool.green { color: var(--on-range); }
+    .tool.red { color: var(--on-danger); }
     .tool.neutral {
       background: var(--panel-2);
       color: var(--text);
@@ -492,7 +497,7 @@
 
     .tab.active {
       background: var(--select);
-      color: var(--on-color);
+      color: var(--on-select);
       border-color: var(--select-edge);
       font-weight: 850;
       box-shadow: 0 var(--depth) 0 var(--select-edge);
@@ -525,7 +530,7 @@
 
     .layer-row.active {
       background: var(--select);
-      color: var(--on-color);
+      color: var(--on-select);
       font-weight: 850;
     }
 
@@ -556,7 +561,7 @@
       border-radius: var(--radius);
       padding: 3px 8px;
       background: var(--menu);
-      color: var(--on-color);
+      color: var(--on-menu);
       font-size: 12px;
       font-weight: 850;
     }
@@ -582,7 +587,7 @@
 
     .chip.hot {
       background: var(--range);
-      color: var(--on-color);
+      color: var(--on-range);
       border-color: var(--range-edge);
     }
 
@@ -613,7 +618,7 @@
       border: 1px solid var(--action-edge);
       padding: 9px 14px;
       background: var(--action);
-      color: var(--on-color);
+      color: var(--on-action);
       box-shadow: 0 var(--depth) 0 var(--action-edge);
       font-weight: 850;
       cursor: pointer;
@@ -633,12 +638,14 @@
     .menu-btn {
       background: var(--menu);
       border-color: var(--menu-edge);
+      color: var(--on-menu);
       box-shadow: 0 var(--depth) 0 var(--menu-edge);
     }
 
     .danger-btn {
       background: var(--danger);
       border-color: var(--danger-edge);
+      color: var(--on-danger);
       box-shadow: 0 var(--depth) 0 var(--danger-edge);
     }
 
@@ -671,7 +678,7 @@
 
     .dropdown button:hover {
       background: var(--menu);
-      color: var(--on-color);
+      color: var(--on-menu);
     }
 
     .input-box {
@@ -702,7 +709,7 @@
       gap: 10px;
       padding: 11px 12px;
       background: var(--dialog-head);
-      color: var(--on-color);
+      color: var(--on-head);
       font-weight: 900;
     }
 
@@ -806,7 +813,7 @@
       border-radius: max(2px, calc(var(--radius) * 0.4));
       border: 2px solid var(--range);
       background: var(--panel);
-      color: var(--on-color);
+      color: var(--on-range);
       font-weight: 900;
     }
 
@@ -817,7 +824,7 @@
 
     .tree-row.selected {
       background: var(--select);
-      color: var(--on-color);
+      color: var(--on-select);
       font-weight: 850;
     }
 
