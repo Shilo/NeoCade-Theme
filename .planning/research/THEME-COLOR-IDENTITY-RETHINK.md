@@ -399,6 +399,7 @@ Core roles:
 - `role_quaternary`
 - `role_neutral`
 - `role_neutral_variant`
+- `role_positive`
 - `role_success`
 - `role_warning`
 - `role_danger`
@@ -410,6 +411,10 @@ Container roles:
 - `role_secondary_container`
 - `role_tertiary_container`
 - `role_quaternary_container`
+- `role_surface_base`
+- `role_surface_panel`
+- `role_surface_overlay`
+- `role_positive_container`
 - `role_success_container`
 - `role_warning_container`
 - `role_danger_container`
@@ -419,16 +424,42 @@ Component aliases:
 
 - `action_fill`
 - `navigation_fill`
+- `menu_fill`
+- `menu_pressed_fill`
 - `input_fill`
+- `input_readonly_fill`
 - `selection_fill`
+- `row_hover_fill`
 - `range_fill`
+- `scrollbar_track_fill`
+- `scrollbar_grabber_fill`
 - `toggle_fill`
+- `toggle_track_fill`
+- `checkbox_indicator_fill`
 - `positive_fill`
+- `success_fill`
+- `warning_fill`
+- `danger_fill`
+- `surface_fill`
+- `panel_fill`
+- `panel_container_fill`
+- `popup_fill`
+- `dialog_fill`
+- `header_fill`
+- `foldable_header_fill`
+- `graph_canvas_fill`
+- `graph_node_fill`
+- `graph_header_fill`
+- `splitter_fill`
+- `separator_fill`
 - `menu_hover_fill`
+- `link_text`
 - `focus_ring`
 - `panel_mark`
 
 Each built-in style can map these aliases differently. This is the key change: Pulse, Daybreak, Slate, Burst, and Bubble should not share the same component color mapping.
+
+`role_positive` is intentionally separate from `role_success`. Positive is an explicit affirmative action role (`PositiveButton`, confirm/apply/save variants); success is a feedback/state role (valid, completed, healthy, successful). They may share a ramp in v1, but they should stay named separately so action semantics and result semantics do not get welded together.
 
 ## Control Coverage Rule
 
@@ -438,15 +469,31 @@ Coverage contract:
 
 | Control family | Role mapping |
 | --- | --- |
-| `BaseButton` family: `Button`, `OptionButton`, `MenuButton`, `CheckBox`, `CheckButton`, `ColorPickerButton`, `LinkButton` | Default `Button` uses `action_fill`; option/menu controls use `menu_fill`; check/toggle controls use their own `toggle_fill` or range-family role; link text uses link/info role; `PositiveButton` uses `positive_fill`; `DangerButton` uses `danger_fill`. |
-| `LineEdit`, `TextEdit`, `CodeEdit`, `SpinBox`, `TreeLineEdit` | `input_fill`, `input_border`, caret, selection, placeholder, read-only, focus, and disabled roles. |
-| `ItemList`, `Tree`, `TabBar`, `TabContainer` | `selection_fill`, `navigation_fill`, row hover, selected focus, cursor, guide/drop-mark, and selected text roles. |
-| `Range` family: `ProgressBar`, sliders, scrollbars, texture progress | `range_fill`, range track, range grabber, disabled range, and raised offsets. |
-| `Panel`, `PanelContainer`, `ScrollContainer`, `PopupPanel`, dialogs/windows, `FoldableContainer`, `GraphEdit`, `GraphNode`, `GraphFrame` | Surface/panel/popup/dialog roles, with selected/active graph states mapped to selection or action roles. |
-| `MenuBar`, `PopupMenu`, tooltip types | `menu_fill`, `menu_hover_fill`, popup shell, menu text, menu disabled, check/radio icon colors. |
+| `Button`, `OptionButton`, `MenuButton` | Default `Button` uses `action_fill`; option/menu controls use `menu_fill`; pressed/open menu states use `menu_pressed_fill` or a state-derived role; `PositiveButton` uses `positive_fill`; `DangerButton` uses `danger_fill`. |
+| `CheckBox`, `CheckButton` | Do not blindly inherit the chunky default Button fill. Text remains on the surrounding surface; indicator/track slots use `checkbox_indicator_fill`, `toggle_track_fill`, and `toggle_fill`, with checked/hover/disabled foregrounds recomputed. |
+| `ColorPickerButton` | Treat as a swatch/input control, not a normal action button. Use restrained `input_fill`/`panel_fill` chrome and keep the checker `bg` texture usable; do not inflate margins until the swatch disappears. |
+| `LinkButton` | No filled background by default. Use `link_text`/info role plus focus ring and hover/pressed text colors. |
+| `TextureButton` | Texture-driven; Godot docs explicitly describe it as using sprites instead of the Theme resource. NeoCade should not promise an automatic fill for it beyond focus/accessibility if a usable slot exists. |
+| `LineEdit`, `TextEdit`, `CodeEdit`, `SpinBox`, `TreeLineEdit` | `input_fill`, `input_readonly_fill`, `input_border`, caret, selection, placeholder, read-only, focus, disabled roles. `SpinBox` stepper backgrounds use a distinct stepper/menu role plus separator roles. `CodeEdit.completion` uses popup/selection roles. |
+| `ItemList`, `Tree`, `TabBar`, `TabContainer` | `panel_fill`, `row_hover_fill`, `selection_fill`, `navigation_fill`, selected focus, cursor, guide/drop-mark, tabbar background, and selected text roles. |
+| `Range` family: `ProgressBar`, sliders, scrollbars, texture progress | `range_fill`, range track, range grabber, disabled range, and raised offsets. `ScrollBar` specifically maps `scroll` to `scrollbar_track_fill` and `grabber*` to `scrollbar_grabber_fill` state variants. |
+| `Panel`, `PanelContainer`, `ScrollContainer`, `PopupPanel`, dialogs/windows | Surface roles are intentional, not omitted: `surface_fill`, `panel_fill`, `panel_container_fill`, `popup_fill`, and `dialog_fill` own these backgrounds. |
+| `FoldableContainer` | `panel` uses `panel_fill`; title styleboxes use `foldable_header_fill` and hover state fills; focus uses `focus_ring`; title text uses matching `on_*`. |
+| `GraphEdit`, `GraphNode`, `GraphFrame`, `GraphElement` | `GraphEdit.panel` uses `graph_canvas_fill`, `menu_panel` uses `menu_fill`/`panel_fill`, grid lines use separator/guide roles, selection fill/stroke use `selection_fill`. `GraphNode`/`GraphFrame` panels use `graph_node_fill`, title bars use `graph_header_fill`, selected panels use `selection_fill`. `GraphElement` itself only exposes a resizer icon, so it does not get a background fill except through its subclasses. |
+| `SplitContainer` | Not a page background. Only the split bar receives `splitter_fill` through `split_bar_background`, and the dragger/touch colors use separator/handle roles. Prefer subtle or empty split bars unless a style explicitly needs visible handles. |
+| `MenuBar`, `PopupMenu`, tooltip types | `menu_fill`, `menu_hover_fill`, `menu_pressed_fill`, `popup_fill`, popup shell, menu text, menu disabled, check/radio icon colors. |
 | `Label`, `RichTextLabel` | Text roles only by default. No visible fill unless a documented variation or editor-specific wrapper has a panel. |
-| `Container` layout subclasses, `ColorRect`, `TextureRect`, `NinePatchRect`, `ReferenceRect`, `VideoStreamPlayer` | No default fill from the Theme. Layout containers get constants; texture/content/debug controls are content-driven or have no useful Theme fill slots. |
-| `Separator` | Outline/separator roles, not action/menu/input colors. |
+| `Container` layout subclasses, `ColorRect`, `TextureRect`, `NinePatchRect`, `ReferenceRect`, `VideoStreamPlayer` | No default fill from the Theme. Layout containers get constants; texture/content/debug controls are content-driven or have no useful Theme fill slots. `TextureRect`/`NinePatchRect` backgrounds come from assigned textures, not NeoCade role fills. |
+| `Separator` | `separator_fill`, not action/menu/input colors. |
+
+Verified fill/background ownership notes from Godot 4.6 class docs/local class XML:
+
+- `FoldableContainer` exposes `panel`, `title_panel`, `title_hover_panel`, `title_collapsed_panel`, and `title_collapsed_hover_panel`; it needs both panel and header/title fills.
+- `GraphEdit` exposes `panel`, `panel_focus`, `menu_panel`, grid colors, and selection colors; `GraphNode`/`GraphFrame` expose their own panel/titlebar selected states, while `GraphElement` itself only exposes a `resizer` texture.
+- `SplitContainer` exposes only split-bar/handle styling, including `split_bar_background`; it should not become a full container background.
+- `TextureButton` is texture-driven rather than Theme-stylebox-driven; `TextureRect` and `NinePatchRect` are content/texture nodes and should not receive NeoCade fills by default.
+- `TextEdit` and `CodeEdit` have real input/completion backgrounds; `SpinBox` has stepper/button backgrounds in addition to its text field; `ScrollBar` has track and grabber styleboxes.
+- `CheckBox`, `CheckButton`, and `ColorPickerButton` inherit from `Button`, but they should be mapped as indicator/toggle/swatch controls instead of plain action buttons.
 
 Important limitation:
 
@@ -469,13 +516,19 @@ Required foreground pairs:
 | Fill role | Foreground role | Godot examples |
 | --- | --- | --- |
 | `surface_base`, `surface_panel`, `surface_overlay` | `on_surface`, `on_panel`, `on_overlay` | Panel text, dialog body, tooltip body, unfilled content. |
+| `panel_fill`, `panel_container_fill`, `popup_fill`, `dialog_fill` | `on_panel`, `on_panel_container`, `on_popup`, `on_dialog` | `Panel`, `PanelContainer`, `PopupPanel`, dialog/window body text and icons. |
+| `header_fill`, `foldable_header_fill`, `graph_header_fill` | `on_header`, `on_foldable_header`, `on_graph_header` | Dialog headers, `FoldableContainer` title rows, `GraphNode`/`GraphFrame` title bars. |
 | `action_fill` | `on_action` | Default `Button` font/icon states. |
-| `menu_fill`, `menu_hover_fill` | `on_menu`, `on_menu_hover` | `OptionButton`, `MenuButton`, `PopupMenu.hover`, menu check/radio icons where applicable. |
+| `menu_fill`, `menu_hover_fill`, `menu_pressed_fill` | `on_menu`, `on_menu_hover`, `on_menu_pressed` | `OptionButton`, `MenuButton`, `MenuBar`, `PopupMenu.hover`, menu check/radio icons where applicable. |
 | `input_fill` | `on_input` | `LineEdit`, `TextEdit`, `SpinBox`, caret/selection text, `TreeLineEdit`. |
-| `selection_fill` | `on_selection` | `TabBar.tab_selected`, `ItemList.selected`, `Tree.selected`, selected popup rows. |
-| `range_fill` / `toggle_fill` | `on_range`, `on_toggle` | Progress labels, slider/toggle/check glyphs when text or icons sit on the fill. |
+| `input_readonly_fill` | `on_input_readonly` | Read-only `LineEdit`, `TextEdit`, `CodeEdit`, disabled-ish input surfaces. |
+| `selection_fill`, `row_hover_fill` | `on_selection`, `on_row_hover` | `TabBar.tab_selected`, `ItemList.selected`, `Tree.selected`, selected popup rows, list/tree hover. |
+| `range_fill`, `scrollbar_track_fill`, `scrollbar_grabber_fill` | `on_range`, `on_scrollbar_track`, `on_scrollbar_grabber` | Progress labels, slider tracks/grabbers, scrollbars. |
+| `toggle_fill`, `toggle_track_fill`, `checkbox_indicator_fill` | `on_toggle`, `on_toggle_track`, `on_checkbox_indicator` | CheckButton tracks/knobs, CheckBox/radio/check glyphs and active/inactive state colors. |
 | `positive_fill` | `on_positive` | Explicit `PositiveButton` variation. |
 | `danger_fill` | `on_danger` | Explicit `DangerButton`, errors, destructive states. |
+| `graph_canvas_fill`, `graph_node_fill`, `splitter_fill`, `separator_fill` | `on_graph_canvas`, `on_graph_node`, `on_splitter`, `on_separator` | Graph backgrounds/nodes, split bars, separators and guide lines. |
+| `link_text` | `on_surface` background pairing, not `on_link_text` over a fill | `LinkButton` text; contrast is measured against the surrounding surface/panel. |
 
 Foreground algorithm:
 
@@ -600,6 +653,8 @@ This is the proposed "no variations required" mapping. Exact values should be te
 | Slate | icy blue quiet fill or outline | steel/lavender | graphite with blue-gray border | icy blue selected state | blue-gray selected container | cyan/blue | mint/blue | restrained mint | red only | graphite panels with cool blue accents |
 | Burst | gold fill | violet/blue | violet/blue | cyan or violet selected state | gold/cyan selected container | lime/cyan | lime/cyan | high-confidence green | red only | plum panels with violet/cyan statement headers |
 | Bubble | blue chunky fill | lavender/sky blue | cream/sky input island | yellow or lavender selected tab | blue/yellow/lavender selected tile | yellow/green | green | bright confirm green | red only | cream panels with lavender headers |
+
+Background fills are intentional and must be generated, not inherited by accident. `surface_fill`, `panel_fill`, `panel_container_fill`, `popup_fill`, and `dialog_fill` own the visual world that Button/Input/List roles sit on. Bubble keeps the recommended dark outer shell plus light cream/sky islands; do not add light/dark mode variants during this rework.
 
 ## Dynamic Source Behavior By Theme
 

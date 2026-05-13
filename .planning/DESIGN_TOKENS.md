@@ -426,6 +426,8 @@ var state_pressed: Color = _mix(base_color, Color.BLACK, abs(pressed_pct) / 100.
 
 `accent_offset`, `accent_rim` (= `_mix(accent_color, Color.WHITE, 0.5)`), and per-role raised depth offsets are derived in `_regenerate_theme()` for raised-mode Control authoring.
 
+**Pending source-color rework token additions:** if `.planning/research/THEME-COLOR-IDENTITY-RETHINK.md` is approved, the semantic layer expands beyond the TOKEN-02 baseline. Add explicit `role.positive` / `role.positive_container` for affirmative action controls, keep `role.success` for feedback state, and add surface/component aliases for actual background owners: `surface_fill`, `panel_fill`, `panel_container_fill`, `popup_fill`, `dialog_fill`, `header_fill`, `foldable_header_fill`, `graph_canvas_fill`, `graph_node_fill`, `graph_header_fill`, `splitter_fill`, `separator_fill`, `scrollbar_track_fill`, `scrollbar_grabber_fill`, `toggle_track_fill`, and `checkbox_indicator_fill`. These are pending rework tokens, not current shipped TOKEN-02 values.
+
 ### 7.2 M3 state-layer constants
 
 Per TOKEN-09 + MD3-RESEARCH.md the M3 deterministic state-layer model is:
