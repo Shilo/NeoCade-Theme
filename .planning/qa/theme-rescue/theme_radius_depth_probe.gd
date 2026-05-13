@@ -8,6 +8,13 @@ const EXPECTED_TAB_RADIUS := {
 	NeoCadeTheme.Style.BURST: 12,
 	NeoCadeTheme.Style.BUBBLE: 12,
 }
+const EXPECTED_POPUP_RADIUS := {
+	NeoCadeTheme.Style.PULSE: 0,
+	NeoCadeTheme.Style.DAYBREAK: 4,
+	NeoCadeTheme.Style.SLATE: 8,
+	NeoCadeTheme.Style.BURST: 12,
+	NeoCadeTheme.Style.BUBBLE: 12,
+}
 const EXPECTED_CORNER_RADIUS := {
 	NeoCadeTheme.Style.PULSE: 0,
 	NeoCadeTheme.Style.DAYBREAK: 4,
@@ -40,6 +47,7 @@ func _run() -> void:
 			_check_tab_separation(theme, label)
 			_check_tab_border_contract(theme, label)
 			_check_default_tabbar_background(theme, label)
+			_check_popup_menu_radius(theme, label)
 			_check_dialog_panel_radius(theme, label)
 			_check_button_radius_and_padding(theme, label)
 			_check_raised_depth(theme, label, raised_value)
@@ -164,6 +172,30 @@ func _check_default_tabbar_background(theme: NeoCadeTheme, label: String) -> voi
 		_fail("%s FilledTabContainer.tabbar_background should provide the opt-in filled rail" % label)
 	elif filled_background.bg_color.a < 0.99:
 		_fail("%s FilledTabContainer.tabbar_background should be visibly filled" % label)
+
+
+func _check_popup_menu_radius(theme: NeoCadeTheme, label: String) -> void:
+	var expected_radius: int = int(EXPECTED_POPUP_RADIUS.get(theme.style, theme.corner_radius))
+	for slot_name in [&"panel", &"hover"]:
+		var stylebox := theme.get_stylebox(slot_name, &"PopupMenu") as StyleBoxFlat
+		if stylebox == null:
+			_fail("%s missing PopupMenu.%s for popup radius check" % [label, slot_name])
+			continue
+		if (
+			stylebox.corner_radius_top_left != expected_radius
+			or stylebox.corner_radius_top_right != expected_radius
+			or stylebox.corner_radius_bottom_right != expected_radius
+			or stylebox.corner_radius_bottom_left != expected_radius
+		):
+			_fail("%s PopupMenu.%s radius expected %d got %d/%d/%d/%d" % [
+				label,
+				slot_name,
+				expected_radius,
+				stylebox.corner_radius_top_left,
+				stylebox.corner_radius_top_right,
+				stylebox.corner_radius_bottom_right,
+				stylebox.corner_radius_bottom_left,
+			])
 
 
 func _check_dialog_panel_radius(theme: NeoCadeTheme, label: String) -> void:

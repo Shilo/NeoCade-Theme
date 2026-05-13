@@ -968,6 +968,7 @@ func _platform_tokens(p: Platform) -> Dictionary:
 # ─── Raised stylebox helper (DESIGN_TOKENS §9) ──────────────────────────────────────────────
 
 const TAB_RADIUS_MAX := 12
+const POPUP_RADIUS_MAX := 12
 
 ## Construct a StyleBoxFlat base for flat or raised mode.
 ## Raised depth is applied later as a hard bottom extrusion, never a StyleBoxFlat shadow.
@@ -991,6 +992,8 @@ func _resolve_raised_depth(intensity: int) -> int:
 func _constrain_shape_radius(radius: int, radius_path: String) -> int:
 	if radius_path == "shape.tab_radius":
 		return mini(radius, TAB_RADIUS_MAX)
+	if radius_path == "shape.popup_radius":
+		return mini(radius, POPUP_RADIUS_MAX)
 	return radius
 
 
@@ -1024,6 +1027,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"ghost_strategy":        &"accent-outlined-accent-text",
 			"secondary_radius":      0,
 			"tab_radius":            0,
+			"popup_radius":          0,
 			"chip_radius":           0,
 			"card_radius":           0,
 			"hero_radius":           0,
@@ -1067,6 +1071,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"ghost_strategy":        &"thin-accent-outline",
 			"secondary_radius":      8,
 			"tab_radius":            8,
+			"popup_radius":          8,
 			"chip_radius":           8,
 			"card_radius":           8,
 			"hero_radius":           8,
@@ -1098,7 +1103,7 @@ const STYLE_PERSONALITY: Dictionary = {
 		},
 	},
 	# ─── Bubble — base=#241326, accent=#FFB3E6 (DESIGN_TOKENS §5.3) ───
-	# Personality: candy-pillowy; base radius 24 with compact tabs capped by TAB_RADIUS_MAX.
+	# Personality: candy-pillowy; base radius 24 with compact tabs and popups capped.
 	# Cheerful-chunky focus (offset=2). Shared desktop padding keeps layout stable.
 	# Surface alpha all 1.00 (candy is opaque).
 	Style.BUBBLE: {
@@ -1110,6 +1115,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"ghost_strategy":        &"rounded-ghost-thicker-outline",
 			"secondary_radius":      24,
 			"tab_radius":            24,
+			"popup_radius":          24,
 			"chip_radius":           24,
 			"card_radius":           24,
 			"hero_radius":           24,
@@ -1153,6 +1159,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"ghost_strategy":        &"soft-outline",
 			"secondary_radius":      4,
 			"tab_radius":            4,
+			"popup_radius":          4,
 			"chip_radius":           4,
 			"card_radius":           4,
 			"hero_radius":           4,
@@ -1196,6 +1203,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"ghost_strategy":        &"normal-accent-ghost",
 			"secondary_radius":      12,
 			"tab_radius":            12,
+			"popup_radius":          12,
 			"chip_radius":           12,
 			"card_radius":           12,
 			"hero_radius":           12,
@@ -1299,6 +1307,7 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 		"ghost_strategy":        &"soft-outline",
 		"secondary_radius":      8,
 		"tab_radius":            8,
+		"popup_radius":          8,
 		"chip_radius":           8,
 		"card_radius":           8,
 		"hero_radius":           8,
@@ -3411,11 +3420,11 @@ const BINDING_TABLE: Dictionary = {
 			"panel":                 {"role": "button_normal", "border_role": "button_border",
 									  "offset_role": "button_normal_offset",
 									  "raised_intensity": "shape.raised_lifts.dialog",
-									  "radius": "shape.secondary_radius",
+									  "radius": "shape.popup_radius",
 									  "raised_face_edge": true, "border_width": 1, "padding": Vector2i(0, 0)},
 			"hover":                 {"role": "button_hover",   "raised_intensity": 0,
 									  "border_role": "button_border_hover",
-									  "radius": "shape.secondary_radius", "border_width": 0},
+									  "radius": "shape.popup_radius", "border_width": 0},
 			"separator":             {"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
 									  "padding": Vector2i(0, 0)},
 			"labeled_separator_left":{"role": "outline_color",  "raised_intensity": 0, "alpha": 0.55,
