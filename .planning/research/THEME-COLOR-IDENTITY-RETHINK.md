@@ -365,9 +365,9 @@ Internal steps:
 
 6. Compute foregrounds per role.
    - Never reuse one global text color for every component.
-   - Use `on_action`, `on_menu`, `on_input`, `on_selection`, `on_surface`, and `on_danger` pairs.
    - Use `on_action`, `on_menu`, `on_input`, `on_selection`, `on_positive`, `on_surface`, and `on_danger` pairs.
    - Enforce at least 4.5:1 for normal UI text where possible, with explicit exceptions only for disabled states.
+   - Treat icons the same way as text for filled controls: icon modulation should use the matching `on_*` role unless Godot exposes a more specific icon state slot.
 
 7. Apply semantic guardrails.
    - `danger/error` remains red-family and is never used for ordinary default controls.
@@ -458,6 +458,37 @@ Implementation gate:
 
 - Add a role-coverage verifier that enumerates the generated Theme entries for the canonical scorecard and fails if any themeable visible stylebox still resolves through old base/accent-only roles.
 - Add a semantic verifier that ordinary roles avoid red-family hues while `danger/error` stays red-family.
+
+## Foreground/Text Color Contract
+
+Every filled role must own its foreground role. The theme should not rely on one global text color for all controls.
+
+Required foreground pairs:
+
+| Fill role | Foreground role | Godot examples |
+| --- | --- | --- |
+| `surface_base`, `surface_panel`, `surface_overlay` | `on_surface`, `on_panel`, `on_overlay` | Panel text, dialog body, tooltip body, unfilled content. |
+| `action_fill` | `on_action` | Default `Button` font/icon states. |
+| `menu_fill`, `menu_hover_fill` | `on_menu`, `on_menu_hover` | `OptionButton`, `MenuButton`, `PopupMenu.hover`, menu check/radio icons where applicable. |
+| `input_fill` | `on_input` | `LineEdit`, `TextEdit`, `SpinBox`, caret/selection text, `TreeLineEdit`. |
+| `selection_fill` | `on_selection` | `TabBar.tab_selected`, `ItemList.selected`, `Tree.selected`, selected popup rows. |
+| `range_fill` / `toggle_fill` | `on_range`, `on_toggle` | Progress labels, slider/toggle/check glyphs when text or icons sit on the fill. |
+| `positive_fill` | `on_positive` | Explicit `PositiveButton` variation. |
+| `danger_fill` | `on_danger` | Explicit `DangerButton`, errors, destructive states. |
+
+Foreground algorithm:
+
+- Pick the best accessible foreground for each fill from the theme's preferred dark ink, preferred light ink, pure black, and pure white.
+- Brightness/luminance is the right intuition, but implementation should use WCAG contrast ratio rather than raw brightness thresholds.
+- Recompute foregrounds for hover, pressed, selected, focus, disabled, and read-only state fills. Do not assume the normal state's `on_*` color still passes after state mixing.
+- Apply the foreground role to both text and icons whenever Godot exposes separate `font_*_color` and `icon_*_color` slots.
+
+Label/RichTextLabel exception:
+
+- `Label` and `RichTextLabel` are usually free-floating content. A global Theme cannot inspect the actual parent/background color at runtime, so it cannot always know what background the text sits on.
+- Default `Label`/`RichTextLabel` should use the best `on_surface` value for the normal NeoCade content surface.
+- For labels intentionally placed on colored fills, implementation should provide explicit text/icon role variations or documented local overrides such as future `OnActionLabel`, `OnSelectionLabel`, `OnPositiveLabel`, and `OnDangerLabel` if needed.
+- Theme-owned composite controls such as Buttons, Tabs, Trees, ItemLists, PopupMenus, LineEdits, and dialogs are not free-floating; their text/icon colors must be computed from their own generated fill roles.
 
 ## Theme Goals
 
