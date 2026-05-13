@@ -1,0 +1,1447 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NeoCade Editor Color Readability Mockup</title>
+  <style>
+    :root {
+      --surface: #111827;
+      --shell: #0d1422;
+      --panel: #1c2635;
+      --panel-alt: #233349;
+      --popup: #202d40;
+      --dialog-header: #2d3d54;
+      --input: #263a51;
+      --input-edge: #375775;
+      --list-panel: #182332;
+      --list-hover: #233247;
+      --list-selected: #2b3f56;
+      --list-rail: #d69033;
+      --action: #d49a3a;
+      --menu: #2e5271;
+      --menu-hover: #3d6687;
+      --tab: #2a3545;
+      --tab-indicator: #d49a3a;
+      --range: #68c26e;
+      --toggle: #60d889;
+      --positive: #42c784;
+      --success: #42c784;
+      --warning: #d49a3a;
+      --info: #4da8e8;
+      --danger: #c84757;
+      --focus: #64c9ff;
+      --separator: #324153;
+      --code: #162131;
+      --on-surface: #f4f8ff;
+      --on-panel: #f0f6ff;
+      --on-popup: #f0f6ff;
+      --on-input: #f5fbff;
+      --on-list: #f2f7ff;
+      --on-list-selected: #f7fbff;
+      --on-action: #121824;
+      --on-menu: #f5fbff;
+      --on-tab: #f4f8ff;
+      --on-range: #102017;
+      --on-toggle: #102017;
+      --on-positive: #0f2118;
+      --on-warning: #121824;
+      --on-info: #0b1822;
+      --on-danger: #fff7f8;
+      --muted: color-mix(in srgb, var(--on-panel) 62%, var(--panel));
+      --radius: 0px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #0a0d12;
+      color: var(--on-surface);
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .control-panel {
+      display: grid;
+      grid-template-columns: minmax(220px, 280px) minmax(220px, 280px) minmax(260px, 1fr);
+      gap: 12px;
+      align-items: end;
+      background: #111720;
+      border: 1px solid #263241;
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .control-group {
+      display: grid;
+      gap: 6px;
+    }
+
+    .control-group label,
+    .audit-title,
+    .swatch-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #9fb0c4;
+      font-weight: 700;
+    }
+
+    select,
+    input[type="color"] {
+      min-height: 36px;
+      border: 1px solid #405063;
+      border-radius: 6px;
+      background: #192230;
+      color: #f4f7fb;
+      padding: 6px 10px;
+      font: inherit;
+    }
+
+    .panel-note {
+      color: #c8d4e4;
+      font-size: 13px;
+    }
+
+    .editor {
+      min-width: 1100px;
+      min-height: 760px;
+      overflow: hidden;
+      border: 1px solid var(--separator);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.03);
+    }
+
+    .topbar {
+      height: 42px;
+      display: grid;
+      grid-template-columns: 320px 1fr 360px;
+      align-items: center;
+      gap: 10px;
+      padding: 0 10px;
+      background: var(--shell);
+      color: var(--on-surface);
+      border-bottom: 1px solid var(--separator);
+    }
+
+    .menu-row,
+    .workspace-row,
+    .tool-row,
+    .button-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .menu-item,
+    .flat-button,
+    .icon-button {
+      color: var(--on-surface);
+      background: transparent;
+      border: 0;
+      border-radius: var(--radius);
+      min-height: 28px;
+      padding: 5px 8px;
+      font: inherit;
+      white-space: nowrap;
+    }
+
+    .flat-button.active,
+    .icon-button.active,
+    .menu-item:hover {
+      background: var(--menu-hover);
+      color: var(--on-menu);
+    }
+
+    .workspace-tab {
+      min-height: 32px;
+      padding: 6px 12px;
+      color: var(--on-tab);
+      background: var(--tab);
+      border: 0;
+      border-top: 3px solid transparent;
+      border-radius: var(--radius);
+      font-weight: 700;
+    }
+
+    .workspace-tab.active {
+      border-top-color: var(--tab-indicator);
+      background: color-mix(in srgb, var(--tab) 86%, var(--tab-indicator));
+    }
+
+    .main {
+      height: 718px;
+      display: grid;
+      grid-template-columns: 360px minmax(420px, 1fr) 420px;
+      gap: 6px;
+      padding: 6px;
+      background: var(--surface);
+    }
+
+    .dock,
+    .center,
+    .inspector,
+    .bottom-console {
+      background: var(--panel);
+      color: var(--on-panel);
+      border: 1px solid var(--separator);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .left {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 6px;
+      min-height: 0;
+    }
+
+    .dock-header {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 0 8px;
+      background: var(--shell);
+      border-bottom: 1px solid var(--separator);
+    }
+
+    .tab-strip {
+      display: flex;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .tab {
+      padding: 7px 11px 6px;
+      min-height: 30px;
+      color: var(--muted);
+      background: transparent;
+      border-top: 3px solid transparent;
+      border-radius: var(--radius);
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      color: var(--on-tab);
+      background: var(--tab);
+      border-top-color: var(--tab-indicator);
+    }
+
+    .toolbar {
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 8px;
+      background: color-mix(in srgb, var(--panel) 82%, var(--shell));
+      border-bottom: 1px solid var(--separator);
+    }
+
+    .input,
+    .option {
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: var(--radius);
+      border: 1px solid var(--input-edge);
+      background: var(--input);
+      color: var(--on-input);
+      padding: 5px 9px;
+      min-width: 0;
+    }
+
+    .input.placeholder {
+      color: color-mix(in srgb, var(--on-input) 62%, var(--input));
+    }
+
+    .option {
+      background: var(--menu);
+      color: var(--on-menu);
+      border-color: color-mix(in srgb, var(--menu) 70%, var(--on-menu));
+    }
+
+    .search {
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .tree-panel {
+      height: calc(100% - 70px);
+      overflow: hidden;
+      background: var(--list-panel);
+      color: var(--on-list);
+      padding: 6px 0;
+    }
+
+    .tree-row,
+    .property-row,
+    .list-row {
+      min-height: 29px;
+      display: grid;
+      align-items: center;
+      color: var(--on-list);
+      background: transparent;
+      border-left: 3px solid transparent;
+    }
+
+    .tree-row {
+      grid-template-columns: 22px 1fr auto;
+      padding: 0 8px;
+    }
+
+    .tree-row.indent {
+      padding-left: 28px;
+    }
+
+    .tree-row.hover,
+    .list-row.hover {
+      background: var(--list-hover);
+    }
+
+    .tree-row.selected,
+    .list-row.selected {
+      background: var(--list-selected);
+      color: var(--on-list-selected);
+      border-left-color: var(--list-rail);
+    }
+
+    .tree-row .muted,
+    .property-row .muted,
+    .list-row .muted {
+      color: color-mix(in srgb, currentColor 58%, transparent);
+    }
+
+    .center {
+      display: grid;
+      grid-template-rows: 38px minmax(360px, 1fr) 180px;
+      min-height: 0;
+    }
+
+    .viewport {
+      position: relative;
+      background:
+        linear-gradient(var(--separator) 1px, transparent 1px),
+        linear-gradient(90deg, var(--separator) 1px, transparent 1px),
+        #4a4f55;
+      background-size: 96px 96px;
+      border: 1px solid var(--tab-indicator);
+      margin: 0 6px 6px;
+      overflow: hidden;
+    }
+
+    .viewport-tools {
+      position: absolute;
+      left: 12px;
+      top: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      color: #ffffff;
+    }
+
+    .viewport-chip {
+      min-width: 34px;
+      min-height: 28px;
+      padding: 5px 8px;
+      background: rgba(0,0,0,0.28);
+      color: #ffffff;
+      border-radius: var(--radius);
+    }
+
+    .crosshair-x,
+    .crosshair-y {
+      position: absolute;
+      background: color-mix(in srgb, var(--focus) 72%, transparent);
+    }
+
+    .crosshair-x {
+      left: 0;
+      right: 0;
+      top: 45%;
+      height: 1px;
+    }
+
+    .crosshair-y {
+      top: 0;
+      bottom: 0;
+      left: 28%;
+      width: 1px;
+    }
+
+    .bottom-console {
+      margin: 0 6px 6px;
+      display: grid;
+      grid-template-rows: 1fr 34px;
+      background: var(--code);
+      color: var(--on-input);
+    }
+
+    .console-text {
+      padding: 10px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      color: var(--on-input);
+      overflow: hidden;
+      border-bottom: 1px solid var(--separator);
+    }
+
+    .console-tabs {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: var(--shell);
+    }
+
+    .inspector {
+      display: grid;
+      grid-template-rows: 34px 36px 1fr;
+      min-height: 0;
+    }
+
+    .object-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 8px;
+      background: var(--tab);
+      border-top: 3px solid var(--tab-indicator);
+      color: var(--on-tab);
+    }
+
+    .inspector-body {
+      overflow: hidden;
+      background: var(--panel);
+    }
+
+    .section-title {
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 8px;
+      background: color-mix(in srgb, var(--panel-alt) 86%, var(--panel));
+      color: var(--on-panel);
+      border-top: 1px solid var(--separator);
+      border-bottom: 1px solid var(--separator);
+      font-weight: 700;
+    }
+
+    .property-row {
+      grid-template-columns: minmax(110px, 0.85fr) minmax(160px, 1.15fr);
+      min-height: 34px;
+      padding: 3px 8px;
+      gap: 8px;
+      border-left: 0;
+      color: var(--on-panel);
+    }
+
+    .property-row.highlight {
+      background: var(--list-selected);
+      color: var(--on-list-selected);
+      border-left: 3px solid var(--list-rail);
+    }
+
+    .field-stack {
+      display: grid;
+      gap: 3px;
+    }
+
+    .mini-field {
+      min-height: 28px;
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      align-items: center;
+      background: var(--input);
+      color: var(--on-input);
+      border: 1px solid var(--input-edge);
+      border-radius: var(--radius);
+      padding: 3px 7px;
+    }
+
+    .axis-x {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .axis-y {
+      color: var(--positive);
+      font-weight: 700;
+    }
+
+    .check {
+      width: 18px;
+      height: 18px;
+      display: inline-grid;
+      place-items: center;
+      background: var(--toggle);
+      color: var(--on-toggle);
+      border-radius: max(2px, calc(var(--radius) / 3));
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .check.off {
+      background: color-mix(in srgb, var(--input) 74%, var(--on-input));
+      color: var(--input);
+    }
+
+    .layer-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .layer-cell {
+      min-height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: max(2px, calc(var(--radius) / 3));
+      background: color-mix(in srgb, var(--input) 76%, var(--panel));
+      color: var(--on-input);
+      font-size: 12px;
+    }
+
+    .button {
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border: 1px solid color-mix(in srgb, var(--action) 65%, var(--on-action));
+      border-radius: var(--radius);
+      background: var(--action);
+      color: var(--on-action);
+      font: inherit;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .button.primary {
+      background: var(--positive);
+      color: var(--on-positive);
+      border-color: color-mix(in srgb, var(--positive) 68%, var(--on-positive));
+    }
+
+    .button.danger {
+      background: var(--danger);
+      color: var(--on-danger);
+      border-color: color-mix(in srgb, var(--danger) 68%, var(--on-danger));
+    }
+
+    .button.ghost {
+      background: transparent;
+      color: var(--focus);
+      border-color: var(--focus);
+    }
+
+    .icon-button {
+      width: 30px;
+      padding: 0;
+      display: inline-grid;
+      place-items: center;
+      color: var(--on-surface);
+    }
+
+    .icon-button.filled {
+      background: var(--menu);
+      color: var(--on-menu);
+    }
+
+    .progress {
+      height: 14px;
+      overflow: hidden;
+      border-radius: max(2px, calc(var(--radius) / 2));
+      background: color-mix(in srgb, var(--input) 74%, var(--surface));
+      border: 1px solid var(--separator);
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 62%;
+      background: var(--range);
+    }
+
+    .status-card {
+      display: grid;
+      gap: 10px;
+      padding: 10px;
+      background: var(--panel-alt);
+      color: var(--on-panel);
+      border-top: 1px solid var(--separator);
+    }
+
+    .semantic-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .chip {
+      min-height: 28px;
+      padding: 5px 8px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .chip.success {
+      background: var(--success);
+      color: var(--on-positive);
+    }
+
+    .chip.warning {
+      background: var(--warning);
+      color: var(--on-warning);
+    }
+
+    .chip.info {
+      background: var(--info);
+      color: var(--on-info);
+    }
+
+    .chip.danger {
+      background: var(--danger);
+      color: var(--on-danger);
+    }
+
+    .below {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.9fr) minmax(520px, 1.1fr);
+      gap: 16px;
+    }
+
+    .swatches,
+    .audit {
+      background: #111720;
+      border: 1px solid #263241;
+      border-radius: 8px;
+      padding: 14px;
+      overflow: auto;
+    }
+
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .swatch {
+      min-height: 54px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 7px;
+      display: grid;
+      align-content: end;
+      gap: 3px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .swatch code {
+      font: 11px ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      opacity: 0.82;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #e5ecf5;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 6px 7px;
+      border-bottom: 1px solid #263241;
+      vertical-align: middle;
+    }
+
+    th {
+      color: #9fb0c4;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+    }
+
+    .pass {
+      color: #7ee6a4;
+      font-weight: 800;
+    }
+
+    .fail {
+      color: #ff8b99;
+      font-weight: 800;
+    }
+
+    .contrast-sample {
+      display: inline-flex;
+      min-width: 54px;
+      min-height: 22px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.15);
+      font-weight: 900;
+    }
+
+    .focus-demo {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 1240px) {
+      .page {
+        overflow-x: auto;
+      }
+      .control-panel,
+      .below {
+        min-width: 1100px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="control-panel">
+      <div class="control-group">
+        <label for="themeSelect">Theme</label>
+        <select id="themeSelect">
+          <option value="pulse">Pulse</option>
+          <option value="daybreak">Daybreak</option>
+          <option value="slate">Slate</option>
+          <option value="burst">Burst</option>
+          <option value="bubble">Bubble</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="sourceColor">source_color</label>
+        <input id="sourceColor" type="color" value="#3aa8ff">
+      </div>
+      <div class="panel-note" id="themeNote"></div>
+    </section>
+
+    <section class="editor" aria-label="Godot editor color stress mockup">
+      <div class="topbar">
+        <div class="menu-row">
+          <button class="menu-item">Scene</button>
+          <button class="menu-item">Project</button>
+          <button class="menu-item">Debug</button>
+          <button class="menu-item">Editor</button>
+          <button class="menu-item">Help</button>
+        </div>
+        <div class="workspace-row">
+          <button class="flat-button active">2D</button>
+          <button class="flat-button">Script</button>
+          <button class="flat-button">Game</button>
+          <button class="flat-button">AssetLib</button>
+        </div>
+        <div class="button-row" style="justify-content:end;">
+          <button class="icon-button">U</button>
+          <button class="icon-button">P</button>
+          <button class="icon-button">S</button>
+          <span class="option">Compatibility v</span>
+        </div>
+      </div>
+
+      <div class="main">
+        <aside class="left">
+          <section class="dock">
+            <div class="dock-header">
+              <div class="tab-strip">
+                <div class="tab active">Scene</div>
+                <div class="tab">Import</div>
+              </div>
+              <button class="icon-button">...</button>
+            </div>
+            <div class="toolbar">
+              <button class="icon-button">+</button>
+              <button class="icon-button">L</button>
+              <div class="input placeholder search">Filter Nodes <span>Q</span></div>
+              <button class="icon-button filled">K</button>
+            </div>
+            <div class="tree-panel">
+              <div class="tree-row"><span></span><span>Remote</span><span></span></div>
+              <div class="tree-row selected"><span>o</span><span>Node2D</span><span>*</span></div>
+              <div class="tree-row indent"><span></span><span>Player</span><span></span></div>
+              <div class="tree-row indent hover"><span></span><span>Camera2D</span><span></span></div>
+              <div class="tree-row indent"><span></span><span>LevelRoot</span><span></span></div>
+            </div>
+          </section>
+
+          <section class="dock">
+            <div class="dock-header">
+              <div class="tab-strip">
+                <div class="tab active">FileSystem</div>
+                <div class="tab">History</div>
+              </div>
+              <button class="icon-button">...</button>
+            </div>
+            <div class="toolbar">
+              <button class="icon-button">B</button>
+              <button class="icon-button">F</button>
+              <div class="input search">res://showcase/ <span>[]</span></div>
+            </div>
+            <div class="tree-panel">
+              <div class="tree-row selected"><span>*</span><span>Favorites:</span><span></span></div>
+              <div class="tree-row"><span>v</span><span>res://</span><span></span></div>
+              <div class="tree-row indent"><span></span><span>addons</span><span></span></div>
+              <div class="tree-row indent"><span></span><span>docs</span><span></span></div>
+              <div class="tree-row indent selected"><span></span><span>showcase.gd</span><span></span></div>
+              <div class="tree-row indent"><span></span><span class="muted">showcase.tscn</span><span></span></div>
+              <div class="tree-row"><span></span><span>AGENTS.md</span><span></span></div>
+            </div>
+          </section>
+        </aside>
+
+        <section class="center">
+          <div class="dock-header">
+            <div class="tab-strip">
+              <div class="tab active">showcase</div>
+              <div class="tab">[unsaved](*) x</div>
+            </div>
+            <div class="tool-row">
+              <button class="icon-button">+</button>
+              <button class="icon-button">...</button>
+            </div>
+          </div>
+          <div class="viewport">
+            <div class="crosshair-x"></div>
+            <div class="crosshair-y"></div>
+            <div class="viewport-tools">
+              <div class="viewport-chip">100.0 %</div>
+              <button class="icon-button filled">-</button>
+              <button class="icon-button filled">+</button>
+            </div>
+          </div>
+          <div class="bottom-console">
+            <div class="console-text">
+Godot Engine v4.6.2.stable.official.71f334935 - https://godotengine.org<br>
+OpenGL API 3.3.0 - Compatibility - Using Device: NVIDIA<br><br>
+New Scene Root<br>
+Set show_behind_parent
+            </div>
+            <div class="console-tabs">
+              <div class="tab active">Output</div>
+              <div class="tab">Debugger</div>
+              <div class="tab">Audio</div>
+              <div class="tab">Animation</div>
+              <div class="tab">Shader Editor</div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="inspector">
+          <div class="dock-header">
+            <div class="tab-strip">
+              <div class="tab active">Inspector</div>
+              <div class="tab">Signals</div>
+              <div class="tab">Groups</div>
+            </div>
+            <button class="icon-button">...</button>
+          </div>
+          <div class="object-row">
+            <span>o Node2D</span>
+            <span>v</span>
+          </div>
+          <div class="inspector-body">
+            <div class="toolbar">
+              <div class="input placeholder search">Filter Properties <span>Q</span></div>
+            </div>
+            <div class="section-title">v Transform</div>
+            <div class="property-row">
+              <span>Position</span>
+              <div class="field-stack">
+                <div class="mini-field"><span class="axis-x">x</span><span>0.0 px</span></div>
+                <div class="mini-field"><span class="axis-y">y</span><span>0.0 px</span></div>
+              </div>
+            </div>
+            <div class="property-row">
+              <span>Rotation</span>
+              <div class="mini-field"><span></span><span>0.0 deg</span></div>
+            </div>
+            <div class="property-row">
+              <span>Scale</span>
+              <div class="field-stack">
+                <div class="mini-field"><span class="axis-x">x</span><span>1.0</span></div>
+                <div class="mini-field"><span class="axis-y">y</span><span>1.0</span></div>
+              </div>
+            </div>
+            <div class="section-title">v Visibility</div>
+            <div class="property-row">
+              <span>Visible</span>
+              <div class="mini-field"><span class="check">x</span><span>On</span></div>
+            </div>
+            <div class="property-row highlight">
+              <span>Show Behind Parent</span>
+              <div class="mini-field"><span class="check off"></span><span>On</span></div>
+            </div>
+            <div class="property-row">
+              <span>Clip Children</span>
+              <div class="option">Disabled v</div>
+            </div>
+            <div class="section-title">Layer Masks</div>
+            <div class="property-row">
+              <span>Light Mask</span>
+              <div class="layer-grid">
+                <span class="layer-cell">1</span><span class="layer-cell">2</span><span class="layer-cell">3</span><span class="layer-cell">4</span>
+                <span class="layer-cell">5</span><span class="layer-cell">6</span><span class="layer-cell">7</span><span class="layer-cell">8</span>
+              </div>
+            </div>
+            <div class="status-card">
+              <div class="button-row">
+                <button class="button">Default</button>
+                <button class="button primary">Primary</button>
+                <button class="button danger">Danger</button>
+                <button class="button ghost focus-demo">Ghost</button>
+              </div>
+              <div class="progress"><span></span></div>
+              <div class="semantic-row">
+                <div class="chip success">Success</div>
+                <div class="chip warning">Warning</div>
+                <div class="chip info">Info</div>
+                <div class="chip danger">Danger</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="below">
+      <section class="swatches">
+        <div class="swatch-title">Resolved role colors</div>
+        <div class="swatch-grid" id="swatches"></div>
+      </section>
+      <section class="audit">
+        <div class="audit-title" id="auditTitle">Contrast audit</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Sample</th>
+              <th>BG</th>
+              <th>FG</th>
+              <th>Ratio</th>
+              <th>Min</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="auditRows"></tbody>
+        </table>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const themeConfigs = {
+      pulse: {
+        name: "Pulse",
+        preset: "#3AA8FF",
+        radius: "0px",
+        note: "LDtk-spiritual: dark navy workbench, readable blue inputs/lists, amber as compact action/rail, green for range/toggle.",
+        darkText: "#101521",
+        lightText: "#F7F8FB",
+        roles: {
+          surface: ["#111827", 0.06, 8, 0.36, 0.10, 0.16],
+          shell: ["#0d1422", 0.05, 8, 0.34, 0.08, 0.14],
+          panel: ["#1c2635", 0.07, 10, 0.34, 0.16, 0.24],
+          panelAlt: ["#233349", 0.08, 12, 0.36, 0.20, 0.30],
+          popup: ["#202d40", 0.08, 12, 0.36, 0.18, 0.30],
+          dialogHeader: ["#2d3d54", 0.10, 14, 0.38, 0.22, 0.34],
+          input: ["#263a51", 0.08, 12, 0.34, 0.20, 0.32],
+          inputEdge: ["#375775", 0.12, 16, 0.46, 0.28, 0.42],
+          listPanel: ["#182332", 0.06, 10, 0.32, 0.12, 0.22],
+          listHover: ["#233247", 0.08, 12, 0.36, 0.18, 0.30],
+          listSelected: ["#2b3f56", 0.08, 12, 0.38, 0.24, 0.36],
+          listRail: ["#d69033", 0.08, 10, 0.78, 0.46, 0.66],
+          action: ["#d49a3a", 0.08, 10, 0.78, 0.42, 0.64],
+          menu: ["#2e5271", 0.12, 18, 0.56, 0.28, 0.44],
+          tab: ["#2a3545", 0.08, 12, 0.34, 0.22, 0.34],
+          tabIndicator: ["#d49a3a", 0.08, 10, 0.80, 0.44, 0.64],
+          range: ["#68c26e", 0.12, 18, 0.72, 0.44, 0.66],
+          toggle: ["#60d889", 0.12, 18, 0.76, 0.44, 0.68],
+          positive: ["#42c784", 0.10, 14, 0.72, 0.38, 0.62],
+          success: ["#42c784", 0.10, 14, 0.72, 0.38, 0.62],
+          warning: ["#d49a3a", 0.06, 8, 0.78, 0.42, 0.64],
+          info: ["#4da8e8", 0.14, 20, 0.74, 0.38, 0.62],
+          danger: ["#c84757", 0.02, 4, 0.66, 0.34, 0.50, true],
+          focus: ["#64c9ff", 0.16, 20, 0.84, 0.48, 0.70],
+          separator: ["#40566f", 0.06, 8, 0.34, 0.24, 0.40],
+          code: ["#162131", 0.06, 8, 0.32, 0.10, 0.20]
+        }
+      },
+      daybreak: {
+        name: "Daybreak",
+        preset: "#76F2D1",
+        radius: "4px",
+        note: "Fresh morning: pine/teal shell, muted teal inputs and lists, sunrise amber action, mint/aqua indicators.",
+        darkText: "#0f1c18",
+        lightText: "#f3fff9",
+        roles: {
+          surface: ["#09201e", 0.08, 10, 0.36, 0.07, 0.15],
+          shell: ["#071917", 0.06, 8, 0.34, 0.05, 0.12],
+          panel: ["#12332f", 0.08, 12, 0.38, 0.14, 0.25],
+          panelAlt: ["#1a423c", 0.10, 14, 0.40, 0.20, 0.32],
+          popup: ["#153a35", 0.10, 14, 0.40, 0.18, 0.30],
+          dialogHeader: ["#27574c", 0.12, 16, 0.48, 0.24, 0.38],
+          input: ["#1a433d", 0.10, 14, 0.40, 0.18, 0.30],
+          inputEdge: ["#3f786b", 0.14, 18, 0.52, 0.30, 0.46],
+          listPanel: ["#0f2a28", 0.08, 12, 0.36, 0.10, 0.22],
+          listHover: ["#183934", 0.10, 14, 0.40, 0.17, 0.29],
+          listSelected: ["#1d4a43", 0.12, 16, 0.44, 0.22, 0.36],
+          listRail: ["#e4b94a", 0.06, 8, 0.76, 0.46, 0.68],
+          action: ["#d69b3a", 0.06, 8, 0.76, 0.42, 0.64],
+          menu: ["#246c68", 0.12, 16, 0.58, 0.26, 0.44],
+          tab: ["#1e4741", 0.12, 16, 0.44, 0.22, 0.36],
+          tabIndicator: ["#f0c868", 0.05, 8, 0.78, 0.48, 0.70],
+          range: ["#75e2c3", 0.12, 18, 0.72, 0.44, 0.70],
+          toggle: ["#69d99d", 0.10, 16, 0.72, 0.42, 0.66],
+          positive: ["#70d69a", 0.08, 12, 0.70, 0.40, 0.64],
+          success: ["#70d69a", 0.08, 12, 0.70, 0.40, 0.64],
+          warning: ["#d6aa3a", 0.04, 8, 0.74, 0.42, 0.64],
+          info: ["#55c9dd", 0.12, 18, 0.72, 0.40, 0.66],
+          danger: ["#c9575b", 0.02, 4, 0.64, 0.34, 0.50, true],
+          focus: ["#8cf3d8", 0.14, 18, 0.82, 0.52, 0.74],
+          separator: ["#3a6b62", 0.06, 10, 0.36, 0.24, 0.40],
+          code: ["#0b2424", 0.08, 10, 0.34, 0.08, 0.18]
+        }
+      },
+      slate: {
+        name: "Slate",
+        preset: "#8BD3FF",
+        radius: "8px",
+        note: "Premium utility: graphite shell, quiet inputs/lists, icy blue focus/selection, restrained saturation.",
+        darkText: "#10151b",
+        lightText: "#f6f9fc",
+        roles: {
+          surface: ["#10151b", 0.04, 6, 0.18, 0.08, 0.15],
+          shell: ["#0b1117", 0.04, 6, 0.16, 0.06, 0.12],
+          panel: ["#1a222c", 0.05, 8, 0.22, 0.14, 0.24],
+          panelAlt: ["#232c38", 0.06, 8, 0.24, 0.18, 0.30],
+          popup: ["#202936", 0.06, 8, 0.24, 0.16, 0.28],
+          dialogHeader: ["#2b3543", 0.08, 10, 0.26, 0.20, 0.34],
+          input: ["#222b35", 0.05, 8, 0.22, 0.17, 0.30],
+          inputEdge: ["#3c4c5f", 0.08, 10, 0.34, 0.26, 0.42],
+          listPanel: ["#151c24", 0.04, 6, 0.20, 0.10, 0.20],
+          listHover: ["#202a35", 0.06, 8, 0.24, 0.16, 0.28],
+          listSelected: ["#25323f", 0.08, 10, 0.28, 0.22, 0.34],
+          listRail: ["#7ab6df", 0.12, 16, 0.62, 0.42, 0.66],
+          action: ["#547fa4", 0.12, 16, 0.50, 0.30, 0.50],
+          menu: ["#2b3443", 0.08, 10, 0.28, 0.20, 0.34],
+          tab: ["#243040", 0.08, 10, 0.28, 0.18, 0.34],
+          tabIndicator: ["#8bd3ff", 0.14, 18, 0.72, 0.48, 0.74],
+          range: ["#78c7d7", 0.12, 16, 0.62, 0.40, 0.66],
+          toggle: ["#79d6c1", 0.12, 16, 0.64, 0.40, 0.66],
+          positive: ["#73cbaa", 0.10, 14, 0.58, 0.38, 0.62],
+          success: ["#73cbaa", 0.10, 14, 0.58, 0.38, 0.62],
+          warning: ["#d3a64f", 0.04, 8, 0.66, 0.40, 0.62],
+          info: ["#82c8f2", 0.12, 16, 0.66, 0.44, 0.70],
+          danger: ["#c75a67", 0.02, 4, 0.60, 0.34, 0.50, true],
+          focus: ["#9bdcff", 0.16, 20, 0.76, 0.54, 0.78],
+          separator: ["#3f4c5d", 0.04, 6, 0.28, 0.24, 0.40],
+          code: ["#121a23", 0.04, 6, 0.22, 0.08, 0.18]
+        }
+      },
+      burst: {
+        name: "Burst",
+        preset: "#FFD166",
+        radius: "12px",
+        note: "Reward/event energy: plum shell, violet inputs/lists, gold action indicators, cyan/lime compact state roles.",
+        darkText: "#1b1328",
+        lightText: "#fff8ef",
+        roles: {
+          surface: ["#1b1328", 0.05, 8, 0.34, 0.08, 0.16],
+          shell: ["#140d20", 0.04, 6, 0.32, 0.06, 0.13],
+          panel: ["#271b39", 0.05, 8, 0.36, 0.14, 0.26],
+          panelAlt: ["#33264a", 0.06, 10, 0.38, 0.20, 0.34],
+          popup: ["#2c2042", 0.06, 10, 0.38, 0.18, 0.32],
+          dialogHeader: ["#4a2f6a", 0.08, 12, 0.48, 0.24, 0.42],
+          input: ["#332848", 0.05, 8, 0.36, 0.18, 0.32],
+          inputEdge: ["#5a4776", 0.08, 12, 0.48, 0.28, 0.46],
+          listPanel: ["#21162f", 0.05, 8, 0.34, 0.10, 0.22],
+          listHover: ["#2e2141", 0.06, 10, 0.38, 0.16, 0.30],
+          listSelected: ["#3a2d52", 0.07, 10, 0.42, 0.24, 0.38],
+          listRail: ["#48cfe0", 0.08, 12, 0.74, 0.42, 0.68],
+          action: ["#d69a25", 0.06, 8, 0.78, 0.40, 0.62],
+          menu: ["#5b3a83", 0.08, 12, 0.54, 0.28, 0.46],
+          tab: ["#39294f", 0.06, 10, 0.42, 0.22, 0.38],
+          tabIndicator: ["#ffcc4d", 0.04, 8, 0.82, 0.48, 0.72],
+          range: ["#8fd24f", 0.08, 12, 0.72, 0.42, 0.66],
+          toggle: ["#6ee08a", 0.08, 12, 0.76, 0.42, 0.68],
+          positive: ["#77d661", 0.08, 12, 0.72, 0.40, 0.66],
+          success: ["#77d661", 0.08, 12, 0.72, 0.40, 0.66],
+          warning: ["#d69a25", 0.04, 8, 0.78, 0.40, 0.62],
+          info: ["#56c7e6", 0.08, 12, 0.74, 0.40, 0.68],
+          danger: ["#c94d62", 0.02, 4, 0.66, 0.34, 0.50, true],
+          focus: ["#6be6f4", 0.08, 12, 0.82, 0.50, 0.74],
+          separator: ["#624874", 0.04, 8, 0.42, 0.28, 0.44],
+          code: ["#191124", 0.04, 8, 0.32, 0.08, 0.18]
+        }
+      },
+      bubble: {
+        name: "Bubble",
+        preset: "#57C7FF",
+        radius: "24px",
+        note: "Flat 3D mobile UI: dark shell plus light cream/sky islands, blue actions, lavender menus, yellow rewards, green confirms.",
+        darkText: "#173044",
+        lightText: "#fffaf2",
+        roles: {
+          surface: ["#1d2442", 0.06, 8, 0.36, 0.12, 0.22],
+          shell: ["#15203c", 0.06, 8, 0.38, 0.10, 0.20],
+          panel: ["#fff3de", 0.04, 8, 0.42, 0.90, 0.98],
+          panelAlt: ["#e7f6ff", 0.10, 14, 0.46, 0.86, 0.96],
+          popup: ["#fff6e8", 0.04, 8, 0.42, 0.90, 0.98],
+          dialogHeader: ["#8ca7d9", 0.10, 14, 0.52, 0.62, 0.78],
+          input: ["#f6fbff", 0.10, 14, 0.38, 0.92, 0.99],
+          inputEdge: ["#87b8dc", 0.12, 16, 0.50, 0.55, 0.78],
+          listPanel: ["#fff7e8", 0.04, 8, 0.40, 0.92, 0.99],
+          listHover: ["#edf7ff", 0.10, 14, 0.42, 0.88, 0.98],
+          listSelected: ["#d9ecfa", 0.12, 16, 0.44, 0.80, 0.94],
+          listRail: ["#a76500", 0.04, 8, 0.84, 0.28, 0.46],
+          action: ["#0077b6", 0.14, 20, 0.76, 0.30, 0.48],
+          menu: ["#8ca7d9", 0.10, 14, 0.52, 0.62, 0.78],
+          tab: ["#b9d9f1", 0.12, 16, 0.48, 0.72, 0.88],
+          tabIndicator: ["#875a00", 0.04, 8, 0.84, 0.24, 0.40],
+          range: ["#31bf67", 0.08, 12, 0.70, 0.38, 0.58],
+          toggle: ["#33cc66", 0.08, 12, 0.72, 0.40, 0.60],
+          positive: ["#32c95a", 0.08, 12, 0.72, 0.38, 0.58],
+          success: ["#32c95a", 0.08, 12, 0.72, 0.38, 0.58],
+          warning: ["#ffb84c", 0.04, 8, 0.84, 0.50, 0.72],
+          info: ["#2ca5df", 0.12, 16, 0.72, 0.34, 0.56],
+          danger: ["#c83f5b", 0.02, 4, 0.68, 0.32, 0.48, true],
+          focus: ["#35b7e8", 0.14, 20, 0.76, 0.42, 0.66],
+          separator: ["#a9b6c4", 0.06, 8, 0.28, 0.58, 0.76],
+          code: ["#eaf6ff", 0.10, 14, 0.38, 0.88, 0.98]
+        }
+      }
+    };
+
+    const roleNames = [
+      "surface", "shell", "panel", "panelAlt", "popup", "dialogHeader",
+      "input", "inputEdge", "listPanel", "listHover", "listSelected", "listRail",
+      "action", "menu", "tab", "tabIndicator", "range", "toggle", "positive",
+      "success", "warning", "info", "danger", "focus", "separator", "code"
+    ];
+
+    const cssMap = {
+      panelAlt: "panel-alt",
+      dialogHeader: "dialog-header",
+      inputEdge: "input-edge",
+      listPanel: "list-panel",
+      listHover: "list-hover",
+      listSelected: "list-selected",
+      listRail: "list-rail",
+      tabIndicator: "tab-indicator"
+    };
+
+    const auditPairs = [
+      ["surface_fill", "surface", "on-surface", 4.5],
+      ["panel_fill", "panel", "on-panel", 4.5],
+      ["popup_shell", "popup", "on-popup", 4.5],
+      ["input_fill", "input", "on-input", 4.5],
+      ["list_panel_fill", "listPanel", "on-list", 4.5],
+      ["list_row_hover", "listHover", "on-list", 4.5],
+      ["list_row_selected", "listSelected", "on-list-selected", 4.5],
+      ["action_fill", "action", "on-action", 4.5],
+      ["menu_fill", "menu", "on-menu", 4.5],
+      ["tab_selected_fill", "tab", "on-tab", 4.5],
+      ["range_fill", "range", "on-range", 4.5],
+      ["toggle_fill", "toggle", "on-toggle", 4.5],
+      ["positive_fill", "positive", "on-positive", 4.5],
+      ["warning_fill", "warning", "on-warning", 4.5],
+      ["info_fill", "info", "on-info", 4.5],
+      ["danger_fill", "danger", "on-danger", 4.5],
+      ["focus_ring_vs_surface", "focus", "surface", 3.0],
+      ["list_rail_vs_selected", "listRail", "listSelected", 3.0],
+      ["tab_indicator_vs_tab", "tabIndicator", "tab", 3.0],
+      ["separator_vs_panel", "separator", "panel", 1.5]
+    ];
+
+    function parseHex(hex) {
+      const clean = hex.replace("#", "").trim();
+      return {
+        r: parseInt(clean.slice(0, 2), 16),
+        g: parseInt(clean.slice(2, 4), 16),
+        b: parseInt(clean.slice(4, 6), 16)
+      };
+    }
+
+    function toHex(rgb) {
+      const c = [rgb.r, rgb.g, rgb.b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0"));
+      return "#" + c.join("");
+    }
+
+    function rgbToHsl(rgb) {
+      let r = rgb.r / 255;
+      let g = rgb.g / 255;
+      let b = rgb.b / 255;
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h = 0;
+      let s = 0;
+      const l = (max + min) / 2;
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+        if (max === g) h = (b - r) / d + 2;
+        if (max === b) h = (r - g) / d + 4;
+        h *= 60;
+      }
+      return { h, s, l };
+    }
+
+    function hslToRgb(hsl) {
+      const h = ((hsl.h % 360) + 360) % 360 / 360;
+      const s = Math.max(0, Math.min(1, hsl.s));
+      const l = Math.max(0, Math.min(1, hsl.l));
+      if (s === 0) {
+        const v = l * 255;
+        return { r: v, g: v, b: v };
+      }
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      return {
+        r: hue2rgb(p, q, h + 1 / 3) * 255,
+        g: hue2rgb(p, q, h) * 255,
+        b: hue2rgb(p, q, h - 1 / 3) * 255
+      };
+    }
+
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v));
+    }
+
+    function hueDistance(from, to) {
+      return ((((to - from) % 360) + 540) % 360) - 180;
+    }
+
+    function isRedHue(h) {
+      return h >= 345 || h <= 18;
+    }
+
+    function roleColor(config, roleName, sourceHsl) {
+      const role = config.roles[roleName];
+      const anchor = rgbToHsl(parseHex(role[0]));
+      const pull = role[6] ? role[1] : (isRedHue(sourceHsl.h) && !["danger", "warning"].includes(roleName) ? Math.min(role[1], 0.025) : role[1]);
+      const maxShift = role[2];
+      const delta = clamp(hueDistance(anchor.h, sourceHsl.h) * pull, -maxShift, maxShift);
+      const satPull = Math.min(0.18, pull * 0.65);
+      const lightPull = Math.min(0.08, pull * 0.35);
+      const h = anchor.h + delta;
+      const s = clamp(anchor.s + (sourceHsl.s - anchor.s) * satPull, 0.03, role[3]);
+      const l = clamp(anchor.l + (sourceHsl.l - anchor.l) * lightPull, role[4], role[5]);
+      return toHex(hslToRgb({ h, s, l }));
+    }
+
+    function relativeLuminance(hex) {
+      const rgb = parseHex(hex);
+      const channel = v => {
+        const s = v / 255;
+        return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      return 0.2126 * channel(rgb.r) + 0.7152 * channel(rgb.g) + 0.0722 * channel(rgb.b);
+    }
+
+    function contrast(a, b) {
+      const l1 = relativeLuminance(a);
+      const l2 = relativeLuminance(b);
+      const hi = Math.max(l1, l2);
+      const lo = Math.min(l1, l2);
+      return (hi + 0.05) / (lo + 0.05);
+    }
+
+    function mix(a, b, amount) {
+      const ar = parseHex(a);
+      const br = parseHex(b);
+      return toHex({
+        r: ar.r + (br.r - ar.r) * amount,
+        g: ar.g + (br.g - ar.g) * amount,
+        b: ar.b + (br.b - ar.b) * amount
+      });
+    }
+
+    function bestText(bg, dark, light) {
+      const candidates = [dark, light, "#05070b", "#ffffff"];
+      return candidates
+        .map(color => ({ color, ratio: contrast(bg, color) }))
+        .sort((a, b) => b.ratio - a.ratio)[0].color;
+    }
+
+    function cssName(roleName) {
+      return cssMap[roleName] || roleName.replace(/[A-Z]/g, m => "-" + m.toLowerCase());
+    }
+
+    function generatePalette(themeKey, sourceHex) {
+      const config = themeConfigs[themeKey];
+      const sourceHsl = rgbToHsl(parseHex(sourceHex));
+      const palette = {};
+      for (const role of roleNames) {
+        palette[role] = roleColor(config, role, sourceHsl);
+      }
+      palette.menuHover = mix(palette.menu, bestText(palette.menu, config.darkText, config.lightText), 0.12);
+      palette.onSurface = bestText(palette.surface, config.darkText, config.lightText);
+      palette.onPanel = bestText(palette.panel, config.darkText, config.lightText);
+      palette.onPopup = bestText(palette.popup, config.darkText, config.lightText);
+      palette.onInput = bestText(palette.input, config.darkText, config.lightText);
+      palette.onList = bestText(palette.listPanel, config.darkText, config.lightText);
+      palette.onListSelected = bestText(palette.listSelected, config.darkText, config.lightText);
+      palette.onAction = bestText(palette.action, config.darkText, config.lightText);
+      palette.onMenu = bestText(palette.menu, config.darkText, config.lightText);
+      palette.onTab = bestText(palette.tab, config.darkText, config.lightText);
+      palette.onRange = bestText(palette.range, config.darkText, config.lightText);
+      palette.onToggle = bestText(palette.toggle, config.darkText, config.lightText);
+      palette.onPositive = bestText(palette.positive, config.darkText, config.lightText);
+      palette.onWarning = bestText(palette.warning, config.darkText, config.lightText);
+      palette.onInfo = bestText(palette.info, config.darkText, config.lightText);
+      palette.onDanger = bestText(palette.danger, config.darkText, config.lightText);
+      palette.muted = mix(palette.onPanel, palette.panel, 0.38);
+      return palette;
+    }
+
+    function setVar(name, value) {
+      document.documentElement.style.setProperty("--" + name, value);
+    }
+
+    function applyTheme() {
+      const themeKey = document.getElementById("themeSelect").value;
+      const sourceHex = document.getElementById("sourceColor").value;
+      const config = themeConfigs[themeKey];
+      const palette = generatePalette(themeKey, sourceHex);
+      for (const role of roleNames) {
+        setVar(cssName(role), palette[role]);
+      }
+      setVar("menu-hover", palette.menuHover);
+      setVar("on-surface", palette.onSurface);
+      setVar("on-panel", palette.onPanel);
+      setVar("on-popup", palette.onPopup);
+      setVar("on-input", palette.onInput);
+      setVar("on-list", palette.onList);
+      setVar("on-list-selected", palette.onListSelected);
+      setVar("on-action", palette.onAction);
+      setVar("on-menu", palette.onMenu);
+      setVar("on-tab", palette.onTab);
+      setVar("on-range", palette.onRange);
+      setVar("on-toggle", palette.onToggle);
+      setVar("on-positive", palette.onPositive);
+      setVar("on-warning", palette.onWarning);
+      setVar("on-info", palette.onInfo);
+      setVar("on-danger", palette.onDanger);
+      setVar("muted", palette.muted);
+      setVar("radius", config.radius);
+      document.getElementById("themeNote").textContent = config.note;
+      renderSwatches(palette);
+      renderAudit(themeKey, palette);
+    }
+
+    function labelFor(role) {
+      return role.replace(/[A-Z]/g, m => "_" + m.toLowerCase());
+    }
+
+    function renderSwatches(palette) {
+      const swatches = document.getElementById("swatches");
+      swatches.innerHTML = "";
+      const visible = ["surface", "panel", "input", "listPanel", "listSelected", "listRail", "action", "menu", "tab", "tabIndicator", "range", "toggle", "positive", "warning", "info", "danger", "focus"];
+      for (const role of visible) {
+        const fg = bestText(palette[role], "#111827", "#ffffff");
+        const el = document.createElement("div");
+        el.className = "swatch";
+        el.style.background = palette[role];
+        el.style.color = fg;
+        el.innerHTML = `<span>${labelFor(role)}</span><code>${palette[role]}</code>`;
+        swatches.appendChild(el);
+      }
+    }
+
+    function roleValue(palette, roleOrOn) {
+      const map = {
+        "on-surface": "onSurface",
+        "on-panel": "onPanel",
+        "on-popup": "onPopup",
+        "on-input": "onInput",
+        "on-list": "onList",
+        "on-list-selected": "onListSelected",
+        "on-action": "onAction",
+        "on-menu": "onMenu",
+        "on-tab": "onTab",
+        "on-range": "onRange",
+        "on-toggle": "onToggle",
+        "on-positive": "onPositive",
+        "on-warning": "onWarning",
+        "on-info": "onInfo",
+        "on-danger": "onDanger"
+      };
+      return palette[map[roleOrOn] || roleOrOn];
+    }
+
+    function renderAudit(themeKey, palette) {
+      const body = document.getElementById("auditRows");
+      body.innerHTML = "";
+      let failures = 0;
+      for (const pair of auditPairs) {
+        const bg = roleValue(palette, pair[1]);
+        const fg = roleValue(palette, pair[2]);
+        const ratio = contrast(bg, fg);
+        const pass = ratio >= pair[3];
+        if (!pass) failures += 1;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${pair[0]}</td>
+          <td><span class="contrast-sample" style="background:${bg};color:${fg}">Aa</span></td>
+          <td><code>${bg}</code></td>
+          <td><code>${fg}</code></td>
+          <td>${ratio.toFixed(2)}</td>
+          <td>${pair[3].toFixed(1)}</td>
+          <td class="${pass ? "pass" : "fail"}">${pass ? "PASS" : "FAIL"}</td>
+        `;
+        body.appendChild(row);
+      }
+      document.getElementById("auditTitle").textContent = `${themeConfigs[themeKey].name} contrast audit: ${failures === 0 ? "all sampled pairs pass" : failures + " failing pair(s)"}`;
+    }
+
+    const select = document.getElementById("themeSelect");
+    const source = document.getElementById("sourceColor");
+    select.addEventListener("change", () => {
+      source.value = themeConfigs[select.value].preset.toLowerCase();
+      applyTheme();
+    });
+    source.addEventListener("input", applyTheme);
+    source.value = themeConfigs[select.value].preset.toLowerCase();
+    applyTheme();
+  </script>
+</body>
+</html>
