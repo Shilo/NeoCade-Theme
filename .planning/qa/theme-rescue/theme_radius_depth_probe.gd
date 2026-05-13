@@ -25,17 +25,17 @@ const EXPECTED_CORNER_RADIUS := {
 const EXPECTED_DESKTOP_BUTTON_PADDING := Vector2(14, 9)
 const EXPECTED_PRIMARY_DEPTH := {
 	NeoCadeTheme.Style.PULSE: 3,
-	NeoCadeTheme.Style.DAYBREAK: 3,
-	NeoCadeTheme.Style.SLATE: 2,
-	NeoCadeTheme.Style.BURST: 5,
-	NeoCadeTheme.Style.BUBBLE: 4,
+	NeoCadeTheme.Style.DAYBREAK: 2,
+	NeoCadeTheme.Style.SLATE: 3,
+	NeoCadeTheme.Style.BURST: 4,
+	NeoCadeTheme.Style.BUBBLE: 5,
 }
 const EXPECTED_REGULAR_DEPTH := {
 	NeoCadeTheme.Style.PULSE: 2,
-	NeoCadeTheme.Style.DAYBREAK: 2,
+	NeoCadeTheme.Style.DAYBREAK: 1,
 	NeoCadeTheme.Style.SLATE: 2,
-	NeoCadeTheme.Style.BURST: 4,
-	NeoCadeTheme.Style.BUBBLE: 3,
+	NeoCadeTheme.Style.BURST: 3,
+	NeoCadeTheme.Style.BUBBLE: 4,
 }
 const EXPECTED_DEPTH_DARKEN := {
 	NeoCadeTheme.Style.PULSE: 0.38,

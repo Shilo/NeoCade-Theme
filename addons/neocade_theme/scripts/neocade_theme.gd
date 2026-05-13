@@ -996,8 +996,8 @@ func _resolve_raised_depth(intensity: int, style_personality: Dictionary) -> int
 	if not raised or raised_strength <= 0 or intensity <= 0:
 		return 0
 	# shape.raised_lifts is a 0-3 family-emphasis scale. The per-style scale
-	# gives Bubble/Burst the chunkier HCGames-style underside while Slate stays
-	# restrained, without adding another public export.
+	# makes Bubble the chunkiest HCGames-style candy underside, keeps Burst bold
+	# but shallower, and lets Daybreak stay gentle without adding a public export.
 	var scale := 1.0
 	var scale_raw: Variant = _lookup_shape(style_personality, "shape.raised_depth_scale")
 	if scale_raw != null and (typeof(scale_raw) == TYPE_INT or typeof(scale_raw) == TYPE_FLOAT):
@@ -1066,6 +1066,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			},
 			"raised_depth_scale":  1.50,
 			"raised_depth_darken": 0.38,
+			"regular_raised_face_edge": true,
 			"focus_offset":  0,
 			"kicker_style":  &"uppercase-tracked-accent",
 			"hairline_thickness":  0,
@@ -1110,8 +1111,9 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    1,
 				"chip":            2,
 			},
-			"raised_depth_scale":  1.50,
+			"raised_depth_scale":  1.60,
 			"raised_depth_darken": 0.30,
+			"regular_raised_face_edge": true,
 			"focus_offset":  2,
 			"kicker_style":  &"small-caps-subtle",
 			"hairline_thickness":  1,   # Phase 12 C6 Slate signature: 1px hairlines on interactive chrome.
@@ -1156,8 +1158,9 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    1,
 				"chip":            2,
 			},
-			"raised_depth_scale":  1.32,
+			"raised_depth_scale":  1.52,
 			"raised_depth_darken": 0.32,
+			"regular_raised_face_edge": true,
 			"focus_offset":  2,
 			"kicker_style":  &"uppercase-tracked-accent",
 			"hairline_thickness":  0,
@@ -1202,8 +1205,9 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    1,
 				"chip":            3,
 			},
-			"raised_depth_scale":  1.00,
+			"raised_depth_scale":  0.66,
 			"raised_depth_darken": 0.34,
+			"regular_raised_face_edge": false,
 			"focus_offset":  2,
 			"kicker_style":  &"sentence-case-accent",
 			"hairline_thickness":  0,
@@ -1248,8 +1252,9 @@ const STYLE_PERSONALITY: Dictionary = {
 				"selected_row":    2,
 				"chip":            2,
 			},
-			"raised_depth_scale":  1.66,
+			"raised_depth_scale":  1.32,
 			"raised_depth_darken": 0.42,
+			"regular_raised_face_edge": true,
 			"focus_offset":  1,
 			"kicker_style":  &"uppercase-bold-larger-scale",
 			"hairline_thickness":  0,
@@ -1356,6 +1361,7 @@ const STYLE_PERSONALITY_DEFAULT: Dictionary = {
 		},
 		"raised_depth_scale":  1.00,
 		"raised_depth_darken": 0.36,
+		"regular_raised_face_edge": true,
 		"focus_offset":  2,
 		"kicker_style":  &"sentence-case-accent",
 		"hairline_thickness":  0,
@@ -2266,19 +2272,19 @@ const BINDING_TABLE: Dictionary = {
 	# PrimaryButton variation per TYPEVAR-01 / DESIGN_TOKENS §5.
 	"Button": {
 		"stylebox": {
-			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
+			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": "shape.regular_raised_face_edge",
 								"raised_intensity": "shape.raised_lifts.regular",
 								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
 								"mobile_padding": Vector2i(18, 14)},
-			"normal_mirrored":{"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
+			"normal_mirrored":{"role": "button_normal", "border_role": "button_border", "raised_face_edge": "shape.regular_raised_face_edge",
 								"raised_intensity": "shape.raised_lifts.regular",
 								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
 								"mobile_padding": Vector2i(18, 14)},
-			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": "shape.regular_raised_face_edge",
 								"raised_intensity": "shape.raised_lifts.regular",
 								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
 								"mobile_padding": Vector2i(18, 14)},
-			"hover_mirrored": {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
+			"hover_mirrored": {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": "shape.regular_raised_face_edge",
 								"raised_intensity": "shape.raised_lifts.regular",
 								"radius": "shape.regular_radius", "padding": "shape.primary_padding",
 								"mobile_padding": Vector2i(18, 14)},
@@ -3373,10 +3379,10 @@ const BINDING_TABLE: Dictionary = {
 	# shape.raised_lifts.regular so the per-direction shape language flows.
 	"MenuButton": {
 		"stylebox": {
-			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
+			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": "shape.regular_raised_face_edge",
 								"raised_intensity": "shape.raised_lifts.regular",
 								"radius": "shape.regular_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
-			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": "shape.regular_raised_face_edge",
 								"raised_intensity": "shape.raised_lifts.regular",
 								"radius": "shape.regular_radius", "padding": Vector2i(10, 5), "mobile_padding": Vector2i(15, 14)},
 			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
@@ -3405,10 +3411,10 @@ const BINDING_TABLE: Dictionary = {
 	# tighter than game CTA buttons while sharing the same button-state colors.
 	"OptionButton": {
 		"stylebox": {
-			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": true,
+			"normal":         {"role": "button_normal", "border_role": "button_border", "raised_face_edge": "shape.regular_raised_face_edge",
 								"raised_intensity": "shape.raised_lifts.regular",
 								"radius": "shape.regular_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 14)},
-			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": true,
+			"hover":          {"role": "button_hover", "border_role": "button_border_hover", "raised_face_edge": "shape.regular_raised_face_edge",
 								"raised_intensity": "shape.raised_lifts.regular",
 								"radius": "shape.regular_radius", "padding": Vector2i(8, 4), "mobile_padding": Vector2i(14, 14)},
 			"pressed":        {"role": "button_pressed", "border_role": "button_border_pressed",
@@ -4584,8 +4590,9 @@ const BINDING_TABLE: Dictionary = {
 	#   - padding:          shape.primary_padding    (Vector2i per FOUND-02; shared
 	#                                                 desktop padding so style swaps do
 	#                                                 not move layouts)
-	#   - raised_intensity: shape.raised_lifts.primary (Pulse 3 / Slate 2 / Bubble 6 /
-	#                                                   Daybreak 3 / Burst 5)
+	#   - raised_intensity: shape.raised_lifts.primary (Pulse 3 / Slate 2 / Bubble 3 /
+	#                                                   Daybreak 3 / Burst 3), then scaled
+	#                                                   by shape.raised_depth_scale.
 	#   - strategy:         shape.primary_strategy   (5 closed-enum dispatchers in
 	#                                                 _apply_primary_strategy)
 	# `pressed` and `disabled` skip strategy dispatch (sink/disable states stay literal so
@@ -5857,7 +5864,13 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			var layer_alpha := clampf(float(recipe.get("state_layer_alpha", 0.0)), 0.0, 1.0)
 			sb.bg_color = Color(layer_color.r, layer_color.g, layer_color.b, layer_alpha)
 		if sb_intensity > 0:
-			var keep_face_edge: bool = bool(recipe.get("raised_face_edge", false))
+			var keep_face_edge_raw: Variant = recipe.get("raised_face_edge", false)
+			var keep_face_edge: bool = false
+			if typeof(keep_face_edge_raw) == TYPE_STRING:
+				var resolved_face_edge: Variant = _lookup_shape(style_personality, keep_face_edge_raw)
+				keep_face_edge = bool(resolved_face_edge)
+			else:
+				keep_face_edge = bool(keep_face_edge_raw)
 			var reserve_height: bool = bool(recipe.get("reserve_raised_depth", true))
 			_apply_raised_depth_border(sb, offset_color, sb_intensity, keep_face_edge, reserve_height)
 		return sb

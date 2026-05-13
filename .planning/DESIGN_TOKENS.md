@@ -554,12 +554,12 @@ Built-in raised depth-edge tuning for common button chrome:
 | Direction | Primary/danger bottom edge | Regular/OptionButton bottom edge | Depth darken |
 |---|---:|---:|---:|
 | Pulse | 3px | 2px | 38% |
-| Slate | 2px | 2px | 30% |
-| Bubble | 4px | 3px | 32% |
-| Daybreak | 3px | 2px | 34% |
-| Burst | 5px | 4px | 42% |
+| Slate | 3px | 2px | 30% |
+| Bubble | 5px | 4px | 32% |
+| Daybreak | 2px | 1px | 34% |
+| Burst | 4px | 3px | 42% |
 
-Bubble intentionally gets a chunkier 4px/3px candy-game underside, but the 32% value darken is softer than Pulse/Burst so it stays playful rather than heavy.
+Bubble intentionally gets the chunkiest 5px/4px candy-game underside, but the 32% value darken is softer than Burst so it stays playful rather than heavy. Burst remains high-energy through stronger color contrast, oversized CTA rhythm, and darker depth color rather than being the physically deepest style. Daybreak is the gentlest raised style.
 
 ### 9.4 Optional top rim highlight (raised primary buttons)
 
