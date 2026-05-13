@@ -52,10 +52,10 @@ All five candidate directions from Phase 3.3 (Revision Round 2/2 dark-only) are 
 | Direction | base_color | accent_color | WCAG ratio (accent on base) | Personality | v1 ship status |
 |---|---|---|---|---|---|
 | Pulse    | `#151A2E` | `#8BFF6A` | 13.62:1 | Vibrant arcade hall — cabinet-bezel chrome, lit primaries, packed control deck | approved · **recommended starter** (Phase 4 implements first) |
-| Slate    | `#111820` | `#8BD3FF` | 10.94:1 | Premium dark default — iOS-pill polish, restrained accent, quiet confident chrome | approved · v1 personality variation |
-| Bubble   | `#241326` | `#FFB3E6` | 10.74:1 | Playful candy-counter at night — pillowy chrome, fully-rounded chips, cheerful warmth | approved · v1 personality variation |
+| Slate    | `#111820` | `#8BD3FF` | 10.94:1 | Premium dark default — restrained accent, quiet confident rounded chrome | approved · v1 personality variation |
+| Bubble   | `#241326` | `#FFB3E6` | 10.74:1 | Playful candy-counter at night — pillowy rounded chrome and cheerful warmth | approved · v1 personality variation |
 | Daybreak | `#0B2420` | `#76F2D1` | 11.96:1 | Fresh evening lobby — dark teal surfaces with bright mint wayfinding, airy spacing | approved · v1 personality variation |
-| Burst    | `#20112E` | `#FFD166` | 12.33:1 | Celebratory MD3 Expressive max — oversized statement primary, asymmetric mark, bold gold | approved · v1 personality variation |
+| Burst    | `#20112E` | `#FFD166` | 12.33:1 | Celebratory MD3 Expressive max — high-contrast statement primary, asymmetric mark, bold gold | approved · v1 personality variation |
 
 CLAUDE.md "v1 ships N user-approved theme `.tres` files" resolves to **N = 5** for v1.
 
@@ -146,7 +146,7 @@ Setters on every `@export` property trigger `_regenerate_theme()`:
 
 ### 4.5 What does NOT live in `@export`
 
-- Per-direction unique mood (chip pill shape, brand mark style, primary button radius oversizing, asymmetric tab indicator behavior, surface alpha policy, kicker style, raised lifts list, etc.) — lives in Theme Editor entry overrides per `.tres`.
+- Per-direction unique mood (rounded chip shape, brand mark style, primary button color strategy, asymmetric tab indicator behavior, surface alpha policy, kicker style, raised lifts list, etc.) — lives in Theme Editor entry overrides per `.tres`.
 - Type scale font sizes — derived from `platform` branch in `_regenerate_theme()`, not exported.
 - WCAG-driven text colors — derived from `is_light` + `base_color` in `_regenerate_theme()`, not exported.
 - State-layer overlay opacities — fixed M3 values (hover 8%, focus 12%, pressed 12%, dragged 16%, disabled 38%) hard-coded in `_regenerate_theme()`, not exported.
@@ -202,17 +202,17 @@ The `@export` defaults below are translated from `.planning/mockups/3.4/data/dir
 | `accent_color` | `Color("#8BD3FF")` |
 | `raised` | `false` |
 | `platform` | `Platform.AUTO` |
-| `corner_radius` | `14` |
+| `corner_radius` | `8` |
 | `spacing` | `22` |
 | `raised_strength` | `2` |
 | `focus_thickness` | `2` |
 | `outline_width` | `1` |
 
 **Theme Editor override intent (Slate personality):**
-- Brand mark: rounded-square (radius 14); size desktop 54 / mobile 42.
-- Buttons: rounded (radius 14); padding 16×11 (desktop) / 18×12 primary; primary strategy = "quiet-pill-primary"; ghost strategy = "thin-accent-outline".
-- Tabs: quiet rounded chrome (radius 14, matching Slate's base radius); selected indicator = restrained accent stripe.
-- Chips: full pill (radius 999).
+- Brand mark: rounded-square (radius 8); size desktop 54 / mobile 42.
+- Buttons: rounded (radius 8); shared desktop padding; primary strategy = "quiet-pill-primary"; ghost strategy = "thin-accent-outline".
+- Tabs: quiet rounded chrome (radius 8); selected indicator = restrained accent stripe.
+- Chips: rounded chrome (radius 8).
 - Density: 22px padding, 14px inter-control gap; "spacious-premium-quiet" feel.
 - Surface ramp: 3 stops, "narrow" spread (`spreadFactor = 0.7`).
 - State-layer deltas: hover +4%, pressed −6%, disabled opacity 0.50.
@@ -229,17 +229,17 @@ The `@export` defaults below are translated from `.planning/mockups/3.4/data/dir
 | `accent_color` | `Color("#FFB3E6")` |
 | `raised` | `false` |
 | `platform` | `Platform.AUTO` |
-| `corner_radius` | `26` |
+| `corner_radius` | `24` |
 | `spacing` | `22` |
 | `raised_strength` | `6` |
 | `focus_thickness` | `3` |
 | `outline_width` | `1` |
 
 **Theme Editor override intent (Bubble personality):**
-- Brand mark: circle/squircle (radius 999); size desktop 54 / mobile 42.
-- Buttons: heavily rounded (radius 26); padding 20×14 (desktop) / 22×15 primary; primary strategy = "pillowy-fully-rounded-primary" (radius 999 on primary specifically); ghost strategy = "rounded-ghost-thicker-outline".
-- Tabs: fully-rounded pill large (radius 999); selected indicator = "accent-fill-plus-raised-offset-on-selected".
-- Chips: full pill (radius 999).
+- Brand mark: round squircle (radius 24); size desktop 54 / mobile 42.
+- Buttons: heavily rounded (radius 24); shared desktop padding; primary strategy = "pillowy-rounded-primary"; ghost strategy = "rounded-ghost-thicker-outline".
+- Tabs: rounded chrome capped at radius 12 so text tabs do not become pills; selected indicator = restrained accent stripe.
+- Chips: heavily rounded chrome (radius 24).
 - Density: 22px padding, 14px inter-control gap; "friendly-airy-generous" feel.
 - Surface ramp: 3 stops, "medium" spread (`spreadFactor = 1.0`).
 - State-layer deltas: hover +8%, pressed −10%, disabled opacity 0.45.
@@ -256,17 +256,17 @@ The `@export` defaults below are translated from `.planning/mockups/3.4/data/dir
 | `accent_color` | `Color("#76F2D1")` |
 | `raised` | `false` |
 | `platform` | `Platform.AUTO` |
-| `corner_radius` | `8` |
+| `corner_radius` | `4` |
 | `spacing` | `24` |
 | `raised_strength` | `3` |
 | `focus_thickness` | `2` |
 | `outline_width` | `1` |
 
 **Theme Editor override intent (Daybreak personality):**
-- Brand mark: rounded-square-with-halo (radius 8); size desktop 54 / mobile 42.
-- Buttons: gently rounded (radius 8); padding 18×12 (desktop) / 20×13 primary; primary strategy = "friendly-primary-generous-breathing"; ghost strategy = "soft-outline-ghost".
-- Tabs: rounded-rect (radius 8); selected indicator = "accent-fill-with-mint-halo-behind".
-- Chips: rounded-rect (radius 8).
+- Brand mark: rounded-square-with-halo (radius 4); size desktop 54 / mobile 42.
+- Buttons: gently rounded (radius 4); shared desktop padding; primary strategy = "friendly-primary-generous-breathing"; ghost strategy = "soft-outline-ghost".
+- Tabs: rounded-rect (radius 4); selected indicator = restrained accent stripe.
+- Chips: rounded-rect (radius 4).
 - Density: 24px padding, 16px inter-control gap; "airy-breathing" feel.
 - Surface ramp: 4 stops, "medium" spread.
 - State-layer deltas: hover +6%, pressed −6%, disabled opacity 0.50.
@@ -283,17 +283,17 @@ The `@export` defaults below are translated from `.planning/mockups/3.4/data/dir
 | `accent_color` | `Color("#FFD166")` |
 | `raised` | `false` |
 | `platform` | `Platform.AUTO` |
-| `corner_radius` | `18` |
+| `corner_radius` | `12` |
 | `spacing` | `22` |
 | `raised_strength` | `5` |
 | `focus_thickness` | `3` |
 | `outline_width` | `1` |
 
 **Theme Editor override intent (Burst personality):**
-- Brand mark: chunky asymmetric badge (radius 18); size desktop 60 / mobile 48 (the only direction with above-baseline mark size — emphasises celebratory brand presence).
-- Buttons: bold rounded (radius 18); primary radius 28 (oversized); padding 20×14 (desktop) / 26×18 primary; primary strategy = "oversized-statement-primary"; ghost strategy = "normal-accent-ghost".
-- Tabs: rounded-rect, asymmetric on selected (radius 16); selected indicator = "accent-fill-plus-bigger-size-on-selected".
-- Chips: rounded (radius 16).
+- Brand mark: chunky asymmetric badge (radius 12); size desktop 60 / mobile 48 (the only direction with above-baseline mark size — emphasises celebratory brand presence).
+- Buttons: bold rounded (radius 12); shared desktop padding; primary strategy = "statement-primary"; ghost strategy = "normal-accent-ghost".
+- Tabs: rounded-rect (radius 12); selected indicator = restrained accent stripe.
+- Chips: rounded (radius 12).
 - Density: 22px padding, 14px inter-control gap; "event-spread-hierarchy-amplified" feel.
 - Surface ramp: 4 stops, "wide" spread.
 - State-layer deltas: hover +8%, pressed −12%, disabled opacity 0.45.
@@ -443,7 +443,7 @@ Phase 4 implements these in `_regenerate_theme()` by populating the explicit the
 
 ### 8.1 Corner radius semantic
 
-`corner_radius` is the per-direction **base radius**. Direction `.tres` files override this. Per-Control radius variations (chip = 999, primary button possibly different from base, brand mark, tab) live in Theme Editor entry overrides per `.tres` — they do NOT bake into `@export`. Sentinel `999` = full pill (Theme Editor reads `corner_radius_top_left = 999` etc. and Godot caps at min(width,height)/2). Current v1 radius ladder is Pulse 0, Daybreak 8, Slate 14, Burst 16 tabs / 18 base chrome, Bubble 26 base / 999 pill tabs. `TabContainer.side_margin` follows `corner_radius` so the first tab clears rounded panel shoulders without adding fake margins to `tabbar_background`.
+`corner_radius` is the per-direction **base radius**. Direction `.tres` files override this. Per-Control radius variations live in Theme Editor entry overrides per `.tres` — they do NOT bake into `@export`. Sentinel `999` remains available for true circular controls, but text-bearing chrome should avoid pill clamping unless explicitly designed for it. Current v1 radius ladder is Pulse 0, Daybreak 4, Slate 8, Burst 12, Bubble 24. Tabs read `shape.tab_radius` but clamp to `12` so Bubble keeps round buttons/panels without turning tab labels into capsules. `TabContainer.side_margin` follows `corner_radius` so the first tab clears rounded panel shoulders without adding fake margins to `tabbar_background`.
 
 ### 8.2 Focus ring construction
 

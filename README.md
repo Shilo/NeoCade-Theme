@@ -103,6 +103,33 @@ been replaced by `neocade_theme.tres` plus the `style` export.
 
 ## Known Issues
 
+### Editor custom theme icon polarity
+
+NeoCade can be loaded into the Godot editor itself via
+*Editor Settings > Interface > Theme > Custom Theme*, but Godot still
+generates its built-in editor theme before merging the custom theme.
+That means `interface/theme/base_color` and `interface/theme/accent_color`
+can affect generated `EditorIcons` even though NeoCade overrides its own
+surfaces and colors.
+
+The most visible case is `interface/theme/base_color = #ffffff` while
+`interface/theme/icon_and_font_color = Auto`: Godot treats the editor as a
+light theme, bakes dark editor icons, and then merges NeoCade's dark editor
+surfaces over them. Toolbars, main screen buttons, FileSystem icons, and other
+editor-only icon textures can then look too dark.
+
+**Workaround:** set
+*Editor Settings > Interface > Theme > Icon And Font Color* to **Light** when
+using NeoCade as the editor custom theme. This forces Godot to generate light
+editor icons regardless of editor `base_color`.
+
+NeoCade does not automatically change this setting because it is a global
+editor preference that persists after the theme is removed. NeoCade also does
+not vendor or override every built-in `EditorIcons` texture; doing so would be
+a large Godot-version maintenance surface. If `accent_color` affects a specific
+generated editor icon, treat it as an editor integration caveat unless that icon
+is worth a narrow explicit override.
+
 ### Project `[gui] theme/custom` triggers Godot debugger spam
 
 Setting `neocade_theme.tres` (or any `class_name`'d resource subclass with

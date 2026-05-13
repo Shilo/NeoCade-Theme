@@ -957,6 +957,8 @@ func _platform_tokens(p: Platform) -> Dictionary:
 
 # ─── Raised stylebox helper (DESIGN_TOKENS §9) ──────────────────────────────────────────────
 
+const TAB_RADIUS_MAX := 12
+
 ## Construct a StyleBoxFlat base for flat or raised mode.
 ## Raised depth is applied later as a hard bottom extrusion, never a StyleBoxFlat shadow.
 func _make_raised_stylebox(bg: Color, _offset_color: Color, _intensity: int) -> StyleBoxFlat:
@@ -974,6 +976,12 @@ func _resolve_raised_depth(intensity: int) -> int:
 	# shape.raised_lifts is a 0-3 family-emphasis scale. Normalize it against
 	# raised_strength so built-in styles top out at a crisp 1-3px hard edge.
 	return maxi(1, ceili(float(raised_strength) * float(intensity) / 3.0))
+
+
+func _constrain_shape_radius(radius: int, radius_path: String) -> int:
+	if radius_path == "shape.tab_radius":
+		return mini(radius, TAB_RADIUS_MAX)
+	return radius
 
 
 # ─── Style personality (DESIGN_TOKENS §5/§6, directions.json axis_8/axis_9) ─────────────────
@@ -1001,7 +1009,7 @@ const STYLE_PERSONALITY: Dictionary = {
 		"spread_factor": 1.3, "hover_pct": 6.0, "pressed_pct": -10.0, "disabled_opacity": 0.42,
 		"shape": {
 			"primary_radius":        0,
-			"primary_padding":       Vector2i(12, 8),
+			"primary_padding":       Vector2i(14, 9),
 			"primary_strategy":      &"bold-accent-fill",
 			"ghost_strategy":        &"accent-outlined-accent-text",
 			"secondary_radius":      0,
@@ -1037,21 +1045,21 @@ const STYLE_PERSONALITY: Dictionary = {
 		},
 	},
 	# ─── Slate — base=#111820, accent=#8BD3FF (DESIGN_TOKENS §5.2) ───
-	# Personality: iOS-premium-quiet; radius=14 rounded chrome; ios-style-offset focus (offset=2).
-	# Buttons rounded (radius 14), padding 16×11 desktop, primary strategy = quiet-pill.
-	# Tabs follow the 14px chrome radius; chips stay full pill. Surface alpha popup 0.92.
+	# Personality: iOS-premium-quiet; radius=8 rounded chrome; ios-style-offset focus (offset=2).
+	# Buttons use the shared desktop padding; primary strategy = quiet-pill.
+	# Tabs follow the base radius under TAB_RADIUS_MAX. Surface alpha popup 0.92.
 	Style.SLATE: {
 		"spread_factor": 0.7, "hover_pct": 4.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
 		"shape": {
-			"primary_radius":        14,
+			"primary_radius":        8,
 			"primary_padding":       Vector2i(14, 9),
 			"primary_strategy":      &"quiet-pill",
 			"ghost_strategy":        &"thin-accent-outline",
-			"secondary_radius":      14,
-			"tab_radius":            14,
-			"chip_radius":           999,
-			"card_radius":           14,
-			"hero_radius":           14,
+			"secondary_radius":      8,
+			"tab_radius":            8,
+			"chip_radius":           8,
+			"card_radius":           8,
+			"hero_radius":           8,
 			"surface_alpha_panels":  1.00,
 			"surface_alpha_popup":   0.92,
 			"surface_alpha_buttons": 1.00,
@@ -1080,21 +1088,21 @@ const STYLE_PERSONALITY: Dictionary = {
 		},
 	},
 	# ─── Bubble — base=#241326, accent=#FFB3E6 (DESIGN_TOKENS §5.3) ───
-	# Personality: candy-pillowy; base radius 26 / primary radius 999 (pill on primary
-	# specifically per §5.3); cheerful-chunky focus (offset=2). Padding 20×14 desktop.
-	# Tabs/chips fully-rounded pill (radius 999). Surface alpha all 1.00 (candy is opaque).
+	# Personality: candy-pillowy; base radius 24 with compact tabs capped by TAB_RADIUS_MAX.
+	# Cheerful-chunky focus (offset=2). Shared desktop padding keeps layout stable.
+	# Surface alpha all 1.00 (candy is opaque).
 	Style.BUBBLE: {
 		"spread_factor": 1.0, "hover_pct": 8.0, "pressed_pct": -10.0, "disabled_opacity": 0.45,
 		"shape": {
-			"primary_radius":        999,
-			"primary_padding":       Vector2i(16, 10),
-			"primary_strategy":      &"pillowy-fully-rounded",
+			"primary_radius":        24,
+			"primary_padding":       Vector2i(14, 9),
+			"primary_strategy":      &"pillowy-rounded",
 			"ghost_strategy":        &"rounded-ghost-thicker-outline",
-			"secondary_radius":      26,
-			"tab_radius":            999,
-			"chip_radius":           999,
-			"card_radius":           26,
-			"hero_radius":           26,
+			"secondary_radius":      24,
+			"tab_radius":            24,
+			"chip_radius":           24,
+			"card_radius":           24,
+			"hero_radius":           24,
 			"surface_alpha_panels":  1.00,
 			"surface_alpha_popup":   1.00,
 			"surface_alpha_buttons": 1.00,
@@ -1114,7 +1122,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"focus_offset":  2,
 			"kicker_style":  &"uppercase-tracked-accent",
 			"hairline_thickness":  0,
-			"min_radius_floor":    26,   # Phase 12 C6 Bubble signature: floor every resolved radius to >= 26.
+			"min_radius_floor":    0,
 			"primary_outline_color":  &"role_primary",
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
@@ -1123,21 +1131,21 @@ const STYLE_PERSONALITY: Dictionary = {
 		},
 	},
 	# ─── Daybreak — base=#0B2420, accent=#76F2D1 (DESIGN_TOKENS §5.4) ───
-	# Personality: airy-welcoming-lobby; radius=8 gently rounded; airy-mint focus (offset=2).
-	# Buttons radius 8, padding 18×12 desktop, primary strategy = friendly-generous.
+	# Personality: airy-welcoming-lobby; radius=4 gently rounded; airy-mint focus (offset=2).
+	# Buttons use the shared desktop padding; primary strategy = friendly-generous.
 	# Surface alpha popup 0.90 + panels 0.96 (airy bleed) but buttons 1.00 (tappability).
 	Style.DAYBREAK: {
 		"spread_factor": 1.0, "hover_pct": 6.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
 		"shape": {
-			"primary_radius":        8,
-			"primary_padding":       Vector2i(20, 14),   # Phase 12 C6 Daybreak: generous primary padding.
+			"primary_radius":        4,
+			"primary_padding":       Vector2i(14, 9),
 			"primary_strategy":      &"friendly-generous",
 			"ghost_strategy":        &"soft-outline",
-			"secondary_radius":      8,
-			"tab_radius":            8,
-			"chip_radius":           8,
-			"card_radius":           8,
-			"hero_radius":           8,
+			"secondary_radius":      4,
+			"tab_radius":            4,
+			"chip_radius":           4,
+			"card_radius":           4,
+			"hero_radius":           4,
 			"surface_alpha_panels":  0.96,
 			"surface_alpha_popup":   0.90,
 			"surface_alpha_buttons": 1.00,
@@ -1166,21 +1174,21 @@ const STYLE_PERSONALITY: Dictionary = {
 		},
 	},
 	# ─── Burst — base=#20112E, accent=#FFD166 (DESIGN_TOKENS §5.5) ───
-	# Personality: event-celebration-statement; base radius 18 / primary radius 28 (oversized
-	# per §5.5); dramatic-event focus (offset=1). Padding 20×14 desktop. Tabs radius 16.
+	# Personality: event-celebration-statement; base radius 12 and dramatic-event focus (offset=1).
+	# Shared desktop padding keeps style changes from moving layout. Primary strategy = oversized-statement.
 	# Surface alpha all 1.00 (celebration posters solid). Primary strategy = oversized-statement.
 	Style.BURST: {
 		"spread_factor": 1.3, "hover_pct": 8.0, "pressed_pct": -12.0, "disabled_opacity": 0.45,
 		"shape": {
-			"primary_radius":        28,
-			"primary_padding":       Vector2i(16, 10),
+			"primary_radius":        12,
+			"primary_padding":       Vector2i(14, 9),
 			"primary_strategy":      &"oversized-statement",
 			"ghost_strategy":        &"normal-accent-ghost",
-			"secondary_radius":      18,
-			"tab_radius":            16,
-			"chip_radius":           16,
-			"card_radius":           18,
-			"hero_radius":           18,
+			"secondary_radius":      12,
+			"tab_radius":            12,
+			"chip_radius":           12,
+			"card_radius":           12,
+			"hero_radius":           12,
 			"surface_alpha_panels":  1.00,
 			"surface_alpha_popup":   1.00,
 			"surface_alpha_buttons": 1.00,
@@ -1204,8 +1212,8 @@ const STYLE_PERSONALITY: Dictionary = {
 			"primary_outline_color":  &"role_primary",
 			"primary_outline_offset": 0,
 			"primary_outline_width":  0,
-			"primary_min_height":  64,   # Phase 12 C6 Burst signature: oversized primary CTAs (bumped 56→64 desktop per SC#4 protocol, MANIFEST 2026-05-11).
-			"primary_min_height_mobile":  72,   # Phase 12 C6 Burst: 72 mobile (bumped 64→72 to preserve mobile delta over desktop); resolved on densityScale > 1.0.
+			"primary_min_height":  0,
+			"primary_min_height_mobile":  0,
 		},
 	},
 }
@@ -1223,7 +1231,7 @@ const STYLE_EXPORTS: Dictionary = {
 	Style.BUBBLE: {
 		"base_color": Color("#241326"),
 		"accent_color": Color("#FFB3E6"),
-		"corner_radius": 26,
+		"corner_radius": 24,
 		"spacing": 16,
 		"raised_strength": 3,
 		"focus_thickness": 3,
@@ -1232,7 +1240,7 @@ const STYLE_EXPORTS: Dictionary = {
 	Style.BURST: {
 		"base_color": Color("#20112E"),
 		"accent_color": Color("#FFD166"),
-		"corner_radius": 18,
+		"corner_radius": 12,
 		"spacing": 16,
 		"raised_strength": 3,
 		"focus_thickness": 3,
@@ -1241,7 +1249,7 @@ const STYLE_EXPORTS: Dictionary = {
 	Style.DAYBREAK: {
 		"base_color": Color("#0B2420"),
 		"accent_color": Color("#76F2D1"),
-		"corner_radius": 8,
+		"corner_radius": 4,
 		"spacing": 16,
 		"raised_strength": 3,
 		"focus_thickness": 2,
@@ -1259,7 +1267,7 @@ const STYLE_EXPORTS: Dictionary = {
 	Style.SLATE: {
 		"base_color": Color("#111820"),
 		"accent_color": Color("#8BD3FF"),
-		"corner_radius": 14,
+		"corner_radius": 8,
 		"spacing": 16,
 		"raised_strength": 2,
 		"focus_thickness": 2,
@@ -4522,11 +4530,11 @@ const BINDING_TABLE: Dictionary = {
 	# 38. PrimaryButton — primary brand action, accent fill via shape.primary_strategy.
 	#
 	# Per-direction recipe data wiring:
-	#   - radius:           shape.primary_radius     (Pulse 0 / Slate 14 / Bubble 999 pill /
-	#                                                 Daybreak 8 / Burst 28 oversized)
-	#   - padding:          shape.primary_padding    (Vector2i per FOUND-02; Pulse 14×10 /
-	#                                                 Slate 16×11 / Bubble 20×14 / Daybreak
-	#                                                 18×12 / Burst 20×14)
+	#   - radius:           shape.primary_radius     (Pulse 0 / Daybreak 4 / Slate 8 /
+	#                                                 Burst 12 / Bubble 24)
+	#   - padding:          shape.primary_padding    (Vector2i per FOUND-02; shared
+	#                                                 desktop padding so style swaps do
+	#                                                 not move layouts)
 	#   - raised_intensity: shape.raised_lifts.primary (Pulse 3 / Slate 2 / Bubble 6 /
 	#                                                   Daybreak 3 / Burst 5)
 	#   - strategy:         shape.primary_strategy   (5 closed-enum dispatchers in
@@ -4583,7 +4591,7 @@ const BINDING_TABLE: Dictionary = {
 	# 39. GhostButton — outlined / transparent bg via shape.ghost_strategy.
 	# Surface_panel as the recipe `role` provides a non-null bg_color to start from; the ghost
 	# strategy overrides bg_color = TRANSPARENT and applies the per-direction outline
-	# (Pulse 2px accent / Slate 1px accent / Bubble 2px accent + radius 999 / Daybreak 1px
+	# (Pulse 2px accent / Slate 1px accent / Bubble 2px accent / Daybreak 1px
 	# outline_color / Burst 2px accent). Padding mirrors PrimaryButton for visual rhythm.
 	"GhostButton": {
 		"stylebox": {
@@ -4688,8 +4696,8 @@ const BINDING_TABLE: Dictionary = {
 	# 42. IconButton — compact, borderless square chrome optimised for an icon glyph.
 	# Uses tokens.tapPadding directly (NOT shape.primary_padding) so the icon stays
 	# centered in a square hit area regardless of direction. Shape.secondary_radius
-	# provides the per-direction corner softness (Pulse 0 rectangular / Slate 14 / Bubble 26 /
-	# Daybreak 8 / Burst 18). Lifts at shape.raised_lifts.ghost so it reads as a "subtle"
+	# provides the per-direction corner softness (Pulse 0 rectangular / Daybreak 4 /
+	# Slate 8 / Burst 12 / Bubble 24). Lifts at shape.raised_lifts.ghost so it reads as a "subtle"
 	# affordance compared to primary chrome.
 	"IconButton": {
 		"stylebox": {
@@ -5120,7 +5128,7 @@ const BINDING_TABLE: Dictionary = {
 	},
 	# 53. CardPanel — PanelContainer variation (TYPEVAR-04). Uses
 	#     shape.card_radius for per-direction radius personality (Pulse 0,
-	#     Slate 14, Bubble 26, Daybreak 8, Burst 18) plus the panel
+	#     Daybreak 4, Slate 8, Burst 12, Bubble 24) plus the panel
 	#     surface_alpha and raised lift.
 	"CardPanel": {
 		"stylebox": {
@@ -5404,12 +5412,11 @@ func _apply_raised_depth_border(sb: StyleBoxFlat, offset_color: Color, intensity
 ## Strategies are sourced VERBATIM from DESIGN_TOKENS §5.1-§5.5:
 ##   "bold-accent-fill"        — Pulse: bg=role_primary (accent), thin outline matches accent.
 ##   "quiet-pill"              — Slate: bg=surface_panel, thin role_primary border (1px).
-##   "pillowy-fully-rounded"   — Bubble: bg=role_primary, radius forced to 999 (pill) AFTER
-##                               any prior radius set so shape.primary_radius=999 wins.
+##   "pillowy-rounded"         — Bubble: bg=role_primary with shape.primary_radius preserved
+##                               so rounded buttons stay generous without becoming full pills.
 ##   "friendly-generous"       — Daybreak: bg=role_primary, generous padding already applied
 ##                               by `padding: shape.primary_padding` recipe row.
-##   "oversized-statement"     — Burst: bg=role_primary, larger radius applied via shape
-##                               (28 vs base 18); padding already 20×14 from shape.
+##   "oversized-statement"     — Burst: bg=role_primary with statement color/state behavior.
 ##
 ## Strategies are CLOSED enums — adding a 6th approved direction in v2 = adding a strategy
 ## entry HERE, not editing 14 BINDING_TABLE recipe rows (D-04). Unknown strategy = no-op
@@ -5430,17 +5437,16 @@ func _apply_primary_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_t
 			sb.border_width_top = 1
 			sb.border_width_right = 1
 			sb.border_width_bottom = 1
-		"pillowy-fully-rounded":
-			# Bubble: accent fill + radius locked to 999 regardless of prior radius set.
+		"pillowy-rounded":
+			# Bubble: accent fill; radius already applied by shape.primary_radius.
 			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
-			_set_radius_all(sb, 999)
 			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
 		"friendly-generous":
 			# Daybreak: accent fill; padding/radius already applied by shape.* recipe rows.
 			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
 			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
 		"oversized-statement":
-			# Burst: accent fill; oversized radius (28) applied via shape.primary_radius.
+			# Burst: accent fill; radius already applied via shape.primary_radius.
 			sb.bg_color = role_table.get("role_primary", role_table.surface_panel)
 			sb.border_color = role_table.get("accent_rim", role_table.outline_color)
 		_:
@@ -5455,7 +5461,7 @@ func _apply_primary_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_t
 ## Strategies are sourced VERBATIM from DESIGN_TOKENS §5.1-§5.5:
 ##   "accent-outlined-accent-text"   — Pulse: transparent bg + 2px accent border.
 ##   "thin-accent-outline"           — Slate: transparent bg + 1px accent border.
-##   "rounded-ghost-thicker-outline" — Bubble: transparent bg + 2px accent border + radius 999.
+##   "rounded-ghost-thicker-outline" — Bubble: transparent bg + 2px accent border.
 ##   "soft-outline"                  — Daybreak / DEFAULT: transparent bg + 1px outline_color.
 ##   "normal-accent-ghost"           — Burst: transparent bg + 2px accent border.
 func _apply_ghost_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_table: Dictionary, style_personality: Dictionary) -> void:
@@ -5477,14 +5483,12 @@ func _apply_ghost_strategy(sb: StyleBoxFlat, strategy_name: StringName, role_tab
 			sb.border_width_right = 1
 			sb.border_width_bottom = 1
 		"rounded-ghost-thicker-outline":
-			# Bubble ghost: 2px accent + force radius 999 (pill) to read with the
-			# pillowy primary nearby.
+			# Bubble ghost: 2px accent; radius already comes from shape.secondary_radius.
 			sb.border_color = role_table.get("role_primary", role_table.outline_color)
 			sb.border_width_left = 2
 			sb.border_width_top = 2
 			sb.border_width_right = 2
 			sb.border_width_bottom = 2
-			_set_radius_all(sb, 999)
 		"soft-outline":
 			# Daybreak / DEFAULT ghost: 1px outline_color (calmer than accent).
 			sb.border_color = role_table.get("outline_color", role_table.outline_color)
@@ -5592,9 +5596,11 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			var fr_radius: int = corner_radius
 			var fr_radius_raw: Variant = recipe.get("radius", null)
 			if fr_radius_raw != null and typeof(fr_radius_raw) == TYPE_STRING and (fr_radius_raw as String).begins_with("shape."):
-				var fr_r_lookup: Variant = _lookup_shape(style_personality, fr_radius_raw)
+				var fr_radius_path := fr_radius_raw as String
+				var fr_r_lookup: Variant = _lookup_shape(style_personality, fr_radius_path)
 				if fr_r_lookup != null and (typeof(fr_r_lookup) == TYPE_INT or typeof(fr_r_lookup) == TYPE_FLOAT):
 					fr_radius = int(fr_r_lookup)
+					fr_radius = _constrain_shape_radius(fr_radius, fr_radius_path)
 			elif fr_radius_raw != null and (typeof(fr_radius_raw) == TYPE_INT or typeof(fr_radius_raw) == TYPE_FLOAT):
 				fr_radius = int(fr_radius_raw)
 			var focus_corner_profile: String = str(recipe.get("corner_profile", ""))
@@ -5631,20 +5637,23 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		# recipes opting into shape.* pin to per-direction values from DESIGN_TOKENS §5.1-§5.5.
 		var radius_raw: Variant = recipe.get("radius", null)
 		var resolved_radius: int = corner_radius
+		var radius_path := ""
 		if radius_raw != null:
 			if typeof(radius_raw) == TYPE_STRING and (radius_raw as String).begins_with("shape."):
-				var r_lookup: Variant = _lookup_shape(style_personality, radius_raw)
+				radius_path = radius_raw as String
+				var r_lookup: Variant = _lookup_shape(style_personality, radius_path)
 				if r_lookup != null and (typeof(r_lookup) == TYPE_INT or typeof(r_lookup) == TYPE_FLOAT):
 					resolved_radius = int(r_lookup)
 			elif typeof(radius_raw) == TYPE_INT or typeof(radius_raw) == TYPE_FLOAT:
 				resolved_radius = int(radius_raw)
-		# Phase 12 C6 Bubble: floor (not clamp) every resolved radius to >= min_radius_floor.
-		# Pitfall 4: use maxi, NOT mini — Bubble's primary_radius=999 must remain 999.
+		# Optional floor for a style family that wants consistently rounded chrome.
 		var min_floor_raw: Variant = _lookup_shape(style_personality, "shape.min_radius_floor")
 		if min_floor_raw != null and (typeof(min_floor_raw) == TYPE_INT or typeof(min_floor_raw) == TYPE_FLOAT):
 			var floor_v: int = int(min_floor_raw)
 			if floor_v > 0:
 				resolved_radius = maxi(resolved_radius, floor_v)
+		if radius_path != "":
+			resolved_radius = _constrain_shape_radius(resolved_radius, radius_path)
 		_set_radius_all(sb, resolved_radius)
 		var corner_profile: String = str(recipe.get("corner_profile", ""))
 		if corner_profile == "tab_connected":
@@ -5711,10 +5720,8 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 			applied_padding = true
 		if not applied_padding:
 			_set_content_margin_from_padding(sb, Vector2i.ZERO)
-		# Phase 12 C6 Burst: floor primary-button content_margin sum to shape.primary_min_height
-		# when set; gated on strategy ending in .primary_strategy so only primary buttons grow.
-		# D-12.11 spec: 56 desktop / 64 mobile. Mobile override via primary_min_height_mobile,
-		# resolved when densityScale > 1.0 (per _platform_tokens MOBILE path).
+		# Optional primary-button min-height hook. Built-in styles keep this at 0 so sizing
+		# is controlled by platform tokens, not by visual direction.
 		if recipe.has("strategy") and String(recipe.get("strategy", "")).ends_with(".primary_strategy"):
 			var min_h_raw: Variant = _lookup_shape(style_personality, "shape.primary_min_height")
 			var min_h_resolved: int = 0

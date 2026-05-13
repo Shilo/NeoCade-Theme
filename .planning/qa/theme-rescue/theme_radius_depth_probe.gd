@@ -3,18 +3,19 @@ extends SceneTree
 const THEME_PATH := "res://addons/neocade_theme/neocade_theme.tres"
 const EXPECTED_TAB_RADIUS := {
 	NeoCadeTheme.Style.PULSE: 0,
-	NeoCadeTheme.Style.DAYBREAK: 8,
-	NeoCadeTheme.Style.SLATE: 14,
-	NeoCadeTheme.Style.BURST: 16,
-	NeoCadeTheme.Style.BUBBLE: 999,
+	NeoCadeTheme.Style.DAYBREAK: 4,
+	NeoCadeTheme.Style.SLATE: 8,
+	NeoCadeTheme.Style.BURST: 12,
+	NeoCadeTheme.Style.BUBBLE: 12,
 }
 const EXPECTED_CORNER_RADIUS := {
 	NeoCadeTheme.Style.PULSE: 0,
-	NeoCadeTheme.Style.DAYBREAK: 8,
-	NeoCadeTheme.Style.SLATE: 14,
-	NeoCadeTheme.Style.BURST: 18,
-	NeoCadeTheme.Style.BUBBLE: 26,
+	NeoCadeTheme.Style.DAYBREAK: 4,
+	NeoCadeTheme.Style.SLATE: 8,
+	NeoCadeTheme.Style.BURST: 12,
+	NeoCadeTheme.Style.BUBBLE: 24,
 }
+const EXPECTED_DESKTOP_BUTTON_PADDING := Vector2(14, 9)
 
 var _failures: PackedStringArray = []
 
@@ -36,6 +37,7 @@ func _run() -> void:
 			var label := "%s:%s" % ["raised" if raised_value else "desktop", NeoCadeTheme.style_label(style_value)]
 			_check_tab_radius(theme, label)
 			_check_tab_side_margin(theme, label)
+			_check_button_radius_and_padding(theme, label)
 			_check_raised_depth(theme, label, raised_value)
 
 	_finish()
@@ -102,6 +104,42 @@ func _check_tab_side_margin(theme: NeoCadeTheme, label: String) -> void:
 				expected_margin,
 				actual_margin,
 			])
+
+
+func _check_button_radius_and_padding(theme: NeoCadeTheme, label: String) -> void:
+	var expected_radius: int = int(EXPECTED_CORNER_RADIUS.get(theme.style, theme.corner_radius))
+	for entry in [
+		{"type": &"Button", "slot": &"normal", "expect_padding": true},
+		{"type": &"PrimaryButton", "slot": &"normal", "expect_padding": true},
+		{"type": &"DangerButton", "slot": &"normal", "expect_padding": true},
+		{"type": &"OptionButton", "slot": &"normal", "expect_padding": false},
+		{"type": &"PanelContainer", "slot": &"panel", "expect_padding": false},
+	]:
+		var theme_type := entry["type"] as StringName
+		var slot_name := entry["slot"] as StringName
+		var stylebox := theme.get_stylebox(slot_name, theme_type) as StyleBoxFlat
+		if stylebox == null:
+			_fail("%s missing %s.%s for base radius check" % [label, theme_type, slot_name])
+			continue
+		if stylebox.corner_radius_top_left != expected_radius or stylebox.corner_radius_top_right != expected_radius:
+			_fail("%s %s.%s radius expected %d got %d/%d" % [
+				label,
+				theme_type,
+				slot_name,
+				expected_radius,
+				stylebox.corner_radius_top_left,
+				stylebox.corner_radius_top_right,
+			])
+		if bool(entry["expect_padding"]):
+			var actual_padding := Vector2(stylebox.content_margin_left, stylebox.content_margin_top)
+			if actual_padding != EXPECTED_DESKTOP_BUTTON_PADDING:
+				_fail("%s %s.%s desktop padding expected %s got %s" % [
+					label,
+					theme_type,
+					slot_name,
+					EXPECTED_DESKTOP_BUTTON_PADDING,
+					actual_padding,
+				])
 
 
 func _check_raised_depth(theme: NeoCadeTheme, label: String, expect_raised: bool) -> void:
