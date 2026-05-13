@@ -1,17 +1,18 @@
 # NeoCade Mobile Design Spec
 
-Phase 8 defines mobile as an export-driven platform mode on the same five NeoCade direction resources. It does not create `neocade_mobile_theme.tres`, per-density `.tres` files, subclasses, or a root fallback theme resource.
+Phase 8 defines mobile as an export-driven platform mode on the canonical NeoCade theme resource. It does not create `neocade_mobile_theme.tres`, per-density `.tres` files, subclasses, or per-style theme resources.
 
 ## Architecture Summary
 
 - Production script: `addons/neocade_theme/scripts/neocade_theme.gd`.
-- Direction resources: Pulse (`pulse_neocade_theme.tres`), Slate (`slate_neocade_theme.tres`), Bubble (`bubble_neocade_theme.tres`), Daybreak (`daybreak_neocade_theme.tres`), and Burst (`burst_neocade_theme.tres`).
-- Public exports remain the locked 9 names: `base_color`, `accent_color`, `raised`, `platform`, `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, and `outline_width`.
-- Mobile behavior is selected through `platform=MOBILE`; `platform=DESKTOP` and `platform=AUTO` remain available on the same resources.
+- Canonical resource: `addons/neocade_theme/neocade_theme.tres`.
+- Built-in styles live behind `NeoCadeTheme.Style`: `BUBBLE`, `BURST`, `DAYBREAK`, `PULSE`, `SLATE`, and `CUSTOM`.
+- Public exports are the locked 12 names: `style`, `raised`, `platform`, `base_color`, `accent_color`, `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`, `use_runtime_popup_selection_icons`, and `texture_cache`.
+- Mobile behavior is selected through `platform=MOBILE`; `platform=DESKTOP` and `platform=AUTO` remain available on the same canonical resource and on consumer-saved `NeoCadeTheme` resources.
 
 ## Forbidden Files And Resources
 
-- `addons/neocade_theme/neocade_theme.tres` is forbidden as a root fallback.
+- Per-style resources such as `pulse_neocade_theme.tres`, `slate_neocade_theme.tres`, `bubble_neocade_theme.tres`, `daybreak_neocade_theme.tres`, and `burst_neocade_theme.tres` are forbidden in the current architecture.
 - `addons/neocade_theme/neocade_mobile_theme.tres` is forbidden as a sibling mobile theme.
 - Per-density theme resources are forbidden.
 - Per-direction addon-root `.gd` subclasses, `_dev`, and `themes` folders are forbidden.
@@ -57,7 +58,7 @@ Android density buckets are handled by Godot project scaling and stretch configu
 | CheckButton | interactive | Mobile toggle/text proxy reaches at least 48px. |
 | CodeEdit | interactive | Mobile input proxy uses 16px body text and input minimum. |
 | ColorPicker | interactive | Picker constants and cursor/bar proxies remain above 48px. |
-| ColorPickerButton | interactive | LIMITED: Godot exposes only `normal` stylebox + `bg` icon for this class; a theme-only 48px min-size would consume the swatch draw rect, so consuming scenes should give standalone swatch buttons a mobile custom minimum size when needed. |
+| ColorPickerButton | interactive | LIMITED: Godot exposes only `normal` stylebox + `bg` icon for this class; a theme-only 48px min-size would consume the swatch draw rect, and the swatch fill itself is drawn as a square `draw_rect`. Consuming scenes should give standalone swatch buttons a mobile custom minimum size when needed; see `.planning/qa/theme-rescue/colorpickerbutton-radius-finding.md` for the radius limitation. |
 | ConfirmationDialog | display | Shell delegates tap targets to child Buttons. |
 | FileDialog | display | Thumbnail proxy grows from 96 to 128; shell buttons inherit Button formulas. |
 | FoldableContainer | interactive | Title row and arrow proxy pass the 48px floor. |
@@ -93,7 +94,7 @@ Android density buckets are handled by Godot project scaling and stretch configu
 
 Evidence lives at `.planning/phases/08-mobile-variant-token-block-tap-target-audit-updated-for-dyna/logs/08-tap-target-audit.log`.
 
-The Phase 8 audit runs all five directions with `platform=MOBILE`, `raised=false`, and `raised=true`. Current result: 250 PASS, 10 LIMITED, 110 N/A, 0 FAIL. Follow-up runtime probing in 2026-05-09 added `theme_mobile_tap_target_probe.gd`, which verifies actual `get_combined_minimum_size()` for common controls, button variations, icon/flat buttons, MenuButton, Tree/ItemList row height, PopupMenu row/icon sizing, and embedded Window title/close chrome. It also verifies mobile-readable icons for CheckBox, RadioButton, CheckButton, PopupMenu check/radio items, LineEdit clear, and TabBar arrows. ColorPickerButton remains source-limited for theme-only minimum size, so the theme keeps its chrome margins small and consuming mobile layouts should assign a 48x48 minimum where the swatch is standalone. Scrollbars remain intentionally compact. Mobile metrics are 1920x1080 design-space units that the project scales to device resolution, not raw physical device pixels.
+The Phase 8 audit runs all five built-in styles with `platform=MOBILE`, `raised=false`, and `raised=true`. Current result: 250 PASS, 10 LIMITED, 110 N/A, 0 FAIL. Follow-up runtime probing in 2026-05-09 added `theme_mobile_tap_target_probe.gd`, which verifies actual `get_combined_minimum_size()` for common controls, button variations, icon/flat buttons, MenuButton, Tree/ItemList row height, PopupMenu row/icon sizing, and embedded Window title/close chrome. It also verifies mobile-readable icons for CheckBox, RadioButton, CheckButton, PopupMenu check/radio items, LineEdit clear, and TabBar arrows. ColorPickerButton remains source-limited for theme-only minimum size and true swatch radius, so the theme keeps its chrome margins small and consuming mobile layouts should assign a 48x48 minimum where the swatch is standalone. Scrollbars remain intentionally compact. Mobile metrics are 1920x1080 design-space units that the project scales to device resolution, not raw physical device pixels.
 
 ## Limitations
 
@@ -107,7 +108,7 @@ The Phase 8 audit runs all five directions with `platform=MOBILE`, `raised=false
 
 ## 14 Core Runtime Type Variations
 
-The older 13-variation research wording is superseded by the live `TYPE_VARIATIONS` registry in `addons/neocade_theme/scripts/neocade_theme.gd`. Phase 8 documents the core runtime variations; editor-only variations may also exist in the registry for Godot editor integration:
+The older 13-variation research wording is superseded by the live `TYPE_VARIATIONS` registry in `addons/neocade_theme/scripts/neocade_theme.gd`. As of the 2026-05-13 docs sync, the live registry contains 62 total entries: the 14 core runtime variations below, 9 opt-in role variations from Phase 13, and editor/integration variations used by Godot editor surfaces.
 
 | Variation | Base | Mobile behavior |
 |---|---|---|
@@ -126,6 +127,22 @@ The older 13-variation research wording is superseded by the live `TYPE_VARIATIO
 | CardPanel | PanelContainer | Keeps radius identity; padding follows density-scaled recipes where authored. |
 | HeroPanel | PanelContainer | Keeps radius identity; mobile mode changes sizing, not brand identity. |
 
+## Role Variations Added After Phase 8
+
+Phase 13 added these opt-in variations. They are not part of the original 14 core runtime list above, but they are now part of the live mobile-capable registry:
+
+| Variation | Base | Mobile behavior |
+|---|---|---|
+| SuccessLabel | Label | Uses the mobile label/font sizing path plus success role color. |
+| WarningLabel | Label | Uses the mobile label/font sizing path plus warning role color. |
+| DangerLabel | Label | Uses the mobile label/font sizing path plus danger role color. |
+| InfoLabel | Label | Uses the mobile label/font sizing path plus info role color. |
+| AccentPanel | PanelContainer | Keeps panel geometry; tint is opt-in via `theme_type_variation`. |
+| InfoPanel | PanelContainer | Keeps panel geometry; tint is opt-in via `theme_type_variation`. |
+| WarningPanel | PanelContainer | Keeps panel geometry; tint is opt-in via `theme_type_variation`. |
+| DangerPanel | PanelContainer | Keeps panel geometry; tint is opt-in via `theme_type_variation`. |
+| SuccessPanel | PanelContainer | Keeps panel geometry; tint is opt-in via `theme_type_variation`. |
+
 ## Requirement Traceability
 
 | Requirement | Phase 8 coverage |
@@ -139,10 +156,10 @@ The older 13-variation research wording is superseded by the live `TYPE_VARIATIO
 | MOBILE-07 | This root spec documents deltas, rationale, evidence, and limitations. |
 | MOBILE-08 | Mobile preserves NeoCade identity and avoids native iOS/Android imitation. |
 | DOCS-02 | Root mobile delta documentation exists. |
-| TYPEVAR-06 | The authoritative core runtime variations are documented with mobile behavior; editor-only variations are handled separately in `TYPE_VARIATIONS`. |
+| TYPEVAR-06 | The authoritative core runtime variations and Phase 13 role variations are documented with mobile behavior; editor/integration variations are handled separately in `TYPE_VARIATIONS`. |
 
 ## Phase 9 And Phase 10 Handoff
 
-- Phase 9 may build the full showcase, but should preserve this Phase 8 fixture boundary: no new mobile `.tres`, no per-density resources, and no subclasses.
+- Phase 9+ showcase work must preserve this Phase 8 fixture boundary: no new mobile `.tres`, no per-style resources, no per-density resources, and no subclasses.
 - Phase 10 owns final cross-platform export and screenshot validation, including real Android/iOS/Web checks subject to UD-5.
 - This spec is implementation evidence, not final device certification.

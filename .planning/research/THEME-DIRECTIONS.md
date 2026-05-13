@@ -4,13 +4,13 @@
 **Created:** 2026-05-06
 **Status:** Text-level directions approved after two revision rounds. **Revision 2/2 (2026-05-06b) migrated Bubble and Daybreak from light-mode to designed dark-mode palettes** to comply with the project-wide "all v1 themes are dark" constraint (PROJECT.md "Out of Scope: Light color mode"). Direction names, identities, personality intent, and use cases preserved.
 
-**Architecture amendment 2026-05-06e:** The "Future subclass form: `{Name}NeoCadeTheme`" lines below in each direction's section reflect the architecture as it stood when Phase 3.3 closed. PROJECT.md was subsequently simplified (2026-05-06e) to **single concrete class + data-driven `.tres` per direction** (godot-minimal-theme pattern). Under the simplified architecture there are NO per-direction subclass classes — every direction is a `.tres` of type `NeoCadeTheme` (the single concrete class) with different `@export` values. The `.tres` filename stems below remain authoritative; the "Future subclass form" lines are historical context only. See PROJECT.md Key Decisions row "Architecture simplified to single concrete class + data-driven `.tres` per direction (2026-05-06e)" for the locked architecture, and `.planning/phases/03.4-visual-direction-flat-extruded-flat-mockup-approval-gate/03.4-CORRECTIVE-ADDENDUM.md` D-31 for the full contract.
+**Architecture amendment 2026-05-13:** Production now uses one concrete `NeoCadeTheme` class plus one canonical `addons/neocade_theme/neocade_theme.tres` resource. Bubble, Burst, Daybreak, Pulse, Slate, and Custom are selected by `NeoCadeTheme.Style`; there are no per-direction subclasses and no per-style `.tres` files. Older Phase 3.3 language about future subclasses or filename stems is preserved only in historical verification notes.
 
 ## Provenance and Scope
 
 Phase 3.3 is text-level direction research only. It derives five candidate theme directions for later user approval, but it must not create mockups, concept images, HTML/CSS boards, production theme resources, addon files, fonts, icons, scenes, project settings, or `.tres` styling commits.
 
-The output is this research artifact plus a later text-level checkpoint. Phase 3.4 owns visual mockups. Phase 4 owns subclass implementation and production theme resources.
+The output is this research artifact plus a later text-level checkpoint. Phase 3.4 owns visual mockups. Phase 4 owns the single-class implementation and production theme resource.
 
 Primary inputs, in priority order per D-02:
 
@@ -18,7 +18,7 @@ Primary inputs, in priority order per D-02:
 2. User restrictions: no textures, patterns, embossing, painterly/leather/wood/grunge surfaces, or gradients on chrome; anti-cyberpunk discipline remains.
 3. User exemplars: HCGames/Renderman Flat GUI for mobile games and fajrulaslim UI Button Flat Design.
 4. v0 reaction DNA: Midnight Marquee, Cabinet Chrome, Prize Pop Plaza, and Orbital Playdeck can contribute liked DNA; Boardwalk Sunset is hard-rejected.
-5. Phase 3.1 and 3.2 outputs: MD3/MD3 Expressive grammar, Flat-3D construction rules, and dynamic `NeoCadeTheme` superclass architecture.
+5. Phase 3.1 and 3.2 outputs: MD3/MD3 Expressive grammar, Flat-3D construction rules, and dynamic `NeoCadeTheme` single-class architecture.
 
 ## Source Roles and Citation Contract
 
@@ -108,15 +108,15 @@ Per D-01, D-01b, D-01c, D-04, and D-05, v0 directions are DNA inputs, not automa
 
 ## Candidate Directions
 
-Shared direction constraints: All five are peer candidates per D-03 and D-03b. No base direction is selected here; base direction deferred to Phase 3.4. Each direction must work through the same dynamic `NeoCadeTheme` export model: `raised`, `platform`, `base_color`, and `accent_color`. D-06 seeded archetypes were retained because the survey provided evidence for all five anchors. D-14 and D-15 naming rules are applied through PascalCase future subclass names ending in `NeoCadeTheme`, with no cyber/synth/noir-coded names. D-16 carries Inter Variable Roman, dynamic superclass compatibility, and coverage discipline into every direction.
+Shared direction constraints: All five are peer candidates per D-03 and D-03b. Pulse was later selected as the recommended starter, but it has no architectural privilege. Each direction works through the same dynamic `NeoCadeTheme` export model: `style`, `raised`, `platform`, `base_color`, and `accent_color`. D-06 seeded archetypes were retained because the survey provided evidence for all five anchors. The final implementation uses `NeoCadeTheme.Style` enum values inside one concrete class, not future subclasses or per-style `.tres` files. D-16 carries Inter Variable Roman, dynamic theme compatibility, and coverage discipline into every direction.
 
 Naming revision note: Per user feedback on 2026-05-06, final direction names are generic one-word names. They avoid surveyed product names, v0 multiword concept labels, and source-specific branding. This is a naming-risk reduction, not legal advice.
 
-### PulseNeoCadeTheme
+### Style.PULSE — Pulse
 
 - Direction display name: Pulse
-- Future subclass form: PulseNeoCadeTheme
-- Suggested future `.tres` filename stem: `pulse_neocade_theme`
+- Implementation selector: `NeoCadeTheme.Style.PULSE`
+- Canonical resource: `res://addons/neocade_theme/neocade_theme.tres`
 - Base color: #151A2E
 - Accent color: #8BFF6A
 - Contrast ratio: 13.62:1 - WCAG AA PASS
@@ -127,15 +127,15 @@ Naming revision note: Per user feedback on 2026-05-06, final direction names are
 - Mobile-sizing notes: Mobile keeps the same personality but increases button/toggle targets toward iOS 44pt and Android 48dp floors; the bright accent is limited to action/focus roles so small screens do not become noisy.
 - DNA inputs used: Midnight Marquee palette love; Cabinet Chrome dark-clean palette; Boardwalk Sunset rejection as a no-texture reminder only.
 - Commercial examples used: Brawl Stars screenshot collection for strong action hierarchy; SunGraphica for dark flat game UI breadth; Material Web for role-token discipline.
-- Rationale: Phase 3.1 supports saturated but controlled color, state layers, and MD3 surface roles; Phase 3.2 supports export-driven base/accent regeneration through one subclass. This direction satisfies D-03 by taking the dark saturated arcade anchor, D-03b by supporting both flat/raised and desktop/mobile, and D-16 by staying Inter-only and Theme-compatible.
-- Surface alpha policy: 100% solid on every surface (popup, panels, buttons, chrome). Cabinets are physical hardware; translucent cabinets read as sci-fi-HUD, not arcade. Modal scrim ~50% black behind popups (Godot's built-in `Window`/`Popup` modal-darkening). Authored in the `.tres` via Theme Editor — not an `@export`.
+- Rationale: Phase 3.1 supports saturated but controlled color, state layers, and MD3 surface roles; Phase 3.2 supports export-driven base/accent regeneration through the single concrete class. This direction satisfies D-03 by taking the dark saturated arcade anchor, D-03b by supporting both flat/raised and desktop/mobile, and D-16 by staying Inter-only and Theme-compatible.
+- Surface alpha policy: 100% solid on every surface (popup, panels, buttons, chrome). Cabinets are physical hardware; translucent cabinets read as sci-fi-HUD, not arcade. Modal scrim ~50% black behind popups (Godot's built-in `Window`/`Popup` modal-darkening). Implemented in `NeoCadeTheme` style formulas/personality — not a public export.
 - Filter audit status: PASS; see Filter Audit Summary.
 
-### SlateNeoCadeTheme
+### Style.SLATE — Slate
 
 - Direction display name: Slate
-- Future subclass form: SlateNeoCadeTheme
-- Suggested future `.tres` filename stem: `slate_neocade_theme`
+- Implementation selector: `NeoCadeTheme.Style.SLATE`
+- Canonical resource: `res://addons/neocade_theme/neocade_theme.tres`
 - Base color: #111820
 - Accent color: #8BD3FF
 - Contrast ratio: 10.94:1 - WCAG AA PASS
@@ -146,15 +146,15 @@ Naming revision note: Per user feedback on 2026-05-06, final direction names are
 - Mobile-sizing notes: Mobile mode keeps the quiet palette but expands spacing and button-like constants toward 44pt/48dp floors; focus rings stay high-contrast because the accent is sparse.
 - DNA inputs used: Orbital Playdeck modern/dark/big-button DNA; Cabinet Chrome clean dark palette; rejected Orbital texture as a hard boundary.
 - Commercial examples used: Material Web theming for token hierarchy; Android Developers Material 3 guidance for role pairing; Kenney UI Pack for restrained reusable shapes.
-- Rationale: Phase 3.1's MD3 role system and state-layer discipline are strongest here; Phase 3.2's dynamic subclass contract lets this direction tune profile values without losing full base coverage. This direction covers the modern minimal dark D-06 anchor while still satisfying D-03b universal axes and D-14/D-15 naming.
-- Surface alpha policy: popup chrome at **92%** alpha (`PopupPanel`, `AcceptDialog`, `ConfirmationDialog`, `Window` chrome `bg_color.a = 0.92`); all other surfaces 100% solid. Matches actual iOS NavigationBar / Sheet / modal-backdrop translucency for an iOS-premium feel. Modal scrim ~50% black behind popups (Godot's built-in modal-darkening). Authored in the `.tres` via Theme Editor — not an `@export`.
+- Rationale: Phase 3.1's MD3 role system and state-layer discipline are strongest here; Phase 3.2's dynamic single-class contract lets this direction tune profile values without losing full base coverage. This direction covers the modern minimal dark D-06 anchor while still satisfying D-03b universal axes and D-14/D-15 naming.
+- Surface alpha policy: popup chrome at **92%** alpha (`PopupPanel`, `AcceptDialog`, `ConfirmationDialog`, `Window` chrome `bg_color.a = 0.92`); all other surfaces 100% solid. Matches actual iOS NavigationBar / Sheet / modal-backdrop translucency for an iOS-premium feel. Modal scrim ~50% black behind popups (Godot's built-in modal-darkening). Implemented in `NeoCadeTheme` style formulas/personality — not a public export.
 - Filter audit status: PASS; see Filter Audit Summary.
 
-### BubbleNeoCadeTheme
+### Style.BUBBLE — Bubble
 
 - Direction display name: Bubble
-- Future subclass form: BubbleNeoCadeTheme
-- Suggested future `.tres` filename stem: `bubble_neocade_theme`
+- Implementation selector: `NeoCadeTheme.Style.BUBBLE`
+- Canonical resource: `res://addons/neocade_theme/neocade_theme.tres`
 - Base color: #241326 *(dark berry-aubergine; Revision 2/2)*
 - Accent color: #FFB3E6 *(light bubblegum pink; Revision 2/2)*
 - Contrast ratio: 10.74:1 - WCAG AAA PASS *(re-verified 2026-05-06b in `.planning/mockups/3.4/wcag-palette-audit.md`)*
@@ -166,15 +166,15 @@ Naming revision note: Per user feedback on 2026-05-06, final direction names are
 - Mobile-sizing notes: Mobile mode leans into larger buttons and toggles with 44pt/48dp minimum targets, while desktop mode tempers spacing to remain usable for editor/runtime panels.
 - DNA inputs used: Prize Pop Plaza loved personality; user exemplar flat/raised button grammar; Boardwalk Sunset rejection prevents warm textured drift.
 - Commercial examples used: HCGames Flat GUI, fajrulaslim UI Button Flat Design, GameArt2D, MODI, Pinky UI, and Royal Match.
-- Rationale: Phase 3.1 validates extruded-flat as a solid top shape plus offset darker duplicate; MD3 Expressive supports stronger static personality through color, shape, and hierarchy. Phase 3.2 lets the same subclass support flat/raised and desktop/mobile from exports, satisfying D-03b and D-16.
-- Surface alpha policy: 100% solid on every surface (popup, panels, buttons, chrome). Candy is opaque material; translucent candy reads as ice or jelly, which would shift the mood toward sci-fi. Modal scrim ~50% black behind popups (Godot's built-in modal-darkening). Authored in the `.tres` via Theme Editor — not an `@export`.
+- Rationale: Phase 3.1 validates extruded-flat as a solid top shape plus offset darker duplicate; MD3 Expressive supports stronger static personality through color, shape, and hierarchy. Phase 3.2 lets the same single class support flat/raised and desktop/mobile from exports, satisfying D-03b and D-16.
+- Surface alpha policy: 100% solid on every surface (popup, panels, buttons, chrome). Candy is opaque material; translucent candy reads as ice or jelly, which would shift the mood toward sci-fi. Modal scrim ~50% black behind popups (Godot's built-in modal-darkening). Implemented in `NeoCadeTheme` style formulas/personality — not a public export.
 - Filter audit status: PASS; see Filter Audit Summary.
 
-### DaybreakNeoCadeTheme
+### Style.DAYBREAK — Daybreak
 
 - Direction display name: Daybreak
-- Future subclass form: DaybreakNeoCadeTheme
-- Suggested future `.tres` filename stem: `daybreak_neocade_theme`
+- Implementation selector: `NeoCadeTheme.Style.DAYBREAK`
+- Canonical resource: `res://addons/neocade_theme/neocade_theme.tres`
 - Base color: #0B2420 *(dark forest teal; Revision 2/2)*
 - Accent color: #76F2D1 *(fresh mint; Revision 2/2)*
 - Contrast ratio: 11.96:1 - WCAG AAA PASS *(re-verified 2026-05-06b in `.planning/mockups/3.4/wcag-palette-audit.md`)*
@@ -187,14 +187,14 @@ Naming revision note: Per user feedback on 2026-05-06, final direction names are
 - DNA inputs used: Phase 3.1 daylight-friendly gap; HCGames/GameArt2D/Kenney friendliness; the "vibrant arcade hall by day" project identity reinterpreted dark.
 - Commercial examples used: HCGames, GameArt2D, Kenney, Pinky UI, Royal Match, and Android Developers Expressive Wear guidance.
 - Rationale: MD3/MD3 Expressive supports bright accents on dark surfaces and accessible role pairing, while NeoCade's dynamic base/accent exports let consumers adjust palettes without losing direction identity. This direction satisfies D-03 by widening personality spread (the friendliest dark direction) and D-03b by treating desktop/mobile and flat/raised as universal, not identity.
-- Surface alpha policy: container panels at **96%** alpha (`Panel`, `PanelContainer`, `ScrollContainer` chrome, `MarginContainer` with panel stylebox `bg_color.a = 0.96`) AND popup chrome at **90%** alpha (`PopupPanel`, `AcceptDialog`, `ConfirmationDialog`, `Window` chrome `bg_color.a = 0.90`); buttons, inputs, tabs, list rows, range controls, brand mark all 100% solid. Subtle translucency reinforces the airy welcoming-lobby mood — daylight feel through windows. Modal scrim ~50% black behind popups (Godot's built-in modal-darkening). Authored in the `.tres` via Theme Editor — not an `@export`.
+- Surface alpha policy: container panels at **96%** alpha (`Panel`, `PanelContainer`, `ScrollContainer` chrome, `MarginContainer` with panel stylebox `bg_color.a = 0.96`) AND popup chrome at **90%** alpha (`PopupPanel`, `AcceptDialog`, `ConfirmationDialog`, `Window` chrome `bg_color.a = 0.90`); buttons, inputs, tabs, list rows, range controls, brand mark all 100% solid. Subtle translucency reinforces the airy welcoming-lobby mood — daylight feel through windows. Modal scrim ~50% black behind popups (Godot's built-in modal-darkening). Implemented in `NeoCadeTheme` style formulas/personality — not a public export.
 - Filter audit status: PASS; see Filter Audit Summary.
 
-### BurstNeoCadeTheme
+### Style.BURST — Burst
 
 - Direction display name: Burst
-- Future subclass form: BurstNeoCadeTheme
-- Suggested future `.tres` filename stem: `burst_neocade_theme`
+- Implementation selector: `NeoCadeTheme.Style.BURST`
+- Canonical resource: `res://addons/neocade_theme/neocade_theme.tres`
 - Base color: #20112E
 - Accent color: #FFD166
 - Contrast ratio: 12.33:1 - WCAG AA PASS
@@ -205,8 +205,8 @@ Naming revision note: Per user feedback on 2026-05-06, final direction names are
 - Mobile-sizing notes: Mobile mode preserves the celebratory accent but enlarges touch affordances to 44pt/48dp targets and avoids filling every row with gold, which would reduce scan speed.
 - DNA inputs used: Phase 3.1 MD3 Expressive findings; Prize Pop Plaza friendliness at a more polished intensity; Midnight/Cabinet dark arcade grounding.
 - Commercial examples used: Google Expressive research, Material 3 Expressive official blog, Android Developers Blog for M3 Expressive, fajrulaslim, MODI, SunGraphica, and Brawl Stars.
-- Rationale: This direction is the D-06 expressive statement anchor. It uses MD3 Expressive's static levers - color confidence, shape, containment, and emphasis - while Phase 3.2's superclass/subclass model keeps the implementation deterministic and complete.
-- Surface alpha policy: 100% solid on every surface (popup, panels, buttons, chrome). Award/poster surfaces are solid; translucent achievement screens feel weak rather than bold. Modal scrim ~50% black behind popups (Godot's built-in modal-darkening). Authored in the `.tres` via Theme Editor — not an `@export`.
+- Rationale: This direction is the D-06 expressive statement anchor. It uses MD3 Expressive's static levers - color confidence, shape, containment, and emphasis - while Phase 3.2's single-class model keeps the implementation deterministic and complete.
+- Surface alpha policy: 100% solid on every surface (popup, panels, buttons, chrome). Award/poster surfaces are solid; translucent achievement screens feel weak rather than bold. Modal scrim ~50% black behind popups (Godot's built-in modal-darkening). Implemented in `NeoCadeTheme` style formulas/personality — not a public export.
 - Filter audit status: PASS; see Filter Audit Summary.
 
 ## Filter Audit Summary
@@ -241,13 +241,13 @@ User decision, 2026-05-06: revise names to generic one-word names and approve th
 
 Five directions awaiting decision:
 
-| Direction | Future subclass | Base color | Accent color | Contrast | One-sentence personality summary |
+| Direction | Style selector | Base color | Accent color | Contrast | One-sentence personality summary |
 |---|---|---|---|---|---|
-| Pulse | PulseNeoCadeTheme | #151A2E | #8BFF6A | 13.62:1 | Dark saturated arcade energy with a near-navy control-panel base and lively green action/focus accent. |
-| Slate | SlateNeoCadeTheme | #111820 | #8BD3FF | 10.94:1 | Calm modern minimal dark with restrained blue accenting and iOS-like clarity. |
-| Bubble | BubbleNeoCadeTheme | #241326 | #FFB3E6 | 10.74:1 | Friendly, childlike, mobile-game-bright translated dark — playful candy-counter at night. *(Revised 2/2 to dark.)* |
-| Daybreak | DaybreakNeoCadeTheme | #0B2420 | #76F2D1 | 11.96:1 | Welcoming-daylight mood translated dark — fresh evening lobby with bright mint wayfinding. *(Revised 2/2 to dark.)* |
-| Burst | BurstNeoCadeTheme | #20112E | #FFD166 | 12.33:1 | Bold MD3 Expressive statement with deep plum grounding and warm event-like emphasis. |
+| Pulse | `NeoCadeTheme.Style.PULSE` | #151A2E | #8BFF6A | 13.62:1 | Dark saturated arcade energy with a near-navy control-panel base and lively green action/focus accent. |
+| Slate | `NeoCadeTheme.Style.SLATE` | #111820 | #8BD3FF | 10.94:1 | Calm modern minimal dark with restrained blue accenting and iOS-like clarity. |
+| Bubble | `NeoCadeTheme.Style.BUBBLE` | #241326 | #FFB3E6 | 10.74:1 | Friendly, childlike, mobile-game-bright translated dark — playful candy-counter at night. *(Revised 2/2 to dark.)* |
+| Daybreak | `NeoCadeTheme.Style.DAYBREAK` | #0B2420 | #76F2D1 | 11.96:1 | Welcoming-daylight mood translated dark — fresh evening lobby with bright mint wayfinding. *(Revised 2/2 to dark.)* |
+| Burst | `NeoCadeTheme.Style.BURST` | #20112E | #FFD166 | 12.33:1 | Bold MD3 Expressive statement with deep plum grounding and warm event-like emphasis. |
 
 ## Phase 3.3 Verification Log
 
@@ -279,7 +279,7 @@ ROADMAP success criteria audit:
 
 | SC | Roadmap success criterion | Evidence | Status |
 |---|---|---|---|
-| SC-01 | THEME-DIRECTIONS.md produced with 5 candidate directions, subclass-form names, base/accent hex values, WCAG AA contrast, personality summaries, target use cases, filter audit, and rationale. | Candidate Directions section and Filter Audit Summary. | PASS |
+| SC-01 | THEME-DIRECTIONS.md produced with 5 candidate directions, style selectors, base/accent hex values, WCAG AA contrast, personality summaries, target use cases, filter audit, and rationale. | Candidate Directions section and Filter Audit Summary. | PASS |
 | SC-02 | Names may keep, revise, or replace per fit; Boardwalk Sunset is hard-rejected. | v0 Feedback DNA Mapping and direction naming decisions. | PASS |
 | SC-03 | Five directions span personality space, not five similar themes. | Pulse, Slate, Bubble, Daybreak, and Burst cover the five D-06 anchors. | PASS |
 | SC-04 | Per-v0-direction reaction to DNA mapping table exists. | v0 Feedback DNA Mapping table names liked DNA, rejected traits, eligible use, and informed directions. | PASS |
@@ -321,9 +321,9 @@ Context decision audit:
 | D-11 | SOURCES.md Section 14 added. | PASS |
 | D-12 | Approval gate options were approve, revise, reject all; user chose a focused naming revision and approved the rest. | PASS |
 | D-13 | Approval is text-level only before mockups. | PASS |
-| D-14 | Candidate future subclass forms are PascalCase and end in NeoCadeTheme. | PASS |
+| D-14 | Candidate names are stable style names under `NeoCadeTheme.Style`; older future-subclass naming is superseded. | PASS |
 | D-15 | Names avoid forbidden cyber/synth/noir coding; Boardwalk Sunset absent as candidate. | PASS |
-| D-16 | Inter Variable Roman and dynamic `NeoCadeTheme` superclass compatibility are preserved. | PASS |
+| D-16 | Inter Variable Roman and dynamic `NeoCadeTheme` single-class compatibility are preserved. | PASS |
 
 Final no-forbidden-file audit: PASS. No mockup, image, addon, theme resource, font, icon, scene, project, production `.gd`, or `.tres` file was intentionally changed during Phase 3.3 execution.
 
@@ -333,7 +333,7 @@ Final no-forbidden-file audit: PASS. No mockup, image, addon, theme resource, fo
 |---|---|
 | user request | PASS: direction names changed to generic one-word names; rest of direction set approved. |
 | final approved names | PASS: Pulse, Slate, Bubble, Daybreak, Burst. |
-| future subclass names | PASS: PulseNeoCadeTheme, SlateNeoCadeTheme, BubbleNeoCadeTheme, DaybreakNeoCadeTheme, BurstNeoCadeTheme. |
+| style selector names | PASS: `PULSE`, `SLATE`, `BUBBLE`, `DAYBREAK`, `BURST`. |
 | copyright/name-risk reduction | PASS: names are generic dictionary-style words and do not reuse surveyed product names or v0 multiword concept labels. |
 | filter and contrast checks | PASS: naming-only revision does not alter palettes, behavior, or filter audit outcomes. |
 
@@ -352,7 +352,7 @@ Final no-forbidden-file audit: PASS. No mockup, image, addon, theme resource, fo
 | Bubble revised palette | PASS: `#241326` (dark berry-aubergine) + `#FFB3E6` (light bubblegum pink) — 10.74:1 WCAG AAA. |
 | Daybreak revised palette | PASS: `#0B2420` (dark forest teal) + `#76F2D1` (fresh mint) — 11.96:1 WCAG AAA. |
 | Pulse / Slate / Burst | UNCHANGED: already dark, no revision needed. |
-| direction identity preservation | PASS: names, future subclass forms, DNA inputs, target use cases, personality summaries (intent), and filter audit outcomes preserved; only base/accent hex values and palette description language changed. |
+| direction identity preservation | PASS: names, style selectors, DNA inputs, target use cases, personality summaries (intent), and filter audit outcomes preserved; only base/accent hex values and palette description language changed. |
 | five-direction visual distinguishability | PASS: bases span navy/slate/wine/forest-teal/plum (five distinct hue families); accents span lime/sky/pink/mint/gold (five distinct hue families). |
 | broader spread maintained | PASS: D-03 broad personality spread retained — saturated arcade (Pulse), modern minimal (Slate), playful (Bubble), welcoming (Daybreak), expressive statement (Burst). |
 | filter audit | PASS: anti-cyberpunk + anti-texture + universal-axes-still-work + no-base-preselection still hold for revised palettes. |

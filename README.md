@@ -84,6 +84,18 @@ func _ready() -> void:
 > it mutates `ThemeDB.default_theme` (the deepest fallback every Control
 > hits) at runtime, past the buggy boot window. See **Known Issues**.
 
+When dogfooding NeoCade as the Godot editor custom theme, avoid also saving
+the same `neocade_theme.tres` as a scene-root `theme` on showcase/sample
+scenes. Prefer runtime-only assignment:
+
+```gdscript
+func _ready() -> void:
+    NeoCadeTheme.apply_to_control(self)
+```
+
+`apply_to_control()` no-ops in the editor and only assigns the canonical theme
+when the target `Control` has no theme yet.
+
 For runtime style or variant toggles, duplicate before mutating:
 
 ```gdscript
@@ -102,6 +114,33 @@ Migration note: older per-style files such as `pulse_neocade_theme.tres` have
 been replaced by `neocade_theme.tres` plus the `style` export.
 
 ## Known Issues
+
+### Editor custom theme icon polarity
+
+NeoCade can be loaded into the Godot editor itself via
+*Editor Settings > Interface > Theme > Custom Theme*, but Godot still
+generates its built-in editor theme before merging the custom theme.
+That means `interface/theme/base_color` and `interface/theme/accent_color`
+can affect generated `EditorIcons` even though NeoCade overrides its own
+surfaces and colors.
+
+The most visible case is `interface/theme/base_color = #ffffff` while
+`interface/theme/icon_and_font_color = Auto`: Godot treats the editor as a
+light theme, bakes dark editor icons, and then merges NeoCade's dark editor
+surfaces over them. Toolbars, main screen buttons, FileSystem icons, and other
+editor-only icon textures can then look too dark.
+
+**Workaround:** set
+*Editor Settings > Interface > Theme > Icon And Font Color* to **Light** when
+using NeoCade as the editor custom theme. This forces Godot to generate light
+editor icons regardless of editor `base_color`.
+
+NeoCade does not automatically change this setting because it is a global
+editor preference that persists after the theme is removed. NeoCade also does
+not vendor or override every built-in `EditorIcons` texture; doing so would be
+a large Godot-version maintenance surface. If `accent_color` affects a specific
+generated editor icon, treat it as an editor integration caveat unless that icon
+is worth a narrow explicit override.
 
 ### Project `[gui] theme/custom` triggers Godot debugger spam
 
@@ -162,11 +201,44 @@ All of this goes away the day Godot patches `scene_debugger.cpp:521`'s
 `ERR_FAIL_NULL_V` to silently early-return when `SceneTree::get_singleton()`
 is null.
 
+### Editor custom theme plus scene-root theme can freeze scene switching
+
+NeoCade supports use as a Godot editor custom theme via
+*Editor Settings > Interface > Theme > Custom Theme*. A separate trap appears
+when the same canonical `res://addons/neocade_theme/neocade_theme.tres`
+resource is also serialized onto the root `Control.theme` of a scene being
+edited, such as the Showcase scene. In Godot 4.6.2 this can make switching
+back to that scene freeze the editor for minutes, especially after creating or
+switching through another scene. Empty scenes do not reproduce it.
+
+The observed freeze was not caused by recursive NeoCade regeneration: the
+theme has a `_regenerating` guard, diagnostic logs showed one regeneration per
+theme instance, and raw generation measured in milliseconds
+(about 25ms uncached, about 4ms with the persistent texture cache warmed).
+The expensive path was the editor applying/inspecting a live scene root theme
+that referenced the same dynamic theme resource already merged into the editor
+UI.
+
+**Workaround:** do not serialize the canonical NeoCade theme onto showcase or
+sample scene roots while also using NeoCade as the editor custom theme. Apply
+it at runtime instead:
+
+```gdscript
+func _ready() -> void:
+    NeoCadeTheme.apply_to_control(self)
+```
+
+`apply_to_control()` returns immediately in editor mode, so the `.tscn` stays
+clean while the running game/showcase still gets the canonical Pulse theme.
+If a scene includes `NeoCadeThemeOptionButton`, it should refresh after the
+runtime assignment so stale editor-serialized picker state cannot clear the
+runtime theme.
+
 ## Showcase
 
 Open `showcase/showcase.tscn` in Godot 4.6.2 to inspect:
 
-- 9 sections covering controls, dialogs, graph, tokens, and coverage.
+- 10 sections covering controls, dialogs, graph, tokens, coverage, and role variations.
 - `NeoCadeThemeOptionButton` dropdown in `addons/neocade_theme/scripts/`
   lists NeoCade styles alphabetically and appends `None` when allowed.
   `None` applies a null theme. It emits `theme_selected(theme, index)` after
@@ -177,6 +249,46 @@ Open `showcase/showcase.tscn` in Godot 4.6.2 to inspect:
 
 `export_presets.cfg` includes a Web preset for release builds and named
 desktop/mobile target presets for QA.
+
+## Role Variations (opt-in)
+
+NeoCade ships 9 opt-in type variations that consumers can apply when a widget
+semantically represents success / warning / danger / info / accent state. Default
+`Label` and `PanelContainer` chrome stay unchanged; the variations only activate
+when the consumer assigns `theme_type_variation`.
+
+**4 Role Labels** (extend `Label`) recolor `font_color` to the matching role token:
+
+| Variation       | Color token   |
+|-----------------|---------------|
+| `SuccessLabel`  | `role_success` |
+| `WarningLabel`  | `role_warning` |
+| `DangerLabel`   | `role_danger`  |
+| `InfoLabel`     | `role_info`    |
+
+**5 Role Panels** (extend `PanelContainer`) replace the panel face with a 6%
+opacity wash of the matching role color so the underlying surface shows through.
+When `raised = true`, the panel additionally picks up a darker role-tinted edge
+from the `raised_face_edge` treatment (consistent with every other raised panel
+chrome); keep `raised` off for a flat translucent banner.
+
+| Variation       | Tint role      |
+|-----------------|----------------|
+| `AccentPanel`   | `role_primary` |
+| `InfoPanel`     | `role_info`    |
+| `WarningPanel`  | `role_warning` |
+| `DangerPanel`   | `role_danger`  |
+| `SuccessPanel`  | `role_success` |
+
+Apply via the Inspector's `Theme Type Variation` field or in code:
+
+```gdscript
+my_label.theme_type_variation = &"SuccessLabel"
+my_panel.theme_type_variation = &"AccentPanel"
+```
+
+The 10th showcase section in `showcase/showcase.tscn` ("Role Variations")
+demonstrates each one with consumer-style content.
 
 ## Design Rules
 

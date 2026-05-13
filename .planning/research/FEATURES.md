@@ -738,7 +738,7 @@ This is conservative. PROJECT.md asks for "type variations where appropriate" �
 
 ### 5.10 Coverage Verification (developer-facing)
 
-A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script enumerating themed types, used for CI/QA.
+A bottom strip lists "Controls covered: 37/37 ✓" — auto-counted via a script enumerating themed user-facing Controls, used for CI/QA.
 
 ---
 
@@ -823,13 +823,13 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 
 ### Launch With (v1) — exhaustive
 
-> **Note 2026-05-04:** The 5-phase plan below was authored before CROSS-PLATFORM landed. The current authoritative phase decomposition is the **11-phase plan in `SUMMARY.md` "Implications for Roadmap"**. The 5 categories below remain valid as DELIVERABLES groupings (what gets shipped); SUMMARY.md provides the actual phase sequence (research/design spikes → foundation → core/lists/dialogs → mobile authoring → showcase → QA + cross-platform validation → distribution). Roadmapper should use SUMMARY.md for phasing and FEATURES.md (this file) for per-deliverable specifics.
+> **Note 2026-05-13:** The 5-category list below is a deliverable grouping, not the current phase count. The authoritative phase decomposition is the 17-entry ROADMAP.md sequence, including Phase 12 Signature Visual Moves and Phase 13 Role Variations.
 
 **Foundation deliverables**
 - [ ] All 6.1 token resources defined (colors, types, spacings, radii, strokes, elevations)
 - [ ] Inter Variable Roman bundled, font resources created, and `inter_ofl.txt` included
-- [ ] `addons/neocade_theme/scripts/neocade_theme.gd` `@tool` Theme subclass with exported desktop/mobile/AUTO platform state
-- [ ] Five data-only direction `.tres` files backed by `NeoCadeTheme`
+- [x] `addons/neocade_theme/scripts/neocade_theme.gd` `@tool` Theme class with exported style, raised, and desktop/mobile/AUTO platform state
+- [x] One canonical `addons/neocade_theme/neocade_theme.tres` resource backed by `NeoCadeTheme`
 - [ ] Mockup approval gate passed for representative Controls (desktop + mobile mockups both required, per ARCHITECTURE Section 6 Step 5b)
 
 **Core Controls deliverables (desktop authoring; mobile overrides accrue alongside)**
@@ -857,17 +857,17 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 - [ ] GraphEdit + GraphNode + GraphFrame themed (basic)
 
 **Mobile Variant Authoring deliverables (NEW; CROSS-PLATFORM Section 3)**
-- [ ] TokenSet.mobile overrides filled (button height 48px, body 16px, spacing +50% on space.4+)
-- [ ] `NeoCadeTheme.platform` regenerates mobile values without a separate mobile `.tres`
-- [ ] Tap-target audit script confirms every interactive Control ≥48px in mobile theme
-- [ ] `.planning/MOBILE-DESIGN-SPEC.md` documents deltas vs desktop
-- [ ] Showcase scene supports three-way theme toggle (NeoCade desktop ↔ NeoCade mobile ↔ Godot default)
+- [x] `NeoCadeTheme.platform` mobile branch filled (button height 48px, body 16px, larger spacing)
+- [x] `NeoCadeTheme.platform` regenerates mobile values without a separate mobile `.tres`
+- [x] Tap-target audit script confirms every interactive Control ≥48px in mobile theme
+- [x] `.planning/MOBILE-DESIGN-SPEC.md` documents deltas vs desktop
+- [x] Showcase scene supports style/default, raised, and platform controls
 
 **Showcase deliverables**
-- [ ] `showcase/showcase.tscn` with all 9 sections rendered
-- [ ] Three-way theme toggle button functional (desktop ↔ mobile ↔ default)
-- [ ] Token gallery section
-- [ ] Coverage counter shows "35/35"
+- [x] `showcase/showcase.tscn` with all 10 sections rendered (Phase 13 adds Role Variations)
+- [x] Style/default theme picker, raised toggle, and platform selector functional
+- [x] Token gallery section
+- [x] Coverage counter shows "37/37"
 
 **QA + Cross-Platform Export Validation deliverables (EXPANDED; CROSS-PLATFORM Section 6.5)**
 - [ ] Visual QA via Godot MCP screenshots at 1080p, 1440p, 4K (Forward+ + GL Compat)
@@ -922,7 +922,7 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 | FoldableContainer | MEDIUM | LOW | P1 |
 | BBCode demo in showcase | MEDIUM | LOW | P2 |
 | Token Gallery in showcase | MEDIUM | MEDIUM | P2 |
-| Coverage counter (35/35) | LOW | LOW | P2 |
+| Coverage counter (37/37) | LOW | LOW | P2 |
 | Editor-only types | LOW (v1.x) | MEDIUM | P3 |
 | Light mode | HIGH (eventually) | HIGH | P3 (v2) |
 

@@ -87,14 +87,11 @@ These supersede every other recommendation below. Lock them at the end of design
 res://
 ├── addons/
 │   └── neocade_theme/
-│       ├── bubble_neocade_theme.tres
-│       ├── burst_neocade_theme.tres
-│       ├── daybreak_neocade_theme.tres
-│       ├── pulse_neocade_theme.tres
-│       ├── slate_neocade_theme.tres
+│       ├── neocade_theme.tres                 # canonical NeoCadeTheme resource
 │       ├── scripts/
 │       │   ├── neocade_theme.gd       # @tool class_name NeoCadeTheme extends Theme
-│       │   └── neocade_theme_option_button.gd
+│       │   ├── neocade_theme_option_button.gd
+│       │   └── neocade_theme_autoload.gd
 │       ├── fonts/
 │       │   ├── inter_variable.ttf
 │       │   ├── inter_variable.ttf.import
@@ -130,7 +127,7 @@ res://
 
 - **Clean addon folder**: The drop-in runtime addon lives under `addons/neocade_theme/`; package docs and release metadata live at the repo root or in `docs/` so the addon stays focused for the author's own game.
 - **`.import` files committed**: Godot 4.6 still uses the `.import` sidecar pattern. They must be in version control or imports re-run on every clone.
-- **Scripts, fonts, and icons in subfolders**: Keeps reusable code (`NeoCadeTheme` and `NeoCadeThemeOptionButton`) separate from the data-only theme direction resources.
+- **Scripts, fonts, and icons in subfolders**: Keeps reusable code (`NeoCadeTheme`, `NeoCadeThemeOptionButton`, and the optional `NeoCadeThemeAutoload` helper) separate from the canonical theme resource.
 - **No `plugin.cfg`**: Addons that aren't `EditorPlugin`s don't need it. Including one would make NeoCade appear (uselessly togglable) in Project Settings → Plugins.
 - **`inter_ofl.txt` next to fonts**: The Inter SIL OFL 1.1 text ships with the font in `addons/neocade_theme/fonts/`.
 
@@ -138,12 +135,13 @@ res://
 
 | Asset | Size | Note |
 |-------|------|------|
-| Five direction `.tres` files | ~2 KB total | Data-only resources backed by `NeoCadeTheme`. |
+| Canonical `neocade_theme.tres` | ~1 KB | One data-oriented `NeoCadeTheme` resource; built-in styles are selected by `style`. |
 | `scripts/neocade_theme.gd` | ~140 KB | Formula/binding implementation. |
 | `scripts/neocade_theme_option_button.gd` | ~5 KB | Reusable editor/runtime theme picker. |
+| `scripts/neocade_theme_autoload.gd` | ~1 KB | Optional one-shot project-wide theme helper. |
 | `inter_variable.ttf` | ~843 KB | Single bundled Inter Variable Roman font. |
-| 84 SVG icons + `.import` sidecars | ~125 KB | The generated Control coverage icon set. |
-| **Total addon footprint** | **~1.1 MB** | Current repository footprint for `addons/neocade_theme/`. |
+| 79 SVG icons + 79 `.import` sidecars | ~125 KB | The generated Control coverage icon set. |
+| **Total addon footprint** | **~1.23 MB** | Current repository footprint for `addons/neocade_theme/` as of 2026-05-13. |
 
 ### User Install Flow
 
@@ -155,11 +153,14 @@ res://
 #   git clone https://github.com/<user>/NeoCade-Theme
 #   Copy addons/neocade_theme/ into your project's addons/ folder
 
-# Apply project-wide using one direction resource:
-#   Project → Project Settings → GUI → Theme → Custom → res://addons/neocade_theme/bubble_neocade_theme.tres
+# Apply project-wide using the canonical resource:
+#   Project → Project Settings → GUI → Theme → Custom → res://addons/neocade_theme/neocade_theme.tres
 
 # Apply per-scene:
-#   Inspector on root Control → Theme → load → res://addons/neocade_theme/bubble_neocade_theme.tres
+#   Inspector on root Control → Theme → load → res://addons/neocade_theme/neocade_theme.tres
+
+# Optional: add res://addons/neocade_theme/scripts/neocade_theme_autoload.gd as an autoload
+# to merge NeoCade into ThemeDB.default_theme once at startup.
 ```
 
 ---

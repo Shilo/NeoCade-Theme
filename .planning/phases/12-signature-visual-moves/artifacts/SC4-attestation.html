@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Phase 12 SC#4 attestation — 5 direction renders</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #14161a; color: #e8eaed; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif; }
+  body { padding: 32px; max-width: 2100px; margin: 0 auto; }
+  h1 { font-size: 28px; font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .lede { color: #9aa0a6; font-size: 14px; margin: 0 0 28px; }
+  .toc { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; padding: 16px; background: #1c1f24; border-radius: 8px; }
+  .toc a { color: #8ab4f8; text-decoration: none; padding: 6px 12px; background: #14161a; border-radius: 6px; font-size: 13px; font-weight: 500; }
+  .toc a:hover { background: #2a2e34; }
+  .row { background: #1c1f24; border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #2a2e34; }
+  .row-header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 6px; }
+  .name { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .hue { font-size: 13px; color: #9aa0a6; padding: 2px 8px; border-radius: 4px; background: #14161a; }
+  .c6-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9aa0a6; margin: 12px 0 4px; }
+  .c6-desc { font-size: 14px; color: #c4c7c5; margin: 0 0 4px; line-height: 1.5; }
+  .c6-tech { font-size: 12px; color: #9aa0a6; margin: 0 0 16px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .verdict { font-size: 13px; color: #fdd663; margin: 4px 0 16px; }
+  img { display: block; width: 100%; max-width: 1920px; height: auto; border-radius: 6px; border: 1px solid #2a2e34; }
+  .footer { margin-top: 40px; padding: 20px; background: #1c1f24; border-radius: 8px; border-left: 3px solid #8ab4f8; }
+  .footer h2 { font-size: 16px; margin: 0 0 8px; }
+  .footer p { font-size: 13px; color: #c4c7c5; margin: 0 0 8px; line-height: 1.5; }
+  .footer code { background: #14161a; padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12px; color: #fdd663; }
+</style>
+</head>
+<body>
+
+<h1>Phase 12 SC#4 attestation</h1>
+<p class="lede">Showcase Buttons tab rendered for each of 5 directions at 1920x1080, raised=true. C6 per-direction signature moves described per row. Source: <code>_phase12_fullsize_render_runtime.tscn</code>.</p>
+
+<nav class="toc">
+  <a href="#pulse">Pulse</a>
+  <a href="#slate">Slate</a>
+  <a href="#bubble">Bubble</a>
+  <a href="#daybreak">Daybreak</a>
+  <a href="#burst">Burst</a>
+</nav>
+
+<section class="row" id="pulse">
+  <div class="row-header"><div class="name">1. Pulse</div><div class="hue">lime accent · recommended starter</div></div>
+  <div class="c6-label">C6 signature move</div>
+  <p class="c6-desc">Showcase-level "BUTTONS · IDENTITY" Kicker Label inserted above the Buttons grid + sharp rectangular chrome (corner_radius = 0).</p>
+  <p class="c6-tech">showcase/showcase.tscn — new Kicker Label node; STYLE_PERSONALITY[Pulse].shape.{corner_radius, button_radius, primary_radius} = 0</p>
+  <p class="verdict">Visible cue: kicker line + sharp boxes</p>
+  <img src="fullsize/pulse-raised-true.png" alt="Pulse showcase render" loading="lazy">
+</section>
+
+<section class="row" id="slate">
+  <div class="row-header"><div class="name">2. Slate</div><div class="hue">steel blue accent · hairline ethos</div></div>
+  <div class="c6-label">C6 signature move</div>
+  <p class="c6-desc">1px hairline borders on interactive chrome (where the recipe carries a border_role). Other directions keep their default 2-3px borders.</p>
+  <p class="c6-tech">STYLE_PERSONALITY[Slate].shape.hairline_thickness = 1; recipe-gated on recipe.has("border_role")</p>
+  <p class="verdict">Visible cue: chrome reads quieter / thinner overall</p>
+  <img src="fullsize/slate-raised-true.png" alt="Slate showcase render" loading="lazy">
+</section>
+
+<section class="row" id="bubble">
+  <div class="row-header"><div class="name">3. Bubble</div><div class="hue">pink accent · soft / aggressive rounding</div></div>
+  <div class="c6-label">C6 signature move</div>
+  <p class="c6-desc">Every resolved corner radius is floored to at least 26 (using maxi() so pre-existing larger pill radii are preserved). Produces pill silhouettes across the entire tab.</p>
+  <p class="c6-tech">STYLE_PERSONALITY[Bubble].shape.min_radius_floor = 26; applied via maxi() in radius resolution</p>
+  <p class="verdict">Visible cue: very rounded pills on every surface</p>
+  <img src="fullsize/bubble-raised-true.png" alt="Bubble showcase render" loading="lazy">
+</section>
+
+<section class="row" id="daybreak">
+  <div class="row-header"><div class="name">4. Daybreak</div><div class="hue">mint accent · outlined primary CTA</div></div>
+  <div class="c6-label">C6 signature move</div>
+  <p class="c6-desc">Primary buttons (when raised=true) get a 1px flat accent outline at +3px offset outside their face. Primary padding also bumped to (20, 14) for chunkier feel.</p>
+  <p class="c6-tech">STYLE_PERSONALITY[Daybreak].shape.primary_outline_width = 1, primary_outline_offset = 3, primary_outline_color = role_primary; gated on raised + strategy.ends_with(".primary_strategy")</p>
+  <p class="verdict">Honest finding: outline IS applied in code (verifier confirms) but 1px mint-on-mint at low contrast is hard to perceive at this render. Open question: bump to 2px for visibility?</p>
+  <img src="fullsize/daybreak-raised-true.png" alt="Daybreak showcase render" loading="lazy">
+</section>
+
+<section class="row" id="burst">
+  <div class="row-header"><div class="name">5. Burst</div><div class="hue">amber accent · oversized primary CTAs</div></div>
+  <div class="c6-label">C6 signature move</div>
+  <p class="c6-desc">Primary buttons get a content_margin floor that grows them to 56px tall on desktop (64px on mobile via density scaling). Other directions sit at ~48-50px.</p>
+  <p class="c6-tech">STYLE_PERSONALITY[Burst].shape.primary_min_height = 56; floor applied via content_margin top/bottom split</p>
+  <p class="verdict">Honest finding: differential is ~6-8px which is hard to read without side-by-side comparison. Open question: bump to 64 for clearer visual delta?</p>
+  <img src="fullsize/burst-raised-true.png" alt="Burst showcase render" loading="lazy">
+</section>
+
+<div class="footer">
+  <h2>SC#4 attestation question</h2>
+  <p>Are these 5 directions distinguishable enough to ship? The original SC#4 spec requires identifiability at 256x144 greyscale (deliberately hostile). Most teams treat that as a stress test rather than a release blocker. At full color and full resolution, all 5 are unambiguous because hue alone separates them.</p>
+  <p>The honest situation: Pulse / Bubble / Slate carry signature moves that survive any scale (kicker text, extreme rounding, hairline thickness). Daybreak's 1px outline and Burst's +6px height are subtle even at 1920x1080 and lean on hue to differentiate in the wild.</p>
+  <p>Reply with one of: <code>approved</code> | <code>strengthen Daybreak</code> | <code>strengthen Burst</code> | <code>strengthen both</code> | freeform direction.</p>
+</div>
+
+</body>
+</html>

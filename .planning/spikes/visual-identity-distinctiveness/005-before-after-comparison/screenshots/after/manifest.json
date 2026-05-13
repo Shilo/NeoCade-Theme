@@ -1,0 +1,127 @@
+{
+	"captured_at": "2026-05-11T12:53:35",
+	"entries": [
+		{
+			"image_bytes": 4096000,
+			"ok": true,
+			"png": "screenshots/after/pulse-flat.png",
+			"raised": false,
+			"size": [
+				1280,
+				800
+			],
+			"slug": "pulse-flat",
+			"style": "Pulse"
+		},
+		{
+			"image_bytes": 4096000,
+			"ok": true,
+			"png": "screenshots/after/pulse-raised.png",
+			"raised": true,
+			"size": [
+				1280,
+				800
+			],
+			"slug": "pulse-raised",
+			"style": "Pulse"
+		},
+		{
+			"image_bytes": 4096000,
+			"ok": true,
+			"png": "screenshots/after/slate-flat.png",
+			"raised": false,
+			"size": [
+				1280,
+				800
+			],
+			"slug": "slate-flat",
+			"style": "Slate"
+		},
+		{
+			"image_bytes": 4096000,
+			"ok": true,
+			"png": "screenshots/after/slate-raised.png",
+			"raised": true,
+			"size": [
+				1280,
+				800
+			],
+			"slug": "slate-raised",
+			"style": "Slate"
+		},
+		{
+			"image_bytes": 4096000,
+			"ok": true,
+			"png": "screenshots/after/bubble-flat.png",
+			"raised": false,
+			"size": [
+				1280,
+				800
+			],
+			"slug": "bubble-flat",
+			"style": "Bubble"
+		},
+		{
+			"image_bytes": 4096000,
+			"ok": true,
+			"png": "screenshots/after/bubble-raised.png",
+			"raised": true,
+			"size": [
+				1280,
+				800
+			],
+			"slug": "bubble-raised",
+			"style": "Bubble"
+		},
+		{
+			"image_bytes": 4096000,
+			"ok": true,
+			"png": "screenshots/after/daybreak-flat.png",
+			"raised": false,
+			"size": [
+				1280,
+				800
+			],
+			"slug": "daybreak-flat",
+			"style": "Daybreak"
+		},
+		{
+			"image_bytes": 4096000,
+			"ok": true,
+			"png": "screenshots/after/daybreak-raised.png",
+			"raised": true,
+			"size": [
+				1280,
+				800
+			],
+			"slug": "daybreak-raised",
+			"style": "Daybreak"
+		},
+		{
+			"image_bytes": 4096000,
+			"ok": true,
+			"png": "screenshots/after/burst-flat.png",
+			"raised": false,
+			"size": [
+				1280,
+				800
+			],
+			"slug": "burst-flat",
+			"style": "Burst"
+		},
+		{
+			"image_bytes": 4096000,
+			"ok": true,
+			"png": "screenshots/after/burst-raised.png",
+			"raised": true,
+			"size": [
+				1280,
+				800
+			],
+			"slug": "burst-raised",
+			"style": "Burst"
+		}
+	],
+	"godot_version": "4.6.2-stable (official)",
+	"phase": "after"
+}

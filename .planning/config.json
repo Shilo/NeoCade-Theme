@@ -31,7 +31,8 @@
     "plan_review_convergence": true,
     "security_enforcement": false,
     "use_worktrees": false,
-    "_phases_6_8_autonomous_authorized": "2026-05-07 -- user authorized /gsd-autonomous scope-limited to Phases 6-8; CLAUDE.md refusal rule overridden for these phases only; Phase 9+ still requires user input"
+    "_phases_6_8_autonomous_authorized": "2026-05-07 -- user authorized /gsd-autonomous scope-limited to Phases 6-8; CLAUDE.md refusal rule overridden for these phases only; Phase 9+ still requires user input",
+    "_auto_chain_active": false
   },
   "hooks": {
     "context_warnings": true

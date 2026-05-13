@@ -4,7 +4,7 @@
 **Researched:** 2026-05-04
 **Overall confidence:** HIGH on per-target Godot behavior (cross-checked with Godot 4.6 release notes + official export docs + 5+ named GitHub issues); HIGH on iOS/Android tap-target/typography numerics (cited iOS HIG and Material 3); HIGH on font license compliance (cited SIL OFL FAQ + OFL official); MEDIUM on token-sharing strategy (Godot Theme has no `.tres`-to-`.tres` inheritance — verified, ThemeGen confirmed as the only mature pattern); MEDIUM on Web export font reliability under deployed hosting (multi-source community reports, no official Godot validation matrix).
 
-**Current implementation note (2026-05-08):** Later architecture work superseded the separate mobile `.tres` / `TokenSet` generator recommendation. Current v1 uses `addons/neocade_theme/scripts/neocade_theme.gd` (`class_name NeoCadeTheme extends Theme`) with exported `platform` and `raised` state, five data-only direction `.tres` files at the addon root, Inter Variable Roman only, `addons/neocade_theme/fonts/inter_ofl.txt`, and `.planning/MOBILE-DESIGN-SPEC.md`.
+**Current implementation note (2026-05-13):** Later architecture work superseded the separate mobile `.tres` / `TokenSet` generator recommendation. Current v1 uses `addons/neocade_theme/scripts/neocade_theme.gd` (`class_name NeoCadeTheme extends Theme`) with exported `style`, `platform`, and `raised` state, one canonical `addons/neocade_theme/neocade_theme.tres` resource, Inter Variable Roman only, `addons/neocade_theme/fonts/inter_ofl.txt`, and `.planning/MOBILE-DESIGN-SPEC.md`.
 
 ---
 
@@ -15,7 +15,7 @@ These are the cross-platform-specific decisions the synthesizer and roadmapper m
 | # | Decision | Recommendation | Confidence | Why |
 |---|---|---|---|---|
 | 1 | **Renderer for cross-platform breadth** | **GL Compatibility** on every target. Already locked in `project.godot` (`renderer/rendering_method=gl_compatibility`, `renderer/rendering_method.mobile=gl_compatibility`). DO NOT switch to Mobile renderer for Android — issue #111729 confirms Mobile renderer reduces Play Store device coverage; iOS Mobile renderer has Metal validation regression on iPhone SE 2nd gen in Godot 4.6 (issue #116090, release blocker for 4.7). | HIGH | Single-renderer discipline keeps the theme's stylebox AA/shadow behavior identical across all 6 targets. |
-| 2 | **Token-sharing strategy: one `@tool` `NeoCadeTheme` script regenerates each direction resource** | Use `addons/neocade_theme/scripts/neocade_theme.gd` as the shared source of behavior, with data-only direction `.tres` files storing exported colors/personality/platform/raised state. Godot's Theme class has NO `.tres`-to-`.tres` inheritance (verified — only `merge_with()` and `copy_from()` at runtime, neither persists at .tres-author time). | HIGH | Confirmed via Godot 4.6 Theme class docs; final implementation avoids static desktop/mobile sibling drift. |
+| 2 | **Token-sharing strategy: one `@tool` `NeoCadeTheme` script regenerates one canonical resource** | Use `addons/neocade_theme/scripts/neocade_theme.gd` as the shared source of behavior, with `addons/neocade_theme/neocade_theme.tres` storing exported style/color/personality/platform/raised state. Godot's Theme class has NO `.tres`-to-`.tres` inheritance (verified — only `merge_with()` and `copy_from()` at runtime, neither persists at .tres-author time). | HIGH | Confirmed via Godot 4.6 Theme class docs; final implementation avoids static desktop/mobile sibling drift and per-style resource drift. |
 | 3 | **Mobile minimum tap target: `Button` minimum height = 48px (Godot pixels), 12px vertical / 16px horizontal padding** | This satisfies BOTH iOS HIG (44pt minimum, with 4pt of touch slop = effectively 48pt @1x) AND Material 3 (48dp Android minimum). Authoring in Godot pixels at base scale 1.0 with proper `content_scale_factor`/`content_scale_size` settings means 48px in the theme → 48dp on Android → 48pt on iOS @ recommended scale. Desktop primary stays at 32px button minimum. | HIGH | iOS HIG 44pt minimum + Material 3 48dp + 8dp button-to-button separation, all verified at developer.apple.com and m3.material.io |
 | 4 | **Mobile body font_size = 16px (vs desktop 14px)** | iOS HIG body = 17pt; Material 3 body-medium = 14sp but body-large = 16sp and recommends 16sp for primary content. 16px is the safe middle that meets both. Caption/hint stays 14px on mobile (vs 12px desktop) so accessibility minimum is honored. | HIGH | Apple HIG body size 17pt; Material 3 body-large 16sp; LearnUI Design + a11y consensus on 16sp/16pt as mobile body floor. |
 | 5 | **Bundle Inter Variable Roman as the only committed `.ttf` in `addons/neocade_theme/fonts/`. NO subsetting at v1.** | Inter is OFL 1.1 and redistributable embedded in App Store + Play Store apps per OFL FAQ + Apple licensing FAQs. License compliance: ship `inter_ofl.txt` with the Inter copyright and OFL text in the same folder as the `.ttf` file. CJK is NOT bundled in v1. | HIGH | OFL 1.1 + SIL FAQ explicit on App Store / Play Store legality; additional fonts are deferred until real product need appears. |
@@ -346,14 +346,14 @@ Beyond raw constants/font sizes, certain Controls need different stylistic treat
 
 ---
 
-## (4) Token-Sharing Strategy — final `@tool` Theme subclass, historical generator notes below
+## (4) Token-Sharing Strategy — final `@tool` Theme class, historical generator notes below
 
 ### 4.1 The verified facts
 
 1. Godot's `Theme` class **does not support `.tres`-to-`.tres` inheritance**. There is no "extends" or "fallback_theme" property. Verified at [docs.godotengine.org/en/stable/classes/class_theme.html](https://docs.godotengine.org/en/stable/classes/class_theme.html).
 2. Runtime composition exists: `Theme.merge_with(other)` and `Theme.copy_from(other)`. Both modify a Theme **in memory only**; the `.tres` file is not changed unless re-saved.
 3. Theme **type variations** (`Theme.set_type_variation(name, base)`) provide pseudo-inheritance WITHIN a single theme — but cannot share across two `.tres` files at design time.
-4. The final NeoCade pattern is **a `@tool` Theme subclass** (`NeoCadeTheme`) that regenerates one direction resource from exported state. The earlier generator pattern below is preserved as research history, not current implementation.
+4. The final NeoCade pattern is **a single `@tool` Theme class** (`NeoCadeTheme`) that regenerates one canonical resource from exported state. The earlier generator pattern below is preserved as research history, not current implementation.
 
 ### 4.2 Historical pattern — custom `@tool` generator (superseded)
 
@@ -410,7 +410,7 @@ DESKTOP.space_roomy = 16
 
 const MOBILE := Variant.new()
 MOBILE.name = "mobile"
-MOBILE.save_path = "res://addons/neocade_theme/neocade_mobile_theme.tres"
+MOBILE.save_path = "res://addons/neocade_theme/neocade_theme.tres" # current implementation: same resource, platform=MOBILE
 MOBILE.btn_min_height = 48
 MOBILE.btn_pad_v = 12
 MOBILE.btn_pad_h = 16
@@ -486,7 +486,7 @@ func _run() -> void:
     NeoCadeThemeGenerator.new().generate_all()
 ```
 
-Historical generator approach: both `neocade_theme.tres` and `neocade_mobile_theme.tres` would have been regenerated from one script. Current implementation instead keeps the source of truth in `addons/neocade_theme/scripts/neocade_theme.gd` and regenerates each direction resource in place from exported state.
+Historical generator approach: both `neocade_theme.tres` and `neocade_mobile_theme.tres` would have been regenerated from one script. Current implementation instead keeps the source of truth in `addons/neocade_theme/scripts/neocade_theme.gd` and uses one canonical `addons/neocade_theme/neocade_theme.tres` resource. Built-in styles are selected through `NeoCadeTheme.Style`; mobile sizing is selected through the `platform` export.
 
 ### 4.3 Alternative: ThemeGen (Inspiaaa, Asset Library)
 
@@ -498,20 +498,17 @@ If we want a more feature-rich generator with built-in stylebox helpers, [ThemeG
 
 Trade-off: extra dependency (~200 lines of GDScript in the consumer's `addons/`); needs to be in NeoCade's `_dev/` folder, not bundled at runtime distribution. NeoCade's user pays no runtime cost because `_dev/` is not part of the shipped addon.
 
-**Final recommendation:** Keep NeoCade's concrete `@tool` Theme subclass and data-only direction resources. Do not add `_dev/` generator tooling unless a future refactor proves the dynamic subclass hard to maintain.
+**Final recommendation:** Keep NeoCade's concrete `@tool` Theme class and canonical data-oriented theme resource. Do not add `_dev/` generator tooling unless a future refactor proves the dynamic class hard to maintain.
 
 ### 4.4 What gets committed
 
 ```
 addons/neocade_theme/
-├── bubble_neocade_theme.tres           ← committed data-only direction resource
-├── burst_neocade_theme.tres
-├── daybreak_neocade_theme.tres
-├── pulse_neocade_theme.tres
-├── slate_neocade_theme.tres
+├── neocade_theme.tres                  ← committed canonical NeoCadeTheme resource
 ├── scripts/
-│   ├── neocade_theme.gd                ← @tool Theme subclass source of truth
-│   └── neocade_theme_option_button.gd
+│   ├── neocade_theme.gd                ← @tool Theme class source of truth
+│   ├── neocade_theme_option_button.gd
+│   └── neocade_theme_autoload.gd
 ├── fonts/...                           ← committed static assets
 └── icons/...                           ← committed static assets
 ```
@@ -519,7 +516,7 @@ addons/neocade_theme/
 Why keep no `_dev/` generator in v1?
 - Documentation lives in root `README.md` and `docs/usage.md`.
 - Reproducibility lives in the exported properties and formula code.
-- Diff hygiene is cleaner: formula changes happen in `scripts/neocade_theme.gd`, data changes happen in direction `.tres` files.
+- Diff hygiene is cleaner: formula changes happen in `scripts/neocade_theme.gd`, while default exported resource values live in the canonical `.tres`.
 - The addon folder stays focused for direct reuse in the author's consuming game.
 
 ### 4.5 What about Godot's built-in pseudo-inheritance via `theme_type_variation`?
@@ -783,14 +780,14 @@ The synthesizer/roadmapper must add at least these two phases to the existing ro
 **Goal:** Author the mobile variant alongside desktop, sharing formulas in `addons/neocade_theme/scripts/neocade_theme.gd`, with concrete tap-target/typography/spacing deltas.
 
 **Deliverables:**
-1. **`addons/neocade_theme/scripts/neocade_theme.gd`** — `@tool` Theme subclass regenerates entries when exported state changes.
-2. **Five direction `.tres` files** — each stores the shared exported `platform` state and regenerates desktop/mobile/AUTO values.
+1. **`addons/neocade_theme/scripts/neocade_theme.gd`** — `@tool` Theme class regenerates entries when exported state changes.
+2. **`addons/neocade_theme/neocade_theme.tres`** — one canonical resource stores the shared exported `style`, `platform`, and `raised` state and regenerates desktop/mobile/AUTO values.
 3. **Mobile-specific tap-target audit script** — GDScript validates every interactive Control in mobile variant has minimum 48px hit area.
 4. **Updated showcase scene `showcase/showcase.tscn`** — exposes desktop/mobile/default theme comparison through the editor-authored interface.
 5. **`.planning/MOBILE-DESIGN-SPEC.md`** — written specification of every mobile delta vs desktop, citing iOS HIG / Material 3 sources for each value.
 
 **Acceptance:**
-- Direction `.tres` files regenerate from exported state with zero hand-edits to generated theme items.
+- The canonical `.tres` resource regenerates from exported state with zero hand-edits to generated theme items.
 - Tap-target audit passes (every interactive Control ≥ 48px on mobile, ≥ 32px on desktop).
 - Mobile variant's body font renders at 16px in the showcase.
 - Visual side-by-side comparison of desktop vs mobile shows IDENTICAL color palette, IDENTICAL corner-radius scale, IDENTICAL accent usage — only sizing/spacing/density differs.

@@ -990,7 +990,7 @@ These three are enumerated below as `### MenuBar`, `### Panel`, `### Window` sec
 
 **Per-class notes (per container):**
 - **HBoxContainer / VBoxContainer:** ONLY constant `separation = 2 EDSCALE`. No stylebox. Layout-only.
-- **HSplitContainer / VSplitContainer:** 3 constants each (autohide, minimum_grab_thickness, separation). No stylebox; the split divider visual is engine-default. NeoCade game runtime touch-targets may want larger `minimum_grab_thickness` — neocade_mobile_theme override territory (Phase 8-9).
+- **HSplitContainer / VSplitContainer:** 3 constants each (autohide, minimum_grab_thickness, separation). No stylebox; the split divider visual is engine-default. NeoCade game runtime touch-targets may want larger `minimum_grab_thickness` — handled by the `NeoCadeTheme.platform` mobile branch, not a separate mobile resource.
 - **PanelContainer:** Single `panel` stylebox = `base_empty_wide_sb` (transparent panel with wide horizontal margins). Upstream PanelContainer is visually a NO-OP (transparent) — NeoCade Phase 5 design decision: should `PanelContainer.panel` be opaque (raised card visual) or remain transparent like upstream?
 - **ScrollContainer:** Two transparent styleboxes (`panel`, `focus`) — visually invisible. Same Pitfall 1.1 evidence as Tree (focus = empty stylebox).
 - **SplitContainer (base):** 2 constants (minimum_grab_thickness, separation). Different values from H/VSplitContainer (these are the parent-class defaults; H/VSplit override).

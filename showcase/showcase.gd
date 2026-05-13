@@ -11,7 +11,7 @@ const PLATFORM_ITEMS := [
 @onready var theme_option_button: NeoCadeThemeOptionButton = $RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow/NeoCadeThemeOptionButton
 @onready var raised_check_box: CheckBox = $RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow/RaisedCheckBox
 @onready var platform_option_button: OptionButton = $RootMargin/RootStack/HeaderPanel/HeaderMargin/HeaderStack/ControlsRow/PlatformOptionButton
-@onready var menu_button: MenuButton = $RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Grid/MenuButtonPanel/MenuButtonStack/Control
+@onready var menu_button: MenuButton = $RootMargin/RootStack/ShowcaseTabs/Buttons/Margin/Stack/Grid/MenuButtonPanel/MenuButtonStack/Control
 @onready var accept_dialog_button: Button = $"RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/AcceptDialogButton"
 @onready var confirmation_dialog_button: Button = $"RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/ConfirmationDialogButton"
 @onready var file_dialog_button: Button = $"RootMargin/RootStack/ShowcaseTabs/Dialogs & Popups/Margin/Grid/FileDialogButton"
@@ -28,7 +28,9 @@ var _syncing_theme_controls := false
 
 
 func _ready() -> void:
+	NeoCadeTheme.apply_to_control(self)
 	_populate_platform_options()
+	theme_option_button.refresh_theme_list()
 	_populate_menu_button_popup()
 	accept_dialog_button.pressed.connect(_on_accept_dialog_button_pressed)
 	confirmation_dialog_button.pressed.connect(_on_confirmation_dialog_button_pressed)
