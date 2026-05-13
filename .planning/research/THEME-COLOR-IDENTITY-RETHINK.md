@@ -92,6 +92,37 @@ Godot references:
 - [Theme class documentation](https://docs.godotengine.org/en/4.6/classes/class_theme.html)
 - [Using Theme editor](https://docs.godotengine.org/en/stable/tutorials/ui/gui_using_theme_editor.html)
 
+## Godot Control Mapping Contract
+
+Every mockup color role must map to real Godot theme slots or be rejected before production.
+
+| Mockup role | Godot control family | Likely theme slots |
+| --- | --- | --- |
+| Default action fill | `Button` | `normal`, `hover`, `pressed`, `disabled`, font/icon colors |
+| Menu/dropdown fill | `OptionButton`, `MenuButton`, `PopupMenu` | `OptionButton.normal`, `MenuButton` inherited `Button` slots or variation slots, `PopupMenu.panel`, `PopupMenu.hover` |
+| Input fill and border | `LineEdit`, `TextEdit`, `SpinBox`, `TreeLineEdit` | `normal`, `focus`, `read_only`, caret/selection colors |
+| Selected tabs | `TabBar`, `TabContainer` | `tab_selected`, `tab_unselected`, `tab_hovered`, selected/unselected font and icon colors |
+| Selected rows | `ItemList`, `Tree` | `selected`, `selected_focus`, hover/guide colors, relationship/guide line colors |
+| Range/progress | `HSlider`, `VSlider`, `ProgressBar`, `HScrollBar`, `VScrollBar` | slider track styleboxes, grabber icons/colors, `ProgressBar.fill`, scrollbar grabber styleboxes |
+| Toggle/check active state | `CheckBox`, `CheckButton`, `PopupMenu` check/radio icons | checked/unchecked icon slots, `checkbox_checked_color`, `button_checked_color`, generated PopupMenu selection icons |
+| Dialog/popup shell | `Window`, `PopupPanel`, `AcceptDialog`, `ConfirmationDialog`, `PopupMenu` | embedded borders, `PopupPanel.panel`, `Window` embedded borders, popup/menu panels |
+| Destructive state | `Button` variations plus base danger state where applicable | `DangerButton` remains optional, but danger color can also be used by explicit destructive UI examples |
+
+The HTML mockup may use CSS for speed, but it must behave like this table: no visual effect should depend on CSS selectors that Godot Theme cannot approximate through control type slots, styleboxes, colors, constants, icons, fonts, or optional type variations.
+
+## Semantic Color Guardrails
+
+NeoCade is a reusable theme, not a one-off game skin. Color meaning must stay readable across editor and runtime contexts.
+
+- Reserve red and red-adjacent hues for danger, destructive actions, errors, invalid states, and delete/remove semantics.
+- Avoid red-orange, hot pink, coral, rose, and saturated reddish magenta for ordinary default buttons, selected rows, menu hovers, and neutral headers.
+- Use amber/yellow for reward, warning, or sunny action only when text contrast passes and the action is clearly non-destructive.
+- Use blue/cyan for info, options, menus, and technical/editor actions.
+- Use green for success, confirmation, enabled toggles, and safe progress.
+- Use violet/lavender/purple for expressive secondary roles when a theme needs energy without implying danger.
+- If a commercial game UI reference uses pink for primary actions, treat that as a genre-specific cue. NeoCade should test a safer translation first: blue actions, lavender headers, yellow rewards, green confirms, red danger only.
+- Always compute or choose readable foreground colors per role. Bright fills usually need dark text; dark or muted fills usually need light text.
+
 ## Research Round 2 Evidence Review
 
 This pass treats the first proposal as a hypothesis. The goal is to test it against the named references before building production code.
@@ -101,7 +132,7 @@ This pass treats the first proposal as a hypothesis. The goal is to test it agai
 | User-provided LDtk screenshot | The mood comes from color taxonomy, not just sharp corners. Toolbar groups, active layers, shortcut chips, category labels, selected rows, and entity rows all use distinct roles. | Pulse cannot be "dark navy plus green accent." It needs several default control-family colors. |
 | [LDtk interface overview](https://ldtk.io/docs/general/editor-components/) | LDtk's side panel includes top project buttons, layer lists, and a lower palette whose content changes by active layer. | Some LDtk color behavior is content semantic. Godot Theme can mimic the feeling at the control-family level, but not infer arbitrary entity/item colors globally. |
 | [LDtk entities docs](https://ldtk.io/docs/general/editor-components/entities/) | Entities are user/project data with custom fields and constraints. | Per-entity colors require app data, custom item drawing, custom controls, or optional variations. A global Theme alone cannot know that `Gem` should be blue and `Enemy` should be red. |
-| [HCGames/Renderman Flat GUI for mobile games](https://hcgamestudios.itch.io/flat-game-ui-for-mobile-games) | The pack is flat, customizable, mobile-oriented, broad in screen coverage, and explicitly ships buttons in five colors with many icon states. | Bubble needs many default roles: pink, blue, green, yellow/orange, cream, and muted lock/disabled colors. Pink-only on dark berry misses the reference. |
+| [HCGames/Renderman Flat GUI for mobile games](https://hcgamestudios.itch.io/flat-game-ui-for-mobile-games) | The pack is flat, customizable, mobile-oriented, broad in screen coverage, and explicitly ships buttons in five colors with many icon states. | Bubble needs many default roles: blue, green, yellow/orange, cream, lavender, and muted lock/disabled colors. The reference uses pink, but NeoCade should first test a safer translation where red-adjacent hues stay reserved for danger. |
 | [Material Color Utilities](https://github.com/material-foundation/material-color-utilities) and [CorePalette source](https://raw.githubusercontent.com/material-foundation/material-color-utilities/main/typescript/palettes/core_palette.ts) | Material dynamic color creates multiple tonal palettes from source colors: accent palettes, neutral palettes, neutral-variant palettes, and error. | NeoCade should generate or author role families, not pipe one accent directly into a few slots. |
 | [Material Web theming](https://material-web.dev/theming/material-theming/) | Material uses reference tokens, system tokens, and component tokens. Components consume roles. | NeoCade should add an internal role layer, then bind Godot control types to component aliases. |
 | [Google M3 Expressive research](https://design.google/library/expressive-material-design-google-research?pubDate=20250521) | Expressive design uses color, shape, size, motion, and containment to make important actions easier to find, but warns that breaking familiar patterns hurts usability. | Burst can be loud, but it must keep familiar Godot/editor patterns and accessibility. Expressive does not mean random color everywhere. |
@@ -131,7 +162,7 @@ This pass treats the first proposal as a hypothesis. The goal is to test it agai
 
 5. **The previous Burst idea risks becoming Bubble with plum paint.**
    - Burst must be expressive, event-like, and reward-forward.
-   - It needs contrast between gold, coral/pink, violet/blue, cyan/lime, and danger red-pink while keeping familiar UI structure.
+   - It needs contrast between gold, violet/blue, cyan/lime, and danger red while keeping familiar UI structure.
 
 6. **A single-source-color export is tempting but not automatically better.**
    - Material can generate multiple palettes from one source, but NeoCade also needs a deliberate dark environment source.
@@ -147,11 +178,11 @@ These are the current goals to test in the HTML mockup. They are not yet impleme
 
 | Theme | Identity goal | Must feel like | Must not feel like | Color identity requirement |
 | --- | --- | --- | --- | --- |
-| Pulse | LDtk-inspired flat arcade editor taxonomy. | Dense control panel, sharp utility, mixed-color categories, active workbench. | Green-accent-only dark theme, synthwave, generic terminal, pixel-art skin. | At least four visible default UI families: orange action, yellow selection/nav, blue input/menu, green toggles/status, red danger. |
-| Daybreak | Fresh morning community lobby translated into flat dark UI. | Warm, open, social, clean, sunrise energy on teal shadow. | Boardwalk Sunset revival, brown/orange monotone, cozy leather/wood, mint-only dark theme. | Amber action, mint navigation/selection, coral highlights, aqua info, dark pine/teal surfaces. |
+| Pulse | LDtk-inspired flat arcade editor taxonomy. | Dense control panel, sharp utility, mixed-color categories, active workbench. | Green-accent-only dark theme, synthwave, generic terminal, pixel-art skin. | At least four visible default UI families: amber/orange action, yellow selection/nav, blue input/menu, green toggles/status, red danger only. |
+| Daybreak | Fresh morning community lobby translated into flat dark UI. | Warm, open, social, clean, sunrise energy on teal shadow. | Boardwalk Sunset revival, brown/orange monotone, cozy leather/wood, mint-only dark theme. | Amber action, mint navigation/selection, sun-gold highlights, aqua info, dark pine/teal surfaces, red danger only. |
 | Slate | Premium futuristic utility with slight iOS inspiration. | Calm, precise, professional, cool, restrained, expensive. | Generic corporate dark, cyber HUD, colorless grayscale, glassmorphism dependency. | Icy blue action, steel/lavender secondary, graphite inputs, mint success, amber warning, soft red danger. |
-| Burst | MD3 Expressive celebration and reward UI. | Energetic, event-like, bold, playful but still readable. | Random rainbow, childish toy UI, Bubble recolor, nightclub/neon, broken usability. | Gold action, coral/pink navigation, violet/blue input, cyan/lime progress/toggle, red-pink danger. |
-| Bubble | Flat 3D mobile game UI. | Chunky, friendly, candy-like, touch-first, bright game menu. | Dark berry with pink accent only, glossy jelly, copied asset-pack art, decorative texture. | Pink/blue default actions, cream/sky panels, yellow rewards, green confirms, blue-gray locked/disabled states. |
+| Burst | MD3 Expressive celebration and reward UI. | Energetic, event-like, bold, playful but still readable. | Random rainbow, childish toy UI, Bubble recolor, nightclub/neon, broken usability. | Gold action, violet navigation, blue/violet input, cyan selection, lime progress/toggle, red danger only. |
+| Bubble | Flat 3D mobile game UI. | Chunky, friendly, candy-like, touch-first, bright game menu. | Dark berry with pink accent only, glossy jelly, copied asset-pack art, decorative texture. | Blue default actions, lavender menu/header roles, cream/sky panels, yellow rewards, green confirms, blue-gray locked/disabled states, red danger only. |
 
 ## First-Pass Look Breakdown
 
@@ -161,7 +192,7 @@ This is what the HTML mockup should test. It intentionally uses default controls
 
 - Root/shell: deep navy black with charcoal-blue panels.
 - Toolbar/menu strip: multiple solid blocks, especially blue, orange, green, and yellow.
-- Default Button: orange/red-orange fill with dark readable text.
+- Default Button: amber/orange fill with dark readable text.
 - OptionButton/MenuButton: blue/steel fill.
 - Inputs: dark blue container with bright blue border or caret.
 - Tabs: yellow/gold selected state, squared and dense.
@@ -178,7 +209,7 @@ This is what the HTML mockup should test. It intentionally uses default controls
 - Inputs: dark teal fill with cream/amber border or inset.
 - Tabs: mint selected state, calm and readable.
 - Lists/Trees: mint selected row with amber secondary emphasis.
-- Popup/Dialog: coral/amber header accent on warm dark panels.
+- Popup/Dialog: amber or aqua header accent on warm dark panels.
 - Range/toggle/progress: aqua or mint.
 
 ### Slate Look
@@ -198,10 +229,10 @@ This is what the HTML mockup should test. It intentionally uses default controls
 - Root/shell: deep plum and dark violet.
 - Panels: saturated violet/plum ramp.
 - Default Button: gold/yellow fill with dark readable text.
-- OptionButton/MenuButton: coral or hot pink.
+- OptionButton/MenuButton: violet or electric blue.
 - Inputs: violet/blue container.
-- Tabs: coral/hot-pink selected state, larger and louder than other themes.
-- Lists/Trees: gold/coral selection container, not just a stripe.
+- Tabs: cyan or violet selected state, larger and louder than other themes.
+- Lists/Trees: gold/cyan selection container, not just a stripe.
 - Popup/Dialog: statement header and high-contrast action row.
 - Range/toggle/progress: cyan or lime.
 
@@ -209,12 +240,12 @@ This is what the HTML mockup should test. It intentionally uses default controls
 
 - Root/shell: dark navy/berry outer frame for v1 compatibility.
 - Panels/dialogs: cream, peach, or sky-blue islands.
-- Default Button: pink or sky-blue chunky fill with hard lower edge in raised mode.
-- OptionButton/MenuButton: sky blue.
+- Default Button: sky-blue chunky fill with hard lower edge in raised mode.
+- OptionButton/MenuButton: lavender or sky blue.
 - Inputs: light cream/white field with blue-gray border.
-- Tabs: pink ribbon/tab selected state.
-- Lists/Trees: rounded blue/pink tiles.
-- Popup/Dialog: cream panel with pink header and blue/green/yellow button families.
+- Tabs: yellow or lavender selected tab state.
+- Lists/Trees: rounded blue/yellow/lavender tiles.
+- Popup/Dialog: cream panel with lavender header and blue/green/yellow button families.
 - Range/toggle/progress: yellow reward progress and green confirm toggles.
 
 ## Export Strategy Recommendation
@@ -287,7 +318,7 @@ Proposed mood words: editor, cabinet, taxonomy, sharp, mixed-color, dense.
 Proposed color language:
 
 - Environment: deep blue-black and charcoal navy.
-- Default actions: orange or red-orange.
+- Default actions: amber/orange, not red-orange.
 - Active tabs and selected rows: yellow/gold.
 - Inputs and option controls: blue or steel.
 - Positive/help/toggles: green.
@@ -297,7 +328,7 @@ Proposed color language:
 
 Goal: warm daylight translated into a flat dark-friendly UI.
 
-Daybreak currently has the least clear identity. It should become the welcoming, public, social, early-morning arcade theme: warm light, teal shade, soft coral highlights, mint freshness, and readable cream-tinted panels.
+Daybreak currently has the least clear identity. It should become the welcoming, public, social, early-morning arcade theme: warm light, teal shade, sun-gold highlights, mint freshness, and readable cream-tinted panels.
 
 This can borrow the useful emotional lesson from the old Boardwalk direction without reviving rejected texture, wood, leather, sunset-gradient, or brown-heavy choices.
 
@@ -309,7 +340,7 @@ Proposed color language:
 - Default actions: amber or sunrise yellow.
 - Navigation and selected states: mint or seafoam.
 - Inputs: muted teal/cream containers.
-- Important headers or highlights: coral.
+- Important headers or highlights: amber, sun-gold, or aqua.
 - Info: aqua.
 
 ### Slate
@@ -343,16 +374,16 @@ Proposed color language:
 
 - Environment: deep plum, dark violet, or night berry.
 - Default actions: gold/yellow.
-- Navigation and selected states: coral or hot pink.
+- Navigation and selected states: violet or cyan.
 - Inputs: violet/blue containers.
 - Range/progress/check states: cyan or lime.
-- Danger: punchy red-pink.
+- Danger: red only.
 
 ### Bubble
 
 Goal: flat 3D mobile game UI.
 
-Bubble should lean hard into the HCGames/Renderman-style mobile UI reference: chunky, playful, touch-first, candy colors, pink ribbons, blue buttons, cream panels, yellow rewards, and green confirms.
+Bubble should lean hard into the HCGames/Renderman-style mobile UI reference: chunky, playful, touch-first, candy colors, blue buttons, cream panels, yellow rewards, green confirms, and lavender/purple header energy as a safer substitute for pink ribbons.
 
 The current dark berry plus pink direction captures only a fraction of that. To hit the reference, Bubble likely needs either a light/default variant later or a v1 compromise where the outer shell remains dark but panels and dialogs can become cream/sky islands.
 
@@ -362,8 +393,8 @@ Proposed color language:
 
 - Environment: dark berry/navy shell for v1 dark compatibility.
 - Panels/dialog islands: cream, peach, or sky blue.
-- Default actions: pink or bright blue.
-- Secondary actions: sky blue.
+- Default actions: bright blue.
+- Secondary actions: lavender or sky blue.
 - Rewards/warnings: yellow/gold.
 - Confirms/success: green.
 - Disabled/locked: muted blue-gray.
@@ -378,11 +409,11 @@ This is the proposed "no variations required" mapping. Exact values should be te
 
 | Theme | Button | Option/Menu | Input | Selected Tab | List/Tree Selection | Range/Progress | Toggle/Check | Popup/Dialog |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Pulse | orange/red-orange fill | blue/steel | dark blue with bright border | yellow/gold filled or strong strip | gold or role-coded row with colored rail | green or cyan | green | dark panels with colored category headers |
-| Daybreak | amber fill | mint/teal | pine/cream-tinted input | mint selected state | mint/amber selected container | aqua or mint | mint | coral/amber highlights on warm dark panels |
+| Pulse | amber/orange fill | blue/steel | dark blue with bright border | yellow/gold filled or strong strip | gold or role-coded row with colored rail | green or cyan | green | dark panels with colored category headers |
+| Daybreak | amber fill | mint/teal | pine/cream-tinted input | mint selected state | mint/amber selected container | aqua or mint | mint | amber/aqua highlights on warm dark panels |
 | Slate | icy blue quiet fill or outline | steel/lavender | graphite with blue-gray border | icy blue selected state | blue-gray selected container | cyan/blue | mint/blue | graphite panels with cool blue accents |
-| Burst | gold fill | coral/pink | violet/blue | coral or hot pink selected state | gold/coral selected container | cyan/lime | lime/cyan | plum panels with bright statement headers |
-| Bubble | pink or blue chunky fill | sky blue | cream/sky input island | pink selected ribbon/tab | blue or pink selected tile | yellow/blue | green | cream panels with pink headers |
+| Burst | gold fill | violet/blue | violet/blue | cyan or violet selected state | gold/cyan selected container | lime/cyan | lime/cyan | plum panels with violet/cyan statement headers |
+| Bubble | blue chunky fill | lavender/sky blue | cream/sky input island | yellow or lavender selected tab | blue/yellow/lavender selected tile | yellow/green | green | cream panels with lavender headers |
 
 ## Mockup Plan
 
