@@ -968,6 +968,14 @@ func _make_raised_stylebox(bg: Color, _offset_color: Color, _intensity: int) -> 
 	return sb
 
 
+func _resolve_raised_depth(intensity: int) -> int:
+	if not raised or raised_strength <= 0 or intensity <= 0:
+		return 0
+	# shape.raised_lifts is a 0-3 family-emphasis scale. Normalize it against
+	# raised_strength so built-in styles top out at a crisp 1-3px hard edge.
+	return maxi(1, ceili(float(raised_strength) * float(intensity) / 3.0))
+
+
 # ─── Style personality (DESIGN_TOKENS §5/§6, directions.json axis_8/axis_9) ─────────────────
 ## Per-style non-exported parameters that don't belong on the public 10-export surface but
 ## must differentiate Pulse (wide spread) from Slate (narrow spread) etc. Sourced from
@@ -1029,9 +1037,9 @@ const STYLE_PERSONALITY: Dictionary = {
 		},
 	},
 	# ─── Slate — base=#111820, accent=#8BD3FF (DESIGN_TOKENS §5.2) ───
-	# Personality: iOS-premium-quiet; radius=14 rounded-pill; ios-style-offset focus (offset=2).
+	# Personality: iOS-premium-quiet; radius=14 rounded chrome; ios-style-offset focus (offset=2).
 	# Buttons rounded (radius 14), padding 16×11 desktop, primary strategy = quiet-pill.
-	# Tabs/chips full pill (radius 999). Surface alpha popup 0.92 (iOS NavigationBar bleed).
+	# Tabs follow the 14px chrome radius; chips stay full pill. Surface alpha popup 0.92.
 	Style.SLATE: {
 		"spread_factor": 0.7, "hover_pct": 4.0, "pressed_pct": -6.0,  "disabled_opacity": 0.50,
 		"shape": {
@@ -1040,7 +1048,7 @@ const STYLE_PERSONALITY: Dictionary = {
 			"primary_strategy":      &"quiet-pill",
 			"ghost_strategy":        &"thin-accent-outline",
 			"secondary_radius":      14,
-			"tab_radius":            999,
+			"tab_radius":            14,
 			"chip_radius":           999,
 			"card_radius":           14,
 			"hero_radius":           14,
@@ -3679,7 +3687,7 @@ const BINDING_TABLE: Dictionary = {
 			"icon_max_width":   {"value": 0},
 			"icon_separation":  {"value": 6},
 			"outline_size":     {"value": 0},
-			"side_margin":      {"value": 0},
+			"side_margin":      {"value": "corner_radius"},
 			"tab_separation":   {"value": 0},
 		},
 		"font_size": {
@@ -3736,7 +3744,7 @@ const BINDING_TABLE: Dictionary = {
 			"icon_max_width":   {"value": 0},
 			"icon_separation":  {"value": 6},
 			"outline_size":     {"value": 0},
-			"side_margin":      {"value": 0},
+			"side_margin":      {"value": "corner_radius"},
 			"tab_separation":   {"value": 0},
 		},
 		"font_size": {
@@ -3831,7 +3839,7 @@ const BINDING_TABLE: Dictionary = {
 		},
 		"constant": {
 			"tab_separation": {"value": 0},
-			"side_margin": {"value": 0},
+			"side_margin": {"value": "corner_radius"},
 			"outline_size": {"value": 0},
 		},
 	},
@@ -5615,7 +5623,7 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		# Pick the matching offset color (per §6.3) for the bg's family.
 		var offset_role: String = recipe.get("offset_role", role + "_offset")
 		var offset_color: Color = role_table.get(offset_role, role_table.get(role + "_offset", role_table.surface_panel_offset))
-		var sb_intensity: int = (raised_strength * raised_intensity) if raised else 0
+		var sb_intensity: int = _resolve_raised_depth(raised_intensity)
 		var sb := _make_raised_stylebox(bg_color, offset_color, sb_intensity)
 		# Plan 05-02 Task 2 (D-03): radius may be either the @export `corner_radius` baseline
 		# (no recipe override), an int literal, or a `shape.<key>` lookup. _set_radius_all
@@ -5835,6 +5843,8 @@ func _resolve_recipe(recipe: Dictionary, data_type: String, role_table: Dictiona
 		if typeof(value_ref) == TYPE_STRING and (value_ref as String).begins_with("tokens."):
 			var key: String = (value_ref as String).substr(7)
 			return tokens.get(key, 0)
+		if typeof(value_ref) == TYPE_STRING and value_ref == "corner_radius":
+			return corner_radius
 		# Plan 05-02 Task 2 (D-03): constants/font_sizes can also pull from shape.* (e.g.,
 		# `value: "shape.focus_offset"` for outline widths or focus expand metadata).
 		if typeof(value_ref) == TYPE_STRING and (value_ref as String).begins_with("shape."):

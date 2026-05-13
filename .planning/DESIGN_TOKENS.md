@@ -211,7 +211,7 @@ The `@export` defaults below are translated from `.planning/mockups/3.4/data/dir
 **Theme Editor override intent (Slate personality):**
 - Brand mark: rounded-square (radius 14); size desktop 54 / mobile 42.
 - Buttons: rounded (radius 14); padding 16×11 (desktop) / 18×12 primary; primary strategy = "quiet-pill-primary"; ghost strategy = "thin-accent-outline".
-- Tabs: rounded-pill (radius 999); selected indicator = "accent-fill-subdued".
+- Tabs: quiet rounded chrome (radius 14, matching Slate's base radius); selected indicator = restrained accent stripe.
 - Chips: full pill (radius 999).
 - Density: 22px padding, 14px inter-control gap; "spacious-premium-quiet" feel.
 - Surface ramp: 3 stops, "narrow" spread (`spreadFactor = 0.7`).
@@ -443,7 +443,7 @@ Phase 4 implements these in `_regenerate_theme()` by populating the explicit the
 
 ### 8.1 Corner radius semantic
 
-`corner_radius` is the per-direction **base radius**. Direction `.tres` files override this. Per-Control radius variations (chip = 999, primary button possibly different from base, brand mark, tab) live in Theme Editor entry overrides per `.tres` — they do NOT bake into `@export`. Sentinel `999` = full pill (Theme Editor reads `corner_radius_top_left = 999` etc. and Godot caps at min(width,height)/2).
+`corner_radius` is the per-direction **base radius**. Direction `.tres` files override this. Per-Control radius variations (chip = 999, primary button possibly different from base, brand mark, tab) live in Theme Editor entry overrides per `.tres` — they do NOT bake into `@export`. Sentinel `999` = full pill (Theme Editor reads `corner_radius_top_left = 999` etc. and Godot caps at min(width,height)/2). Current v1 radius ladder is Pulse 0, Daybreak 8, Slate 14, Burst 16 tabs / 18 base chrome, Bubble 26 base / 999 pill tabs. `TabContainer.side_margin` follows `corner_radius` so the first tab clears rounded panel shoulders without adding fake margins to `tabbar_background`.
 
 ### 8.2 Focus ring construction
 
@@ -510,17 +510,16 @@ These are Theme Editor entry overrides on the `.kicker` Label type variation (no
 
 ### 9.2 `raised = true` (extruded-flat)
 
-Translates the mockup CSS `box-shadow: 0 raised_strength 0 0 var(--{element}-offset)` hard-offset pattern into Godot StyleBoxFlat:
+Translates the mockup CSS `box-shadow: 0 raised_strength 0 0 var(--{element}-offset)` hard-offset pattern into Godot StyleBoxFlat border depth, not soft shadows:
 
 ```gdscript
 # For each raised-eligible Control's stylebox:
-sb.shadow_color = element_offset_color  # per §6.3 (e.g., accent_offset for primary buttons,
-                                         # surface_panel_offset for panels)
-sb.shadow_size = raised_strength        # the @export scalar (3 for Pulse/Daybreak, 2 for Slate,
-                                         # 5 for Burst, 6 for Bubble)
-sb.shadow_offset = Vector2(0, raised_strength)  # hard offset directly below; no blur
-# No `shadow_*_blur` properties exist on StyleBoxFlat — the result is a hard solid shadow
-# that mimics the CSS `box-shadow: 0 N 0 0 color` extruded-flat pattern.
+sb.shadow_size = 0
+sb.shadow_offset = Vector2.ZERO
+depth_width = ceil(raised_strength * shape.raised_lifts.<family> / 3.0)
+sb.border_color = element_offset_color  # per §6.3
+sb.border_width_bottom = max(depth_width, face_edge_width + 1)
+sb.content_margin_bottom += max(0, sb.border_width_bottom - face_edge_width)
 
 # CRITICAL: do NOT add bevel gradients, texture, glow, or soft drop shadow.
 # raised = solid top shape + hard offset darker shape duplicate. That is it.
@@ -532,10 +531,10 @@ Raised intensity by Control family per FLAT-3D-UI-RESEARCH.md + per-direction `a
 
 | Family | Raised behavior |
 |---|---|
-| Buttons (primary/secondary/ghost) | strongest — full `raised_strength` offset |
-| Selected tabs / chips | medium — typically `raised_strength * 0.7` |
-| Range handles (slider grabber, scrollbar grabber) | subtle — typically `raised_strength * 0.5` |
-| Panels / dialogs | subtle — `raised_strength * 1.0` (panels lift to convey card-like depth, but flat fill content) |
+| Buttons (primary/secondary/ghost) | strongest — normalized from the 0-3 family lift scale; built-in primary/danger bottoms cap at a crisp 3px |
+| Selected tabs / chips | medium or flat; tabs do not gain extra bottom depth because they must stay connected to the panel |
+| Range handles (slider grabber, scrollbar grabber) | subtle — small hard offset only |
+| Panels / dialogs | subtle — normalized from the 0-3 family lift scale (panels lift to convey card-like depth, but flat fill content) |
 | Lists / tree / item rows | absent or very subtle — most directions: rows do NOT lift (only Bubble + Daybreak + Slate + Burst's selected rows lift; Pulse rows stay flat) |
 | Popup/dialog shells | rare — Phase 4 may opt to keep popup shells flat regardless of `raised` to preserve readability |
 | Passive labels / separators | NEVER lift (passive elements have no affordance) |

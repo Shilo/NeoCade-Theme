@@ -627,7 +627,8 @@ func _expect_editor_compact_chrome(theme: Theme, label: String) -> void:
 	_expect_equal(theme.get_constant("v_separation", "FlowContainer"), 4, "%s FlowContainer.v_separation" % label)
 	_expect_equal(theme.get_constant("h_separation", "GridContainer"), 4, "%s GridContainer.h_separation" % label)
 	_expect_equal(theme.get_constant("v_separation", "GridContainer"), 4, "%s GridContainer.v_separation" % label)
-	_expect_equal(theme.get_constant("side_margin", "TabContainer"), 0, "%s TabContainer.side_margin" % label)
+	var expected_tab_side_margin := (theme as NeoCadeTheme).corner_radius if theme is NeoCadeTheme else 0
+	_expect_equal(theme.get_constant("side_margin", "TabContainer"), expected_tab_side_margin, "%s TabContainer.side_margin" % label)
 	_expect_equal(theme.get_constant("tab_separation", "TabContainer"), 0, "%s TabContainer.tab_separation" % label)
 	_expect_equal(theme.get_constant("icon_max_width", "TabBar"), 0, "%s TabBar.icon_max_width" % label)
 	_expect_equal(theme.get_constant("icon_max_width", "TabContainer"), 0, "%s TabContainer.icon_max_width" % label)
