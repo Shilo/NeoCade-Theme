@@ -11,8 +11,17 @@ Use `theme-color-identity-approval-gate.html` as the implementation approval art
 
 The approval-gate mockup includes a live `source_color` picker. You can also set it from the URL:
 
-- `theme-color-identity-approval-gate.html?source=%2357c7ff`
-- `theme-color-identity-approval-gate.html?source=%23ff5f6f`
+- `theme-color-identity-approval-gate.html?mode=preset`
+- `theme-color-identity-approval-gate.html?mode=stress&source=%2357c7ff`
+- `theme-color-identity-approval-gate.html?mode=stress&source=%23ff5f6f`
+
+Recommended preset sources:
+
+- Pulse: `#3AA8FF`
+- Daybreak: `#76F2D1`
+- Slate: `#8BD3FF`
+- Burst: `#FFD166`
+- Bubble: `#57C7FF`
 
 Direct theme URLs:
 

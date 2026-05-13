@@ -604,6 +604,16 @@ This is the proposed "no variations required" mapping. Exact values should be te
 
 These strategies answer the key workflow question: what changes when the user changes `source_color`?
 
+Recommended preset `source_color` values:
+
+| Theme | Default source | Why |
+| --- | --- | --- |
+| Pulse | `#3AA8FF` | Tool-blue seed keeps the LDtk-like taxonomy from starting too green while still generating amber/yellow/blue/green control families. |
+| Daybreak | `#76F2D1` | Mint/teal seed preserves the fresh morning lobby identity and lets amber action stay distinct. |
+| Slate | `#8BD3FF` | Icy blue seed fits the restrained premium utility goal. |
+| Burst | `#FFD166` | Gold seed reinforces reward/action energy while the strategy still generates violet/cyan/lime supporting roles. |
+| Bubble | `#57C7FF` | Sky-blue seed best matches the flat mobile-game UI reference without leaning on pink/red ordinary controls. |
+
 All themes:
 
 - Surfaces change through a low-chroma harmonized surface ramp.

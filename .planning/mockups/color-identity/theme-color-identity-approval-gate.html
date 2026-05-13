@@ -183,6 +183,29 @@
       cursor: pointer;
     }
 
+    .mode-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .mode-button {
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px 11px;
+      background: var(--panel);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .mode-button[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--page);
+    }
+
     main {
       display: grid;
       gap: 28px;
@@ -753,6 +776,10 @@
         </label>
         <div class="source-preview" id="source-preview" style="--source-preview:#57c7ff;--source-preview-fg:#101521">#57C7FF</div>
       </div>
+      <div class="mode-row" aria-label="Source mode">
+        <button class="mode-button" id="mode-preset" type="button" aria-pressed="true">Preset sources</button>
+        <button class="mode-button" id="mode-stress" type="button" aria-pressed="false">Shared stress source</button>
+      </div>
       <div class="preset-row" aria-label="Source color presets">
         <button class="preset-button" data-source="#57c7ff" style="--preset-color:#57c7ff;--preset-fg:#101521">Sky</button>
         <button class="preset-button" data-source="#8bff6a" style="--preset-color:#8bff6a;--preset-fg:#101521">Lime</button>
@@ -760,7 +787,7 @@
         <button class="preset-button" data-source="#967cff" style="--preset-color:#967cff;--preset-fg:#101521">Violet</button>
         <button class="preset-button" data-source="#ff5f6f" style="--preset-color:#ff5f6f;--preset-fg:#ffffff">Red stress</button>
       </div>
-      <p>One source is fed into all five style strategies. Every visible role below should move, but ordinary controls are guarded away from red, rose, coral, and hot-pink danger territory.</p>
+      <p><strong>Preset sources</strong> shows the recommended shipping defaults for each built-in style. <strong>Shared stress source</strong> pushes one color through all five strategies to prove the algorithms stay distinct and avoid red, rose, coral, and hot-pink danger territory.</p>
     </section>
   </header>
 
@@ -773,7 +800,7 @@
 
     <section class="section" id="themes">
       <h2>Dynamic Source Proposal</h2>
-      <p>Each card shows the dynamic role palette generated from <code>source_color</code>: default Button, OptionButton/MenuButton, inputs, selected rows/tabs, range controls, dialogs, and danger all get roles without type variations.</p>
+      <p>Each card shows the dynamic role palette generated from its active <code>source_color</code>: default Button, OptionButton/MenuButton, inputs, selected rows/tabs, range controls, dialogs, and danger all get roles without type variations.</p>
       <div class="theme-grid" id="theme-grid"></div>
     </section>
 
@@ -836,6 +863,7 @@
       {
         id: "pulse",
         name: "Pulse",
+        defaultSource: "#3aa8ff",
         goal: "LDtk-inspired flat arcade editor taxonomy.",
         fail: "Fails if it still reads as navy plus green accent.",
         algorithm: "Wide taxonomic palette. Source nudges five different control families, but action remains amber-safe, menu/input stay blue-safe, range stays green-safe, and selection stays yellow-safe.",
@@ -867,6 +895,7 @@
       {
         id: "daybreak",
         name: "Daybreak",
+        defaultSource: "#76f2d1",
         goal: "Fresh morning community lobby translated to dark teal.",
         fail: "Fails if it becomes brown, nostalgic, or Boardwalk-like.",
         algorithm: "Teal morning environment with sun and mint roles. Source warms or cools the palette, but surfaces remain pine/teal, actions remain golden, and selected/navigation roles stay mint-forward.",
@@ -898,6 +927,7 @@
       {
         id: "slate",
         name: "Slate",
+        defaultSource: "#8bd3ff",
         goal: "Premium futuristic utility with slight iOS calm.",
         fail: "Fails if it is just generic dark mode with blue focus.",
         algorithm: "Low-chroma precision palette. Source influences hue subtly and mainly through cool steel roles; hot sources are translated into restrained blue/steel rather than ordinary red controls.",
@@ -929,6 +959,7 @@
       {
         id: "burst",
         name: "Burst",
+        defaultSource: "#ffd166",
         goal: "MD3 Expressive celebration and reward UI.",
         fail: "Fails if color becomes random or Bubble painted purple.",
         algorithm: "Maximum expression with role discipline. Source gets the strongest pull, especially menu/input/selection roles, while gold action and lime/cyan status roles stay semantically readable.",
@@ -960,6 +991,7 @@
       {
         id: "bubble",
         name: "Bubble",
+        defaultSource: "#57c7ff",
         goal: "Flat 3D mobile-game UI with dark shell and light islands.",
         fail: "Fails if it stays dark berry plus pink accent only.",
         algorithm: "Flat mobile-game palette. Source harmonizes blue action, lavender headers, cream/sky islands, yellow rewards, and green confirms. Pink sources are translated away from ordinary controls.",
@@ -991,6 +1023,7 @@
     ];
 
     const DEFAULT_SOURCE = "#57c7ff";
+    const DEFAULT_MODE = "preset";
 
     function hexToRgb(hex) {
       const value = hex.replace("#", "");
@@ -1271,6 +1304,7 @@
           <h3>${theme.name}</h3>
           <p>${theme.goal}</p>
           <p>${theme.fail}</p>
+          <p><code>source_color</code> ${theme.source.toUpperCase()}</p>
         </header>
 
         <div class="compare">
@@ -1375,21 +1409,32 @@
       </article>`;
     }
 
-    function setSource(sourceHex, pushHistory = false) {
+    function setSource(sourceHex, mode = DEFAULT_MODE, pushHistory = false) {
       const normalized = normalizeHex(sourceHex) || DEFAULT_SOURCE;
+      const normalizedMode = mode === "stress" ? "stress" : "preset";
       const sourceColor = document.getElementById("source-color");
       const sourceHexInput = document.getElementById("source-hex");
       const preview = document.getElementById("source-preview");
+      const modePreset = document.getElementById("mode-preset");
+      const modeStress = document.getElementById("mode-stress");
       sourceColor.value = normalized;
       sourceHexInput.value = normalized.toUpperCase();
       preview.textContent = normalized.toUpperCase();
       preview.style.setProperty("--source-preview", normalized);
       preview.style.setProperty("--source-preview-fg", readableOn(normalized));
-      const builtThemes = themeBlueprints.map(blueprint => buildTheme(blueprint, normalized));
+      modePreset.setAttribute("aria-pressed", String(normalizedMode === "preset"));
+      modeStress.setAttribute("aria-pressed", String(normalizedMode === "stress"));
+      sourceColor.disabled = normalizedMode === "preset";
+      sourceHexInput.disabled = normalizedMode === "preset";
+      const builtThemes = themeBlueprints.map(blueprint => buildTheme(
+        blueprint,
+        normalizedMode === "preset" ? blueprint.defaultSource : normalized
+      ));
       document.getElementById("algorithm-grid").innerHTML = builtThemes.map(algorithmCard).join("");
       document.getElementById("theme-grid").innerHTML = builtThemes.map(themeCard).join("");
       if (pushHistory) {
         const url = new URL(window.location.href);
+        url.searchParams.set("mode", normalizedMode);
         url.searchParams.set("source", normalized);
         window.history.replaceState(null, "", url);
       }
@@ -1397,19 +1442,28 @@
 
     const params = new URLSearchParams(window.location.search);
     const initialSource = normalizeHex(params.get("source")) || DEFAULT_SOURCE;
-    setSource(initialSource);
+    const initialMode = params.get("mode") === "stress" ? "stress" : DEFAULT_MODE;
+    setSource(initialSource, initialMode);
 
     document.getElementById("source-color").addEventListener("input", event => {
-      setSource(event.target.value, true);
+      setSource(event.target.value, "stress", true);
     });
 
     document.getElementById("source-hex").addEventListener("input", event => {
       const normalized = normalizeHex(event.target.value);
-      if (normalized) setSource(normalized, true);
+      if (normalized) setSource(normalized, "stress", true);
     });
 
     document.querySelectorAll("[data-source]").forEach(button => {
-      button.addEventListener("click", () => setSource(button.dataset.source, true));
+      button.addEventListener("click", () => setSource(button.dataset.source, "stress", true));
+    });
+
+    document.getElementById("mode-preset").addEventListener("click", () => {
+      setSource(document.getElementById("source-hex").value, "preset", true);
+    });
+
+    document.getElementById("mode-stress").addEventListener("click", () => {
+      setSource(document.getElementById("source-hex").value, "stress", true);
     });
   </script>
 </body>
