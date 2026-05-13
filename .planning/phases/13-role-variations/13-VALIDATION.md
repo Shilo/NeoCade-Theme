@@ -1,10 +1,11 @@
 ---
 phase: 13
 slug: role-variations
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-11
+updated: 2026-05-13
 ---
 
 # Phase 13 — Validation Strategy
@@ -28,7 +29,7 @@ created: 2026-05-11
 
 ## Sampling Rate
 
-- **After every task commit:** `--stage architecture` (~5 seconds; asserts the BINDING_TABLE.size() == 149 and TYPE_VARIATIONS.size() == 56 counts hold).
+- **After every task commit:** `--stage architecture` (~5 seconds; asserts the current `BINDING_TABLE.size() == 150` and `TYPE_VARIATIONS.size() == 62` counts hold).
 - **After every plan wave:** `--stage full` + `_phase13_smoke_matrix.gd` (~30 seconds).
 - **Before `/gsd-verify-work`:** Full suite must be green plus visual inspection of showcase Role Variations section against the locked design intent (subtle 6% tint per panel; legible color font on each label).
 - **Max feedback latency:** ~30 seconds (full suite).
@@ -41,13 +42,13 @@ Phase 13 has **no REQUIREMENTS.md REQ-IDs** (per ROADMAP.md). Validation maps to
 
 | SC ID | Behavior | Test Type | Automated Command | File Exists | Status |
 |-------|----------|-----------|-------------------|-------------|--------|
-| **SC#1** | Default chrome unchanged from Phase 12 baseline. Smoke-test 30 configs (5 styles × 2 raised × 3 platforms) pre/post pixel-equal where no Role Variation widget is placed. | runtime (headless) + diff-against-Phase-12-baseline | `godot --headless --quit --script ".../_phase13_smoke_matrix.gd"` (asserts BINDING_TABLE == 149, TYPE_VARIATIONS == 56, Button.normal/PanelContainer.panel/Label.font_color recipes BYTE-IDENTICAL to Phase 12 by comparing resolved StyleBox fields) | ❌ Wave 0 | ⬜ pending |
-| **SC#2** | All 4 Labels + 5 Panels visible in the new Showcase section. Headless render verifies each `TYPE_VARIATIONS` entry appears in the live registry AND in the showcase scene. | runtime (headless registry introspection) + scene-load assertion | `_phase13_verify_headless.gd --stage role-variations-registered` (asserts the 9 keys exist in TYPE_VARIATIONS; `theme.get_color_type_list()` contains all 4 Labels; `theme.get_stylebox_type_list()` contains all 5 Panels) + `--stage role-variations-in-showcase` (loads showcase.tscn, walks tree, asserts 9 nodes with expected `theme_type_variation` properties) | ❌ Wave 0 | ⬜ pending |
-| **SC#3** | Type variations only activate when consumer applies `theme_type_variation` — never auto-bound to widget defaults. Default Label and default PanelContainer chrome produce byte-identical output to Phase 12 baseline. | static (BINDING_TABLE diff vs frozen Phase 12 baseline) + runtime introspection | `--stage default-chrome-unchanged` (loads canonical .tres, retrieves `theme.get_color("font_color", "Label")` and `theme.get_stylebox("panel", "PanelContainer")`, compares against captured Phase 12 baseline; FAILS if anything in those slots references role_success/role_warning/role_danger/role_info/role_primary) | ❌ Wave 0 | ⬜ pending |
-| **architecture** | Canonical .tres loads, BINDING_TABLE.size() == 149, TYPE_VARIATIONS.size() == 56, @export count == 12 | runtime (headless) | `--stage architecture` | ❌ Wave 0 | ⬜ pending |
-| **smoke-30** | All 30 representative configs regenerate without error post-Phase-13 (invariants: BT==149, TV==56, @export==12, Button.normal exists, PanelContainer.panel exists, all 9 new variations resolve to a StyleBox or Color value, not null) | runtime (headless) | `_phase13_smoke_matrix.gd` | ❌ Wave 0 | ⬜ pending |
-| **fonts-explicit** | Each of the 4 new Role Labels has an explicit `font` slot bound (per PITFALLS 1.2 mandate). | runtime (headless) | `--stage role-label-fonts` (asserts `theme.get_font("font", "SuccessLabel") != null` × 4) | ❌ Wave 0 | ⬜ pending |
-| **panel-alpha-renders-cleanly** (Pitfall 1 contingency) | A Role Panel with `bg_color.a == 0.06` renders cleanly under GL Compatibility (no halo). | tooled (headless render) + manual visual confirmation | Render via `_phase13_role_render.gd`; visual diff against the precomputed-mix fallback's render | ❌ Wave 0 | ⬜ pending (only run if Pitfall 1 contingency triggers) |
+| **SC#1** | Default chrome unchanged from Phase 12 baseline. Smoke-test 30 configs (5 styles × 2 raised × 3 platforms) where no Role Variation widget is placed. | runtime (headless) + diff-against-Phase-12-baseline | `godot --headless --quit --script ".../_phase13_smoke_matrix.gd"` (current invariant counts: BT==150, TV==62, exports==12; Button.normal/PanelContainer.panel/Label.font_color recipes remain non-role defaults) | ✅ existing | ✅ green |
+| **SC#2** | All 4 Labels + 5 Panels visible in the new Showcase section. Headless verification confirms each `TYPE_VARIATIONS` entry appears in the live registry AND in the showcase scene. | runtime (headless registry introspection) + scene-load assertion | `_phase13_verify_headless.gd --stage role-variations-registered` + `--stage role-variations-in-showcase` | ✅ existing | ✅ green |
+| **SC#3** | Type variations only activate when consumer applies `theme_type_variation` — never auto-bound to widget defaults. Default Label and default PanelContainer chrome remain non-role defaults. | static (BINDING_TABLE diff vs frozen Phase 12 baseline) + runtime introspection | `--stage default-chrome-unchanged`; DI-13-01 documents the historical over-strict Daybreak alpha-band false-red, not a product regression | ✅ existing | ✅ green with documented verifier caveat |
+| **architecture** | Canonical .tres loads, BINDING_TABLE.size() == 150, TYPE_VARIATIONS.size() == 62, @export count == 12 | runtime (headless) | `--stage architecture` | ✅ existing | ✅ green |
+| **smoke-30** | All 30 representative configs regenerate without error post-Phase-13 (invariants: BT==150, TV==62, @export==12, Button.normal exists, PanelContainer.panel exists, all 9 new variations resolve to a StyleBox or Color value, not null) | runtime (headless) | `_phase13_smoke_matrix.gd` | ✅ existing | ✅ green |
+| **fonts-explicit** | Each of the 4 new Role Labels has an explicit `font` slot bound (per PITFALLS 1.2 mandate). | runtime (headless) | `--stage role-label-fonts` (asserts `theme.get_font("font", "SuccessLabel") != null` × 4) | ✅ existing | ✅ green |
+| **panel-alpha-renders-cleanly** (Pitfall 1 contingency) | A Role Panel with `bg_color.a == 0.06` renders cleanly under GL Compatibility (no halo). | tooled (headless render) + manual visual confirmation | Render via `_phase13_role_render.gd`; visual diff against the precomputed-mix fallback's render | ✅ existing | manual/contingency only |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -57,10 +58,10 @@ Phase 13 has **no REQUIREMENTS.md REQ-IDs** (per ROADMAP.md). Validation maps to
 
 Before Phase 13 implementation can begin, Wave 0 must create the following helpers (mirror Phase 12 precedent):
 
-- [ ] `.planning/phases/13-role-variations/helpers/_phase13_verify_headless.gd` — SceneTree headless verifier with stages: `architecture`, `role-variations-registered`, `role-variations-in-showcase`, `default-chrome-unchanged`, `role-label-fonts`, `full`. Mirror Phase 12 `_phase12_verify_headless.gd` structure.
-- [ ] `.planning/phases/13-role-variations/helpers/_phase13_smoke_matrix.gd` — Direct port of `_phase12_smoke_matrix.gd` with `EXPECTED_BINDING_TABLE_ROWS = 149` and a new invariant block asserting all 9 Phase 13 variations exist in TYPE_VARIATIONS and produce non-null stylebox/color values for the 30 configs.
-- [ ] `.planning/phases/13-role-variations/helpers/_phase13_role_render.gd` (optional, Pitfall 1 contingency only) — Renders showcase.tscn at Pulse style with the Role Variations tab active, saves PNG to `.planning/phases/13-role-variations/artifacts/`, for visual halo inspection.
-- [ ] Framework install: **NONE** — Godot CLI path already documented at `.planning/phases/05-.../helpers/godot-cli-path.txt` per Phase 12 precedent.
+- [x] `.planning/phases/13-role-variations/helpers/_phase13_verify_headless.gd` — SceneTree headless verifier with stages: `architecture`, `role-variations-registered`, `role-variations-in-showcase`, `default-chrome-unchanged`, `role-label-fonts`, `full`. Mirrors Phase 12 `_phase12_verify_headless.gd` structure and now pins current 2026-05-13 live counts.
+- [x] `.planning/phases/13-role-variations/helpers/_phase13_smoke_matrix.gd` — Direct port of `_phase12_smoke_matrix.gd` with current live counts and an invariant block asserting all 9 Phase 13 variations exist in TYPE_VARIATIONS and produce non-null stylebox/color values for the 30 configs.
+- [x] `.planning/phases/13-role-variations/helpers/_phase13_role_render.gd` (optional, Pitfall 1 contingency only) — Renders showcase.tscn at Pulse style with the Role Variations tab active, saves PNG to `.planning/phases/13-role-variations/artifacts/`, for visual halo inspection.
+- [x] Framework install: **NONE** — Godot CLI path already documented at `.planning/phases/05-.../helpers/godot-cli-path.txt` per Phase 12 precedent.
 
 If Godot CLI is unavailable on the executor machine: defer SC#1/SC#2 smoke tests to manual UAT per Phase 4 `BINDING_TABLE_SEED.txt` fallback precedent. The static SC#3 check (default chrome unchanged) can still run via grep / introspection-by-reading-source.
 
@@ -77,11 +78,11 @@ If Godot CLI is unavailable on the executor machine: defer SC#1/SC#2 smoke tests
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 30s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 30s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** complete, with manual visual inspection retained as optional owner UAT.

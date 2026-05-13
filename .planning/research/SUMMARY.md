@@ -1,16 +1,16 @@
 # NeoCade Theme — Project Research Summary
 
-**Project:** NeoCade Theme (Godot 4.6 dark UI Theme addon, dark v1, distributed as five data-only direction resources backed by `addons/neocade_theme/scripts/neocade_theme.gd`)
+**Project:** NeoCade Theme (Godot 4.6 dark UI Theme addon, dark v1, distributed as one canonical `neocade_theme.tres` resource backed by `addons/neocade_theme/scripts/neocade_theme.gd`)
 **Domain:** Godot 4.6 native Theme resource — visual design system + bundled fonts + bespoke icons + showcase scene
 **Researched:** 2026-05-04 (initial parallel pass complete)
 **Overall confidence:** HIGH on Godot Theme/Font API, table-stakes Control coverage, and table-stakes pitfalls. MEDIUM on real-arcade visual reference depth, Asset Library policy nuance, MCP screenshot tooling baseline. LOW on `godot-minimal-theme` `.tres` line-by-line entry enumeration and LDtk `src/electron.renderer/` UI mining — both flagged for dedicated source-dive spike phases.
 
 > **Update (2026-05-04, post-CROSS-PLATFORM):** The 5th research dimension landed after the initial synthesis. Key cross-platform findings have been folded in below:
-> - **No `.tres`-to-`.tres` inheritance in Godot Theme** — verified against Theme class API. Final v1 token-sharing strategy is direct `NeoCadeTheme` export-driven regeneration: one concrete `addons/neocade_theme/scripts/neocade_theme.gd` class, five data-only direction `.tres` files at the addon root, and no `_dev` generator or separate static desktop/mobile sibling resources.
+> - **No `.tres`-to-`.tres` inheritance in Godot Theme** — verified against Theme class API. Final v1 token-sharing strategy is direct `NeoCadeTheme` export-driven regeneration: one concrete `addons/neocade_theme/scripts/neocade_theme.gd` class, one canonical `addons/neocade_theme/neocade_theme.tres` resource with built-in styles, and no `_dev` generator or separate static desktop/mobile sibling resources.
 > - **GL Compatibility renderer is the safest cross-platform choice** — already locked in project.godot. Avoids two new Godot 4.6 regressions: iOS Mobile-renderer Metal validation failure on iPhone SE 2nd gen (#116090, 4.7 release blocker) and Android Mobile-renderer reducing Play Store device coverage (#111729). **Stay on GL Compatibility — do NOT switch.**
 > - **Web export is highest-risk** — three failure modes: SystemFont resource silently fails (must use FontFile + bundled `.ttf`); `.ttf` files must be in "Filters to export non-resources" OR wrapped in saved FontFile.tres; iOS Safari has documented WebGL2 quirks (no pixel-parity required for v1). All `.tres` references must use `uid://` to survive PCK remap.
 > - **Mobile spec is concrete:** Button height 48px mobile vs 32px desktop (satisfies iOS HIG 44pt + Material 3 48dp); body 16px mobile vs 14px desktop; spacing scale +50% on space.4 and above; **corner radii STAY IDENTICAL** across desktop/mobile (brand identity, not platform-specific).
-> - **Density buckets — answered:** Ship one direction resource per approved theme, with `platform=AUTO` or `platform=MOBILE` selecting mobile values at runtime. Godot does not use Android density qualifiers for theme resources; density variation is handled at runtime via `content_scale_factor` + Godot stretch modes (`canvas_items` + `expand`). Authored values are dp-equivalent at base scale 1.0.
+> - **Density buckets — answered:** Ship one canonical theme resource, with `style` selecting the approved built-in direction and `platform=AUTO` or `platform=MOBILE` selecting mobile values at runtime. Godot does not use Android density qualifiers for theme resources; density variation is handled at runtime via `content_scale_factor` + Godot stretch modes (`canvas_items` + `expand`). Authored values are dp-equivalent at base scale 1.0.
 > - **License compliance:** Inter Variable Roman is the only bundled v1 font and is OFL 1.1 — App Store + Play Store + Web embedding legal per SIL OFL FAQ. Reserved-name clause: do NOT rename the Inter binary. Noto Sans, Outfit, JetBrains Mono, and Inter Italic are consumer-side or v1.x options, not bundled v1 assets.
 > - **Two new phases required** in the roadmap: **Mobile Variant Authoring** (interleaved with desktop authoring after Foundation) and **Cross-Platform Export Validation** (post-desktop-QA, pre-v1-release). Optional Cross-Platform Hardening Spike buffer phase recommended.
 > - **FEATURES.md AF-5 must be stricken** — mobile-as-anti-feature is no longer correct; mobile variant is now v1 must-have.
@@ -277,7 +277,7 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 
 ### Phase 9: Showcase + Token Gallery + Theme Toggle
 **Rationale:** PROJECT.md mandates showcase + prominent toggle. Showcase doubles as QA forcing function. With mobile variant in v1, the showcase scene also demonstrates platform switching on the active duplicated theme.
-**Delivers:** `res://showcase/showcase.tscn` with 9 sections (Buttons, Text Inputs, Numbers/Range, Selection/Lists, Containers/Layout, Dialogs/Popups, Advanced/Graph, Token Gallery, Coverage 37/37); direction/default theme picker, raised toggle, and platform selector with inline overrides (Pitfall 10.3); BBCode demo; `accessibility_name` on every Control (Pitfall 2.5); realistic sample content per Control (Pitfall 10.1).
+**Delivers:** `res://showcase/showcase.tscn` with 10 sections after Phase 13 (Buttons, Text Inputs, Numbers/Range, Selection/Lists, Containers/Layout, Dialogs/Popups, Advanced/Graph, Token Gallery, Coverage 37/37, Role Variations); direction/default theme picker, raised toggle, and platform selector with inline overrides (Pitfall 10.3); BBCode demo; `accessibility_name` on every Control (Pitfall 2.5); realistic sample content per Control (Pitfall 10.1).
 
 ### Phase 10 (EXPANDED post-CROSS-PLATFORM): QA + Cross-Platform Export Validation
 **Rationale:** PITFALLS flags multiple QA gates pre-ship. CROSS-PLATFORM elevates per-target export validation to v1 must-have. This phase combines visual QA, accessibility QA, dual-renderer screenshot pass, and per-target export validation.
@@ -301,7 +301,7 @@ Updated structure: **11 phases** post-CROSS-PLATFORM. Phases 1-3 are research/de
 
 ### Phase Ordering Rationale (post-CROSS-PLATFORM)
 - Research/spike (1-3) precedes implementation (4-9) per mandatory mockup gate.
-- Foundation (4) establishes the `NeoCadeTheme` class, exports, binding table, font/icon assets, and direction resources — every later phase populates the one regeneration path.
+- Foundation (4) establishes the `NeoCadeTheme` class, exports, binding table, font/icon assets, and canonical resource with built-in styles — every later phase populates the one regeneration path.
 - Desktop core authoring (5-7) → Mobile variant authoring/audit (8) → Showcase (9): mobile overrides depend on desktop entries existing.
 - QA + Cross-Platform Validation (10) requires both themes complete and the showcase scene ready.
 - Distribution (11) is last — GitHub Actions release pipeline (CI checks → version bump → addon zip + web export → GitHub Release publish). No Asset Library in v1.

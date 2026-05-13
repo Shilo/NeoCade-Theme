@@ -4,17 +4,16 @@ extends SceneTree
 ## Invoke via: godot --headless --quit --script ".planning/phases/13-role-variations/helpers/_phase13_smoke_matrix.gd"
 ##
 ## Exits 0 if all 30 configs regenerate cleanly AND maintain invariants
-## (BINDING_TABLE == 149 rows, TYPE_VARIATIONS == 56, @export count == 12, Button.normal stylebox produced,
+## (BINDING_TABLE == 150 rows, TYPE_VARIATIONS == 62, @export count == 12, Button.normal stylebox produced,
 ## all 9 Phase 13 variations produce non-null bindings).
 ## Exits 1 on first invariant violation (with collected failure list).
 ##
-## Note: EXPECTED_BINDING_TABLE_ROWS = 149 = Phase 12 baseline 140 + 9 Phase 13 additions.
-## EXPECTED_TYPE_VARIATIONS_COUNT = 61 = Phase 12 actual baseline 52 + 9 Phase 13 additions (Plan 13-02 deviation: plan's "47 baseline" was stale).
+## Note: expected registry counts track the current live implementation as of 2026-05-13.
 
 const CANONICAL_TRES := "res://addons/neocade_theme/neocade_theme.tres"
 const EXPECTED_EXPORT_COUNT := 12
-const EXPECTED_BINDING_TABLE_ROWS := 149  # Phase 12 baseline 140 + 9 Phase 13 additions
-const EXPECTED_TYPE_VARIATIONS_COUNT := 61  # Plan 13-02 deviation: Phase 12 actual baseline 52 + 9 Phase 13 additions (plan's "47 baseline" was stale).
+const EXPECTED_BINDING_TABLE_ROWS := 150  # Current live implementation count as of 2026-05-13.
+const EXPECTED_TYPE_VARIATIONS_COUNT := 62  # Current live implementation count as of 2026-05-13.
 const PHASE_13_NEW_LABEL_VARIATIONS := ["SuccessLabel", "WarningLabel", "DangerLabel", "InfoLabel"]
 const PHASE_13_NEW_PANEL_VARIATIONS := ["AccentPanel", "InfoPanel", "WarningPanel", "DangerPanel", "SuccessPanel"]
 

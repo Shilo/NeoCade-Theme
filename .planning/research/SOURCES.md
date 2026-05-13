@@ -293,7 +293,7 @@ This dossier catalogues each source the user explicitly named in PROJECT.md. For
 - **NOT read in initial pass:** `.tscn` file in full; per-Control sample-content patterns; layout constants (separations, margins, MarginContainer values used)
 
 **What we adopted:**
-- **Showcase scope reference** — FEATURES.md Section 5 mirrors the gallery sections (Buttons, Inputs, Numbers, Lists, Containers, Dialogs, Advanced) plus NeoCade additions (Token Gallery, Coverage Verification 35/35).
+- **Showcase scope reference** — FEATURES.md Section 5 mirrors the gallery sections (Buttons, Inputs, Numbers, Lists, Containers, Dialogs, Advanced) plus NeoCade additions (Token Gallery, Coverage Verification 37/37, Role Variations).
 - **FoldableContainer requirement** — control_gallery includes it; FEATURES.md TS-coverage includes it (Godot 4.4+ Container).
 - **Sample-content discipline** — PITFALLS.md 10.1 derives from the gallery's pattern of populating every control with realistic content (Tree with multi-level items, OptionButton with multiple options, etc.).
 - **Section-headed scrolling layout** — informed showcase scene structure.
@@ -400,7 +400,7 @@ Phase 2 checked LDtk-specific report claims in `.planning/research/LDTK-UI-MININ
 | 13 | Visible focus indicator | **MISSING — must add** | ARCHITECTURE.md Section 8: prototype shows hover-ish styling on tabs/buttons but no dedicated 2px solid focus ring — accessibility regression vs WCAG 2.1 SC 1.4.11 + SC 2.4.7. Every focusable Control must get the 2px outer focus ring. |
 | 14 | Status pill icons (CRT-styled, glowing) | **REJECT — synthwave drift** | ARCHITECTURE.md Section 8: pill icons reinforce cyberpunk drift. Replace with flat material-style monochrome accent fill, no glow. |
 | 15 | Rounded panel corners throughout | **PRESERVE — value 4px default** | Aligns with godot-minimal-theme parity. |
-| 16 | Comprehensive Control coverage in showcase | **PRESERVE — extends to FEATURES.md scope** | Prototype proves the 35-class coverage is achievable in one scene; FEATURES.md Section 5 extends with 9 sections + Token Gallery + Coverage Verification strip. |
+| 16 | Comprehensive Control coverage in showcase | **PRESERVE — extends to FEATURES.md scope** | Prototype proves comprehensive coverage is achievable in one scene; current showcase extends this to 10 sections including Token Gallery, Coverage Verification, and Role Variations. |
 
 **What we adopted:**
 - **Surface ramp structural concept** (5 stops) — preserved, renamed to M3 canonical with friendlier aliases.
@@ -489,13 +489,13 @@ Phase 2 checked LDtk-specific report claims in `.planning/research/LDTK-UI-MININ
 **What was read:** Godot Theme class API docs (verified `merge_with()` and `copy_from()` are runtime-only; no .tres-to-.tres inheritance exists); ThemeGen MIT (github.com/Inspiaaa/ThemeGen) — proven `@tool` script generator pattern.
 
 **What we adopted:**
-- **`@tool` Theme subclass pattern** — `addons/neocade_theme/scripts/neocade_theme.gd` backs five data-only direction resources and regenerates entries from exported state, including desktop/mobile/AUTO platform behavior.
+- **`@tool` Theme class pattern** — `addons/neocade_theme/scripts/neocade_theme.gd` backs one canonical `neocade_theme.tres` resource and regenerates entries from exported state, including built-in style and desktop/mobile/AUTO platform behavior.
 - **ThemeGen as prior-art reference only** — verifies code-generated theme entries are practical; NeoCade does not ship a `_dev/` generator in v1.
 
 **What we rejected:**
 - **`.tres`-to-`.tres` inheritance** — does not exist in Godot's Theme system (verified, not assumed).
 - **Separate generated desktop/mobile `.tres` resources** — superseded by the `platform` export on the single concrete class.
-- **External tool dependency for consumers** — consumers receive direction `.tres` files, scripts, fonts, and icons with no generator dependency.
+- **External tool dependency for consumers** — consumers receive the canonical `.tres`, scripts, fonts, and icons with no generator dependency.
 
 **Confidence:** HIGH on Godot Theme limits; MEDIUM on generator implementation (well-precedented but custom code path).
 

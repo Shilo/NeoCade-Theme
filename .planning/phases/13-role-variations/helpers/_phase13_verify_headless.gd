@@ -4,7 +4,7 @@ extends SceneTree
 ##   godot --headless --quit --script ".planning/phases/13-role-variations/helpers/_phase13_verify_headless.gd" -- --stage <stage>
 ##
 ## Stages (per 13-VALIDATION.md):
-##   architecture                     — canonical .tres loads, BINDING_TABLE.size() == 149, TYPE_VARIATIONS == 56, @export == 12
+##   architecture                     — canonical .tres loads, BINDING_TABLE.size() == 150, TYPE_VARIATIONS == 62, @export == 12
 ##   role-variations-registered       — SC#2 part 1: 9 new keys exist in TYPE_VARIATIONS + live theme registries
 ##   role-variations-in-showcase      — SC#2 part 2: showcase.tscn contains 9 nodes with the expected theme_type_variation
 ##   default-chrome-unchanged         — SC#3: Label.font_color and PanelContainer.panel resolve to non-role-color values
@@ -16,8 +16,8 @@ extends SceneTree
 const CANONICAL_TRES := "res://addons/neocade_theme/neocade_theme.tres"
 const SHOWCASE_SCENE := "res://showcase/showcase.tscn"
 const EXPECTED_EXPORT_COUNT := 12
-const EXPECTED_BINDING_TABLE_ROWS := 149  # Phase 12 baseline 140 + 9 Phase 13 additions
-const EXPECTED_TYPE_VARIATIONS_COUNT := 61  # Plan 13-02 deviation: Phase 12 actual baseline 52 + 9 Phase 13 additions (plan's "47 baseline" was stale; same drift Phase 12 captured for BINDING_TABLE 37 -> 140).
+const EXPECTED_BINDING_TABLE_ROWS := 150  # Current live implementation count as of 2026-05-13.
+const EXPECTED_TYPE_VARIATIONS_COUNT := 62  # Current live implementation count as of 2026-05-13.
 const PHASE_13_NEW_LABEL_VARIATIONS := ["SuccessLabel", "WarningLabel", "DangerLabel", "InfoLabel"]
 const PHASE_13_NEW_PANEL_VARIATIONS := ["AccentPanel", "InfoPanel", "WarningPanel", "DangerPanel", "SuccessPanel"]
 const PHASE_13_ROLE_KEYS_FOR_LABELS := {

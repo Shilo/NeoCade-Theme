@@ -2,7 +2,7 @@
 
 ## Overview
 
-NeoCade is a feature-complete coverage project, not a velocity project. The journey is: dissect prior-art (`godot-minimal-theme` `.tres`, LDtk source) → research **flat MD3 / MD3 Expressive / Flat-3D Game UI** visual language (Phase 3.1) and **Godot dynamic theme architecture** (Phase 3.2) → derive and approve 5 candidate theme directions (Phase 3.3/3.4) → implement the **single concrete `NeoCadeTheme` class** + canonical `neocade_theme.tres` resource with built-in styles + fonts + icons (Phase 4 plus 2026-05-08 cleanup) → author every Godot 4.6 user-facing Control class across all states (Phases 5-7) → fill mobile + raised token deltas and audit tap targets (Phase 8) → showcase scene with style/variation controls (Phase 9) → exhaustive QA + cross-platform export validation across all 6 Godot targets (Phase 10) → GitHub Actions release pipeline (Phase 11). 15 phases (was 11; Phase 3 redirected; Phase 3.1 + 3.2 + 3.3 + 3.4 inserted 2026-05-04). **No Asset Library submission in v1.** Mockup approval is a hard blocker between Phase 3.4 and Phase 4. Mobile + raised + dynamic-theme architecture are all v1 must-haves. All 6 Godot export targets are v1 must-haves.
+NeoCade is a feature-complete coverage project, not a velocity project. The journey is: dissect prior-art (`godot-minimal-theme` `.tres`, LDtk source) → research **flat MD3 / MD3 Expressive / Flat-3D Game UI** visual language (Phase 3.1) and **Godot dynamic theme architecture** (Phase 3.2) → derive and approve 5 candidate theme directions (Phase 3.3/3.4) → implement the **single concrete `NeoCadeTheme` class** + canonical `neocade_theme.tres` resource with built-in styles + fonts + icons (Phase 4 plus 2026-05-08 cleanup) → author every Godot 4.6 user-facing Control class across all states (Phases 5-7) → fill mobile + raised token deltas and audit tap targets (Phase 8) → showcase scene with style/raised/platform/variation controls (Phase 9 plus Phase 13) → exhaustive QA + cross-platform export validation across all 6 Godot targets (Phase 10) → GitHub Actions release pipeline (Phase 11) → post-v1 visual distinctiveness and role-variation polish (Phases 12-13). 17 phase entries total after the Phase 3 redirect insertions and Phase 12/13 post-v1 additions. **No Asset Library submission in v1.** Mockup approval is a hard blocker between Phase 3.4 and Phase 4. Mobile + raised + dynamic-theme architecture are all v1 must-haves. All 6 Godot export targets are v1 must-haves.
 
 **v1 visual identity (locked 2026-05-04 redirect):** Flat, modern, colorful, expressive UI in the Material Design 3 / MD3 Expressive lineage with optional "extruded flat 3D" raised variation. **No textures, no patterns, no embossing, no painterly/leather backgrounds, no gradients on chrome.** Solid colors + offset darker shadow shapes for depth (extruded-flat) on the raised variation only. References: [hcgamestudios.itch.io flat-game-ui-for-mobile-games](https://hcgamestudios.itch.io/flat-game-ui-for-mobile-games), [fajrulaslim UI button flat design](https://fajrulaslim.itch.io/ui-button-flat-design/devlog/157464/ui-button-flat-design). The original Phase 3 explored 5 painterly/3D arcade-venue directions (Midnight Marquee / Boardwalk Sunset / Cabinet Chrome / Prize Pop Plaza / Orbital Playdeck) — those concept boards are preserved as v0 historical reference under `.planning/mockups/concepts/` + `.planning/mockups/03-direction-boards.*` for future revisit, but **Boardwalk Sunset is rejected**, and the other four directions are subject to a flat-MD3 reinterpretation (no textures, no embossing) in Phase 3.3.
 
@@ -28,7 +28,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Lists, Layout, Range — Tree, ItemList, Tabs, Containers, Sliders (desktop)** - Tree (16 styleboxes/12 icons) + ItemList + TabBar/TabContainer + range controls + container chrome (completed 2026-05-07)
 - [x] **Phase 7: Dialogs, Popups, Advanced — Window, Popups, MenuBar, ColorPicker, Graph (desktop)** - Popup-class controls themed as first-class types + ColorPicker (16 icons) + Graph stack (completed 2026-05-07)
 - [x] **Phase 8: Mobile Variant Authoring** - mobile-sizing branch in `NeoCadeTheme._regenerate_theme()` (triggered by `@export platform=MOBILE`), tap-target audit, `.planning/MOBILE-DESIGN-SPEC.md` *(no separate `neocade_mobile_theme.tres`; mobile is a platform export on the single concrete class)* (completed 2026-05-07)
-- [x] **Phase 9: Showcase + Token Gallery + Theme Picker** - editor-authored `res://showcase/showcase.tscn` with 9 sections + reusable `NeoCadeThemeOptionButton` dropdown that lists built-in `NeoCadeTheme.Style` values alphabetically from the canonical resource, appends optional `None`, and emits `theme_selected(theme, index)` after applying a selection; raised/platform remain resource exports, not showcase runtime controls (completed 2026-05-07; corrected 2026-05-08)
+- [x] **Phase 9: Showcase + Token Gallery + Theme Picker** - editor-authored `res://showcase/showcase.tscn` now has 10 sections after Phase 13, plus reusable `NeoCadeThemeOptionButton` dropdown that lists built-in `NeoCadeTheme.Style` values alphabetically from the canonical resource, appends optional `None`, and emits `theme_selected(theme, index)` after applying a selection; showcase runtime controls also toggle `raised` and `platform` on the canonical resource (completed 2026-05-07; corrected 2026-05-08; extended 2026-05-11)
 - [x] **Phase 10: QA + Cross-Platform Export Validation** - Autonomous QA evidence package complete; manual screenshot/device UAT deferred and documented (completed 2026-05-07)
 - [x] **Phase 11: Distribution — GitHub Actions Release** - Single manually-triggered workflow prepared: CI checks → auto-version-bump → commit/tag/push → addon zip via `git archive` → Godot Web export of showcase scene → publish GitHub Release with both artifacts + CHANGELOG slice as body. NO Asset Library submission. (completed 2026-05-07)
 
@@ -82,11 +82,11 @@ that:
 
 **Trigger command:** `/gsd-phase add "Signature Visual Moves"`
 
-**Status:** Spike series 001-005 closed 2026-05-10. Scope locked in
-`.planning/spikes/visual-identity-distinctiveness/REPORT.md` and
-`.planning/spikes/MANIFEST.md`. Phase 12 implements only the **default-
-behavior moves** (C4 + C2' + C6). Opt-in role variations (C1 + C3)
-deferred to Phase 13 to keep Phase 12 in a single executable session.
+**Status:** Completed 2026-05-11. Spike series 001-005 closed 2026-05-10.
+Scope locked in `.planning/spikes/visual-identity-distinctiveness/REPORT.md`
+and `.planning/spikes/MANIFEST.md`. Phase 12 implements only the
+**default-behavior moves** (C4 + C2' + C6). Opt-in role variations (C1 + C3)
+shipped in Phase 13 to keep Phase 12 in a single executable session.
 
 **Goal:** Resolve the user's "generic dark Godot theme with an accent
 color" complaint by surfacing the existing accent in idle chrome (C2'),
@@ -147,9 +147,9 @@ shows the BEFORE state. The forward-looking mockup is the visual contract.
 
 **Trigger command:** `/gsd-phase add "Role Variations"` (after Phase 12 ships)
 
-**Status:** Carved out from the original Phase 12 to keep each phase in a
-single executable session. Independent of Phase 12 — no shared code path,
-no shared verification surface.
+**Status:** Completed 2026-05-11. Carved out from the original Phase 12 to
+keep each phase in a single executable session. Independent of Phase 12 —
+no shared code path, no shared verification surface.
 
 **Goal:** Add opt-in role-coded type variations consumers can apply
 deliberately when a widget semantically represents success / warning /
@@ -478,20 +478,20 @@ Cross-cutting constraints:
 - Verification must cover forced `DESKTOP`, forced `MOBILE`, host `AUTO`, all five directions in forced mobile mode, 48px tap-target audit, raised/platform orthogonality, no `Theme.clear`, and `.planning/MOBILE-DESIGN-SPEC.md`.
 **UI hint**: yes
 
-### Phase 9: Showcase + Token Gallery + Theme Picker (UPDATED for dynamic architecture; corrected 2026-05-08)
-**Goal**: Build `res://showcase/showcase.tscn` — an editor-authored showcase scene that visually proves every Godot Control is themed in v1, doubles as the QA forcing function, and includes a dropdown so consumers can compare built-in NeoCade styles plus NeoCade vs a null target theme. Raised/platform variations remain `NeoCadeTheme` resource exports previewed through the inspector or consumer code, not showcase runtime controls.
+### Phase 9: Showcase + Token Gallery + Theme Picker (UPDATED for dynamic architecture; corrected 2026-05-08; extended by Phase 13)
+**Goal**: Build `res://showcase/showcase.tscn` — an editor-authored showcase scene that visually proves every Godot Control is themed in v1, doubles as the QA forcing function, and includes controls so consumers can compare built-in NeoCade styles, NeoCade vs a null target theme, raised on/off, and forced platform modes. Phase 13 extends the scene with the Role Variations section.
 **Depends on**: Phase 8
 **Requirements**: SHOW-01, SHOW-02, SHOW-03, SHOW-04, SHOW-05, SHOW-06, SHOW-07, SHOW-08
 **Success Criteria** (what must be TRUE):
-  1. **Showcase scene exists and is project main scene:** `res://showcase/showcase.tscn` is set as the project's main scene; uses `res://addons/neocade_theme/neocade_theme.tres` with Pulse as the starter style; opens to a fullscreen Control root with all 9 sections visible/scrollable.
-  2. **9 sections present, covering all 37 Controls + Token Gallery + Coverage Verification:** Buttons / Text Inputs / Numbers & Range / Selection & Lists / Containers & Layout / Dialogs & Popups / Advanced & Graph / Token Gallery / Coverage 37/37. Every Control has REALISTIC sample content (Tree with multi-level items, ItemList with options, OptionButton with multiple options, dialog content with realistic text, etc. — per PITFALLS 10.1, empty controls render invisibly and are not valid QA).
-  3. **Theme picker is dropdown-only; showcase behavior script is minimal:** The scene provides a Theme picker that cycles through the 5 built-in styles (Bubble, Burst, Daybreak, Pulse, Slate) + `None` (`null` target theme). The rest of the showcase UI is serialized scene nodes, not constructed by script; `showcase/showcase.gd` only handles behavior glue such as the scoreboard Window close/reopen path.
+  1. **Showcase scene exists and is project main scene:** `res://showcase/showcase.tscn` is set as the project's main scene; uses `res://addons/neocade_theme/neocade_theme.tres` with Pulse as the starter style; opens to a fullscreen Control root with all 10 sections visible/scrollable.
+  2. **10 sections present, covering all 37 Controls + Token Gallery + Coverage Verification + Role Variations:** Buttons / Text Inputs / Numbers & Range / Selection & Lists / Containers & Layout / Dialogs & Popups / Advanced & Graph / Token Gallery / Coverage 37/37 / Role Variations. Every Control has REALISTIC sample content (Tree with multi-level items, ItemList with options, OptionButton with multiple options, dialog content with realistic text, etc. — per PITFALLS 10.1, empty controls render invisibly and are not valid QA).
+  3. **Theme controls are explicit and behavior script is minimal:** The scene provides a Theme picker that cycles through the 5 built-in styles (Bubble, Burst, Daybreak, Pulse, Slate) + `None` (`null` target theme), plus runtime controls for `raised` and `platform`. The rest of the showcase UI is serialized scene nodes, not constructed by script; `showcase/showcase.gd` only handles behavior glue such as theme control changes and the scoreboard Window close/reopen path.
   4. **BBCode demo + accessibility wiring:** RichTextLabel section showcases inline color/weight/italic via BBCode (verifies font-system handles italic transform per FONT-07); `accessibility_name` is set on every interactive Control in the scene (Godot 4.5 API per PITFALLS 2.5 + 4.4 — minimum bar for screen-reader sanity in v1; deeper VoiceOver/TalkBack QA deferred to v1.x per UD-6).
   5. **Token Gallery + Coverage Verification visible:** Token Gallery section displays each design token visually — color swatches with hex + role label, type-scale samples in actual fonts, spacing/radius scale visualizations; Coverage Verification strip displays "37/37 Controls themed ✓" (or accurate count if any deferred — verifiable against Phase 7 close).
 **Plans**: 1 plan
 
 Plans:
-- [x] `09-01-PLAN.md` — Implement the showcase scene with nine editor-authored sections, dropdown-only direction/none theme picker, minimal behavior glue, token gallery, and coverage strip.
+- [x] `09-01-PLAN.md` — Implement the showcase scene with editor-authored sections, direction/none theme picker, minimal behavior glue, token gallery, and coverage strip. Later Phase 13 adds the 10th Role Variations section.
 **UI hint**: yes
 
 ### Phase 10: QA + Cross-Platform Export Validation
@@ -505,7 +505,7 @@ Plans:
   4. **Accessibility evidence scoped (A11Y-01..06):** Contrast, focus-indicator, color-not-alone, fallback-font, and `accessibility_name` evidence is documented where static/autonomous checks are available. CVD simulation, tab-walk screenshots, and deeper VoiceOver/TalkBack QA remain deferred UAT/v1.x scope.
   5. **Cross-platform export validation scoped (EXPORT-01..08):** Export presets and release workflow cover all 6 Godot targets (Windows, macOS, Linux, iOS, Android, Web/Browser); manual screenshot decks and real-device Android/iOS validation remain deferred. Web export specifics handled — bundled font/theme/icon resources are exportable, no `SystemFont` dependency is used, and the project remains on GL Compatibility renderer (avoids #116090 + #111729 4.6 regressions). License compliance is for the single bundled font, Inter Variable Roman (OFL 1.1); Outfit, Noto Sans, and JetBrains Mono are not bundled in v1.
   6. **Fresh-install dry-run scoped (QA-05):** `.planning/qa/fresh-install-dry-run.md` documents the clean install checklist and expected consumer smoke. Physical clean-project copy and screenshots remain deferred UAT.
-  7. **Theme inspector workaround documented (QA-06):** `docs/usage.md` notes the active issue #115500 — do NOT edit theme resources through a Control inspector context menu. Safe authoring paths are the dedicated Theme editor, the 11 exported `NeoCadeTheme` properties on the canonical resource or consumer-saved resources, and formula edits in `addons/neocade_theme/scripts/neocade_theme.gd`.
+  7. **Theme inspector workaround documented (QA-06):** `docs/usage.md` notes the active issue #115500 — do NOT edit theme resources through a Control inspector context menu. Safe authoring paths are the dedicated Theme editor, the 12 exported `NeoCadeTheme` properties on the canonical resource or consumer-saved resources, and formula edits in `addons/neocade_theme/scripts/neocade_theme.gd`.
 **Plans**: 1 plan
 
 Plans:
@@ -610,7 +610,7 @@ Plans:
 
 Plans:
 **Wave 1**
-- [x] 13-01-PLAN.md — Wave 0: create three Phase 13 verifier helpers (Nyquist gate; ports of Phase 12 verifier/smoke/render with BT=149 / TV=56 constants).
+- [x] 13-01-PLAN.md — Wave 0: create three Phase 13 verifier helpers (Nyquist gate; ports of Phase 12 verifier/smoke/render). Historical helper constants changed during the phase; current live implementation count is `BINDING_TABLE.size() == 150` and `TYPE_VARIATIONS.size() == 62`.
 - [x] 13-02-PLAN.md — Wave 1: add 9 TYPE_VARIATIONS entries (4 Role Labels + 5 Role Panels) and 8 explicit set_font/set_font_size calls for the Role Labels (PITFALLS 1.2).
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -621,5 +621,5 @@ Plans:
 
 ---
 *Roadmap authored: 2026-05-04 from SUMMARY.md 11-phase plan + REQUIREMENTS.md traceability*
-*Last updated: 2026-05-07 — autonomous Phase 9-11 closeout; UAT/device QA deferred per user instruction*
+*Last updated: 2026-05-13 — docs synced to current implementation: 12 exports, 10-section showcase, runtime raised/platform controls, Phase 13 role variations, `BINDING_TABLE.size() == 150`, `TYPE_VARIATIONS.size() == 62`*
 *Mockup approval gate is non-negotiable per PROJECT.md hard constraint*

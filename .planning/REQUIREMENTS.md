@@ -3,13 +3,13 @@
 **Defined:** 2026-05-04
 **Core Value:** A drop-in Godot 4.6 flat-MD3/MD3-Expressive Theme system that styles every built-in user-facing Control to a `godot-minimal-theme` bar of feature-completeness, with a colorful, professional, accessible arcade identity and universal editor + runtime + all-6-export-target support. v1 ships one concrete `NeoCadeTheme` class at `res://addons/neocade_theme/scripts/neocade_theme.gd` plus one canonical `res://addons/neocade_theme/neocade_theme.tres` resource with built-in Bubble, Burst, Daybreak, Pulse, and Slate styles; mobile is an `@export platform=MOBILE` mode on the same resource, not a sibling `neocade_mobile_theme.tres`.
 
-> **Authoritative inputs:** PROJECT.md (constraints + hard rules), `.planning/ROADMAP.md` (15-phase redirected roadmap), `.planning/research/SUMMARY.md` (original synthesis + Conflict resolutions + UD-1..6; superseded where later Phase 3.x artifacts explicitly say so), `.planning/research/FEATURES.md` (35-class coverage matrix + original 13 type-variation seed + anti-features; type-variation count superseded by the live `TYPE_VARIATIONS` registry), `.planning/research/MINIMAL-THEME-COVERAGE-DELTA.md` (37-row scorecard reconciliation), `.planning/research/CROSS-PLATFORM.md` (mobile spec + per-target validation), `.planning/research/PITFALLS.md` (10 categories of gotchas + prevention), `.planning/research/EDITOR-COVERAGE.md` (themed-vs-default editor surfaces), `.planning/research/SOURCES.md` (per-source dossier).
+> **Authoritative inputs:** PROJECT.md (constraints + hard rules), `.planning/ROADMAP.md` (17 phase entries including redirected/historical Phase 3 plus completed Phases 12-13), `.planning/research/SUMMARY.md` (original synthesis + Conflict resolutions + UD-1..6; superseded where later Phase 3.x artifacts explicitly say so), `.planning/research/FEATURES.md` (35-class coverage matrix + original 13 type-variation seed + anti-features; type-variation count superseded by the live `TYPE_VARIATIONS` registry), `.planning/research/MINIMAL-THEME-COVERAGE-DELTA.md` (37-row scorecard reconciliation), `.planning/research/CROSS-PLATFORM.md` (mobile spec + per-target validation), `.planning/research/PITFALLS.md` (10 categories of gotchas + prevention), `.planning/research/EDITOR-COVERAGE.md` (themed-vs-default editor surfaces), `.planning/research/SOURCES.md` (per-source dossier).
 
 ## v1 Requirements
 
 Requirements for initial release. Each REQ-ID maps to exactly one primary phase in ROADMAP.md (some are cumulative across multiple phases — see Traceability section).
 
-> **Status note (2026-05-08):** Phases 1-11 are complete for autonomous scope. Manual screenshot decks, real Android/iOS device checks, macOS signing/notarization, live GitHub Pages COOP/COEP verification, and deeper screen-reader QA remain explicitly deferred UAT rather than hidden pending implementation work.
+> **Status note (2026-05-13):** Phases 1-13 are complete for autonomous implementation scope. Manual release dispatch, repo settings checks, live GitHub Pages verification, and deeper screen-reader/device QA remain explicitly deferred owner/manual work rather than hidden pending implementation.
 
 ### Research & Spike (RES)
 
@@ -30,9 +30,9 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 
 ### Theme Foundation (FOUND)
 
-- [x] **FOUND-01** *(updated 2026-05-08 for single-resource style architecture)*: `addons/neocade_theme/` directory layout: `fonts/`, `icons/`, and `scripts/` subdirs; addon root contains one canonical `neocade_theme.tres` runtime resource, runtime asset subfolders, and no README/CHANGELOG/LICENSE/VERSION metadata. `scripts/neocade_theme.gd` is the concrete, instantiable `@tool class_name NeoCadeTheme extends Theme`; `scripts/neocade_theme_option_button.gd` is the reusable style picker Control. Required font license text stays beside the redistributed font at `fonts/inter_ofl.txt`. Package docs live outside the addon (`README.md`, `docs/usage.md`, `CHANGELOG.md`, `LICENSE.md`, `VERSION`). **No per-direction `.gd` files. No per-style `.tres` files. No `_dev/` subfolder. No `themes/` subfolder. No `neocade_mobile_theme.tres`. No `plugin.cfg`.**
+- [x] **FOUND-01** *(updated 2026-05-13 for autoload helper)*: `addons/neocade_theme/` directory layout: `fonts/`, `icons/`, and `scripts/` subdirs; addon root contains one canonical `neocade_theme.tres` runtime resource, runtime asset subfolders, and no README/CHANGELOG/LICENSE/VERSION metadata. `scripts/neocade_theme.gd` is the concrete, instantiable `@tool class_name NeoCadeTheme extends Theme`; `scripts/neocade_theme_option_button.gd` is the reusable style picker Control; `scripts/neocade_theme_autoload.gd` is the optional one-shot autoload helper that calls `NeoCadeTheme.apply_globally()`. Required font license text stays beside the redistributed font at `fonts/inter_ofl.txt`. Package docs live outside the addon (`README.md`, `docs/usage.md`, `CHANGELOG.md`, `LICENSE.md`, `VERSION`). **No per-direction `.gd` files. No per-style `.tres` files. No `_dev/` subfolder. No `themes/` subfolder. No `neocade_mobile_theme.tres`. No `plugin.cfg`.**
 - [x] **FOUND-02** *(updated 2026-05-09 for Advanced exports)*: `addons/neocade_theme/scripts/neocade_theme.gd` is `@tool class_name NeoCadeTheme extends Theme` — the **single, concrete, instantiable** class with **12 `@export` properties total**. **Top level (3):** `style: {BUBBLE, BURST, DAYBREAK, PULSE, SLATE, CUSTOM}`, `raised: bool`, `platform: {DESKTOP, MOBILE, AUTO}`. **Style Overrides group (7, under `@export_group("Style Overrides")`)**: `base_color: Color`, `accent_color: Color`, `corner_radius: int`, `spacing: int`, `raised_strength: int`, `focus_thickness: int`, `outline_width: int`. **Advanced group (2):** `use_runtime_popup_selection_icons: bool`, allowing users to disable runtime-generated PopupMenu check/radio icons and use static fallback icons, and `texture_cache: bool`, allowing users to retain loaded/generated textures across regenerations for faster live tweaking. The `_regenerate_theme()` method dynamically populates derived theme entry values from the exports via formulas and resolves direction personality from `style`, not from a magic `base_color` lookup. `Style.CUSTOM` is manual/custom mode. Setters on exported properties trigger regeneration. The class is **NOT abstract**.
-- [x] **FOUND-03** *(updated 2026-05-09)*: `addons/neocade_theme/neocade_theme.tres` is the canonical `NeoCadeTheme` resource. Loading it into a Godot scene yields a `NeoCadeTheme` instance that automatically calls `_regenerate_theme()` to populate entries for ALL 37 scorecard Control rows plus the current runtime and editor integration variations from `addons/neocade_theme/scripts/neocade_theme.gd::TYPE_VARIATIONS`. Built-in styles cover Bubble, Burst, Daybreak, Pulse, and Slate.
+- [x] **FOUND-03** *(updated 2026-05-13)*: `addons/neocade_theme/neocade_theme.tres` is the canonical `NeoCadeTheme` resource. Loading it into a Godot scene yields a `NeoCadeTheme` instance that automatically calls `_regenerate_theme()` to populate entries for ALL 37 scorecard Control rows plus the current runtime/editor/role variations from `addons/neocade_theme/scripts/neocade_theme.gd::TYPE_VARIATIONS`. Built-in styles cover Bubble, Burst, Daybreak, Pulse, and Slate. Current live registry counts: `BINDING_TABLE.size() == 150`, `TYPE_VARIATIONS.size() == 62`.
 
 ### Fonts (FONT)
 
@@ -119,7 +119,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [x] **TYPEVAR-03**: 1 RichTextLabel type variation: InfoText.
 - [x] **TYPEVAR-04**: 2 Panel type variations: CardPanel, HeroPanel.
 - [x] **TYPEVAR-05**: Fonts set explicitly on every type variation (per PITFALLS 1.2 — type variations DO NOT inherit fonts from base type, even when stylebox inheritance works).
-- [x] **TYPEVAR-06** *(reconciled 2026-05-07; updated 2026-05-09 after removing redundant SecondaryButton)*: The 14 core runtime type variations are documented in `.planning/MOBILE-DESIGN-SPEC.md` and `DESIGN_TOKENS.md` with concrete usage examples. Source of truth is `addons/neocade_theme/scripts/neocade_theme.gd::TYPE_VARIATIONS`: PrimaryButton, GhostButton, DangerButton, IconButton, FlatButton, HeaderLarge, HeaderMedium, HeaderSmall, Caption, CodeLabel, Kicker, InfoText, CardPanel, HeroPanel. The same registry also contains editor-only variations used to integrate with Godot's editor.
+- [x] **TYPEVAR-06** *(updated 2026-05-13)*: The 14 core runtime type variations and 9 Phase 13 opt-in role variations are documented in `.planning/MOBILE-DESIGN-SPEC.md` and `DESIGN_TOKENS.md` with concrete usage examples. Source of truth is `addons/neocade_theme/scripts/neocade_theme.gd::TYPE_VARIATIONS`: current live count is 62 total entries, including core runtime, role, and editor/integration variations.
 
 ### Mobile Variant (MOBILE)
 
@@ -135,9 +135,9 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 ### Showcase Scene (SHOW)
 
 - [x] **SHOW-01**: `res://showcase/showcase.tscn` is the showcase scene; applied as project main scene. Uses NeoCade Theme as project theme (or per-scene `theme` override if leak avoidance preferred). Completed Phase 9.
-- [x] **SHOW-02**: Showcase scene contains 9 sections covering all 37 scorecard Control rows + Token Gallery + Coverage Verification: Buttons / Text Inputs / Numbers & Range / Selection & Lists / Containers & Layout / Dialogs & Popups / Advanced & Graph / Token Gallery / Coverage 37/37.
+- [x] **SHOW-02** *(updated 2026-05-13)*: Showcase scene contains 10 sections: Buttons / Text Inputs / Numbers & Range / Selection & Lists / Containers & Layout / Dialogs & Popups / Advanced & Graph / Token Gallery / Coverage 37/37 / Role Variations. The canonical 37-row coverage strip remains unchanged; Role Variations are additive opt-ins.
 - [x] **SHOW-03**: Realistic sample content per Control (Tree with multi-level items, ItemList with options, OptionButton with multiple options, etc.) per PITFALLS 10.1 — empty controls render invisibly.
-- [x] **SHOW-04**: `NeoCadeThemeOptionButton` dropdown switches built-in `NeoCadeTheme.Style` values from the canonical resource, sorted alphabetically with optional `None` last; `None` applies `null` to the target theme. The picker emits `theme_selected(theme, index)` after applying a selection. Per 2026-05-08 correction, the showcase UI is editor-authored in `showcase/showcase.tscn`; scripts are limited to `addons/neocade_theme/scripts/neocade_theme_option_button.gd` for the dropdown and `showcase/showcase.gd` for scoreboard Window open/close behavior. Raised/platform variations remain `NeoCadeTheme` resource exports previewed through the inspector or consumer code, not showcase runtime controls.
+- [x] **SHOW-04** *(updated 2026-05-13)*: `NeoCadeThemeOptionButton` dropdown switches built-in `NeoCadeTheme.Style` values from the canonical resource, sorted alphabetically with optional `None` last; `None` applies `null` to the target theme. The picker emits `theme_selected(theme, index)` after applying a selection. Per 2026-05-08 correction, the showcase UI is editor-authored in `showcase/showcase.tscn`; scripts are limited to `addons/neocade_theme/scripts/neocade_theme_option_button.gd` for the dropdown and `showcase/showcase.gd` for scoreboard Window open/close behavior plus runtime raised/platform controls.
 - [x] **SHOW-05**: BBCode demo in RichTextLabel section showcasing inline color/weight/italic.
 - [x] **SHOW-06**: `accessibility_name` set on every interactive Control in showcase (per PITFALLS 2.5 + 4.4 — minimum bar for screen-reader sanity in v1).
 - [x] **SHOW-07**: Token Gallery section displays design tokens visually (color swatches with hex + role label, type scale samples, radius scale visualization).
@@ -170,7 +170,7 @@ Requirements for initial release. Each REQ-ID maps to exactly one primary phase 
 - [x] **QA-03**: Manual tab-walk focused-state screenshot pass closed 2026-05-10 by user attestation.
 - [x] **QA-04**: Dual-renderer screenshot pass closed 2026-05-10 by user attestation; GL Compatibility remains the ship target.
 - [x] **QA-05**: Fresh-install dry-run closed 2026-05-10 by user attestation; checklist preserved at `.planning/qa/fresh-install-dry-run.md`.
-- [x] **QA-06**: Theme inspector workaround: per PITFALLS 4.6 active issue #115500, do NOT edit theme resources through a Control inspector context menu. Safe authoring paths are the dedicated Theme editor, the 11 exported `NeoCadeTheme` properties on the canonical resource or consumer-saved resources, and formula edits in `addons/neocade_theme/scripts/neocade_theme.gd`. Documented in `docs/usage.md`.
+- [x] **QA-06**: Theme inspector workaround: per PITFALLS 4.6 active issue #115500, do NOT edit theme resources through a Control inspector context menu. Safe authoring paths are the dedicated Theme editor, the 12 exported `NeoCadeTheme` properties on the canonical resource or consumer-saved resources, and formula edits in `addons/neocade_theme/scripts/neocade_theme.gd`. Documented in `docs/usage.md`.
 
 ### Distribution (DIST)
 
@@ -269,7 +269,7 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by SUMMARY.md's 11-phase plan, then updated by Phase 3 redirect and 2026-05-06e/f architecture simplification). Every v1 REQ-ID maps to exactly ONE primary phase. Cumulative requirements (those whose work accrues across multiple phases) are assigned a primary phase with explicit cumulative reasoning.
+Phase mapping per ROADMAP.md (17 phase entries including redirected/historical Phase 3 and completed post-v1 Phases 12-13; originally seeded by SUMMARY.md's 11-phase plan, then updated by Phase 3 redirect and later architecture/visual-identity work). Every v1 REQ-ID maps to exactly ONE primary phase. Cumulative requirements (those whose work accrues across multiple phases) are assigned a primary phase with explicit cumulative reasoning.
 
 | Requirement | Primary Phase | Cumulative Contributors | Status |
 |-------------|---------------|------------------------|--------|
@@ -325,7 +325,7 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | TYPEVAR-03 | Phase 5 (RichTextLabel InfoText) | — | Complete |
 | TYPEVAR-04 | Phase 5 (2 Panel variations) | — | Complete |
 | TYPEVAR-05 | Phase 5 (fonts set explicitly per variation) | Phase 6 + 7 (any variations declared in later phases follow same pattern) | Complete |
-| TYPEVAR-06 | Phase 8 (`.planning/MOBILE-DESIGN-SPEC.md` + `DESIGN_TOKENS.md` finalized with core runtime variations from `TYPE_VARIATIONS`) | Phase 5 + 6 + 7 (variation declarations and polish; Kicker added after original 13-seed wording; redundant SecondaryButton removed 2026-05-09) | Complete |
+| TYPEVAR-06 | Phase 8 + Phase 13 (`.planning/MOBILE-DESIGN-SPEC.md` + `DESIGN_TOKENS.md` synchronized with live `TYPE_VARIATIONS`) | Phase 5 + 6 + 7 (variation declarations and polish), Phase 13 (9 role variations), 2026-05-13 docs sync (live count 62) | Complete |
 | MOBILE-01 | Phase 8 | — | Complete |
 | MOBILE-02 | Phase 8 (≥48px tap targets) | — | Complete |
 | MOBILE-03 | Phase 8 (16px body / heading parity) | — | Complete |
@@ -335,7 +335,7 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 | MOBILE-07 | Phase 8 (`.planning/MOBILE-DESIGN-SPEC.md`) | — | Complete |
 | MOBILE-08 | Phase 8 (NeoCade identity preservation) | — | Complete |
 | SHOW-01 | Phase 9 (`res://showcase/showcase.tscn` as project main scene) | — | Complete |
-| SHOW-02 | Phase 9 (9 sections / 37 scorecard rows covered) | — | Complete |
+| SHOW-02 | Phase 9 + Phase 13 (10 sections / 37 scorecard rows + Role Variations) | Phase 13 adds opt-in role section without changing the 37-row scorecard | Complete |
 | SHOW-03 | Phase 9 (realistic sample content) | — | Complete |
 | SHOW-04 | Phase 9 (three-way theme toggle) | — | Complete |
 | SHOW-05 | Phase 9 (BBCode demo) | — | Complete |
@@ -391,7 +391,7 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 - v1 requirements: 113 total (RES-5, DESIGN-6, FOUND-3, FONT-9, ICON-4, TOKEN-10, COV-10, TYPEVAR-6, MOBILE-8, SHOW-8, EXPORT-8, A11Y-6, QA-6, DIST-19, DOCS-5)
 - Mapped to a primary phase or pre-roadmap artifact: 113
 - Unmapped: 0 ✓
-- Autonomous implementation/evidence complete through Phase 11; remaining unchecked items are intentionally deferred manual UAT/release checks, not missing implementation plans.
+- Autonomous implementation/evidence complete through Phase 13; remaining unchecked items are intentionally deferred manual release/device/screen-reader checks, not missing implementation plans.
 - Cumulative requirements (assigned primary phase + documented contributors): TOKEN-01..10, COV-01, COV-07, COV-09, COV-10, TYPEVAR-05, TYPEVAR-06, A11Y-02, A11Y-06, QA-01, DOCS-05
 
 **Phase distribution (primary-phase counts):**
@@ -407,6 +407,8 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 - Phase 9: 8 (SHOW-01..08)
 - Phase 10: 21 (COV-10, EXPORT-01..08, A11Y-01..06, QA-01..06)
 - Phase 11: 21 (RES-05, DIST-01..19, DOCS-04)
+- Phase 12: 0 v1 REQ-IDs (post-v1 signature visual moves; governed by locked success criteria)
+- Phase 13: 0 v1 REQ-IDs (post-v1 role variations; governed by SC-13-1..3)
 
 **Mockup approval gate:** Hard blocker between Phase 3.4 and Phase 4. No addon `.tres`/`.gd` styling commits permitted before Phase 3.4 final approval is logged and DESIGN_TOKENS.md is written.
 
@@ -414,5 +416,5 @@ Phase mapping per ROADMAP.md (15-phase redirected roadmap; originally seeded by 
 
 ---
 *Requirements defined: 2026-05-04*
-*Last updated: 2026-05-08 — synchronized after autonomous Phase 9-11 closeout; deferred manual UAT separated from missing implementation*
+*Last updated: 2026-05-13 — synchronized after Phase 12/13 completion and current implementation audit*
 *Next update trigger: manual release/UAT decision or milestone archive*

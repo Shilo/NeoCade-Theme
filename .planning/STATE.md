@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: ship_ready
-stopped_at: Phase 12 + 13 complete; post-audit remediation applied (WR-04/05/01, DI-13-01, SC#4 follow-up signatures)
-last_updated: "2026-05-11T18:00:00.000Z"
-last_activity: 2026-05-11
+stopped_at: Docs synced to current implementation; release dispatch remains the next owner-driven action.
+last_updated: "2026-05-13T00:00:00.000Z"
+last_activity: 2026-05-13
 progress:
   total_phases: 17
   completed_phases: 17
@@ -18,26 +18,26 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-09)
+See: .planning/PROJECT.md (updated 2026-05-13)
 
-**Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships one canonical `neocade_theme.tres` resource of type `NeoCadeTheme`, plus one concrete `addons/neocade_theme/scripts/neocade_theme.gd` class and one reusable `NeoCadeThemeOptionButton` picker. Consumers choose `style` (Pulse, Slate, Bubble, Daybreak, Burst, or `CUSTOM`) and toggle `raised` / `platform` / `base_color` / `accent_color` exports for flat/raised × desktop/mobile/AUTO variations — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect). **Dynamic-theme architecture** feasibility-validated 2026-05-06 (Phase 3.2 strict gate 6/6 PASS in Godot 4.6.2), then consolidated 2026-05-08 and updated 2026-05-09: single concrete `@tool class_name NeoCadeTheme extends Theme`, 12 exports including `style` and the Advanced `use_runtime_popup_selection_icons` / `texture_cache` toggles, luminance-derived `is_light`, no subclasses, no `_dev/`, no `themes/`, no per-style `.tres`, no editor plugin, no `neocade_mobile_theme.tres`.
-**Current focus:** Post-audit remediation complete (2026-05-11); branch ship-ready pending push to origin + release dispatch.
+**Core value:** A drop-in Godot 4.6 **flat MD3 / MD3 Expressive** Theme system at `res://addons/neocade_theme/` that ships one canonical `neocade_theme.tres` resource of type `NeoCadeTheme`, plus one concrete `addons/neocade_theme/scripts/neocade_theme.gd` class, one reusable `NeoCadeThemeOptionButton` picker, and one optional `NeoCadeThemeAutoload` helper for project-wide application. Consumers choose `style` (Pulse, Slate, Bubble, Daybreak, Burst, or `CUSTOM`) and toggle `raised` / `platform` / `base_color` / `accent_color` exports for flat/raised × desktop/mobile/AUTO variations — every built-in Control themed to a `godot-minimal-theme` bar of feature-completeness, accessible (WCAG 2.1 AA), universal across editor + runtime + all 6 Godot export targets. **No textures / no patterns / no embossing / no painterly chrome** (locked 2026-05-04 redirect). **Dynamic-theme architecture** feasibility-validated 2026-05-06 (Phase 3.2 strict gate 6/6 PASS in Godot 4.6.2), then consolidated 2026-05-08 and updated 2026-05-13: single concrete `@tool class_name NeoCadeTheme extends Theme`, 12 exports including `style` and the Advanced `use_runtime_popup_selection_icons` / `texture_cache` toggles, luminance-derived `is_light`, 10-section showcase, live `BINDING_TABLE.size() == 150`, live `TYPE_VARIATIONS.size() == 62`, no subclasses, no `_dev/`, no `themes/`, no per-style `.tres`, no editor plugin, no `neocade_mobile_theme.tres`.
+**Current focus:** Documentation synced to the current implementation (2026-05-13); project remains ship-ready pending release dispatch.
 
 ## Current Position
 
-Phase: 13 (role-variations) — COMPLETE; Phase 12 — COMPLETE
-Plan: 4/4 complete (Phase 12) + 4/4 complete (Phase 13)
-Next: push 47+ commits to origin (`git push`), then dispatch release.yml workflow when ready. Optional: re-render SC#4 greyscale thumbnails to confirm Daybreak 2px outline + Burst 64/72 floor clear thumbnail-scale identifiability.
+Phase: All 17 phase entries complete; Phase 12 and Phase 13 are both COMPLETE.
+Plan: 75/75 complete
+Next: confirm GitHub repo/release workflow settings, push any local commits if needed, then dispatch `release.yml` when ready. Optional: re-render SC#4 greyscale thumbnails and run any deferred device/screen-reader checks the owner wants before release.
 Status: Ship-ready — all locked success criteria met; post-audit gaps closed.
-Last activity: 2026-05-11
+Last activity: 2026-05-13
 
-Progress: [██████████] 96%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 52
+- Total plans completed: 75
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -164,10 +164,11 @@ Recent decisions affecting current work:
 - [Phase 12-04]: Per-direction C6 shape keys wired (Slate hairline_thickness=1, Bubble min_radius_floor=26, Daybreak primary_outline_width=1/offset=3, Burst primary_min_height=56, Pulse Kicker showcase); Pitfall 5 mirror invariant applied; SC#1..SC#3+SC#6 all green; SC#4 thumbnail attestation deferred to user; Daybreak primary_padding bumped Vector2i(15,9)→Vector2i(20,14)
 - [Phase 12 verifier]: Architecture helper baseline updated to current canonical `BINDING_TABLE.size()=150` so the Phase 12 full gate reflects the live theme surface.
 - [Phase 12 follow-up]: Raised depth edges now use hidden per-style `shape.raised_depth_scale` + `shape.raised_depth_darken` values. Neutral/surface offsets stay base-tinted, while colored button/semantic undersides use HSV value-darken; Bubble is intentionally chunkier but softer to match the flat mobile game UI reference without muddy edges.
-- [Phase 13-01]: Wave-0 verifier helpers landed at .planning/phases/13-role-variations/helpers/ (4 files: _phase13_verify_headless.gd + _phase13_smoke_matrix.gd + _phase13_role_render.gd + _phase13_role_render.tscn). Pins BT=149/TV=56 and all 9 role variation names. Helpers are intentionally RED until Wave 1/2 land production additions; this is expected behavior per 13-RESEARCH.md lines 416-423. Pitfall-1 contingency render helper built but NOT auto-run; invoke only on suspected halo.
+- [Phase 13-01]: Wave-0 verifier helpers landed at .planning/phases/13-role-variations/helpers/ (4 files: _phase13_verify_headless.gd + _phase13_smoke_matrix.gd + _phase13_role_render.gd + _phase13_role_render.tscn). Historical wave notes pinned early BT/TV constants before later wave corrections; current live counts are recorded in the 2026-05-13 docs-sync note. Pitfall-1 contingency render helper built but NOT auto-run; invoke only on suspected halo.
 - [Phase ?]: Phase 13-02 Wave 1: TYPE_VARIATIONS 52 -> 61 (4 Role Labels + 5 Role Panels); 4 Role Labels got explicit set_font + set_font_size per PITFALLS 1.2 / Pitfall 6. Wave 0 helpers EXPECTED_TYPE_VARIATIONS_COUNT corrected 56 -> 61 (stale baseline drift, same kind Phase 12 captured for BINDING_TABLE 37 -> 140). Verifier role-label-fonts GREEN; architecture single-RED at BT=140 (Plan 13-03 unblocks). D-01 + 12-export + Pitfall 4 invariants intact.
 - [Phase ?]: Phase 13-03 Wave 2: BINDING_TABLE 140 -> 149 (4 Role Label font_color + 5 Role Panel stylebox recipes with alpha=0.06). Verifier --stage architecture + --stage role-variations-registered + --stage role-label-fonts + 30-config smoke all GREEN. SC#3 + D-01 + 12-export intact. Plan 13-04 unblocked.
 - [Phase ?]: Phase 13 closed: SC#1/SC#2/SC#3 wired AND verified; DI-13-01 alpha-band false-RED remains deferred
+- [Docs sync 2026-05-13]: Living `.planning/` docs reconciled against the current addon implementation. Current live registry counts are `BINDING_TABLE.size() == 150` and `TYPE_VARIATIONS.size() == 62`; the showcase has 10 sections and runtime `raised` / `platform` controls; the optional autoload helper is part of the shipped addon surface.
 
 ### Roadmap Evolution
 
@@ -184,7 +185,7 @@ None yet.
 
 [Issues that affect future work]
 
-- **Visual-identity gap (post-v1, NOT a v1 blocker):** Production-readiness audit on 2026-05-10 surfaced that the rendered theme reads as "a generic dark Godot theme with an accent color" rather than a unique identity in the lineage of LDtk. The technical foundation is excellent (single concrete `NeoCadeTheme`, 12 exports, 79 SVG icons, 5 styles with shape language); the visible chrome is generic MD3 with color swaps. Tracked as the "Visual Identity Distinctiveness" initiative (spike + phase) in ROADMAP.md.
+- **Visual-identity gap — closed historical concern:** Production-readiness audit on 2026-05-10 surfaced that the rendered theme read as "a generic dark Godot theme with an accent color." Phase 12 and Phase 13 addressed that with accent redistribution, raised-depth tuning, per-style signature moves, and opt-in role variations. Keep the note as provenance, not as an active blocker.
 - **Release repo settings (owner action):** Before running `.github/workflows/release.yml`, confirm GitHub Pages source is "GitHub Actions", release workflow permissions can push commits/tags, and branch protection allows the actions bot release commit.
 - **Deferred manual QA — closed:** Phase 9/10/11 UATs and the 8-row deferred-UAT-matrix items closed by user attestation 2026-05-10 (heavy manual testing performed prior to audit). Logged here so future work knows the closure is on the basis of attestation, not regenerated evidence.
 
@@ -200,18 +201,19 @@ Items acknowledged and carried forward from previous milestone close:
 | Palettes | Alternate palette variants (magenta, amber) | Deferred to v2 | Project init |
 | Editor | Editor-only theme types (FlatButton, MainScreenButton, etc.) | Deferred to v1.x | Project init |
 | Accessibility | Deeper VoiceOver/TalkBack/AccessKit screen-reader QA | Deferred to v1.x (UD-6; `accessibility_name` only in v1) | 2026-05-04 |
-| QA | Real-device Android + iOS validation | Conditional on UD-5 resolution; v1 may ship with "deferred to v1.0.1" note | 2026-05-04 |
+| QA | Real-device Android + iOS validation | Deferred/optional owner check before release; prior manual testing accepted by user attestation | 2026-05-04 |
 
 ## Session Continuity
 
-Last session: 2026-05-11T11:47:45.505Z
-Stopped at: Phase 12 Task 6 thumbnail attestation pending — see 12-04-wave-3-c6-per-direction-SUMMARY.md
+Last session: 2026-05-13 docs sync
+Stopped at: Ship-ready docs state; no active implementation phase.
 Resume file: 
 
 None
 
-1. `/gsd-spike` — frame: "What signature visual moves separate NeoCade from a generic dark Godot theme, given LDtk as the polish bar and the locked flat-MD3 / no-textures / no-gradients / anti-cyberpunk constraints?"
-2. `/gsd-phase` — insert a "Signature Visual Moves" phase that consumes the spike's recommendations (sidebar tinting, severity-coded chrome, branded iconography pass, distinctive selected-row treatment, header marquee strategy).
+1. Confirm GitHub repository settings for release workflow permissions and GitHub Pages source.
+2. Push any local release/docs commits if needed, then run `.github/workflows/release.yml` when ready.
+3. Optional owner checks before release: SC#4 greyscale thumbnail rerender, device screenshots, or deeper screen-reader testing.
 
 The first execution of Phase 3.4 Plan 02 (by Codex) was rejected by the user. The 15 generated concept PNGs collapsed all five directions into the same UI template with only color tokens varying — every direction looked like the same screen with a hex swap. Two corrective tracks landed on 2026-05-06b:
 

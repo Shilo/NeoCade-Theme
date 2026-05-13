@@ -1,7 +1,8 @@
 # Coverage Audit
 
 **Date:** 2026-05-07
-**Scope:** Phase 10 autonomous static coverage audit.
+**Updated:** 2026-05-13
+**Scope:** Phase 10 autonomous static coverage audit, updated for the current canonical-resource implementation.
 
 ## Runtime Showcase Coverage
 
@@ -17,21 +18,22 @@
   TooltipPanel, TooltipLabel, Window
 - MenuBar, ColorPicker, GraphEdit, GraphNode, GraphFrame
 
-The visible coverage strip reports `37/37 Controls themed ✓`; additive theme
-types and layout/chrome samples are listed alongside the canonical scorecard
-so QA can inspect them without changing the scorecard promise.
+The visible coverage strip reports `37/37 Controls themed`; additive theme
+types, layout/chrome samples, and the Phase 13 Role Variations tab are listed
+alongside the canonical scorecard so QA can inspect them without changing the
+scorecard promise.
 
 ## Theme Resource Coverage
 
 The shared `NeoCadeTheme._regenerate_theme()` BINDING_TABLE remains the source
-for all generated entries. All five direction resources load through the same
-class and therefore share generated coverage:
+for all generated entries. The current architecture uses one canonical resource:
 
-- `pulse_neocade_theme.tres`
-- `slate_neocade_theme.tres`
-- `bubble_neocade_theme.tres`
-- `daybreak_neocade_theme.tres`
-- `burst_neocade_theme.tres`
+- `addons/neocade_theme/neocade_theme.tres`
+
+The five built-in styles (`PULSE`, `SLATE`, `BUBBLE`, `DAYBREAK`, `BURST`) are
+selected through the `style` export on that one resource. As of the 2026-05-13
+docs sync, the live generated surface is `BINDING_TABLE.size() == 150` and
+`TYPE_VARIATIONS.size() == 62`.
 
 ## Deferred
 

@@ -13,6 +13,9 @@ findings:
   info: 4
   total: 5
 status: issues_found
+docs_sync: 2026-05-13
+closed_findings:
+  - WR-01
 ---
 
 # Phase 13: Code Review Report
@@ -21,6 +24,8 @@ status: issues_found
 **Depth:** standard
 **Files Reviewed:** 3
 **Status:** issues_found
+
+**Docs Sync 2026-05-13:** WR-01 is now closed in `README.md`; Role Panels are documented as replacing the panel face with a 6% role-color fill, with raised mode adding a darker role-tinted edge. The rest of this file remains a historical review snapshot.
 
 ## Summary
 

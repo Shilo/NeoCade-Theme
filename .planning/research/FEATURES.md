@@ -738,7 +738,7 @@ This is conservative. PROJECT.md asks for "type variations where appropriate" �
 
 ### 5.10 Coverage Verification (developer-facing)
 
-A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script enumerating themed types, used for CI/QA.
+A bottom strip lists "Controls covered: 37/37 ✓" — auto-counted via a script enumerating themed user-facing Controls, used for CI/QA.
 
 ---
 
@@ -864,10 +864,10 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 - [ ] Showcase scene supports three-way theme toggle (NeoCade desktop ↔ NeoCade mobile ↔ Godot default)
 
 **Showcase deliverables**
-- [ ] `showcase/showcase.tscn` with all 9 sections rendered
-- [ ] Three-way theme toggle button functional (desktop ↔ mobile ↔ default)
-- [ ] Token gallery section
-- [ ] Coverage counter shows "35/35"
+- [x] `showcase/showcase.tscn` with all 10 sections rendered (Phase 13 adds Role Variations)
+- [x] Style/default theme picker, raised toggle, and platform selector functional
+- [x] Token gallery section
+- [x] Coverage counter shows "37/37"
 
 **QA + Cross-Platform Export Validation deliverables (EXPANDED; CROSS-PLATFORM Section 6.5)**
 - [ ] Visual QA via Godot MCP screenshots at 1080p, 1440p, 4K (Forward+ + GL Compat)
@@ -922,7 +922,7 @@ A bottom strip lists "Controls covered: 35/35 ✓" — auto-counted via a script
 | FoldableContainer | MEDIUM | LOW | P1 |
 | BBCode demo in showcase | MEDIUM | LOW | P2 |
 | Token Gallery in showcase | MEDIUM | MEDIUM | P2 |
-| Coverage counter (35/35) | LOW | LOW | P2 |
+| Coverage counter (37/37) | LOW | LOW | P2 |
 | Editor-only types | LOW (v1.x) | MEDIUM | P3 |
 | Light mode | HIGH (eventually) | HIGH | P3 (v2) |
 
