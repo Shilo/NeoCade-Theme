@@ -495,6 +495,8 @@ Rules:
 
 - `menu_fill` should be more chromatic than `input_fill`.
 - `menu_fill` should usually be less visually dominant than `action_fill`.
+- `menu_fill` must be distinguishable from `panel_fill`, `panel_alt_fill`, and `popup_shell` by luminance/contrast, not only hue.
+- For colorblind accessibility, target at least 3:1 between the visible menu control boundary/fill and the surrounding panel. If the face itself cannot hit 3:1, the border/edge/focus treatment must.
 - Popup rows can use `menu_fill` for hover/active, but normal popup shells should stay `popup_shell`.
 
 ### 6. Semantic Colors Do Not Become Theme Decoration
@@ -541,7 +543,7 @@ Every `*_fill` token belongs to a risk group. The generator should choose chroma
 | Broad structural | `surface_fill`, `shell_fill`, `panel_fill`, `panel_alt_fill`, `popup_shell`, `code_fill` | Low chroma | Very low | Large painted regions must stay calm and readable. |
 | Dense text | `input_fill`, `list_panel_fill`, `list_row_hover`, `list_row_selected`, `text_selection_fill` | Low to moderate chroma | Very low to low | Text density wins over theme color. |
 | Navigation and selection | `selection_fill`, `tab_selected_fill`, `dialog_header` | Moderate chroma | Low to medium | Must be obvious, stable, and readable; no arbitrary per-tab colors. |
-| Menu interaction | `menu_fill` | Moderate chroma | Low to medium | More colorful than inputs, less dominant than action buttons. |
+| Menu interaction | `menu_fill` | Moderate chroma | Low to medium | More colorful than inputs, less dominant than action buttons, visibly separated from panels. |
 | Compact action/state | `action_fill`, `range_fill`, `toggle_fill`, `focus_ring` | Moderate to high chroma | Medium to high | Color can be stronger because the painted area is compact. |
 | Semantic action/status | `positive_fill`, `success_fill`, `warning_fill`, `info_fill`, `danger_fill` | Meaning-driven | Very low to low, except safe personalization | Hue meaning is more important than theme variety. |
 | Utility lines | `separator_fill`, guide/grid/relationship line colors | Low to moderate contrast | Very low | Should structure the UI without becoming visual noise. |

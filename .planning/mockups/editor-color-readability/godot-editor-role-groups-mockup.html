@@ -19,6 +19,7 @@
       --selection: #315f87;
       --action: #d39a35;
       --menu: #3a6689;
+      --menu-edge: #8fc7ea;
       --range: #62c86c;
       --toggle: #54d987;
       --positive: #42c784;
@@ -174,6 +175,7 @@
     .icon-button.active {
       background: var(--menu);
       color: var(--on-menu);
+      box-shadow: inset 0 0 0 1px var(--menu-edge);
     }
 
     .workspace-tab {
@@ -335,6 +337,7 @@
       border-radius: var(--radius);
       background: var(--menu);
       color: var(--on-menu);
+      box-shadow: inset 0 0 0 1px var(--menu-edge);
       font-size: 12px;
       font-weight: 900;
     }
@@ -378,7 +381,8 @@
     .tool-button.active {
       background: var(--menu);
       color: var(--on-menu);
-      border-color: color-mix(in srgb, var(--menu) 72%, #fff);
+      border-color: var(--menu-edge);
+      box-shadow: inset 0 0 0 1px var(--menu-edge);
     }
 
     .tool-button.primary-tool {
@@ -548,6 +552,7 @@
       padding: 2px 4px;
       background: var(--menu);
       color: var(--on-menu);
+      box-shadow: inset 0 0 0 1px var(--menu-edge);
       font-weight: 900;
     }
 
@@ -634,7 +639,8 @@
       justify-content: space-between;
       background: var(--menu);
       color: var(--on-menu);
-      border-color: color-mix(in srgb, var(--menu) 72%, #fff);
+      border-color: var(--menu-edge);
+      box-shadow: inset 0 0 0 1px var(--menu-edge);
     }
 
     .axis-chip {
@@ -730,7 +736,7 @@
 
     .port-row.menu .port {
       background: var(--menu);
-      border-color: color-mix(in srgb, var(--menu) 65%, #000);
+      border-color: var(--menu-edge);
     }
 
     .button-row {
@@ -752,6 +758,7 @@
     .button.menu {
       background: var(--menu);
       color: var(--on-menu);
+      border: 1px solid var(--menu-edge);
       box-shadow: 0 var(--depth) 0 color-mix(in srgb, var(--menu) 62%, #000);
     }
 
@@ -1324,6 +1331,10 @@
       ["selection_fill", "selection", "onSelection", 4.5],
       ["action_fill", "action", "onAction", 4.5],
       ["menu_fill", "menu", "onMenu", 4.5],
+      ["menu_edge_vs_panel", "menuEdge", "panel", 3.0],
+      ["menu_edge_vs_panel_alt", "menuEdge", "panelAlt", 3.0],
+      ["menu_edge_vs_popup", "menuEdge", "popup", 3.0],
+      ["menu_edge_vs_menu_fill", "menuEdge", "menu", 1.5],
       ["range_fill", "range", "onRange", 4.5],
       ["toggle_fill", "toggle", "onToggle", 4.5],
       ["positive_fill", "positive", "onPositive", 4.5],
@@ -1468,6 +1479,42 @@
         .sort((a, b) => b.ratio - a.ratio)[0].color;
     }
 
+    function bestBoundary(fill, surrounds, dark, light) {
+      const candidates = [
+        mix(fill, light, .22),
+        mix(fill, light, .32),
+        mix(fill, light, .42),
+        mix(fill, light, .50),
+        mix(fill, light, .58),
+        mix(fill, dark, .22),
+        mix(fill, dark, .32),
+        mix(fill, dark, .42),
+        mix(fill, dark, .50),
+        mix(fill, dark, .58),
+        light,
+        dark
+      ];
+      const scored = candidates.map(color => {
+        const surroundScore = Math.min(...surrounds.map(bg => contrast(color, bg)));
+        const fillScore = contrast(color, fill);
+        const fillRgb = parseHex(fill);
+        const colorRgb = parseHex(color);
+        const distance =
+          Math.abs(fillRgb.r - colorRgb.r) +
+          Math.abs(fillRgb.g - colorRgb.g) +
+          Math.abs(fillRgb.b - colorRgb.b);
+        return { color, surroundScore, fillScore, distance };
+      });
+      const valid = scored
+        .filter(item => item.surroundScore >= 3 && item.fillScore >= 1.5)
+        .sort((a, b) => a.distance - b.distance);
+      if (valid.length > 0) {
+        return valid[0].color;
+      }
+      return scored
+        .sort((a, b) => (b.surroundScore + b.fillScore * .2) - (a.surroundScore + a.fillScore * .2))[0].color;
+    }
+
     function cssName(roleName) {
       return cssNames[roleName] || roleName.replace(/[A-Z]/g, m => "-" + m.toLowerCase());
     }
@@ -1492,6 +1539,12 @@
       palette.onToggle = bestText(palette.toggle, config.darkText, config.lightText);
       palette.onPositive = bestText(palette.positive, config.darkText, config.lightText);
       palette.onDanger = bestText(palette.danger, config.darkText, config.lightText);
+      palette.menuEdge = bestBoundary(
+        palette.menu,
+        [palette.panel, palette.panelAlt, palette.popup],
+        config.darkText,
+        config.lightText
+      );
       palette.muted = mix(palette.onPanel, palette.panel, .38);
       return palette;
     }
@@ -1517,6 +1570,7 @@
       setVar("on-selection", palette.onSelection);
       setVar("on-action", palette.onAction);
       setVar("on-menu", palette.onMenu);
+      setVar("menu-edge", palette.menuEdge);
       setVar("on-range", palette.onRange);
       setVar("on-toggle", palette.onToggle);
       setVar("on-positive", palette.onPositive);
@@ -1534,7 +1588,7 @@
       const visible = [
         ["surface", "onSurface"], ["panel", "onPanel"], ["input", "onInput"],
         ["listPanel", "onList"], ["selection", "onSelection"], ["action", "onAction"],
-        ["menu", "onMenu"], ["range", "onRange"], ["toggle", "onToggle"],
+        ["menu", "onMenu"], ["menuEdge", "onPanel"], ["range", "onRange"], ["toggle", "onToggle"],
         ["positive", "onPositive"], ["danger", "onDanger"], ["focus", "onPanel"]
       ];
       swatches.innerHTML = visible.map(([bg, fg]) => {
