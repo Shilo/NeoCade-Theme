@@ -54,7 +54,7 @@ NeoCade lesson:
 
 - A theme can have multiple expressive role lanes while still having base surfaces.
 - NeoCade should not collapse everything into action/input/selection.
-- Add categorical accent lanes for non-status color variety.
+- Use multiple stable role lanes for non-status color variety; the later `category_*` experiment was useful research but is not the active direction.
 
 Source: https://daisyui.com/docs/themes/
 
@@ -77,7 +77,7 @@ Chakra distinguishes raw tokens from semantic tokens. Semantic tokens are contex
 NeoCade lesson:
 
 - Keep primitive generated colors internal.
-- Public/internal implementation should talk in semantic roles: `input_fill`, `list_row_selected`, `category_3`, `danger_fill`.
+- Public/internal implementation should talk in semantic roles: `input_fill`, `selection_fill`, `menu_fill`, `positive_fill`, `danger_fill`.
 - Component aliases can map Godot classes to those roles without inventing a new color for every Control.
 
 Sources:
@@ -103,9 +103,9 @@ Atlassian's accent colors are specifically for differentiating interface element
 
 NeoCade lesson:
 
-- Add `category_*` lanes for LDtk-like color identity.
-- Use them where color helps differentiate regions or content categories: dock tabs, file/tree icons, selected-row rails, badges, property-group strips, graph ports, compact indicators.
-- Do not use `category_*` for danger/success/warning semantics.
+- LDtk-like color identity can come from stronger component roles, not arbitrary per-widget lanes.
+- Use color where it helps differentiate stable control groups: actions, menus, selection, inputs, ranges, toggles, semantic statuses, and compact indicators.
+- Do not use non-semantic color roles for danger/success/warning semantics.
 
 Source: https://atlassian.design/foundations/color/accents
 
@@ -278,7 +278,6 @@ These are deliberately clamped for readability.
 - `input_edge`
 - `list_panel_fill`
 - `list_row_hover`
-- `list_row_selected`
 - `text_selection_fill`
 - `code_fill`
 
@@ -288,6 +287,7 @@ These may carry more personality because they are smaller or clearly actionable.
 
 - `action_fill`
 - `menu_fill`
+- `selection_fill`
 - `tab_selected_fill`
 - `tab_selected_indicator`
 - `range_fill`
@@ -299,14 +299,25 @@ These may carry more personality because they are smaller or clearly actionable.
 These retain common meaning and should not rotate by theme identity.
 
 - `positive_fill`
-- `success_fill`
 - `warning_fill`
 - `info_fill`
 - `danger_fill`
 
 `PrimaryButton` should consume `positive_fill`. Do not add a separate `PositiveButton` variation unless a future Godot/API reason appears. For destructive actions, pick one public variation name and keep it singular. Current planning preference remains `DangerButton`; if existing code says `NegativeButton`, rename rather than supporting both.
 
-### 5. Rejected Experiment: Categorical Accent Lanes
+`success_fill` aliases `positive_fill` for v1. It can become a separate semantic status only if implementation shows that success badges/messages need a different tone from confirm buttons.
+
+### 5. Component Aliases
+
+These names may appear in implementation mapping tables, but they are not separate authored colors in Option B:
+
+- `list_row_selected` aliases `selection_fill`.
+- `tab_selected_fill` aliases `selection_fill`.
+- `tab_selected_indicator` aliases `action_fill`.
+- `text_selection_fill` is a dedicated derived role near `selection_fill` because dense text selection needs its own contrast audit.
+- `menu_boundary` is an internal derived boundary from `menu_fill`, visible only when `menu_fill` fails 3:1 against adjacent panels. It is not a public fill token.
+
+### 6. Rejected Experiment: Categorical Accent Lanes
 
 This section records the rejected experiment that produced `.planning/mockups/editor-color-readability/godot-editor-color-taxonomy-mockup.html`. It is useful evidence, but it is not the current implementation target.
 
@@ -532,7 +543,7 @@ Rules:
 - Text and icons that communicate content: 4.5:1 minimum against their actual fill.
 - Required non-text state indicators: 3:1 minimum against adjacent colors.
 - Foreground colors are computed from the final resolved fill, not from the role name.
-- If the preferred theme foreground fails, fall back to near-black or white.
+- Prefer the theme dark/light foreground if it passes 4.5:1; fall back to near-black or white only when the theme foregrounds fail.
 
 ## Fill Token Risk Groups
 
@@ -541,11 +552,11 @@ Every `*_fill` token belongs to a risk group. The generator should choose chroma
 | Risk group | Tokens | Color strength | Source-color pull | Main rule |
 | --- | --- | --- | --- | --- |
 | Broad structural | `surface_fill`, `shell_fill`, `panel_fill`, `panel_alt_fill`, `popup_shell`, `code_fill` | Low chroma | Very low | Large painted regions must stay calm and readable. |
-| Dense text | `input_fill`, `list_panel_fill`, `list_row_hover`, `list_row_selected`, `text_selection_fill` | Low to moderate chroma | Very low to low | Text density wins over theme color. |
-| Navigation and selection | `selection_fill`, `tab_selected_fill`, `dialog_header` | Moderate chroma | Low to medium | Must be obvious, stable, and readable; no arbitrary per-tab colors. |
-| Menu interaction | `menu_fill` | Moderate chroma | Low to medium | More colorful than inputs, less dominant than action buttons, visibly separated from panels. |
+| Dense text | `input_fill`, `input_edge`, `list_panel_fill`, `list_row_hover`, `text_selection_fill` | Low to moderate chroma | Very low to low | Text density wins over theme color. |
+| Navigation and selection | `selection_fill`, `dialog_header`, `tab_selected_fill` alias, `tab_selected_indicator` alias | Moderate chroma | Low to medium | Must be obvious, stable, and readable; no arbitrary per-tab colors. |
+| Menu interaction | `menu_fill`, internal `menu_boundary` | Moderate chroma | Low to medium | More colorful than inputs, less dominant than action buttons, visibly separated from panels. |
 | Compact action/state | `action_fill`, `range_fill`, `toggle_fill`, `focus_ring` | Moderate to high chroma | Medium to high | Color can be stronger because the painted area is compact. |
-| Semantic action/status | `positive_fill`, `success_fill`, `warning_fill`, `info_fill`, `danger_fill` | Meaning-driven | Very low to low, except safe personalization | Hue meaning is more important than theme variety. |
+| Semantic action/status | `positive_fill`, `success_fill` alias, `warning_fill`, `info_fill`, `danger_fill` | Meaning-driven | Very low to low, except safe personalization | Hue meaning is more important than theme variety. |
 | Utility lines | `separator_fill`, guide/grid/relationship line colors | Low to moderate contrast | Very low | Should structure the UI without becoming visual noise. |
 
 Implementation rules:
@@ -553,8 +564,11 @@ Implementation rules:
 - A token cannot opt into a stronger group just because a theme wants more color.
 - `source_color` may only shift a token within that token's risk group.
 - Broad structural and dense text tokens should never receive high-chroma yellow, orange, pink, magenta, or red.
-- `selection_fill` may be stronger than `list_row_selected`, but if one token is used for both selected tabs and selected rows, it must pass row text readability first.
+- `selection_fill` is currently shared by selected tabs and selected rows; it must pass row text readability first.
+- `text_selection_fill` is audited separately for LineEdit/TextEdit/CodeEdit selection text.
+- `menu_fill` should pass 3:1 against nearby panel/popup surfaces when possible. If it cannot, emit an internal `menu_boundary`; do not expose `menu_boundary` as a public role.
 - `range_fill`, `toggle_fill`, and `focus_ring` must pass 3:1 as non-text indicators against their adjacent track/input/panel colors.
+- `toggle_fill` should remain visually related to `positive_fill` but not collapse into the same resolved color; toggles are state controls, while `positive_fill` is for confirm/primary actions.
 - `danger_fill` is hue-locked to red-family. Red-family source colors should not pull non-danger tokens into red.
 - `positive_fill` is the source for `PrimaryButton`; do not create a separate `PositiveButton` color role.
 
@@ -588,6 +602,26 @@ Palette appendix for reviewers:
 
 - `.planning/research/EDITOR-ROLE-GROUP-PRESET-PALETTE.md`
 
+## Reviewer Reconciliation
+
+Three reviewers checked the Option B role-group direction: Codex subagent, Claude, and opencode/DeepSeek. All returned PASS WITH FLAGS rather than BLOCK.
+
+Accepted changes:
+
+- Add exact preset colors for every active token so reviewers can audit the palette standards directly.
+- Add `warning_fill` and `info_fill` explicitly; do not let warning borrow `action_fill`.
+- Keep `success_fill` as an alias of `positive_fill` instead of adding another green role.
+- Keep `toggle_fill`, but separate it from `positive_fill` by hue/luminance so toggle-on controls do not visually collapse into confirm buttons.
+- Move `menu_edge` out of the public role model. The current name is internal `menu_boundary`, and it appears only when `menu_fill` cannot reach 3:1 against adjacent panel/popup surfaces.
+- Add explicit `on_dialog_header`, `on_input_edge`, and `on_text_selection` calculations.
+- Adjust Slate away from an all-blue affordance stack by moving `action_fill` to a restrained champagne role.
+
+Rejected or modified findings:
+
+- Do not delete `toggle_fill`; Godot has real toggle/check controls, and a stable component role is useful.
+- Do not return to the conservative baseline. Option A remains deferred.
+- Do not reintroduce `category_1_fill` through `category_6_fill`; those lanes remain rejected research.
+
 ## Decision Update: Category Lanes Rejected For Current Direction
 
 The `category_1_fill` through `category_6_fill` experiment made the editor mockup more colorful, but it failed the consistency goal:
@@ -606,8 +640,10 @@ The current approved direction is to dial back to component-group fills:
 - `range_fill`
 - `toggle_fill`
 - `positive_fill`
+- `warning_fill`
+- `info_fill`
 - `danger_fill`
-- plus structural roles such as `surface_fill`, `panel_fill`, `popup_shell`, `dialog_header`, `separator_fill`, and `focus_ring`
+- plus structural and text roles such as `surface_fill`, `panel_fill`, `popup_shell`, `dialog_header`, `separator_fill`, `text_selection_fill`, and `focus_ring`
 
 The research still matters, but the translation changes:
 

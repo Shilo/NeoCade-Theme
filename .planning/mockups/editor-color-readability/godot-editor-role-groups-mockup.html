@@ -40,6 +40,7 @@
       --on-input-edge: #0d1420;
       --on-list: #f2f7ff;
       --on-selection: #f7fbff;
+      --on-text-selection: #f7fbff;
       --on-action: #111722;
       --on-menu: #f5fbff;
       --on-range: #0f2016;
@@ -1181,7 +1182,7 @@
           selection: ["#447faf", .10, 16, .52, .34, .50],
           textSelection: ["#447faf", .08, 12, .50, .34, .50],
           action: ["#d39a35", .08, 12, .76, .44, .62],
-          menu: ["#3a6689", .12, 18, .52, .27, .45],
+          menu: ["#5489b0", .12, 18, .52, .34, .54],
           range: ["#62c86c", .12, 20, .72, .40, .60],
           toggle: ["#43d2bb", .12, 20, .72, .40, .60],
           positive: ["#42c784", .08, 12, .72, .36, .58],
@@ -1215,7 +1216,7 @@
           selection: ["#3f8f84", .12, 18, .50, .34, .50],
           textSelection: ["#3f8f84", .08, 12, .48, .34, .50],
           action: ["#d8a233", .07, 12, .76, .44, .62],
-          menu: ["#2d6f7a", .12, 18, .52, .25, .44],
+          menu: ["#3a9aa5", .12, 18, .56, .38, .57],
           range: ["#63d6a1", .18, 28, .72, .40, .62],
           toggle: ["#48d6bf", .14, 20, .72, .40, .60],
           positive: ["#42c983", .08, 12, .72, .36, .58],
@@ -1249,7 +1250,7 @@
           selection: ["#4a7fa6", .10, 16, .46, .34, .50],
           textSelection: ["#4a7fa6", .08, 12, .44, .34, .50],
           action: ["#d6b47a", .07, 10, .56, .48, .66],
-          menu: ["#4d668c", .10, 14, .42, .28, .46],
+          menu: ["#5c7fa8", .10, 14, .46, .34, .54],
           range: ["#7bd2cc", .14, 22, .58, .42, .62],
           toggle: ["#78d8b4", .12, 18, .62, .42, .62],
           positive: ["#65c98f", .08, 12, .62, .38, .58],
@@ -1283,7 +1284,7 @@
           selection: ["#8a6fc0", .10, 16, .54, .42, .58],
           textSelection: ["#8a6fc0", .08, 12, .52, .42, .58],
           action: ["#e0a637", .06, 10, .78, .44, .62],
-          menu: ["#5d4a87", .10, 14, .54, .28, .46],
+          menu: ["#8c63b8", .10, 14, .60, .40, .60],
           range: ["#75d94f", .12, 20, .72, .40, .60],
           toggle: ["#4fd6ac", .12, 20, .72, .40, .60],
           positive: ["#45c978", .08, 12, .72, .36, .58],
@@ -1315,11 +1316,11 @@
           listPanel: ["#fff4df", .03, 6, .30, .90, .98],
           listHover: ["#e8f5ff", .08, 12, .24, .86, .96],
           selection: ["#236f9f", .10, 14, .58, .22, .38],
-          textSelection: ["#236f9f", .08, 12, .54, .22, .38],
+          textSelection: ["#236f9f", .08, 12, .54, .20, .36],
           action: ["#259bd8", .12, 18, .66, .34, .54],
-          menu: ["#8ca7d9", .08, 12, .44, .58, .76],
-          range: ["#13a7a1", .08, 12, .68, .30, .48],
-          toggle: ["#2c9e70", .08, 12, .68, .30, .48],
+          menu: ["#5f77ab", .08, 12, .48, .38, .58],
+          range: ["#0f918c", .08, 12, .68, .24, .42],
+          toggle: ["#238d66", .08, 12, .68, .24, .42],
           positive: ["#238f49", .06, 10, .68, .28, .44],
           warning: ["#e8b830", .025, 4, .78, .46, .64],
           info: ["#259bd8", .08, 12, .66, .34, .54],
@@ -1357,7 +1358,7 @@
       ["input_edge", "inputEdge", "onInputEdge", 4.5],
       ["list_panel_fill", "listPanel", "onList", 4.5],
       ["selection_fill", "selection", "onSelection", 4.5],
-      ["text_selection_fill", "textSelection", "onSelection", 4.5],
+      ["text_selection_fill", "textSelection", "onTextSelection", 4.5],
       ["action_fill", "action", "onAction", 4.5],
       ["menu_fill", "menu", "onMenu", 4.5],
       ["menu_visible_boundary_vs_panel", "menuVisibleBoundary", "panel", 3.0],
@@ -1570,6 +1571,7 @@
       palette.onInputEdge = bestText(palette.inputEdge, config.darkText, config.lightText);
       palette.onList = bestText(palette.listPanel, config.darkText, config.lightText);
       palette.onSelection = bestText(palette.selection, config.darkText, config.lightText);
+      palette.onTextSelection = bestText(palette.textSelection, config.darkText, config.lightText);
       palette.onAction = bestText(palette.action, config.darkText, config.lightText);
       palette.onMenu = bestText(palette.menu, config.darkText, config.lightText);
       palette.onRange = bestText(palette.range, config.darkText, config.lightText);
@@ -1616,6 +1618,7 @@
       setVar("on-input-edge", palette.onInputEdge);
       setVar("on-list", palette.onList);
       setVar("on-selection", palette.onSelection);
+      setVar("on-text-selection", palette.onTextSelection);
       setVar("on-action", palette.onAction);
       setVar("on-menu", palette.onMenu);
       setVar("menu-boundary", palette.menuBoundaryCss);
@@ -1638,7 +1641,7 @@
       const visible = [
         ["surface", "onSurface"], ["panel", "onPanel"], ["dialogHeader", "onDialogHeader"],
         ["input", "onInput"], ["inputEdge", "onInputEdge"], ["listPanel", "onList"],
-        ["selection", "onSelection"], ["textSelection", "onSelection"], ["action", "onAction"],
+        ["selection", "onSelection"], ["textSelection", "onTextSelection"], ["action", "onAction"],
         ["menu", "onMenu"], ["menuBoundary", "onPanel"], ["range", "onRange"], ["toggle", "onToggle"],
         ["positive", "onPositive"], ["warning", "onWarning"], ["info", "onInfo"],
         ["danger", "onDanger"], ["focus", "onPanel"]
