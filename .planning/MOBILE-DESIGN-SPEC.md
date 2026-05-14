@@ -7,7 +7,7 @@ Phase 8 defines mobile as an export-driven platform mode on the canonical NeoCad
 - Production script: `addons/neocade_theme/scripts/neocade_theme.gd`.
 - Canonical resource: `addons/neocade_theme/neocade_theme.tres`.
 - Built-in styles live behind `NeoCadeTheme.Style`: `BUBBLE`, `BURST`, `DAYBREAK`, `PULSE`, `SLATE`, and `CUSTOM`.
-- Public exports are the locked 12 names: `style`, `raised`, `platform`, `base_color`, `accent_color`, `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`, `use_runtime_popup_selection_icons`, and `texture_cache`.
+- Public exports are the locked 11 names: `style`, `raised`, `platform`, `source_color`, `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`, `use_runtime_popup_selection_icons`, and `texture_cache`.
 - Mobile behavior is selected through `platform=MOBILE`; `platform=DESKTOP` and `platform=AUTO` remain available on the same canonical resource and on consumer-saved `NeoCadeTheme` resources.
 
 ## Forbidden Files And Resources
@@ -108,7 +108,7 @@ The Phase 8 audit runs all five built-in styles with `platform=MOBILE`, `raised=
 
 ## 14 Core Runtime Type Variations
 
-The older 13-variation research wording is superseded by the live `TYPE_VARIATIONS` registry in `addons/neocade_theme/scripts/neocade_theme.gd`. As of the 2026-05-13 docs sync, the live registry contains 62 total entries: the 14 core runtime variations below, 9 opt-in role variations from Phase 13, and editor/integration variations used by Godot editor surfaces.
+The older 13-variation research wording is superseded by the live `TYPE_VARIATIONS` registry in `addons/neocade_theme/scripts/neocade_theme.gd`. As of the 2026-05-13 source-color role rework, the live registry contains 66 total entries: the 14 core runtime variations below, 9 opt-in role variations from Phase 13, and editor/integration variations used by Godot editor surfaces.
 
 | Variation | Base | Mobile behavior |
 |---|---|---|
@@ -133,10 +133,10 @@ Phase 13 added these opt-in variations. They are not part of the original 14 cor
 
 | Variation | Base | Mobile behavior |
 |---|---|---|
-| SuccessLabel | Label | Uses the mobile label/font sizing path plus success role color. |
-| WarningLabel | Label | Uses the mobile label/font sizing path plus warning role color. |
-| DangerLabel | Label | Uses the mobile label/font sizing path plus danger role color. |
-| InfoLabel | Label | Uses the mobile label/font sizing path plus info role color. |
+| SuccessLabel | Label | Uses the mobile label/font sizing path plus success semantic text color. |
+| WarningLabel | Label | Uses the mobile label/font sizing path plus warning semantic text color. |
+| DangerLabel | Label | Uses the mobile label/font sizing path plus danger semantic text color. |
+| InfoLabel | Label | Uses the mobile label/font sizing path plus info semantic text color. |
 | AccentPanel | PanelContainer | Keeps panel geometry; tint is opt-in via `theme_type_variation`. |
 | InfoPanel | PanelContainer | Keeps panel geometry; tint is opt-in via `theme_type_variation`. |
 | WarningPanel | PanelContainer | Keeps panel geometry; tint is opt-in via `theme_type_variation`. |

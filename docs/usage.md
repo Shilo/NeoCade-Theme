@@ -29,11 +29,11 @@ share the same `NeoCadeTheme` engine and the same exported controls.
 
 | Style | Personality |
 |---|---|
-| **Pulse** | Arcade-dense; cabinet-bezel rectangles; bold accent fill on primary |
+| **Pulse** | Arcade-dense; cabinet-bezel rectangles; mixed arcade role colors |
 | **Slate** | Spacious-premium-quiet; rounded-pill primary; iOS-style focus offset |
-| **Bubble** | Friendly-airy-generous; pillowy fully-rounded primary; pastel pink accent |
+| **Bubble** | Friendly-airy-generous; dark shell with light mobile-game islands |
 | **Daybreak** | Airy-breathing; gentle rounded; mint-halo focus ring |
-| **Burst** | Event-spread-hierarchy-amplified; oversized statement primary; gold accent |
+| **Burst** | Event-spread-hierarchy-amplified; oversized statement primary with warm role color |
 
 Select a style in the Inspector through the `style` export, or in code:
 
@@ -60,18 +60,24 @@ been replaced by `neocade_theme.tres` plus the `style` export.
 ## Custom Themes
 
 Set `style = NeoCadeTheme.Style.CUSTOM` to make the direction exports manual.
-Changing direction-defining exports such as `base_color`, `accent_color`,
-`corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, or
-`outline_width` will update the style back to a matching built-in style when
-the values match one exactly; otherwise it falls back to `CUSTOM`.
-`Style.CUSTOM` uses NeoCade's neutral fallback personality rather than
-inferring one from `base_color`.
+Changing `source_color` preserves the currently selected built-in style and
+nudges that style's authored role palette. Shape/spacing exports such as
+`corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, and
+`outline_width` update the style back to a matching built-in preset when they
+match one exactly; otherwise they fall back to `CUSTOM`. `Style.CUSTOM` uses
+NeoCade's neutral fallback personality rather than inferring one from the
+source color.
+
+The bundled `NeoCadeThemeOptionButton` is a preset picker: choosing a built-in
+style applies that style's preset `source_color` and shape/spacing values too.
+It preserves the target theme's independent `raised`, `platform`, and Advanced
+toggle values. Manual `source_color` edits still preserve the selected style in
+the Inspector.
 
 ```gdscript
 var custom_theme := NeoCadeTheme.new()
 custom_theme.style = NeoCadeTheme.Style.CUSTOM
-custom_theme.base_color = Color("#080A1E")
-custom_theme.accent_color = Color("#FF66AA")
+custom_theme.source_color = Color("#6EE7FF")
 custom_theme.corner_radius = 10
 theme = custom_theme
 ```

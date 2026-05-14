@@ -4,16 +4,16 @@ extends SceneTree
 ## Invoke via: godot --headless --quit --script ".planning/phases/13-role-variations/helpers/_phase13_smoke_matrix.gd"
 ##
 ## Exits 0 if all 30 configs regenerate cleanly AND maintain invariants
-## (BINDING_TABLE == 150 rows, TYPE_VARIATIONS == 62, @export count == 12, Button.normal stylebox produced,
+## (BINDING_TABLE == 154 rows, TYPE_VARIATIONS == 66, @export count == 11, Button.normal stylebox produced,
 ## all 9 Phase 13 variations produce non-null bindings).
 ## Exits 1 on first invariant violation (with collected failure list).
 ##
 ## Note: expected registry counts track the current live implementation as of 2026-05-13.
 
 const CANONICAL_TRES := "res://addons/neocade_theme/neocade_theme.tres"
-const EXPECTED_EXPORT_COUNT := 12
-const EXPECTED_BINDING_TABLE_ROWS := 150  # Current live implementation count as of 2026-05-13.
-const EXPECTED_TYPE_VARIATIONS_COUNT := 62  # Current live implementation count as of 2026-05-13.
+const EXPECTED_EXPORT_COUNT := 11
+const EXPECTED_BINDING_TABLE_ROWS := 154  # Current live implementation count as of 2026-05-13 source-color role rework.
+const EXPECTED_TYPE_VARIATIONS_COUNT := 66  # Current live implementation count as of 2026-05-13 source-color role rework.
 const PHASE_13_NEW_LABEL_VARIATIONS := ["SuccessLabel", "WarningLabel", "DangerLabel", "InfoLabel"]
 const PHASE_13_NEW_PANEL_VARIATIONS := ["AccentPanel", "InfoPanel", "WarningPanel", "DangerPanel", "SuccessPanel"]
 
@@ -39,10 +39,8 @@ func _init() -> void:
 		# Apply axes. CUSTOM bypasses _apply_style_exports so we set fields directly.
 		if cfg.has("style"):
 			t.style = cfg.style
-		if cfg.has("base_color"):
-			t.base_color = cfg.base_color
-		if cfg.has("accent_color"):
-			t.accent_color = cfg.accent_color
+		if cfg.has("source_color"):
+			t.source_color = cfg.source_color
 		t.raised = cfg.raised
 		t.platform = cfg.platform
 
@@ -94,26 +92,24 @@ func _build_curated_configs() -> Array:
 	for r in [false, true]:
 		for p in [NeoCadeTheme.Platform.DESKTOP, NeoCadeTheme.Platform.MOBILE, NeoCadeTheme.Platform.AUTO]:
 			out.append({"style": NeoCadeTheme.Style.CUSTOM, "raised": r, "platform": p})
-	# Group 4: 5 styles × raised=true × AUTO × custom base/accent (5 configs)
-	var custom_base := Color("#1A1A22")
-	var custom_accent := Color("#E5C16C")
+	# Group 4: 5 styles × raised=true × AUTO × custom source color (5 configs)
+	var custom_source := Color("#6EE7FF")
 	for s in NeoCadeTheme.selectable_styles():
 		out.append({
 			"style": s,
 			"raised": true,
 			"platform": NeoCadeTheme.Platform.AUTO,
-			"base_color": custom_base,
-			"accent_color": custom_accent,
+			"source_color": custom_source,
 		})
 	# Group 5: 4 edge cases on CUSTOM
 	out.append({"style": NeoCadeTheme.Style.CUSTOM, "raised": true, "platform": NeoCadeTheme.Platform.DESKTOP,
-				"base_color": Color("#000005"), "accent_color": Color("#FFFFFF")})  # very dark base
+				"source_color": Color("#05070B")})  # very dark source
 	out.append({"style": NeoCadeTheme.Style.CUSTOM, "raised": true, "platform": NeoCadeTheme.Platform.DESKTOP,
-				"base_color": Color("#F5F5F5"), "accent_color": Color("#222222")})  # very light base
+				"source_color": Color("#FFFFFF")})  # very light source
 	out.append({"style": NeoCadeTheme.Style.CUSTOM, "raised": true, "platform": NeoCadeTheme.Platform.DESKTOP,
-				"base_color": Color("#333333"), "accent_color": Color("#3A3A3A")})  # accent ≈ base (low contrast)
+				"source_color": Color("#7A8794")})  # low-chroma source
 	out.append({"style": NeoCadeTheme.Style.CUSTOM, "raised": true, "platform": NeoCadeTheme.Platform.DESKTOP,
-				"base_color": Color("#0E0E14"), "accent_color": Color("#FF6B35")})  # accent over WCAG floor
+				"source_color": Color("#FF6B35")})  # vivid warm source
 	return out
 
 

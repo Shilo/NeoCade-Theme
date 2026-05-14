@@ -46,12 +46,13 @@ func _check_theme(theme: NeoCadeTheme, label: String) -> void:
 		if panel == null:
 			_fail("%s missing %s.panel" % [label, dialog_type])
 			continue
-		if not panel.bg_color.is_equal_approx(theme.base_color):
-			_fail("%s %s.panel bg should be base color: got=%s base=%s" % [
+		var expected_dialog_base := theme.get_color(&"base_color", &"Editor")
+		if not panel.bg_color.is_equal_approx(expected_dialog_base):
+			_fail("%s %s.panel bg should be generated surface base: got=%s base=%s" % [
 				label,
 				dialog_type,
 				panel.bg_color.to_html(false),
-				theme.base_color.to_html(false),
+				expected_dialog_base.to_html(false),
 			])
 		if panel.corner_radius_top_left != 0 or panel.corner_radius_top_right != 0 or panel.corner_radius_bottom_left != 0 or panel.corner_radius_bottom_right != 0:
 			_fail("%s %s.panel should stay square inside Window.embedded_border chrome, got radius=%s/%s/%s/%s" % [

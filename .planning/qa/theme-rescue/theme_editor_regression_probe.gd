@@ -248,17 +248,21 @@ func _expect_editor_rich_text_uses_code_surface(theme: Theme, label: String) -> 
 
 
 func _expect_selection_control_colors(theme: Theme, label: String) -> void:
-	var accent := theme.get_color(&"checkbox_checked_color", &"CheckBox")
+	var active := theme.get_color(&"checkbox_checked_color", &"CheckBox")
 	var checkbox_off := theme.get_color(&"checkbox_unchecked_color", &"CheckBox")
 	var checkbutton_on := theme.get_color(&"button_checked_color", &"CheckButton")
 	var checkbutton_off := theme.get_color(&"button_unchecked_color", &"CheckButton")
-	var button_normal := (theme.get_stylebox(&"normal", &"Button") as StyleBoxFlat).bg_color
-	if not checkbutton_on.is_equal_approx(accent):
-		_fail("%s CheckBox and CheckButton checked fills should match accent" % label)
-	if checkbox_off.get_luminance() <= button_normal.get_luminance() + 0.03:
-		_fail("%s CheckBox unchecked fill should be visibly lighter than Button.normal" % label)
-	if checkbutton_off.get_luminance() <= button_normal.get_luminance() + 0.03:
-		_fail("%s CheckButton unchecked fill should be visibly lighter than Button.normal" % label)
+	var panel := (theme.get_stylebox(&"panel", &"Panel") as StyleBoxFlat).bg_color
+	if not checkbutton_on.is_equal_approx(active):
+		_fail("%s CheckBox and CheckButton checked fills should match active toggle fill" % label)
+	if _color_distance(checkbox_off, active) < 0.10:
+		_fail("%s CheckBox unchecked fill should be distinct from active toggle fill" % label)
+	if _color_distance(checkbutton_off, active) < 0.10:
+		_fail("%s CheckButton unchecked fill should be distinct from active toggle fill" % label)
+	if _contrast_ratio(checkbox_off, panel) < 2.0:
+		_fail("%s CheckBox unchecked fill should remain visible on panel surface" % label)
+	if _contrast_ratio(checkbutton_off, panel) < 2.0:
+		_fail("%s CheckButton unchecked fill should remain visible on panel surface" % label)
 	if _color_distance(checkbox_off, checkbutton_off) > 0.01:
 		_fail("%s CheckBox and CheckButton unchecked fills should match" % label)
 
@@ -267,18 +271,18 @@ func _expect_popup_selection_icons(theme: Theme, label: String) -> void:
 	var neocade_theme := theme as NeoCadeTheme
 	if neocade_theme != null and not neocade_theme.use_runtime_popup_selection_icons:
 		return
-	var accent := theme.get_color(&"checkbox_checked_color", &"CheckBox")
+	var active := theme.get_color(&"checkbox_checked_color", &"CheckBox")
 	var inactive := theme.get_color(&"checkbox_unchecked_color", &"CheckBox")
 	var popup_checked := _sample_icon(theme, &"PopupMenu", &"checked", Vector2i(6, 6))
 	var popup_unchecked := _sample_icon(theme, &"PopupMenu", &"unchecked", Vector2i(6, 6))
 	var popup_radio_checked := _sample_icon(theme, &"PopupMenu", &"radio_checked", Vector2i(12, 6))
 	var popup_radio_unchecked := _sample_icon(theme, &"PopupMenu", &"radio_unchecked", Vector2i(12, 12))
-	if _color_distance(popup_checked, accent) > 0.08:
-		_fail("%s PopupMenu checked icon should embed accent fill, got %s" % [label, popup_checked.to_html(true)])
+	if _color_distance(popup_checked, active) > 0.08:
+		_fail("%s PopupMenu checked icon should embed active toggle fill, got %s" % [label, popup_checked.to_html(true)])
 	if _color_distance(popup_unchecked, inactive) > 0.08:
 		_fail("%s PopupMenu unchecked icon should embed inactive fill, got %s" % [label, popup_unchecked.to_html(true)])
-	if _color_distance(popup_radio_checked, accent) > 0.08:
-		_fail("%s PopupMenu radio_checked icon should embed accent fill, got %s" % [label, popup_radio_checked.to_html(true)])
+	if _color_distance(popup_radio_checked, active) > 0.08:
+		_fail("%s PopupMenu radio_checked icon should embed active toggle fill, got %s" % [label, popup_radio_checked.to_html(true)])
 	if _color_distance(popup_radio_unchecked, inactive) > 0.08:
 		_fail("%s PopupMenu radio_unchecked icon should embed inactive fill, got %s" % [label, popup_radio_unchecked.to_html(true)])
 
@@ -297,6 +301,22 @@ func _sample_icon(theme: Theme, theme_type: StringName, slot: StringName, point:
 
 func _color_distance(a: Color, b: Color) -> float:
 	return absf(a.r - b.r) + absf(a.g - b.g) + absf(a.b - b.b) + absf(a.a - b.a)
+
+
+func _contrast_ratio(a: Color, b: Color) -> float:
+	var a_lum := _relative_luminance(a)
+	var b_lum := _relative_luminance(b)
+	var lighter: float = maxf(a_lum, b_lum)
+	var darker: float = minf(a_lum, b_lum)
+	return (lighter + 0.05) / (darker + 0.05)
+
+
+func _relative_luminance(c: Color) -> float:
+	return 0.2126 * _srgb_to_linear(c.r) + 0.7152 * _srgb_to_linear(c.g) + 0.0722 * _srgb_to_linear(c.b)
+
+
+func _srgb_to_linear(channel: float) -> float:
+	return channel / 12.92 if channel <= 0.03928 else pow((channel + 0.055) / 1.055, 2.4)
 
 
 func _fail(message: String) -> void:

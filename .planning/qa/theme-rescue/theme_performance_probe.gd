@@ -67,7 +67,7 @@ func _benchmark_regeneration_mutations() -> void:
 		{"name": "toggle raised temp cache", "call": func() -> void: theme.raised = not theme.raised},
 		{"name": "set style SLATE", "call": func() -> void: theme.style = NeoCadeTheme.Style.SLATE},
 		{"name": "set style PULSE", "call": func() -> void: theme.style = NeoCadeTheme.Style.PULSE},
-		{"name": "set base color", "call": func() -> void: theme.base_color = Color("#151B30")},
+		{"name": "set source color", "call": func() -> void: theme.source_color = Color("#A34DFF")},
 		{"name": "toggle popup icons", "call": func() -> void: theme.use_runtime_popup_selection_icons = not theme.use_runtime_popup_selection_icons},
 		{"name": "enable texture cache", "call": func() -> void: theme.texture_cache = true},
 		{"name": "toggle raised persistent cache", "call": func() -> void: theme.raised = not theme.raised},
