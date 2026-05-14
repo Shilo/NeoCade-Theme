@@ -19,20 +19,25 @@
       --selection: #315f87;
       --action: #d39a35;
       --menu: #3a6689;
-      --menu-edge: #8fc7ea;
+      --menu-boundary: transparent;
       --range: #62c86c;
-      --toggle: #54d987;
+      --toggle: #43d2bb;
       --positive: #42c784;
+      --warning: #c8793a;
+      --info: #3f9fd6;
       --danger: #c84a5c;
       --focus: #64c9ff;
       --separator: #324153;
       --code: #111c2b;
+      --text-selection: #315f87;
 
       --on-surface: #f4f8ff;
       --on-shell: #f4f8ff;
       --on-panel: #f0f6ff;
+      --on-dialog-header: #f0f6ff;
       --on-popup: #f0f6ff;
       --on-input: #f5fbff;
+      --on-input-edge: #0d1420;
       --on-list: #f2f7ff;
       --on-selection: #f7fbff;
       --on-action: #111722;
@@ -40,6 +45,8 @@
       --on-range: #0f2016;
       --on-toggle: #0f2016;
       --on-positive: #0f2016;
+      --on-warning: #111722;
+      --on-info: #0d1420;
       --on-danger: #fff7f8;
       --muted: #aebbd0;
       --radius: 0px;
@@ -175,7 +182,7 @@
     .icon-button.active {
       background: var(--menu);
       color: var(--on-menu);
-      box-shadow: inset 0 0 0 1px var(--menu-edge);
+      box-shadow: inset 0 0 0 1px var(--menu-boundary);
     }
 
     .workspace-tab {
@@ -337,7 +344,6 @@
       border-radius: var(--radius);
       background: var(--menu);
       color: var(--on-menu);
-      box-shadow: inset 0 0 0 1px var(--menu-edge);
       font-size: 12px;
       font-weight: 900;
     }
@@ -381,8 +387,8 @@
     .tool-button.active {
       background: var(--menu);
       color: var(--on-menu);
-      border-color: var(--menu-edge);
-      box-shadow: inset 0 0 0 1px var(--menu-edge);
+      border-color: var(--menu-boundary);
+      box-shadow: inset 0 0 0 1px var(--menu-boundary);
     }
 
     .tool-button.primary-tool {
@@ -552,7 +558,6 @@
       padding: 2px 4px;
       background: var(--menu);
       color: var(--on-menu);
-      box-shadow: inset 0 0 0 1px var(--menu-edge);
       font-weight: 900;
     }
 
@@ -562,8 +567,13 @@
     }
 
     .counter.warn {
-      background: var(--action);
-      color: var(--on-action);
+      background: var(--warning);
+      color: var(--on-warning);
+    }
+
+    .counter.info {
+      background: var(--info);
+      color: var(--on-info);
     }
 
     .counter.err {
@@ -610,7 +620,7 @@
       min-height: 30px;
       padding: 0 8px;
       background: var(--dialog-header);
-      color: var(--on-panel);
+      color: var(--on-dialog-header);
       border-left: 5px solid var(--selection);
       font-weight: 900;
     }
@@ -639,8 +649,8 @@
       justify-content: space-between;
       background: var(--menu);
       color: var(--on-menu);
-      border-color: var(--menu-edge);
-      box-shadow: inset 0 0 0 1px var(--menu-edge);
+      border-color: var(--menu-boundary);
+      box-shadow: inset 0 0 0 1px var(--menu-boundary);
     }
 
     .axis-chip {
@@ -649,7 +659,7 @@
       min-width: 18px;
       height: 18px;
       background: var(--input-edge);
-      color: var(--on-input);
+      color: var(--on-input-edge);
       font-size: 11px;
       font-weight: 900;
     }
@@ -736,7 +746,7 @@
 
     .port-row.menu .port {
       background: var(--menu);
-      border-color: var(--menu-edge);
+      border-color: color-mix(in srgb, var(--menu) 65%, #000);
     }
 
     .button-row {
@@ -758,7 +768,7 @@
     .button.menu {
       background: var(--menu);
       color: var(--on-menu);
-      border: 1px solid var(--menu-edge);
+      border: 1px solid var(--menu-boundary);
       box-shadow: 0 var(--depth) 0 color-mix(in srgb, var(--menu) 62%, #000);
     }
 
@@ -1033,7 +1043,7 @@
               </div>
             </section>
             <aside class="counters">
-              <span class="counter"><b>I</b> 2</span>
+              <span class="counter info"><b>I</b> 2</span>
               <span class="counter warn"><b>W</b> 1</span>
               <span class="counter ok"><b>OK</b> 8</span>
               <span class="counter"><b>FX</b> 3</span>
@@ -1156,7 +1166,7 @@
         depth: "3px",
         darkText: "#0d1420",
         lightText: "#f5f9ff",
-        note: "Pulse keeps LDtk spirit through stable roles: amber action, blue menu/input/selection, green range/toggle.",
+        note: "Pulse keeps LDtk spirit through stable roles: amber action, blue menu/input/selection, green range, aqua toggle, and green positive.",
         roles: {
           surface: ["#111827", .02, 5, .32, .09, .17],
           shell: ["#0b1220", .02, 5, .32, .06, .13],
@@ -1169,11 +1179,14 @@
           listPanel: ["#172333", .04, 8, .34, .10, .22],
           listHover: ["#233247", .06, 10, .36, .15, .29],
           selection: ["#447faf", .10, 16, .52, .34, .50],
+          textSelection: ["#447faf", .08, 12, .50, .34, .50],
           action: ["#d39a35", .08, 12, .76, .44, .62],
           menu: ["#3a6689", .12, 18, .52, .27, .45],
           range: ["#62c86c", .12, 20, .72, .40, .60],
-          toggle: ["#54d987", .12, 20, .72, .40, .60],
+          toggle: ["#43d2bb", .12, 20, .72, .40, .60],
           positive: ["#42c784", .08, 12, .72, .36, .58],
+          warning: ["#c8793a", .025, 4, .70, .36, .54],
+          info: ["#3f9fd6", .08, 12, .66, .34, .56],
           danger: ["#c84a5c", .01, 2, .68, .32, .48, true],
           focus: ["#64c9ff", .16, 24, .76, .48, .68],
           separator: ["#324153", .04, 8, .30, .20, .36],
@@ -1187,7 +1200,7 @@
         depth: "3px",
         darkText: "#0d1715",
         lightText: "#f4fffb",
-        note: "Daybreak uses coastal roles: gold actions, teal menus/selection, mint range and toggle, calm teal inputs.",
+        note: "Daybreak uses coastal roles: gold actions, blue-teal menus, teal selection, mint range, aqua toggle, calm teal inputs.",
         roles: {
           surface: ["#0f1f24", .03, 6, .34, .08, .17],
           shell: ["#0a171b", .03, 6, .34, .06, .13],
@@ -1200,11 +1213,14 @@
           listPanel: ["#152a31", .04, 8, .34, .10, .22],
           listHover: ["#204047", .06, 10, .36, .16, .29],
           selection: ["#3f8f84", .12, 18, .50, .34, .50],
+          textSelection: ["#3f8f84", .08, 12, .48, .34, .50],
           action: ["#d8a233", .07, 12, .76, .44, .62],
-          menu: ["#2f746f", .12, 18, .52, .25, .44],
+          menu: ["#2d6f7a", .12, 18, .52, .25, .44],
           range: ["#63d6a1", .18, 28, .72, .40, .62],
-          toggle: ["#57df8c", .14, 20, .72, .40, .60],
+          toggle: ["#48d6bf", .14, 20, .72, .40, .60],
           positive: ["#42c983", .08, 12, .72, .36, .58],
+          warning: ["#c87f34", .025, 4, .70, .36, .54],
+          info: ["#43a8d5", .08, 12, .66, .34, .56],
           danger: ["#c74a59", .01, 2, .68, .32, .48, true],
           focus: ["#7cead1", .18, 28, .74, .48, .70],
           separator: ["#31535d", .04, 8, .30, .20, .36],
@@ -1218,7 +1234,7 @@
         depth: "2px",
         darkText: "#0e141c",
         lightText: "#f6f9ff",
-        note: "Slate is restrained utility: graphite surfaces, icy blue action/selection, steel menu, mint range/toggle.",
+        note: "Slate is restrained utility: graphite surfaces, icy selection, champagne action, steel menu, mint state controls.",
         roles: {
           surface: ["#111620", .02, 5, .22, .08, .16],
           shell: ["#0b1018", .02, 5, .22, .06, .12],
@@ -1231,11 +1247,14 @@
           listPanel: ["#171f2a", .04, 8, .28, .10, .22],
           listHover: ["#232f3f", .05, 9, .30, .15, .29],
           selection: ["#4a7fa6", .10, 16, .46, .34, .50],
-          action: ["#68b7ea", .12, 18, .60, .40, .60],
+          textSelection: ["#4a7fa6", .08, 12, .44, .34, .50],
+          action: ["#d6b47a", .07, 10, .56, .48, .66],
           menu: ["#4d668c", .10, 14, .42, .28, .46],
           range: ["#7bd2cc", .14, 22, .58, .42, .62],
-          toggle: ["#78dba5", .12, 18, .62, .42, .62],
+          toggle: ["#78d8b4", .12, 18, .62, .42, .62],
           positive: ["#65c98f", .08, 12, .62, .38, .58],
+          warning: ["#c79255", .025, 4, .62, .36, .54],
+          info: ["#5aa4d4", .08, 12, .58, .34, .56],
           danger: ["#c45161", .01, 2, .64, .32, .48, true],
           focus: ["#8bd3ff", .18, 26, .66, .50, .72],
           separator: ["#354354", .04, 8, .24, .21, .36],
@@ -1249,7 +1268,7 @@
         depth: "4px",
         darkText: "#15101d",
         lightText: "#fff8ff",
-        note: "Burst keeps reward color in roles: gold action, violet menu/selection, lime range, green toggle.",
+        note: "Burst keeps reward color in roles: gold action, violet menu/selection, lime range, aqua toggle, green positive.",
         roles: {
           surface: ["#171326", .02, 5, .34, .08, .17],
           shell: ["#100d1d", .02, 5, .34, .06, .13],
@@ -1262,11 +1281,14 @@
           listPanel: ["#1d172d", .04, 8, .34, .10, .22],
           listHover: ["#2d2541", .05, 9, .36, .15, .29],
           selection: ["#8a6fc0", .10, 16, .54, .42, .58],
+          textSelection: ["#8a6fc0", .08, 12, .52, .42, .58],
           action: ["#e0a637", .06, 10, .78, .44, .62],
           menu: ["#5d4a87", .10, 14, .54, .28, .46],
           range: ["#75d94f", .12, 20, .72, .40, .60],
-          toggle: ["#58de83", .12, 20, .72, .40, .60],
+          toggle: ["#4fd6ac", .12, 20, .72, .40, .60],
           positive: ["#45c978", .08, 12, .72, .36, .58],
+          warning: ["#d66f3b", .025, 4, .72, .36, .54],
+          info: ["#45aedc", .08, 12, .70, .34, .56],
           danger: ["#c84862", .01, 2, .68, .32, .48, true],
           focus: ["#5fd2ff", .16, 26, .74, .48, .70],
           separator: ["#423654", .04, 8, .30, .20, .36],
@@ -1280,7 +1302,7 @@
         depth: "5px",
         darkText: "#151923",
         lightText: "#ffffff",
-        note: "Bubble stays flat mobile-game UI: dark shell, light islands, blue action, lavender menu, sky selection, green controls.",
+        note: "Bubble stays flat mobile-game UI: dark shell, light islands, blue action, lavender menu, sky selection, aqua range/toggle, green positive.",
         roles: {
           surface: ["#184071", .04, 8, .50, .18, .34],
           shell: ["#12315c", .04, 8, .52, .14, .28],
@@ -1293,11 +1315,14 @@
           listPanel: ["#fff4df", .03, 6, .30, .90, .98],
           listHover: ["#e8f5ff", .08, 12, .24, .86, .96],
           selection: ["#236f9f", .10, 14, .58, .22, .38],
+          textSelection: ["#236f9f", .08, 12, .54, .22, .38],
           action: ["#259bd8", .12, 18, .66, .34, .54],
           menu: ["#8ca7d9", .08, 12, .44, .58, .76],
-          range: ["#238b4e", .08, 12, .68, .28, .44],
-          toggle: ["#1f8f42", .08, 12, .68, .28, .44],
+          range: ["#13a7a1", .08, 12, .68, .30, .48],
+          toggle: ["#2c9e70", .08, 12, .68, .30, .48],
           positive: ["#238f49", .06, 10, .68, .28, .44],
+          warning: ["#e8b830", .025, 4, .78, .46, .64],
+          info: ["#259bd8", .08, 12, .66, .34, .54],
           danger: ["#ca3f5f", .01, 2, .70, .34, .50, true],
           focus: ["#00679e", .14, 22, .70, .24, .40],
           separator: ["#a2b7c9", .04, 8, .24, .56, .76],
@@ -1308,9 +1333,9 @@
 
     const roleNames = [
       "surface", "shell", "panel", "panelAlt", "popup", "dialogHeader",
-      "input", "inputEdge", "listPanel", "listHover", "selection",
-      "action", "menu", "range", "toggle", "positive", "danger", "focus",
-      "separator", "code"
+      "input", "inputEdge", "listPanel", "listHover", "selection", "textSelection",
+      "action", "menu", "range", "toggle", "positive", "warning", "info", "danger",
+      "focus", "separator", "code"
     ];
 
     const cssNames = {
@@ -1318,26 +1343,31 @@
       dialogHeader: "dialog-header",
       inputEdge: "input-edge",
       listPanel: "list-panel",
-      listHover: "list-hover"
+      listHover: "list-hover",
+      textSelection: "text-selection"
     };
 
     const auditPairs = [
       ["surface_fill", "surface", "onSurface", 4.5],
       ["shell_fill", "shell", "onShell", 4.5],
       ["panel_fill", "panel", "onPanel", 4.5],
+      ["dialog_header", "dialogHeader", "onDialogHeader", 4.5],
       ["popup_shell", "popup", "onPopup", 4.5],
       ["input_fill", "input", "onInput", 4.5],
+      ["input_edge", "inputEdge", "onInputEdge", 4.5],
       ["list_panel_fill", "listPanel", "onList", 4.5],
       ["selection_fill", "selection", "onSelection", 4.5],
+      ["text_selection_fill", "textSelection", "onSelection", 4.5],
       ["action_fill", "action", "onAction", 4.5],
       ["menu_fill", "menu", "onMenu", 4.5],
-      ["menu_edge_vs_panel", "menuEdge", "panel", 3.0],
-      ["menu_edge_vs_panel_alt", "menuEdge", "panelAlt", 3.0],
-      ["menu_edge_vs_popup", "menuEdge", "popup", 3.0],
-      ["menu_edge_vs_menu_fill", "menuEdge", "menu", 1.5],
+      ["menu_visible_boundary_vs_panel", "menuVisibleBoundary", "panel", 3.0],
+      ["menu_visible_boundary_vs_panel_alt", "menuVisibleBoundary", "panelAlt", 3.0],
+      ["menu_visible_boundary_vs_popup", "menuVisibleBoundary", "popup", 3.0],
       ["range_fill", "range", "onRange", 4.5],
       ["toggle_fill", "toggle", "onToggle", 4.5],
       ["positive_fill", "positive", "onPositive", 4.5],
+      ["warning_fill", "warning", "onWarning", 4.5],
+      ["info_fill", "info", "onInfo", 4.5],
       ["danger_fill", "danger", "onDanger", 4.5],
       ["focus_ring_vs_panel", "focus", "panel", 3.0],
       ["input_edge_vs_input", "inputEdge", "input", 3.0],
@@ -1472,9 +1502,14 @@
       });
     }
 
-    function bestText(bg, dark, light) {
-      const candidates = [dark, light, "#05070b", "#ffffff"];
-      return candidates
+    function bestText(bg, dark, light, target = 4.5) {
+      const themed = [dark, light]
+        .map(color => ({ color, ratio: contrast(bg, color) }))
+        .sort((a, b) => b.ratio - a.ratio);
+      if (themed[0].ratio >= target) {
+        return themed[0].color;
+      }
+      return ["#05070b", "#ffffff"]
         .map(color => ({ color, ratio: contrast(bg, color) }))
         .sort((a, b) => b.ratio - a.ratio)[0].color;
     }
@@ -1529,8 +1564,10 @@
       palette.onSurface = bestText(palette.surface, config.darkText, config.lightText);
       palette.onShell = bestText(palette.shell, config.darkText, config.lightText);
       palette.onPanel = bestText(palette.panel, config.darkText, config.lightText);
+      palette.onDialogHeader = bestText(palette.dialogHeader, config.darkText, config.lightText);
       palette.onPopup = bestText(palette.popup, config.darkText, config.lightText);
       palette.onInput = bestText(palette.input, config.darkText, config.lightText);
+      palette.onInputEdge = bestText(palette.inputEdge, config.darkText, config.lightText);
       palette.onList = bestText(palette.listPanel, config.darkText, config.lightText);
       palette.onSelection = bestText(palette.selection, config.darkText, config.lightText);
       palette.onAction = bestText(palette.action, config.darkText, config.lightText);
@@ -1538,13 +1575,22 @@
       palette.onRange = bestText(palette.range, config.darkText, config.lightText);
       palette.onToggle = bestText(palette.toggle, config.darkText, config.lightText);
       palette.onPositive = bestText(palette.positive, config.darkText, config.lightText);
+      palette.onWarning = bestText(palette.warning, config.darkText, config.lightText);
+      palette.onInfo = bestText(palette.info, config.darkText, config.lightText);
       palette.onDanger = bestText(palette.danger, config.darkText, config.lightText);
-      palette.menuEdge = bestBoundary(
+      palette.menuBoundary = bestBoundary(
         palette.menu,
         [palette.panel, palette.panelAlt, palette.popup],
         config.darkText,
         config.lightText
       );
+      palette.menuNeedsBoundary = Math.min(
+        contrast(palette.menu, palette.panel),
+        contrast(palette.menu, palette.panelAlt),
+        contrast(palette.menu, palette.popup)
+      ) < 3.0;
+      palette.menuBoundaryCss = palette.menuNeedsBoundary ? palette.menuBoundary : "transparent";
+      palette.menuVisibleBoundary = palette.menuNeedsBoundary ? palette.menuBoundary : palette.menu;
       palette.muted = mix(palette.onPanel, palette.panel, .38);
       return palette;
     }
@@ -1564,16 +1610,20 @@
       setVar("on-surface", palette.onSurface);
       setVar("on-shell", palette.onShell);
       setVar("on-panel", palette.onPanel);
+      setVar("on-dialog-header", palette.onDialogHeader);
       setVar("on-popup", palette.onPopup);
       setVar("on-input", palette.onInput);
+      setVar("on-input-edge", palette.onInputEdge);
       setVar("on-list", palette.onList);
       setVar("on-selection", palette.onSelection);
       setVar("on-action", palette.onAction);
       setVar("on-menu", palette.onMenu);
-      setVar("menu-edge", palette.menuEdge);
+      setVar("menu-boundary", palette.menuBoundaryCss);
       setVar("on-range", palette.onRange);
       setVar("on-toggle", palette.onToggle);
       setVar("on-positive", palette.onPositive);
+      setVar("on-warning", palette.onWarning);
+      setVar("on-info", palette.onInfo);
       setVar("on-danger", palette.onDanger);
       setVar("muted", palette.muted);
       setVar("radius", config.radius);
@@ -1586,10 +1636,12 @@
     function renderSwatches(palette) {
       const swatches = document.getElementById("swatches");
       const visible = [
-        ["surface", "onSurface"], ["panel", "onPanel"], ["input", "onInput"],
-        ["listPanel", "onList"], ["selection", "onSelection"], ["action", "onAction"],
-        ["menu", "onMenu"], ["menuEdge", "onPanel"], ["range", "onRange"], ["toggle", "onToggle"],
-        ["positive", "onPositive"], ["danger", "onDanger"], ["focus", "onPanel"]
+        ["surface", "onSurface"], ["panel", "onPanel"], ["dialogHeader", "onDialogHeader"],
+        ["input", "onInput"], ["inputEdge", "onInputEdge"], ["listPanel", "onList"],
+        ["selection", "onSelection"], ["textSelection", "onSelection"], ["action", "onAction"],
+        ["menu", "onMenu"], ["menuBoundary", "onPanel"], ["range", "onRange"], ["toggle", "onToggle"],
+        ["positive", "onPositive"], ["warning", "onWarning"], ["info", "onInfo"],
+        ["danger", "onDanger"], ["focus", "onPanel"]
       ];
       swatches.innerHTML = visible.map(([bg, fg]) => {
         const fgColor = palette[fg] || palette.onPanel;
