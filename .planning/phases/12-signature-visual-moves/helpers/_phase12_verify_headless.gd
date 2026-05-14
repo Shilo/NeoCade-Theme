@@ -4,24 +4,24 @@ extends SceneTree
 ##   godot --headless --quit --script ".planning/phases/12-signature-visual-moves/helpers/_phase12_verify_headless.gd" -- --stage <stage>
 ##
 ## Stages (per 12-VALIDATION.md):
-##   architecture           — canonical .tres loads, BINDING_TABLE.size() == 37, TYPE_VARIATIONS not empty, @export count == 12
+##   architecture           — canonical .tres loads, BINDING_TABLE.size() == 154, TYPE_VARIATIONS not empty, @export count == 11
 ##   sc1-no-3d-when-flat    — SC#1: every selectable style at raised=false shows no depth strips (face == face_offset)
 ##   sc2-tabs-flat-when-raised — SC#2: every selectable style at raised=true keeps TabBar/TabContainer tab styleboxes flat
 ##   sc3-no-glow-halo       — SC#3: every generated stylebox has border_color.a in {0.0, 1.0}; no intermediate alphas
-##   sc6-export-count       — SC#6: script export count == 12
+##   sc6-export-count       — SC#6: script export count == 11
 ##   smoke-30               — 30-config regenerate sweep (defers to _phase12_smoke_matrix.gd)
 ##   full                   — all stages above except smoke-30 (run that separately)
 ##
 ## Exit code 0 = pass, 1 = fail. Marker prefix: `PHASE12_VERIFY:` for CI grep.
 
 const CANONICAL_TRES := "res://addons/neocade_theme/neocade_theme.tres"
-const EXPECTED_EXPORT_COUNT := 12
+const EXPECTED_EXPORT_COUNT := 11
 ## BINDING_TABLE.size() = 140 at pre-Phase-12 baseline (top-level theme_type keys).
 ## The historical "37 rows" note in CONTEXT.md referred to the Phase 4 scorecard Control count;
 ## subsequent phases (6, 7, 8, 9) added Editor types, TYPE_VARIATIONS-backed types, and
 ## additional Controls, growing the table to 140 by Phase 12.
-## Updated 2026-05-13 after current canonical-theme additions: BT is 150.
-const EXPECTED_BINDING_TABLE_ROWS := 150
+## Updated 2026-05-13 after source-color role rework: BT is 154.
+const EXPECTED_BINDING_TABLE_ROWS := 154
 
 const VALID_STAGES := [
 	"architecture",
@@ -122,7 +122,7 @@ func _stage_sc6() -> void:
 	if export_count != EXPECTED_EXPORT_COUNT:
 		_fail("sc6: @export count = %d (expected %d)" % [export_count, EXPECTED_EXPORT_COUNT])
 	else:
-		print("PHASE12_VERIFY: sc6 OK (12 exports)")
+		print("PHASE12_VERIFY: sc6 OK (11 exports)")
 
 
 func _stage_sc1() -> void:

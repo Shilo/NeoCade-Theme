@@ -6,7 +6,7 @@
 **Consumed by:** Phase 4 (`addons/neocade_theme/scripts/neocade_theme.gd` + canonical `.tres`), Phases 5-7 (Control coverage), Phase 8 (mobile branch), Phase 9 (showcase), Phase 12 (signature visual moves), Phase 13 (role variations).
 **Hard precondition:** Phase 4 may NOT begin until `/gsd-verify-work` of Phase 3.4 passes.
 
-This document is the **single source of truth** for token values, formulas, and the `NeoCadeTheme` class contract. It reflects the current implementation as of 2026-05-13: 12 public exports, one canonical resource, five built-in styles, and additive Phase 12/13 visual-role work. Historical Phase 4 text that referred to five peer `.tres` files is superseded here.
+This document is the **single source of truth** for token values, formulas, and the `NeoCadeTheme` class contract. It reflects the current implementation as of 2026-05-13: 11 public exports, one canonical resource, five built-in styles, and the Phase 14 source-color role-palette rework. Historical Phase 4 text that referred to five peer `.tres` files is superseded here.
 
 **Implemented color-identity rework note (2026-05-13):** the public color contract is now `style + source_color`. The old `base_color` / `accent_color` public API was removed intentionally without backwards compatibility. `.planning/research/THEME-COLOR-IDENTITY-RETHINK.md` and `.planning/phases/14-source-color-role-palette-rework/14-IMPLEMENTATION-PLAN.md` are the active authorities for color generation, preset `source_color` values, fill roles, and contrast-safe `on_*` foregrounds. Older base/accent tables and formulas in this document are historical unless explicitly restated in the Phase 14 source-color materials. Shape, spacing, flat/raised constraints, no-texture rules, and single-resource architecture remain binding until explicitly changed.
 
@@ -49,19 +49,19 @@ This document is the **single source of truth** for token values, formulas, and 
 
 ## §2 Approved final themes
 
-All five candidate directions from Phase 3.3 (Revision Round 2/2 dark-only) are approved for v1 ship as **built-in styles** on the single concrete `NeoCadeTheme` class. None deferred. All five satisfy WCAG 2.1 AA at body text against `base_color`.
+All five candidate directions from Phase 3.3 are approved for v1 ship as **built-in styles** on the single concrete `NeoCadeTheme` class. None deferred. Phase 14 replaced the old two-color public palette with a single `source_color` per style plus authored role anchors for each fill group.
 
-| Direction | base_color | accent_color | WCAG ratio (accent on base) | Personality | v1 ship status |
-|---|---|---|---|---|---|
-| Pulse    | `#151A2E` | `#8BFF6A` | 13.62:1 | Vibrant arcade hall — cabinet-bezel chrome, lit primaries, packed control deck | approved · **recommended starter** (Phase 4 implements first) |
-| Slate    | `#111820` | `#8BD3FF` | 10.94:1 | Premium dark default — restrained accent, quiet confident rounded chrome | approved · v1 personality variation |
-| Bubble   | `#241326` | `#FFB3E6` | 10.74:1 | Playful candy-counter at night — pillowy rounded chrome and cheerful warmth | approved · v1 personality variation |
-| Daybreak | `#0B2420` | `#76F2D1` | 11.96:1 | Fresh evening lobby — dark teal surfaces with bright mint wayfinding, airy spacing | approved · v1 personality variation |
-| Burst    | `#20112E` | `#FFD166` | 12.33:1 | Celebratory MD3 Expressive max — high-contrast statement primary, asymmetric mark, bold gold | approved · v1 personality variation |
+| Direction | preset `source_color` | Current color authority | Personality | v1 ship status |
+|---|---|---|---|---|
+| Pulse    | `#3AA8FF` | `STYLE_COLOR_STRATEGIES[Style.PULSE]` + readability probe | Vibrant arcade hall — cabinet-bezel chrome, lit primaries, packed control deck | approved · **recommended starter** |
+| Slate    | `#8BD3FF` | `STYLE_COLOR_STRATEGIES[Style.SLATE]` + readability probe | Premium dark default — restrained accent, quiet confident rounded chrome | approved · v1 personality variation |
+| Bubble   | `#57C7FF` | `STYLE_COLOR_STRATEGIES[Style.BUBBLE]` + readability probe | Playful flat-3D mobile-game shell with light readable islands | approved · v1 personality variation |
+| Daybreak | `#76F2D1` | `STYLE_COLOR_STRATEGIES[Style.DAYBREAK]` + readability probe | Fresh evening lobby — dark teal surfaces with mint wayfinding, airy spacing | approved · v1 personality variation |
+| Burst    | `#FFD166` | `STYLE_COLOR_STRATEGIES[Style.BURST]` + readability probe | Celebratory MD3 Expressive max — high-contrast statement primary, asymmetric mark, bold gold | approved · v1 personality variation |
 
 The old "v1 ships N user-approved theme `.tres` files" wording is superseded: v1 ships **one** canonical `.tres` with **five** user-approved built-in styles.
 
-**Direction integrity rule:** the five built-in style names, shape languages, spacing personalities, flat/raised behavior, no-texture constraints, and single-resource architecture remain locked. The historical `base_color`/`accent_color` palettes in this document describe the current shipped implementation, but they are no longer the authority for the approved color rework. `.planning/research/THEME-COLOR-IDENTITY-RETHINK.md` owns the next implementation's color generation, preset `source_color` values, and role-palette identity. Polish passes live in `STYLE_PERSONALITY` / `STYLE_EXPORTS` and BINDING_TABLE recipes, not as new public exports or ad hoc palette swaps.
+**Direction integrity rule:** the five built-in style names, shape languages, spacing personalities, flat/raised behavior, no-texture constraints, and single-resource architecture remain locked. The current color authority is `source_color` plus internal style-specific role palettes, not `base_color` / `accent_color`. Polish passes live in `STYLE_PERSONALITY`, `STYLE_EXPORTS`, `STYLE_COLOR_STRATEGIES`, and BINDING_TABLE recipes, not as new public exports or ad hoc palette swaps.
 
 ---
 
@@ -101,7 +101,7 @@ The export set is **intentionally minimal** — limited to values consumers shou
 | 1 | `style` | `Style` enum | Top level | `Style.PULSE` | `{BUBBLE, BURST, DAYBREAK, PULSE, SLATE, CUSTOM}`; built-in styles apply export values and hidden personality. |
 | 2 | `raised` | `bool` | Top level | `false` | `false` = flat MD3, `true` = extruded-flat where recipes opt in. |
 | 3 | `platform` | `Platform` enum | Top level | `Platform.AUTO` | `{DESKTOP=0, MOBILE=1, AUTO=2}`; AUTO resolves via `OS.has_feature("mobile")`. |
-| 4 | `source_color` | `Color` | Style Overrides | `#3AA8FF` | Single public color input; setter regenerates the per-style role palette and may switch to `CUSTOM` if it no longer matches a built-in style. |
+| 4 | `source_color` | `Color` | Style Overrides | `#3AA8FF` | Single public color input; setter regenerates the current style's role palette while preserving the selected built-in style identity. Shape/spacing overrides, not source-color edits, determine whether a preset still matches exactly. |
 | 5 | `corner_radius` | `int` | Style Overrides | `0` | px; integer pixels only. Built-in styles overwrite this through `STYLE_EXPORTS`. |
 | 6 | `spacing` | `int` | Style Overrides | `14` | px; base spacing value; mobile branch scales through platform tokens. |
 | 7 | `raised_strength` | `int` | Style Overrides | `2` | px multiplier for raised offsets when `raised=true`. |
@@ -160,10 +160,11 @@ Setters on every `@export` property trigger `_regenerate_theme()`:
 
 ## §5 Built-in style recipes
 
-Each entry below is the current built-in style recipe stored in `STYLE_EXPORTS` plus personality intent stored in `STYLE_PERSONALITY`. These are **not** separate `.tres` resources anymore; users select them through the `style` export on the canonical resource.
+Each entry below lists the public default values users see for a built-in style, plus personality intent stored in `STYLE_PERSONALITY`. The shape/color override subset (`source_color`, `corner_radius`, `spacing`, `raised_strength`, `focus_thickness`, `outline_width`) is stored in `STYLE_EXPORTS`; `raised` and `platform` remain top-level resource settings and are not reset by built-in style changes. These are **not** separate `.tres` resources anymore; users select them through the `style` export on the canonical resource.
 
-The style export values below are translated from `.planning/mockups/3.4/data/directions.json` plus later Phase 12 tuning:
-- `base_color` / `accent_color` from §2 (locked palettes).
+The style export values below are translated from `.planning/mockups/3.4/data/directions.json` plus later Phase 12/14 tuning:
+- `source_color` from `STYLE_EXPORTS`; fill colors come from `STYLE_COLOR_STRATEGIES` role anchors plus bounded source-color pull.
+- `raised` and `platform` are shown for the canonical starter defaults, but they are deliberately not part of `STYLE_EXPORTS`.
 - `corner_radius` = `axis_1_corner_radius_base_px` from `directions.json`.
 - `spacing` = current style export value used by the platform token branch.
 - `raised_strength` = current style export value; hidden per-style `shape.raised_depth_scale` and `shape.raised_depth_darken` handle Phase 12 depth personality.
@@ -174,8 +175,7 @@ The style export values below are translated from `.planning/mockups/3.4/data/di
 
 | `@export` | Value |
 |---|---|
-| `base_color` | `Color("#151A2E")` |
-| `accent_color` | `Color("#8BFF6A")` |
+| `source_color` | `Color("#3AA8FF")` |
 | `raised` | `false` |
 | `platform` | `Platform.AUTO` |
 | `corner_radius` | `0` |
@@ -203,8 +203,7 @@ The style export values below are translated from `.planning/mockups/3.4/data/di
 
 | `@export` | Value |
 |---|---|
-| `base_color` | `Color("#111820")` |
-| `accent_color` | `Color("#8BD3FF")` |
+| `source_color` | `Color("#8BD3FF")` |
 | `raised` | `false` |
 | `platform` | `Platform.AUTO` |
 | `corner_radius` | `8` |
@@ -230,8 +229,7 @@ The style export values below are translated from `.planning/mockups/3.4/data/di
 
 | `@export` | Value |
 |---|---|
-| `base_color` | `Color("#241326")` |
-| `accent_color` | `Color("#FFB3E6")` |
+| `source_color` | `Color("#57C7FF")` |
 | `raised` | `false` |
 | `platform` | `Platform.AUTO` |
 | `corner_radius` | `24` |
@@ -257,8 +255,7 @@ The style export values below are translated from `.planning/mockups/3.4/data/di
 
 | `@export` | Value |
 |---|---|
-| `base_color` | `Color("#0B2420")` |
-| `accent_color` | `Color("#76F2D1")` |
+| `source_color` | `Color("#76F2D1")` |
 | `raised` | `false` |
 | `platform` | `Platform.AUTO` |
 | `corner_radius` | `4` |
@@ -284,8 +281,7 @@ The style export values below are translated from `.planning/mockups/3.4/data/di
 
 | `@export` | Value |
 |---|---|
-| `base_color` | `Color("#20112E")` |
-| `accent_color` | `Color("#FFD166")` |
+| `source_color` | `Color("#FFD166")` |
 | `raised` | `false` |
 | `platform` | `Platform.AUTO` |
 | `corner_radius` | `12` |
@@ -311,7 +307,7 @@ The style export values below are translated from `.planning/mockups/3.4/data/di
 
 ## §6 Color formula and surface ramp contract
 
-These formulas are the production reference. They are translated from `.planning/mockups/3.4/src/neocade-mockups.js`'s `deriveSurfaceRamp(direction)` and `deriveTokens(direction, platform, raised)` functions and represent the visual contract approved at the Phase 3.4 final-approval gate. Phase 4 ports them into GDScript verbatim — same mix targets, same coefficients, same `is_light` branching.
+Phase 14 supersedes the old public `base_color + accent_color` formula path. The active production path is: `source_color` -> per-style authored role anchors -> bounded hue/saturation/lightness pull -> contrast-safe `on_*` text colors -> BINDING_TABLE recipes. The historical Phase 4 excerpts below are retained as provenance for mix helpers, state layers, and raised-depth behavior; do not treat `base_color` or `accent_color` as public or current.
 
 ### 6.1 Color mixing helpers (Phase 4 GDScript ports)
 
@@ -334,7 +330,7 @@ func _tint_toward_base(element: Color, base_c: Color, ratio: float = 0.40) -> Co
 
 ### 6.2 Surface ramp (5 stops + outline)
 
-Driven by `base_color` + the `axis_8_surface_spread` factor from `directions.json` (`narrow=0.7`, `medium=1.0`, `wide=1.3`). The `is_light` flag flips the elevated tier's mix target so containers stay distinguishable from the page color in both modes.
+Historically driven by `base_color`; currently driven by generated surface roles (`surface_fill`, `shell_fill`, `panel_fill`, `panel_alt_fill`, `popup_shell`, `dialog_header`) from `STYLE_COLOR_STRATEGIES`. The `is_light` flag is derived from `surface_fill` luminance so Bubble can keep a dark shell with light readable islands.
 
 ```gdscript
 # In _regenerate_theme():
@@ -355,7 +351,7 @@ var outline_color: Color   = _mix(base_color, elevate_target, 0.24 * spread_fact
 
 ### 6.3 Raised depth-edge color tokens (raised mode)
 
-When `raised = true`, raised elements use a hard bottom extrusion, not a soft shadow. Neutral/surface elements keep the rev-3 tinted-offset behavior: same family as the face, shifted toward `base_color` so panels and quiet chrome never collapse to near-black.
+When `raised = true`, raised elements use a hard bottom extrusion, not a soft shadow. Neutral/surface elements keep same-family depth edges; colored interactive and semantic faces use an HSV value-darken from the generated face color so undersides stay readable and do not collapse to black.
 
 ```gdscript
 var accent_offset: Color          = _tint_toward_base(accent_color, base_color)
@@ -418,16 +414,18 @@ var state_pressed: Color = _mix(base_color, Color.BLACK, abs(pressed_pct) / 100.
 
 | Role | Source | Notes |
 |---|---|---|
-| `role.primary` | generated from `source_color` as `selection_fill` / `role_primary` | Drives focus rings, selected tabs/rows, caret, links, and selection accents |
+| `role.primary` | generated from `source_color` as `selection_fill` / `role_primary` | Drives selected tabs/rows and legacy primary slots; focus rings use `focus_ring`, links use readable `link_text`, and text carets/selections use text-specific roles. |
 | `role.positive` | generated from `source_color` as `positive_fill` / `primary_action_fill` | Drives the single affirmative/high-emphasis `PrimaryButton` role |
-| `role.success` | derived green | Default `Color("#5CC971")`; styles may override internally |
+| `role.success` | alias of `positive_fill` | `PrimaryButton` consumes the positive role; there is no separate `PositiveButton` variation. |
 | `role.warning` | derived amber | Default `Color("#FFD166")`; directions may override |
 | `role.danger` | derived red | Default `Color("#FF6E6E")`; directions may override |
 | `role.info` | derived cyan/blue | Default `Color("#5FE3FF")`; directions may override |
 
-`accent_offset`, `accent_rim`, `primary_button_border`, and per-role raised depth offsets are derived in `_regenerate_theme()` from generated role fills, not from public `base_color` / `accent_color`.
+`primary_button_border`, `menu_boundary`, `input_edge`, and per-role raised depth offsets are derived in `_regenerate_theme()` from generated role fills, not from public `base_color` / `accent_color`.
 
-The active source-color role vocabulary is: `surface_fill`, `panel_fill`, `popup_shell`, `dialog_header`, `action_fill`, `menu_fill`, `input_fill`, `selection_fill`, `tab_selected_fill`, `range_fill`, `toggle_fill`, `positive_fill`, `danger_fill`, `separator_fill`, `link_text`, `focus_ring`, `raised_offset_*`, and conditional `success_fill`, `warning_fill`, `info_fill`. Slot-specific hover/pressed/disabled/read-only/scrollbar/check states derive from those aliases unless visual tests prove a new alias is necessary.
+The active source-color role vocabulary is: `surface_fill`, `shell_fill`, `panel_fill`, `panel_alt_fill`, `popup_shell`, `dialog_header`, `action_fill`, `menu_fill`, `input_fill`, `input_edge`, `list_panel_fill`, `list_row_hover`, `selection_fill`, `tab_selected_fill`, `tab_selected_indicator`, `text_selection_fill`, `range_fill`, `toggle_fill`, `positive_fill`, `danger_fill`, `warning_fill`, `info_fill`, `separator_fill`, `code_fill`, `link_text`, `link_text_hover`, `link_text_outline`, `link_icon`, `focus_ring`, `text_ambient`, `text_ambient_outline`, `text_default_outline`, and `raised_offset_*`. Slot-specific hover/pressed/disabled/read-only/scrollbar/check states derive from those aliases unless visual tests prove a new alias is necessary.
+
+Transparent text guardrail: known surfaces use explicit `on_*` foregrounds. Default transparent `Label`, `RichTextLabel`, `CheckBox`, and `CheckButton` use ambient shell-readable `text_ambient`; `text_ambient_outline` is transparent in normal single-polarity themes and becomes the opposite polarity only when Bubble-style light islands make a single fill color impossible. Text-only accent controls (`LinkButton`, `GhostButton`, and accent `Kicker`) use `link_text` plus `link_text_outline`, because one accent fill cannot pass 4.5:1 on both Bubble's navy shell and cream islands. `link_icon` targets the 3:1 non-text floor on ambient shell surfaces. `PanelLabel`, `DialogLabel`, `PanelRichTextLabel`, and `DialogRichTextLabel` remain the clean fill-only choices for known island/dialog surfaces.
 
 ### 7.2 M3 state-layer constants
 
@@ -436,7 +434,7 @@ Per TOKEN-09 + MD3-RESEARCH.md the M3 deterministic state-layer model is:
 | State | Layer opacity | Where applied |
 |---|---|---|
 | hover | 8% (overlay; specific delta per direction in §6.5) | `Button.hover` stylebox bg, `Tree.hover` stylebox, etc. |
-| focus | 12% overlay + 2px outer ring in `role.primary` | OUTSIDE corner radius (PITFALLS 1.1) |
+| focus | transparent fill + generated outer ring in `focus_ring` | OUTSIDE corner radius (PITFALLS 1.1) |
 | pressed | 12% overlay (specific delta per direction in §6.5) | `Button.pressed`, etc. |
 | dragged | 16% overlay | drag-source styling (Tree, ItemList, etc.) |
 | disabled | 38% text / 12% container | `font_color_disabled = text * 0.38`; container opacity 0.12 |
@@ -465,8 +463,8 @@ Phase 4 implements these in `_regenerate_theme()` by populating the explicit the
 
 - `focus_thickness` = ring thickness in px (per-direction; 2 for Pulse/Slate/Daybreak, 3 for Bubble/Burst).
 - `focus_offset` (internal style personality) = gap between bg edge and ring start. 0 for Pulse (tight cabinet ring); 2 for Slate/Bubble/Daybreak; 1 for Burst.
-- Ring color = `accent_color` (= `role.primary`).
-- Ring stylebox = `StyleBoxFlat` with transparent bg, `border_width_*` = `focus_thickness`, border color = `accent_color`, `expand_margin_*` = `focus_offset`. Drawn OUTSIDE corner radius bounds (PITFALLS 1.1).
+- Ring color = generated `focus_ring`.
+- Ring stylebox = `StyleBoxFlat` with transparent bg, `border_width_*` = `focus_thickness`, border color = `focus_ring`, `expand_margin_*` = `focus_offset`. Drawn OUTSIDE corner radius bounds (PITFALLS 1.1).
 
 ### 8.3 Outline width
 
@@ -571,7 +569,7 @@ Bubble intentionally gets the chunkiest 5px/4px candy-game underside, but the 32
 
 ### 9.4 Optional top rim highlight (raised primary buttons)
 
-Per MOCKUP-REVISION-2-HANDOFF.md Issue 2 optional recommendation, raised primary buttons MAY use a 1px lighter top rim (`accent_rim = _mix(accent_color, Color.WHITE, 0.5)`) for an "inner highlight" reading. Implemented as `border_width_top = 1` + `border_color = accent_rim`. Optional; Phase 4 evaluates per-direction whether the rim improves readability or competes with the focus ring.
+Raised colored controls may use a 1px lighter top rim derived from the generated face/edge color for an "inner highlight" reading. This remains optional per recipe; readability and focus-ring separation take priority over decorative rim contrast.
 
 ---
 
@@ -611,7 +609,7 @@ Per Phase 3.2 strict feasibility verifier (VERIFY-RESULTS.md), `web_android` / `
 
 ```gdscript
 func _regenerate_theme() -> void:
-    is_light = base_color.get_luminance() >= 0.5
+    is_light = surface_fill.get_luminance() >= 0.5
     var p: Platform = _resolve_platform()
     var tokens: Dictionary = _platform_tokens(p)  # returns table from §10.1
     # ... use tokens.buttonMin, tokens.body, etc. when authoring entries ...
@@ -633,7 +631,7 @@ Per architecture revision 2026-05-04, 2026-05-08 style consolidation, and 2026-0
 |---|---|---|
 | AA body text | 4.5:1 | text_default / text_strong on every surface ramp stop; verified in `wcag-palette-audit.md` |
 | AA large text | 3:1 | display-* / headline-* sizes |
-| AAA body text | 7:1 | aspirational; Pulse 13.62:1, Slate 10.94:1, Bubble 10.74:1, Daybreak 11.96:1, Burst 12.33:1 — all directions exceed AAA on accent-on-base |
+| AAA body text | 7:1 | aspirational for broad surfaces; Phase 14 readability probes enforce AA everywhere and prefer higher contrast for large text-heavy areas. |
 
 ### 11.2 Tap-target floors (mobile)
 
@@ -672,8 +670,8 @@ The anti-cyberpunk discipline is preserved (Phase 3 redirect 2026-05-04). The ea
 ### 12.1 Files that exist now
 
 1. `addons/neocade_theme/scripts/neocade_theme.gd` — `@tool class_name NeoCadeTheme extends Theme` with the 11 `@export` properties, setters → `_regenerate_theme()`, `is_light` derivation, `STYLE_EXPORTS`, `STYLE_PERSONALITY`, source-color role strategies, `TYPE_VARIATIONS`, and `BINDING_TABLE`.
-2. `addons/neocade_theme/neocade_theme.tres` — canonical `NeoCadeTheme` resource with `style = PULSE` and the 12 serialized exports.
-3. `addons/neocade_theme/scripts/neocade_theme_option_button.gd` — reusable style picker that duplicates the canonical resource, sets `style`, applies it to a target Control, and can emit `null` for the `None` entry.
+2. `addons/neocade_theme/neocade_theme.tres` — canonical `NeoCadeTheme` resource with `style = PULSE` and the 11 serialized exports.
+3. `addons/neocade_theme/scripts/neocade_theme_option_button.gd` — reusable style picker that duplicates the canonical resource, sets `style`, applies the built-in style's `STYLE_EXPORTS` preset to a target Control, preserves independent `raised` / `platform` / Advanced toggle axes from any existing target `NeoCadeTheme`, and can emit `null` for the `None` entry.
 4. `addons/neocade_theme/scripts/neocade_theme_autoload.gd` — optional drop-in autoload that calls `NeoCadeTheme.apply_globally()` and merges the canonical theme into `ThemeDB.default_theme`.
 
 Plus package metadata files (`LICENSE.md`, `README.md`, `docs/usage.md`, `CHANGELOG.md`, `VERSION`) and bundled font license `addons/neocade_theme/fonts/inter_ofl.txt` per FOUND-01.
@@ -690,11 +688,11 @@ Plus package metadata files (`LICENSE.md`, `README.md`, `docs/usage.md`, `CHANGE
 ### 12.3 Verification checkpoints
 
 The implementation is considered current when:
-- All 12 `@export` properties exist on `NeoCadeTheme` with the correct types, defaults, group labels, and setter wiring.
-- `is_light` flag is computed correctly from `base_color.get_luminance()` and branches all conditional formulas.
+- All 11 `@export` properties exist on `NeoCadeTheme` with the correct types, defaults, group labels, and setter wiring.
+- `is_light` flag is computed correctly from the generated surface role luminance and branches all conditional formulas.
 - `_regenerate_theme()` populates entries for the canonical 37-row Control scorecard plus additive runtime/editor integration types without errors.
 - The canonical `.tres` loads as `NeoCadeTheme`, defaults to Pulse, and can switch to Slate/Bubble/Daybreak/Burst/Custom through `style`.
-- Toggling `style` / `raised` / `platform` / `base_color` / `accent_color` produces correctly regenerated entries.
+- Toggling `style` / `raised` / `platform` / `source_color` produces correctly regenerated entries.
 - No theme-default-overlay errors at editor or runtime load time.
 - WCAG audit re-runs against the implemented theme produce the same ratios as `wcag-palette-audit.md`.
 

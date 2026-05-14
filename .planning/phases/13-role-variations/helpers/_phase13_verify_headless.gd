@@ -4,7 +4,7 @@ extends SceneTree
 ##   godot --headless --quit --script ".planning/phases/13-role-variations/helpers/_phase13_verify_headless.gd" -- --stage <stage>
 ##
 ## Stages (per 13-VALIDATION.md):
-##   architecture                     — canonical .tres loads, BINDING_TABLE.size() == 150, TYPE_VARIATIONS == 62, @export == 12
+##   architecture                     — canonical .tres loads, BINDING_TABLE.size() == 154, TYPE_VARIATIONS == 66, @export == 11
 ##   role-variations-registered       — SC#2 part 1: 9 new keys exist in TYPE_VARIATIONS + live theme registries
 ##   role-variations-in-showcase      — SC#2 part 2: showcase.tscn contains 9 nodes with the expected theme_type_variation
 ##   default-chrome-unchanged         — SC#3: Label.font_color and PanelContainer.panel resolve to non-role-color values
@@ -15,9 +15,9 @@ extends SceneTree
 
 const CANONICAL_TRES := "res://addons/neocade_theme/neocade_theme.tres"
 const SHOWCASE_SCENE := "res://showcase/showcase.tscn"
-const EXPECTED_EXPORT_COUNT := 12
-const EXPECTED_BINDING_TABLE_ROWS := 150  # Current live implementation count as of 2026-05-13.
-const EXPECTED_TYPE_VARIATIONS_COUNT := 62  # Current live implementation count as of 2026-05-13.
+const EXPECTED_EXPORT_COUNT := 11
+const EXPECTED_BINDING_TABLE_ROWS := 154  # Current live implementation count as of 2026-05-13 source-color role rework.
+const EXPECTED_TYPE_VARIATIONS_COUNT := 66  # Current live implementation count as of 2026-05-13 source-color role rework.
 const PHASE_13_NEW_LABEL_VARIATIONS := ["SuccessLabel", "WarningLabel", "DangerLabel", "InfoLabel"]
 const PHASE_13_NEW_PANEL_VARIATIONS := ["AccentPanel", "InfoPanel", "WarningPanel", "DangerPanel", "SuccessPanel"]
 const PHASE_13_ROLE_KEYS_FOR_LABELS := {
@@ -192,20 +192,19 @@ func _stage_default_chrome_unchanged() -> void:
 	var theme: NeoCadeTheme = _fresh_theme()
 	if theme == null:
 		return
-	# Phase 13 role-token literal defaults (per RESEARCH.md Example 4 lines 668-672).
-	var role_success := Color("#5CC971")
-	var role_warning := Color("#FFD166")
-	var role_danger  := Color("#FF6E6E")
-	var role_info    := Color("#5FE3FF")
 	for style_value in NeoCadeTheme.selectable_styles():
 		theme.style = style_value
+		# Role label font colors are contrast-adjusted text colors; the raw semantic
+		# role fills live in fill_color as machine-readable metadata for audits.
+		var role_success: Color = theme.get_color("fill_color", "SuccessLabel")
+		var role_warning: Color = theme.get_color("fill_color", "WarningLabel")
+		var role_danger: Color = theme.get_color("fill_color", "DangerLabel")
+		var role_info: Color = theme.get_color("fill_color", "InfoLabel")
 		var default_label_color: Color = theme.get_color("font_color", "Label")
-		# role_primary == accent_color (per-style). Compare against accent_color too.
 		if default_label_color.is_equal_approx(role_success) \
 				or default_label_color.is_equal_approx(role_warning) \
 				or default_label_color.is_equal_approx(role_danger) \
-				or default_label_color.is_equal_approx(role_info) \
-				or default_label_color.is_equal_approx(theme.accent_color):
+				or default_label_color.is_equal_approx(role_info):
 			_fail("default-chrome-unchanged: style=%s Label.font_color resolves to a role color (%s) — SC#3 violation" % [NeoCadeTheme.style_label(style_value), default_label_color])
 		# Default PanelContainer.panel.bg_color must NOT equal any role color (rgb-only,
 		# ignoring alpha — the panel may legitimately carry `shape.surface_alpha_panels`).
@@ -216,8 +215,7 @@ func _stage_default_chrome_unchanged() -> void:
 			if panel_rgb.is_equal_approx(Color(role_success.r, role_success.g, role_success.b, 1.0)) \
 					or panel_rgb.is_equal_approx(Color(role_warning.r, role_warning.g, role_warning.b, 1.0)) \
 					or panel_rgb.is_equal_approx(Color(role_danger.r, role_danger.g, role_danger.b, 1.0)) \
-					or panel_rgb.is_equal_approx(Color(role_info.r, role_info.g, role_info.b, 1.0)) \
-					or panel_rgb.is_equal_approx(Color(theme.accent_color.r, theme.accent_color.g, theme.accent_color.b, 1.0)):
+					or panel_rgb.is_equal_approx(Color(role_info.r, role_info.g, role_info.b, 1.0)):
 				_fail("default-chrome-unchanged: style=%s PanelContainer.panel bg_color resolves to a role color (%s) — SC#3 violation" % [NeoCadeTheme.style_label(style_value), panel_bg])
 	# WR-01 gate: only print OK when no failures were recorded in this stage.
 	if _failures.is_empty():

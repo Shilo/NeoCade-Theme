@@ -8,15 +8,17 @@ Scope: exact resolved preset colors for the active Option B role-group mockup.
 - Option B: role-group palette.
 - Option A conservative baseline is deferred.
 - `category_1_fill` through `category_6_fill` are rejected research, not implementation targets.
-- `menu_boundary` is an internal provisional derived boundary. It is not a public fill token and is only visible when `menu_fill` fails the 3:1 surrounding-panel separation target.
+- `menu_boundary` is an internal provisional derived boundary. It is not a public fill token and resolves to transparent when `menu_fill` already passes the 3:1 surrounding-panel separation target.
 - `PrimaryButton` consumes `positive_fill`; there is no separate `PositiveButton`. `DangerButton` consumes `danger_fill`; there is no duplicate `NegativeButton`.
 - `success_fill` aliases `positive_fill` for v1 unless a future status-specific need requires a split.
 
 ## Audit Snapshot
 
-- Audit result: `PASS 5 themes x 9 sources x 26 audit pairs`.
+- Audit target: all five preset themes plus nine source-color stress values per style.
 - Text-bearing fills target 4.5:1. Required non-text boundaries/indicators target 3:1.
+- The readability probe also checks large-surface subtlety, non-danger red avoidance, `Tree.panel`'s editor-resource-picker exception, menu boundary contrast, source-color responsiveness across role groups, transparent-text ambient/shell fallbacks, selected graph-frame title text, and toggle/positive separation.
 - Foregrounds prefer the theme dark/light foreground when it passes; pure black/white is fallback only.
+- Bubble's default transparent text uses ambient-shell-readable fill plus an opposite outline for light islands because one fill cannot pass 4.5:1 on both navy shell and cream panels. Known panel/dialog/code controls still use clean `on_*` fill colors.
 
 ## Pulse
 
@@ -39,9 +41,13 @@ Mood: Pulse keeps LDtk spirit through stable roles: amber action, blue menu/inpu
 | `list_row_hover` | `#23344B` | #F5F9FF |
 | `selection_fill` | `#4081B6` | #05070B |
 | `text_selection_fill` | `#4180B4` | #05070B |
+| `link_text` | `#4F8ABB` | ambient text with outline fallback |
+| `link_text_hover` | `#788691` | ambient text with outline fallback |
+| `link_text_outline` | `#FFFFFF` | transparent/opposite outline as needed |
+| `link_icon` | `#4081B6` | 3:1 ambient non-text target |
 | `action_fill` | `#D6BC34` | #0D1420 |
 | `menu_fill` | `#4F8BB7` | #0D1420 |
-| `menu_boundary internal` | `#84AECE` | inactive for preset, 4.06:1 visible boundary vs panel_fill |
+| `menu_boundary internal` | transparent | face passes; candidate `#84AECE` if a boundary is needed |
 | `range_fill` | `#5ECD7B` | #0D1420 |
 | `toggle_fill` | `#40D6C9` | #0D1420 |
 | `positive_fill / success_fill` | `#40CA8F` | #0D1420 |
@@ -71,9 +77,13 @@ Mood: Daybreak uses coastal roles: gold actions, blue-teal menus, teal selection
 | `list_row_hover` | `#23444A` | #F4FFFB |
 | `selection_fill` | `#3D978A` | #0D1715 |
 | `text_selection_fill` | `#3E9588` | #0D1715 |
+| `link_text` | `#3D978A` | ambient text with outline fallback |
+| `link_text_hover` | `#389489` | ambient text with outline fallback |
+| `link_text_outline` | `#FFFFFF` | transparent/opposite outline as needed |
+| `link_icon` | `#3D978A` | 3:1 ambient non-text target |
 | `action_fill` | `#D9BB34` | #0D1715 |
 | `menu_fill` | `#38A6AD` | #0D1715 |
-| `menu_boundary internal` | `#87CBCE` | inactive for preset, 4.56:1 visible boundary vs panel_fill |
+| `menu_boundary internal` | transparent | face passes; candidate `#87CBCE` if a boundary is needed |
 | `range_fill` | `#62DAA7` | #0D1715 |
 | `toggle_fill` | `#49D9BF` | #0D1715 |
 | `positive_fill / success_fill` | `#42CB87` | #0D1715 |
@@ -103,9 +113,13 @@ Mood: Slate is restrained utility: graphite surfaces, icy selection, champagne a
 | `list_row_hover` | `#243243` | #F6F9FF |
 | `selection_fill` | `#4683AF` | #0E141C |
 | `text_selection_fill` | `#4782AD` | #05070B |
+| `link_text` | `#4D88B2` | ambient text with outline fallback |
+| `link_text_hover` | `#5685A9` | ambient text with outline fallback |
+| `link_text_outline` | `#FFFFFF` | transparent/opposite outline as needed |
+| `link_icon` | `#4683AF` | 3:1 ambient non-text target |
 | `action_fill` | `#D8C578` | #0E141C |
 | `menu_fill` | `#5982B0` | #0E141C |
-| `menu_boundary internal` | `#8BA8C9` | inactive for preset, 3.81:1 visible boundary vs panel_fill |
+| `menu_boundary internal` | transparent | face passes; candidate `#8BA8C9` if a boundary is needed |
 | `range_fill` | `#6AD3D2` | #0E141C |
 | `toggle_fill` | `#65D7B7` | #0E141C |
 | `positive_fill / success_fill` | `#5DCB94` | #0E141C |
@@ -135,9 +149,13 @@ Mood: Burst keeps reward color in roles: gold action, violet menu/selection, lim
 | `list_row_hover` | `#322545` | #FFF8FF |
 | `selection_fill` | `#9A65C2` | #05070B |
 | `text_selection_fill` | `#9666C1` | #05070B |
+| `link_text` | `#A069C9` | ambient text with outline fallback |
+| `link_text_hover` | `#8B7E95` | ambient text with outline fallback |
+| `link_text_outline` | `#FFFFFF` | transparent/opposite outline as needed |
+| `link_icon` | `#9A65C2` | 3:1 ambient non-text target |
 | `action_fill` | `#E2A737` | #15101D |
 | `menu_fill` | `#A260BE` | #05070B |
-| `menu_boundary internal` | `#C091D3` | inactive for preset, 3.77:1 visible boundary vs panel_fill |
+| `menu_boundary internal` | transparent | face passes; candidate `#C091D3` if a boundary is needed |
 | `range_fill` | `#87DD4E` | #15101D |
 | `toggle_fill` | `#4EDA8D` | #15101D |
 | `positive_fill / success_fill` | `#44CD66` | #15101D |
@@ -167,14 +185,18 @@ Mood: Bubble stays flat mobile-game UI: dark shell, light islands, blue action, 
 | `list_row_hover` | `#EEF2F5` | #151923 |
 | `selection_fill` | `#296E99` | #FFFFFF |
 | `text_selection_fill` | `#2A678D` | #FFFFFF |
+| `link_text` | `#72B5DF` | ambient text with dark outline fallback on light islands |
+| `link_text_hover` | `#A5AFB6` | ambient text with dark outline fallback on light islands |
+| `link_text_outline` | `#000000` | opposite outline for cream islands |
+| `link_icon` | `#4394C6` | 3:1 ambient non-text target |
 | `action_fill` | `#2D9BD4` | #151923 |
 | `menu_fill` | `#5C79B0` | #05070B |
-| `menu_boundary internal` | `#455A83` | inactive for preset, 3.86:1 visible boundary vs panel_fill |
+| `menu_boundary internal` | transparent | face passes; candidate `#455A83` if a boundary is needed |
 | `range_fill` | `#1A8B8A` | #05070B |
 | `toggle_fill` | `#229370` | #151923 |
 | `positive_fill / success_fill` | `#229351` | #05070B |
 | `warning_fill` | `#E6C333` | #151923 |
-| `info_fill` | `#2C9BD4` | #151923 |
+| `info_fill` | `#28A7C6` | #151923 |
 | `danger_fill` | `#C8375C` | #FFFFFF |
 | `focus_ring` | `#19668E` | #151923 |
 

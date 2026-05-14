@@ -139,12 +139,19 @@ func _apply_theme(index: int) -> void:
 		theme_selected.emit(null, index)
 		return
 
-	if _target_has_style(target, selected_style):
+	if _target_matches_style_preset(target, selected_style):
 		return
 
 	var next_theme := _theme_for_style(selected_style)
 	if next_theme == null:
 		return
+
+	var current_theme := target.theme as NeoCadeTheme
+	if current_theme != null:
+		next_theme.raised = current_theme.raised
+		next_theme.platform = current_theme.platform
+		next_theme.use_runtime_popup_selection_icons = current_theme.use_runtime_popup_selection_icons
+		next_theme.texture_cache = current_theme.texture_cache
 
 	target.theme = next_theme
 	theme_selected.emit(next_theme, index)
@@ -243,6 +250,25 @@ func _index_for_style(style_value: int) -> int:
 func _target_has_style(target: Control, style_value: int) -> bool:
 	var neocade_theme := target.theme as NeoCadeTheme
 	return neocade_theme != null and neocade_theme.style == style_value
+
+
+func _target_matches_style_preset(target: Control, style_value: int) -> bool:
+	var neocade_theme := target.theme as NeoCadeTheme
+	if neocade_theme == null or neocade_theme.style != style_value:
+		return false
+
+	var preset := _theme_for_style(style_value)
+	if preset == null:
+		return false
+
+	return (
+		neocade_theme.source_color.is_equal_approx(preset.source_color)
+		and neocade_theme.corner_radius == preset.corner_radius
+		and neocade_theme.spacing == preset.spacing
+		and neocade_theme.raised_strength == preset.raised_strength
+		and neocade_theme.focus_thickness == preset.focus_thickness
+		and neocade_theme.outline_width == preset.outline_width
+	)
 
 
 func _theme_target() -> Control:

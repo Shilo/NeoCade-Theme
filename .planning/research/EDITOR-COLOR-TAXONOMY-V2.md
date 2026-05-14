@@ -28,6 +28,7 @@ NeoCade lesson:
 - Generate roles, not direct component hexes.
 - Every text-bearing fill gets its own `on_*` from the final fill.
 - Broad surfaces should mostly come from neutral/surface roles, while primary/tertiary style color appears in smaller interactive states.
+- Text-only accent roles need their own readable foreground token. In Bubble-style mixed polarity palettes, the theme uses `link_text` plus `link_text_outline` instead of raw `role_primary`, because no single accent foreground can satisfy 4.5:1 on both the navy shell and cream panels.
 
 Sources:
 
@@ -316,6 +317,7 @@ These names may appear in implementation mapping tables, but they are not separa
 - `tab_selected_indicator` aliases `action_fill`.
 - `text_selection_fill` is a dedicated derived role near `selection_fill` because dense text selection needs its own contrast audit.
 - `menu_boundary` is an internal derived boundary from `menu_fill`, visible only when `menu_fill` fails 3:1 against adjacent panels. It is not a public fill token.
+- Plain `Tree.panel` intentionally maps to `input_fill`, not `list_panel_fill`, because Godot's `EditorResourcePicker` paints inspector value cells through plain `Tree.panel`. Visible list/tree surfaces stay on `ItemList.panel`, `TreeSecondary.panel`, and `TreeTable.panel`, which map to `list_panel_fill`.
 
 ### 6. Rejected Experiment: Categorical Accent Lanes
 
@@ -650,6 +652,13 @@ The research still matters, but the translation changes:
 - LDtk, casual game UI, Bootswatch Brite, and neubrutalism support stronger color confidence.
 - They do not require six arbitrary category lanes.
 - NeoCade should get more color by making the existing component groups more distinct per theme, while keeping each group semantically stable.
+
+Implementation guardrail added after live Bubble testing:
+
+- Known text-bearing surfaces must use their own `on_*` roles: panels use `on_panel`, dialogs use `on_dialog`, code/canvas areas use `on_code`, menu controls use `on_menu`, and selected rows use `on_selection`.
+- Transparent default text controls cannot know their parent background. In Bubble, no single fill color can pass 4.5:1 against both the dark shell and the cream islands, so default `Label`, `RichTextLabel`, `CheckBox`, and `CheckButton` now choose the ambient shell-readable `text_ambient` fill and receive a 1px `text_ambient_outline` only when light islands/code/input surfaces need the opposite polarity.
+- `PanelLabel`, `DialogLabel`, `PanelRichTextLabel`, `DialogRichTextLabel`, and component-local text remain clean fill-only on their known surfaces. `Header*` and `GraphFrameTitleLabel` use clean `on_panel` fills on intended panel/titlebar surfaces, plus a 1px `text_default_outline` fallback for accidental ambient-shell placement.
+- When a tab or editor-only variant deliberately paints `surface_fill` / `shell_fill`, its text must use `on_surface` / `text_muted_surface`, not the panel-readable `text_default`.
 
 New mockup target:
 
