@@ -584,6 +584,10 @@ File:
 
 - `.planning/mockups/editor-color-readability/godot-editor-role-groups-mockup.html`
 
+Palette appendix for reviewers:
+
+- `.planning/research/EDITOR-ROLE-GROUP-PRESET-PALETTE.md`
+
 ## Decision Update: Category Lanes Rejected For Current Direction
 
 The `category_1_fill` through `category_6_fill` experiment made the editor mockup more colorful, but it failed the consistency goal:
