@@ -140,6 +140,59 @@ Sources:
 - https://monokai.pro/
 - https://code.visualstudio.com/api/references/theme-color
 
+### New Brutalism, Neubrutalism, And Bootswatch
+
+New Brutalism / neubrutalism is relevant as a color reference, not as a full style direction. NeoCade should not adopt the heavy black block shadows, intentionally ugly outlines, harsh typography, or anti-polish layout behaviors. Those conflict with the current flat MD3/MD3 Expressive contract and the user's explicit feedback.
+
+The useful color lessons are:
+
+- Color is categorical, not ambient. Saturated colors are assigned to different UI functions/blocks instead of becoming one global tint.
+- High contrast is part of the visual identity, not a cleanup pass after the palette is chosen.
+- Black/white or near-black/near-white foregrounds are often used directly on saturated fills.
+- The strongest colors work best in compact roles: buttons, badges, tabs, labels, callouts, rails, and icons.
+- The palette should be disciplined. Two to six confident color lanes feel more intentional than every widget getting a random color.
+
+Bootswatch is especially useful because it shows a mature, component-system version of distinct theme personalities. Its catalog includes themes with explicit moods, and the current Bootswatch home page describes `Brite` as a "Neobrutalist form." The `Brite` variables are a strong reference for NeoCade's role-group colors:
+
+- blue `#61bcff`
+- indigo `#828df9`
+- purple `#be82fa`
+- pink `#ea4998`
+- red `#f56565`
+- orange `#fa984a`
+- yellow `#ffc700`
+- green `#68d391`
+- teal `#2ed3be`
+- cyan `#22d2ed`
+- lime `#a2e436`
+- primary = lime
+- focus ring = black
+
+Other Bootswatch lessons:
+
+- `Flatly` shows a safer flat palette: deep blue, green, cyan, yellow, red over conventional readable surfaces.
+- `Minty` shows softer casual color: mint primary, pink secondary, green, cyan, yellow, coral-red.
+- `Cyborg` and `Slate` show that dark themes can still use very readable light input fields; this is worth considering for Bubble and maybe optional editor-safe modes, though not mandatory for every theme.
+- `Vapor` proves that dark purple plus cyan/pink/green/yellow creates strong identity, but NeoCade should not copy it directly because the project has a hard no-cyberpunk/no-synthwave rule.
+
+NeoCade lesson:
+
+- Keep the component role-group model.
+- Let roles such as `action_fill`, `menu_fill`, `selection_fill`, `range_fill`, and `toggle_fill` be bold enough to feel like Bootswatch Brite / casual UI, but keep their meanings stable.
+- Avoid translating Bootswatch/neubrutalism into arbitrary per-item color lanes unless a future Godot API or user-authored content model gives those lanes real meaning.
+- Do not let these references pull NeoCade toward black block shadows or thick brutalist borders.
+
+Sources:
+
+- https://neubrutalism.com/
+- https://bootswatch.com/
+- https://bootswatch.com/5/brite/_variables.scss
+- https://bootswatch.com/5/flatly/_variables.scss
+- https://bootswatch.com/5/minty/_variables.scss
+- https://bootswatch.com/5/cyborg/_variables.scss
+- https://bootswatch.com/5/slate/_variables.scss
+- https://bootswatch.com/5/vapor/_variables.scss
+
 ### Casual And Mobile Game UI
 
 Casual/mobile game UI references are the strongest reminder that "colorful" does not mean "every component is saturated." The common pattern is:
@@ -154,8 +207,8 @@ Casual/mobile game UI references are the strongest reminder that "colorful" does
 This matters for NeoCade because Godot Theme can map component classes and states, but it cannot know arbitrary game content. The safe translation is:
 
 - Use readable panel/input/list foundations.
-- Add more compact categorical lanes.
-- Let icon/button/range/toggle/tab/rail roles carry the game UI mood.
+- Make component roles more chromatic and more distinct from each other.
+- Let button/menu/range/toggle/tab/selection roles carry the game UI mood.
 - Keep rewards/warnings/yellows compact unless the theme is a light-island game UI like Bubble.
 
 Reference patterns reviewed:
@@ -201,7 +254,7 @@ Local source evidence:
 
 Conclusion:
 
-NeoCade cannot reproduce LDtk's exact variety through generic Godot Theme slots alone because Godot Theme does not know what a user's items mean. LDtk knows "this entity is Gem" and "this IntGrid value is Water"; NeoCade sees "Tree row" or "Button." The best spiritual translation is categorical lanes: implicit, reusable colors for non-semantic differentiation.
+NeoCade cannot reproduce LDtk's exact variety through generic Godot Theme slots alone because Godot Theme does not know what a user's items mean. LDtk knows "this entity is Gem" and "this IntGrid value is Water"; NeoCade sees "Tree row" or "Button." The category-lane mockup explored a spiritual translation, but the current direction rejects arbitrary lanes in favor of stronger, stable component-group fills.
 
 ## Token Model Update
 
@@ -253,7 +306,9 @@ These retain common meaning and should not rotate by theme identity.
 
 `PrimaryButton` should consume `positive_fill`. Do not add a separate `PositiveButton` variation unless a future Godot/API reason appears. For destructive actions, pick one public variation name and keep it singular. Current planning preference remains `DangerButton`; if existing code says `NegativeButton`, rename rather than supporting both.
 
-### 5. Categorical Accent Lanes
+### 5. Rejected Experiment: Categorical Accent Lanes
+
+This section records the rejected experiment that produced `.planning/mockups/editor-color-readability/godot-editor-color-taxonomy-mockup.html`. It is useful evidence, but it is not the current implementation target.
 
 These restore the color variety that LDtk gets from explicit content colors:
 
@@ -296,29 +351,29 @@ Each theme has authored anchors for every role. Changing `source_color` shifts t
 | Inputs/lists/code | Very low to low | Avoid screenshot failure. |
 | Actions/menus/tabs | Medium | Let user color personalize UI chrome. |
 | Range/toggle/focus | Medium to high | Compact state indicators can carry more color. |
-| Category lanes | Medium, orbit-based | Keep multi-color variety while letting source color rotate the theme. |
+| Component role groups | Low to medium by role | Keep stable meanings while letting source color personalize the theme. |
 | Danger | Almost none | Red remains destructive/error. |
 | Positive/success/warning/info | Low | Preserve semantic expectations. |
 
-For category lanes, do not generate six tints of source color. Generate six hues from a theme-specific orbit around `source_color`, then clamp luminance/chroma per role. That keeps "one source color" workflow while still producing a multi-color palette.
+For component groups, do not generate six tints of source color. Each role keeps an authored theme anchor, and `source_color` nudges that anchor within safe bounds. That keeps the "one source color" workflow while preserving stable meanings like action, menu, input, selection, range, and toggle.
 
 ## Revised Theme Identities
 
 ### Pulse
 
-LDtk-inspired dark editor taxonomy: navy shell, blue input/menu surfaces, amber category/action markers, cyan rails, green state controls. Pulse should feel like a flat game editor, not like a yellow app.
+LDtk-inspired dark editor taxonomy: navy shell, blue input/menu/selection surfaces, amber action markers, green state controls. Pulse should feel like a flat game editor, not like a yellow app.
 
 ### Daybreak
 
-Coastal dawn: deep teal shell, mint/aqua focus and range, warm gold action, soft green and sky category lanes. It should feel bright and optimistic without becoming orange/brown or washed out.
+Coastal dawn: deep teal shell, mint/aqua focus and range, warm gold action, teal menu/selection roles. It should feel bright and optimistic without becoming orange/brown or washed out.
 
 ### Slate
 
-Futuristic/iOS-adjacent utility: graphite shell, icy blue focus, steel/lavender category lanes, restrained cyan actions. It can be quieter than the other themes, but still needs distinct lanes for tabs, rails, and icons.
+Futuristic/iOS-adjacent utility: graphite shell, icy blue focus/action/selection, steel menu roles, mint range/toggle. It can be quieter than the other themes, but the component groups still need distinct colors.
 
 ### Burst
 
-Reward/event UI: plum/indigo shell, gold action and reward markers, cyan/lime/violet lanes. It should feel celebratory, not random rainbow and not warning-yellow everywhere.
+Reward/event UI: plum/indigo shell, gold action and reward markers, violet menu/selection, lime range, green toggle. It should feel celebratory, not random rainbow and not warning-yellow everywhere.
 
 ### Bubble
 
@@ -327,16 +382,183 @@ Flat 3D mobile-game UI: dark outer shell with cream/sky light islands, blue prim
 ## Practical Guardrails For Implementation
 
 - No broad high-chroma yellow, orange, pink, magenta, or red on `LineEdit`, `TextEdit`, `CodeEdit`, `SpinBox`, `Tree`, or `ItemList`.
-- Lists and trees should get muted selected rows plus colorful rails/icons.
+- Lists and trees should get readable selected rows with the same `selection_fill` used by selected tabs and active object bars.
 - If a node has text on a fill, compute the foreground from that exact fill.
-- If a Label/RichTextLabel can be placed anywhere, default to `on_panel`/`on_surface` style text, not a category color.
-- Category lanes are for differentiation, not status.
-- Semantic status colors are separate from category lanes.
+- If a Label/RichTextLabel can be placed anywhere, default to `on_panel`/`on_surface` style text, not a decorative color.
+- Semantic status colors are separate from ordinary component role colors.
 - WCAG targets remain 4.5:1 for text and 3:1 for required non-text state indicators.
 
-## New Mockup Gate
+## General Color Rules
 
-Create a second editor mockup that is intentionally more colorful than the readability baseline:
+These rules are the implementation contract for choosing role fills.
+
+### 1. Size And Text Density Control Color Strength
+
+The larger and more text-heavy a painted area is, the quieter its fill should be.
+
+Broad surfaces should use low-chroma structural colors:
+
+- `surface_fill`
+- `shell_fill`
+- `panel_fill`
+- `panel_alt_fill`
+- `popup_shell`
+- `list_panel_fill`
+- `code_fill`
+
+Applies to:
+
+- `Panel`
+- `PanelContainer`
+- broad `Container` backgrounds when painted by an editor wrapper
+- `Tree`
+- `ItemList`
+- `TextEdit`
+- `CodeEdit`
+- `RichTextLabel` backgrounds when a visible panel is required
+- `GraphEdit` canvas/background regions
+
+These areas may be tinted by theme identity, but they should not be saturated billboards.
+
+### 2. Inputs Are Readable Fields, Not Accent Blocks
+
+Text-entry controls should prioritize long-form readability and editability.
+
+Applies to:
+
+- `LineEdit`
+- `TextEdit`
+- `CodeEdit`
+- `SpinBox`
+- `TreeLineEdit`
+- inspector value cells such as `EditorProperty.child_bg`
+- editor numeric fields such as `EditorSpinSlider.label_bg`
+
+Rules:
+
+- `input_fill` should be low to moderate chroma.
+- The fill should usually sit near `panel_fill` / `panel_alt_fill`, not near `action_fill`.
+- Theme personality should appear through `input_edge`, caret/focus color, text selection, and focus ring.
+- Never use high-chroma yellow, orange, pink, magenta, or red as a broad input fill.
+
+### 3. Small Interactables Can Carry More Color
+
+Compact controls can use stronger chroma because they occupy less area and usually communicate action or state.
+
+Applies to:
+
+- `Button`
+- `CheckBox`
+- `CheckButton`
+- radio/check indicators
+- `HSlider` / `VSlider`
+- `ProgressBar`
+- `ScrollBar`
+- compact toolbar/icon-button active states
+
+Rules:
+
+- `action_fill`, `range_fill`, `toggle_fill`, and `positive_fill` may be brighter than panels and inputs.
+- These fills still need computed `on_*` text/icon colors.
+- If the control has a large text label or large body, clamp the fill closer to the readable role range.
+
+### 4. Selection Is A Stable Role
+
+Selection should be colorful enough to be obvious, but not random.
+
+Applies to:
+
+- `Tree.selected`
+- `ItemList.selected`
+- selected `TabBar` / `TabContainer` tabs
+- active object bars
+- text selection highlight, with extra care for text readability
+
+Rules:
+
+- Use one `selection_fill` family, not arbitrary per-list/per-tab colors.
+- `selection_fill` must be distinct from `list_panel_fill` / `panel_fill`.
+- Text on selected rows/tabs must pass 4.5:1.
+
+### 5. Menus Sit Between Inputs And Actions
+
+Menu controls should feel interactive, but less primary than default action buttons.
+
+Applies to:
+
+- `OptionButton`
+- `MenuButton`
+- `PopupMenu` hover/selected rows
+- menu-like editor toolbar controls
+
+Rules:
+
+- `menu_fill` should be more chromatic than `input_fill`.
+- `menu_fill` should usually be less visually dominant than `action_fill`.
+- Popup rows can use `menu_fill` for hover/active, but normal popup shells should stay `popup_shell`.
+
+### 6. Semantic Colors Do Not Become Theme Decoration
+
+Status colors carry meaning and should stay stable across themes.
+
+Rules:
+
+- Red/red-pink is reserved for `danger_fill`, invalid/error states, and destructive actions.
+- Green/mint can be `positive_fill` / `success_fill` / `toggle_fill`, but should not imply success unless the state actually means success/on/confirmed.
+- Yellow/orange is acceptable for `action_fill`, reward-like compact accents, and warnings, but should not become broad input/list fill.
+- `DangerButton` is the destructive variation. `PrimaryButton` consumes `positive_fill`; do not add a separate `PositiveButton` unless a future API reason appears.
+
+### 7. Source Color Nudges Roles, It Does Not Flatten Them
+
+Each theme has authored role anchors. `source_color` shifts those anchors within safe bounds.
+
+Rules:
+
+- Structural surfaces get very low source-color pull.
+- Inputs/lists/code get very low to low source-color pull.
+- Actions/menus/selection get low to medium pull.
+- Range/toggle/focus can get medium to high pull because they are compact.
+- Danger gets almost no pull.
+- If `source_color` is red-family, non-danger roles reduce pull sharply to avoid accidental destructive meaning.
+
+### 8. Contrast Is Mandatory
+
+Every generated color must be checked after all source-color shifts.
+
+Rules:
+
+- Text and icons that communicate content: 4.5:1 minimum against their actual fill.
+- Required non-text state indicators: 3:1 minimum against adjacent colors.
+- Foreground colors are computed from the final resolved fill, not from the role name.
+- If the preferred theme foreground fails, fall back to near-black or white.
+
+## Fill Token Risk Groups
+
+Every `*_fill` token belongs to a risk group. The generator should choose chroma, tone, source-color pull, and contrast targets from the group before applying theme-specific personality.
+
+| Risk group | Tokens | Color strength | Source-color pull | Main rule |
+| --- | --- | --- | --- | --- |
+| Broad structural | `surface_fill`, `shell_fill`, `panel_fill`, `panel_alt_fill`, `popup_shell`, `code_fill` | Low chroma | Very low | Large painted regions must stay calm and readable. |
+| Dense text | `input_fill`, `list_panel_fill`, `list_row_hover`, `list_row_selected`, `text_selection_fill` | Low to moderate chroma | Very low to low | Text density wins over theme color. |
+| Navigation and selection | `selection_fill`, `tab_selected_fill`, `dialog_header` | Moderate chroma | Low to medium | Must be obvious, stable, and readable; no arbitrary per-tab colors. |
+| Menu interaction | `menu_fill` | Moderate chroma | Low to medium | More colorful than inputs, less dominant than action buttons. |
+| Compact action/state | `action_fill`, `range_fill`, `toggle_fill`, `focus_ring` | Moderate to high chroma | Medium to high | Color can be stronger because the painted area is compact. |
+| Semantic action/status | `positive_fill`, `success_fill`, `warning_fill`, `info_fill`, `danger_fill` | Meaning-driven | Very low to low, except safe personalization | Hue meaning is more important than theme variety. |
+| Utility lines | `separator_fill`, guide/grid/relationship line colors | Low to moderate contrast | Very low | Should structure the UI without becoming visual noise. |
+
+Implementation rules:
+
+- A token cannot opt into a stronger group just because a theme wants more color.
+- `source_color` may only shift a token within that token's risk group.
+- Broad structural and dense text tokens should never receive high-chroma yellow, orange, pink, magenta, or red.
+- `selection_fill` may be stronger than `list_row_selected`, but if one token is used for both selected tabs and selected rows, it must pass row text readability first.
+- `range_fill`, `toggle_fill`, and `focus_ring` must pass 3:1 as non-text indicators against their adjacent track/input/panel colors.
+- `danger_fill` is hue-locked to red-family. Red-family source colors should not pull non-danger tokens into red.
+- `positive_fill` is the source for `PrimaryButton`; do not create a separate `PositiveButton` color role.
+
+## Superseded Mockup Gate
+
+The category-lane mockup gate below has been superseded by the role-group direction. It remains here as a record of the rejected experiment:
 
 - Keep readable input/list/value-cell fills.
 - Add six category lanes and show them in tabs, rails, icons, badges, GraphEdit-like ports, and property strips.
@@ -346,3 +568,47 @@ Create a second editor mockup that is intentionally more colorful than the reada
 File:
 
 - `.planning/mockups/editor-color-readability/godot-editor-color-taxonomy-mockup.html`
+
+## Current Mockup Gate
+
+The active mockup target is component-group color only:
+
+- Use fewer fill roles with obvious meanings.
+- Make each fill group visually distinct enough to avoid the bland one-color-tint failure.
+- Do not assign unrelated colors to arbitrary tabs, icons, prefixes, masks, or tree rows.
+- Verify source-color stress behavior and contrast.
+
+File:
+
+- `.planning/mockups/editor-color-readability/godot-editor-role-groups-mockup.html`
+
+## Decision Update: Category Lanes Rejected For Current Direction
+
+The `category_1_fill` through `category_6_fill` experiment made the editor mockup more colorful, but it failed the consistency goal:
+
+- The roles were not obvious to a user. `category_4` has no plain meaning like "input", "menu", or "selection".
+- It encouraged per-item color assignment in places Godot Theme cannot naturally control, such as arbitrary tree icons, light mask cells, tab groups, and inspector prefixes.
+- It moved NeoCade away from the user's stated workflow goal: a theme should work out of the box without requiring per-control variations or per-item color authorship.
+- It made the palette feel less like component semantics and more like decorative scatter.
+
+The current approved direction is to dial back to component-group fills:
+
+- `action_fill`
+- `menu_fill`
+- `input_fill`
+- `selection_fill`
+- `range_fill`
+- `toggle_fill`
+- `positive_fill`
+- `danger_fill`
+- plus structural roles such as `surface_fill`, `panel_fill`, `popup_shell`, `dialog_header`, `separator_fill`, and `focus_ring`
+
+The research still matters, but the translation changes:
+
+- LDtk, casual game UI, Bootswatch Brite, and neubrutalism support stronger color confidence.
+- They do not require six arbitrary category lanes.
+- NeoCade should get more color by making the existing component groups more distinct per theme, while keeping each group semantically stable.
+
+New mockup target:
+
+- `.planning/mockups/editor-color-readability/godot-editor-role-groups-mockup.html`
